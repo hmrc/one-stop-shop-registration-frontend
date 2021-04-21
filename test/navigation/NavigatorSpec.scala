@@ -34,6 +34,37 @@ class NavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
+
+      "must go from Registered Company Name to Has Trading Name" in {
+
+        navigator.nextPage(RegisteredCompanyNamePage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+
+      "must go from Has Trading Name" - {
+
+        "to Trading Name when the user answers true" in {
+
+          val answers = emptyUserAnswers.set(HasTradingNamePage, true).success.value
+
+          navigator.nextPage(HasTradingNamePage, NormalMode, answers)
+            .mustBe(routes.TradingNameController.onPageLoad(NormalMode))
+        }
+
+        "to Part of VAT Group when the user answers false" in {
+
+          val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+
+          navigator.nextPage(HasTradingNamePage, NormalMode, answers)
+            .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Trading Name to Part of VAT Group" in {
+
+        navigator.nextPage(TradingNamePage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+      }
     }
 
     "in Check mode" - {
