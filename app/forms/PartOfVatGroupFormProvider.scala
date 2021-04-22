@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import org.scalacheck.Arbitrary
-import pages._
+import javax.inject.Inject
 
-trait PageGenerators {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  implicit lazy val arbitraryTradingNamePage: Arbitrary[TradingNamePage.type] =
-    Arbitrary(TradingNamePage)
+class PartOfVatGroupFormProvider @Inject() extends Mappings {
 
-  implicit lazy val arbitraryRegisteredCompanyNamePage: Arbitrary[RegisteredCompanyNamePage.type] =
-    Arbitrary(RegisteredCompanyNamePage)
-
-  implicit lazy val arbitraryPartOfVatGroupPage: Arbitrary[PartOfVatGroupPage.type] =
-    Arbitrary(PartOfVatGroupPage)
-
-  implicit lazy val arbitraryHasTradingNamePage: Arbitrary[HasTradingNamePage.type] =
-    Arbitrary(HasTradingNamePage)
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("partOfVatGroup.error.required")
+    )
 }

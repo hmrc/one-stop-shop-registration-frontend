@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import org.scalacheck.Arbitrary
-import pages._
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-trait PageGenerators {
+class PartOfVatGroupFormProviderSpec extends BooleanFieldBehaviours {
 
-  implicit lazy val arbitraryTradingNamePage: Arbitrary[TradingNamePage.type] =
-    Arbitrary(TradingNamePage)
+  val requiredKey = "partOfVatGroup.error.required"
+  val invalidKey = "error.boolean"
 
-  implicit lazy val arbitraryRegisteredCompanyNamePage: Arbitrary[RegisteredCompanyNamePage.type] =
-    Arbitrary(RegisteredCompanyNamePage)
+  val form = new PartOfVatGroupFormProvider()()
 
-  implicit lazy val arbitraryPartOfVatGroupPage: Arbitrary[PartOfVatGroupPage.type] =
-    Arbitrary(PartOfVatGroupPage)
+  ".value" - {
 
-  implicit lazy val arbitraryHasTradingNamePage: Arbitrary[HasTradingNamePage.type] =
-    Arbitrary(HasTradingNamePage)
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

@@ -27,7 +27,16 @@ import models._
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case _ => _ => routes.IndexController.onPageLoad()
+    case RegisteredCompanyNamePage => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
+    case HasTradingNamePage        => hasTradingNameRoute
+    case TradingNamePage           => _ => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+    case _                         => _ => routes.IndexController.onPageLoad()
+  }
+
+  private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
+    case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode)
+    case Some(false) => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+    case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

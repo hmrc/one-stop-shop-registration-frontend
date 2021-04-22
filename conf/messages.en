@@ -55,3 +55,29 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+hasTradingName.title = hasTradingName
+hasTradingName.heading = hasTradingName
+hasTradingName.checkYourAnswersLabel = hasTradingName
+hasTradingName.error.required = Select yes if hasTradingName
+hasTradingName.change.hidden = HasTradingName
+
+partOfVatGroup.title = partOfVatGroup
+partOfVatGroup.heading = partOfVatGroup
+partOfVatGroup.checkYourAnswersLabel = partOfVatGroup
+partOfVatGroup.error.required = Select yes if partOfVatGroup
+partOfVatGroup.change.hidden = PartOfVatGroup
+
+registeredCompanyName.title = registeredCompanyName
+registeredCompanyName.heading = registeredCompanyName
+registeredCompanyName.checkYourAnswersLabel = registeredCompanyName
+registeredCompanyName.error.required = Enter registeredCompanyName
+registeredCompanyName.error.length = RegisteredCompanyName must be 100 characters or less
+registeredCompanyName.change.hidden = RegisteredCompanyName
+
+tradingName.title = tradingName
+tradingName.heading = tradingName
+tradingName.checkYourAnswersLabel = tradingName
+tradingName.error.required = Enter tradingName
+tradingName.error.length = TradingName must be 100 characters or less
+tradingName.change.hidden = TradingName
