@@ -124,7 +124,7 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Session Expired for a GET if no existing data is found" in {
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -138,7 +138,7 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Session Expired for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
