@@ -18,12 +18,14 @@ package controllers
 
 import controllers.actions._
 import forms.HasTradingNameFormProvider
+
 import javax.inject.Inject
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
-import pages.HasTradingNamePage
+import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HasTradingNameView
@@ -42,31 +44,46 @@ class HasTradingNameController @Inject()(
                                          view: HasTradingNameView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
-
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getRegisteredCompanyName {
+        registeredCompanyName =>
 
-      val preparedForm = request.userAnswers.get(HasTradingNamePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val form = formProvider(registeredCompanyName)
+
+          val preparedForm = request.userAnswers.get(HasTradingNamePage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Future.successful(Ok(view(preparedForm, mode, registeredCompanyName)))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getRegisteredCompanyName {
+        registeredCompanyName =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          val form = formProvider(registeredCompanyName)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasTradingNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HasTradingNamePage, mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, registeredCompanyName))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(HasTradingNamePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(HasTradingNamePage, mode, updatedAnswers))
+        )
+      }
   }
+
+  private def getRegisteredCompanyName(block: String => Future[Result])
+                                      (implicit request: DataRequest[AnyContent]) =
+    request.userAnswers.get(RegisteredCompanyNamePage).map {
+      name =>
+        block(name)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

@@ -23,7 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.HasTradingNamePage
+import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -35,18 +35,21 @@ import scala.concurrent.Future
 
 class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new HasTradingNameFormProvider()
-  val form = formProvider()
+  private val registeredCompanyName = "foo"
+  private val formProvider = new HasTradingNameFormProvider()
+  private val form = formProvider(registeredCompanyName)
 
-  lazy val hasTradingNameRoute = routes.HasTradingNameController.onPageLoad(NormalMode).url
+  private lazy val hasTradingNameRoute = routes.HasTradingNameController.onPageLoad(NormalMode).url
+
+  private val baseUserAnswers = emptyUserAnswers.set(RegisteredCompanyNamePage, registeredCompanyName).success.value
 
   "HasTradingName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasTradingNameRoute)
@@ -56,13 +59,13 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[HasTradingNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, registeredCompanyName)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(HasTradingNamePage, true).success.value
+      val userAnswers = baseUserAnswers.set(HasTradingNamePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +77,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, registeredCompanyName)(request, messages(application)).toString
       }
     }
 
@@ -85,7 +88,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -106,7 +109,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request =
@@ -120,7 +123,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, registeredCompanyName)(request, messages(application)).toString
       }
     }
 
@@ -138,9 +141,39 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a GET if Registered Company Name has not been answered" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasTradingNameRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, hasTradingNameRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if Registered Company Name has not been answered" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
