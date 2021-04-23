@@ -1,4 +1,4 @@
-service.name = one-stop-shop-registration-frontend
+service.name = Register for One Stop Shop
 
 site.back = Back
 site.remove = Remove
@@ -56,28 +56,28 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-hasTradingName.title = hasTradingName
-hasTradingName.heading = hasTradingName
-hasTradingName.checkYourAnswersLabel = hasTradingName
-hasTradingName.error.required = Select yes if hasTradingName
-hasTradingName.change.hidden = HasTradingName
+hasTradingName.title = Does your business trade using a different name?
+hasTradingName.heading = Does your business trade using a name other than {0}?
+hasTradingName.checkYourAnswersLabel = Does your business trade using a name other than {0}?
+hasTradingName.error.required = Select yes if your business trades using a name other than {0}
+hasTradingName.change.hidden = if your business trades using a name other than {0}
 
-partOfVatGroup.title = partOfVatGroup
-partOfVatGroup.heading = partOfVatGroup
-partOfVatGroup.checkYourAnswersLabel = partOfVatGroup
-partOfVatGroup.error.required = Select yes if partOfVatGroup
-partOfVatGroup.change.hidden = PartOfVatGroup
+partOfVatGroup.title = Is the business you’re registering part of a VAT group?
+partOfVatGroup.heading = Is the business you’re registering part of a VAT group?
+partOfVatGroup.checkYourAnswersLabel = Is the business you’re registering part of a VAT group?
+partOfVatGroup.error.required = Select yes if the business you’re registering is part of a VAT group
+partOfVatGroup.change.hidden = if the business you’re registering is part of a VAT group
 
-registeredCompanyName.title = registeredCompanyName
-registeredCompanyName.heading = registeredCompanyName
-registeredCompanyName.checkYourAnswersLabel = registeredCompanyName
-registeredCompanyName.error.required = Enter registeredCompanyName
-registeredCompanyName.error.length = RegisteredCompanyName must be 100 characters or less
-registeredCompanyName.change.hidden = RegisteredCompanyName
+registeredCompanyName.title = What is the registered company name?
+registeredCompanyName.heading = What is the registered company name?
+registeredCompanyName.checkYourAnswersLabel = What is the registered company name?
+registeredCompanyName.error.required = Enter the registered company name
+registeredCompanyName.error.length = The registered company name must be 100 characters or less
+registeredCompanyName.change.hidden = the registered company name
 
-tradingName.title = tradingName
-tradingName.heading = tradingName
-tradingName.checkYourAnswersLabel = tradingName
-tradingName.error.required = Enter tradingName
-tradingName.error.length = TradingName must be 100 characters or less
-tradingName.change.hidden = TradingName
+tradingName.title = What is your trading name?
+tradingName.heading = What is your trading name?
+tradingName.checkYourAnswersLabel = What is your trading name?
+tradingName.error.required = Enter your trading name
+tradingName.error.length = Your trading name must be 100 characters or less
+tradingName.change.hidden = your trading name
