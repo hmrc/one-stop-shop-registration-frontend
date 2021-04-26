@@ -62,7 +62,7 @@ class UkVatRegisteredPostcodeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(UkVatRegisteredPostcodePage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UkVatRegisteredPostcodePage, "NE1 2RA").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +74,7 @@ class UkVatRegisteredPostcodeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("NE1 2RA"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -95,7 +95,7 @@ class UkVatRegisteredPostcodeControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, ukVatRegisteredPostcodeRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "NE1 2RA"))
 
         val result = route(application, request).value
 
@@ -145,7 +145,7 @@ class UkVatRegisteredPostcodeControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, ukVatRegisteredPostcodeRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "NE1 2RA"))
 
         val result = route(application, request).value
 

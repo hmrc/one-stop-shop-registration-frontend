@@ -103,5 +103,6 @@ ukVatRegisteredPostcode.title = ukVatRegisteredPostcode
 ukVatRegisteredPostcode.heading = ukVatRegisteredPostcode
 ukVatRegisteredPostcode.checkYourAnswersLabel = ukVatRegisteredPostcode
 ukVatRegisteredPostcode.error.required = Enter ukVatRegisteredPostcode
+ukVatRegisteredPostcode.error.invalid = Enter a valid Postcode
 ukVatRegisteredPostcode.error.length = UkVatRegisteredPostcode must be 9 characters or less
 ukVatRegisteredPostcode.change.hidden = UkVatRegisteredPostcode

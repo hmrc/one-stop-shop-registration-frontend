@@ -23,9 +23,11 @@ import play.api.data.Form
 
 class UkVatRegisteredPostcodeFormProvider @Inject() extends Mappings {
 
+  val pattern: String = """^[ ]*[A-Za-z][ ]*[A-Za-z]{0,1}[ ]*[0-9][ ]*[0-9A-Za-z]{0,1}[ ]*[0-9][ ]*[A-Za-z][ ]*[A-Za-z][ ]*$"""
+
   def apply(): Form[String] =
     Form(
       "value" -> text("ukVatRegisteredPostcode.error.required")
-        .verifying(maxLength(9, "ukVatRegisteredPostcode.error.length"))
+        .verifying(regexp(pattern, "ukVatRegisteredPostcode.error.invalid"))
     )
 }
