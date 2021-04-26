@@ -33,7 +33,7 @@ object UkVatNumberSummary  {
 
         SummaryListRowViewModel(
           key     = "ukVatNumber.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(HtmlFormat.escape(answer.vrn).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.UkVatNumberController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("ukVatNumber.change.hidden"))

@@ -19,6 +19,15 @@ package generators
 import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
+import uk.gov.hmrc.domain.Vrn
 
 trait ModelGenerators {
+
+  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
+    for {
+      chars <- Gen.listOfN(9, Gen.numChar)
+    } yield {
+      Vrn("GB" + chars.mkString(""))
+    }
+  }
 }

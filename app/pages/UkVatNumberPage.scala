@@ -17,8 +17,9 @@
 package pages
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.domain.Vrn
 
-case object UkVatNumberPage extends QuestionPage[String] {
+case object UkVatNumberPage extends QuestionPage[Vrn] {
 
   override def path: JsPath = JsPath \ toString
 

@@ -17,16 +17,17 @@
 package pages
 
 import pages.behaviours.PageBehaviours
+import uk.gov.hmrc.domain.Vrn
 
 
 class UkVatNumberPageSpec extends PageBehaviours {
 
   "UkVatNumberPage" - {
 
-    beRetrievable[String](UkVatNumberPage)
+    beRetrievable[Vrn](UkVatNumberPage)
 
-    beSettable[String](UkVatNumberPage)
+    beSettable[Vrn](UkVatNumberPage)
 
-    beRemovable[String](UkVatNumberPage)
+    beRemovable[Vrn](UkVatNumberPage)
   }
 }

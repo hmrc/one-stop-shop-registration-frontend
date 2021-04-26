@@ -17,15 +17,16 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
 import play.api.data.Form
+import uk.gov.hmrc.domain.Vrn
 
 class UkVatNumberFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[Vrn] =
     Form(
       "value" -> text("ukVatNumber.error.required")
         .verifying(maxLength(11, "ukVatNumber.error.length"))
+        .transform[Vrn](Vrn.apply, _.vrn)
     )
 }
