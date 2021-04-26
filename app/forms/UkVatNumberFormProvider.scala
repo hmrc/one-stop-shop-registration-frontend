@@ -23,10 +23,12 @@ import uk.gov.hmrc.domain.Vrn
 
 class UkVatNumberFormProvider @Inject() extends Mappings {
 
+  val pattern: String = "(?:[Gg][Bb])?\\d{9}"
+
   def apply(): Form[Vrn] =
     Form(
       "value" -> text("ukVatNumber.error.required")
-        .verifying(maxLength(11, "ukVatNumber.error.length"))
+        .verifying(regexp(pattern, "ukVatNumber.error.invalid"))
         .transform[Vrn](Vrn.apply, _.vrn)
     )
 }

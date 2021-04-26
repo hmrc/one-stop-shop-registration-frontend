@@ -63,7 +63,7 @@ class UkVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(UkVatNumberPage, Vrn("answer")).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(UkVatNumberPage, Vrn("GB123456789")).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,7 +75,7 @@ class UkVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Vrn("answer")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Vrn("GB123456789")), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -96,7 +96,7 @@ class UkVatNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, ukVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "GB123456789"))
 
         val result = route(application, request).value
 
@@ -146,7 +146,7 @@ class UkVatNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, ukVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "GB123456789"))
 
         val result = route(application, request).value
 

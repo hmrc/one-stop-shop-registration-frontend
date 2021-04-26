@@ -17,7 +17,9 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
+import uk.gov.hmrc.domain.Vrn
 
 class UkVatNumberFormProviderSpec extends StringFieldBehaviours {
 
@@ -25,7 +27,8 @@ class UkVatNumberFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "ukVatNumber.error.length"
   val maxLength = 11
 
-  val form = new UkVatNumberFormProvider()()
+  val formProvider = new UkVatNumberFormProvider()
+  val form = formProvider()
 
   ".value" - {
 
@@ -34,15 +37,14 @@ class UkVatNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      arbitrary[Vrn].map(_.vrn)
     )
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
+    "must not bind invalid data" in {
+      val invalidData = "invalid"
+      val result = form.bind(Map(fieldName -> invalidData)).apply(fieldName)
+      result.errors must contain only FormError(fieldName, "ukVatNumber.error.invalid", Seq(formProvider.pattern))
+    }
 
     behave like mandatoryField(
       form,

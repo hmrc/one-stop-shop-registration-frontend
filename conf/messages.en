@@ -96,7 +96,7 @@ ukVatNumber.title = ukVatNumber
 ukVatNumber.heading = ukVatNumber
 ukVatNumber.checkYourAnswersLabel = ukVatNumber
 ukVatNumber.error.required = Enter ukVatNumber
-ukVatNumber.error.length = UkVatNumber must be 11 characters or less
+ukVatNumber.error.invalid = VAT Number must be GB followed by 9 digits
 ukVatNumber.change.hidden = UkVatNumber
 
 ukVatRegisteredPostcode.title = ukVatRegisteredPostcode
