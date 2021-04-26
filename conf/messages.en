@@ -81,3 +81,27 @@ tradingName.checkYourAnswersLabel = What is your trading name?
 tradingName.error.required = Enter your trading name
 tradingName.error.length = Your trading name must be 100 characters or less
 tradingName.change.hidden = your trading name
+
+ukVatEffectiveDate.title = UkVatEffectiveDate
+ukVatEffectiveDate.heading = UkVatEffectiveDate
+ukVatEffectiveDate.hint = For example, 12 11 2007
+ukVatEffectiveDate.checkYourAnswersLabel = UkVatEffectiveDate
+ukVatEffectiveDate.error.required.all = Enter the ukVatEffectiveDate
+ukVatEffectiveDate.error.required.two = The ukVatEffectiveDate must include {0} and {1}
+ukVatEffectiveDate.error.required = The ukVatEffectiveDate must include {0}
+ukVatEffectiveDate.error.invalid = Enter a real UkVatEffectiveDate
+ukVatEffectiveDate.change.hidden = UkVatEffectiveDate
+
+ukVatNumber.title = ukVatNumber
+ukVatNumber.heading = ukVatNumber
+ukVatNumber.checkYourAnswersLabel = ukVatNumber
+ukVatNumber.error.required = Enter ukVatNumber
+ukVatNumber.error.length = UkVatNumber must be 11 characters or less
+ukVatNumber.change.hidden = UkVatNumber
+
+ukVatRegisteredPostcode.title = ukVatRegisteredPostcode
+ukVatRegisteredPostcode.heading = ukVatRegisteredPostcode
+ukVatRegisteredPostcode.checkYourAnswersLabel = ukVatRegisteredPostcode
+ukVatRegisteredPostcode.error.required = Enter ukVatRegisteredPostcode
+ukVatRegisteredPostcode.error.length = UkVatRegisteredPostcode must be 9 characters or less
+ukVatRegisteredPostcode.change.hidden = UkVatRegisteredPostcode
