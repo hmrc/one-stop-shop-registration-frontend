@@ -65,6 +65,24 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(TradingNamePage, NormalMode, emptyUserAnswers)
           .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
       }
+
+      "must go from Part of VAT Group to UK VAT Number" in {
+
+        navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.UkVatNumberController.onPageLoad(NormalMode))
+      }
+
+      "must go from UK VAT Number to UK VAT Effective Date" in {
+
+        navigator.nextPage(UkVatNumberPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+      }
+
+      "must go from UK VAT Effective Date to UK VAT Registered Postcode" in {
+
+        navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode))
+      }
     }
 
     "in Check mode" - {
