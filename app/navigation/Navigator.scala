@@ -36,6 +36,8 @@ class Navigator @Inject()() {
     case UkVatRegisteredPostcodePage => _ => routes.VatRegisteredInEuController.onPageLoad(NormalMode)
     case VatRegisteredInEuPage => isEuVatRegistered
     case VatRegisteredEuMemberStatePage => _ => routes.EuVatNumberController.onPageLoad(NormalMode)
+    case EuVatNumberPage => _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode)
+    case AddAdditionalEuVatDetailsPage => hasAdditionalEuVatDetails
     case _                         => _ => routes.IndexController.onPageLoad()
   }
 
@@ -47,6 +49,12 @@ class Navigator @Inject()() {
 
   private def isEuVatRegistered(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
     case Some(true)  => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode)
+    case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  private def hasAdditionalEuVatDetails(answers: UserAnswers): Call = answers.get(AddAdditionalEuVatDetailsPage) match {
+    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode)
     case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }

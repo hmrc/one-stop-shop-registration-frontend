@@ -115,6 +115,30 @@ class NavigatorSpec extends SpecBase {
           .mustBe(routes.EuVatNumberController.onPageLoad(NormalMode))
       }
 
+      "must got to Add Additional EU VAT Details from EU VAT Number" in {
+
+        navigator.nextPage(EuVatNumberPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
+      }
+
+      "must go from Add Additional EU VAT Details" - {
+
+        "to VAT Registered EU Member State when the user answers true" in {
+
+          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, true).success.value
+
+          navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
+            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode))
+        }
+
+        "TO DO - User answers FALSE" in {
+
+          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, false).success.value
+
+          navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
+            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+        }
+      }
     }
 
     "in Check mode" - {
