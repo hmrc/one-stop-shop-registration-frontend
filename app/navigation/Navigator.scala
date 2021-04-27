@@ -30,6 +30,9 @@ class Navigator @Inject()() {
     case RegisteredCompanyNamePage => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
     case HasTradingNamePage        => hasTradingNameRoute
     case TradingNamePage           => _ => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+    case PartOfVatGroupPage        => _ => routes.UkVatNumberController.onPageLoad(NormalMode)
+    case UkVatNumberPage           => _ => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
+    case UkVatEffectiveDatePage    => _ => routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode)
     case _                         => _ => routes.IndexController.onPageLoad()
   }
 

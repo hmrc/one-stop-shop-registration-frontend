@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.domain.Vrn
+import java.time.{LocalDate, ZoneOffset}
 
-trait ModelGenerators {
+import forms.behaviours.DateBehaviours
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
+class UkVatEffectiveDateFormProviderSpec extends DateBehaviours {
+
+  val form = new UkVatEffectiveDateFormProvider()()
+
+  ".value" - {
+
+    val validData = datesBetween(
+      min = LocalDate.of(2000, 1, 1),
+      max = LocalDate.now(ZoneOffset.UTC)
+    )
+
+    behave like dateField(form, "value", validData)
+
+    behave like mandatoryDateField(form, "value", "ukVatEffectiveDate.error.required.all")
   }
 }

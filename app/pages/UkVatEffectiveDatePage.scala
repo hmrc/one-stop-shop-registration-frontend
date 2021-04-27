@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.domain.Vrn
+import java.time.LocalDate
 
-trait ModelGenerators {
+import play.api.libs.json.JsPath
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
-  }
+case object UkVatEffectiveDatePage extends QuestionPage[LocalDate] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "ukVatEffectiveDate"
 }

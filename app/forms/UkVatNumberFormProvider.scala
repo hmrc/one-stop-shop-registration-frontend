@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
 import uk.gov.hmrc.domain.Vrn
 
-trait ModelGenerators {
+class UkVatNumberFormProvider @Inject() extends Mappings {
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
-  }
+  val pattern: String = "(?:[Gg][Bb])?\\d{9}"
+
+  def apply(): Form[Vrn] =
+    Form(
+      "value" -> text("ukVatNumber.error.required")
+        .verifying(regexp(pattern, "ukVatNumber.error.invalid"))
+        .transform[Vrn](Vrn.apply, _.vrn)
+    )
 }

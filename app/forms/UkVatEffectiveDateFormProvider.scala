@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.domain.Vrn
+import java.time.LocalDate
 
-trait ModelGenerators {
+import forms.mappings.Mappings
+import javax.inject.Inject
+import play.api.data.Form
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
-  }
+class UkVatEffectiveDateFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[LocalDate] =
+    Form(
+      "value" -> localDate(
+        invalidKey     = "ukVatEffectiveDate.error.invalid",
+        allRequiredKey = "ukVatEffectiveDate.error.required.all",
+        twoRequiredKey = "ukVatEffectiveDate.error.required.two",
+        requiredKey    = "ukVatEffectiveDate.error.required"
+      )
+    )
 }

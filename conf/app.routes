@@ -40,3 +40,18 @@ GET        /tradingName                        controllers.TradingNameController
 POST       /tradingName                        controllers.TradingNameController.onSubmit(mode: Mode = NormalMode)
 GET        /changeTradingName                  controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeTradingName                  controllers.TradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /ukVatEffectiveDate                  controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
+POST       /ukVatEffectiveDate                  controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
+GET        /changeUkVatEffectiveDate                        controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeUkVatEffectiveDate                        controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
+
+GET        /ukVatNumber                        controllers.UkVatNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /ukVatNumber                        controllers.UkVatNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeUkVatNumber                  controllers.UkVatNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeUkVatNumber                  controllers.UkVatNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = NormalMode)
+POST       /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = NormalMode)
+GET        /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = CheckMode)

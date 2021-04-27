@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.JsPath
 import uk.gov.hmrc.domain.Vrn
 
-trait ModelGenerators {
+case object UkVatNumberPage extends QuestionPage[Vrn] {
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
-  }
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "ukVatNumber"
 }

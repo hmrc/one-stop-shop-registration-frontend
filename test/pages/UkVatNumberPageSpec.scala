@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Vrn
 
-trait ModelGenerators {
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
+class UkVatNumberPageSpec extends PageBehaviours {
+
+  "UkVatNumberPage" - {
+
+    beRetrievable[Vrn](UkVatNumberPage)
+
+    beSettable[Vrn](UkVatNumberPage)
+
+    beRemovable[Vrn](UkVatNumberPage)
   }
 }

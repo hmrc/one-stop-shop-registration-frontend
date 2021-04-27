@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.domain.Vrn
+import javax.inject.Inject
 
-trait ModelGenerators {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
-    }
-  }
+class UkVatRegisteredPostcodeFormProvider @Inject() extends Mappings {
+
+  val pattern: String = """^[ ]*[A-Za-z][ ]*[A-Za-z]{0,1}[ ]*[0-9][ ]*[0-9A-Za-z]{0,1}[ ]*[0-9][ ]*[A-Za-z][ ]*[A-Za-z][ ]*$"""
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("ukVatRegisteredPostcode.error.required")
+        .verifying(regexp(pattern, "ukVatRegisteredPostcode.error.invalid"))
+    )
 }

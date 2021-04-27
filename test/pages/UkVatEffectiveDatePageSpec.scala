@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.domain.Vrn
+import java.time.LocalDate
 
-trait ModelGenerators {
+import org.scalacheck.Arbitrary
+import pages.behaviours.PageBehaviours
 
-  implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
-    for {
-      chars <- Gen.listOfN(9, Gen.numChar)
-    } yield {
-      Vrn("GB" + chars.mkString(""))
+class UkVatEffectiveDatePageSpec extends PageBehaviours {
+
+  "UkVatEffectiveDatePage" - {
+
+    implicit lazy val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary {
+      datesBetween(LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1))
     }
+
+    beRetrievable[LocalDate](UkVatEffectiveDatePage)
+
+    beSettable[LocalDate](UkVatEffectiveDatePage)
+
+    beRemovable[LocalDate](UkVatEffectiveDatePage)
   }
 }
