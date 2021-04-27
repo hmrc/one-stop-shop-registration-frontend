@@ -33,12 +33,21 @@ class Navigator @Inject()() {
     case PartOfVatGroupPage        => _ => routes.UkVatNumberController.onPageLoad(NormalMode)
     case UkVatNumberPage           => _ => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
     case UkVatEffectiveDatePage    => _ => routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode)
+    case UkVatRegisteredPostcodePage => _ => routes.VatRegisteredInEuController.onPageLoad(NormalMode)
+    case VatRegisteredInEuPage => isEuVatRegistered
+    case VatRegisteredEuMemberStatePage => _ => routes.EuVatNumberController.onPageLoad(NormalMode)
     case _                         => _ => routes.IndexController.onPageLoad()
   }
 
   private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
     case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode)
     case Some(false) => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  private def isEuVatRegistered(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
+    case Some(true)  => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode)
+    case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 

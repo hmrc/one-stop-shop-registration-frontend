@@ -83,6 +83,38 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
           .mustBe(routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode))
       }
+
+      "must go from UK VAT Registered Postcode to VAT Registered in EU" in {
+
+        navigator.nextPage(UkVatRegisteredPostcodePage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.VatRegisteredInEuController.onPageLoad(NormalMode))
+      }
+
+      "must go from VAT Registered in EU" - {
+
+        "to VAT Registered EU Member State when the user answers true" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
+
+          navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
+            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode))
+        }
+
+        "TO DO - User answers FALSE" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
+
+          navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
+            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must got to EU VAT Number from VAT Registered EU Member State" in {
+
+        navigator.nextPage(VatRegisteredEuMemberStatePage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.EuVatNumberController.onPageLoad(NormalMode))
+      }
+
     }
 
     "in Check mode" - {
