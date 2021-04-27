@@ -70,3 +70,8 @@ GET        /vatRegisteredInEu                        controllers.VatRegisteredIn
 POST       /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
 GET        /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+
+GET        /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
