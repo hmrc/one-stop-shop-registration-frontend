@@ -22,8 +22,6 @@ import play.api.data.FormError
 class UkVatRegisteredPostcodeFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "ukVatRegisteredPostcode.error.required"
-//  val lengthKey = "ukVatRegisteredPostcode.error.length"
-//  val maxLength = 9
 
   val formProvider = new UkVatRegisteredPostcodeFormProvider()
   val form = formProvider()
@@ -34,7 +32,7 @@ class UkVatRegisteredPostcodeFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "value"
 
     "must bind valid postcode" in {
-      val postCode = "NE1 2RA"
+      val postCode = "AA1 1AA"
       val result = form.bind(Map(fieldName -> postCode)).apply(fieldName)
       result.value.value mustBe postCode
       result.errors mustBe empty
