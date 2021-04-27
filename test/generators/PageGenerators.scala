@@ -21,6 +21,15 @@ import pages._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryVatRegisteredInEuPage: Arbitrary[VatRegisteredInEuPage.type] =
+    Arbitrary(VatRegisteredInEuPage)
+
+  implicit lazy val arbitraryVatRegisteredEuMemberStatePage: Arbitrary[VatRegisteredEuMemberStatePage.type] =
+    Arbitrary(VatRegisteredEuMemberStatePage)
+
+  implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage.type] =
+    Arbitrary(EuVatNumberPage)
+
   implicit lazy val arbitraryUkVatRegisteredPostcodePage: Arbitrary[UkVatRegisteredPostcodePage.type] =
     Arbitrary(UkVatRegisteredPostcodePage)
 

@@ -55,3 +55,18 @@ GET        /ukVatRegisteredPostcode                        controllers.UkVatRegi
 POST       /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = NormalMode)
 GET        /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /euVatNumber                        controllers.EuVatNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /euVatNumber                        controllers.EuVatNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeEuVatNumber                  controllers.EuVatNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeEuVatNumber                  controllers.EuVatNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /vatRegisteredEuMemberState                        controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = NormalMode)
+POST       /vatRegisteredEuMemberState                        controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = NormalMode)
+GET        /changeVatRegisteredEuMemberState                  controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeVatRegisteredEuMemberState                  controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = CheckMode)
+
+GET        /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
+POST       /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
+GET        /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)

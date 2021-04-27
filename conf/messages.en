@@ -106,3 +106,23 @@ ukVatRegisteredPostcode.error.required = Enter the postcode where your business 
 ukVatRegisteredPostcode.error.invalid = Enter a valid postcode
 ukVatRegisteredPostcode.error.length = Postcode must be 9 characters or less
 ukVatRegisteredPostcode.change.hidden = the postcode where your business is registered for UK VAT
+
+euVatNumber.title = euVatNumber
+euVatNumber.heading = euVatNumber
+euVatNumber.checkYourAnswersLabel = euVatNumber
+euVatNumber.error.required = Enter euVatNumber
+euVatNumber.error.length = EuVatNumber must be 100 characters or less
+euVatNumber.change.hidden = EuVatNumber
+
+vatRegisteredEuMemberState.title = vatRegisteredEuMemberState
+vatRegisteredEuMemberState.heading = vatRegisteredEuMemberState
+vatRegisteredEuMemberState.checkYourAnswersLabel = vatRegisteredEuMemberState
+vatRegisteredEuMemberState.error.required = Enter vatRegisteredEuMemberState
+vatRegisteredEuMemberState.error.length = VatRegisteredEuMemberState must be 100 characters or less
+vatRegisteredEuMemberState.change.hidden = VatRegisteredEuMemberState
+
+vatRegisteredInEu.title = vatRegisteredInEu
+vatRegisteredInEu.heading = vatRegisteredInEu
+vatRegisteredInEu.checkYourAnswersLabel = vatRegisteredInEu
+vatRegisteredInEu.error.required = Select yes if vatRegisteredInEu
+vatRegisteredInEu.change.hidden = VatRegisteredInEu
