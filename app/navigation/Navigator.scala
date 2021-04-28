@@ -54,7 +54,7 @@ class Navigator @Inject()() {
   }
 
   def hasAdditionalEuVatDetails(answers: UserAnswers): Call = answers.get(AddAdditionalEuVatDetailsPage) match {
-    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(answers.get(DeriveNumberOfEuVatRegisteredCountries).get + 1))
+    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(answers.get(DeriveNumberOfEuVatRegisteredCountries).get))
     case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
