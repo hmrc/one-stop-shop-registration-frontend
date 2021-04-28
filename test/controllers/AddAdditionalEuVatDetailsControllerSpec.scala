@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.AddAdditionalEuVatDetailsFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

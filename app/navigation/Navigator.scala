@@ -53,10 +53,11 @@ class Navigator @Inject()() {
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  def hasAdditionalEuVatDetails(answers: UserAnswers): Call = answers.get(AddAdditionalEuVatDetailsPage) match {
-    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(answers.get(DeriveNumberOfEuVatRegisteredCountries).get))
-    case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
-    case None        => routes.JourneyRecoveryController.onPageLoad()
+  def hasAdditionalEuVatDetails(answers: UserAnswers): Call =
+    (answers.get(AddAdditionalEuVatDetailsPage), answers.get(DeriveNumberOfEuVatRegisteredCountries)) match {
+      case (Some(true), Some(size)) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
+      case _        => routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

@@ -20,12 +20,13 @@ import base.SpecBase
 import controllers.routes
 import pages._
 import models._
+import queries.DeriveNumberOfEuVatRegisteredCountries
 
 class NavigatorSpec extends SpecBase {
 
   val navigator = new Navigator
 
-  val index: Index
+  val index: Index = Index(0)
 
   "Navigator" - {
 
@@ -127,10 +128,13 @@ class NavigatorSpec extends SpecBase {
 
         "to VAT Registered EU Member State when the user answers true" in {
 
-          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, true).success.value
+          val answers = emptyUserAnswers
+            .set(AddAdditionalEuVatDetailsPage, true).success.value
+            .set(VatRegisteredEuMemberStatePage(Index(0)), "France").success.value
+            .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index))
+            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(1)))
         }
 
         "TO DO - User answers FALSE" in {
