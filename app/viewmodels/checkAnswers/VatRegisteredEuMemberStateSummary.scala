@@ -27,17 +27,17 @@ import viewmodels.implicits._
 
 object VatRegisteredEuMemberStateSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(VatRegisteredEuMemberStatePage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "vatRegisteredEuMemberState.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.VatRegisteredEuMemberStateController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden"))
-          )
-        )
-    }
+//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+//    answers.get(VatRegisteredEuMemberStatePage).map {
+//      answer =>
+//
+//        SummaryListRowViewModel(
+//          key     = "vatRegisteredEuMemberState.checkYourAnswersLabel",
+//          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+//          actions = Seq(
+//            ActionItemViewModel("site.change", routes.VatRegisteredEuMemberStateController.onPageLoad(CheckMode).url)
+//              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden"))
+//          )
+//        )
+//    }
 }

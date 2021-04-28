@@ -27,17 +27,17 @@ import viewmodels.implicits._
 
 object EuVatNumberSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(EuVatNumberPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "euVatNumber.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.EuVatNumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("euVatNumber.change.hidden"))
-          )
-        )
-    }
+//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+//    answers.get(EuVatNumberPage).map {
+//      answer =>
+//
+//        SummaryListRowViewModel(
+//          key     = "euVatNumber.checkYourAnswersLabel",
+//          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+//          actions = Seq(
+//            ActionItemViewModel("site.change", routes.EuVatNumberController.onPageLoad(CheckMode).url)
+//              .withVisuallyHiddenText(messages("euVatNumber.change.hidden"))
+//          )
+//        )
+//    }
 }

@@ -26,19 +26,19 @@ import viewmodels.implicits._
 
 object AddAdditionalEuVatDetailsSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddAdditionalEuVatDetailsPage).map {
-      answer =>
-
-        val value = if (answer) "site.yes" else "site.no"
-
-        SummaryListRowViewModel(
-          key     = "addAdditionalEuVatDetails.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.AddAdditionalEuVatDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("addAdditionalEuVatDetails.change.hidden"))
-          )
-        )
-    }
+//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+//    answers.get(AddAdditionalEuVatDetailsPage).map {
+//      answer =>
+//
+//        val value = if (answer) "site.yes" else "site.no"
+//
+//        SummaryListRowViewModel(
+//          key     = "addAdditionalEuVatDetails.checkYourAnswersLabel",
+//          value   = ValueViewModel(value),
+//          actions = Seq(
+//            ActionItemViewModel("site.change", routes.AddAdditionalEuVatDetailsController.onPageLoad(CheckMode).url)
+//              .withVisuallyHiddenText(messages("addAdditionalEuVatDetails.change.hidden"))
+//          )
+//        )
+//    }
 }

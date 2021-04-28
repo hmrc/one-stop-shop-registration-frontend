@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package queries
 
-import models.Index
-import play.api.libs.json.JsPath
 
-case class VatRegisteredEuMemberStatePage(index: Index) extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \"euVatDetails"\ index.position \ toString
-
-  override def toString: String = "vatRegisteredEuMemberState"
+trait Derivable[A, B] extends Gettable[A] {
+  val derive: A => B
 }

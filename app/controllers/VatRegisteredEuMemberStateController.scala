@@ -18,8 +18,9 @@ package controllers
 
 import controllers.actions._
 import forms.VatRegisteredEuMemberStateFormProvider
+
 import javax.inject.Inject
-import models.Mode
+import models.{Index, Mode}
 import navigation.Navigator
 import pages.VatRegisteredEuMemberStatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -44,10 +45,10 @@ class VatRegisteredEuMemberStateController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(VatRegisteredEuMemberStatePage) match {
+      val preparedForm = request.userAnswers.get(VatRegisteredEuMemberStatePage(index)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -55,7 +56,7 @@ class VatRegisteredEuMemberStateController @Inject()(
       Ok(view(preparedForm, mode, index))
   }
 
-  def onSubmit(mode: Mode, index: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
@@ -64,9 +65,9 @@ class VatRegisteredEuMemberStateController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredEuMemberStatePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredEuMemberStatePage(index), value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(VatRegisteredEuMemberStatePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(VatRegisteredEuMemberStatePage(index), mode, updatedAnswers))
       )
   }
 }

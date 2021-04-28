@@ -17,11 +17,11 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
 import pages._
 import models._
+import queries.DeriveNumberOfEuVatRegisteredCountries
 
 @Singleton
 class Navigator @Inject()() {
@@ -34,9 +34,9 @@ class Navigator @Inject()() {
     case UkVatNumberPage           => _ => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
     case UkVatEffectiveDatePage    => _ => routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode)
     case UkVatRegisteredPostcodePage => _ => routes.VatRegisteredInEuController.onPageLoad(NormalMode)
-    case VatRegisteredInEuPage => isEuVatRegistered
-    case VatRegisteredEuMemberStatePage => _ => routes.EuVatNumberController.onPageLoad(NormalMode)
-    case EuVatNumberPage => _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode)
+    case VatRegisteredInEuPage          => isEuVatRegistered
+    case VatRegisteredEuMemberStatePage(index) => _ => routes.EuVatNumberController.onPageLoad(NormalMode, index)
+    case EuVatNumberPage(index) => _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode)
     case AddAdditionalEuVatDetailsPage => hasAdditionalEuVatDetails
     case _                         => _ => routes.IndexController.onPageLoad()
   }
@@ -48,13 +48,13 @@ class Navigator @Inject()() {
   }
 
   private def isEuVatRegistered(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
-    case Some(true)  => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode)
+    case Some(true)  => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(0))
     case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private def hasAdditionalEuVatDetails(answers: UserAnswers): Call = answers.get(AddAdditionalEuVatDetailsPage) match {
-    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode)
+  def hasAdditionalEuVatDetails(answers: UserAnswers): Call = answers.get(AddAdditionalEuVatDetailsPage) match {
+    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(answers.get(DeriveNumberOfEuVatRegisteredCountries).get + 1))
     case Some(false) => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
