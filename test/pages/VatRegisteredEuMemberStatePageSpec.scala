@@ -16,17 +16,18 @@
 
 package pages
 
+import models.Index
 import pages.behaviours.PageBehaviours
 
 
-class VatRegisteredEuMemberStatePageSpec extends PageBehaviours {
+class VatRegisteredEuMemberStatePageSpec(index: Index) extends PageBehaviours {
 
   "VatRegisteredEuMemberStatePage" - {
 
-    beRetrievable[String](VatRegisteredEuMemberStatePage)
+    beRetrievable[String](VatRegisteredEuMemberStatePage(index))
 
-    beSettable[String](VatRegisteredEuMemberStatePage)
+    beSettable[String](VatRegisteredEuMemberStatePage(index))
 
-    beRemovable[String](VatRegisteredEuMemberStatePage)
+    beRemovable[String](VatRegisteredEuMemberStatePage(index))
   }
 }

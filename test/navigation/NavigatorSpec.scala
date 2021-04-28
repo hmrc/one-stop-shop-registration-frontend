@@ -25,6 +25,8 @@ class NavigatorSpec extends SpecBase {
 
   val navigator = new Navigator
 
+  val index: Index
+
   "Navigator" - {
 
     "in Normal mode" - {
@@ -97,7 +99,7 @@ class NavigatorSpec extends SpecBase {
           val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode))
+            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index))
         }
 
         "TO DO - User answers FALSE" in {
@@ -111,13 +113,13 @@ class NavigatorSpec extends SpecBase {
 
       "must got to EU VAT Number from VAT Registered EU Member State" in {
 
-        navigator.nextPage(VatRegisteredEuMemberStatePage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.EuVatNumberController.onPageLoad(NormalMode))
+        navigator.nextPage(VatRegisteredEuMemberStatePage(index), NormalMode, emptyUserAnswers)
+          .mustBe(routes.EuVatNumberController.onPageLoad(NormalMode, index))
       }
 
       "must got to Add Additional EU VAT Details from EU VAT Number" in {
 
-        navigator.nextPage(EuVatNumberPage, NormalMode, emptyUserAnswers)
+        navigator.nextPage(EuVatNumberPage(index), NormalMode, emptyUserAnswers)
           .mustBe(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
       }
 
@@ -128,7 +130,7 @@ class NavigatorSpec extends SpecBase {
           val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, true).success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode))
+            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index))
         }
 
         "TO DO - User answers FALSE" in {

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.VatRegisteredEuMemberStateFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -33,14 +33,14 @@ import views.html.VatRegisteredEuMemberStateView
 
 import scala.concurrent.Future
 
-class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSugar {
+class VatRegisteredEuMemberStateControllerSpec(index: Index) extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new VatRegisteredEuMemberStateFormProvider()
   val form = formProvider()
 
-  lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode).url
+  lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index).url
 
   "VatRegisteredEuMemberState Controller" - {
 
@@ -56,13 +56,13 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[VatRegisteredEuMemberStateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(VatRegisteredEuMemberStatePage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(VatRegisteredEuMemberStatePage(index), "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +74,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -120,7 +120,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
       }
     }
 

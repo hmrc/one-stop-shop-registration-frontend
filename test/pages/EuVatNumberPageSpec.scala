@@ -16,17 +16,18 @@
 
 package pages
 
+import models.Index
 import pages.behaviours.PageBehaviours
 
 
-class EuVatNumberPageSpec extends PageBehaviours {
+class EuVatNumberPageSpec(index:Index) extends PageBehaviours {
 
   "EuVatNumberPage" - {
 
-    beRetrievable[String](EuVatNumberPage)
+    beRetrievable[String](EuVatNumberPage(index))
 
-    beSettable[String](EuVatNumberPage)
+    beSettable[String](EuVatNumberPage(index))
 
-    beRemovable[String](EuVatNumberPage)
+    beRemovable[String](EuVatNumberPage(index))
   }
 }
