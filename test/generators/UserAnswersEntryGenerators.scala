@@ -24,6 +24,38 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
+  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddAdditionalEuVatDetailsPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[AddAdditionalEuVatDetailsPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryVatRegisteredInEuUserAnswersEntry: Arbitrary[(VatRegisteredInEuPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[VatRegisteredInEuPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryVatRegisteredEuMemberStateUserAnswersEntry: Arbitrary[(VatRegisteredEuMemberStatePage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[VatRegisteredEuMemberStatePage]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryEuVatNumberUserAnswersEntry: Arbitrary[(EuVatNumberPage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[EuVatNumberPage]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitraryUkVatRegisteredPostcodeUserAnswersEntry: Arbitrary[(UkVatRegisteredPostcodePage.type, JsValue)] =
     Arbitrary {
       for {

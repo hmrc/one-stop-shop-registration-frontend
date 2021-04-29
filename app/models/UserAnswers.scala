@@ -17,7 +17,7 @@
 package models
 
 import play.api.libs.json._
-import queries.{Gettable, Settable}
+import queries.{Derivable, Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -63,6 +63,9 @@ final case class UserAnswers(
         page.cleanup(None, updatedAnswers)
     }
   }
+
+  def get[A, B](derivable: Derivable[A, B])(implicit rds: Reads[A]): Option[B] =
+    get(derivable: Gettable[A]).map(derivable.derive)
 }
 
 object UserAnswers {

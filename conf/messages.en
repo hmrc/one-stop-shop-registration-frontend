@@ -106,3 +106,29 @@ ukVatRegisteredPostcode.error.required = Enter the postcode where your business 
 ukVatRegisteredPostcode.error.invalid = Enter a valid postcode
 ukVatRegisteredPostcode.error.length = Postcode must be 9 characters or less
 ukVatRegisteredPostcode.change.hidden = the postcode where your business is registered for UK VAT
+
+euVatNumber.title = What is your VAT number?
+euVatNumber.heading = What is your VAT number?
+euVatNumber.checkYourAnswersLabel = What is your VAT number?
+euVatNumber.error.required = Enter your VAT number
+euVatNumber.error.length = VAT number must be 100 characters or less
+euVatNumber.change.hidden = your VAT number
+
+vatRegisteredEuMemberState.title = Which EU member state is your business VAT registered in?
+vatRegisteredEuMemberState.heading = Which EU member state is your business VAT registered in?
+vatRegisteredEuMemberState.checkYourAnswersLabel = Which EU member state is your business VAT registered in?
+vatRegisteredEuMemberState.error.required = Enter an EU member state
+vatRegisteredEuMemberState.error.length = EU member state must be 100 characters or less
+vatRegisteredEuMemberState.change.hidden = EU member state
+
+vatRegisteredInEu.title = Is your business VAT registered in an EU member state?
+vatRegisteredInEu.heading = Is your business VAT registered in an EU member state?
+vatRegisteredInEu.checkYourAnswersLabel = Is your business VAT registered in an EU member state?
+vatRegisteredInEu.error.required = Select yes if your business is VAT registered in an EU member state
+vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU member state
+
+addAdditionalEuVatDetails.title = Do you need to add VAT details for another EU member country?
+addAdditionalEuVatDetails.heading = Do you need to add VAT details for another EU member country?
+addAdditionalEuVatDetails.checkYourAnswersLabel = Do you need to add VAT details for another EU member country?
+addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU member country
+addAdditionalEuVatDetails.change.hidden = AddAdditionalEuVatDetails

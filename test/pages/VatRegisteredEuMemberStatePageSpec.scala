@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package queries
+package pages
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import models.Index
+import pages.behaviours.PageBehaviours
 
-import scala.util.{Success, Try}
 
-sealed trait Query {
+class VatRegisteredEuMemberStatePageSpec(index: Index) extends PageBehaviours {
 
-  def path: JsPath
-}
+  "VatRegisteredEuMemberStatePage" - {
 
-trait Gettable[A] extends Query
+    beRetrievable[String](VatRegisteredEuMemberStatePage(index))
 
-trait Settable[A] extends Query {
+    beSettable[String](VatRegisteredEuMemberStatePage(index))
 
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+    beRemovable[String](VatRegisteredEuMemberStatePage(index))
+  }
 }

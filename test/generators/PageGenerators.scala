@@ -16,10 +16,23 @@
 
 package generators
 
+import models.Index
 import org.scalacheck.Arbitrary
 import pages._
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryAddAdditionalEuVatDetailsPage: Arbitrary[AddAdditionalEuVatDetailsPage.type] =
+    Arbitrary(AddAdditionalEuVatDetailsPage)
+
+  implicit lazy val arbitraryVatRegisteredInEuPage: Arbitrary[VatRegisteredInEuPage.type] =
+    Arbitrary(VatRegisteredInEuPage)
+
+  implicit lazy val arbitraryVatRegisteredEuMemberStatePage: Arbitrary[VatRegisteredEuMemberStatePage] =
+    Arbitrary(VatRegisteredEuMemberStatePage(Index(0)))
+
+  implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
+    Arbitrary(EuVatNumberPage(Index(0)))
 
   implicit lazy val arbitraryUkVatRegisteredPostcodePage: Arbitrary[UkVatRegisteredPostcodePage.type] =
     Arbitrary(UkVatRegisteredPostcodePage)

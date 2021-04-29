@@ -55,3 +55,23 @@ GET        /ukVatRegisteredPostcode                        controllers.UkVatRegi
 POST       /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = NormalMode)
 GET        /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /euVatNumber/:index                        controllers.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /euVatNumber/:index                        controllers.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeEuVatNumber/:index                  controllers.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeEuVatNumber/:index                  controllers.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /vatRegisteredEuMemberState/:index                 controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /vatRegisteredEuMemberState/:index                 controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeVatRegisteredEuMemberState/:index           controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeVatRegisteredEuMemberState/:index           controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
+POST       /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
+GET        /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+
+GET        /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)

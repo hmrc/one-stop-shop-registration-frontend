@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package queries
+package forms
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-import scala.util.{Success, Try}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-sealed trait Query {
+class AddAdditionalEuVatDetailsFormProvider @Inject() extends Mappings {
 
-  def path: JsPath
-}
-
-trait Gettable[A] extends Query
-
-trait Settable[A] extends Query {
-
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("addAdditionalEuVatDetails.error.required")
+    )
 }

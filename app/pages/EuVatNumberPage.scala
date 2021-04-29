@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package queries
+package pages
 
-import models.UserAnswers
+import models.Index
 import play.api.libs.json.JsPath
 
-import scala.util.{Success, Try}
+case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
 
-sealed trait Query {
+  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
 
-  def path: JsPath
-}
-
-trait Gettable[A] extends Query
-
-trait Settable[A] extends Query {
-
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+  override def toString: String = "euVatNumber"
 }

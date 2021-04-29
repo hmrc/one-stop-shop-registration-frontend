@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package queries
+package forms
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-import scala.util.{Success, Try}
+class VatRegisteredInEuFormProviderSpec extends BooleanFieldBehaviours {
 
-sealed trait Query {
+  val requiredKey = "vatRegisteredInEu.error.required"
+  val invalidKey = "error.boolean"
 
-  def path: JsPath
-}
+  val form = new VatRegisteredInEuFormProvider()()
 
-trait Gettable[A] extends Query
+  ".value" - {
 
-trait Settable[A] extends Query {
+    val fieldName = "value"
 
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }
