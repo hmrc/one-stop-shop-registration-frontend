@@ -132,3 +132,27 @@ addAdditionalEuVatDetails.heading = Do you need to add VAT details for another E
 addAdditionalEuVatDetails.checkYourAnswersLabel = Do you need to add VAT details for another EU member country?
 addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU member country
 addAdditionalEuVatDetails.change.hidden = AddAdditionalEuVatDetails
+
+businessAddress.title = businessAddress
+businessAddress.heading = businessAddress
+businessAddress.Line1 = Line1
+businessAddress.Line2 = Line2
+businessAddress.checkYourAnswersLabel = BusinessAddress
+businessAddress.error.Line1.required = Enter Line1
+businessAddress.error.Line2.required = Enter Line2
+businessAddress.error.Line1.length = Line1 must be 100 characters or less
+businessAddress.error.Line2.length = Line2 must be 100 characters or less
+businessAddress.Line1.change.hidden = Line1
+businessAddress.Line2.change.hidden = Line2
+
+businessContactDetails.title = businessContactDetails
+businessContactDetails.heading = businessContactDetails
+businessContactDetails.fullName = fullName
+businessContactDetails.telephoneNumber = telephoneNumber
+businessContactDetails.checkYourAnswersLabel = BusinessContactDetails
+businessContactDetails.error.fullName.required = Enter fullName
+businessContactDetails.error.telephoneNumber.required = Enter telephoneNumber
+businessContactDetails.error.fullName.length = fullName must be 100 characters or less
+businessContactDetails.error.telephoneNumber.length = telephoneNumber must be 100 characters or less
+businessContactDetails.fullName.change.hidden = fullName
+businessContactDetails.telephoneNumber.change.hidden = telephoneNumber

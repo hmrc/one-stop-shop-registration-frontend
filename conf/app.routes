@@ -75,3 +75,13 @@ GET        /addAdditionalEuVatDetails                        controllers.AddAddi
 POST       /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /businessAddress                        controllers.BusinessAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessAddress                        controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessAddress                  controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessAddress                  controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /businessContactDetails                        controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessContactDetails                        controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessContactDetails                  controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessContactDetails                  controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)

@@ -23,6 +23,22 @@ import uk.gov.hmrc.domain.Vrn
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryBusinessContactDetails: Arbitrary[BusinessContactDetails] =
+    Arbitrary {
+      for {
+        fullName <- arbitrary[String]
+        telephoneNumber <- arbitrary[String]
+      } yield BusinessContactDetails(fullName, telephoneNumber)
+    }
+
+  implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =
+    Arbitrary {
+      for {
+        Line1 <- arbitrary[String]
+        Line2 <- arbitrary[String]
+      } yield BusinessAddress(Line1, Line2)
+    }
+
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
     for {
       chars <- Gen.listOfN(9, Gen.numChar)
