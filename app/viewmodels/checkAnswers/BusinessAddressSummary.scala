@@ -28,19 +28,19 @@ import viewmodels.implicits._
 
 object BusinessAddressSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(BusinessAddressPage).map {
-      answer =>
-
-      val value = HtmlFormat.escape(answer.Line1).toString + "<br/>" + HtmlFormat.escape(answer.Line2).toString
-
-        SummaryListRowViewModel(
-          key     = "businessAddress.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.BusinessAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("businessAddress.change.hidden"))
-          )
-        )
-    }
+//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+//    answers.get(BusinessAddressPage).map {
+//      answer =>
+//
+//      val value = HtmlFormat.escape(answer.line1).toString + "<br/>" + HtmlFormat.escape(answer.line2).toString
+//
+//        SummaryListRowViewModel(
+//          key     = "businessAddress.checkYourAnswersLabel",
+//          value   = ValueViewModel(HtmlContent(value)),
+//          actions = Seq(
+//            ActionItemViewModel("site.change", routes.BusinessAddressController.onPageLoad(CheckMode).url)
+//              .withVisuallyHiddenText(messages("businessAddress.change.hidden"))
+//          )
+//        )
+//    }
 }

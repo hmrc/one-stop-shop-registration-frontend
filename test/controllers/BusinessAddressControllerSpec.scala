@@ -47,8 +47,11 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
     userAnswersId,
     Json.obj(
       BusinessAddressPage.toString -> Json.obj(
-        "Line1" -> "value 1",
-        "Line2" -> "value 2"
+        "line1" -> "value 1",
+        "line2" -> "value 2",
+        "townOrCity" -> "value 3",
+        "county" -> "value 4",
+        "postCode" -> "value 5"
       )
     )
   )
@@ -83,7 +86,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BusinessAddress("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(BusinessAddress("value 1", Some("value 2"), "value 3", Some("value 4"), "value 5")), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -104,7 +107,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, businessAddressRoute)
-            .withFormUrlEncodedBody(("Line1", "value 1"), ("Line2", "value 2"))
+            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "value 3"), ("county", "value 4"),("postCode", "value 5"))
 
         val result = route(application, request).value
 
@@ -154,7 +157,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, businessAddressRoute)
-            .withFormUrlEncodedBody(("Line1", "value 1"), ("Line2", "value 2"))
+            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "value 3"), ("county", "value 4"),("postCode", "value 5"))
 
         val result = route(application, request).value
 

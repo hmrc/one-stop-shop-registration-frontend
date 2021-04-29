@@ -35,6 +35,7 @@
         }
 
         <h1 class="govuk-heading-xl">@messages("businessContactDetails.heading")</h1>
+        <p class="govuk-body govuk-!-margin-bottom-9">@messages("businessContactDetails.caption")</p>
 
         @govukInput(
             InputViewModel(
@@ -48,6 +49,22 @@
             InputViewModel(
                 field = form("telephoneNumber"),
                 label = LabelViewModel(messages("businessContactDetails.telephoneNumber"))
+            )
+            .withWidth(Full)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("emailAddress"),
+                label = LabelViewModel(messages("businessContactDetails.emailAddress"))
+            )
+            .withWidth(Full)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("websiteAddress"),
+                label = LabelViewModel(messages("businessContactDetails.websiteAddress"))
             )
             .withWidth(Full)
         )

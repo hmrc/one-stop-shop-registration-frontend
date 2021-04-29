@@ -102,12 +102,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index))
         }
 
-        "TO DO - User answers FALSE" in {
+        "to Business Address when the user answers false" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
-            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+            .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
         }
       }
 
@@ -136,13 +136,19 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(1)))
         }
 
-        "TO DO - User answers FALSE" in {
+        "to Business Address when the user answers false" in {
 
           val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, false).success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+            .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
         }
+      }
+
+      "must go from Business Address to Business Contact Details" in {
+
+        navigator.nextPage(BusinessAddressPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
       }
     }
 

@@ -27,10 +27,16 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
 
    def apply(): Form[BusinessAddress] = Form(
      mapping(
-      "Line1" -> text("businessAddress.error.Line1.required")
+      "line1" -> text("businessAddress.error.Line1.required")
         .verifying(maxLength(100, "businessAddress.error.Line1.length")),
-      "Line2" -> text("businessAddress.error.Line2.required")
-        .verifying(maxLength(100, "businessAddress.error.Line2.length"))
+      "line2" -> optional(text("businessAddress.error.Line2.required")
+        .verifying(maxLength(100, "businessAddress.error.Line2.length"))),
+       "townOrCity" -> text("businessAddress.error.townOrCity.required")
+         .verifying(maxLength(100, "businessAddress.error.townOrCity.length")),
+       "county" -> optional(text("businessAddress.error.county.required")
+         .verifying(maxLength(100, "businessAddress.error.county.length"))),
+       "postCode" -> text("businessAddress.error.postCode.required")
+         .verifying(maxLength(100, "businessAddress.error.postCode.length"))
     )(BusinessAddress.apply)(BusinessAddress.unapply)
    )
  }

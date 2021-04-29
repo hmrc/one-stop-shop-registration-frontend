@@ -28,15 +28,20 @@ trait ModelGenerators {
       for {
         fullName <- arbitrary[String]
         telephoneNumber <- arbitrary[String]
-      } yield BusinessContactDetails(fullName, telephoneNumber)
+        emailAddress <- arbitrary[String]
+        websiteAddress <- arbitrary[String]
+      } yield BusinessContactDetails(fullName, telephoneNumber, emailAddress, websiteAddress)
     }
 
   implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =
     Arbitrary {
       for {
-        Line1 <- arbitrary[String]
-        Line2 <- arbitrary[String]
-      } yield BusinessAddress(Line1, Line2)
+        line1 <- arbitrary[String]
+        line2 <- arbitrary[String]
+        townOrCity <- arbitrary[String]
+        county <- arbitrary[String]
+        postCode <- arbitrary[String]
+      } yield BusinessAddress(line1, Some(line2), townOrCity, Some(county), postCode)
     }
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
