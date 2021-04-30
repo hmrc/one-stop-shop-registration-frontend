@@ -22,6 +22,9 @@ import pages._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryDeleteEuVatDetailsPage: Arbitrary[DeleteEuVatDetailsPage.type] =
+    Arbitrary(DeleteEuVatDetailsPage)
+
   implicit lazy val arbitraryAddAdditionalEuVatDetailsPage: Arbitrary[AddAdditionalEuVatDetailsPage.type] =
     Arbitrary(AddAdditionalEuVatDetailsPage)
 

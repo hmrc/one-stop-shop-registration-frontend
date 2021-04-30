@@ -136,3 +136,9 @@ addAdditionalEuVatDetails.change.hidden = VAT details for {0}
 addAdditionalEuVatDetails.remove.hidden = VAT details for {0}
 addAdditionalEuVatDetails.addAnother = Do you need to add VAT details for another EU country?
 addAdditionalEuVatDetails.addAnother.hint = You must tell us about all your VAT registrations in EU countries.
+
+deleteEuVatDetails.title = deleteEuVatDetails
+deleteEuVatDetails.heading = deleteEuVatDetails
+deleteEuVatDetails.checkYourAnswersLabel = deleteEuVatDetails
+deleteEuVatDetails.error.required = Select yes if deleteEuVatDetails
+deleteEuVatDetails.change.hidden = DeleteEuVatDetails
