@@ -29,18 +29,21 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import viewmodels.govuk.summarylist._
 import views.html.AddAdditionalEuVatDetailsView
 
 import scala.concurrent.Future
 
 class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AddAdditionalEuVatDetailsFormProvider()
-  val form = formProvider()
+  private val formProvider = new AddAdditionalEuVatDetailsFormProvider()
+  private val form = formProvider()
 
-  lazy val addAdditionalEuVatDetailsRoute = routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode).url
+  private lazy val addAdditionalEuVatDetailsRoute = routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode).url
+
+  private val emptySummaryList = SummaryListViewModel(rows = Seq.empty)
 
   "AddAdditionalEuVatDetails Controller" - {
 
@@ -56,7 +59,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
         val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, emptySummaryList)(request, messages(application)).toString
       }
     }
 
@@ -74,7 +77,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, emptySummaryList)(request, messages(application)).toString
       }
     }
 
@@ -120,7 +123,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, emptySummaryList)(request, messages(application)).toString
       }
     }
 

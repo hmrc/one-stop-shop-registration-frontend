@@ -127,8 +127,12 @@ vatRegisteredInEu.checkYourAnswersLabel = Is your business VAT registered in an 
 vatRegisteredInEu.error.required = Select yes if your business is VAT registered in an EU member state
 vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU member state
 
-addAdditionalEuVatDetails.title = Do you need to add VAT details for another EU member country?
-addAdditionalEuVatDetails.heading = Do you need to add VAT details for another EU member country?
-addAdditionalEuVatDetails.checkYourAnswersLabel = Do you need to add VAT details for another EU member country?
+addAdditionalEuVatDetails.title = You added VAT details for {0} EU country
+addAdditionalEuVatDetails.heading = You added VAT details for {0} EU country
+addAdditionalEuVatDetails.title.plural = You added VAT details for {0} EU countries
+addAdditionalEuVatDetails.heading.plural = You added VAT details for {0} EU countries
 addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU member country
-addAdditionalEuVatDetails.change.hidden = AddAdditionalEuVatDetails
+addAdditionalEuVatDetails.change.hidden = VAT details for {0}
+addAdditionalEuVatDetails.remove.hidden = VAT details for {0}
+addAdditionalEuVatDetails.addAnother = Do you need to add VAT details for another EU country?
+addAdditionalEuVatDetails.addAnother.hint = You must tell us about all your VAT registrations in EU countries.

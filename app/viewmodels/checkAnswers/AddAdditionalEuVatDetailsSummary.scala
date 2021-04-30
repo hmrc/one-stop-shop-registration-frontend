@@ -17,28 +17,27 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
-import pages.AddAdditionalEuVatDetailsPage
+import models.{Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
+import queries.EuVatDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object AddAdditionalEuVatDetailsSummary  {
 
-//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-//    answers.get(AddAdditionalEuVatDetailsPage).map {
-//      answer =>
-//
-//        val value = if (answer) "site.yes" else "site.no"
-//
-//        SummaryListRowViewModel(
-//          key     = "addAdditionalEuVatDetails.checkYourAnswersLabel",
-//          value   = ValueViewModel(value),
-//          actions = Seq(
-//            ActionItemViewModel("site.change", routes.AddAdditionalEuVatDetailsController.onPageLoad(CheckMode).url)
-//              .withVisuallyHiddenText(messages("addAdditionalEuVatDetails.change.hidden"))
-//          )
-//        )
-//    }
+  def rows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+    answers.get(EuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
+      case (details, index) =>
+        SummaryListRowViewModel(
+          key     = KeyViewModel(details.vatRegisteredEuMemberState).withCssClass("hmrc-add-to-a-list__identifier--light"),
+          value   = ValueViewModel(details.euVatNumber),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden", details.vatRegisteredEuMemberState)),
+            ActionItemViewModel("site.remove", routes.IndexController.onPageLoad().url) // TODO: Change this!
+              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.remove.hidden", details.vatRegisteredEuMemberState))
+          )
+        )
+    }
 }

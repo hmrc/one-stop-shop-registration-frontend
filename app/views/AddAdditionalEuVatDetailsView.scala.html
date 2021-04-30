@@ -14,17 +14,20 @@
  * limitations under the License.
  *@
 
+@import viewmodels.LegendSize
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukSummaryList: GovukSummaryList
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: SummaryList)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title"))) {
+@layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title", list.rows.size))) {
 
     @formHelper(action = routes.AddAdditionalEuVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
 
@@ -32,11 +35,15 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-xl">@messages("addAdditionalEuVatDetails.heading", list.rows.size)</h1>
+
+        @govukSummaryList(list)
+
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("addAdditionalEuVatDetails.heading")).asPageHeading()
-            )
+                legend = LegendViewModel(messages("addAdditionalEuVatDetails.addAnother")).withSize(LegendSize.Medium)
+            ).withHint(HintViewModel(messages("addAdditionalEuVatDetails.addAnother.hint")))
         )
 
         @govukButton(
