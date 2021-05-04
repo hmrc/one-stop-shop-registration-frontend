@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package pages
+package queries
 
-import pages.behaviours.PageBehaviours
+import models.EuVatDetails
+import play.api.libs.json.JsPath
 
-class DeleteEuVatDetailsPageSpec extends PageBehaviours {
+case object AllEuVatDetailsQuery extends Gettable[List[EuVatDetails]] {
 
-  "DeleteEuVatDetailsPage" - {
-
-    beRetrievable[Boolean](DeleteEuVatDetailsPage)
-
-    beSettable[Boolean](DeleteEuVatDetailsPage)
-
-    beRemovable[Boolean](DeleteEuVatDetailsPage)
-  }
+  override def path: JsPath = JsPath \ "euVatDetails"
 }

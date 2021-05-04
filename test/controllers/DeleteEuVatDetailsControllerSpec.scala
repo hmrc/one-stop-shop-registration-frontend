@@ -18,12 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteEuVatDetailsFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{EuVatDetails, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.DeleteEuVatDetailsPage
+import pages.{DeleteEuVatDetailsPage, EuVatNumberPage, RegisteredCompanyNamePage, VatRegisteredEuMemberStatePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -35,18 +35,25 @@ import scala.concurrent.Future
 
 class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new DeleteEuVatDetailsFormProvider()
-  val form = formProvider()
+  private val formProvider = new DeleteEuVatDetailsFormProvider()
+  private val form = formProvider()
 
-  lazy val deleteEuVatDetailsRoute = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode).url
+  private val index = Index(0)
+  private val euVatDetails = EuVatDetails("Country", "VAT Number")
+  private lazy val deleteEuVatDetailsRoute = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, index).url
+
+  private val baseUserAnswers =
+    emptyUserAnswers
+      .set(VatRegisteredEuMemberStatePage(index), euVatDetails.vatRegisteredEuMemberState).success.value
+      .set(EuVatNumberPage(index), euVatDetails.euVatNumber).success.value
 
   "DeleteEuVatDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, deleteEuVatDetailsRoute)
@@ -56,36 +63,18 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[DeleteEuVatDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, euVatDetails)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(DeleteEuVatDetailsPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
-
-        val view = application.injector.instanceOf[DeleteEuVatDetailsView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted" in {
+    "must delete a record and redirect to the next page when the user answers Yes" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -101,12 +90,41 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository, times(1)).set(any())
+      }
+    }
+
+
+    "must not delete a record and redirect to the next page when the user answers Yes" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteEuVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository, never()).set(any())
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request =
@@ -120,7 +138,7 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, euVatDetails)(request, messages(application)).toString
       }
     }
 

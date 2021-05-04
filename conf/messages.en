@@ -127,18 +127,16 @@ vatRegisteredInEu.checkYourAnswersLabel = Is your business VAT registered in an 
 vatRegisteredInEu.error.required = Select yes if your business is VAT registered in an EU member state
 vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU member state
 
-addAdditionalEuVatDetails.title = You added VAT details for {0} EU country
-addAdditionalEuVatDetails.heading = You added VAT details for {0} EU country
-addAdditionalEuVatDetails.title.plural = You added VAT details for {0} EU countries
-addAdditionalEuVatDetails.heading.plural = You added VAT details for {0} EU countries
+addAdditionalEuVatDetails.title.singular = You added VAT details for 1 EU country
+addAdditionalEuVatDetails.heading.singular = You added VAT details for 1 EU country
+addAdditionalEuVatDetails.title = You added VAT details for {0} EU countries
+addAdditionalEuVatDetails.heading = You added VAT details for {0} EU countries
 addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU member country
 addAdditionalEuVatDetails.change.hidden = VAT details for {0}
 addAdditionalEuVatDetails.remove.hidden = VAT details for {0}
 addAdditionalEuVatDetails.addAnother = Do you need to add VAT details for another EU country?
 addAdditionalEuVatDetails.addAnother.hint = You must tell us about all your VAT registrations in EU countries.
 
-deleteEuVatDetails.title = deleteEuVatDetails
-deleteEuVatDetails.heading = deleteEuVatDetails
-deleteEuVatDetails.checkYourAnswersLabel = deleteEuVatDetails
-deleteEuVatDetails.error.required = Select yes if deleteEuVatDetails
-deleteEuVatDetails.change.hidden = DeleteEuVatDetails
+deleteEuVatDetails.title = Are you sure you want to remove the VAT details for {0}?
+deleteEuVatDetails.heading = Are you sure you want to remove the VAT details for {0}?
+deleteEuVatDetails.error.required = Select yes if you are sure you want to remove the VAT details

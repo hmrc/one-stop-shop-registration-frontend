@@ -26,28 +26,30 @@
 )
 
 @(form: Form[_], mode: Mode, list: SummaryList)(implicit request: Request[_], messages: Messages)
+@defining(if(list.rows.size == 1) ".singular" else "") { messageSuffix =>
 
-@layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title", list.rows.size))) {
+    @layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title" + messageSuffix, list.rows.size))) {
 
-    @formHelper(action = routes.AddAdditionalEuVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
+        @formHelper(action = routes.AddAdditionalEuVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @if(form.errors.nonEmpty) {
+                @govukErrorSummary(ErrorSummaryViewModel(form))
+            }
+
+            <h1 class="govuk-heading-xl">@messages("addAdditionalEuVatDetails.heading" + messageSuffix, list.rows.size)</h1>
+
+            @govukSummaryList(list)
+
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("addAdditionalEuVatDetails.addAnother")).withSize(LegendSize.Medium)
+                ).withHint(HintViewModel(messages("addAdditionalEuVatDetails.addAnother.hint")))
+            )
+
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
         }
-
-        <h1 class="govuk-heading-xl">@messages("addAdditionalEuVatDetails.heading", list.rows.size)</h1>
-
-        @govukSummaryList(list)
-
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("addAdditionalEuVatDetails.addAnother")).withSize(LegendSize.Medium)
-            ).withHint(HintViewModel(messages("addAdditionalEuVatDetails.addAnother.hint")))
-        )
-
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
     }
 }

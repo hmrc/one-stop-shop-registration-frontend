@@ -27,7 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.AddAdditionalEuVatDetailsSummary
+import viewmodels.checkAnswers.EuVatDetailsSummary
 import viewmodels.govuk.summarylist._
 import views.html.AddAdditionalEuVatDetailsView
 
@@ -51,7 +51,7 @@ class AddAdditionalEuVatDetailsController @Inject()(
     implicit request =>
 
       val list = SummaryListViewModel(
-        rows = AddAdditionalEuVatDetailsSummary.rows(request.userAnswers)
+        rows = EuVatDetailsSummary.rows(request.userAnswers)
       )
 
       Ok(view(form, mode, list))
@@ -64,7 +64,7 @@ class AddAdditionalEuVatDetailsController @Inject()(
         formWithErrors => {
 
           val list = SummaryListViewModel(
-            rows = AddAdditionalEuVatDetailsSummary.rows(request.userAnswers)
+            rows = EuVatDetailsSummary.rows(request.userAnswers)
           )
 
           Future.successful(BadRequest(view(formWithErrors, mode, list)))

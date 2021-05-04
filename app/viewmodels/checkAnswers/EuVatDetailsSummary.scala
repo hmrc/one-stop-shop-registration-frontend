@@ -19,15 +19,15 @@ package viewmodels.checkAnswers
 import controllers.routes
 import models.{Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
-import queries.EuVatDetailsQuery
+import queries.AllEuVatDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object AddAdditionalEuVatDetailsSummary  {
+object EuVatDetailsSummary  {
 
   def rows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
-    answers.get(EuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
+    answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         SummaryListRowViewModel(
           key     = KeyViewModel(details.vatRegisteredEuMemberState).withCssClass("hmrc-add-to-a-list__identifier--light"),
@@ -35,7 +35,7 @@ object AddAdditionalEuVatDetailsSummary  {
           actions = Seq(
             ActionItemViewModel("site.change", routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(index)).url)
               .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden", details.vatRegisteredEuMemberState)),
-            ActionItemViewModel("site.remove", routes.IndexController.onPageLoad().url) // TODO: Change this!
+            ActionItemViewModel("site.remove", routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url)
               .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.remove.hidden", details.vatRegisteredEuMemberState))
           )
         )

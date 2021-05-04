@@ -18,8 +18,8 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages._
 import models._
+import pages._
 
 class NavigatorSpec extends SpecBase {
 
@@ -142,6 +142,26 @@ class NavigatorSpec extends SpecBase {
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
             .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Delete EU VAT Details" - {
+
+        "to Add Additional EU VAT Details when there are still some EU VAT details" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(VatRegisteredEuMemberStatePage(Index(0)), "Country").success.value
+              .set(EuVatNumberPage(Index(0)), "VAT Number").success.value
+
+          navigator.nextPage(DeleteEuVatDetailsPage(Index(0)), NormalMode, answers)
+            .mustBe(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
+        }
+
+        "to VAT Registered in EU when there are no EU VAT details left" in {
+
+          navigator.nextPage(DeleteEuVatDetailsPage(Index(0)), NormalMode, emptyUserAnswers)
+            .mustBe(routes.VatRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
     }

@@ -16,10 +16,10 @@
 
 package queries
 
-import models.EuVatDetails
+import models.{EuVatDetails, Index}
 import play.api.libs.json.JsPath
 
-case object EuVatDetailsQuery extends Gettable[List[EuVatDetails]] {
+case class EuVatDetailsQuery(index: Index) extends Gettable[EuVatDetails] with Settable[EuVatDetails] {
 
-  override def path: JsPath = JsPath \ "euVatDetails"
+  override def path: JsPath = JsPath \ "euVatDetails" \ index.position
 }

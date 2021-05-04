@@ -16,11 +16,6 @@
 
 package pages
 
-import play.api.libs.json.JsPath
+import models.Index
 
-case object DeleteEuVatDetailsPage extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "deleteEuVatDetails"
-}
+case class DeleteEuVatDetailsPage(index: Index) extends Page

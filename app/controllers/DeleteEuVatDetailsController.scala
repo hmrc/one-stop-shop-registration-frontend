@@ -18,12 +18,15 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteEuVatDetailsFormProvider
+import models.requests.DataRequest
+
 import javax.inject.Inject
-import models.Mode
+import models.{EuVatDetails, Index, Mode}
 import navigation.Navigator
 import pages.DeleteEuVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.EuVatDetailsQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteEuVatDetailsView
@@ -42,31 +45,44 @@ class DeleteEuVatDetailsController @Inject()(
                                          view: DeleteEuVatDetailsView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
-      val preparedForm = request.userAnswers.get(DeleteEuVatDetailsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+      getEuVatDetails(index) {
+        details =>
+          Future.successful(Ok(view(form, mode, index, details)))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getEuVatDetails(index) {
+        details =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, details))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteEuVatDetailsPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(DeleteEuVatDetailsPage, mode, updatedAnswers))
-      )
+            value =>
+              if (value) {
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuVatDetailsQuery(index)))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, updatedAnswers))
+              } else {
+                Future.successful(Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, request.userAnswers)))
+              }
+          )
+      }
   }
+
+
+  private def getEuVatDetails(index: Index)
+                             (block: EuVatDetails => Future[Result])
+                             (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(EuVatDetailsQuery(index)).map {
+      details =>
+        block(details)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

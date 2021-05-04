@@ -76,7 +76,7 @@ POST       /addAdditionalEuVatDetails                        controllers.AddAddi
 GET        /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /deleteEuVatDetails                        controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /deleteEuVatDetails                        controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeDeleteEuVatDetails                  controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeDeleteEuVatDetails                  controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /deleteEuVatDetails/:index                        controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /deleteEuVatDetails/:index                        controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeDeleteEuVatDetails/:index                  controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeDeleteEuVatDetails/:index                  controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
