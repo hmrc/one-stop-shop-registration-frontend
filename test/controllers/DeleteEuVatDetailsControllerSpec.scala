@@ -17,78 +17,64 @@
 package controllers
 
 import base.SpecBase
-import forms.AddAdditionalEuVatDetailsFormProvider
-import models.{NormalMode, UserAnswers}
+import forms.DeleteEuVatDetailsFormProvider
+import models.{EuVatDetails, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddAdditionalEuVatDetailsPage
+import pages.{DeleteEuVatDetailsPage, EuVatNumberPage, RegisteredCompanyNamePage, VatRegisteredEuMemberStatePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import viewmodels.govuk.summarylist._
-import views.html.AddAdditionalEuVatDetailsView
+import views.html.DeleteEuVatDetailsView
 
 import scala.concurrent.Future
 
-class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
+class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private val formProvider = new AddAdditionalEuVatDetailsFormProvider()
+  private val formProvider = new DeleteEuVatDetailsFormProvider()
   private val form = formProvider()
 
-  private lazy val addAdditionalEuVatDetailsRoute = routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode).url
+  private val index = Index(0)
+  private val euVatDetails = EuVatDetails("Country", "VAT Number")
+  private lazy val deleteEuVatDetailsRoute = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, index).url
 
-  private val emptySummaryList = SummaryListViewModel(rows = Seq.empty)
+  private val baseUserAnswers =
+    emptyUserAnswers
+      .set(VatRegisteredEuMemberStatePage(index), euVatDetails.vatRegisteredEuMemberState).success.value
+      .set(EuVatNumberPage(index), euVatDetails.euVatNumber).success.value
 
-  "AddAdditionalEuVatDetails Controller" - {
+  "DeleteEuVatDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addAdditionalEuVatDetailsRoute)
+        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        val view = application.injector.instanceOf[DeleteEuVatDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, euVatDetails)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(AddAdditionalEuVatDetailsPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addAdditionalEuVatDetailsRoute)
-
-        val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, emptySummaryList)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted" in {
+    "must delete a record and redirect to the next page when the user answers Yes" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -97,33 +83,62 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
 
       running(application) {
         val request =
-          FakeRequest(POST, addAdditionalEuVatDetailsRoute)
+          FakeRequest(POST, deleteEuVatDetailsRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository, times(1)).set(any())
+      }
+    }
+
+
+    "must not delete a record and redirect to the next page when the user answers Yes" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteEuVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository, never()).set(any())
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, addAdditionalEuVatDetailsRoute)
+          FakeRequest(POST, deleteEuVatDetailsRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        val view = application.injector.instanceOf[DeleteEuVatDetailsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, euVatDetails)(request, messages(application)).toString
       }
     }
 
@@ -132,7 +147,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, addAdditionalEuVatDetailsRoute)
+        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
 
         val result = route(application, request).value
 
@@ -147,7 +162,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
 
       running(application) {
         val request =
-          FakeRequest(POST, addAdditionalEuVatDetailsRoute)
+          FakeRequest(POST, deleteEuVatDetailsRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

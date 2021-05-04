@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.AddAdditionalEuVatDetailsFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
@@ -26,6 +27,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.EuVatDetailsSummary
+import viewmodels.govuk.summarylist._
 import views.html.AddAdditionalEuVatDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,15 +50,25 @@ class AddAdditionalEuVatDetailsController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      Ok(view(form, mode))
+      val list = SummaryListViewModel(
+        rows = EuVatDetailsSummary.rows(request.userAnswers)
+      )
+
+      Ok(view(form, mode, list))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+        formWithErrors => {
+
+          val list = SummaryListViewModel(
+            rows = EuVatDetailsSummary.rows(request.userAnswers)
+          )
+
+          Future.successful(BadRequest(view(formWithErrors, mode, list)))
+        },
 
         value =>
           for {
