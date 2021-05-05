@@ -91,3 +91,5 @@ POST       /businessContactDetails                        controllers.BusinessCo
 GET        /changeBusinessContactDetails                  controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeBusinessContactDetails                  controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
+GET        /isBusinessBasedInNorthernIreland       controllers.IsBusinessBasedInNorthernIrelandController.onPageLoad()
+POST       /isBusinessBasedInNorthernIreland       controllers.IsBusinessBasedInNorthernIrelandController.onSubmit()
