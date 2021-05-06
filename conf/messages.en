@@ -187,3 +187,8 @@ businessContactDetails.websiteAddress.change.hidden = Website address
 isBusinessBasedInNorthernIreland.title = Is your business based in Northern Ireland?
 isBusinessBasedInNorthernIreland.heading = Is your business based in Northern Ireland?
 isBusinessBasedInNorthernIreland.error.required = Select yes if your business is based in Northern Ireland
+
+cannotRegisterForService.title = You cannot use this service
+cannotRegisterForService.heading = You cannot use this service
+cannotRegisterForService.can-register-in-eu-country = You can register for the One-Stop Shop scheme in an EU country.
+cannotRegisterForService.change.hidden = CannotRegisterForService

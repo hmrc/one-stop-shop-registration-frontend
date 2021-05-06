@@ -52,7 +52,7 @@ class IsBusinessBasedInNorthernIrelandController @Inject()(
         if (value) {
           Redirect(routes.IndexController.onPageLoad())
         } else {
-          Redirect(routes.IndexController.onPageLoad())
+          Redirect(routes.CannotRegisterForServiceController.onPageLoad())
         }
     )
   }
