@@ -18,22 +18,11 @@ package controllers
 
 import base.SpecBase
 import forms.IsBusinessBasedInNorthernIrelandFormProvider
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import views.html.IsBusinessBasedInNorthernIrelandView
 
-import scala.concurrent.Future
-
-class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/one-stop-shop-registration/cannotRegisterForService")
+class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase {
 
   private val formProvider = new IsBusinessBasedInNorthernIrelandFormProvider()
   private val form = formProvider()
@@ -60,17 +49,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with Mocki
 
     "must redirect to the cannot register for service page when false is selected" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+      val application = applicationBuilder().build()
 
       running(application) {
         val request =
@@ -80,7 +59,23 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual routes.CannotRegisterForServiceController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the start page when true is selected" in {
+
+      val application = applicationBuilder().build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, isBusinessBasedInNorthernIrelandRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
       }
     }
 

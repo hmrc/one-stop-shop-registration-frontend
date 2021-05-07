@@ -35,8 +35,8 @@ class IsBusinessBasedInNorthernIrelandController @Inject()(
   def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
 
-    val form = formProvider()
-    Ok(view(form))
+      val form = formProvider()
+      Ok(view(form))
   }
 
   def onSubmit(): Action[AnyContent] = Action {
