@@ -21,6 +21,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.{BusinessAddressSummary, BusinessContactDetailsSummary, HasTradingNameSummary, PartOfVatGroupSummary, RegisteredCompanyNameSummary, TradingNameSummary, UkVatEffectiveDateSummary, UkVatNumberSummary, UkVatRegisteredPostcodeSummary, VatRegisteredEuMemberStateSummary, VatRegisteredInEuSummary}
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
@@ -37,7 +38,19 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
 
       val list = SummaryListViewModel(
-        rows = Seq.empty
+        rows = Seq(
+          RegisteredCompanyNameSummary.row(request.userAnswers),
+          HasTradingNameSummary.row(request.userAnswers),
+          TradingNameSummary.row(request.userAnswers),
+          PartOfVatGroupSummary.row(request.userAnswers),
+          UkVatNumberSummary.row(request.userAnswers),
+          UkVatEffectiveDateSummary.row(request.userAnswers),
+          UkVatRegisteredPostcodeSummary.row(request.userAnswers),
+          VatRegisteredInEuSummary.row(request.userAnswers),
+//          VatRegisteredEuMemberStateSummary.row(request.userAnswers),
+          BusinessAddressSummary.row(request.userAnswers),
+          BusinessContactDetailsSummary.row(request.userAnswers)
+        ).flatten
       )
 
       Ok(view(list))
