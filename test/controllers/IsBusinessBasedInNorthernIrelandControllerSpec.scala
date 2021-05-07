@@ -17,32 +17,30 @@
 package controllers
 
 import base.SpecBase
-import forms.{HasTradingNameFormProvider, IsBusinessBasedInNorthernIrelandFormProvider}
-import models.NormalMode
+import forms.IsBusinessBasedInNorthernIrelandFormProvider
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.{HasTradingNameView, IsBusinessBasedInNorthernIrelandView}
+import views.html.IsBusinessBasedInNorthernIrelandView
 
 import scala.concurrent.Future
 
 class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with MockitoSugar {
 
-  private def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/one-stop-shop-registration/cannotRegisterForService")
 
   private val formProvider = new IsBusinessBasedInNorthernIrelandFormProvider()
   private val form = formProvider()
 
   private lazy val isBusinessBasedInNorthernIrelandRoute = routes.IsBusinessBasedInNorthernIrelandController.onPageLoad().url
 
-  "HasTradingName Controller" - {
+  "IsBusinessBasedInNorthernIreland Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -60,23 +58,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val application = applicationBuilder().build()
-
-      running(application) {
-        val request = FakeRequest(GET, isBusinessBasedInNorthernIrelandRoute)
-
-        val view = application.injector.instanceOf[IsBusinessBasedInNorthernIrelandView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true))(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to the cannot register for service page when true is selected" in {
+    "must redirect to the cannot register for service page when false is selected" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -93,7 +75,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with Mocki
       running(application) {
         val request =
           FakeRequest(POST, isBusinessBasedInNorthernIrelandRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
@@ -119,66 +101,6 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder().build()
-
-      running(application) {
-        val request = FakeRequest(GET, isBusinessBasedInNorthernIrelandRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if Registered Company Name has not been answered" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, isBusinessBasedInNorthernIrelandRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, isBusinessBasedInNorthernIrelandRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if Registered Company Name has not been answered" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, isBusinessBasedInNorthernIrelandRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
