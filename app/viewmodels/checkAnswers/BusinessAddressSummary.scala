@@ -32,11 +32,13 @@ object BusinessAddressSummary  {
     answers.get(BusinessAddressPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.line1).toString + "<br/>" +
-        HtmlFormat.escape(answer.line2.getOrElse("")).toString + "<br/>" +
-        HtmlFormat.escape(answer.townOrCity).toString + "<br/>" +
-        HtmlFormat.escape(answer.county.getOrElse("")).toString + "<br/>" +
-        HtmlFormat.escape(answer.postCode).toString
+        val value = Seq(
+          Some(HtmlFormat.escape(answer.line1).toString),
+          answer.line2.map(HtmlFormat.escape),
+          Some(HtmlFormat.escape(answer.townOrCity).toString),
+          answer.county.map(HtmlFormat.escape),
+          Some(HtmlFormat.escape(answer.postCode).toString)
+        ).flatten.mkString("<br/>")
 
         SummaryListRowViewModel(
           key     = "businessAddress.checkYourAnswersLabel",

@@ -184,3 +184,5 @@ businessContactDetails.telephoneNumber.change.hidden = Telephone number
 businessContactDetails.emailAddress.change.hidden = Email address
 businessContactDetails.websiteAddress.change.hidden = Website address
 
+euVatDetails.checkYourAnswersLabel = EU VAT registration details
+euVatDetails.change.hidden = your EU VAT registration details
