@@ -17,6 +17,7 @@
 package controllers
 
 import forms.IsBusinessBasedInNorthernIrelandFormProvider
+import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -50,7 +51,7 @@ class IsBusinessBasedInNorthernIrelandController @Inject()(
 
       value =>
         if (value) {
-          Redirect(routes.IndexController.onPageLoad())
+          Redirect(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
         } else {
           Redirect(routes.CannotRegisterForServiceController.onPageLoad())
         }

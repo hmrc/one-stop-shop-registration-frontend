@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.IsBusinessBasedInNorthernIrelandFormProvider
+import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.IsBusinessBasedInNorthernIrelandView
@@ -63,7 +64,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to the start page when true is selected" in {
+    "must redirect to Registered Company Name page when true is selected" in {
 
       val application = applicationBuilder().build()
 
@@ -75,7 +76,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.RegisteredCompanyNameController.onPageLoad(NormalMode).url
       }
     }
 
