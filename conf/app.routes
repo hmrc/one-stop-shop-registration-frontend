@@ -1,93 +1,96 @@
 # microservice specific routes
 
-->          /govuk-frontend                              govuk.Routes
-->          /hmrc-frontend                               hmrcfrontend.Routes
+->          /govuk-frontend                                 govuk.Routes
+->          /hmrc-frontend                                  hmrcfrontend.Routes
 
-GET         /                                            controllers.IndexController.onPageLoad
+GET         /                                               controllers.IndexController.onPageLoad
 
-GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                                 controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                            controllers.KeepAliveController.keepAlive
+GET         /refresh-session                                controllers.KeepAliveController.keepAlive
 
-GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                             controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad
+GET         /check-your-answers                             controllers.CheckYourAnswersController.onPageLoad
 
-GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
-GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad
+GET         /account/sign-out-survey                        controllers.auth.AuthController.signOut
+GET         /account/sign-out                               controllers.auth.AuthController.signOutNoSurvey
+GET         /account/signed-out                             controllers.auth.SignedOutController.onPageLoad
 
-GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                                   controllers.UnauthorisedController.onPageLoad
 
-GET        /hasTradingName                        controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasTradingName                        controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasTradingName                  controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasTradingName                  controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /hasTradingName                                 controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /hasTradingName                                 controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /changeHasTradingName                           controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeHasTradingName                           controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /partOfVatGroup                        controllers.PartOfVatGroupController.onPageLoad(mode: Mode = NormalMode)
-POST       /partOfVatGroup                        controllers.PartOfVatGroupController.onSubmit(mode: Mode = NormalMode)
-GET        /changePartOfVatGroup                  controllers.PartOfVatGroupController.onPageLoad(mode: Mode = CheckMode)
-POST       /changePartOfVatGroup                  controllers.PartOfVatGroupController.onSubmit(mode: Mode = CheckMode)
+GET         /partOfVatGroup                                 controllers.PartOfVatGroupController.onPageLoad(mode: Mode = NormalMode)
+POST        /partOfVatGroup                                 controllers.PartOfVatGroupController.onSubmit(mode: Mode = NormalMode)
+GET         /changePartOfVatGroup                           controllers.PartOfVatGroupController.onPageLoad(mode: Mode = CheckMode)
+POST        /changePartOfVatGroup                           controllers.PartOfVatGroupController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registeredCompanyName                        controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /registeredCompanyName                        controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeRegisteredCompanyName                  controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeRegisteredCompanyName                  controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = CheckMode)
+GET         /registeredCompanyName                          controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /registeredCompanyName                          controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = NormalMode)
+GET         /changeRegisteredCompanyName                    controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeRegisteredCompanyName                    controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /tradingName                        controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /tradingName                        controllers.TradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeTradingName                  controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeTradingName                  controllers.TradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /tradingName                                    controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /tradingName                                    controllers.TradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /changeTradingName                              controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeTradingName                              controllers.TradingNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /ukVatEffectiveDate                  controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
-POST       /ukVatEffectiveDate                  controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
-GET        /changeUkVatEffectiveDate                        controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeUkVatEffectiveDate                        controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
+GET         /ukVatEffectiveDate                             controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
+POST        /ukVatEffectiveDate                             controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
+GET         /changeUkVatEffectiveDate                       controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeUkVatEffectiveDate                       controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
 
-GET        /ukVatNumber                        controllers.UkVatNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /ukVatNumber                        controllers.UkVatNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /changeUkVatNumber                  controllers.UkVatNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeUkVatNumber                  controllers.UkVatNumberController.onSubmit(mode: Mode = CheckMode)
+GET         /ukVatNumber                                    controllers.UkVatNumberController.onPageLoad(mode: Mode = NormalMode)
+POST        /ukVatNumber                                    controllers.UkVatNumberController.onSubmit(mode: Mode = NormalMode)
+GET         /changeUkVatNumber                              controllers.UkVatNumberController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeUkVatNumber                              controllers.UkVatNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = NormalMode)
-POST       /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = NormalMode)
-GET        /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = CheckMode)
+GET         /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = NormalMode)
+POST        /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = NormalMode)
+GET         /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /euVatNumber/:index                        controllers.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /euVatNumber/:index                        controllers.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /changeEuVatNumber/:index                  controllers.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /changeEuVatNumber/:index                  controllers.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /euVatNumber/:index                             controllers.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /euVatNumber/:index                             controllers.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeEuVatNumber/:index                       controllers.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeEuVatNumber/:index                       controllers.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET        /vatRegisteredEuMemberState/:index                 controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /vatRegisteredEuMemberState/:index                 controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /changeVatRegisteredEuMemberState/:index           controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /changeVatRegisteredEuMemberState/:index           controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /vatRegisteredEuMemberState/:index              controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /vatRegisteredEuMemberState/:index              controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeVatRegisteredEuMemberState/:index        controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeVatRegisteredEuMemberState/:index        controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET        /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
-POST       /vatRegisteredInEu                        controllers.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
-GET        /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeVatRegisteredInEu                  controllers.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+GET         /vatRegisteredInEu                              controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
+POST        /vatRegisteredInEu                              controllers.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
+GET         /changeVatRegisteredInEu                        controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeVatRegisteredInEu                        controllers.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
 
-GET        /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /addAdditionalEuVatDetails                        controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeAddAdditionalEuVatDetails                  controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /addAdditionalEuVatDetails                      controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /addAdditionalEuVatDetails                      controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /changeAddAdditionalEuVatDetails                controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeAddAdditionalEuVatDetails                controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /deleteEuVatDetails/:index                        controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /deleteEuVatDetails/:index                        controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /changeDeleteEuVatDetails/:index                  controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /changeDeleteEuVatDetails/:index                  controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /deleteEuVatDetails/:index                      controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /deleteEuVatDetails/:index                      controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeDeleteEuVatDetails/:index                controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeDeleteEuVatDetails/:index                controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET        /businessAddress                        controllers.BusinessAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /businessAddress                        controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /changeBusinessAddress                  controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeBusinessAddress                  controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
+GET         /businessAddress                                controllers.BusinessAddressController.onPageLoad(mode: Mode = NormalMode)
+POST        /businessAddress                                controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
+GET         /changeBusinessAddress                          controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeBusinessAddress                          controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /businessContactDetails                        controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /businessContactDetails                        controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeBusinessContactDetails                  controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeBusinessContactDetails                  controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /businessContactDetails                         controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /businessContactDetails                         controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
+GET         /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onPageLoad()
+POST        /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onSubmit()
+GET         /cannotRegisterForService                       controllers.CannotRegisterForServiceController.onPageLoad()
