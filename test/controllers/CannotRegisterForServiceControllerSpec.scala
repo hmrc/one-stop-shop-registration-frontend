@@ -17,23 +17,14 @@
 package controllers
 
 import base.SpecBase
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import views.html.CannotRegisterForServiceView
-
-import scala.concurrent.Future
 
 class CannotRegisterForServiceControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val cannotRegisterForServiceRoute = routes.CannotRegisterForServiceController.onPageLoad().url
+  private lazy val cannotRegisterForServiceRoute = routes.CannotRegisterForServiceController.onPageLoad().url
 
   "CannotRegisterForService Controller" - {
 

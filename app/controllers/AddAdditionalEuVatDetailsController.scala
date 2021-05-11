@@ -51,7 +51,7 @@ class AddAdditionalEuVatDetailsController @Inject()(
     implicit request =>
 
       val list = SummaryListViewModel(
-        rows = EuVatDetailsSummary.rows(request.userAnswers)
+        rows = EuVatDetailsSummary.addToListRows(request.userAnswers)
       )
 
       Ok(view(form, mode, list))
@@ -64,7 +64,7 @@ class AddAdditionalEuVatDetailsController @Inject()(
         formWithErrors => {
 
           val list = SummaryListViewModel(
-            rows = EuVatDetailsSummary.rows(request.userAnswers)
+            rows = EuVatDetailsSummary.addToListRows(request.userAnswers)
           )
 
           Future.successful(BadRequest(view(formWithErrors, mode, list)))

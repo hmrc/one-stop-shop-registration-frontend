@@ -19,13 +19,12 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.IndexView
 
 class IndexControllerSpec extends SpecBase {
 
   "Index Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return SEE OTHER and go to Is Business Based In Northern Ireland page" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -34,11 +33,9 @@ class IndexControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndexView]
+        status(result) mustEqual SEE_OTHER
 
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        redirectLocation(result).value mustBe routes.IsBusinessBasedInNorthernIrelandController.onPageLoad().url
       }
     }
   }

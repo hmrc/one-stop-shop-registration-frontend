@@ -32,7 +32,10 @@ object BusinessContactDetailsSummary  {
     answers.get(BusinessContactDetailsPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.fullName).toString + "<br/>" + HtmlFormat.escape(answer.telephoneNumber).toString
+      val value = HtmlFormat.escape(answer.fullName).toString + "<br/>" +
+        HtmlFormat.escape(answer.telephoneNumber).toString + "<br/>" +
+        HtmlFormat.escape(answer.emailAddress).toString + "<br/>" +
+        HtmlFormat.escape(answer.websiteAddress).toString
 
         SummaryListRowViewModel(
           key     = "businessContactDetails.checkYourAnswersLabel",

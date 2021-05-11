@@ -17,16 +17,18 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import queries.AllEuVatDetailsQuery
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object EuVatDetailsSummary  {
 
-  def rows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+  def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
     answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         SummaryListRowViewModel(
@@ -37,6 +39,25 @@ object EuVatDetailsSummary  {
               .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden", details.vatRegisteredEuMemberState)),
             ActionItemViewModel("site.remove", routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url)
               .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.remove.hidden", details.vatRegisteredEuMemberState))
+          )
+        )
+    }
+
+  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllEuVatDetailsQuery).map {
+      euVatDetails =>
+
+        val value = euVatDetails.map {
+          details =>
+            HtmlFormat.escape(details.vatRegisteredEuMemberState) + " - " + HtmlFormat.escape(details.euVatNumber)
+        }.mkString("<br/>")
+
+        SummaryListRowViewModel(
+          key     = "euVatDetails.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlContent(value)),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.AddAdditionalEuVatDetailsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("euVatDetails.change.hidden"))
           )
         )
     }
