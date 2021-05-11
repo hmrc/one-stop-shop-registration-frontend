@@ -17,17 +17,32 @@
 package controllers
 
 import base.SpecBase
+import models.UserAnswers
+import pages.BusinessContactDetailsPage
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.ApplicationCompleteView
 
 class ApplicationCompleteControllerSpec extends SpecBase {
 
+  val userAnswers = UserAnswers(
+    userAnswersId,
+    Json.obj(
+      BusinessContactDetailsPage.toString -> Json.obj(
+        "fullName" -> "value 1",
+        "telephoneNumber" -> "value 2",
+        "emailAddress" -> "test@test.com",
+        "websiteAddress" -> "value 4",
+      )
+    )
+  )
+
   "ApplicationComplete Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
@@ -35,9 +50,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ApplicationCompleteView]
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(userAnswers.get())(request, messages(application)).toString
       }
     }
   }

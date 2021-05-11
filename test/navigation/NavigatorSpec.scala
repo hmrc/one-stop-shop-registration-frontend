@@ -176,6 +176,12 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(BusinessContactDetailsPage, NormalMode, emptyUserAnswers)
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
+
+      "must go from Check Your Answers to Application Complete" in {
+
+        navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.ApplicationCompleteController.onPageLoad())
+      }
     }
 
     "in Check mode" - {

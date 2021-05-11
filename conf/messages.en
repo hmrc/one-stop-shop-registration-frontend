@@ -10,6 +10,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.submit = Submit application
 
 date.day = Day
 date.month = Month
@@ -192,5 +193,10 @@ cannotRegisterForService.heading = You cannot use this service
 cannotRegisterForService.can-register-in-eu-country = You can register for the One-Stop Shop scheme in an EU country.
 cannotRegisterForService.change.hidden = Cannot register for service
 
-applicationComplete.title = applicationComplete
-applicationComplete.heading = applicationComplete
+applicationComplete.title = Application complete
+applicationComplete.heading = Application complete
+applicationComplete.reference = Your reference number {0}
+applicationComplete.next = What happens next
+
+applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>
+applicationComplete.caption = You will be able to submit your EU VAT returns on GOV.UK.

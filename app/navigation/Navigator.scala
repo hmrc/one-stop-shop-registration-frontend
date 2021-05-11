@@ -41,6 +41,7 @@ class Navigator @Inject()() {
     case DeleteEuVatDetailsPage(_)             => deleteEuVatDetailsRoute
     case BusinessAddressPage                   => _ => routes.BusinessContactDetailsController.onPageLoad(NormalMode)
     case BusinessContactDetailsPage            => _ => routes.CheckYourAnswersController.onPageLoad()
+    case CheckYourAnswersPage                  => _ => routes.ApplicationCompleteController.onPageLoad()
     case _                                     => _ => routes.IndexController.onPageLoad()
   }
 
