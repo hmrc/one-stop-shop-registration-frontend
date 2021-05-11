@@ -191,3 +191,6 @@ cannotRegisterForService.title = You cannot use this service
 cannotRegisterForService.heading = You cannot use this service
 cannotRegisterForService.can-register-in-eu-country = You can register for the One-Stop Shop scheme in an EU country.
 cannotRegisterForService.change.hidden = Cannot register for service
+
+applicationComplete.title = applicationComplete
+applicationComplete.heading = applicationComplete

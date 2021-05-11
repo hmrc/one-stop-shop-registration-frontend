@@ -94,3 +94,5 @@ POST        /changeBusinessContactDetails                   controllers.Business
 GET         /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onPageLoad()
 POST        /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onSubmit()
 GET         /cannotRegisterForService                       controllers.CannotRegisterForServiceController.onPageLoad()
+
+GET        /applicationComplete                       controllers.ApplicationCompleteController.onPageLoad()
