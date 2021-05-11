@@ -19,7 +19,6 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.IndexView
 
 class IndexControllerSpec extends SpecBase {
 
@@ -34,11 +33,9 @@ class IndexControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndexView]
-
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result) mustBe Some(routes.IsBusinessBasedInNorthernIrelandController.onPageLoad().url)
+        redirectLocation(result).value mustBe routes.IsBusinessBasedInNorthernIrelandController.onPageLoad().url
       }
     }
   }

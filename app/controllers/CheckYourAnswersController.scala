@@ -21,7 +21,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.{BusinessAddressSummary, BusinessContactDetailsSummary, EuVatDetailsSummary, HasTradingNameSummary, PartOfVatGroupSummary, RegisteredCompanyNameSummary, TradingNameSummary, UkVatEffectiveDateSummary, UkVatNumberSummary, UkVatRegisteredPostcodeSummary, VatRegisteredEuMemberStateSummary, VatRegisteredInEuSummary}
+import viewmodels.checkAnswers._
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 

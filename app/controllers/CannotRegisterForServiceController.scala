@@ -22,17 +22,15 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CannotRegisterForServiceView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class CannotRegisterForServiceController @Inject()(
     override val messagesApi: MessagesApi,
     val controllerComponents: MessagesControllerComponents,
     view: CannotRegisterForServiceView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action {
     implicit request =>
       Ok(view())
   }
-
 }
