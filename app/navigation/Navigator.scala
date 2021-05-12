@@ -70,7 +70,25 @@ class Navigator @Inject()() {
     }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
+    case HasTradingNamePage => hasTradingNameRoute(CheckMode)
+    case AddAdditionalEuVatDetailsPage => AddAdditionalEuVatDetailsRoute(CheckMode)
+    case VatRegisteredInEuPage => vatRegisteredInEuRoute(CheckMode)
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private def hasTradingNameRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
+    case Some(true) => routes.TradingNameController.onPageLoad(mode)
+    case Some(false) => routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private def vatRegisteredInEuRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
+    case Some(true) => routes.VatRegisteredEuMemberStateController.onPageLoad(mode, Index(0))
+    case Some(false) => routes.CheckYourAnswersController.onPageLoad()
+  }
+
+  private def AddAdditionalEuVatDetailsRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(DeriveNumberOfEuVatRegisteredCountries) match {
+      case Some(n) if n > 0 => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
+      case _                => vatRegisteredInEuRoute(mode)(answers)
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
