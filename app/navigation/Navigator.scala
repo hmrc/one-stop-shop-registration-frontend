@@ -73,6 +73,8 @@ class Navigator @Inject()() {
     case HasTradingNamePage => hasTradingNameRoute(CheckMode)
     case AddAdditionalEuVatDetailsPage => AddAdditionalEuVatDetailsRoute(CheckMode)
     case VatRegisteredInEuPage => vatRegisteredInEuRoute(CheckMode)
+    case VatRegisteredEuMemberStatePage(index) => VatRegisteredEuMemberStateRoute(CheckMode, index)
+    case EuVatNumberPage(index) => EuVatNumberRoute(CheckMode, index)
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
@@ -86,9 +88,20 @@ class Navigator @Inject()() {
     case Some(false) => routes.CheckYourAnswersController.onPageLoad()
   }
 
-  private def AddAdditionalEuVatDetailsRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(DeriveNumberOfEuVatRegisteredCountries) match {
-      case Some(n) if n > 0 => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
+  private def AddAdditionalEuVatDetailsRoute(mode: Mode)(answers: UserAnswers): Call =
+    (answers.get(AddAdditionalEuVatDetailsPage), answers.get(DeriveNumberOfEuVatRegisteredCountries)) match {
+      case (Some(true), Some(size)) => routes.VatRegisteredEuMemberStateController.onPageLoad(mode, Index(size))
+      case (Some(false), _ ) => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(_), Some(n)) if n > 0 => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
       case _                => vatRegisteredInEuRoute(mode)(answers)
+  }
+
+  private def VatRegisteredEuMemberStateRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(VatRegisteredEuMemberStatePage(index)) match {
+    case _ => routes.EuVatNumberController.onPageLoad(mode, index)
+  }
+
+  private def EuVatNumberRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(EuVatNumberPage(index)) match {
+    case _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
