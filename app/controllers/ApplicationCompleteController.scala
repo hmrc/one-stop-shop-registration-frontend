@@ -26,19 +26,17 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationCompleteView
 
 class ApplicationCompleteController @Inject()(
-                                               override val messagesApi: MessagesApi,
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               requireData: DataRequiredAction,
-                                               val controllerComponents: MessagesControllerComponents,
-                                               view: ApplicationCompleteView
-                                             ) extends FrontendBaseController with I18nSupport {
-
+   override val messagesApi: MessagesApi,
+   identify: IdentifierAction,
+   getData: DataRetrievalAction,
+   requireData: DataRequiredAction,
+   val controllerComponents: MessagesControllerComponents,
+   view: ApplicationCompleteView
+) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-
-      val emailAddress = request.userAnswers.get(BusinessContactDetailsPage)
-        Ok(view(emailAddress.get.emailAddress))
+      val businessContactDetailsPage = request.userAnswers.get(BusinessContactDetailsPage)
+        Ok(view(businessContactDetailsPage.get.emailAddress))
   }
 }

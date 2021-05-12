@@ -42,6 +42,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
+      val emailAddress: String = "test@test.com"
+
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -51,7 +53,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[ApplicationCompleteView]
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(userAnswers.get())(request, messages(application)).toString
+        contentAsString(result) mustEqual view(emailAddress)(request, messages(application)).toString
       }
     }
   }
