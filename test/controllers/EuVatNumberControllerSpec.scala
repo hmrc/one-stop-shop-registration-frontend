@@ -33,14 +33,15 @@ import views.html.EuVatNumberView
 
 import scala.concurrent.Future
 
-class EuVatNumberControllerSpec(index: Index) extends SpecBase with MockitoSugar {
+class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val index = Index(0)
+  private val onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new EuVatNumberFormProvider()
-  val form = formProvider()
+  private val formProvider = new EuVatNumberFormProvider()
+  private val form = formProvider()
 
-  lazy val euVatNumberRoute = routes.EuVatNumberController.onPageLoad(NormalMode, index).url
+  private lazy val euVatNumberRoute = routes.EuVatNumberController.onPageLoad(NormalMode, index).url
 
   "EuVatNumber Controller" - {
 

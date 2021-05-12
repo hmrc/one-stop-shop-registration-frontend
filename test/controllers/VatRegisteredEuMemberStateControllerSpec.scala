@@ -33,14 +33,15 @@ import views.html.VatRegisteredEuMemberStateView
 
 import scala.concurrent.Future
 
-class VatRegisteredEuMemberStateControllerSpec(index: Index) extends SpecBase with MockitoSugar {
+class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val index = Index(0)
+  private val onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new VatRegisteredEuMemberStateFormProvider()
-  val form = formProvider()
+  private val formProvider = new VatRegisteredEuMemberStateFormProvider()
+  private val form = formProvider()
 
-  lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index).url
+  private lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index).url
 
   "VatRegisteredEuMemberState Controller" - {
 
