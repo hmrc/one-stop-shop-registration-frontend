@@ -92,7 +92,7 @@ class Navigator @Inject()() {
     (answers.get(AddAdditionalEuVatDetailsPage), answers.get(DeriveNumberOfEuVatRegisteredCountries)) match {
       case (Some(true), Some(size)) => routes.VatRegisteredEuMemberStateController.onPageLoad(mode, Index(size))
       case (Some(false), _ ) => routes.CheckYourAnswersController.onPageLoad()
-      case (Some(_), Some(n)) if n > 0 => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
+      case (None, Some(n)) if n > 0 => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
       case _                => vatRegisteredInEuRoute(mode)(answers)
   }
 

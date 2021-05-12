@@ -16,11 +16,21 @@
 
 package pages
 
+import models.UserAnswers
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object HasTradingNamePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "hasTradingName"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value) match {
+      case Some(false) => userAnswers.remove(TradingNamePage)
+      case _ => super.cleanup(value, userAnswers)
+    }
+
 }

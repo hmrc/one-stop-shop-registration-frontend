@@ -16,11 +16,27 @@
 
 package pages
 
+import models.{Index, UserAnswers}
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case object VatRegisteredInEuPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "vatRegisteredInEu"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value) match {
+      case Some(false) =>
+        userAnswers.remove(VatRegisteredEuMemberStatePage(Index(0))).flatMap(
+        _.remove(EuVatNumberPage(Index(0)))
+      )
+      case _ => super.cleanup(value, userAnswers)
+    }
+
+//  private def removeAll(userAnswers: UserAnswers) = {
+//
+//  }
 }
