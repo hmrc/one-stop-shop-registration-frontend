@@ -258,7 +258,7 @@ class NavigatorSpec extends SpecBase {
 
         "to VAT Registered EU Member State page if true" in {
 
-          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true ).success.value
+          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, CheckMode, answers)
             .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(CheckMode, index))
@@ -266,7 +266,7 @@ class NavigatorSpec extends SpecBase {
 
         "to Check Your Answers if false" in {
 
-          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false ).success.value
+          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, CheckMode, answers)
             .mustBe(routes.CheckYourAnswersController.onPageLoad())
@@ -293,7 +293,7 @@ class NavigatorSpec extends SpecBase {
 
         "to VAT Registered EU Member State page if true" in {
 
-          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, true ).success.value
+          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, true).success.value
             .set(VatRegisteredEuMemberStatePage(index), "France").success.value
             .set(EuVatNumberPage(index), "FR123456789").success.value
 
@@ -303,7 +303,7 @@ class NavigatorSpec extends SpecBase {
 
         "to Check Your Answers if false" in {
 
-          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, false ).success.value
+          val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, false).success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, CheckMode, answers)
             .mustBe(routes.CheckYourAnswersController.onPageLoad())
