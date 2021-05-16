@@ -18,12 +18,14 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteTradingNameFormProvider
+import models.requests.DataRequest
+
 import javax.inject.Inject
-import models.Mode
+import models.{Index, Mode}
 import navigation.Navigator
-import pages.DeleteTradingNamePage
+import pages.{DeleteTradingNamePage, TradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteTradingNameView
@@ -42,31 +44,43 @@ class DeleteTradingNameController @Inject()(
                                          view: DeleteTradingNameView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
-      val preparedForm = request.userAnswers.get(DeleteTradingNamePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+      getTradingName(index) {
+        tradingName =>
+          Future.successful(Ok(view(form, mode, index, tradingName)))
       }
 
-      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getTradingName(index) {
+        tradingName =>
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, tradingName))),
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteTradingNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(DeleteTradingNamePage, mode, updatedAnswers))
-      )
+            value =>
+              if (value) {
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(TradingNamePage(index)))
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(DeleteTradingNamePage(index), mode, updatedAnswers))
+              } else {
+                Future.successful(Redirect(navigator.nextPage(DeleteTradingNamePage(index), mode, request.userAnswers)))
+              }
+          )
+      }
   }
+
+  private def getTradingName(index: Index)
+                            (block: String => Future[Result])
+                            (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(TradingNamePage(index)).map {
+      name =>
+        block(name)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

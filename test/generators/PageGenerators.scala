@@ -22,9 +22,6 @@ import pages._
 
 trait PageGenerators {
 
-  implicit lazy val arbitraryDeleteTradingNamePage: Arbitrary[DeleteTradingNamePage.type] =
-    Arbitrary(DeleteTradingNamePage)
-
   implicit lazy val arbitraryBusinessContactDetailsPage: Arbitrary[BusinessContactDetailsPage.type] =
     Arbitrary(BusinessContactDetailsPage)
 
@@ -52,8 +49,8 @@ trait PageGenerators {
   implicit lazy val arbitraryUkVatEffectiveDatePage: Arbitrary[UkVatEffectiveDatePage.type] =
     Arbitrary(UkVatEffectiveDatePage)
 
-  implicit lazy val arbitraryTradingNamePage: Arbitrary[TradingNamePage.type] =
-    Arbitrary(TradingNamePage)
+  implicit lazy val arbitraryTradingNamePage: Arbitrary[TradingNamePage] =
+    Arbitrary(TradingNamePage(Index(0)))
 
   implicit lazy val arbitraryRegisteredCompanyNamePage: Arbitrary[RegisteredCompanyNamePage.type] =
     Arbitrary(RegisteredCompanyNamePage)

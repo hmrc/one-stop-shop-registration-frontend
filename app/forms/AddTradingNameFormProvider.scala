@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import models.Index
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-case class TradingNamePage(index: Index) extends QuestionPage[String] {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  override def path: JsPath = JsPath \ "tradingNames" \ index.position
+class AddTradingNameFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "tradingName"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("addTradingName.error.required")
+    )
 }

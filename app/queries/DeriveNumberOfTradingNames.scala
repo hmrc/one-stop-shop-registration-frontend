@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package queries
 
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.{JsPath, JsString}
 
-class DeleteTradingNamePageSpec extends PageBehaviours {
-
-  "DeleteTradingNamePage" - {
-
-    beRetrievable[Boolean](DeleteTradingNamePage)
-
-    beSettable[Boolean](DeleteTradingNamePage)
-
-    beRemovable[Boolean](DeleteTradingNamePage)
-  }
+case object DeriveNumberOfTradingNames extends Derivable[List[JsString], Int] {
+  override val derive: List[JsString] => Int = _.size
+  override def path: JsPath = JsPath \ "tradingNames"
 }

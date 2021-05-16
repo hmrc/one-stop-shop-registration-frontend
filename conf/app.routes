@@ -37,10 +37,10 @@ POST        /registeredCompanyName                          controllers.Register
 GET         /changeRegisteredCompanyName                    controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeRegisteredCompanyName                    controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = CheckMode)
 
-GET         /tradingName                                    controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /tradingName                                    controllers.TradingNameController.onSubmit(mode: Mode = NormalMode)
-GET         /changeTradingName                              controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeTradingName                              controllers.TradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /tradingName/:index                             controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /tradingName/:index                             controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeTradingName/:index                       controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeTradingName/:index                       controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /ukVatEffectiveDate                             controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
 POST        /ukVatEffectiveDate                             controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
@@ -96,9 +96,14 @@ GET         /isBusinessBasedInNorthernIreland               controllers.IsBusine
 POST        /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onSubmit()
 GET         /cannotRegisterForService                       controllers.CannotRegisterForServiceController.onPageLoad()
 
-GET        /applicationComplete                       controllers.ApplicationCompleteController.onPageLoad()
+GET        /applicationComplete                             controllers.ApplicationCompleteController.onPageLoad()
 
-GET        /deleteTradingName                        controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /deleteTradingName                        controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeDeleteTradingName                  controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeDeleteTradingName                  controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET        /deleteTradingName/:index                        controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /deleteTradingName/:index                        controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeDeleteTradingName/:index                  controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeDeleteTradingName/:index                  controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /addTradingName                                 controllers.AddTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /addTradingName                                 controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /changeAddTradingName                           controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeAddTradingName                           controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)

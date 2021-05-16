@@ -41,7 +41,7 @@ class CheckYourAnswersController @Inject()(
         rows = Seq(
           RegisteredCompanyNameSummary.row(request.userAnswers),
           HasTradingNameSummary.row(request.userAnswers),
-          TradingNameSummary.row(request.userAnswers),
+          TradingNameSummary.checkAnswersRow(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatNumberSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),

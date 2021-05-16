@@ -53,7 +53,7 @@ class NavigatorSpec extends SpecBase {
           val answers = emptyUserAnswers.set(HasTradingNamePage, true).success.value
 
           navigator.nextPage(HasTradingNamePage, NormalMode, answers)
-            .mustBe(routes.TradingNameController.onPageLoad(NormalMode))
+            .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(0)))
         }
 
         "to Part of VAT Group when the user answers false" in {
@@ -65,10 +65,51 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Trading Name to Part of VAT Group" in {
+      "must go from Trading Name to Add Trading Name" in {
 
-        navigator.nextPage(TradingNamePage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+        navigator.nextPage(TradingNamePage(Index(0)), NormalMode, emptyUserAnswers)
+          .mustBe(routes.AddTradingNameController.onPageLoad(NormalMode))
+      }
+
+      "must go from Add Trading Name" - {
+
+        "to Trading Name for the next index when the user answers yes" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo").success.value
+              .set(AddTradingNamePage, true).success.value
+
+          navigator.nextPage(AddTradingNamePage, NormalMode, answers)
+            .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(1)))
+        }
+
+        "to Part of VAT Group when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
+
+          navigator.nextPage(AddTradingNamePage, NormalMode, answers)
+            .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Delete Trading Name" - {
+
+        "to Add Trading Name when there are still trading names left" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo").success.value
+
+          navigator.nextPage(DeleteTradingNamePage(Index(0)), NormalMode, answers)
+            .mustBe(routes.AddTradingNameController.onPageLoad(NormalMode))
+        }
+
+        "to Has Trading Name when there are no trading names left" in {
+
+          navigator.nextPage(DeleteTradingNamePage(Index(0)), NormalMode, emptyUserAnswers)
+            .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+        }
       }
 
       "must go from Part of VAT Group to UK VAT Number" in {
@@ -210,7 +251,7 @@ class NavigatorSpec extends SpecBase {
           val answers = emptyUserAnswers.set(HasTradingNamePage, true).success.value
 
           navigator.nextPage(HasTradingNamePage, CheckMode, answers)
-            .mustBe(routes.TradingNameController.onPageLoad(CheckMode))
+            .mustBe(routes.TradingNameController.onPageLoad(CheckMode, Index(0)))
         }
 
         "to Check Your Answers when the user answers false" in {

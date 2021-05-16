@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package queries
 
-import models.Index
 import play.api.libs.json.JsPath
 
-case class TradingNamePage(index: Index) extends QuestionPage[String] {
+case object AllTradingNames extends Gettable[List[String]] with Settable[List[String]] {
 
-  override def path: JsPath = JsPath \ "tradingNames" \ index.position
-
-  override def toString: String = "tradingName"
+  override def path: JsPath = JsPath \ "tradingNames"
 }

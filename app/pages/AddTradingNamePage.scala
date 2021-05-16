@@ -16,12 +16,11 @@
 
 package pages
 
-import models.Index
 import play.api.libs.json.JsPath
 
-case class TradingNamePage(index: Index) extends QuestionPage[String] {
+case object AddTradingNamePage extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ "tradingNames" \ index.position
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "tradingName"
+  override def toString: String = "addTradingName"
 }
