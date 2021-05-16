@@ -200,3 +200,9 @@ applicationComplete.next = What happens next
 
 applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>
 applicationComplete.caption = You will be able to submit your EU VAT returns on GOV.UK.
+
+deleteTradingName.title = deleteTradingName
+deleteTradingName.heading = deleteTradingName
+deleteTradingName.checkYourAnswersLabel = deleteTradingName
+deleteTradingName.error.required = Select yes if deleteTradingName
+deleteTradingName.change.hidden = DeleteTradingName

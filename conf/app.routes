@@ -97,3 +97,8 @@ POST        /isBusinessBasedInNorthernIreland               controllers.IsBusine
 GET         /cannotRegisterForService                       controllers.CannotRegisterForServiceController.onPageLoad()
 
 GET        /applicationComplete                       controllers.ApplicationCompleteController.onPageLoad()
+
+GET        /deleteTradingName                        controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /deleteTradingName                        controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeDeleteTradingName                  controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeDeleteTradingName                  controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode)
