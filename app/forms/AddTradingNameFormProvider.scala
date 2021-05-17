@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package queries
+package forms
 
-import models.EuVatDetails
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-case object AllEuVatDetailsQuery extends Gettable[List[EuVatDetails]] with Settable[List[EuVatDetails]] {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  override def path: JsPath = JsPath \ "euVatDetails"
+class AddTradingNameFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("addTradingName.error.required")
+    )
 }

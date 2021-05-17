@@ -17,37 +17,34 @@
 package controllers
 
 import base.SpecBase
-import forms.DeleteEuVatDetailsFormProvider
-import models.{EuVatDetails, Index, NormalMode}
+import forms.DeleteTradingNameFormProvider
+import models.{Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{EuVatNumberPage, VatRegisteredEuMemberStatePage}
+import pages.TradingNamePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.DeleteEuVatDetailsView
+import views.html.DeleteTradingNameView
 
 import scala.concurrent.Future
 
-class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
+class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private val formProvider = new DeleteEuVatDetailsFormProvider()
+  private val formProvider = new DeleteTradingNameFormProvider()
   private val form = formProvider()
 
   private val index = Index(0)
-  private val euVatDetails = EuVatDetails("Country", "VAT Number")
-  private lazy val deleteEuVatDetailsRoute = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, index).url
+  private val tradingName = "foo"
+  private lazy val deleteTradingNameRoute = routes.DeleteTradingNameController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers =
-    emptyUserAnswers
-      .set(VatRegisteredEuMemberStatePage(index), euVatDetails.vatRegisteredEuMemberState).success.value
-      .set(EuVatNumberPage(index), euVatDetails.euVatNumber).success.value
+  private val baseUserAnswers = emptyUserAnswers.set(TradingNamePage(index), tradingName).success.value
 
   "DeleteEuVatDetails Controller" - {
 
@@ -56,14 +53,14 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
+        val request = FakeRequest(GET, deleteTradingNameRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[DeleteEuVatDetailsView]
+        val view = application.injector.instanceOf[DeleteTradingNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, euVatDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, tradingName)(request, messages(application)).toString
       }
     }
 
@@ -83,7 +80,7 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteEuVatDetailsRoute)
+          FakeRequest(POST, deleteTradingNameRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -111,7 +108,7 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteEuVatDetailsRoute)
+          FakeRequest(POST, deleteTradingNameRoute)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
@@ -128,17 +125,17 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteEuVatDetailsRoute)
+          FakeRequest(POST, deleteTradingNameRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[DeleteEuVatDetailsView]
+        val view = application.injector.instanceOf[DeleteTradingNameView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, euVatDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, tradingName)(request, messages(application)).toString
       }
     }
 
@@ -147,7 +144,7 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
+        val request = FakeRequest(GET, deleteTradingNameRoute)
 
         val result = route(application, request).value
 
@@ -156,12 +153,12 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no EU VAT details exist" in {
+    "must redirect to Journey Recovery for a GET if the trading name is not found" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
+        val request = FakeRequest(GET, deleteTradingNameRoute)
 
         val result = route(application, request).value
 
@@ -176,7 +173,7 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteEuVatDetailsRoute)
+          FakeRequest(POST, deleteTradingNameRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

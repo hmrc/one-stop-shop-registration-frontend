@@ -14,12 +14,32 @@
  * limitations under the License.
  */
 
-package queries
+package forms
 
-import models.EuVatDetails
-import play.api.libs.json.JsPath
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-case object AllEuVatDetailsQuery extends Gettable[List[EuVatDetails]] with Settable[List[EuVatDetails]] {
+class DeleteTradingNameFormProviderSpec extends BooleanFieldBehaviours {
 
-  override def path: JsPath = JsPath \ "euVatDetails"
+  val requiredKey = "deleteTradingName.error.required"
+  val invalidKey = "error.boolean"
+
+  val form = new DeleteTradingNameFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package queries
+package pages
 
-import models.EuVatDetails
-import play.api.libs.json.JsPath
+import models.Index
 
-case object AllEuVatDetailsQuery extends Gettable[List[EuVatDetails]] with Settable[List[EuVatDetails]] {
-
-  override def path: JsPath = JsPath \ "euVatDetails"
-}
+case class DeleteTradingNamePage(index: Index) extends Page

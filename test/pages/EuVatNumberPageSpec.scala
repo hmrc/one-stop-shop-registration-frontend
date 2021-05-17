@@ -20,7 +20,9 @@ import models.Index
 import pages.behaviours.PageBehaviours
 
 
-class EuVatNumberPageSpec(index:Index) extends PageBehaviours {
+class EuVatNumberPageSpec extends PageBehaviours {
+
+  val index: Index = Index(0)
 
   "EuVatNumberPage" - {
 

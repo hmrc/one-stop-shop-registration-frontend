@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import controllers.routes
 import pages._
 import models._
-import queries.DeriveNumberOfEuVatRegisteredCountries
+import queries._
 
 @Singleton
 class Navigator @Inject()() {
@@ -29,7 +29,9 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case RegisteredCompanyNamePage             => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
     case HasTradingNamePage                    => hasTradingNameRoute
-    case TradingNamePage                       => _ => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+    case TradingNamePage(_)                    => _ => routes.AddTradingNameController.onPageLoad(NormalMode)
+    case AddTradingNamePage                    => addTradingNameRoute
+    case DeleteTradingNamePage(_)              => deleteTradingNameRoute
     case PartOfVatGroupPage                    => _ => routes.UkVatNumberController.onPageLoad(NormalMode)
     case UkVatNumberPage                       => _ => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
     case UkVatEffectiveDatePage                => _ => routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode)
@@ -46,10 +48,23 @@ class Navigator @Inject()() {
   }
 
   private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
-    case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode)
+    case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))
     case Some(false) => routes.PartOfVatGroupController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
+
+  private def addTradingNameRoute(answers: UserAnswers): Call =
+    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
+      case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _)         => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def deleteTradingNameRoute(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfTradingNames) match {
+      case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(NormalMode)
+      case _                => routes.HasTradingNameController.onPageLoad(NormalMode)
+    }
 
   private def isEuVatRegistered(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
     case Some(true)  => routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(0))
@@ -72,24 +87,26 @@ class Navigator @Inject()() {
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case HasTradingNamePage                     => hasTradingNameRoute(CheckMode)
-    case AddAdditionalEuVatDetailsPage          => AddAdditionalEuVatDetailsRoute(CheckMode)
+    case AddAdditionalEuVatDetailsPage          => addAdditionalEuVatDetailsRoute(CheckMode)
     case VatRegisteredInEuPage                  => vatRegisteredInEuRoute(CheckMode)
-    case VatRegisteredEuMemberStatePage(index)  => VatRegisteredEuMemberStateRoute(CheckMode, index)
-    case EuVatNumberPage(index)                 => EuVatNumberRoute(CheckMode, index)
+    case VatRegisteredEuMemberStatePage(index)  => vatRegisteredEuMemberStateRoute(CheckMode, index)
+    case EuVatNumberPage(index)                 => euVatNumberRoute(CheckMode, index)
     case _                                      => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def hasTradingNameRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
-    case Some(true)   => routes.TradingNameController.onPageLoad(mode)
+    case Some(true)   => routes.TradingNameController.onPageLoad(mode, Index(0))
     case Some(false)  => routes.CheckYourAnswersController.onPageLoad()
+    case None         => routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def vatRegisteredInEuRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
     case Some(true)   => routes.VatRegisteredEuMemberStateController.onPageLoad(mode, Index(0))
     case Some(false)  => routes.CheckYourAnswersController.onPageLoad()
+    case None         => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private def AddAdditionalEuVatDetailsRoute(mode: Mode)(answers: UserAnswers): Call =
+  private def addAdditionalEuVatDetailsRoute(mode: Mode)(answers: UserAnswers): Call =
     (answers.get(AddAdditionalEuVatDetailsPage), answers.get(DeriveNumberOfEuVatRegisteredCountries)) match {
       case (Some(true), Some(size)) => routes.VatRegisteredEuMemberStateController.onPageLoad(mode, Index(size))
       case (Some(false), _ )        => routes.CheckYourAnswersController.onPageLoad()
@@ -97,11 +114,11 @@ class Navigator @Inject()() {
       case _                        => vatRegisteredInEuRoute(mode)(answers)
   }
 
-  private def VatRegisteredEuMemberStateRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(VatRegisteredEuMemberStatePage(index)) match {
+  private def vatRegisteredEuMemberStateRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(VatRegisteredEuMemberStatePage(index)) match {
     case _ => routes.EuVatNumberController.onPageLoad(mode, index)
   }
 
-  private def EuVatNumberRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(EuVatNumberPage(index)) match {
+  private def euVatNumberRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(EuVatNumberPage(index)) match {
     case _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
   }
 

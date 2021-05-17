@@ -14,32 +14,29 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
-
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
+    govukRadios: GovukRadios,
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, tradingName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("tradingName.title"))) {
+@layout(pageTitle = title(form, messages("deleteTradingName.title"))) {
 
-    @formHelper(action = routes.TradingNameController.onSubmit(mode, index)) {
+    @formHelper(action = routes.DeleteTradingNameController.onSubmit(mode, index), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput(
-            InputViewModel(
+        @govukRadios(
+            RadiosViewModel.yesNo(
                 field = form("value"),
-                label = LabelViewModel(messages("tradingName.heading")).asPageHeading()
+                legend = LegendViewModel(messages("deleteTradingName.heading")).asPageHeading()
             )
-            .withWidth(Full)
         )
 
         @govukButton(

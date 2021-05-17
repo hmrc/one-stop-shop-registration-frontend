@@ -17,25 +17,47 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
-import pages.TradingNamePage
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import queries.AllTradingNames
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object TradingNameSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TradingNamePage).map {
-      answer =>
+
+  def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+    answers.get(AllTradingNames).getOrElse(List.empty).zipWithIndex.map {
+      case (name, index) =>
+        SummaryListRowViewModel(
+          key     = KeyViewModel(name).withCssClass("hmrc-add-to-a-list__identifier--light"),
+          value   = ValueViewModel(""),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.TradingNameController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("addTradingName.change.hidden", name)),
+            ActionItemViewModel("site.remove", routes.DeleteTradingNameController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("addTradingName.remove.hidden", name))
+          )
+        )
+    }
+
+  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllTradingNames).map {
+      tradingNames =>
+
+        val value = tradingNames.map {
+          name =>
+            HtmlFormat.escape(name)
+        }.mkString("<br/>")
 
         SummaryListRowViewModel(
           key     = "tradingName.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.TradingNameController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("tradingName.change.hidden"))
           )
         )

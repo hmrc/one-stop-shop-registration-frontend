@@ -16,10 +16,9 @@
 
 package queries
 
-import models.EuVatDetails
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsPath, JsString}
 
-case object DeleteAllEuVatDetailsQuery extends Settable[List[EuVatDetails]] {
-
-  override def path: JsPath = JsPath \ "euVatDetails"
+case object DeriveNumberOfTradingNames extends Derivable[List[JsString], Int] {
+  override val derive: List[JsString] => Int = _.size
+  override def path: JsPath = JsPath \ "tradingNames"
 }

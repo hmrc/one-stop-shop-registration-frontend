@@ -16,10 +16,9 @@
 
 package queries
 
-import models.EuVatDetails
 import play.api.libs.json.JsPath
 
-case object AllEuVatDetailsQuery extends Gettable[List[EuVatDetails]] with Settable[List[EuVatDetails]] {
+case object AllTradingNames extends Gettable[List[String]] with Settable[List[String]] {
 
-  override def path: JsPath = JsPath \ "euVatDetails"
+  override def path: JsPath = JsPath \ "tradingNames"
 }
