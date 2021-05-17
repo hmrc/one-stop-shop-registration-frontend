@@ -18,7 +18,7 @@ package pages
 
 import models.UserAnswers
 import play.api.libs.json.JsPath
-import queries.DeleteAllEuVatDetailsQuery
+import queries.AllEuVatDetailsQuery
 
 import scala.util.Try
 
@@ -30,7 +30,7 @@ case object VatRegisteredInEuPage extends QuestionPage[Boolean] {
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(false) => userAnswers.remove(DeleteAllEuVatDetailsQuery)
-      case _ => super.cleanup(value, userAnswers)
+      case Some(false) => userAnswers.remove(AllEuVatDetailsQuery)
+      case _           => super.cleanup(value, userAnswers)
     }
 }

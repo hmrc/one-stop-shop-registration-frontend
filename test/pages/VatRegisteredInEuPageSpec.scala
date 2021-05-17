@@ -16,6 +16,7 @@
 
 package pages
 
+import models.{Index, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class VatRegisteredInEuPageSpec extends PageBehaviours {
@@ -27,5 +28,40 @@ class VatRegisteredInEuPageSpec extends PageBehaviours {
     beSettable[Boolean](VatRegisteredInEuPage)
 
     beRemovable[Boolean](VatRegisteredInEuPage)
+
+
+    "must remove all EU VAT details when the answer is false" in {
+
+      val answers =
+        UserAnswers("id")
+          .set(VatRegisteredEuMemberStatePage(Index(0)), "country 1").success.value
+          .set(EuVatNumberPage(Index(0)), "reg 1").success.value
+          .set(VatRegisteredEuMemberStatePage(Index(1)), "country 2").success.value
+          .set(EuVatNumberPage(Index(1)), "reg 2").success.value
+
+      val result = answers.set(VatRegisteredInEuPage, false).success.value
+
+      result.get(VatRegisteredEuMemberStatePage(Index(0))) must not be defined
+      result.get(EuVatNumberPage(Index(0))) must not be defined
+      result.get(VatRegisteredEuMemberStatePage(Index(1))) must not be defined
+      result.get(EuVatNumberPage(Index(1))) must not be defined
+    }
+
+    "must not remove any trading names when the answer is true" in {
+
+      val answers =
+        UserAnswers("id")
+          .set(VatRegisteredEuMemberStatePage(Index(0)), "country 1").success.value
+          .set(EuVatNumberPage(Index(0)), "reg 1").success.value
+          .set(VatRegisteredEuMemberStatePage(Index(1)), "country 2").success.value
+          .set(EuVatNumberPage(Index(1)), "reg 2").success.value
+
+      val result = answers.set(VatRegisteredInEuPage, true).success.value
+
+      result.get(VatRegisteredEuMemberStatePage(Index(0))).value mustEqual "country 1"
+      result.get(EuVatNumberPage(Index(0))).value mustEqual "reg 1"
+      result.get(VatRegisteredEuMemberStatePage(Index(1))).value mustEqual "country 2"
+      result.get(EuVatNumberPage(Index(1))).value mustEqual "reg 2"
+    }
   }
 }
