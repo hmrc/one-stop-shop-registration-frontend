@@ -210,3 +210,10 @@ addTradingName.change.hidden = {0}
 addTradingName.remove.hidden = {0}
 addTradingName.addAnother = Do you need to add another trading name?
 addTradingName.addAnother.hint = You must tell us about all the trading names you use.
+
+website.title = website
+website.heading = website
+website.checkYourAnswersLabel = website
+website.error.required = Enter website
+website.error.length = Website must be 100 characters or less
+website.change.hidden = Website

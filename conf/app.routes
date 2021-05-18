@@ -107,3 +107,8 @@ GET         /addTradingName                                 controllers.AddTradi
 POST        /addTradingName                                 controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET         /changeAddTradingName                           controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeAddTradingName                           controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /website                        controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode)
+POST       /website                        controllers.WebsiteController.onSubmit(mode: Mode = NormalMode)
+GET        /changeWebsite                  controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeWebsite                  controllers.WebsiteController.onSubmit(mode: Mode = CheckMode)
