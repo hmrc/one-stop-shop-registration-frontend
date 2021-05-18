@@ -29,8 +29,7 @@ trait ModelGenerators {
         fullName <- arbitrary[String]
         telephoneNumber <- arbitrary[String]
         emailAddress <- arbitrary[String]
-        websiteAddress <- arbitrary[String]
-      } yield BusinessContactDetails(fullName, telephoneNumber, emailAddress, websiteAddress)
+      } yield BusinessContactDetails(fullName, telephoneNumber, emailAddress)
     }
 
   implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =

@@ -372,8 +372,7 @@ class NavigatorSpec extends SpecBase {
         val businessContactDetails = new BusinessContactDetails(
           "Name",
           "0111 1111111",
-          "email@email.com",
-          "web.com"
+          "email@email.com"
         )
 
         val answers = emptyUserAnswers.set(BusinessContactDetailsPage, businessContactDetails).success.value

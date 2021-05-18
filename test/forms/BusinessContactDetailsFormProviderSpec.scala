@@ -76,4 +76,31 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
   }
+
+  ".emailAddress" - {
+
+    val fieldName = "emailAddress"
+    val requiredKey = "businessContactDetails.error.emailAddress.required"
+    val lengthKey = "businessContactDetails.error.emailAddress.length"
+    val maxLength = 100
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }
