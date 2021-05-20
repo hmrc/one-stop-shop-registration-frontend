@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json._
+import pages.behaviours.PageBehaviours
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
+class AddTradingNamePageSpec extends PageBehaviours {
 
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+  "AddAdditionalEuVatDetailsPage" - {
+
+    beRetrievable[Boolean](AddTradingNamePage)
+
+    beSettable[Boolean](AddTradingNamePage)
+
+    beRemovable[Boolean](AddTradingNamePage)
+  }
 }

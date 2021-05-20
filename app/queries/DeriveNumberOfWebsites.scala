@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package queries
 
-import play.api.libs.json._
+import play.api.libs.json.{JsPath, JsString}
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
-
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+case object DeriveNumberOfWebsites extends Derivable[List[JsString], Int] {
+  override val derive: List[JsString] => Int = _.size
+  override def path: JsPath = JsPath \ "websites"
 }

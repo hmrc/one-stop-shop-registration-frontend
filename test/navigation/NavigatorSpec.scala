@@ -209,10 +209,57 @@ class NavigatorSpec extends SpecBase {
         }
       }
       
-      "must go from Business Address to Business Contact Details" in {
+      "must go from Business Address to Website" in {
 
         navigator.nextPage(BusinessAddressPage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
+          .mustBe(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
+      }
+
+      "must go from Website to Add Website" in {
+
+        navigator.nextPage(WebsitePage(Index(0)), NormalMode, emptyUserAnswers)
+          .mustBe(routes.AddWebsiteController.onPageLoad(NormalMode))
+      }
+
+      "must go from Add Website" - {
+
+        "to Website for the next index when the user answers yes" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(WebsitePage(Index(0)), "website").success.value
+              .set(AddWebsitePage, true).success.value
+
+          navigator.nextPage(AddWebsitePage, NormalMode, answers)
+            .mustBe(routes.WebsiteController.onPageLoad(NormalMode, Index(1)))
+        }
+
+        "to Business Contact Details when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(AddWebsitePage, false).success.value
+
+          navigator.nextPage(AddWebsitePage, NormalMode, answers)
+            .mustBe(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Delete Website" - {
+
+        "to Website Name when there are still websites left" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(WebsitePage(Index(0)), "foo").success.value
+
+          navigator.nextPage(DeleteWebsitePage(Index(0)), NormalMode, answers)
+            .mustBe(routes.AddWebsiteController.onPageLoad(NormalMode))
+        }
+
+        "to Website with index 0 when there are no websites left" in {
+
+          navigator.nextPage(DeleteWebsitePage(Index(0)), NormalMode, emptyUserAnswers)
+            .mustBe(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
+        }
       }
 
       "must go from Business Contact Details to Check Your Answers" in {
@@ -372,8 +419,7 @@ class NavigatorSpec extends SpecBase {
         val businessContactDetails = new BusinessContactDetails(
           "Name",
           "0111 1111111",
-          "email@email.com",
-          "web.com"
+          "email@email.com"
         )
 
         val answers = emptyUserAnswers.set(BusinessContactDetailsPage, businessContactDetails).success.value

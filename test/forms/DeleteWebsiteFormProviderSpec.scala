@@ -14,16 +14,32 @@
  * limitations under the License.
  */
 
-package models
+package forms
 
-import play.api.libs.json._
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
+class DeleteWebsiteFormProviderSpec extends BooleanFieldBehaviours {
 
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+  val requiredKey = "deleteWebsite.error.required"
+  val invalidKey = "error.boolean"
+
+  val form = new DeleteWebsiteFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

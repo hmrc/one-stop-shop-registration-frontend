@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json._
+import models.Index
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
-
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
-}
+case class DeleteWebsitePage(index: Index) extends Page

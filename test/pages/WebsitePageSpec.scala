@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json._
+import models.Index
+import pages.behaviours.PageBehaviours
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
+class WebsitePageSpec extends PageBehaviours {
 
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+  val index: Index = Index(0)
+
+  "WebsitePage" - {
+
+    beRetrievable[String](WebsitePage(index))
+
+    beSettable[String](WebsitePage(index))
+
+    beRemovable[String](WebsitePage(index))
+  }
 }

@@ -17,74 +17,65 @@
 package controllers
 
 import base.SpecBase
-import forms.BusinessContactDetailsFormProvider
-import models.{NormalMode, BusinessContactDetails, UserAnswers}
+import forms.WebsiteFormProvider
+import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.BusinessContactDetailsPage
+import pages.WebsitePage
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.BusinessContactDetailsView
+import views.html.WebsiteView
 
 import scala.concurrent.Future
 
-class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
+class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val index = Index(0)
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new BusinessContactDetailsFormProvider()
-  val form = formProvider()
+  private val formProvider = new WebsiteFormProvider()
+  private val form = formProvider()
 
-  lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
+  private lazy val websiteRoute = routes.WebsiteController.onPageLoad(NormalMode, index).url
 
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      BusinessContactDetailsPage.toString -> Json.obj(
-        "fullName" -> "value 1",
-        "telephoneNumber" -> "value 2",
-        "emailAddress" -> "value 3"
-      )
-    )
-  )
-
-  "BusinessContactDetails Controller" - {
+  "Website Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, businessContactDetailsRoute)
-
-        val view = application.injector.instanceOf[BusinessContactDetailsView]
+        val request = FakeRequest(GET, websiteRoute)
 
         val result = route(application, request).value
 
+        val view = application.injector.instanceOf[WebsiteView]
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
+      val userAnswers = UserAnswers(userAnswersId).set(WebsitePage(Index(0)), "answer").success.value
+
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, businessContactDetailsRoute)
+        val request = FakeRequest(GET, websiteRoute)
 
-        val view = application.injector.instanceOf[BusinessContactDetailsView]
+        val view = application.injector.instanceOf[WebsiteView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BusinessContactDetails("value 1", "value 2", "value 3")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -104,8 +95,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, businessContactDetailsRoute)
-            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "value 2"), ("emailAddress", "value 3"))
+          FakeRequest(POST, websiteRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
@@ -120,17 +111,17 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, businessContactDetailsRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+          FakeRequest(POST, websiteRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[BusinessContactDetailsView]
+        val view = application.injector.instanceOf[WebsiteView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -139,7 +130,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, businessContactDetailsRoute)
+        val request = FakeRequest(GET, websiteRoute)
 
         val result = route(application, request).value
 
@@ -154,8 +145,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, businessContactDetailsRoute)
-            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "value 2"), ("emailAddress", "value 3"))
+          FakeRequest(POST, websiteRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package forms
 
-import play.api.libs.json._
+import javax.inject.Inject
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
+import forms.mappings.Mappings
+import play.api.data.Form
 
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+class AddWebsiteFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("addWebsite.error.required")
+    )
 }

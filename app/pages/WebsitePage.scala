@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json._
+import models.Index
+import play.api.libs.json.JsPath
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
+case class WebsitePage(index: Index) extends QuestionPage[String] {
 
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+  override def path: JsPath = JsPath \ "websites" \ index.position
+
+  override def toString: String = "website"
 }

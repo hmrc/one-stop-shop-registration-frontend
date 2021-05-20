@@ -20,44 +20,44 @@ import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.AllTradingNames
+import queries.AllWebsites
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object TradingNameSummary  {
+object WebsiteSummary  {
 
   def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
-    answers.get(AllTradingNames).getOrElse(List.empty).zipWithIndex.map {
+    answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {
       case (name, index) =>
         SummaryListRowViewModel(
           key     = KeyViewModel(name).withCssClass("hmrc-add-to-a-list__identifier--light"),
           value   = ValueViewModel(""),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.TradingNameController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("addTradingName.change.hidden", name)),
-            ActionItemViewModel("site.remove", routes.DeleteTradingNameController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("addTradingName.remove.hidden", name))
+            ActionItemViewModel("site.change", routes.WebsiteController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("addWebsite.change.hidden", name)),
+            ActionItemViewModel("site.remove", routes.DeleteWebsiteController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("addWebsite.remove.hidden", name))
           )
         )
     }
 
   def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllTradingNames).map {
-      tradingNames =>
+    answers.get(AllWebsites).map {
+      websites =>
 
-        val value = tradingNames.map {
+        val value = websites.map {
           name =>
             HtmlFormat.escape(name)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
-          key     = "tradingName.checkYourAnswersLabel",
+          key     = "website.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("tradingName.change.hidden"))
+            ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("website.change.hidden"))
           )
         )
     }
