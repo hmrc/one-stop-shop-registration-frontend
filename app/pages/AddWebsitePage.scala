@@ -16,19 +16,11 @@
 
 package pages
 
-import models.Index
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
-class WebsitePageSpec extends PageBehaviours {
+case object AddWebsitePage extends QuestionPage[Boolean] {
 
-  val index: Index = Index(0)
+  override def path: JsPath = JsPath \ toString
 
-  "WebsitePage" - {
-
-    beRetrievable[String](WebsitePage(index))
-
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
-  }
+  override def toString: String = "addWebsite"
 }

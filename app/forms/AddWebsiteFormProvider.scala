@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import models.Index
-import pages.behaviours.PageBehaviours
+import javax.inject.Inject
 
-class WebsitePageSpec extends PageBehaviours {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  val index: Index = Index(0)
+class AddWebsiteFormProvider @Inject() extends Mappings {
 
-  "WebsitePage" - {
-
-    beRetrievable[String](WebsitePage(index))
-
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
-  }
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("addWebsite.error.required")
+    )
 }

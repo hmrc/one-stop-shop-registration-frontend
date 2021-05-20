@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import models.Index
-import pages.behaviours.PageBehaviours
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-class WebsitePageSpec extends PageBehaviours {
+class AddWebsiteFormProviderSpec extends BooleanFieldBehaviours {
 
-  val index: Index = Index(0)
+  val requiredKey = "addWebsite.error.required"
+  val invalidKey = "error.boolean"
 
-  "WebsitePage" - {
+  val form = new AddWebsiteFormProvider()()
 
-    beRetrievable[String](WebsitePage(index))
+  ".value" - {
 
-    beSettable[String](WebsitePage(index))
+    val fieldName = "value"
 
-    beRemovable[String](WebsitePage(index))
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
   }
 }

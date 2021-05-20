@@ -16,19 +16,16 @@
 
 package pages
 
-import models.Index
 import pages.behaviours.PageBehaviours
 
-class WebsitePageSpec extends PageBehaviours {
+class AddWebsitePageSpec extends PageBehaviours {
 
-  val index: Index = Index(0)
+  "AddWebsitePage" - {
 
-  "WebsitePage" - {
+    beRetrievable[Boolean](AddWebsitePage)
 
-    beRetrievable[String](WebsitePage(index))
+    beSettable[Boolean](AddWebsitePage)
 
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
+    beRemovable[Boolean](AddWebsitePage)
   }
 }

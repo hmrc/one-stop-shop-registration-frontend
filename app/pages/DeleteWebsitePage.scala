@@ -17,18 +17,5 @@
 package pages
 
 import models.Index
-import pages.behaviours.PageBehaviours
 
-class WebsitePageSpec extends PageBehaviours {
-
-  val index: Index = Index(0)
-
-  "WebsitePage" - {
-
-    beRetrievable[String](WebsitePage(index))
-
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
-  }
-}
+case class DeleteWebsitePage(index: Index) extends Page

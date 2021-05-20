@@ -16,19 +16,16 @@
 
 package pages
 
-import models.Index
 import pages.behaviours.PageBehaviours
 
-class WebsitePageSpec extends PageBehaviours {
+class AddTradingNamePageSpec extends PageBehaviours {
 
-  val index: Index = Index(0)
+  "AddAdditionalEuVatDetailsPage" - {
 
-  "WebsitePage" - {
+    beRetrievable[Boolean](AddTradingNamePage)
 
-    beRetrievable[String](WebsitePage(index))
+    beSettable[Boolean](AddTradingNamePage)
 
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
+    beRemovable[Boolean](AddTradingNamePage)
   }
 }

@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package queries
 
-import models.Index
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
-class WebsitePageSpec extends PageBehaviours {
+case object AllWebsites extends Gettable[List[String]] with Settable[List[String]] {
 
-  val index: Index = Index(0)
-
-  "WebsitePage" - {
-
-    beRetrievable[String](WebsitePage(index))
-
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
-  }
+  override def path: JsPath = JsPath \ "websites"
 }

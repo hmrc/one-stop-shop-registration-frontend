@@ -211,9 +211,23 @@ addTradingName.remove.hidden = {0}
 addTradingName.addAnother = Do you need to add another trading name?
 addTradingName.addAnother.hint = You must tell us about all the trading names you use.
 
-website.title = website
-website.heading = website
-website.checkYourAnswersLabel = website
-website.error.required = Enter website
+website.title = Enter a website address you use to sell your products
+website.heading = Enter a website address you use to sell your products
+website.checkYourAnswersLabel = Website
+website.error.required = Enter a website
 website.error.length = Website must be 100 characters or less
 website.change.hidden = Website
+
+deleteWebsite.title = Are you sure you want to remove this website?
+deleteWebsite.heading = Are you sure you want to remove this website?
+deleteWebsite.error.required = Select yes if you want to remove this website
+
+addWebsite.title.singular = You have added one website
+addWebsite.heading.singular = You have added one website
+addWebsite.title = You have added {0} websites
+addWebsite.heading = You have added {0} websites
+addWebsite.error.required = Select yes if you need to add another website
+addWebsite.change.hidden = {0}
+addWebsite.remove.hidden = {0}
+addWebsite.addAnother = Do you need to add another website?
+addWebsite.addAnother.hint = You must tell us about all the websites you use.

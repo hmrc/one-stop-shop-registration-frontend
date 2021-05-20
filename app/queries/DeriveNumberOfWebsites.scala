@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package queries
 
-import models.Index
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.{JsPath, JsString}
 
-class WebsitePageSpec extends PageBehaviours {
-
-  val index: Index = Index(0)
-
-  "WebsitePage" - {
-
-    beRetrievable[String](WebsitePage(index))
-
-    beSettable[String](WebsitePage(index))
-
-    beRemovable[String](WebsitePage(index))
-  }
+case object DeriveNumberOfWebsites extends Derivable[List[JsString], Int] {
+  override val derive: List[JsString] => Int = _.size
+  override def path: JsPath = JsPath \ "websites"
 }

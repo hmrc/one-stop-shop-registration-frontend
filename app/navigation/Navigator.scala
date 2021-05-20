@@ -41,7 +41,10 @@ class Navigator @Inject()() {
     case EuVatNumberPage(_)                    => _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode)
     case AddAdditionalEuVatDetailsPage         => hasAdditionalEuVatDetails
     case DeleteEuVatDetailsPage(_)             => deleteEuVatDetailsRoute
-    case BusinessAddressPage                   => _ => routes.BusinessContactDetailsController.onPageLoad(NormalMode)
+    case BusinessAddressPage                   => _ => routes.WebsiteController.onPageLoad(NormalMode, Index(0))
+    case WebsitePage(_)                        => _ => routes.AddWebsiteController.onPageLoad(NormalMode)
+    case AddWebsitePage                        => addWebsiteRoute
+    case DeleteWebsitePage(_)                  => deleteWebsiteRoute
     case BusinessContactDetailsPage            => _ => routes.CheckYourAnswersController.onPageLoad()
     case CheckYourAnswersPage                  => _ => routes.ApplicationCompleteController.onPageLoad()
     case _                                     => _ => routes.IndexController.onPageLoad()
@@ -83,6 +86,19 @@ class Navigator @Inject()() {
     answers.get(DeriveNumberOfEuVatRegisteredCountries) match {
       case Some(n) if n > 0 => routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode)
       case _                => routes.VatRegisteredInEuController.onPageLoad(NormalMode)
+    }
+
+  private def addWebsiteRoute(answers: UserAnswers): Call =
+    (answers.get(AddWebsitePage), answers.get(DeriveNumberOfWebsites)) match {
+      case (Some(true), Some(size)) => routes.WebsiteController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _)         => routes.BusinessContactDetailsController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def deleteWebsiteRoute(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfWebsites) match {
+      case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(NormalMode)
+      case _                => routes.WebsiteController.onPageLoad(NormalMode, Index(0))
     }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

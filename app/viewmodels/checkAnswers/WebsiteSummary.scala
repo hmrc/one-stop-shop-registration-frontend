@@ -17,25 +17,46 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
-import pages.WebsitePage
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import queries.AllWebsites
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object WebsiteSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WebsitePage).map {
-      answer =>
+  def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+    answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {
+      case (name, index) =>
+        SummaryListRowViewModel(
+          key     = KeyViewModel(name).withCssClass("hmrc-add-to-a-list__identifier--light"),
+          value   = ValueViewModel(""),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.WebsiteController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("addWebsite.change.hidden", name)),
+            ActionItemViewModel("site.remove", routes.DeleteWebsiteController.onPageLoad(NormalMode, Index(index)).url)
+              .withVisuallyHiddenText(messages("addWebsite.remove.hidden", name))
+          )
+        )
+    }
+
+  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllWebsites).map {
+      websites =>
+
+        val value = websites.map {
+          name =>
+            HtmlFormat.escape(name)
+        }.mkString("<br/>")
 
         SummaryListRowViewModel(
           key     = "website.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.WebsiteController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("website.change.hidden"))
           )
         )

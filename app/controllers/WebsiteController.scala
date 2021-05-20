@@ -18,8 +18,9 @@ package controllers
 
 import controllers.actions._
 import forms.WebsiteFormProvider
+
 import javax.inject.Inject
-import models.Mode
+import models.{Index, Mode}
 import navigation.Navigator
 import pages.WebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -42,31 +43,31 @@ class WebsiteController @Inject()(
                                         view: WebsiteView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(WebsitePage) match {
+      val preparedForm = request.userAnswers.get(WebsitePage(index)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, index))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, index))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WebsitePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(WebsitePage(index), value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WebsitePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(WebsitePage(index), mode, updatedAnswers))
       )
   }
 }
