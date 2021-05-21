@@ -30,7 +30,7 @@ class RegistrationConnector @Inject()(
                           httpClient: HttpClient
 )(implicit ec: ExecutionContext) extends HttpErrorFunctions {
 
-  private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration-frontend")
+  private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
 
   def submitRegistration(request: RegistrationRequest)(implicit hc: HeaderCarrier): Future[RegistrationResponse] = {
     val url = s"$baseUrl/one-stop-shop-registration/create"

@@ -59,10 +59,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
         val responseBody =
-          s"""{
-             |  "registrationResponse":{"response": "true"}
-             |}
-             |""".stripMargin
+          s"""{"response": true}""".stripMargin
 
         server.stubFor(post(urlEqualTo(url))
           .willReturn(ok(responseBody)))
