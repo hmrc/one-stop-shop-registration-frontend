@@ -2,7 +2,9 @@ service.name = Register for One Stop Shop
 
 site.back = Back
 site.remove = Remove
+site.remove.hidden = Remove {0} from the list
 site.change = Change
+site.change.hidden = Change {0}
 site.no = No
 site.yes = Yes
 site.continue = Continue
@@ -54,10 +56,10 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 hasTradingName.title = Does your business trade using a different name?
-hasTradingName.heading = Does your business trade using a name other than {0}?
-hasTradingName.checkYourAnswersLabel = Does your business trade using a name other than {0}?
-hasTradingName.error.required = Select yes if your business trades using a name other than {0}
-hasTradingName.change.hidden = if your business trades using a name other than {0}
+hasTradingName.heading = Does your business trade using a name that is different from {0}?
+hasTradingName.checkYourAnswersLabel = Does your business have a different trading name
+hasTradingName.error.required = Select yes if your business trades using a name that is different from {0}
+hasTradingName.change.hidden = if your business trades using a name that is different from {0}
 
 partOfVatGroup.title = Is the business you’re registering part of a VAT group?
 partOfVatGroup.heading = Is the business you’re registering part of a VAT group?
@@ -65,70 +67,74 @@ partOfVatGroup.checkYourAnswersLabel = Is the business you’re registering part
 partOfVatGroup.error.required = Select yes if the business you’re registering is part of a VAT group
 partOfVatGroup.change.hidden = if the business you’re registering is part of a VAT group
 
-registeredCompanyName.title = What is the registered company name?
-registeredCompanyName.heading = What is the registered company name?
-registeredCompanyName.checkYourAnswersLabel = What is the registered company name?
-registeredCompanyName.error.required = Enter the registered company name
-registeredCompanyName.error.length = The registered company name must be 100 characters or less
-registeredCompanyName.change.hidden = the registered company name
+registeredCompanyName.title = What is your business name?
+registeredCompanyName.heading = What is your business name?
+registeredCompanyName.hint = If your business is incorporated with Companies House, you must enter the registered name on the certificate.
+registeredCompanyName.checkYourAnswersLabel = Registered business name
+registeredCompanyName.error.required = Enter your business name
+registeredCompanyName.error.length = The business name must be 100 characters or less
+registeredCompanyName.change.hidden = the registered business name
 
 tradingName.title = What is your trading name?
 tradingName.heading = What is your trading name?
-tradingName.checkYourAnswersLabel = What is your trading name?
+tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
 tradingName.error.required = Enter your trading name
 tradingName.error.length = Your trading name must be 100 characters or less
 tradingName.change.hidden = your trading name
 
-ukVatEffectiveDate.title = What is your UK VAT effective date?
-ukVatEffectiveDate.heading = What is your UK VAT effective date?
+ukVatEffectiveDate.title = What is your UK VAT registration date?
+ukVatEffectiveDate.heading = What is your UK VAT registration date?
+ukVatEffectiveDate.guidance = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
 ukVatEffectiveDate.hint = For example, 12 11 2007
-ukVatEffectiveDate.checkYourAnswersLabel = What is your UK VAT effective date?
-ukVatEffectiveDate.error.required.all = Enter your UK VAT effective date
-ukVatEffectiveDate.error.required.two = Your UK VAT effective date must include {0} and {1}
-ukVatEffectiveDate.error.required = Your UK VAT effective date must include {0}
+ukVatEffectiveDate.checkYourAnswersLabel = UK VAT registration date
+ukVatEffectiveDate.error.required.all = Enter your UK VAT registration date
+ukVatEffectiveDate.error.required.two = Your UK VAT registration date must include {0} and {1}
+ukVatEffectiveDate.error.required = Your UK VAT registration date must include {0}
 ukVatEffectiveDate.error.invalid = Enter a real date
-ukVatEffectiveDate.change.hidden = your UK VAT effective date
+ukVatEffectiveDate.change.hidden = your UK VAT registration date
 
-ukVatNumber.title = What is your UK VAT number?
-ukVatNumber.heading = What is your UK VAT number?
-ukVatNumber.checkYourAnswersLabel = What is your UK VAT number?
-ukVatNumber.error.required = Enter your UK VAT number
+ukVatNumber.title = What is your UK VAT registration number?
+ukVatNumber.heading = What is your UK VAT registration number?
+ukVatNumber.hint = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.
+ukVatNumber.checkYourAnswersLabel =UK VAT registration number
+ukVatNumber.error.required = Enter your UK VAT registration number
 ukVatNumber.error.invalid = UK VAT number must be GB followed by 9 digits
-ukVatNumber.change.hidden = your UK VAT number
+ukVatNumber.change.hidden = your UK VAT registration number
 
 ukVatRegisteredPostcode.title = What is the postcode where your business is registered for UK VAT?
 ukVatRegisteredPostcode.heading = What is the postcode where your business is registered for UK VAT?
-ukVatRegisteredPostcode.checkYourAnswersLabel = What is the postcode where your business is registered for UK VAT?
+ukVatRegisteredPostcode.hint = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
+ukVatRegisteredPostcode.checkYourAnswersLabel = UK VAT registration postcode
 ukVatRegisteredPostcode.error.required = Enter the postcode where your business is registered for UK VAT
 ukVatRegisteredPostcode.error.invalid = Enter a valid postcode
 ukVatRegisteredPostcode.error.length = Postcode must be 9 characters or less
 ukVatRegisteredPostcode.change.hidden = the postcode where your business is registered for UK VAT
 
-euVatNumber.title = What is your VAT number?
-euVatNumber.heading = What is your VAT number?
-euVatNumber.checkYourAnswersLabel = What is your VAT number?
-euVatNumber.error.required = Enter your VAT number
-euVatNumber.error.length = VAT number must be 100 characters or less
-euVatNumber.change.hidden = your VAT number
+euVatNumber.title = What is your VAT registration number for {0}?
+euVatNumber.heading = What is your VAT registration number for {0}?
+euVatNumber.checkYourAnswersLabel = What is your VAT registration number for {0}?
+euVatNumber.error.required = Enter your VAT registration number for {0}
+euVatNumber.error.length = VAT registration number must be 100 characters or less
+euVatNumber.change.hidden = your VAT registration number for {0}
 
-vatRegisteredEuMemberState.title = Which EU member state is your business VAT registered in?
-vatRegisteredEuMemberState.heading = Which EU member state is your business VAT registered in?
-vatRegisteredEuMemberState.checkYourAnswersLabel = Which EU member state is your business VAT registered in?
-vatRegisteredEuMemberState.error.required = Enter an EU member state
-vatRegisteredEuMemberState.error.length = EU member state must be 100 characters or less
-vatRegisteredEuMemberState.change.hidden = EU member state
+vatRegisteredEuMemberState.title = Which EU country?
+vatRegisteredEuMemberState.heading = Which EU country?
+vatRegisteredEuMemberState.checkYourAnswersLabel = Which EU country?
+vatRegisteredEuMemberState.error.required = Enter an EU country
+vatRegisteredEuMemberState.error.length = EU country must be 100 characters or less
+vatRegisteredEuMemberState.change.hidden = EU country
 
-vatRegisteredInEu.title = Is your business VAT registered in an EU member state?
-vatRegisteredInEu.heading = Is your business VAT registered in an EU member state?
-vatRegisteredInEu.checkYourAnswersLabel = Is your business VAT registered in an EU member state?
-vatRegisteredInEu.error.required = Select yes if your business is VAT registered in an EU member state
+vatRegisteredInEu.title = Is your business registered for VAT in EU countries?
+vatRegisteredInEu.heading = Is your business registered for VAT in EU countries?
+vatRegisteredInEu.checkYourAnswersLabel = Registered for VAT in EU countries
+vatRegisteredInEu.error.required = Select yes if your business is registered for VAT in EU countries
 vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU member state
 
-addAdditionalEuVatDetails.title.singular = You added VAT details for 1 EU country
-addAdditionalEuVatDetails.heading.singular = You added VAT details for 1 EU country
+addAdditionalEuVatDetails.title.singular = You added VAT details for one EU country
+addAdditionalEuVatDetails.heading.singular = You added VAT details for one EU country
 addAdditionalEuVatDetails.title = You added VAT details for {0} EU countries
 addAdditionalEuVatDetails.heading = You added VAT details for {0} EU countries
-addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU member country
+addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU country
 addAdditionalEuVatDetails.change.hidden = VAT details for {0}
 addAdditionalEuVatDetails.remove.hidden = VAT details for {0}
 addAdditionalEuVatDetails.addAnother = Do you need to add VAT details for another EU country?
@@ -145,7 +151,7 @@ businessAddress.line2 =
 businessAddress.townOrCity = Town or city
 businessAddress.county = County
 businessAddress.postCode = Postcode
-businessAddress.checkYourAnswersLabel = Your business address
+businessAddress.checkYourAnswersLabel = UK business address
 businessAddress.error.line1.required = Enter building and street
 businessAddress.error.townOrCity.required = Enter town or city
 businessAddress.error.postCode.required = Enter postcode
@@ -160,16 +166,16 @@ businessAddress.townOrCity.change.hidden = Town or city
 businessAddress.county.change.hidden = County
 businessAddress.postCode.change.hidden = Postcode
 
-businessContactDetails.title = Enter your contact details
-businessContactDetails.heading = Enter your contact details
-businessContactDetails.caption = We'll only use this to send you information about your account and returns.
+businessContactDetails.title = Enter your business contact details
+businessContactDetails.heading = Enter your business contact details
+businessContactDetails.caption = We’ll only use this to send you information about your EU VAT returns.
 businessContactDetails.fullName = Full name
 businessContactDetails.telephoneNumber = Telephone number
 businessContactDetails.emailAddress = Email address
 businessContactDetails.checkYourAnswersLabel = Your contact details
-businessContactDetails.error.fullName.required = Enter full name
-businessContactDetails.error.telephoneNumber.required = Enter telephone number
-businessContactDetails.error.emailAddress.required = Enter email address
+businessContactDetails.error.fullName.required = Enter a full name
+businessContactDetails.error.telephoneNumber.required = Enter a telephone number
+businessContactDetails.error.emailAddress.required = Enter an email address
 businessContactDetails.error.fullName.length = Full name must be 100 characters or less
 businessContactDetails.error.telephoneNumber.length = Telephone number must be 100 characters or less
 businessContactDetails.error.emailAddress.length = Email address must be 100 characters or less
@@ -179,6 +185,13 @@ businessContactDetails.emailAddress.change.hidden = Email address
 
 euVatDetails.checkYourAnswersLabel = EU VAT registration details
 euVatDetails.change.hidden = your EU VAT registration details
+
+websites.checkYourAnswersLabel = Website addresses
+websites.change.hidden = your websites
+
+tradingNames.checkYourAnswersLabel = Trading names
+tradingNames.change.hidden = your trading names
+
 isBusinessBasedInNorthernIreland.title = Is your business based in Northern Ireland?
 isBusinessBasedInNorthernIreland.title = Is your business based in Northern Ireland?
 isBusinessBasedInNorthernIreland.heading = Is your business based in Northern Ireland?
@@ -222,12 +235,12 @@ deleteWebsite.title = Are you sure you want to remove this website?
 deleteWebsite.heading = Are you sure you want to remove this website?
 deleteWebsite.error.required = Select yes if you want to remove this website
 
-addWebsite.title.singular = You have added one website
-addWebsite.heading.singular = You have added one website
-addWebsite.title = You have added {0} websites
-addWebsite.heading = You have added {0} websites
-addWebsite.error.required = Select yes if you need to add another website
-addWebsite.change.hidden = {0}
-addWebsite.remove.hidden = {0}
-addWebsite.addAnother = Do you need to add another website?
-addWebsite.addAnother.hint = You must tell us about all the websites you use.
+addWebsite.name.singular = website address
+addWebsite.name.plural = website addresses
+addWebsite.title.singular = You have added one website address
+addWebsite.title = You have added {0} website addresses
+addWebsite.heading.singular = You have added one website address
+addWebsite.heading = You have added {0} website addresses
+addWebsite.addAnother = Do you need to add another website address?
+addWebsite.error.required = Select yes if you need to add another website address
+addWebsite.addAnother.hint = You must tell us about all the websites you use to sell your products.

@@ -50,25 +50,17 @@ class AddAdditionalEuVatDetailsController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val list = SummaryListViewModel(
-        rows = EuVatDetailsSummary.addToListRows(request.userAnswers)
-      )
-
-      Ok(view(form, mode, list))
+      Ok(view(form, mode, EuVatDetailsSummary.addToListRows(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
-        formWithErrors => {
-
-          val list = SummaryListViewModel(
-            rows = EuVatDetailsSummary.addToListRows(request.userAnswers)
-          )
-
-          Future.successful(BadRequest(view(formWithErrors, mode, list)))
-        },
+        formWithErrors =>
+          Future.successful(
+            BadRequest(view(formWithErrors, mode, EuVatDetailsSummary.addToListRows(request.userAnswers)))
+          ),
 
         value =>
           for {

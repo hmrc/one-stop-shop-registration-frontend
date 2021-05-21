@@ -23,23 +23,19 @@ import play.twirl.api.HtmlFormat
 import queries.AllWebsites
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object WebsiteSummary  {
 
-  def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+  def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
     answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {
-      case (name, index) =>
-        SummaryListRowViewModel(
-          key     = KeyViewModel(name).withCssClass("hmrc-add-to-a-list__identifier--light"),
-          value   = ValueViewModel(""),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.WebsiteController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("addWebsite.change.hidden", name)),
-            ActionItemViewModel("site.remove", routes.DeleteWebsiteController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("addWebsite.remove.hidden", name))
-          )
+      case (website, index) =>
+        ListItem(
+          name      = HtmlFormat.escape(website).toString,
+          changeUrl = routes.WebsiteController.onPageLoad(NormalMode, Index(index)).url,
+          removeUrl = routes.DeleteWebsiteController.onPageLoad(NormalMode, Index(index)).url
         )
     }
 
@@ -53,11 +49,11 @@ object WebsiteSummary  {
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
-          key     = "website.checkYourAnswersLabel",
+          key     = "websites.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("website.change.hidden"))
+              .withVisuallyHiddenText(messages("websites.change.hidden"))
           )
         )
     }

@@ -34,7 +34,7 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("businessContactDetails.heading")</h1>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-1">@messages("businessContactDetails.heading")</h1>
         <p class="govuk-body govuk-!-margin-bottom-9">@messages("businessContactDetails.caption")</p>
 
         @govukInput(
@@ -43,6 +43,8 @@
                 label = LabelViewModel(messages("businessContactDetails.fullName"))
             )
             .withWidth(Full)
+            .withAutocomplete("name")
+            .withSpellcheck(on = false)
         )
 
         @govukInput(
@@ -50,7 +52,10 @@
                 field = form("telephoneNumber"),
                 label = LabelViewModel(messages("businessContactDetails.telephoneNumber"))
             )
-            .withWidth(Full)
+            .withWidth(Fixed20)
+            .withInputType("tel")
+            .withInputMode("numeric")
+            .withAutocomplete("tel")
         )
 
         @govukInput(
@@ -59,6 +64,7 @@
                 label = LabelViewModel(messages("businessContactDetails.emailAddress"))
             )
             .withWidth(Full)
+            .asEmail()
         )
 
         @govukButton(

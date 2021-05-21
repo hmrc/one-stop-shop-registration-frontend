@@ -18,8 +18,6 @@ package controllers
 
 import controllers.actions._
 import forms.AddTradingNameFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.AddTradingNamePage
@@ -28,9 +26,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.TradingNameSummary
-import viewmodels.govuk.summarylist._
 import views.html.AddTradingNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddTradingNameController @Inject()(
@@ -50,25 +48,17 @@ class AddTradingNameController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val list = SummaryListViewModel(
-        rows = TradingNameSummary.addToListRows(request.userAnswers)
-      )
-
-      Ok(view(form, mode, list))
+      Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
-        formWithErrors => {
-
-          val list = SummaryListViewModel(
-            TradingNameSummary.addToListRows(request.userAnswers)
-          )
-
-          Future.successful(BadRequest(view(formWithErrors, mode, list)))
-        },
+        formWithErrors =>
+          Future.successful(
+            BadRequest(view(formWithErrors, mode, TradingNameSummary.addToListRows(request.userAnswers)))
+          ),
 
         value =>
           for {

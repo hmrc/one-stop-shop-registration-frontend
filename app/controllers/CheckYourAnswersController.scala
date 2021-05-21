@@ -49,6 +49,7 @@ class CheckYourAnswersController @Inject()(
           VatRegisteredInEuSummary.row(request.userAnswers),
           EuVatDetailsSummary.checkAnswersRow(request.userAnswers),
           BusinessAddressSummary.row(request.userAnswers),
+          WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers)
         ).flatten
       )

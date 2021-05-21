@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ListItem, Long}
 @import viewmodels.LegendSize
 
 @this(
@@ -22,13 +23,13 @@
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
     govukButton: GovukButton,
-    govukSummaryList: GovukSummaryList
+    addToList: components.addToList
 )
 
-@(form: Form[_], mode: Mode, list: SummaryList)(implicit request: Request[_], messages: Messages)
-@defining(if(list.rows.size == 1) ".singular" else "") { messageSuffix =>
+@(form: Form[_], mode: Mode, list: Seq[ListItem])(implicit request: Request[_], messages: Messages)
+@defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
-    @layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title" + messageSuffix, list.rows.size))) {
+    @layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title" + messageSuffix, list.size))) {
 
         @formHelper(action = routes.AddAdditionalEuVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
 
@@ -36,9 +37,9 @@
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
 
-            <h1 class="govuk-heading-xl">@messages("addAdditionalEuVatDetails.heading" + messageSuffix, list.rows.size)</h1>
+            <h1 class="govuk-heading-xl">@messages("addAdditionalEuVatDetails.heading" + messageSuffix, list.size)</h1>
 
-            @govukSummaryList(list)
+            @addToList(list, Long)
 
             @govukRadios(
                 RadiosViewModel.yesNo(
