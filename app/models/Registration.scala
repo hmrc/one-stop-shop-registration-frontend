@@ -32,7 +32,8 @@ case class Registration(
                          vatRegisteredInEu: Boolean,
                          euVatDetails: Seq[EuVatDetails],
                          businessAddress: BusinessAddress,
-                         businessContactDetails: BusinessContactDetails
+                         businessContactDetails: BusinessContactDetails,
+                         websites: Seq[String]
                        )
 
 case object Registration {

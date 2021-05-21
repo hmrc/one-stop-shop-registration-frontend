@@ -19,7 +19,7 @@ package models.requests
 import models.{BusinessAddress, BusinessContactDetails, EuVatDetails, UserAnswers}
 import pages._
 import play.api.libs.json.{Json, OFormat}
-import queries.{AllEuVatDetailsQuery, AllTradingNames}
+import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -35,7 +35,8 @@ final case class RegistrationRequest(
                                       vatRegisteredInEu: Boolean,
                                       euVatDetails: Seq[EuVatDetails],
                                       businessAddress: BusinessAddress,
-                                      businessContactDetails: BusinessContactDetails
+                                      businessContactDetails: BusinessContactDetails,
+                                      websites: Seq[String]
   )
 
   case object RegistrationRequest {
@@ -55,6 +56,7 @@ final case class RegistrationRequest(
         euVatDetails                <- userAnswers.get(AllEuVatDetailsQuery)
         businessAddress             <- userAnswers.get(BusinessAddressPage)
         businessContactDetails      <- userAnswers.get(BusinessContactDetailsPage)
+        websites                    <- userAnswers.get(AllWebsites)
       } yield
         RegistrationRequest(
           registeredCompanyName,
@@ -67,54 +69,9 @@ final case class RegistrationRequest(
           vatRegisteredInEu,
           euVatDetails,
           businessAddress,
-          businessContactDetails
+          businessContactDetails,
+          websites
         )
-
     }
+
 }
-
-
-/*
-
-override def unbind(key: String, value: String): Map[String, String] =
-      Map(key -> value)
-implicit val format: OFormat[RegistrationRequest] = Json.format[RegistrationRequest]
-
-def buildValidRegistrationRequest(internalId: InternalId, userAnswers: UserAnswers): Option[RegistrationRequest] = {
-    def getRestaurants(userAnswers: UserAnswers): Option[Seq[RestaurantInfo]] = for {
-      numberOfRestaurants <- userAnswers.get(NumberOfRestaurantsPage)
-      restaurantsJson     <- if (numberOfRestaurants > Constants.largeBusinessCutoff) Some(Seq.empty) else userAnswers.get(AllRestaurantJsonQuery)
-      if restaurantsJson.forall(_.value.get("restaurantRegisteredWithLocalAuthority").contains(JsTrue))
-      restaurants         <- if (numberOfRestaurants > Constants.largeBusinessCutoff) Some(Seq.empty) else userAnswers.get(AllRestaurantsQuery)
-      if restaurants.nonEmpty || numberOfRestaurants > Constants.largeBusinessCutoff
-    } yield restaurants
-
-    def cleanseBankInfo(bankInfo: BankInfo): BankInfo = bankInfo.copy(
-      bankDetails = bankInfo.bankDetails.copy(
-        sortCode      = bankInfo.bankDetails.sortCodeTrimmed,
-        accountNumber = bankInfo.bankDetails.accountNumberPadded
-      )
-    )
-
-    for {
-      businessName             <- userAnswers.get(BusinessNamePage)
-      taxIdentifiers           <- TaxIdentifiers.extractFromUserAnswers(userAnswers)
-      bankInfo                 <- BankInfo.extractFromUserAnswers(userAnswers).map(cleanseBankInfo)
-      primaryContactDetails    <- userAnswers.get(PrimaryContactDetailsPage)
-      restaurants              <- getRestaurants(userAnswers)
-      businessStartedTradingOn <- userAnswers.get(BusinessStartedTradingPage)
-      numberOfRestaurants      <- userAnswers.get(NumberOfRestaurantsPage)
-      businessWebsite           = userAnswers.get(BusinessWebsitePage)
-    } yield RegistrationRequest(
-      businessName,
-      internalId,
-      taxIdentifiers,
-      bankInfo,
-      restaurants,
-      primaryContactDetails,
-      businessStartedTradingOn,
-      numberOfRestaurants,
-      businessWebsite
-    )
-  }
- */

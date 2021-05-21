@@ -34,7 +34,8 @@ object RegistrationData {
       true,
       Seq(EuVatDetails("France","FR123456789"), EuVatDetails("Spain","ES123456789")),
       createBusinessAddress(),
-      createBusinessContactDetails()
+      createBusinessContactDetails(),
+      Seq("website1", "website2")
     )
 
   private def createBusinessAddress(): BusinessAddress =
@@ -52,5 +53,5 @@ object RegistrationData {
       "01112223344",
       "email@email.com"
     )
-
 }
+
