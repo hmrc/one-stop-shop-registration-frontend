@@ -23,6 +23,11 @@ import uk.gov.hmrc.domain.Vrn
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryStartDate: Arbitrary[StartDate] =
+    Arbitrary {
+      Gen.oneOf(StartDate.values.toSeq)
+    }
+
   implicit lazy val arbitraryBusinessContactDetails: Arbitrary[BusinessContactDetails] =
     Arbitrary {
       for {

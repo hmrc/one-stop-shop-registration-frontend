@@ -244,3 +244,11 @@ addWebsite.heading = You have added {0} website addresses
 addWebsite.addAnother = Do you need to add another website address?
 addWebsite.error.required = Select yes if you need to add another website address
 addWebsite.addAnother.hint = You must tell us about all the websites you use to sell your products.
+
+startDate.title = startDate
+startDate.heading = startDate
+startDate.option1 = Option 1
+startDate.option2 = Option 2
+startDate.checkYourAnswersLabel = startDate
+startDate.error.required = Select startDate
+startDate.change.hidden = StartDate
