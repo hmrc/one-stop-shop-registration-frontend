@@ -18,8 +18,6 @@ package controllers
 
 import controllers.actions._
 import forms.AddWebsiteFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.AddWebsitePage
@@ -28,9 +26,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.WebsiteSummary
-import viewmodels.govuk.summarylist._
 import views.html.AddWebsiteView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddWebsiteController @Inject()(
@@ -50,25 +48,17 @@ class AddWebsiteController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val list = SummaryListViewModel(
-        rows = WebsiteSummary.addToListRows(request.userAnswers)
-      )
-
-      Ok(view(form, mode, list))
+      Ok(view(form, mode, WebsiteSummary.addToListRows(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
-        formWithErrors => {
-
-          val list = SummaryListViewModel(
-            WebsiteSummary.addToListRows(request.userAnswers)
-          )
-
-          Future.successful(BadRequest(view(formWithErrors, mode, list)))
-        },
+        formWithErrors =>
+          Future.successful(
+            BadRequest(view(formWithErrors, mode, WebsiteSummary.addToListRows(request.userAnswers)))
+          ),
 
         value =>
           for {

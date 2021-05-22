@@ -32,10 +32,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value.day")))
         }
 
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-1">@messages("ukVatEffectiveDate.heading")</h1>
+
+        <p class="govuk-body">@Html(messages("ukVatEffectiveDate.guidance"))</p>
+
         @govukDateInput(
             DateViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("ukVatEffectiveDate.heading")).asPageHeading()
+                legend = LegendViewModel(messages("ukVatEffectiveDate.heading")).withCssClass("govuk-visually-hidden")
             )
             .withHint(HintViewModel(messages("ukVatEffectiveDate.hint")))
         )

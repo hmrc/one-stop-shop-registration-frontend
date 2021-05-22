@@ -29,7 +29,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import viewmodels.govuk.summarylist._
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import views.html.AddTradingNameView
 
 import scala.concurrent.Future
@@ -43,7 +43,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(NormalMode).url
 
-  private val emptySummaryList = SummaryListViewModel(rows = Seq.empty)
+  private val emptyList = Seq.empty[ListItem]
 
   "AddAdditionalEuVatDetails Controller" - {
 
@@ -59,7 +59,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[AddTradingNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, emptyList)(request, messages(application)).toString
       }
     }
 
@@ -77,7 +77,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, emptyList)(request, messages(application)).toString
       }
     }
 
@@ -123,7 +123,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, emptyList)(request, messages(application)).toString
       }
     }
 

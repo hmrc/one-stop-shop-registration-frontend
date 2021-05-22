@@ -23,9 +23,9 @@ import play.api.data.Form
 
 class EuVatNumberFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(country: String): Form[String] =
     Form(
-      "value" -> text("euVatNumber.error.required")
+      "value" -> text("euVatNumber.error.required", Seq(country))
         .verifying(maxLength(100, "euVatNumber.error.length"))
     )
 }

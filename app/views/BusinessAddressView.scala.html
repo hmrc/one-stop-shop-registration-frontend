@@ -42,6 +42,7 @@
                 label = LabelViewModel(messages("businessAddress.line1"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line1")
         )
 
         @govukInput(
@@ -50,6 +51,7 @@
                 label = LabelViewModel(messages("businessAddress.line2"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line2")
         )
 
         @govukInput(
@@ -57,7 +59,8 @@
                 field = form("townOrCity"),
                 label = LabelViewModel(messages("businessAddress.townOrCity"))
             )
-            .withWidth(Full)
+            .withWidth(TwoThirds)
+            .withAutocomplete("address-level2")
         )
 
         @govukInput(
@@ -65,7 +68,7 @@
                 field = form("county"),
                 label = LabelViewModel(messages("businessAddress.county"))
             )
-            .withWidth(Full)
+            .withWidth(TwoThirds)
         )
 
         @govukInput(
@@ -73,7 +76,8 @@
                 field = form("postCode"),
                 label = LabelViewModel(messages("businessAddress.postCode"))
             )
-            .withWidth(Full)
+            .withWidth(Fixed10)
+            .withAutocomplete("postal-code")
         )
 
         @govukButton(
