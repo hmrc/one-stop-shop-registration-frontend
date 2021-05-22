@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.StartDateFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
@@ -25,9 +26,11 @@ import pages.StartDatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.StartDateView
 
+import java.time.format.DateTimeFormatter
 import scala.concurrent.{ExecutionContext, Future}
 
 class StartDateController @Inject()(
@@ -39,10 +42,15 @@ class StartDateController @Inject()(
                                        requireData: DataRequiredAction,
                                        formProvider: StartDateFormProvider,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: StartDateView
+                                       view: StartDateView,
+                                       startDateService: StartDateService
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
+
+  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  private def earlierDateGuidanceKey: String =
+    s"startDate.earlierDate.guidance.canRegisterLastMonth.${startDateService.canRegisterLastMonth}"
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -52,7 +60,8 @@ class StartDateController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+
+      Ok(view(preparedForm, mode, startDateService.startOfNextPeriod.format(dateFormatter), earlierDateGuidanceKey))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -60,7 +69,7 @@ class StartDateController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, startDateService.startOfNextPeriod.format(dateFormatter), earlierDateGuidanceKey))),
 
         value =>
           for {

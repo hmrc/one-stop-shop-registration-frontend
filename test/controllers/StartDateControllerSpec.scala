@@ -18,7 +18,8 @@ package controllers
 
 import base.SpecBase
 import forms.StartDateFormProvider
-import models.{NormalMode, StartDate, UserAnswers}
+import generators.Generators
+import models.{NormalMode, StartDate, StartDateOption, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -29,24 +30,34 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import services.StartDateService
 import views.html.StartDateView
 
+import java.time.format.DateTimeFormatter
+import java.time.{Clock, LocalDate, ZoneId}
 import scala.concurrent.Future
 
 class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  lazy val startDateRoute = routes.StartDateController.onPageLoad(NormalMode).url
+  private lazy val startDateRoute = routes.StartDateController.onPageLoad(NormalMode).url
 
-  val formProvider = new StartDateFormProvider()
-  val form = formProvider()
+  private val startDateService  = new StartDateService(stubClockAtArbitraryDate)
+  private val formProvider      = new StartDateFormProvider(stubClockAtArbitraryDate, startDateService)
+  private val form              = formProvider()
+  private val guidanceKey       = s"startDate.earlierDate.guidance.canRegisterLastMonth.${startDateService.canRegisterLastMonth}"
+  private val dateFormatter     = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  private val startOfNextPeriod = startDateService.startOfNextPeriod.format(dateFormatter)
 
   "StartDate Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, startDateRoute)
@@ -56,15 +67,18 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[StartDateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, startOfNextPeriod, guidanceKey)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(StartDatePage, StartDate.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(StartDatePage, StartDate(StartDateOption.NextPeriod, None)).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, startDateRoute)
@@ -74,7 +88,8 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(StartDate.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view(form.fill(StartDate(StartDateOption.NextPeriod, None)), NormalMode, startOfNextPeriod, guidanceKey)(request, messages(application)).toString
       }
     }
 
@@ -88,14 +103,15 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[Clock].toInstance(stubClockAtArbitraryDate)
           )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, startDateRoute)
-            .withFormUrlEncodedBody(("value", StartDate.values.head.toString))
+            .withFormUrlEncodedBody(("choice", StartDateOption.NextPeriod.toString))
 
         val result = route(application, request).value
 
@@ -106,27 +122,33 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
+          .build()
 
       running(application) {
         val request =
           FakeRequest(POST, startDateRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(("choice", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("choice" -> "invalid value"))
 
         val view = application.injector.instanceOf[StartDateView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, startOfNextPeriod, guidanceKey)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, startDateRoute)
@@ -140,12 +162,15 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
+          .build()
 
       running(application) {
         val request =
           FakeRequest(POST, startDateRoute)
-            .withFormUrlEncodedBody(("value", StartDate.values.head.toString))
+            .withFormUrlEncodedBody(("choice", StartDateOption.NextPeriod.toString))
 
         val result = route(application, request).value
 

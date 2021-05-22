@@ -16,13 +16,17 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+sealed trait StartDateOption
 
-import java.time.LocalDate
+object StartDateOption extends Enumerable.Implicits {
 
-case class StartDate(option: StartDateOption, earlierDate: Option[LocalDate])
+  case object NextPeriod extends WithName("nextPeriod") with StartDateOption
+  case object EarlierDate extends WithName("earlierDate") with StartDateOption
 
-object StartDate {
+  val values: Seq[StartDateOption] = Seq(
+    NextPeriod, EarlierDate
+  )
 
-  implicit val format: OFormat[StartDate] = Json.format[StartDate]
+  implicit val enumerable: Enumerable[StartDateOption] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

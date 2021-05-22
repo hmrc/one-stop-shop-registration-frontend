@@ -146,12 +146,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index))
         }
 
-        "to Business Address when the user answers false" in {
+        "to Start Date when the user answers false" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
-            .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+            .mustBe(routes.StartDateController.onPageLoad(NormalMode))
         }
       }
 
@@ -180,12 +180,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(1)))
         }
 
-        "to Business Address when the user answers false" in {
+        "to Start Date when the user answers false" in {
 
           val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, false).success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+            .mustBe(routes.StartDateController.onPageLoad(NormalMode))
         }
       }
 
@@ -208,7 +208,13 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.VatRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
-      
+
+      "must go from Start Date to Business Address" in {
+
+        navigator.nextPage(StartDatePage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+      }
+
       "must go from Business Address to Website" in {
 
         navigator.nextPage(BusinessAddressPage, NormalMode, emptyUserAnswers)

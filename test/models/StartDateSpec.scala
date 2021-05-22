@@ -30,29 +30,29 @@ class StartDateSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChe
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(StartDate.values.toSeq)
+      val gen = Gen.oneOf(StartDateOption.values.toSeq)
 
       forAll(gen) {
         startDate =>
 
-          JsString(startDate.toString).validate[StartDate].asOpt.value mustEqual startDate
+          JsString(startDate.toString).validate[StartDateOption].asOpt.value mustEqual startDate
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!StartDate.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!StartDateOption.values.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValue =>
 
-          JsString(invalidValue).validate[StartDate] mustEqual JsError("error.invalid")
+          JsString(invalidValue).validate[StartDateOption] mustEqual JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(StartDate.values.toSeq)
+      val gen = Gen.oneOf(StartDateOption.values.toSeq)
 
       forAll(gen) {
         startDate =>

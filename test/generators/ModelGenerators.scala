@@ -16,17 +16,28 @@
 
 package generators
 
+import models.StartDateOption.{EarlierDate, NextPeriod}
 import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Vrn
 
+import java.time.LocalDate
+
 trait ModelGenerators {
 
-  implicit lazy val arbitraryStartDate: Arbitrary[StartDate] =
+  implicit lazy val arbitraryStartDate: Arbitrary[StartDate] = {
+    val nextPeriodGen = Gen.const(StartDateOption.NextPeriod)
+
+    val earlierDateGen = Gen.const(LocalDate.now())
+
     Arbitrary {
-      Gen.oneOf(StartDate.values.toSeq)
+      Gen.oneOf(
+        nextPeriodGen.map(_ => StartDate(NextPeriod, None)),
+        earlierDateGen.map(date => StartDate(EarlierDate, Some(date)))
+      )
     }
+  }
 
   implicit lazy val arbitraryBusinessContactDetails: Arbitrary[BusinessContactDetails] =
     Arbitrary {
@@ -40,19 +51,20 @@ trait ModelGenerators {
   implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =
     Arbitrary {
       for {
-        line1 <- arbitrary[String]
-        line2 <- arbitrary[String]
+        line1      <- arbitrary[String]
+        line2      <- Gen.option(arbitrary[String])
         townOrCity <- arbitrary[String]
-        county <- arbitrary[String]
-        postCode <- arbitrary[String]
-      } yield BusinessAddress(line1, Some(line2), townOrCity, Some(county), postCode)
+        county     <- Gen.option(arbitrary[String])
+        postCode   <- arbitrary[String]
+      } yield BusinessAddress(line1, line2, townOrCity, county, postCode)
     }
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
     for {
-      chars <- Gen.listOfN(9, Gen.numChar)
+      prefix <- Gen.oneOf("", "GB")
+      chars  <- Gen.listOfN(9, Gen.numChar)
     } yield {
-      Vrn("GB" + chars.mkString(""))
+      Vrn(prefix + chars.mkString(""))
     }
   }
 }

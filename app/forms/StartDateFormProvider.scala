@@ -16,16 +16,35 @@
 
 package forms
 
+import forms.mappings.Mappings
+import models.StartDateOption.EarlierDate
+import models.{StartDate, StartDateOption}
+import play.api.data.Form
+import play.api.data.Forms.mapping
+import services.StartDateService
+import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfEqual
+
+import java.time.format.DateTimeFormatter
+import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 
-import forms.mappings.Mappings
-import play.api.data.Form
-import models.StartDate
+class StartDateFormProvider @Inject()(clock: Clock, startDateService: StartDateService) extends Mappings {
 
-class StartDateFormProvider @Inject() extends Mappings {
+  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   def apply(): Form[StartDate] =
     Form(
-      "value" -> enumerable[StartDate]("startDate.error.required")
+      mapping(
+        "choice" -> enumerable[StartDateOption]("startDate.choice.error.required"),
+        "earlierDate" -> mandatoryIfEqual("choice", EarlierDate.toString, localDate(
+          invalidKey     = "startDate.earlierDate.error.invalid",
+          allRequiredKey = "startDate.earlierDate.error.allRequired",
+          twoRequiredKey = "startDate.earlierDate.error.twoRequired",
+          requiredKey    = "startDate.earlierDate.error.required"
+        )
+        .verifying(minDate(startDateService.earliestAlternativeDate, "startDate.earlierDate.error.minDate", startDateService.earliestAlternativeDate.format(dateFormatter)))
+        .verifying(maxDate(startDateService.latestAlternativeDate, "startDate.earlierDate.error.maxDate", startDateService.latestAlternativeDate.format(dateFormatter)))
+        ))(StartDate.apply)(StartDate.unapply)
     )
+
 }
