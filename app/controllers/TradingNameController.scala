@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.Constants
 import controllers.actions._
 import forms.TradingNameFormProvider
 
@@ -38,6 +39,7 @@ class TradingNameController @Inject()(
                                         identify: IdentifierAction,
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
+                                        limitIndex: MaximumIndexFilterProvider,
                                         formProvider: TradingNameFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: TradingNameView
@@ -45,29 +47,31 @@ class TradingNameController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen limitIndex(index, Constants.maxTradingNames)) {
+      implicit request =>
 
-      val preparedForm = request.userAnswers.get(TradingNamePage(index)) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+        val preparedForm = request.userAnswers.get(TradingNamePage(index)) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
 
-      Ok(view(preparedForm, mode, index))
-  }
+        Ok(view(preparedForm, mode, index))
+    }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen limitIndex(index, Constants.maxTradingNames)).async {
+      implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, index))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNamePage(index), value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(TradingNamePage(index), mode, updatedAnswers))
-      )
-  }
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNamePage(index), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TradingNamePage(index), mode, updatedAnswers))
+        )
+    }
 }

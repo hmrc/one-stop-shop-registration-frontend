@@ -22,6 +22,7 @@ import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalacheck.Gen
 import org.scalatestplus.mockito.MockitoSugar
 import pages.TradingNamePage
 import play.api.inject.bind
@@ -152,6 +153,51 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return NOT_FOUND for a GET with an index of position 10 or greater" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val highIndex = Gen.choose(10, Int.MaxValue).map(Index(_)).sample.value
+
+      running(application) {
+
+        val request = FakeRequest(GET, routes.TradingNameController.onPageLoad(NormalMode, highIndex).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
+      }
+    }
+
+    "must return NOT_FOUND for a POST with an index of position 10 or greater" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(TradingNamePage(Index(0)), "foo").success.value
+          .set(TradingNamePage(Index(1)), "foo").success.value
+          .set(TradingNamePage(Index(2)), "foo").success.value
+          .set(TradingNamePage(Index(3)), "foo").success.value
+          .set(TradingNamePage(Index(4)), "foo").success.value
+          .set(TradingNamePage(Index(5)), "foo").success.value
+          .set(TradingNamePage(Index(6)), "foo").success.value
+          .set(TradingNamePage(Index(7)), "foo").success.value
+          .set(TradingNamePage(Index(8)), "foo").success.value
+          .set(TradingNamePage(Index(9)), "foo").success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+      val highIndex = Gen.choose(10, Int.MaxValue).map(Index(_)).sample.value
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, routes.TradingNameController.onPageLoad(NormalMode, highIndex).url)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
       }
     }
   }
