@@ -16,7 +16,7 @@
 
 package pages
 
-import models.Index
+import models.{Country, Index}
 import pages.behaviours.PageBehaviours
 
 
@@ -24,10 +24,10 @@ class VatRegisteredEuMemberStatePageSpec(index: Index) extends PageBehaviours {
 
   "VatRegisteredEuMemberStatePage" - {
 
-    beRetrievable[String](VatRegisteredEuMemberStatePage(index))
+    beRetrievable[Country](VatRegisteredEuMemberStatePage(index))
 
-    beSettable[String](VatRegisteredEuMemberStatePage(index))
+    beSettable[Country](VatRegisteredEuMemberStatePage(index))
 
-    beRemovable[String](VatRegisteredEuMemberStatePage(index))
+    beRemovable[Country](VatRegisteredEuMemberStatePage(index))
   }
 }

@@ -16,10 +16,10 @@
 
 package pages
 
-import models.Index
+import models.{Country, Index}
 import play.api.libs.json.JsPath
 
-case class VatRegisteredEuMemberStatePage(index: Index) extends QuestionPage[String] {
+case class VatRegisteredEuMemberStatePage(index: Index) extends QuestionPage[Country] {
 
   override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
 

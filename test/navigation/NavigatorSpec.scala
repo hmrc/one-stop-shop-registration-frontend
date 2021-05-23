@@ -173,7 +173,7 @@ class NavigatorSpec extends SpecBase {
 
           val answers = emptyUserAnswers
             .set(AddAdditionalEuVatDetailsPage, true).success.value
-            .set(VatRegisteredEuMemberStatePage(index), "France").success.value
+            .set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
             .set(EuVatNumberPage(index), "FR123456789").success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, NormalMode, answers)
@@ -195,7 +195,7 @@ class NavigatorSpec extends SpecBase {
 
           val answers =
             emptyUserAnswers
-              .set(VatRegisteredEuMemberStatePage(index), "Country").success.value
+              .set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
               .set(EuVatNumberPage(index), "VAT Number").success.value
 
           navigator.nextPage(DeleteEuVatDetailsPage(index), NormalMode, answers)
@@ -369,7 +369,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from VAT Registered EU Member State Page to EU VAT Number page" in {
 
-        val answers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), "France").success.value
+        val answers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
 
         navigator.nextPage(VatRegisteredEuMemberStatePage(index), CheckMode, answers)
           .mustBe(routes.EuVatNumberController.onPageLoad(CheckMode, index))
@@ -388,7 +388,7 @@ class NavigatorSpec extends SpecBase {
         "to VAT Registered EU Member State page if true" in {
 
           val answers = emptyUserAnswers.set(AddAdditionalEuVatDetailsPage, true).success.value
-            .set(VatRegisteredEuMemberStatePage(index), "France").success.value
+            .set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
             .set(EuVatNumberPage(index), "FR123456789").success.value
 
           navigator.nextPage(AddAdditionalEuVatDetailsPage, CheckMode, answers)

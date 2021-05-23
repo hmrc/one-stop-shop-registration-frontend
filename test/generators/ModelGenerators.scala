@@ -26,6 +26,11 @@ import java.time.LocalDate
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryCountry: Arbitrary[Country] =
+    Arbitrary {
+      Gen.oneOf(Country.euCountries)
+    }
+
   implicit lazy val arbitraryStartDate: Arbitrary[StartDate] = {
     Arbitrary {
       Gen.const(StartDate(EarlierDate, LocalDate.now))
