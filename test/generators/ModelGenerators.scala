@@ -16,7 +16,7 @@
 
 package generators
 
-import models.StartDateOption.{EarlierDate, NextPeriod}
+import models.StartDateOption.EarlierDate
 import models._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -27,15 +27,8 @@ import java.time.LocalDate
 trait ModelGenerators {
 
   implicit lazy val arbitraryStartDate: Arbitrary[StartDate] = {
-    val nextPeriodGen = Gen.const(StartDateOption.NextPeriod)
-
-    val earlierDateGen = Gen.const(LocalDate.now())
-
     Arbitrary {
-      Gen.oneOf(
-        nextPeriodGen.map(_ => StartDate(NextPeriod, None)),
-        earlierDateGen.map(date => StartDate(EarlierDate, Some(date)))
-      )
+      Gen.const(StartDate(EarlierDate, LocalDate.now))
     }
   }
 

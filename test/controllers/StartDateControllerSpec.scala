@@ -17,8 +17,8 @@
 package controllers
 
 import base.SpecBase
+import formats.Format.dateFormatter
 import forms.StartDateFormProvider
-import generators.Generators
 import models.{NormalMode, StartDate, StartDateOption, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -33,8 +33,7 @@ import repositories.SessionRepository
 import services.StartDateService
 import views.html.StartDateView
 
-import java.time.format.DateTimeFormatter
-import java.time.{Clock, LocalDate, ZoneId}
+import java.time.Clock
 import scala.concurrent.Future
 
 class StartDateControllerSpec extends SpecBase with MockitoSugar {
@@ -44,10 +43,9 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
   private lazy val startDateRoute = routes.StartDateController.onPageLoad(NormalMode).url
 
   private val startDateService  = new StartDateService(stubClockAtArbitraryDate)
-  private val formProvider      = new StartDateFormProvider(stubClockAtArbitraryDate, startDateService)
+  private val formProvider      = new StartDateFormProvider(startDateService)
   private val form              = formProvider()
   private val guidanceKey       = s"startDate.earlierDate.guidance.canRegisterLastMonth.${startDateService.canRegisterLastMonth}"
-  private val dateFormatter     = DateTimeFormatter.ofPattern("d MMMM yyyy")
   private val startOfNextPeriod = startDateService.startOfNextPeriod.format(dateFormatter)
 
   "StartDate Controller" - {
@@ -73,7 +71,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(StartDatePage, StartDate(StartDateOption.NextPeriod, None)).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(StartDatePage, StartDate(StartDateOption.NextPeriod, startDateService.startOfNextPeriod)).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -89,7 +87,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(StartDate(StartDateOption.NextPeriod, None)), NormalMode, startOfNextPeriod, guidanceKey)(request, messages(application)).toString
+          view(form.fill(StartDate(StartDateOption.NextPeriod, startDateService.startOfNextPeriod)), NormalMode, startOfNextPeriod, guidanceKey)(request, messages(application)).toString
       }
     }
 

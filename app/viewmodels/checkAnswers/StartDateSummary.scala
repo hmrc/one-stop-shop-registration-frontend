@@ -17,11 +17,10 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
+import formats.Format.dateFormatter
 import models.{CheckMode, UserAnswers}
 import pages.StartDatePage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -32,15 +31,9 @@ object StartDateSummary  {
     answers.get(StartDatePage).map {
       answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"startDate.$answer"))
-          )
-        )
-
         SummaryListRowViewModel(
           key     = "startDate.checkYourAnswersLabel",
-          value   = value,
+          value   = ValueViewModel(answer.date.format(dateFormatter)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.StartDateController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("startDate.change.hidden"))

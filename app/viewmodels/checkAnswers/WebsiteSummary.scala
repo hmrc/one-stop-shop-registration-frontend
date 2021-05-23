@@ -27,7 +27,7 @@ import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object WebsiteSummary  {
+object WebsiteSummary {
 
   def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
     answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {

@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import formats.Format.dateFormatter
 import forms.StartDateFormProvider
 
 import javax.inject.Inject
@@ -48,7 +49,6 @@ class StartDateController @Inject()(
 
   private val form = formProvider()
 
-  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
   private def earlierDateGuidanceKey: String =
     s"startDate.earlierDate.guidance.canRegisterLastMonth.${startDateService.canRegisterLastMonth}"
 

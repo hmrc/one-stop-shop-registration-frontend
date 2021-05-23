@@ -17,8 +17,8 @@
 package viewmodels.checkAnswers
 
 import java.time.format.DateTimeFormatter
-
 import controllers.routes
+import formats.Format.dateFormatter
 import models.{CheckMode, UserAnswers}
 import pages.UkVatEffectiveDatePage
 import play.api.i18n.Messages
@@ -31,8 +31,6 @@ object UkVatEffectiveDateSummary  {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(UkVatEffectiveDatePage).map {
       answer =>
-
-        val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
         SummaryListRowViewModel(
           key     = "ukVatEffectiveDate.checkYourAnswersLabel",

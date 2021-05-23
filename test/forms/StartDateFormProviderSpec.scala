@@ -16,6 +16,7 @@
 
 package forms
 
+import formats.Format.dateFormatter
 import forms.behaviours.{DateBehaviours, OptionFieldBehaviours}
 import models.StartDateOption.{EarlierDate, NextPeriod}
 import models.{StartDate, StartDateOption}
@@ -23,18 +24,15 @@ import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 import services.StartDateService
 
-import java.time.format.DateTimeFormatter
 import java.time.{Clock, LocalDate, ZoneId}
 
 class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviours {
-
-  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   def getForm(today: LocalDate): Form[StartDate] = {
     val stubClock = Clock.fixed(today.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
     val startDateService = new StartDateService(stubClock)
 
-    new StartDateFormProvider(stubClock, startDateService)()
+    new StartDateFormProvider(startDateService)()
   }
 
   "form" - {
@@ -46,10 +44,10 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
         val stubClock = Clock.fixed(arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
         val startDateService = new StartDateService(stubClock)
 
-        val form = new StartDateFormProvider(stubClock, startDateService)()
+        val form = new StartDateFormProvider(startDateService)()
 
         val result = form.bind(Map("choice" -> NextPeriod.toString))
-        result.value.value mustEqual StartDate(NextPeriod, None)
+        result.value.value mustEqual StartDate(NextPeriod, startDateService.startOfNextPeriod)
         result.errors mustBe empty
       }
     }
@@ -61,7 +59,7 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
         val stubClock = Clock.fixed(arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
         val startDateService = new StartDateService(stubClock)
 
-        val form = new StartDateFormProvider(stubClock, startDateService)()
+        val form = new StartDateFormProvider(startDateService)()
 
         val result = form.bind(Map("choice" -> EarlierDate.toString))
         result.errors must contain only FormError("earlierDate", "startDate.earlierDate.error.allRequired")
@@ -78,7 +76,7 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
         val stubClock = Clock.fixed(today.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
         val startDateService = new StartDateService(stubClock)
 
-        val form = new StartDateFormProvider(stubClock, startDateService)()
+        val form = new StartDateFormProvider(startDateService)()
 
         val validDates = datesBetween(today.minusMonths(1).withDayOfMonth(1), today.withDayOfMonth(today.lengthOfMonth))
 
@@ -96,7 +94,7 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
 
               val result = form.bind(data)
 
-              result.value.value mustEqual StartDate(EarlierDate, Some(date))
+              result.value.value mustEqual StartDate(EarlierDate, date)
               result.errors mustBe empty
           }
         }
@@ -161,7 +159,7 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
         val stubClock = Clock.fixed(today.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
         val startDateService = new StartDateService(stubClock)
 
-        val form = new StartDateFormProvider(stubClock, startDateService)()
+        val form = new StartDateFormProvider(startDateService)()
 
         val validDates = datesBetween(today.withDayOfMonth(1), today.withDayOfMonth(today.lengthOfMonth))
 
@@ -179,7 +177,7 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
 
               val result = form.bind(data)
 
-              result.value.value mustEqual StartDate(EarlierDate, Some(date))
+              result.value.value mustEqual StartDate(EarlierDate, date)
               result.errors mustBe empty
           }
         }
@@ -240,7 +238,7 @@ class StartDateFormProviderSpec extends OptionFieldBehaviours with DateBehaviour
       val stubClock = Clock.fixed(arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
       val startDateService = new StartDateService(stubClock)
 
-      val form = new StartDateFormProvider(stubClock, startDateService)()
+      val form = new StartDateFormProvider(startDateService)()
 
       "when no choice is selected" in {
         val result = form.bind(Map.empty[String, String])

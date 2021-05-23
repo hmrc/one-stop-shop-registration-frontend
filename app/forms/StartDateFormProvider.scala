@@ -16,21 +16,19 @@
 
 package forms
 
+import formats.Format.dateFormatter
 import forms.mappings.Mappings
-import models.StartDateOption.EarlierDate
+import models.StartDateOption.{EarlierDate, NextPeriod}
 import models.{StartDate, StartDateOption}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import services.StartDateService
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfEqual
 
-import java.time.format.DateTimeFormatter
-import java.time.{Clock, LocalDate}
+import java.time.LocalDate
 import javax.inject.Inject
 
-class StartDateFormProvider @Inject()(clock: Clock, startDateService: StartDateService) extends Mappings {
-
-  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+class StartDateFormProvider @Inject()(startDateService: StartDateService) extends Mappings {
 
   def apply(): Form[StartDate] =
     Form(
@@ -44,7 +42,17 @@ class StartDateFormProvider @Inject()(clock: Clock, startDateService: StartDateS
         )
         .verifying(minDate(startDateService.earliestAlternativeDate, "startDate.earlierDate.error.minDate", startDateService.earliestAlternativeDate.format(dateFormatter)))
         .verifying(maxDate(startDateService.latestAlternativeDate, "startDate.earlierDate.error.maxDate", startDateService.latestAlternativeDate.format(dateFormatter)))
-        ))(StartDate.apply)(StartDate.unapply)
+        ))(a)(u)
     )
 
+  private def a(choice: StartDateOption, earlierDate: Option[LocalDate]): StartDate = (choice, earlierDate) match {
+    case (NextPeriod, _)           => StartDate(NextPeriod, startDateService.startOfNextPeriod)
+    case (EarlierDate, Some(date)) => StartDate(EarlierDate, date)
+    case (EarlierDate, None)       => throw new IllegalArgumentException("Tried to bind a form for an earlier date, but no date was supplied")
+  }
+
+  private def u(startDate: StartDate): Option[(StartDateOption, Option[LocalDate])] = startDate.option match {
+    case NextPeriod  => Some((NextPeriod, None))
+    case EarlierDate => Some((EarlierDate, Some(startDate.date)))
+  }
 }

@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package formats
 
-import play.api.libs.json.{Json, OFormat}
+import java.time.format.DateTimeFormatter
 
-import java.time.LocalDate
+object Format {
 
-case class StartDate(option: StartDateOption, date: LocalDate)
-
-object StartDate {
-
-  implicit val format: OFormat[StartDate] = Json.format[StartDate]
+  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 }
