@@ -17,13 +17,14 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class VatRegisteredEuMemberStateFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "vatRegisteredEuMemberState.error.required"
-  val lengthKey = "vatRegisteredEuMemberState.error.length"
-  val maxLength = 100
+
 
   val form = new VatRegisteredEuMemberStateFormProvider()()
 
@@ -34,14 +35,7 @@ class VatRegisteredEuMemberStateFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      arbitrary[Country].map(_.code)
     )
 
     behave like mandatoryField(
@@ -49,5 +43,16 @@ class VatRegisteredEuMemberStateFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind any values other than valid country codes" in {
+
+      val invalidAnswers = arbitrary[String] suchThat (x => !Country.euCountries.map(_.code).contains(x))
+
+      forAll(invalidAnswers) {
+        answer =>
+          val result = form.bind(Map("value" -> answer)).apply(fieldName)
+          result.errors must contain only FormError(fieldName, requiredKey)
+      }
+    }
   }
 }

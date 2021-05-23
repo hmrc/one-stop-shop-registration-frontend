@@ -34,7 +34,7 @@ object EuVatDetailsSummary  {
     answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
-          name      = HtmlFormat.escape(details.vatRegisteredEuMemberState).toString + " - " + HtmlFormat.escape(details.euVatNumber),
+          name      = HtmlFormat.escape(details.vatRegisteredEuMemberState.name).toString + " - " + HtmlFormat.escape(details.euVatNumber),
           changeUrl = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(index)).url,
           removeUrl = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url
         )
@@ -46,7 +46,7 @@ object EuVatDetailsSummary  {
 
         val value = euVatDetails.map {
           details =>
-            HtmlFormat.escape(details.vatRegisteredEuMemberState) + " - " + HtmlFormat.escape(details.euVatNumber)
+            HtmlFormat.escape(details.vatRegisteredEuMemberState.name) + " - " + HtmlFormat.escape(details.euVatNumber)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(

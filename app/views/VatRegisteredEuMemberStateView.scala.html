@@ -14,15 +14,17 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
+@import viewmodels.InputWidth
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
+    govukSelect: GovukSelect,
     govukButton: GovukButton
 )
+
 
 @(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
 
@@ -34,12 +36,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput(
-            InputViewModel(
+        @govukSelect(
+            SelectViewModel(
                 field = form("value"),
+                items = Country.euCountrySelectItems,
                 label = LabelViewModel(messages("vatRegisteredEuMemberState.heading")).asPageHeading()
             )
-            .withWidth(Full)
+            .withCssClass(InputWidth.Fixed20.toString)
+            .withCssClass("autocomplete")
         )
 
         @govukButton(

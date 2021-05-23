@@ -21,7 +21,7 @@ import forms.EuVatNumberFormProvider
 import models.requests.DataRequest
 
 import javax.inject.Inject
-import models.{Index, Mode}
+import models.{Country, Index, Mode}
 import navigation.Navigator
 import pages.{EuVatNumberPage, RegisteredCompanyNamePage, VatRegisteredEuMemberStatePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -81,7 +81,7 @@ class EuVatNumberController @Inject()(
   }
 
   private def getCountry(index: Index)
-                        (block: String => Future[Result])
+                        (block: Country => Future[Result])
                         (implicit request: DataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(VatRegisteredEuMemberStatePage(index)).map {
       country =>

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.EuVatNumberFormProvider
-import models.{Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -38,13 +38,14 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
   private val index = Index(0)
   private val onwardRoute = Call("GET", "/foo")
 
-  private val country = "country"
+  private val country = Country.euCountries.head
   private val formProvider = new EuVatNumberFormProvider()
   private val form = formProvider(country)
 
   private lazy val euVatNumberRoute = routes.EuVatNumberController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), "country").success.value
+
+  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
 
   "EuVatNumber Controller" - {
 

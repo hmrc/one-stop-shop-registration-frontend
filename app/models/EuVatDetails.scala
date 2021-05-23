@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EuVatDetails(vatRegisteredEuMemberState: String, euVatNumber: String)
+case class EuVatDetails(vatRegisteredEuMemberState: Country, euVatNumber: String)
 
 object EuVatDetails {
 
