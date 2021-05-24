@@ -17,6 +17,7 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.Index
 import play.api.data.FormError
 
 class WebsiteFormProviderSpec extends StringFieldBehaviours {
@@ -24,8 +25,10 @@ class WebsiteFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "website.error.required"
   val lengthKey = "website.error.length"
   val maxLength = 100
+  val index = Index(0)
+  val emptyExistingAnswers = Seq.empty[String]
 
-  val form = new WebsiteFormProvider()()
+  val form = new WebsiteFormProvider()(index, emptyExistingAnswers)
 
   ".value" - {
 
@@ -49,5 +52,14 @@ class WebsiteFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must fail to bind when given a duplicate value" in {
+      val existingAnswers = Seq("foo", "bar")
+      val answer = "bar"
+      val form = new WebsiteFormProvider()(index, existingAnswers)
+
+      val result = form.bind(Map(fieldName ->  answer)).apply(fieldName)
+      result.errors must contain only FormError(fieldName, "website.error.duplicate")
+    }
   }
 }

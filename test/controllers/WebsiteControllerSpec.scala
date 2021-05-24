@@ -22,6 +22,7 @@ import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalacheck.Gen
 import org.scalatestplus.mockito.MockitoSugar
 import pages.WebsitePage
 import play.api.inject.bind
@@ -39,7 +40,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
   private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new WebsiteFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(index, Seq.empty)
 
   private lazy val websiteRoute = routes.WebsiteController.onPageLoad(NormalMode, index).url
 
@@ -152,6 +153,51 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return NOT_FOUND for a GET with an index of position 10 or greater" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val highIndex = Gen.choose(10, Int.MaxValue).map(Index(_)).sample.value
+
+      running(application) {
+
+        val request = FakeRequest(GET, routes.WebsiteController.onPageLoad(NormalMode, highIndex).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
+      }
+    }
+
+    "must return NOT_FOUND for a POST with an index of position 10 or greater" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(WebsitePage(Index(0)), "foo").success.value
+          .set(WebsitePage(Index(1)), "foo").success.value
+          .set(WebsitePage(Index(2)), "foo").success.value
+          .set(WebsitePage(Index(3)), "foo").success.value
+          .set(WebsitePage(Index(4)), "foo").success.value
+          .set(WebsitePage(Index(5)), "foo").success.value
+          .set(WebsitePage(Index(6)), "foo").success.value
+          .set(WebsitePage(Index(7)), "foo").success.value
+          .set(WebsitePage(Index(8)), "foo").success.value
+          .set(WebsitePage(Index(9)), "foo").success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+      val highIndex = Gen.choose(10, Int.MaxValue).map(Index(_)).sample.value
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, routes.WebsiteController.onPageLoad(NormalMode, highIndex).url)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
       }
     }
   }

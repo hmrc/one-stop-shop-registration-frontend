@@ -39,7 +39,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
   private val onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new VatRegisteredEuMemberStateFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(index, Seq.empty)
 
   private lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index).url
 

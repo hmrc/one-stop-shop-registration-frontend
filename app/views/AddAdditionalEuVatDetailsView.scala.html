@@ -26,7 +26,7 @@
     addToList: components.addToList
 )
 
-@(form: Form[_], mode: Mode, list: Seq[ListItem])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: Seq[ListItem], canAddCountries: Boolean)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
     @layout(pageTitle = title(form, messages("addAdditionalEuVatDetails.title" + messageSuffix, list.size))) {
@@ -41,12 +41,17 @@
 
             @addToList(list, Long)
 
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("addAdditionalEuVatDetails.addAnother")).withSize(LegendSize.Medium)
-                ).withHint(HintViewModel(messages("addAdditionalEuVatDetails.addAnother.hint")))
-            )
+            @if(canAddCountries) {
+                @govukRadios(
+                    RadiosViewModel.yesNo(
+                        field = form("value"),
+                        legend = LegendViewModel(messages("addAdditionalEuVatDetails.addAnother")).withSize(LegendSize.Medium)
+                    ).withHint(HintViewModel(messages("addAdditionalEuVatDetails.addAnother.hint")))
+                )
+            } else {
+                <p class="govuk-body">@messages("addAdditionalEuVatDetails.maximumReached")</p>
+                <input type="hidden" name="value" id="value" value="false"/>
+            }
 
             @govukButton(
                 ButtonViewModel(messages("site.continue"))

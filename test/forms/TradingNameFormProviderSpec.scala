@@ -17,6 +17,7 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.Index
 import play.api.data.FormError
 
 class TradingNameFormProviderSpec extends StringFieldBehaviours {
@@ -24,8 +25,10 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "tradingName.error.required"
   val lengthKey = "tradingName.error.length"
   val maxLength = 100
+  val index = Index(0)
+  val emptyExistingAnswers = Seq.empty[String]
 
-  val form = new TradingNameFormProvider()()
+  val form = new TradingNameFormProvider()(index, emptyExistingAnswers)
 
   ".value" - {
 
@@ -49,5 +52,14 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must fail to bind when given a duplicate value" in {
+      val existingAnswers = Seq("foo", "bar")
+      val answer = "bar"
+      val form = new TradingNameFormProvider()(index, existingAnswers)
+
+      val result = form.bind(Map(fieldName ->  answer)).apply(fieldName)
+      result.errors must contain only FormError(fieldName, "tradingName.error.duplicate")
+    }
   }
 }

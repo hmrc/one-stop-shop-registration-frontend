@@ -18,18 +18,20 @@ package controllers
 
 import base.SpecBase
 import forms.AddWebsiteFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddWebsitePage
+import pages.{AddWebsitePage, WebsitePage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
+import viewmodels.checkAnswers.WebsiteSummary
 import views.html.AddWebsiteView
 
 import scala.concurrent.Future
@@ -43,41 +45,76 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val addWebsiteRoute = routes.AddWebsiteController.onPageLoad(NormalMode).url
 
-  private val emptyList = Seq.empty[ListItem]
+  private val baseAnswers = emptyUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
 
-  "AddAdditionalEuVatDetails Controller" - {
+  "AddWebsite Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, addWebsiteRoute)
+
+        val view                    = application.injector.instanceOf[AddWebsiteView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = WebsiteSummary.addToListRows(baseAnswers)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when the maximum number of websites have already been added" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(WebsitePage(Index(0)), "foo").success.value
+          .set(WebsitePage(Index(1)), "foo").success.value
+          .set(WebsitePage(Index(2)), "foo").success.value
+          .set(WebsitePage(Index(3)), "foo").success.value
+          .set(WebsitePage(Index(4)), "foo").success.value
+          .set(WebsitePage(Index(5)), "foo").success.value
+          .set(WebsitePage(Index(6)), "foo").success.value
+          .set(WebsitePage(Index(7)), "foo").success.value
+          .set(WebsitePage(Index(8)), "foo").success.value
+          .set(WebsitePage(Index(9)), "foo").success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AddWebsiteView]
+        val view                    = application.injector.instanceOf[AddWebsiteView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = WebsiteSummary.addToListRows(answers)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, emptyList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
       }
     }
 
     "must not populate the answer on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(AddWebsitePage, true).success.value
+      val userAnswers = baseAnswers.set(AddWebsitePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
-        val view = application.injector.instanceOf[AddWebsiteView]
+        val view                    = application.injector.instanceOf[AddWebsiteView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = WebsiteSummary.addToListRows(baseAnswers)
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, emptyList)(request, messages(application)).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
 
@@ -88,7 +125,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -109,7 +146,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -118,12 +155,14 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AddWebsiteView]
+        val view                    = application.injector.instanceOf[AddWebsiteView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = WebsiteSummary.addToListRows(baseAnswers)
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, emptyList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
 

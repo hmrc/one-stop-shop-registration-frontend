@@ -25,6 +25,7 @@ import navigation.Navigator
 import pages.VatRegisteredEuMemberStatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.{AllEuVatDetailsQuery, AllWebsites}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.VatRegisteredEuMemberStateView
@@ -43,10 +44,10 @@ class VatRegisteredEuMemberStateController @Inject()(
                                         view: VatRegisteredEuMemberStateView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
-
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+
+      val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.vatRegisteredEuMemberState))
 
       val preparedForm = request.userAnswers.get(VatRegisteredEuMemberStatePage(index)) match {
         case None => form
@@ -58,6 +59,8 @@ class VatRegisteredEuMemberStateController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.vatRegisteredEuMemberState))
 
       form.bindFromRequest().fold(
         formWithErrors =>

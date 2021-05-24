@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package forms
+package config
 
-import javax.inject.Inject
-import forms.mappings.Mappings
-import models.Index
-import play.api.data.Form
+object Constants {
 
-class WebsiteFormProvider @Inject() extends Mappings {
-
-  def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
-    Form(
-      "value" -> text("website.error.required")
-        .verifying(maxLength(100, "website.error.length"))
-        .verifying(notADuplicate(thisIndex, existingAnswers, "website.error.duplicate"))
-    )
+  val maxTradingNames: Int = 10
+  val maxWebsites: Int = 10
 }
