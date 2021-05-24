@@ -16,13 +16,27 @@
 
 package controllers
 
+import akka.http.impl.util.JavaAccessors.HttpResponse
 import base.SpecBase
+import forms.HasTradingNameFormProvider
+import models.RegistrationResponse
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.{mock, when}
+import pages.RegisteredCompanyNamePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import service.RegistrationService
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+import javax.inject.Inject
+import scala.concurrent.Future.successful
+
+class CheckYourAnswersControllerSpec @Inject()(
+  mockRegistrationService: RegistrationService
+) extends SpecBase with SummaryListFluency {
+
+  private val mockRegistrationResponse = mock[RegistrationResponse]
 
   "Check Your Answers Controller" - {
 
@@ -53,5 +67,23 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to 'Application Complete' page on valid submission" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      when(mockRegistrationService.submit(any())(any(),any())).thenReturn(successful(mockRegistrationResponse))
+
+      val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+
+      redirectLocation(result).value mustEqual routes.ApplicationCompleteController.onPageLoad().url
+    }
+
+
+
   }
 }

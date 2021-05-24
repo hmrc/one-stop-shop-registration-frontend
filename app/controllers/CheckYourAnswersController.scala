@@ -17,13 +17,21 @@
 package controllers
 
 import com.google.inject.Inject
+import connectors.RegistrationConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.requests.RegistrationRequest
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import service.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
 class CheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
@@ -31,6 +39,8 @@ class CheckYourAnswersController @Inject()(
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  registrationService: RegistrationService,
+  registrationConnector: RegistrationConnector,
   view: CheckYourAnswersView
 ) extends FrontendBaseController with I18nSupport {
 
@@ -56,8 +66,12 @@ class CheckYourAnswersController @Inject()(
       Ok(view(list))
   }
 
+  // Send payload to backend
+
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      Redirect(routes.ApplicationCompleteController.onPageLoad())
+
+      registrationService.submit(request.userAnswers)
+
   }
 }
