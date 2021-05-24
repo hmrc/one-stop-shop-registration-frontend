@@ -16,13 +16,16 @@
 
 package controllers
 
+import config.Constants
 import controllers.actions._
 import forms.AddTradingNameFormProvider
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.AddTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.DeriveNumberOfTradingNames
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.TradingNameSummary
@@ -45,26 +48,42 @@ class AddTradingNameController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getNumberOfTradingNames {
+        number =>
 
-      Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers)))
+          val canAddTradingNames = number < Constants.maxTradingNames
+          Future.successful(Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers), canAddTradingNames)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getNumberOfTradingNames {
+        number =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(
-            BadRequest(view(formWithErrors, mode, TradingNameSummary.addToListRows(request.userAnswers)))
-          ),
+          val canAddTradingNames = number < Constants.maxTradingNames
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddTradingNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddTradingNamePage, mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(formWithErrors, mode, TradingNameSummary.addToListRows(request.userAnswers), canAddTradingNames))
+              ),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddTradingNamePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddTradingNamePage, mode, updatedAnswers))
+          )
+      }
   }
+
+  private def getNumberOfTradingNames(block: Int => Future[Result])
+                                     (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(DeriveNumberOfTradingNames).map {
+      number =>
+        block(number)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

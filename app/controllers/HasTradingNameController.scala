@@ -81,7 +81,7 @@ class HasTradingNameController @Inject()(
   }
 
   private def getRegisteredCompanyName(block: String => Future[Result])
-                                      (implicit request: DataRequest[AnyContent]) =
+                                      (implicit request: DataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(RegisteredCompanyNamePage).map {
       name =>
         block(name)

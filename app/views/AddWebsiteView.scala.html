@@ -27,7 +27,7 @@
 )
 
 
-@(form: Form[_], mode: Mode, list: Seq[ListItem])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: Seq[ListItem], canAddWebsites: Boolean)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
     @layout(pageTitle = title(form, messages("addWebsite.title" + messageSuffix, list.size))) {
@@ -42,12 +42,17 @@
 
             @addToList(list, itemSize = Long)
 
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("addWebsite.addAnother")).withSize(LegendSize.Medium)
-                ).withHint(HintViewModel(messages("addWebsite.addAnother.hint")))
-            )
+            @if(canAddWebsites) {
+                @govukRadios(
+                    RadiosViewModel.yesNo(
+                        field = form("value"),
+                        legend = LegendViewModel(messages("addWebsite.addAnother")).withSize(LegendSize.Medium)
+                    ).withHint(HintViewModel(messages("addWebsite.addAnother.hint")))
+                )
+            } else {
+                <p class="govuk-body">@messages("addWebsite.maximumReached")</p>
+                <input type="hidden" name="value" id="value" value="false"/>
+            }
 
             @govukButton(
                 ButtonViewModel(messages("site.continue"))
