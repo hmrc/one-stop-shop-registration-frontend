@@ -40,7 +40,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
   private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new TradingNameFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(index, Seq.empty)
 
   private lazy val tradingNameRoute = routes.TradingNameController.onPageLoad(NormalMode, index).url
 

@@ -80,6 +80,7 @@ tradingName.heading = What is your trading name?
 tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
 tradingName.error.required = Enter your trading name
 tradingName.error.length = Your trading name must be 100 characters or less
+tradingName.error.duplicate = You have already added this trading name
 tradingName.change.hidden = your trading name
 
 ukVatEffectiveDate.title = What is your UK VAT registration date?
@@ -121,7 +122,7 @@ vatRegisteredEuMemberState.title = Which EU country?
 vatRegisteredEuMemberState.heading = Which EU country?
 vatRegisteredEuMemberState.checkYourAnswersLabel = Which EU country?
 vatRegisteredEuMemberState.error.required = Enter an EU country
-vatRegisteredEuMemberState.error.length = EU country must be 100 characters or less
+vatRegisteredEuMemberState.error.duplicate = You have already added this country
 vatRegisteredEuMemberState.change.hidden = EU country
 
 vatRegisteredInEu.title = Is your business registered for VAT in EU countries?
@@ -229,6 +230,7 @@ website.heading = Enter a website address you use to sell your products
 website.checkYourAnswersLabel = Website
 website.error.required = Enter a website
 website.error.length = Website must be 100 characters or less
+website.error.duplicate = You have already added this website
 website.change.hidden = Website
 
 deleteWebsite.title = Are you sure you want to remove this website?

@@ -17,15 +17,16 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
+import models.Index
 import play.api.data.Form
 
 class TradingNameFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
     Form(
       "value" -> text("tradingName.error.required")
         .verifying(maxLength(100, "tradingName.error.length"))
+        .verifying(notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"))
     )
 }

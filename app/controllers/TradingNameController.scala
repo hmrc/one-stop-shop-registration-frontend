@@ -19,17 +19,17 @@ package controllers
 import config.Constants
 import controllers.actions._
 import forms.TradingNameFormProvider
-
-import javax.inject.Inject
 import models.{Index, Mode}
 import navigation.Navigator
 import pages.TradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AllTradingNames
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.TradingNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TradingNameController @Inject()(
@@ -45,11 +45,11 @@ class TradingNameController @Inject()(
                                         view: TradingNameView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
-
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen limitIndex(index, Constants.maxTradingNames)) {
       implicit request =>
+
+        val form = formProvider(index, request.userAnswers.get(AllTradingNames).getOrElse(Seq.empty))
 
         val preparedForm = request.userAnswers.get(TradingNamePage(index)) match {
           case None => form
@@ -62,6 +62,8 @@ class TradingNameController @Inject()(
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen limitIndex(index, Constants.maxTradingNames)).async {
       implicit request =>
+
+        val form = formProvider(index, request.userAnswers.get(AllTradingNames).getOrElse(Seq.empty))
 
         form.bindFromRequest().fold(
           formWithErrors =>

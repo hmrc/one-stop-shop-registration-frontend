@@ -40,7 +40,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
   private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new WebsiteFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(index, Seq.empty)
 
   private lazy val websiteRoute = routes.WebsiteController.onPageLoad(NormalMode, index).url
 
