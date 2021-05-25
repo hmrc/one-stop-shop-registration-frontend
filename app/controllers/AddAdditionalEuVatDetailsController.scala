@@ -20,11 +20,13 @@ import controllers.actions._
 import forms.AddAdditionalEuVatDetailsFormProvider
 
 import javax.inject.Inject
-import models.Mode
+import models.{Country, Mode}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.AddAdditionalEuVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.DeriveNumberOfEuVatRegisteredCountries
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.EuVatDetailsSummary
@@ -47,34 +49,42 @@ class AddAdditionalEuVatDetailsController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getNumberOfEuCountries {
+        number =>
 
-      val list = SummaryListViewModel(
-        rows = EuVatDetailsSummary.addToListRows(request.userAnswers)
-      )
-
-      Ok(view(form, mode, list))
+          val canAddCountries = number < Country.euCountries.size
+          Future.successful(Ok(view(form, mode, EuVatDetailsSummary.addToListRows(request.userAnswers), canAddCountries)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getNumberOfEuCountries {
+        number =>
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+          val canAddCountries = number < Country.euCountries.size
 
-          val list = SummaryListViewModel(
-            rows = EuVatDetailsSummary.addToListRows(request.userAnswers)
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(formWithErrors, mode, EuVatDetailsSummary.addToListRows(request.userAnswers), canAddCountries))
+              ),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAdditionalEuVatDetailsPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddAdditionalEuVatDetailsPage, mode, updatedAnswers))
           )
-
-          Future.successful(BadRequest(view(formWithErrors, mode, list)))
-        },
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAdditionalEuVatDetailsPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddAdditionalEuVatDetailsPage, mode, updatedAnswers))
-      )
+      }
   }
+
+  private def getNumberOfEuCountries(block: Int => Future[Result])
+                                    (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(DeriveNumberOfEuVatRegisteredCountries).map {
+      number =>
+        block(number)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

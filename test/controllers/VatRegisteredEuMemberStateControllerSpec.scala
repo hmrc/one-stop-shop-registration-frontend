@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.VatRegisteredEuMemberStateFormProvider
-import models.{Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -39,9 +39,11 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
   private val onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new VatRegisteredEuMemberStateFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(index, Seq.empty)
 
   private lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index).url
+
+  private val country = Country.euCountries.head
 
   "VatRegisteredEuMemberState Controller" - {
 
@@ -63,7 +65,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(VatRegisteredEuMemberStatePage(index), "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(VatRegisteredEuMemberStatePage(index), country).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,7 +77,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(country), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -96,7 +98,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
       running(application) {
         val request =
           FakeRequest(POST, vatRegisteredEuMemberStateRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", country.code))
 
         val result = route(application, request).value
 
@@ -146,7 +148,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
       running(application) {
         val request =
           FakeRequest(POST, vatRegisteredEuMemberStateRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", country.code))
 
         val result = route(application, request).value
 

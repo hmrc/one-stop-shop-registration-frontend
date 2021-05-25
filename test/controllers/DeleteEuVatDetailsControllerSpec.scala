@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteEuVatDetailsFormProvider
-import models.{EuVatDetails, Index, NormalMode}
+import models.{Country, EuVatDetails, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
@@ -41,7 +41,8 @@ class DeleteEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider()
 
   private val index = Index(0)
-  private val euVatDetails = EuVatDetails("Country", "VAT Number")
+  private val country = Country.euCountries.head
+  private val euVatDetails = EuVatDetails(country, "VAT Number")
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, index).url
 
   private val baseUserAnswers =

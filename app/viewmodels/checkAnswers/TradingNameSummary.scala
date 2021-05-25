@@ -23,23 +23,19 @@ import play.twirl.api.HtmlFormat
 import queries.AllTradingNames
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object TradingNameSummary  {
 
-  def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+  def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
     answers.get(AllTradingNames).getOrElse(List.empty).zipWithIndex.map {
       case (name, index) =>
-        SummaryListRowViewModel(
-          key     = KeyViewModel(name).withCssClass("hmrc-add-to-a-list__identifier--light"),
-          value   = ValueViewModel(""),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.TradingNameController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("addTradingName.change.hidden", name)),
-            ActionItemViewModel("site.remove", routes.DeleteTradingNameController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("addTradingName.remove.hidden", name))
-          )
+        ListItem(
+          name      = HtmlFormat.escape(name).toString,
+          changeUrl = routes.TradingNameController.onPageLoad(NormalMode, Index(index)).url,
+          removeUrl = routes.DeleteTradingNameController.onPageLoad(NormalMode, Index(index)).url
         )
     }
 
@@ -53,11 +49,11 @@ object TradingNameSummary  {
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
-          key     = "tradingName.checkYourAnswersLabel",
+          key     = "tradingNames.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("tradingName.change.hidden"))
+              .withVisuallyHiddenText(messages("tradingNames.change.hidden"))
           )
         )
     }

@@ -24,9 +24,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("euVatNumber.title"))) {
+@layout(pageTitle = title(form, messages("euVatNumber.title", country.name))) {
 
     @formHelper(action = routes.EuVatNumberController.onSubmit(mode, index)) {
 
@@ -37,9 +37,9 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("euVatNumber.heading")).asPageHeading()
+                label = LabelViewModel(messages("euVatNumber.heading", country.name)).asPageHeading()
             )
-            .withWidth(Full)
+            .withWidth(Fixed10)
         )
 
         @govukButton(

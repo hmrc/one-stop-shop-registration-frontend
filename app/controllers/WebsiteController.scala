@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.Constants
 import controllers.actions._
 import forms.WebsiteFormProvider
 
@@ -25,6 +26,7 @@ import navigation.Navigator
 import pages.WebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AllWebsites
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WebsiteView
@@ -38,36 +40,41 @@ class WebsiteController @Inject()(
                                         identify: IdentifierAction,
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
+                                        limitIndex: MaximumIndexFilterProvider,
                                         formProvider: WebsiteFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: WebsiteView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen limitIndex(index, Constants.maxWebsites)) {
+      implicit request =>
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+        val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
 
-      val preparedForm = request.userAnswers.get(WebsitePage(index)) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+        val preparedForm = request.userAnswers.get(WebsitePage(index)) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
 
-      Ok(view(preparedForm, mode, index))
-  }
+        Ok(view(preparedForm, mode, index))
+    }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen limitIndex(index, Constants.maxTradingNames)).async {
+      implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+        val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WebsitePage(index), value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WebsitePage(index), mode, updatedAnswers))
-      )
-  }
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, index))),
+
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(WebsitePage(index), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(WebsitePage(index), mode, updatedAnswers))
+        )
+    }
 }

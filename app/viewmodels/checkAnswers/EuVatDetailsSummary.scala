@@ -18,28 +18,25 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
+import pages.AddAdditionalEuVatDetailsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuVatDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object EuVatDetailsSummary  {
 
-  def addToListRows(answers: UserAnswers)(implicit messages: Messages): List[SummaryListRow] =
+  def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
     answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
-        SummaryListRowViewModel(
-          key     = KeyViewModel(details.vatRegisteredEuMemberState).withCssClass("hmrc-add-to-a-list__identifier--light"),
-          value   = ValueViewModel(details.euVatNumber),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden", details.vatRegisteredEuMemberState)),
-            ActionItemViewModel("site.remove", routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url)
-              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.remove.hidden", details.vatRegisteredEuMemberState))
-          )
+        ListItem(
+          name      = HtmlFormat.escape(details.vatRegisteredEuMemberState.name).toString + " - " + HtmlFormat.escape(details.euVatNumber),
+          changeUrl = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(index)).url,
+          removeUrl = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url
         )
     }
 
@@ -49,7 +46,7 @@ object EuVatDetailsSummary  {
 
         val value = euVatDetails.map {
           details =>
-            HtmlFormat.escape(details.vatRegisteredEuMemberState) + " - " + HtmlFormat.escape(details.euVatNumber)
+            HtmlFormat.escape(details.vatRegisteredEuMemberState.name) + " - " + HtmlFormat.escape(details.euVatNumber)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(

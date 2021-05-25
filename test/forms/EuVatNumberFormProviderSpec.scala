@@ -17,6 +17,8 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
@@ -25,7 +27,9 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "euVatNumber.error.length"
   val maxLength = 100
 
-  val form = new EuVatNumberFormProvider()()
+  val country: Country = arbitrary[Country].sample.value
+
+  val form = new EuVatNumberFormProvider()(country)
 
   ".value" - {
 
@@ -47,7 +51,7 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

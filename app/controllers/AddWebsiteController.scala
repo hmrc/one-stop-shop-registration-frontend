@@ -16,21 +16,22 @@
 
 package controllers
 
+import config.Constants
 import controllers.actions._
 import forms.AddWebsiteFormProvider
-
-import javax.inject.Inject
 import models.Mode
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.AddWebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.DeriveNumberOfWebsites
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.WebsiteSummary
-import viewmodels.govuk.summarylist._
 import views.html.AddWebsiteView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddWebsiteController @Inject()(
@@ -47,34 +48,40 @@ class AddWebsiteController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
-      val list = SummaryListViewModel(
-        rows = WebsiteSummary.addToListRows(request.userAnswers)
-      )
-
-      Ok(view(form, mode, list))
+      getNumberOfWebsites {
+        number =>
+          val canAddWebsites = number < Constants.maxWebsites
+          Future.successful(Ok(view(form, mode, WebsiteSummary.addToListRows(request.userAnswers), canAddWebsites)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getNumberOfWebsites {
+        number =>
+          val canAddWebsites = number < Constants.maxWebsites
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(formWithErrors, mode, WebsiteSummary.addToListRows(request.userAnswers), canAddWebsites))
+              ),
 
-          val list = SummaryListViewModel(
-            WebsiteSummary.addToListRows(request.userAnswers)
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddWebsitePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddWebsitePage, mode, updatedAnswers))
           )
-
-          Future.successful(BadRequest(view(formWithErrors, mode, list)))
-        },
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddWebsitePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddWebsitePage, mode, updatedAnswers))
-      )
+      }
   }
+
+  private def getNumberOfWebsites(block: Int => Future[Result])
+                                 (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(DeriveNumberOfWebsites).map {
+      number =>
+        block(number)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

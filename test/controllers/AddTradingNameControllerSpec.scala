@@ -18,18 +18,19 @@ package controllers
 
 import base.SpecBase
 import forms.AddTradingNameFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddTradingNamePage
+import pages.{AddTradingNamePage, TradingNamePage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import viewmodels.govuk.summarylist._
+import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
 
 import scala.concurrent.Future
@@ -40,44 +41,77 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new AddTradingNameFormProvider()
   private val form = formProvider()
-
+  private val baseAnswers = emptyUserAnswers.set(TradingNamePage(Index(0)), "foo").success.value
   private lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(NormalMode).url
 
-  private val emptySummaryList = SummaryListViewModel(rows = Seq.empty)
-
-  "AddAdditionalEuVatDetails Controller" - {
+  "AddTradingName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)
 
+        val view                    = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = TradingNameSummary.addToListRows(baseAnswers)
+
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AddTradingNameView]
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when the maximum number of trading names have already been added" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(TradingNamePage(Index(0)), "foo").success.value
+          .set(TradingNamePage(Index(1)), "foo").success.value
+          .set(TradingNamePage(Index(2)), "foo").success.value
+          .set(TradingNamePage(Index(3)), "foo").success.value
+          .set(TradingNamePage(Index(4)), "foo").success.value
+          .set(TradingNamePage(Index(5)), "foo").success.value
+          .set(TradingNamePage(Index(6)), "foo").success.value
+          .set(TradingNamePage(Index(7)), "foo").success.value
+          .set(TradingNamePage(Index(8)), "foo").success.value
+          .set(TradingNamePage(Index(9)), "foo").success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameRoute)
+
+        val view                    = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+
+        val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view(form, NormalMode, TradingNameSummary.addToListRows(answers), canAddTradingNames = false)(request, implicitly).toString
       }
     }
 
     "must not populate the answer on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(AddTradingNamePage, true).success.value
+      val userAnswers = baseAnswers.set(AddTradingNamePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)
 
-        val view = application.injector.instanceOf[AddTradingNameView]
+        val view                    = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = TradingNameSummary.addToListRows(baseAnswers)
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
       }
     }
 
@@ -88,7 +122,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -109,7 +143,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -118,12 +152,14 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AddTradingNameView]
+        val view                    = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = TradingNameSummary.addToListRows(baseAnswers)
+
 
         val result = route(application, request).value
-
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
       }
     }
 

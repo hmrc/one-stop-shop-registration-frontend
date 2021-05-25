@@ -18,18 +18,19 @@ package controllers
 
 import base.SpecBase
 import forms.AddAdditionalEuVatDetailsFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AddAdditionalEuVatDetailsPage
+import pages.{AddAdditionalEuVatDetailsPage, EuVatNumberPage, VatRegisteredEuMemberStatePage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import viewmodels.govuk.summarylist._
+import viewmodels.checkAnswers.EuVatDetailsSummary
 import views.html.AddAdditionalEuVatDetailsView
 
 import scala.concurrent.Future
@@ -43,41 +44,48 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
 
   private lazy val addAdditionalEuVatDetailsRoute = routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode).url
 
-  private val emptySummaryList = SummaryListViewModel(rows = Seq.empty)
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(VatRegisteredEuMemberStatePage(Index(0)), Country.euCountries.head).success.value
+      .set(EuVatNumberPage(Index(0)), "foo").success.value
 
   "AddAdditionalEuVatDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addAdditionalEuVatDetailsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        val view                    = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = EuVatDetailsSummary.addToListRows(baseAnswers)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(AddAdditionalEuVatDetailsPage, true).success.value
+      val userAnswers = baseAnswers.set(AddAdditionalEuVatDetailsPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addAdditionalEuVatDetailsRoute)
 
-        val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        val view                    = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = EuVatDetailsSummary.addToListRows(baseAnswers)
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -88,7 +96,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -109,7 +117,7 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -118,12 +126,14 @@ class AddAdditionalEuVatDetailsControllerSpec extends SpecBase with MockitoSugar
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        val view                    = application.injector.instanceOf[AddAdditionalEuVatDetailsView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = EuVatDetailsSummary.addToListRows(baseAnswers)
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, emptySummaryList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
