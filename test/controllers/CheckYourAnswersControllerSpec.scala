@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.RegistrationConnector
 import models.requests.RegistrationRequest
+import models.responses.ConflictFound
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.MockitoSugar.{mock, when}
@@ -143,7 +144,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           )
 
           when(registrationService.fromUserAnswers(any())) thenReturn (Some(request))
-          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(any()))
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(bind[RegistrationService]

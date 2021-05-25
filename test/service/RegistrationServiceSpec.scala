@@ -17,30 +17,73 @@
 package service
 
 import base.SpecBase
-import models.UserAnswers
+import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, UserAnswers}
 import models.requests.RegistrationRequest
+import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
 import play.api.libs.json.Json
-import testutils.WireMockHelper
+import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
+import testutils.{RegistrationData, WireMockHelper}
+import uk.gov.hmrc.domain.Vrn
 
-import java.time.Instant
-import javax.inject.Inject
+import java.time.LocalDate
 
-class RegistrationServiceSpec @Inject()(
-                                       registrationService: RegistrationService
-                                       ) extends SpecBase with WireMockHelper {
+class RegistrationServiceSpec extends SpecBase with WireMockHelper {
 
-//  private val instant = Instant.now
-//  private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  val answers =
+    UserAnswers("id")
+      .set(RegisteredCompanyNamePage, "foo").success.value
+      .set(HasTradingNamePage, true).success.value
+      .set(AllTradingNames, List("single", "double")).success.value
+      .set(PartOfVatGroupPage, true).success.value
+      .set(UkVatNumberPage, Vrn("GB123456789")).success.value
+      .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
+      .set(UkVatRegisteredPostcodePage, "AA1 1AA").success.value
+      .set(VatRegisteredInEuPage, true).success.value
+      .set(AllEuVatDetailsQuery, List(EuVatDetails(Country("FR", "France"),"FR123456789"), EuVatDetails(Country("ES", "Spain"),"ES123456789"))).success.value
+      .set(BusinessAddressPage, BusinessAddress(
+        "123 Street",
+        Some("Street"),
+        "City",
+        Some("county"),
+        "AA12 1AB"
+      )).success.value
+      .set(BusinessContactDetailsPage, BusinessContactDetails(
+        "Joe Bloggs",
+        "01112223344",
+        "email@email.com"
+      )).success.value
+      .set(AllWebsites, List("website1", "website2")).success.value
+
+
+  private val registrationService = new RegistrationService()
+  private val registration = RegistrationData.createNewRegistration()
+
+
+  val request = RegistrationRequest(
+    registration.registeredCompanyName,
+    registration.hasTradingName,
+    registration.tradingNames,
+    registration.partOfVatGroup,
+    registration.ukVatNumber,
+    registration.ukVatEffectiveDate,
+    registration.ukVatRegisteredPostcode,
+    registration.vatRegisteredInEu,
+    registration.euVatDetails,
+    registration.businessAddress,
+    registration.businessContactDetails,
+    registration.websites
+  )
 
   "fromUserAnswers" - {
 
     "must return a Registration request when user answers are provided" in {
 
-      val registrationRequestOpt = registrationService.fromUserAnswers(emptyUserAnswers)
+      val registrationRequestOpt = registrationService.fromUserAnswers(answers)
 
-      registrationRequestOpt mustBe Some(RegistrationRequest)
+      val expectedAnswer = request
+
+      registrationRequestOpt mustBe Some(expectedAnswer)
     }
-
   }
 
 }

@@ -16,7 +16,7 @@
 
 package testutils
 
-import models.{BusinessAddress, BusinessContactDetails, EuVatDetails, Registration}
+import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, Registration}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -32,7 +32,7 @@ object RegistrationData {
       LocalDate.now(),
       "AA1 1AA",
       true,
-      Seq(EuVatDetails("France","FR123456789"), EuVatDetails("Spain","ES123456789")),
+      Seq(EuVatDetails(Country("FR", "France"),"FR123456789"), EuVatDetails(Country("ES", "Spain"),"ES123456789")),
       createBusinessAddress(),
       createBusinessContactDetails(),
       Seq("website1", "website2")
