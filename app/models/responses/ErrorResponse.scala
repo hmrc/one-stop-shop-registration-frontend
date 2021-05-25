@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package models
+package models.responses
 
-import play.api.libs.json.{Json, OFormat}
-
-final case class RegistrationResponse(
- registrationCreated: Boolean
-)
-
-object RegistrationResponse {
-  implicit lazy val formats: OFormat[RegistrationResponse] =
-    Json.format[RegistrationResponse]
+sealed trait ErrorResponse {
+  val body: String
 }
+
+case object InvalidJson extends ErrorResponse {
+  override val body = "Invalid JSON received"
+}
+
+case object NotFound extends ErrorResponse {
+  override val body = "Not found"
+}
+
+case object ConflictFound extends ErrorResponse {
+  override val body = "Conflict"
+}
+
+case class UnexpectedResponseStatus(status: Int, body: String) extends ErrorResponse
+

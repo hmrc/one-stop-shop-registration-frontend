@@ -17,8 +17,7 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{ok, post, urlEqualTo}
-import models.RegistrationResponse
+import com.github.tomakehurst.wiremock.client.WireMock.{created, ok, post, urlEqualTo}
 import models.requests.RegistrationRequest
 import play.api.Application
 import play.api.test.Helpers.running
@@ -59,16 +58,12 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
-        val responseBody =
-          """{"registrationCreated": true}"""
-
         server.stubFor(post(urlEqualTo(url))
-          .willReturn(ok(responseBody)))
+          .willReturn(created()))
 
         val result = connector.submitRegistration(request).futureValue
 
-        result mustEqual RegistrationResponse(true)
-
+        result mustEqual Right(())
       }
     }
   }

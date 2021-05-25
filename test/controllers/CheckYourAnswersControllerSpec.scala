@@ -16,31 +16,38 @@
 
 package controllers
 
-import akka.http.impl.util.JavaAccessors.HttpResponse
 import base.SpecBase
-import forms.HasTradingNameFormProvider
-import models.RegistrationResponse
+import connectors.RegistrationConnector
+import models.requests.RegistrationRequest
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
 import org.mockito.MockitoSugar.{mock, when}
-import pages.RegisteredCompanyNamePage
+import org.scalatest.BeforeAndAfterEach
+import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.{running, _}
 import service.RegistrationService
+import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-import javax.inject.Inject
-import scala.concurrent.Future.successful
+import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec @Inject()(
-  mockRegistrationService: RegistrationService
-) extends SpecBase with SummaryListFluency {
+class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with BeforeAndAfterEach {
 
-  private val mockRegistrationResponse = mock[RegistrationResponse]
+  private val registration = RegistrationData.createNewRegistration()
+
+  private val registrationService = mock[RegistrationService]
+  private val registrationConnector = mock[RegistrationConnector]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(registrationConnector)
+    Mockito.reset(registrationService)
+  }
 
   "Check Your Answers Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return 201 and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -53,37 +60,106 @@ class CheckYourAnswersControllerSpec @Inject()(
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(list)(request, messages(application)).toString
       }
+
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+    "on submit" - {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
+        "user should be redirected to Application Complete page" in {
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          val request = RegistrationRequest(
+            registration.registeredCompanyName,
+            registration.hasTradingName,
+            registration.tradingNames,
+            registration.partOfVatGroup,
+            registration.ukVatNumber,
+            registration.ukVatEffectiveDate,
+            registration.ukVatRegisteredPostcode,
+            registration.vatRegisteredInEu,
+            registration.euVatDetails,
+            registration.businessAddress,
+            registration.businessContactDetails,
+            registration.websites
+          )
+
+          when(registrationService.fromUserAnswers(any())) thenReturn Some(request)
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationService]
+              .toInstance(registrationService),
+              bind[RegistrationConnector]
+                .toInstance(registrationConnector)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.ApplicationCompleteController.onPageLoad().url
+          }
+        }
+      }
+
+      "when the user has not answered all necessary data" - {
+
+        "the user is redirected to Journey Recovery Page" in {
+
+          when(registrationService.fromUserAnswers(any())) thenReturn None
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationService]
+              .toInstance(registrationService)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+      }
+
+      "when the submission fails" - {
+
+        "the user is redirected to Journey Recovery Page" in {
+
+          val request = RegistrationRequest(
+            registration.registeredCompanyName,
+            registration.hasTradingName,
+            registration.tradingNames,
+            registration.partOfVatGroup,
+            registration.ukVatNumber,
+            registration.ukVatEffectiveDate,
+            registration.ukVatRegisteredPostcode,
+            registration.vatRegisteredInEu,
+            registration.euVatDetails,
+            registration.businessAddress,
+            registration.businessContactDetails,
+            registration.websites
+          )
+
+          when(registrationService.fromUserAnswers(any())) thenReturn (Some(request))
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(any()))
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationService]
+              .toInstance(registrationService),
+              bind[RegistrationConnector]
+                .toInstance(registrationConnector)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
-
-    "must redirect to 'Application Complete' page on valid submission" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      when(mockRegistrationService.submit(any())(any(),any())).thenReturn(successful(mockRegistrationResponse))
-
-      val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-
-      val result = route(application, request).value
-
-      status(result) mustEqual SEE_OTHER
-
-      redirectLocation(result).value mustEqual routes.ApplicationCompleteController.onPageLoad().url
-    }
-
-
-
   }
 }

@@ -16,67 +16,48 @@
 
 package service
 
-import connectors.RegistrationConnector
-import models.{RegistrationResponse, UserAnswers}
-import models.requests.{DataRequest, RegistrationRequest}
+import models.UserAnswers
+import models.requests.RegistrationRequest
 import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
-import play.api.mvc.Results.Redirect
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import play.api.Logger
-import play.api.i18n.Lang.logger
-import uk.gov.hmrc.govukfrontend.controllers.routes
 
-import javax.inject.Inject
-import scala.concurrent.Future
-import scala.concurrent.Future.successful
+class RegistrationService {
 
-class RegistrationService @Inject()(
-   registrationConnector: RegistrationConnector
-){
-//  def submit(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Option[HttpResponse]] = {
-//    val request =  RegistrationRequest(
-//      userAnswers.get(RegisteredCompanyNamePage).getOrElse(""),
-//      userAnswers.get(HasTradingNamePage).getOrElse(""),
-//      userAnswers.get(AllTradingNames).getOrElse(""),
-//      userAnswers.get(PartOfVatGroupPage).getOrElse(""),
-//      userAnswers.get(UkVatNumberPage).getOrElse(""),
-//      userAnswers.get(UkVatEffectiveDatePage).getOrElse(""),
-//      userAnswers.get(UkVatRegisteredPostcodePage).getOrElse(""),
-//      userAnswers.get(VatRegisteredInEuPage).getOrElse(""),
-//      userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty),
-//      userAnswers.get(BusinessAddressPage).getOrElse(""),
-//      userAnswers.get(BusinessContactDetailsPage).getOrElse(""),
-//      userAnswers.get(AllWebsites).getOrElse(Seq.empty)
-//    )
-//
-//    request match => {
-//      case Some(request) => registrationConnector.submitRegistration(request)
-//      case _ => ""
-//    }
+  def buildRegistrationRequest(userAnswers: UserAnswers): Option[RegistrationRequest] = {
 
-  // Build payload for backend
-
-  def submit(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, request: DataRequest[_]): Future[RegistrationResponse] = {
-    val registrationRequest = RegistrationRequest.buildRegistrationRequest(userAnswers)
-
-    registrationRequest match {
-      case Some(registrationSubmission) =>
-        registrationConnector.submitRegistration(registrationSubmission).flatMap {
-          case result =>
-            successful(Redirect(routes.ApplicationCompleteController.onPageLoad()))
-          case _ =>
-            ???
-        }
-      case None =>
-        logger.error("Unable to create a OSS registration request from user answers")
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
+    for {
+      registeredCompanyName       <- userAnswers.get(RegisteredCompanyNamePage)
+      hasTradingName              <- userAnswers.get(HasTradingNamePage)
+      tradingNames                <- userAnswers.get(AllTradingNames)
+      partOfVatGroup              <- userAnswers.get(PartOfVatGroupPage)
+      ukVatNumber                 <- userAnswers.get(UkVatNumberPage)
+      ukVatEffectiveDate          <- userAnswers.get(UkVatEffectiveDatePage)
+      ukVatRegisteredPostcode     <- userAnswers.get(UkVatRegisteredPostcodePage)
+      vatRegisteredInEu           <- userAnswers.get(VatRegisteredInEuPage)
+      euVatDetails                <- userAnswers.get(AllEuVatDetailsQuery)
+      businessAddress             <- userAnswers.get(BusinessAddressPage)
+      businessContactDetails      <- userAnswers.get(BusinessContactDetailsPage)
+      websites                    <- userAnswers.get(AllWebsites)
+    } yield
+      RegistrationRequest(
+        registeredCompanyName,
+        hasTradingName,
+        tradingNames,
+        partOfVatGroup,
+        ukVatNumber,
+        ukVatEffectiveDate,
+        ukVatRegisteredPostcode,
+        vatRegisteredInEu,
+        euVatDetails,
+        businessAddress,
+        businessContactDetails,
+        websites
+      )
   }
 
-
-
-
+  def fromUserAnswers(answers: UserAnswers): Option[RegistrationRequest] = {
+    buildRegistrationRequest(answers)
+  }
 
 
 }

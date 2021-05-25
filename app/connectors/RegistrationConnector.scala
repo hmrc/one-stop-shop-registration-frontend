@@ -17,10 +17,11 @@
 package connectors
 
 import config.Service
-import models.RegistrationResponse
+import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
 import models.requests.RegistrationRequest
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
+import models.responses.ErrorResponse
 import play.api.Configuration
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,10 +33,10 @@ class RegistrationConnector @Inject()(
 
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
 
-  def submitRegistration(request: RegistrationRequest)(implicit hc: HeaderCarrier): Future[RegistrationResponse] = {
+  def submitRegistration(registrationRequest: RegistrationRequest)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Unit]] = {
     val url = s"$baseUrl/one-stop-shop-registration/create"
 
-    httpClient.POST[RegistrationRequest, RegistrationResponse](url, request)
+    httpClient.POST[RegistrationRequest, RegistrationResultResponse](url, registrationRequest)
  }
 
 }

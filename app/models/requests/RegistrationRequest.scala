@@ -16,62 +16,28 @@
 
 package models.requests
 
-import models.{BusinessAddress, BusinessContactDetails, EuVatDetails, UserAnswers}
-import pages._
+import models.{BusinessAddress, BusinessContactDetails, EuVatDetails}
 import play.api.libs.json.{Json, OFormat}
-import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 final case class RegistrationRequest(
-                                      registeredCompanyName: String,
-                                      hasTradingName: Boolean,
-                                      tradingNames: List[String],
-                                      partOfVatGroup: Boolean,
-                                      ukVatNumber: Vrn,
-                                      ukVatEffectiveDate: LocalDate,
-                                      ukVatRegisteredPostcode: String,
-                                      vatRegisteredInEu: Boolean,
-                                      euVatDetails: Seq[EuVatDetails],
-                                      businessAddress: BusinessAddress,
-                                      businessContactDetails: BusinessContactDetails,
-                                      websites: Seq[String]
-  )
+  registeredCompanyName: String,
+  hasTradingName: Boolean,
+  tradingNames: List[String],
+  partOfVatGroup: Boolean,
+  ukVatNumber: Vrn,
+  ukVatEffectiveDate: LocalDate,
+  ukVatRegisteredPostcode: String,
+  vatRegisteredInEu: Boolean,
+  euVatDetails: Seq[EuVatDetails],
+  businessAddress: BusinessAddress,
+  businessContactDetails: BusinessContactDetails,
+  websites: Seq[String]
+)
 
-  case object RegistrationRequest {
-    implicit val format: OFormat[RegistrationRequest] = Json.format[RegistrationRequest]
-
-    def buildRegistrationRequest(userAnswers: UserAnswers): Option[RegistrationRequest] = {
-
-      for {
-        registeredCompanyName       <- userAnswers.get(RegisteredCompanyNamePage)
-        hasTradingName              <- userAnswers.get(HasTradingNamePage)
-        tradingNames                <- userAnswers.get(AllTradingNames)
-        partOfVatGroup              <- userAnswers.get(PartOfVatGroupPage)
-        ukVatNumber                 <- userAnswers.get(UkVatNumberPage)
-        ukVatEffectiveDate          <- userAnswers.get(UkVatEffectiveDatePage)
-        ukVatRegisteredPostcode     <- userAnswers.get(UkVatRegisteredPostcodePage)
-        vatRegisteredInEu           <- userAnswers.get(VatRegisteredInEuPage)
-        euVatDetails                <- userAnswers.get(AllEuVatDetailsQuery)
-        businessAddress             <- userAnswers.get(BusinessAddressPage)
-        businessContactDetails      <- userAnswers.get(BusinessContactDetailsPage)
-        websites                    <- userAnswers.get(AllWebsites)
-      } yield
-        RegistrationRequest(
-          registeredCompanyName,
-          hasTradingName,
-          tradingNames,
-          partOfVatGroup,
-          ukVatNumber,
-          ukVatEffectiveDate,
-          ukVatRegisteredPostcode,
-          vatRegisteredInEu,
-          euVatDetails,
-          businessAddress,
-          businessContactDetails,
-          websites
-        )
-    }
-
+case object RegistrationRequest {
+  implicit val format: OFormat[RegistrationRequest] = Json.format[RegistrationRequest]
 }
+

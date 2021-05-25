@@ -22,20 +22,21 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 
 case class Registration(
-                         registeredCompanyName: String,
-                         hasTradingName: Boolean,
-                         tradingNames: List[String],
-                         partOfVatGroup: Boolean,
-                         ukVatNumber: Vrn,
-                         ukVatEffectiveDate: LocalDate,
-                         ukVatRegisteredPostcode: String,
-                         vatRegisteredInEu: Boolean,
-                         euVatDetails: Seq[EuVatDetails],
-                         businessAddress: BusinessAddress,
-                         businessContactDetails: BusinessContactDetails,
-                         websites: Seq[String]
-                       )
+  registeredCompanyName: String,
+  hasTradingName: Boolean,
+  tradingNames: List[String],
+  partOfVatGroup: Boolean,
+  ukVatNumber: Vrn,
+  ukVatEffectiveDate: LocalDate,
+  ukVatRegisteredPostcode: String,
+  vatRegisteredInEu: Boolean,
+  euVatDetails: Seq[EuVatDetails],
+  businessAddress: BusinessAddress,
+  businessContactDetails: BusinessContactDetails,
+  websites: Seq[String]
+)
 
 case object Registration {
   implicit val format = Json.format[Registration]
 }
+
