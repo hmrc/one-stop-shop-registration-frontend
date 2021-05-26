@@ -49,7 +49,6 @@ class CheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-
       val list = SummaryListViewModel(
         rows = Seq(
           RegisteredCompanyNameSummary.row(request.userAnswers),
@@ -73,7 +72,6 @@ class CheckYourAnswersController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
       val registrationRequest = registrationService.fromUserAnswers(request.userAnswers)
 
       registrationRequest match {

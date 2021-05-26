@@ -63,15 +63,12 @@ class AddAdditionalEuVatDetailsController @Inject()(
     implicit request =>
       getNumberOfEuCountries {
         number =>
-
           val canAddCountries = number < Country.euCountries.size
-
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(
                 BadRequest(view(formWithErrors, mode, EuVatDetailsSummary.addToListRows(request.userAnswers), canAddCountries))
               ),
-
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAdditionalEuVatDetailsPage, value))
