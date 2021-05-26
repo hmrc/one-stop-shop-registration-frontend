@@ -38,28 +38,15 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
   "submitRegistration" - {
 
     "must return OK when a new registration is created on the backend" in {
-      val request = RegistrationRequest(
-        registration.registeredCompanyName,
-        registration.hasTradingName,
-        registration.tradingNames,
-        registration.partOfVatGroup,
-        registration.ukVatNumber,
-        registration.ukVatEffectiveDate,
-        registration.ukVatRegisteredPostcode,
-        registration.vatRegisteredInEu,
-        registration.euVatDetails,
-        registration.businessAddress,
-        registration.businessContactDetails,
-        registration.websites
-      )
+
+      val request = RegistrationData.createRegistrationRequest()
 
       val url = s"/one-stop-shop-registration/create"
 
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
-        server.stubFor(post(urlEqualTo(url))
-          .willReturn(created()))
+        server.stubFor(post(urlEqualTo(url)).willReturn(created()))
 
         val result = connector.submitRegistration(request).futureValue
 

@@ -35,16 +35,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddTradingNameController @Inject()(
-                                          override val messagesApi: MessagesApi,
-                                          sessionRepository: SessionRepository,
-                                          navigator: Navigator,
-                                          identify: IdentifierAction,
-                                          getData: DataRetrievalAction,
-                                          requireData: DataRequiredAction,
-                                          formProvider: AddTradingNameFormProvider,
-                                          val controllerComponents: MessagesControllerComponents,
-                                          view: AddTradingNameView
-                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: AddTradingNameFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: AddTradingNameView
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 
@@ -52,7 +52,6 @@ class AddTradingNameController @Inject()(
     implicit request =>
       getNumberOfTradingNames {
         number =>
-
           val canAddTradingNames = number < Constants.maxTradingNames
           Future.successful(Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers), canAddTradingNames)))
       }
@@ -62,7 +61,6 @@ class AddTradingNameController @Inject()(
     implicit request =>
       getNumberOfTradingNames {
         number =>
-
           val canAddTradingNames = number < Constants.maxTradingNames
 
           form.bindFromRequest().fold(

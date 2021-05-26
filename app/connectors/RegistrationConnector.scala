@@ -26,10 +26,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationConnector @Inject()(
-                          config: Configuration,
-                          httpClient: HttpClient
-)(implicit ec: ExecutionContext) extends HttpErrorFunctions {
+class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpClient)
+                                     (implicit ec: ExecutionContext) extends HttpErrorFunctions {
 
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
 

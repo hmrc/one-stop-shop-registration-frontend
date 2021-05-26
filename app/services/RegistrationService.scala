@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package service
+package services
 
 import models.UserAnswers
 import models.requests.RegistrationRequest
-import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
+import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 
 class RegistrationService {
@@ -58,6 +58,5 @@ class RegistrationService {
   def fromUserAnswers(answers: UserAnswers): Option[RegistrationRequest] = {
     buildRegistrationRequest(answers)
   }
-
 
 }

@@ -27,7 +27,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
-import service.RegistrationService
+import services.RegistrationService
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
@@ -70,29 +70,16 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         "user should be redirected to Application Complete page" in {
 
-          val request = RegistrationRequest(
-            registration.registeredCompanyName,
-            registration.hasTradingName,
-            registration.tradingNames,
-            registration.partOfVatGroup,
-            registration.ukVatNumber,
-            registration.ukVatEffectiveDate,
-            registration.ukVatRegisteredPostcode,
-            registration.vatRegisteredInEu,
-            registration.euVatDetails,
-            registration.businessAddress,
-            registration.businessContactDetails,
-            registration.websites
-          )
+          val request = RegistrationData.createRegistrationRequest()
 
           when(registrationService.fromUserAnswers(any())) thenReturn Some(request)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[RegistrationService]
-              .toInstance(registrationService),
-              bind[RegistrationConnector]
-                .toInstance(registrationConnector)).build()
+            .overrides(
+              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationConnector].toInstance(registrationConnector)
+            ).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
@@ -111,8 +98,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           when(registrationService.fromUserAnswers(any())) thenReturn None
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[RegistrationService]
-              .toInstance(registrationService)).build()
+            .overrides(bind[RegistrationService].toInstance(registrationService)).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
@@ -128,29 +114,17 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         "the user is redirected to Journey Recovery Page" in {
 
-          val request = RegistrationRequest(
-            registration.registeredCompanyName,
-            registration.hasTradingName,
-            registration.tradingNames,
-            registration.partOfVatGroup,
-            registration.ukVatNumber,
-            registration.ukVatEffectiveDate,
-            registration.ukVatRegisteredPostcode,
-            registration.vatRegisteredInEu,
-            registration.euVatDetails,
-            registration.businessAddress,
-            registration.businessContactDetails,
-            registration.websites
-          )
+          val request = RegistrationData.createRegistrationRequest()
 
-          when(registrationService.fromUserAnswers(any())) thenReturn (Some(request))
+          when(registrationService.fromUserAnswers(any())) thenReturn Some(request)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[RegistrationService]
-              .toInstance(registrationService),
-              bind[RegistrationConnector]
-                .toInstance(registrationConnector)).build()
+            .overrides(
+              bind[RegistrationService]
+              .toInstance(registrationService),bind[RegistrationConnector]
+              .toInstance(registrationConnector)
+            ).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)

@@ -16,6 +16,7 @@
 
 package testutils
 
+import models.requests.RegistrationRequest
 import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, Registration}
 import uk.gov.hmrc.domain.Vrn
 
@@ -36,6 +37,24 @@ object RegistrationData {
       createBusinessAddress(),
       createBusinessContactDetails(),
       Seq("website1", "website2")
+    )
+
+  val registration: Registration = createNewRegistration()
+
+  def createRegistrationRequest(): RegistrationRequest =
+    RegistrationRequest(
+      registration.registeredCompanyName,
+      registration.hasTradingName,
+      registration.tradingNames,
+      registration.partOfVatGroup,
+      registration.ukVatNumber,
+      registration.ukVatEffectiveDate,
+      registration.ukVatRegisteredPostcode,
+      registration.vatRegisteredInEu,
+      registration.euVatDetails,
+      registration.businessAddress,
+      registration.businessContactDetails,
+      registration.websites
     )
 
   private def createBusinessAddress(): BusinessAddress =

@@ -22,6 +22,7 @@ import models.requests.RegistrationRequest
 import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
 import play.api.libs.json.Json
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
+import services.RegistrationService
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.domain.Vrn
 
@@ -39,50 +40,31 @@ class RegistrationServiceSpec extends SpecBase with WireMockHelper {
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
       .set(UkVatRegisteredPostcodePage, "AA1 1AA").success.value
       .set(VatRegisteredInEuPage, true).success.value
-      .set(AllEuVatDetailsQuery, List(EuVatDetails(Country("FR", "France"),"FR123456789"), EuVatDetails(Country("ES", "Spain"),"ES123456789"))).success.value
-      .set(BusinessAddressPage, BusinessAddress(
-        "123 Street",
-        Some("Street"),
-        "City",
-        Some("county"),
-        "AA12 1AB"
-      )).success.value
-      .set(BusinessContactDetailsPage, BusinessContactDetails(
-        "Joe Bloggs",
-        "01112223344",
-        "email@email.com"
-      )).success.value
+      .set(
+        AllEuVatDetailsQuery,
+        List(EuVatDetails(Country("FR", "France"),"FR123456789"),
+             EuVatDetails(Country("ES", "Spain"),"ES123456789")
+        )).success.value
+      .set(
+        BusinessAddressPage,
+        BusinessAddress("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
+      ).success.value
+      .set(
+        BusinessContactDetailsPage,
+        BusinessContactDetails("Joe Bloggs","01112223344","email@email.com")).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
 
-
   private val registrationService = new RegistrationService()
-  private val registration = RegistrationData.createNewRegistration()
-
-
-  val request = RegistrationRequest(
-    registration.registeredCompanyName,
-    registration.hasTradingName,
-    registration.tradingNames,
-    registration.partOfVatGroup,
-    registration.ukVatNumber,
-    registration.ukVatEffectiveDate,
-    registration.ukVatRegisteredPostcode,
-    registration.vatRegisteredInEu,
-    registration.euVatDetails,
-    registration.businessAddress,
-    registration.businessContactDetails,
-    registration.websites
-  )
 
   "fromUserAnswers" - {
 
     "must return a Registration request when user answers are provided" in {
 
-      val registrationRequestOpt = registrationService.fromUserAnswers(answers)
+      val registrationRequest = registrationService.fromUserAnswers(answers)
 
-      val expectedAnswer = request
+      val request = RegistrationData.createRegistrationRequest()
 
-      registrationRequestOpt mustBe Some(expectedAnswer)
+      registrationRequest mustBe Some(request)
     }
   }
 
