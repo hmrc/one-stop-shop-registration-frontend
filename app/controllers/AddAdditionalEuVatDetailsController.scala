@@ -36,16 +36,16 @@ import views.html.AddAdditionalEuVatDetailsView
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddAdditionalEuVatDetailsController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: AddAdditionalEuVatDetailsFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: AddAdditionalEuVatDetailsView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+   override val messagesApi: MessagesApi,
+   sessionRepository: SessionRepository,
+   navigator: Navigator,
+   identify: IdentifierAction,
+   getData: DataRetrievalAction,
+   requireData: DataRequiredAction,
+   formProvider: AddAdditionalEuVatDetailsFormProvider,
+   val controllerComponents: MessagesControllerComponents,
+   view: AddAdditionalEuVatDetailsView
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 
@@ -63,15 +63,12 @@ class AddAdditionalEuVatDetailsController @Inject()(
     implicit request =>
       getNumberOfEuCountries {
         number =>
-
           val canAddCountries = number < Country.euCountries.size
-
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(
                 BadRequest(view(formWithErrors, mode, EuVatDetailsSummary.addToListRows(request.userAnswers), canAddCountries))
               ),
-
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAdditionalEuVatDetailsPage, value))

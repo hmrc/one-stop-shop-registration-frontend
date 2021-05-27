@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package pages
+package models.responses
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
-import queries.AllTradingNames
-
-import scala.util.Try
-
-case object HasTradingNamePage extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "hasTradingName"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(AllTradingNames)
-      case _           => super.cleanup(value, userAnswers)
-    }
+sealed trait ErrorResponse {
+  val body: String
 }
+
+case object InvalidJson extends ErrorResponse {
+  override val body = "Invalid JSON received"
+}
+
+case object NotFound extends ErrorResponse {
+  override val body = "Not found"
+}
+
+case object ConflictFound extends ErrorResponse {
+  override val body = "Conflict"
+}
+
+case class UnexpectedResponseStatus(status: Int, body: String) extends ErrorResponse
+
