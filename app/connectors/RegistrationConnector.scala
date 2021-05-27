@@ -32,7 +32,7 @@ class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpCli
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
 
   def submitRegistration(registrationRequest: RegistrationRequest)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Unit]] = {
-    val url = s"$baseUrl/one-stop-shop-registration/create"
+    val url = s"$baseUrl/create"
 
     httpClient.POST[RegistrationRequest, RegistrationResultResponse](url, registrationRequest)
  }
