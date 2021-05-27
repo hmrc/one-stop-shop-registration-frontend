@@ -25,12 +25,14 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView, UnsupportedAuthProviderView, UnsupportedCredentialRoleView}
 
 import java.net.URLEncoder
-
 import scala.concurrent.Future
 
 class AuthControllerSpec extends SpecBase with MockitoSugar {
+
+  private val continueUrl = "continueUrl"
 
   "signOut" - {
 
@@ -86,6 +88,127 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl
         verify(mockSessionRepository, times(1)).clear(eqTo(userAnswersId))
+      }
+    }
+  }
+
+  "redirectToRegister" - {
+
+    "must redirect the user to bas-gateway to register" in {
+
+      val application = applicationBuilder(Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.redirectToRegister(continueUrl).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual "http://localhost:9553/bas-gateway/register?origin=OSS&continueUrl=continueUrl&accountType=Organisation"
+      }
+    }
+  }
+
+  "redirectToLogin" - {
+
+    "must redirect the user to bas-gateway to log in" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.redirectToLogin(continueUrl).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual "http://localhost:9553/bas-gateway/sign-in?origin=OSS&continue=continueUrl"
+      }
+    }
+  }
+
+  "unsupportedAuthProvider" - {
+
+    "must return OK and the correct view" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.unsupportedAuthProvider(continueUrl).url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[UnsupportedAuthProviderView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(continueUrl)(request, messages(application)).toString
+      }
+    }
+  }
+
+  "unsupportedAffinityGroup" - {
+
+    "must return OK and the correct view" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.unsupportedAffinityGroup().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[UnsupportedAffinityGroupView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view()(request, messages(application)).toString
+      }
+    }
+  }
+
+  "unsupportedCredentialRole" - {
+
+    "must return OK and the correct view" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.unsupportedCredentialRole().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[UnsupportedCredentialRoleView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view()(request, messages(application)).toString
+      }
+    }
+  }
+
+
+  "insufficientEnrolments" - {
+
+    "must return OK and the correct view" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.insufficientEnrolments().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[InsufficientEnrolmentsView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view()(request, messages(application)).toString
       }
     }
   }

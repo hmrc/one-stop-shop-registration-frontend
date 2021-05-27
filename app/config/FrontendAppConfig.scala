@@ -27,6 +27,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
+  val origin: String  = configuration.get[String]("origin")
 
   private val contactHost = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "one-stop-shop-registration-frontend"
@@ -36,7 +37,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val loginUrl: String         = configuration.get[String]("urls.login")
   val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
+  val registerUrl: String      = configuration.get[String]("urls.register")
   val signOutUrl: String       = configuration.get[String]("urls.signOut")
+  val mfaUpliftUrl: String     = configuration.get[String]("urls.mfaUplift")
+  val ivUpliftUrl: String      = configuration.get[String]("urls.ivUplift")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/one-stop-shop-registration-frontend"

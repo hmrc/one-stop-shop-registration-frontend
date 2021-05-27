@@ -20,7 +20,7 @@ import base.SpecBase
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
-import play.api.mvc.{BodyParsers, Results}
+import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthActionSpec extends SpecBase {
 
   class Harness(authAction: IdentifierAction) {
-    def onPageLoad() = authAction { _ => Results.Ok }
+    def onPageLoad(): Action[AnyContent] = authAction { _ => Results.Ok }
   }
 
   "Auth Action" - {
@@ -83,7 +83,7 @@ class AuthActionSpec extends SpecBase {
 
     "the user doesn't have sufficient enrolments" - {
 
-      "must redirect the user to the unauthorised page" in {
+      "must redirect the user to the insufficient enrolments page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -96,7 +96,7 @@ class AuthActionSpec extends SpecBase {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
+          redirectLocation(result).value mustBe controllers.auth.routes.AuthController.insufficientEnrolments().url
         }
       }
     }
@@ -121,9 +121,9 @@ class AuthActionSpec extends SpecBase {
       }
     }
 
-    "the user used an unaccepted auth provider" - {
+    "the user used an unsupported auth provider" - {
 
-      "must redirect the user to the unauthorised page" in {
+      "must redirect the user to the unsupported auth provider page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -136,14 +136,14 @@ class AuthActionSpec extends SpecBase {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
+          redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedAuthProvider(appConfig.loginContinueUrl).url + "%2F"
         }
       }
     }
 
     "the user has an unsupported affinity group" - {
 
-      "must redirect the user to the unauthorised page" in {
+      "must redirect the user to the unsupported affinity group page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -156,14 +156,14 @@ class AuthActionSpec extends SpecBase {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+          redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedAffinityGroup().url
         }
       }
     }
 
     "the user has an unsupported credential role" - {
 
-      "must redirect the user to the unauthorised page" in {
+      "must redirect the user to the unsupported credential role page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -176,7 +176,28 @@ class AuthActionSpec extends SpecBase {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+          redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedCredentialRole().url
+        }
+      }
+    }
+
+    "the user has weak credentials" - {
+
+      "must redirect the user to an MFA uplift journey" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new IncorrectCredentialStrength), appConfig, bodyParsers)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result) mustBe Some("http://localhost:9553/bas-gateway/uplift-mfa?origin=OSS&continueUrl=http%3A%2F%2Flocalhost%3A10200%2F")
         }
       }
     }

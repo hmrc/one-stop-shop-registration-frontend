@@ -267,3 +267,23 @@ startDate.earlierDate.error.twoRequired = The date must include {0} and {1}
 startDate.earlierDate.error.required = The date must include {0}
 startDate.earlierDate.error.minDate = The date must be on or after {0}
 startDate.earlierDate.error.maxDate = The date must be on or before {0}
+
+unsupportedAffinityGroup.title = You cannot use this service
+unsupportedAffinityGroup.heading = You cannot use this service
+unsupportedAffinityGroup.p1 = Agents cannot register for this scheme on behalf of their client.
+unsupportedAffinityGroup.p2 = You should tell your clients that they will need to register themselves.
+
+unsupportedAuthProvider.title = You cannot use these details to register
+unsupportedAuthProvider.heading = You cannot use these details to register
+unsupportedAuthProvider.p1 = You need to use Government Gateway to
+unsupportedAuthProvider.p1.link = sign in and register
+unsupportedAuthProvider.p2 = If you do not have a Government Gateway user ID and password you should
+unsupportedAuthProvider.p2.link = create them now
+
+unsupportedCredentialRole.title = You cannot use this service
+unsupportedCredentialRole.heading = You cannot use this service
+unsupportedCredentialRole.p1 = Only group administrators can register for this scheme.
+
+insufficientEnrolments.title = Insufficient enrolments
+insufficientEnrolments.heading = Insufficient enrolments
+insufficientEnrolments.p1 = <Content and link to guide the user to claim their VAT enrolment>
