@@ -17,8 +17,7 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{created, ok, post, urlEqualTo}
-import models.requests.RegistrationRequest
+import com.github.tomakehurst.wiremock.client.WireMock.{created, post, urlEqualTo}
 import play.api.Application
 import play.api.test.Helpers.running
 import testutils.{RegistrationData, WireMockHelper}

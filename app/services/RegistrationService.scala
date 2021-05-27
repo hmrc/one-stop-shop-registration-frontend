@@ -23,7 +23,7 @@ import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 
 class RegistrationService {
 
-  def buildRegistrationRequest(userAnswers: UserAnswers): Option[RegistrationRequest] = {
+  def fromUserAnswers(userAnswers: UserAnswers): Option[RegistrationRequest] = {
 
     for {
       registeredCompanyName       <- userAnswers.get(RegisteredCompanyNamePage)
@@ -53,10 +53,6 @@ class RegistrationService {
         businessContactDetails,
         websites
       )
-  }
-
-  def fromUserAnswers(answers: UserAnswers): Option[RegistrationRequest] = {
-    buildRegistrationRequest(answers)
   }
 
 }

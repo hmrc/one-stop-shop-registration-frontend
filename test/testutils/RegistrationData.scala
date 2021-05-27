@@ -17,14 +17,14 @@
 package testutils
 
 import models.requests.RegistrationRequest
-import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, Registration}
+import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 object RegistrationData {
-  def createNewRegistration(): Registration =
-    Registration(
+  def createNewRegistration(): RegistrationRequest =
+    RegistrationRequest(
       "foo",
       true,
       List("single", "double"),
@@ -39,7 +39,7 @@ object RegistrationData {
       Seq("website1", "website2")
     )
 
-  val registration: Registration = createNewRegistration()
+  val registration: RegistrationRequest = createNewRegistration()
 
   def createRegistrationRequest(): RegistrationRequest =
     RegistrationRequest(
