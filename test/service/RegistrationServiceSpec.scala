@@ -17,10 +17,8 @@
 package service
 
 import base.SpecBase
-import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, UserAnswers}
-import models.requests.RegistrationRequest
-import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
-import play.api.libs.json.Json
+import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption, UserAnswers}
+import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, StartDatePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import services.RegistrationService
 import testutils.{RegistrationData, WireMockHelper}
@@ -45,6 +43,9 @@ class RegistrationServiceSpec extends SpecBase with WireMockHelper {
         List(EuVatDetails(Country("FR", "France"),"FR123456789"),
              EuVatDetails(Country("ES", "Spain"),"ES123456789")
         )).success.value
+      .set(StartDatePage,
+        StartDate(StartDateOption.NextPeriod, LocalDate.now())
+      ).success.value
       .set(
         BusinessAddressPage,
         BusinessAddress("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
