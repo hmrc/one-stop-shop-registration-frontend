@@ -1,0 +1,16 @@
+@this(
+        layout: templates.Layout
+)
+
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm("ivFailed.title"), showBackLink = false) {
+
+    <h1 class="govuk-heading-xl">@messages("ivFailed.title")</h1>
+
+    <p class="govuk-body">@messages("ivFailed.p")</p>
+
+    <a href="@continueUrl" class="govuk-button" data-module="govuk-button" role="button" draggable="false">
+        @messages("site.tryAgain")
+    </a>
+}

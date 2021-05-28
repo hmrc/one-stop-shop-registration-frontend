@@ -17,7 +17,6 @@
 package models.iv
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.http.HttpResponse
 
 sealed trait IdentityVerificationResponse
 
@@ -35,7 +34,7 @@ object IdentityVerificationResult {
   case object UserAborted extends IdentityVerificationResult
   case object Timeout extends IdentityVerificationResult
   case object TechnicalIssue extends IdentityVerificationResult
-  case object PreconditionFailed extends IdentityVerificationResult
+  case object PrecondFailed extends IdentityVerificationResult
 
   def fromString(s: String): Option[IdentityVerificationResult] =
     s match {
@@ -48,7 +47,7 @@ object IdentityVerificationResult {
       case "UserAborted"          => Some(UserAborted)
       case "Timeout"              => Some(Timeout)
       case "TechnicalIssue"       => Some(TechnicalIssue)
-      case "PreconditionFailed"   => Some(PreconditionFailed)
+      case "PreconditionFailed"   => Some(PrecondFailed)
       case _                      => None
     }
 }

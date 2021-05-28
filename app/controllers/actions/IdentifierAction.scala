@@ -19,6 +19,7 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
+import controllers.auth.{routes => authRoutes}
 import logging.Logging
 import models.requests.IdentifierRequest
 import play.api.mvc.Results._
@@ -82,9 +83,6 @@ class AuthenticatedIdentifierAction @Inject()(
             throw InsufficientEnrolments()
         }
 
-      case _ ~ _ ~ Some(Agent) ~ _ ~ _ =>
-        throw UnsupportedAffinityGroup()
-
       case _ =>
         throw new UnauthorizedException("Unable to retrieve authorisation data")
 
@@ -95,23 +93,27 @@ class AuthenticatedIdentifierAction @Inject()(
 
       case _: UnsupportedAffinityGroup =>
         logger.info("Unsupported affinity grouop")
-        Redirect(controllers.auth.routes.AuthController.unsupportedAffinityGroup())
+        Redirect(authRoutes.AuthController.unsupportedAffinityGroup())
 
       case _: UnsupportedAuthProvider =>
         logger.info("Unsupported auth provider")
-        Redirect(controllers.auth.routes.AuthController.unsupportedAuthProvider(continueUrl = continueUrl))
+        Redirect(authRoutes.AuthController.unsupportedAuthProvider(continueUrl = continueUrl))
 
       case _: UnsupportedCredentialRole =>
         logger.info("Unsupported credential role")
-        Redirect(controllers.auth.routes.AuthController.unsupportedCredentialRole().url)
+        Redirect(authRoutes.AuthController.unsupportedCredentialRole().url)
 
       case _: InsufficientEnrolments =>
         logger.info("Insufficient enrolments")
-        Redirect(controllers.auth.routes.AuthController.insufficientEnrolments())
+        Redirect(authRoutes.AuthController.insufficientEnrolments())
 
       case _: IncorrectCredentialStrength =>
         logger.info("Incorrect credential strength")
         upliftCredentialStrength(request)
+
+      case _: InsufficientConfidenceLevel =>
+        logger.info("Insufficient confidence level")
+        upliftConfidenceLevel(request)
 
       case e: AuthorisationException =>
         logger.info("Authorisation Exception", e.getMessage)
@@ -140,6 +142,18 @@ class AuthenticatedIdentifierAction @Inject()(
       Map(
         "origin"      -> Seq(config.origin),
         "continueUrl" -> Seq(config.loginContinueUrl + request.path)
+      )
+    )
+
+  private def upliftConfidenceLevel[A](request: Request[A]): Result =
+    Redirect(
+      config.ivUpliftUrl,
+      Map(
+        "origin"          -> Seq(config.origin),
+        "confidenceLevel" -> Seq(ConfidenceLevel.L250.toString),
+        "completionURL"   -> Seq(config.loginContinueUrl + request.path),
+        "failureURL"      ->
+          Seq(config.loginContinueUrl + authRoutes.IdentityVerificationController.handleIvFailure(config.loginContinueUrl + request.path, None).url)
       )
     )
 }

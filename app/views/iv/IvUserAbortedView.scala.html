@@ -1,0 +1,18 @@
+@this(
+        layout: templates.Layout
+)
+
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm("ivUserAborted.title"), showBackLink = false) {
+
+    <h1 class="govuk-heading-xl">@messages("ivUserAborted.title")</h1>
+
+    <p class="govuk-body">@messages("ivUserAborted.p")</p>
+
+    <a href="@continueUrl" class="govuk-button" data-module="govuk-button" role="button" draggable="false">
+        @messages("site.tryAgain")
+    </a>
+
+    <a href="https://www.gov.uk" class="govuk-link">@messages("site.returnToGovUK")</a>
+}
