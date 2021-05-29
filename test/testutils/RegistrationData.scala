@@ -16,50 +16,29 @@
 
 package testutils
 
-import models.requests.RegistrationRequest
-import models.{Address, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption}
+import models.domain.{EuVatRegistration, Registration}
+import models.{Address, BusinessContactDetails, Country, EuVatDetails}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 object RegistrationData {
-  def createNewRegistration(): RegistrationRequest =
-    RegistrationRequest(
-      "foo",
-      true,
-      List("single", "double"),
-      true,
-      Vrn("GB123456789"),
-      LocalDate.now(),
-      "AA1 1AA",
-      true,
+  val registration: Registration =
+    Registration(
+      vrn = Vrn("123456789"),
+      registeredCompanyName = "foo",
+      tradingNames = List("single", "double"),
+      partOfVatGroup = true,
+      vatEffectiveDate = LocalDate.now(),
+      vatRegisteredPostcode = "AA1 1AA",
       Seq(
-        EuVatDetails(Country("FR", "France"),"FR123456789", false, None, None),
-        EuVatDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
+        EuVatRegistration(Country("FR", "France"), "FR123456789", None),
+        EuVatRegistration(Country("ES", "Spain"), "ES123456789", None)
       ),
-      LocalDate.now(),
       createBusinessAddress(),
       createBusinessContactDetails(),
-      Seq("website1", "website2")
-    )
-
-  val registration: RegistrationRequest = createNewRegistration()
-
-  def createRegistrationRequest(): RegistrationRequest =
-    RegistrationRequest(
-      registration.registeredCompanyName,
-      registration.hasTradingName,
-      registration.tradingNames,
-      registration.partOfVatGroup,
-      registration.ukVatNumber,
-      registration.ukVatEffectiveDate,
-      registration.ukVatRegisteredPostcode,
-      registration.vatRegisteredInEu,
-      registration.euVatDetails,
-      registration.startDate,
-      registration.businessAddress,
-      registration.businessContactDetails,
-      registration.websites
+      Seq("website1", "website2"),
+      LocalDate.now()
     )
 
   private def createBusinessAddress(): Address =

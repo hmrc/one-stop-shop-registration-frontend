@@ -16,7 +16,7 @@
 
 package models.domain
 
-import models.{Address, Country}
+import models.Country
 import play.api.libs.json.{Json, OFormat}
 
 final case class EuVatRegistration(

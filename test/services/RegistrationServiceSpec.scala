@@ -17,17 +17,17 @@
 package services
 
 import base.SpecBase
-import models.{Address, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption, UserAnswers}
+import models._
 import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
-import testutils.{RegistrationData, WireMockHelper}
+import testutils.RegistrationData
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
-class RegistrationServiceSpec extends SpecBase with WireMockHelper {
+class RegistrationServiceSpec extends SpecBase {
 
-  val answers =
+  private val answers =
     UserAnswers("id")
       .set(RegisteredCompanyNamePage, "foo").success.value
       .set(HasTradingNamePage, true).success.value
@@ -39,8 +39,9 @@ class RegistrationServiceSpec extends SpecBase with WireMockHelper {
       .set(VatRegisteredInEuPage, true).success.value
       .set(
         AllEuVatDetailsQuery,
-        List(EuVatDetails(Country("FR", "France"),"FR123456789", false, None, None),
-             EuVatDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
+        List(
+          EuVatDetails(Country("FR", "France"),"FR123456789", false, None, None),
+          EuVatDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
         )).success.value
       .set(StartDatePage,
         StartDate(StartDateOption.NextPeriod, LocalDate.now())
@@ -58,14 +59,39 @@ class RegistrationServiceSpec extends SpecBase with WireMockHelper {
 
   "fromUserAnswers" - {
 
-    "must return a Registration request when user answers are provided" in {
+    "must return a Registration when user answers are provided" in {
 
-      val registrationRequest = registrationService.fromUserAnswers(answers)
+      val registration = registrationService.fromUserAnswers(answers, vrn)
 
-      val request = RegistrationData.createRegistrationRequest()
+      val expectedRegistration = RegistrationData.registration
 
-      registrationRequest mustBe Some(request)
+      registration.value mustBe expectedRegistration
+    }
+
+    "must return a Registration when no trading names or EU country details were provided" in {
+
+      val userAnswers =
+        answers
+          .set(HasTradingNamePage, false).success.value
+          .remove(AllTradingNames).success.value
+          .remove(AllEuVatDetailsQuery).success.value
+
+      val expectedRegistration =
+        RegistrationData.registration copy (
+          tradingNames       = Seq.empty,
+          euVatRegistrations = Seq.empty
+        )
+
+      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+      registration.value mustEqual expectedRegistration
+    }
+
+    "must return None when mandatory data is missing" in {
+
+      val userAnswers = answers.remove(RegisteredCompanyNamePage).success.value
+      val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+      result mustBe empty
     }
   }
-
 }

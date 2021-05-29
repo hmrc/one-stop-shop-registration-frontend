@@ -16,46 +16,54 @@
 
 package services
 
-import models.UserAnswers
-import models.requests.RegistrationRequest
+import models.{EuVatDetails, UserAnswers}
+import models.domain.{EuVatRegistration, FixedEstablishment, Registration}
 import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
+import uk.gov.hmrc.domain.Vrn
 
 class RegistrationService {
 
-  def fromUserAnswers(userAnswers: UserAnswers): Option[RegistrationRequest] = {
-
+  def fromUserAnswers(userAnswers: UserAnswers, vrn: Vrn): Option[Registration] =
     for {
-      registeredCompanyName       <- userAnswers.get(RegisteredCompanyNamePage)
-      hasTradingName              <- userAnswers.get(HasTradingNamePage)
-      tradingNames                <- userAnswers.get(AllTradingNames)
-      partOfVatGroup              <- userAnswers.get(PartOfVatGroupPage)
-      ukVatNumber                 <- userAnswers.get(UkVatNumberPage)
-      ukVatEffectiveDate          <- userAnswers.get(UkVatEffectiveDatePage)
-      ukVatRegisteredPostcode     <- userAnswers.get(UkVatRegisteredPostcodePage)
-      vatRegisteredInEu           <- userAnswers.get(VatRegisteredInEuPage)
-      euVatDetails                <- userAnswers.get(AllEuVatDetailsQuery)
-      startDate                   <- userAnswers.get(StartDatePage)
-      businessAddress             <- userAnswers.get(BusinessAddressPage)
-      businessContactDetails      <- userAnswers.get(BusinessContactDetailsPage)
-      websites                    <- userAnswers.get(AllWebsites)
-      startDate                   <- userAnswers.get(StartDatePage)
-    } yield
-      RegistrationRequest(
-        registeredCompanyName,
-        hasTradingName,
-        tradingNames,
-        partOfVatGroup,
-        ukVatNumber,
-        ukVatEffectiveDate,
-        ukVatRegisteredPostcode,
-        vatRegisteredInEu,
-        euVatDetails,
-        startDate.date,
-        businessAddress,
-        businessContactDetails,
-        websites
-      )
-  }
+      registeredCompanyName   <- userAnswers.get(RegisteredCompanyNamePage)
+      tradingNames            = getTradingNames(userAnswers)
+      partOfVatGroup          <- userAnswers.get(PartOfVatGroupPage)
+      ukVatEffectiveDate      <- userAnswers.get(UkVatEffectiveDatePage)
+      ukVatRegisteredPostcode <- userAnswers.get(UkVatRegisteredPostcodePage)
+      euVatRegistrations      = buildEuVatRegistrations(userAnswers)
+      startDate               <- userAnswers.get(StartDatePage)
+      businessAddress         <- userAnswers.get(BusinessAddressPage)
+      businessContactDetails  <- userAnswers.get(BusinessContactDetailsPage)
+      websites                <- userAnswers.get(AllWebsites)
+    } yield Registration(
+      vrn,
+      registeredCompanyName,
+      tradingNames,
+      partOfVatGroup,
+      ukVatEffectiveDate,
+      ukVatRegisteredPostcode,
+      euVatRegistrations,
+      businessAddress,
+      businessContactDetails,
+      websites,
+      startDate.date
+    )
 
+  private def getTradingNames(userAnswers: UserAnswers): List[String] =
+    userAnswers.get(AllTradingNames).getOrElse(List.empty)
+
+  private def buildEuVatRegistrations(answers: UserAnswers): List[EuVatRegistration] =
+    answers
+      .get(AllEuVatDetailsQuery).getOrElse(List.empty)
+      .map {
+        detail =>
+          val fixedEstablishment = (detail.fixedEstablishmentTradingName, detail.fixedEstablishmentAddress) match {
+            case (Some(tradingName), Some(address)) =>
+              Some(FixedEstablishment(tradingName, address))
+            case _ => None
+          }
+
+          EuVatRegistration(detail.vatRegisteredEuMemberState, detail.euVatNumber, fixedEstablishment)
+    }
 }

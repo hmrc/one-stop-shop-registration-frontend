@@ -16,10 +16,10 @@
 
 package models.domain
 
-import models.Address
+import models.FixedEstablishmentAddress
 import play.api.libs.json.{Json, OFormat}
 
-final case class FixedEstablishment(tradingName: String, address: Address)
+final case class FixedEstablishment(tradingName: String, address: FixedEstablishmentAddress)
 
 object FixedEstablishment {
 

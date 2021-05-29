@@ -27,5 +27,5 @@ case class FixedEstablishmentAddress (
                                      )
 
 object FixedEstablishmentAddress {
-  implicit val format = Json.format[FixedEstablishmentAddress]
+  implicit val format: OFormat[FixedEstablishmentAddress] = Json.format[FixedEstablishmentAddress]
 }

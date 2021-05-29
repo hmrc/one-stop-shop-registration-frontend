@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
-  val registration = RegistrationData.createNewRegistration()
+  private val registration = RegistrationData.registration
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
@@ -38,8 +38,6 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
     "must return OK when a new registration is created on the backend" in {
 
-      val request = RegistrationData.createRegistrationRequest()
-
       val url = s"/one-stop-shop-registration/create"
 
       running(application) {
@@ -47,7 +45,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         server.stubFor(post(urlEqualTo(url)).willReturn(created()))
 
-        val result = connector.submitRegistration(request).futureValue
+        val result = connector.submitRegistration(registration).futureValue
 
         result mustEqual Right(())
       }

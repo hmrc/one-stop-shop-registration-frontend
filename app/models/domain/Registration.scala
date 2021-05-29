@@ -29,10 +29,10 @@ final case class Registration(
                                partOfVatGroup: Boolean,
                                vatEffectiveDate: LocalDate,
                                vatRegisteredPostcode: String,
-                               euVatDetails: List[EuVatRegistration],
+                               euVatRegistrations: Seq[EuVatRegistration],
                                businessAddress: Address,
                                contactDetails: BusinessContactDetails,
-                               websites: List[String],
+                               websites: Seq[String],
                                startDate: LocalDate
                              )
 
