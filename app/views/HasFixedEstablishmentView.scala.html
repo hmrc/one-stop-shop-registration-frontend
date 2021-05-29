@@ -6,9 +6,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("hasFixedEstablishment.title"))) {
+@layout(pageTitle = title(form, messages("hasFixedEstablishment.title", country.name))) {
 
     @formHelper(action = routes.HasFixedEstablishmentController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -19,7 +19,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("hasFixedEstablishment.heading")).asPageHeading()
+                legend = LegendViewModel(messages("hasFixedEstablishment.heading", country.name)).asPageHeading()
             )
         )
 

@@ -18,13 +18,14 @@ package controllers
 
 import controllers.actions._
 import forms.HasFixedEstablishmentFormProvider
+import models.requests.DataRequest
 
 import javax.inject.Inject
-import models.{Index, Mode}
+import models.{Country, Index, Mode}
 import navigation.Navigator
-import pages.HasFixedEstablishmentPage
+import pages.{HasFixedEstablishmentPage, VatRegisteredEuMemberStatePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HasFixedEstablishmentView
@@ -43,31 +44,46 @@ class HasFixedEstablishmentController @Inject()(
                                          view: HasFixedEstablishmentView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
-
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getCountry(index) {
+        country =>
 
-      val preparedForm = request.userAnswers.get(HasFixedEstablishmentPage(index)) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val form         = formProvider(country)
+          val preparedForm = request.userAnswers.get(HasFixedEstablishmentPage(index)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Future.successful(Ok(view(preparedForm, mode, index, country)))
       }
-
-      Ok(view(preparedForm, mode, index))
   }
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getCountry(index) {
+        country =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+          val form = formProvider(country)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasFixedEstablishmentPage(index), value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HasFixedEstablishmentPage(index), mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(HasFixedEstablishmentPage(index), value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(HasFixedEstablishmentPage(index), mode, updatedAnswers))
+          )
+      }
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(VatRegisteredEuMemberStatePage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

@@ -22,13 +22,13 @@
         govukButton: GovukButton
 )
 
-@(list: SummaryList, index: Index)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkEuVatDetailsAnswers.title"))) {
+@layout(pageTitle = titleNoForm(messages("checkEuVatDetailsAnswers.title", country.name))) {
 
     @formHelper(action = routes.CheckEuVatDetailsAnswersController.onSubmit(index)) {
 
-        <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
 
         @govukSummaryList(list)
 

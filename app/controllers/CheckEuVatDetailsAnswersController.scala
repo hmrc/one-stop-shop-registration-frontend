@@ -17,16 +17,19 @@
 package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{Index, NormalMode}
+import models.requests.DataRequest
+import models.{Country, Index, NormalMode}
 import navigation.Navigator
+import pages.VatRegisteredEuMemberStatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.govuk.summarylist._
 import views.html.CheckEuVatDetailsAnswersView
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class CheckEuVatDetailsAnswersController @Inject()(
                                                     override val messagesApi: MessagesApi,
@@ -37,23 +40,35 @@ class CheckEuVatDetailsAnswersController @Inject()(
                                                     view: CheckEuVatDetailsAnswersView
                                                   ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val list = SummaryListViewModel(
-        rows = Seq(
-          VatRegisteredEuMemberStateSummary.row(request.userAnswers, index),
-          EuVatNumberSummary.row(request.userAnswers, index),
-          HasFixedEstablishmentSummary.row(request.userAnswers, index),
-          FixedEstablishmentTradingNameSummary.row(request.userAnswers, index),
-          FixedEstablishmentAddressSummary.row(request.userAnswers, index)
-        ).flatten
-      )
+      getCountry(index) {
+        country =>
 
-      Ok(view(list, index))
+          val list = SummaryListViewModel(
+            rows = Seq(
+              VatRegisteredEuMemberStateSummary.row(request.userAnswers, index),
+              EuVatNumberSummary.row(request.userAnswers, index),
+              HasFixedEstablishmentSummary.row(request.userAnswers, index),
+              FixedEstablishmentTradingNameSummary.row(request.userAnswers, index),
+              FixedEstablishmentAddressSummary.row(request.userAnswers, index)
+            ).flatten
+          )
+
+          Future.successful(Ok(view(list, index, country)))
+      }
   }
 
   def onSubmit(index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       Redirect(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(VatRegisteredEuMemberStatePage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

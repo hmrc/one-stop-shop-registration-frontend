@@ -8,9 +8,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("fixedEstablishmentTradingName.title"))) {
+@layout(pageTitle = title(form, messages("fixedEstablishmentTradingName.title", country.name))) {
 
     @formHelper(action = routes.FixedEstablishmentTradingNameController.onSubmit(mode, index)) {
 
@@ -21,7 +21,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("fixedEstablishmentTradingName.heading")).asPageHeading()
+                label = LabelViewModel(messages("fixedEstablishmentTradingName.heading", country.name)).asPageHeading()
             )
             .withWidth(Full)
         )

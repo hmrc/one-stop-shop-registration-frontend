@@ -17,6 +17,8 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviours {
@@ -25,7 +27,8 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
   val lengthKey = "fixedEstablishmentTradingName.error.length"
   val maxLength = 100
 
-  val form = new FixedEstablishmentTradingNameFormProvider()()
+  val country: Country = arbitrary[Country].sample.value
+  val form = new FixedEstablishmentTradingNameFormProvider()(country)
 
   ".value" - {
 
@@ -47,7 +50,7 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

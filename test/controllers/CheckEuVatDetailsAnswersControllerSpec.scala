@@ -17,30 +17,38 @@
 package controllers
 
 import base.SpecBase
-import models.{Index, NormalMode}
+import models.{Country, Index, NormalMode}
+import pages.VatRegisteredEuMemberStatePage
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import viewmodels.checkAnswers.VatRegisteredEuMemberStateSummary
 import viewmodels.govuk.SummaryListFluency
-import views.html.{CheckEuVatDetailsAnswersView, CheckYourAnswersView}
+import views.html.CheckEuVatDetailsAnswersView
 
 class CheckEuVatDetailsAnswersControllerSpec extends SpecBase with SummaryListFluency {
 
-  private val index = Index(0)
+  private val index           = Index(0)
+  private val country         = Country.euCountries.head
+  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
 
   "CheckEuVatDetailsAnswersController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
+        implicit val msgs: Messages = messages(application)
         val request = FakeRequest(GET, routes.CheckEuVatDetailsAnswersController.onPageLoad(index).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuVatDetailsAnswersView]
-        val list = SummaryListViewModel(Seq.empty)
+        val list = SummaryListViewModel(
+          Seq(VatRegisteredEuMemberStateSummary.row(baseUserAnswers, index)).flatten
+        )
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(list, index, country)(request, messages(application)).toString
       }
     }
 

@@ -18,14 +18,13 @@ package controllers
 
 import base.SpecBase
 import forms.FixedEstablishmentAddressFormProvider
-import models.{FixedEstablishmentAddress, Index, NormalMode, UserAnswers}
+import models.{Country, FixedEstablishmentAddress, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.FixedEstablishmentAddressPage
+import pages.{FixedEstablishmentAddressPage, VatRegisteredEuMemberStatePage}
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,20 +37,22 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
 
   def onwardRoute = Call("GET", "/foo")
 
+  private val country = Country.euCountries.head
   val formProvider = new FixedEstablishmentAddressFormProvider()
   val form = formProvider()
 
   private val index = Index(0)
   lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index).url
 
-  private val address = FixedEstablishmentAddress("value 1", "value 2")
-  private val userAnswers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
+  private val address         = FixedEstablishmentAddress("value 1", "value 2")
+  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
+  private val userAnswers     = baseUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
   "FixedEstablishmentAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, fixedEstablishmentAddressRoute)
@@ -61,7 +62,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
@@ -77,7 +78,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(address), NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(address), NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
@@ -88,7 +89,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -109,7 +110,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request =
@@ -123,7 +124,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
