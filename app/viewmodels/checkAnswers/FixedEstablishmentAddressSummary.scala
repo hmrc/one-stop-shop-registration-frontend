@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import pages.FixedEstablishmentAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,8 +28,8 @@ import viewmodels.implicits._
 
 object FixedEstablishmentAddressSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(FixedEstablishmentAddressPage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(FixedEstablishmentAddressPage(index)).map {
       answer =>
 
       val value = HtmlFormat.escape(answer.field1).toString + "<br/>" + HtmlFormat.escape(answer.field2).toString
@@ -38,7 +38,7 @@ object FixedEstablishmentAddressSummary  {
           key     = "fixedEstablishmentAddress.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.FixedEstablishmentAddressController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.FixedEstablishmentAddressController.onPageLoad(CheckMode, index).url)
               .withVisuallyHiddenText(messages("fixedEstablishmentAddress.change.hidden"))
           )
         )

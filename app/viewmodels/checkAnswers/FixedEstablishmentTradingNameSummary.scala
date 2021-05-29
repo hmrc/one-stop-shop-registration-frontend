@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import pages.FixedEstablishmentTradingNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,15 +27,15 @@ import viewmodels.implicits._
 
 object FixedEstablishmentTradingNameSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(FixedEstablishmentTradingNamePage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(FixedEstablishmentTradingNamePage(index)).map {
       answer =>
 
         SummaryListRowViewModel(
           key     = "fixedEstablishmentTradingName.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index).url)
               .withVisuallyHiddenText(messages("fixedEstablishmentTradingName.change.hidden"))
           )
         )

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.FixedEstablishmentTradingNameFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -39,8 +39,9 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
 
   val formProvider = new FixedEstablishmentTradingNameFormProvider()
   val form = formProvider()
+  private val index = Index(0)
 
-  lazy val fixedEstablishmentTradingNameRoute = routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode).url
+  lazy val fixedEstablishmentTradingNameRoute = routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index).url
 
   "FixedEstablishmentTradingName Controller" - {
 
@@ -56,13 +57,13 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
         val view = application.injector.instanceOf[FixedEstablishmentTradingNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(FixedEstablishmentTradingNamePage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(FixedEstablishmentTradingNamePage(index), "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +75,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -120,7 +121,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
       }
     }
 

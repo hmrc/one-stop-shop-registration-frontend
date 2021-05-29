@@ -16,16 +16,19 @@
 
 package pages
 
+import models.Index
 import pages.behaviours.PageBehaviours
 
 class HasFixedEstablishmentPageSpec extends PageBehaviours {
 
+  private val index = Index(0)
+
   "HasFixedEstablishmentPage" - {
 
-    beRetrievable[Boolean](HasFixedEstablishmentPage)
+    beRetrievable[Boolean](HasFixedEstablishmentPage(index))
 
-    beSettable[Boolean](HasFixedEstablishmentPage)
+    beSettable[Boolean](HasFixedEstablishmentPage(index))
 
-    beRemovable[Boolean](HasFixedEstablishmentPage)
+    beRemovable[Boolean](HasFixedEstablishmentPage(index))
   }
 }

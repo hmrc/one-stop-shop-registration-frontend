@@ -24,26 +24,26 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
-  implicit lazy val arbitraryHasFixedEstablishmentUserAnswersEntry: Arbitrary[(HasFixedEstablishmentPage.type, JsValue)] =
+  implicit lazy val arbitraryHasFixedEstablishmentUserAnswersEntry: Arbitrary[(HasFixedEstablishmentPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[HasFixedEstablishmentPage.type]
+        page  <- arbitrary[HasFixedEstablishmentPage]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryFixedEstablishmentTradingNameUserAnswersEntry: Arbitrary[(FixedEstablishmentTradingNamePage.type, JsValue)] =
+  implicit lazy val arbitraryFixedEstablishmentTradingNameUserAnswersEntry: Arbitrary[(FixedEstablishmentTradingNamePage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[FixedEstablishmentTradingNamePage.type]
+        page  <- arbitrary[FixedEstablishmentTradingNamePage]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryFixedEstablishmentAddressUserAnswersEntry: Arbitrary[(FixedEstablishmentAddressPage.type, JsValue)] =
+  implicit lazy val arbitraryFixedEstablishmentAddressUserAnswersEntry: Arbitrary[(FixedEstablishmentAddressPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[FixedEstablishmentAddressPage.type]
+        page  <- arbitrary[FixedEstablishmentAddressPage]
         value <- arbitrary[FixedEstablishmentAddress].map(Json.toJson(_))
       } yield (page, value)
     }

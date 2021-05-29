@@ -16,17 +16,20 @@
 
 package pages
 
+import models.Index
 import pages.behaviours.PageBehaviours
 
 
 class FixedEstablishmentTradingNamePageSpec extends PageBehaviours {
 
+  private val index = Index(0)
+
   "FixedEstablishmentTradingNamePage" - {
 
-    beRetrievable[String](FixedEstablishmentTradingNamePage)
+    beRetrievable[String](FixedEstablishmentTradingNamePage(index))
 
-    beSettable[String](FixedEstablishmentTradingNamePage)
+    beSettable[String](FixedEstablishmentTradingNamePage(index))
 
-    beRemovable[String](FixedEstablishmentTradingNamePage)
+    beRemovable[String](FixedEstablishmentTradingNamePage(index))
   }
 }

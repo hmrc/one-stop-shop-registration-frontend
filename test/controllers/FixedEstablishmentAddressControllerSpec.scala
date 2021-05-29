@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.FixedEstablishmentAddressFormProvider
-import models.{NormalMode, FixedEstablishmentAddress, UserAnswers}
+import models.{FixedEstablishmentAddress, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -41,17 +41,11 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
   val formProvider = new FixedEstablishmentAddressFormProvider()
   val form = formProvider()
 
-  lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode).url
+  private val index = Index(0)
+  lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index).url
 
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      FixedEstablishmentAddressPage.toString -> Json.obj(
-        "field1" -> "value 1",
-        "field2" -> "value 2"
-      )
-    )
-  )
+  private val address = FixedEstablishmentAddress("value 1", "value 2")
+  private val userAnswers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
   "FixedEstablishmentAddress Controller" - {
 
@@ -67,7 +61,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -83,7 +77,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(FixedEstablishmentAddress("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(address), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -129,7 +123,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
       }
     }
 

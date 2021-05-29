@@ -153,17 +153,17 @@ POST       /checkVatDetails                        controllers.CheckVatDetailsCo
 
 GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad
 
-GET        /fixedEstablishmentAddress                        controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /fixedEstablishmentAddress                        controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /changeFixedEstablishmentAddress                  controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeFixedEstablishmentAddress                  controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode)
+GET        /fixedEstablishmentAddress/:index                        controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /fixedEstablishmentAddress/:index                        controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeFixedEstablishmentAddress/:index                  controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeFixedEstablishmentAddress/:index                  controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET        /fixedEstablishmentTradingName                        controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /fixedEstablishmentTradingName                        controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeFixedEstablishmentTradingName                  controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeFixedEstablishmentTradingName                  controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET        /fixedEstablishmentTradingName/:index                        controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /fixedEstablishmentTradingName/:index                        controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeFixedEstablishmentTradingName/:index                  controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeFixedEstablishmentTradingName/:index                  controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET        /hasFixedEstablishment                        controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasFixedEstablishment                        controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasFixedEstablishment                  controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasFixedEstablishment                  controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode)
+GET        /hasFixedEstablishment/:index                        controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /hasFixedEstablishment/:index                        controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeHasFixedEstablishment/:index                  controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeHasFixedEstablishment/:index                  controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode, index: Index)

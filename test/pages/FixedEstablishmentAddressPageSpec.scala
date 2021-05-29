@@ -16,17 +16,19 @@
 
 package pages
 
-import models.FixedEstablishmentAddress
+import models.{FixedEstablishmentAddress, Index}
 import pages.behaviours.PageBehaviours
 
 class FixedEstablishmentAddressPageSpec extends PageBehaviours {
 
+  private val index = Index(0)
+
   "FixedEstablishmentAddressPage" - {
 
-    beRetrievable[FixedEstablishmentAddress](FixedEstablishmentAddressPage)
+    beRetrievable[FixedEstablishmentAddress](FixedEstablishmentAddressPage(index))
 
-    beSettable[FixedEstablishmentAddress](FixedEstablishmentAddressPage)
+    beSettable[FixedEstablishmentAddress](FixedEstablishmentAddressPage(index))
 
-    beRemovable[FixedEstablishmentAddress](FixedEstablishmentAddressPage)
+    beRemovable[FixedEstablishmentAddress](FixedEstablishmentAddressPage(index))
   }
 }

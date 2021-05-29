@@ -22,14 +22,14 @@ import pages._
 
 trait PageGenerators {
 
-  implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage.type] =
-    Arbitrary(HasFixedEstablishmentPage)
+  implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
+    Arbitrary(HasFixedEstablishmentPage(Index(0)))
 
-  implicit lazy val arbitraryFixedEstablishmentTradingNamePage: Arbitrary[FixedEstablishmentTradingNamePage.type] =
-    Arbitrary(FixedEstablishmentTradingNamePage)
+  implicit lazy val arbitraryFixedEstablishmentTradingNamePage: Arbitrary[FixedEstablishmentTradingNamePage] =
+    Arbitrary(FixedEstablishmentTradingNamePage(Index(0)))
 
-  implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage.type] =
-    Arbitrary(FixedEstablishmentAddressPage)
+  implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage] =
+    Arbitrary(FixedEstablishmentAddressPage(Index(0)))
 
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)

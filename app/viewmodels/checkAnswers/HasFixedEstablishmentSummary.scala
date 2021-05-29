@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import pages.HasFixedEstablishmentPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,8 +26,8 @@ import viewmodels.implicits._
 
 object HasFixedEstablishmentSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(HasFixedEstablishmentPage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(HasFixedEstablishmentPage(index)).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +36,7 @@ object HasFixedEstablishmentSummary  {
           key     = "hasFixedEstablishment.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.HasFixedEstablishmentController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.HasFixedEstablishmentController.onPageLoad(CheckMode, index).url)
               .withVisuallyHiddenText(messages("hasFixedEstablishment.change.hidden"))
           )
         )
