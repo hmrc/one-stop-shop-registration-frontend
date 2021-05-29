@@ -39,6 +39,7 @@ class RegistrationService {
       businessAddress             <- userAnswers.get(BusinessAddressPage)
       businessContactDetails      <- userAnswers.get(BusinessContactDetailsPage)
       websites                    <- userAnswers.get(AllWebsites)
+      startDate                   <- userAnswers.get(StartDatePage)
     } yield
       RegistrationRequest(
         registeredCompanyName,
@@ -50,7 +51,7 @@ class RegistrationService {
         ukVatRegisteredPostcode,
         vatRegisteredInEu,
         euVatDetails,
-        startDate,
+        startDate.date,
         businessAddress,
         businessContactDetails,
         websites

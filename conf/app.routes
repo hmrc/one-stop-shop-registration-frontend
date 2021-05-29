@@ -16,10 +16,6 @@ GET         /there-is-a-problem                             controllers.JourneyR
 GET         /check-your-answers                             controllers.CheckYourAnswersController.onPageLoad
 POST        /check-your-answers                             controllers.CheckYourAnswersController.onSubmit
 
-GET         /account/sign-out-survey                        controllers.auth.AuthController.signOut
-GET         /account/sign-out                               controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                             controllers.auth.SignedOutController.onPageLoad
-
 GET         /unauthorised                                   controllers.UnauthorisedController.onPageLoad
 
 GET         /hasTradingName                                 controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
@@ -127,3 +123,27 @@ GET        /startDate                        controllers.StartDateController.onP
 POST       /startDate                        controllers.StartDateController.onSubmit(mode: Mode = NormalMode)
 GET        /changeStartDate                  controllers.StartDateController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeStartDate                  controllers.StartDateController.onSubmit(mode: Mode = CheckMode)
+
+GET         /identity-complete                              controllers.auth.IdentityVerificationController.handleIvFailure(continueURL: String, journeyId: Option[String])
+GET         /identity-problem                               controllers.auth.IdentityVerificationController.identityError(continueUrl: String)
+GET         /iv/error                                       controllers.auth.IvReturnController.error
+GET         /iv/incomplete                                  controllers.auth.IvReturnController.incomplete
+GET         /iv/insufficient-evidence                       controllers.auth.IvReturnController.insufficientEvidence
+GET         /iv/locked-out                                  controllers.auth.IvReturnController.lockedOut
+GET         /iv/precondition-failed                         controllers.auth.IvReturnController.preconditionFailed
+GET         /iv/technical-issue                             controllers.auth.IvReturnController.technicalIssue
+GET         /iv/timeout                                     controllers.auth.IvReturnController.timeout
+GET         /iv/user-aborted                                controllers.auth.IvReturnController.userAborted(continueUrl: String)
+GET         /iv/insufficient-evidence-sources               controllers.auth.IvReturnController.notEnoughEvidenceSources
+GET         /iv/failed-matching                             controllers.auth.IvReturnController.failedMatching(continueUrl: String)
+GET         /iv/failed-identity-verification                controllers.auth.IvReturnController.failed(continueUrl: String)
+
+GET         /account/register                                               controllers.auth.AuthController.redirectToRegister(continueUrl: String)
+GET         /account/login                                                  controllers.auth.AuthController.redirectToLogin(continueUrl: String)
+GET         /account/sign-out-survey                                        controllers.auth.AuthController.signOut
+GET         /account/sign-out                                               controllers.auth.AuthController.signOutNoSurvey
+GET         /account/signed-out                                             controllers.auth.SignedOutController.onPageLoad
+GET         /account/agent-unsupported                                      controllers.auth.AuthController.unsupportedAffinityGroup()
+GET         /account/provider-unsupported                                   controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
+GET         /account/credential-unsupported                                 controllers.auth.AuthController.insufficientEnrolments()
+GET         /account/role-unsupported                                       controllers.auth.AuthController.unsupportedCredentialRole

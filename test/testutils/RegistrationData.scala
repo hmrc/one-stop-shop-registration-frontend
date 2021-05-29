@@ -34,7 +34,7 @@ object RegistrationData {
       "AA1 1AA",
       true,
       Seq(EuVatDetails(Country("FR", "France"),"FR123456789"), EuVatDetails(Country("ES", "Spain"),"ES123456789")),
-      StartDate(StartDateOption.NextPeriod, LocalDate.now()),
+      LocalDate.now(),
       createBusinessAddress(),
       createBusinessContactDetails(),
       Seq("website1", "website2")

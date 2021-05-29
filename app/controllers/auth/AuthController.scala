@@ -22,6 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.auth._
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -31,8 +32,33 @@ class AuthController @Inject()(
                                 val controllerComponents: MessagesControllerComponents,
                                 config: FrontendAppConfig,
                                 sessionRepository: SessionRepository,
-                                identify: IdentifierAction
+                                identify: IdentifierAction,
+                                insufficientEnrolmentsView: InsufficientEnrolmentsView,
+                                unsupportedAffinityGroupView: UnsupportedAffinityGroupView,
+                                unsupportedAuthProviderView: UnsupportedAuthProviderView,
+                                unsupportedCredentialRoleView: UnsupportedCredentialRoleView
                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  def redirectToRegister(continueUrl: String): Action[AnyContent] = Action {
+    implicit request =>
+      Redirect(
+        config.registerUrl,
+        Map(
+          "origin"      -> Seq(config.origin),
+          "continueUrl" -> Seq(continueUrl),
+          "accountType" -> Seq("Organisation"))
+      )
+  }
+
+  def redirectToLogin(continueUrl: String): Action[AnyContent] = Action {
+    implicit request =>
+        Redirect(config.loginUrl,
+          Map(
+            "origin"   -> Seq(config.origin),
+            "continue" -> Seq(continueUrl)
+          )
+        )
+  }
 
   def signOut(): Action[AnyContent] = identify.async {
     implicit request =>
@@ -52,5 +78,25 @@ class AuthController @Inject()(
         _ =>
         Redirect(config.signOutUrl, Map("continue" -> Seq(routes.SignedOutController.onPageLoad().url)))
       }
+  }
+
+  def unsupportedAffinityGroup(): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(unsupportedAffinityGroupView())
+  }
+
+  def unsupportedAuthProvider(continueUrl: String): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(unsupportedAuthProviderView(continueUrl))
+  }
+
+  def insufficientEnrolments(): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(insufficientEnrolmentsView())
+  }
+
+  def unsupportedCredentialRole(): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(unsupportedCredentialRoleView())
   }
 }

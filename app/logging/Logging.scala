@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package models.requests
+package logging
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.domain.Vrn
+import org.slf4j.{Logger, LoggerFactory}
 
-case class IdentifierRequest[A] (request: Request[A], userId: String, vrn: Vrn) extends WrappedRequest[A](request)
+trait Logging {
+
+  protected val logger: Logger =
+    LoggerFactory.getLogger("application." + getClass.getCanonicalName)
+}

@@ -16,7 +16,7 @@
 
 package models.requests
 
-import models.{BusinessAddress, BusinessContactDetails, EuVatDetails, StartDate}
+import models.{BusinessAddress, BusinessContactDetails, EuVatDetails}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
 
@@ -32,7 +32,7 @@ final case class RegistrationRequest(
   ukVatRegisteredPostcode: String,
   vatRegisteredInEu: Boolean,
   euVatDetails: Seq[EuVatDetails],
-  startDate: StartDate,
+  startDate: LocalDate,
   businessAddress: BusinessAddress,
   businessContactDetails: BusinessContactDetails,
   websites: Seq[String]
@@ -41,4 +41,3 @@ final case class RegistrationRequest(
 case object RegistrationRequest {
   implicit val format: OFormat[RegistrationRequest] = Json.format[RegistrationRequest]
 }
-

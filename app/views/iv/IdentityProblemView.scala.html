@@ -1,0 +1,14 @@
+@this(
+    layout: templates.Layout
+)
+
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm("identityProblem.title"), showBackLink = false) {
+
+    <h1 class="govuk-heading-xl">@messages("identityProblem.heading")</h1>
+
+    <p class="govuk-body">@messages("identityProblem.p1")</p>
+    <p class="govuk-body">@messages("identityProblem.p2")</p>
+    <p class="govuk-body">@messages("identityProblem.p3")</p>
+}
