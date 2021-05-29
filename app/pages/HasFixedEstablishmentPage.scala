@@ -16,12 +16,23 @@
 
 package pages
 
-import models.Index
+import models.{Index, UserAnswers}
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "euVatDetails" \ index.position \  toString
 
   override def toString: String = "hasFixedEstablishment"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (value.contains(false)) {
+      userAnswers
+        .remove(FixedEstablishmentTradingNamePage(index))
+        .flatMap(_.remove(FixedEstablishmentAddressPage(index)))
+    } else {
+      super.cleanup(value, userAnswers)
+    }
 }

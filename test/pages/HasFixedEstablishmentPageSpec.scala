@@ -16,7 +16,7 @@
 
 package pages
 
-import models.Index
+import models.{FixedEstablishmentAddress, Index, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class HasFixedEstablishmentPageSpec extends PageBehaviours {
@@ -30,5 +30,35 @@ class HasFixedEstablishmentPageSpec extends PageBehaviours {
     beSettable[Boolean](HasFixedEstablishmentPage(index))
 
     beRemovable[Boolean](HasFixedEstablishmentPage(index))
+
+    "must remove Fixed Establishment Trading Name and Address for this index when the answer is no" in {
+
+      val answers =
+        UserAnswers("id")
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), FixedEstablishmentAddress("first", "first")).success.value
+          .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
+          .set(FixedEstablishmentAddressPage(Index(1)), FixedEstablishmentAddress("second", "second")).success.value
+
+      val result = answers.set(HasFixedEstablishmentPage(Index(1)), false).success.value
+
+      result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual FixedEstablishmentAddress("first", "first")
+      result.get(FixedEstablishmentTradingNamePage(Index(1))) mustBe empty
+      result.get(FixedEstablishmentAddressPage(Index(1))) mustBe empty
+    }
+
+    "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
+
+      val answers =
+        UserAnswers("id")
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), FixedEstablishmentAddress("first", "first")).success.value
+
+      val result = answers.set(HasFixedEstablishmentPage(Index(0)), true).success.value
+
+      result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual FixedEstablishmentAddress("first", "first")
+    }
   }
 }

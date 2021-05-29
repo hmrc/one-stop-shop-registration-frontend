@@ -119,12 +119,15 @@ class Navigator @Inject()() {
     }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case HasTradingNamePage                     => hasTradingNameRoute(CheckMode)
-    case AddAdditionalEuVatDetailsPage          => addAdditionalEuVatDetailsRoute(CheckMode)
-    case VatRegisteredInEuPage                  => vatRegisteredInEuRoute(CheckMode)
-    case VatRegisteredEuMemberStatePage(index)  => vatRegisteredEuMemberStateRoute(CheckMode, index)
-    case EuVatNumberPage(index)                 => euVatNumberRoute(CheckMode, index)
-    case _                                      => _ => routes.CheckYourAnswersController.onPageLoad()
+    case HasTradingNamePage                       => hasTradingNameRoute(CheckMode)
+    case AddAdditionalEuVatDetailsPage            => addAdditionalEuVatDetailsRoute(CheckMode)
+    case VatRegisteredInEuPage                    => vatRegisteredInEuRoute(CheckMode)
+    case VatRegisteredEuMemberStatePage(index)    => _ => routes.CheckEuVatDetailsAnswersController.onPageLoad(index)
+    case EuVatNumberPage(index)                   => _ => routes.CheckEuVatDetailsAnswersController.onPageLoad(index)
+    case HasFixedEstablishmentPage(index)         => hasFixedEstablishmentCheckRoute(index)
+    case FixedEstablishmentTradingNamePage(index) => _ => routes.CheckEuVatDetailsAnswersController.onPageLoad(index)
+    case FixedEstablishmentAddressPage(index)     => _ => routes.CheckEuVatDetailsAnswersController.onPageLoad(index)
+    case _                                        => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
   private def hasTradingNameRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
@@ -147,13 +150,11 @@ class Navigator @Inject()() {
       case _                        => vatRegisteredInEuRoute(mode)(answers)
   }
 
-  private def vatRegisteredEuMemberStateRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(VatRegisteredEuMemberStatePage(index)) match {
-    case _ => routes.EuVatNumberController.onPageLoad(mode, index)
-  }
-
-  private def euVatNumberRoute(mode: Mode, index: Index)(answers: UserAnswers): Call = answers.get(EuVatNumberPage(index)) match {
-    case _ => routes.AddAdditionalEuVatDetailsController.onPageLoad(mode)
-  }
+  private def hasFixedEstablishmentCheckRoute(index: Index)(answers: UserAnswers): Call =
+    (answers.get(HasFixedEstablishmentPage(index)), answers.get(FixedEstablishmentTradingNamePage(index))) match {
+      case (Some(true), None) => routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
+      case _                  => routes.CheckEuVatDetailsAnswersController.onPageLoad(index)
+    }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode => normalRoutes(page)(userAnswers)
