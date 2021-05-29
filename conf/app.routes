@@ -152,3 +152,18 @@ GET        /checkVatDetails                        controllers.CheckVatDetailsCo
 POST       /checkVatDetails                        controllers.CheckVatDetailsController.onSubmit
 
 GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad
+
+GET        /fixedEstablishmentAddress                        controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /fixedEstablishmentAddress                        controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeFixedEstablishmentAddress                  controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeFixedEstablishmentAddress                  controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /fixedEstablishmentTradingName                        controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /fixedEstablishmentTradingName                        controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeFixedEstablishmentTradingName                  controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeFixedEstablishmentTradingName                  controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /hasFixedEstablishment                        controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode)
+POST       /hasFixedEstablishment                        controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode)
+GET        /changeHasFixedEstablishment                  controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeHasFixedEstablishment                  controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode)

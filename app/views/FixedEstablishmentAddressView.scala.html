@@ -1,0 +1,43 @@
+@import viewmodels.InputWidth._
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("fixedEstablishmentAddress.title"))) {
+
+    @formHelper(action = routes.FixedEstablishmentAddressController.onSubmit(mode), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 class="govuk-heading-xl">@messages("fixedEstablishmentAddress.heading")</h1>
+
+        @govukInput(
+            InputViewModel(
+                field = form("field1"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.field1"))
+            )
+            .withWidth(Full)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("field2"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.field2"))
+            )
+            .withWidth(Full)
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}
