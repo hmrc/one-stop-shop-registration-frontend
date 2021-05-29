@@ -17,7 +17,7 @@
 package testutils
 
 import models.requests.RegistrationRequest
-import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails}
+import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -34,6 +34,7 @@ object RegistrationData {
       "AA1 1AA",
       true,
       Seq(EuVatDetails(Country("FR", "France"),"FR123456789"), EuVatDetails(Country("ES", "Spain"),"ES123456789")),
+      LocalDate.now(),
       createBusinessAddress(),
       createBusinessContactDetails(),
       Seq("website1", "website2")
@@ -52,6 +53,7 @@ object RegistrationData {
       registration.ukVatRegisteredPostcode,
       registration.vatRegisteredInEu,
       registration.euVatDetails,
+      registration.startDate,
       registration.businessAddress,
       registration.businessContactDetails,
       registration.websites

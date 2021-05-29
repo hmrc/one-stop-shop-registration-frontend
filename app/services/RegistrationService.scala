@@ -35,6 +35,7 @@ class RegistrationService {
       ukVatRegisteredPostcode     <- userAnswers.get(UkVatRegisteredPostcodePage)
       vatRegisteredInEu           <- userAnswers.get(VatRegisteredInEuPage)
       euVatDetails                <- userAnswers.get(AllEuVatDetailsQuery)
+      startDate                   <- userAnswers.get(StartDatePage)
       businessAddress             <- userAnswers.get(BusinessAddressPage)
       businessContactDetails      <- userAnswers.get(BusinessContactDetailsPage)
       websites                    <- userAnswers.get(AllWebsites)

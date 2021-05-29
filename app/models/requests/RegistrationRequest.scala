@@ -41,4 +41,3 @@ final case class RegistrationRequest(
 case object RegistrationRequest {
   implicit val format: OFormat[RegistrationRequest] = Json.format[RegistrationRequest]
 }
-
