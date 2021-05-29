@@ -40,6 +40,23 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from Check VAT Details" - {
+
+        "to Registered Company Name when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(CheckVatDetailsPage, true).success.value
+          navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+        }
+
+        "to User Other Account when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(CheckVatDetailsPage, false).success.value
+          navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+            .mustBe(routes.UseOtherAccountController.onPageLoad())
+        }
+      }
+
       "must go from Registered Company Name to Has Trading Name" in {
 
         navigator.nextPage(RegisteredCompanyNamePage, NormalMode, emptyUserAnswers)

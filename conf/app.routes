@@ -148,9 +148,7 @@ GET         /account/provider-unsupported                                   cont
 GET         /account/credential-unsupported                                 controllers.auth.AuthController.insufficientEnrolments()
 GET         /account/role-unsupported                                       controllers.auth.AuthController.unsupportedCredentialRole
 
-GET        /checkVatDetails                        controllers.CheckVatDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /checkVatDetails                        controllers.CheckVatDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCheckVatDetails                  controllers.CheckVatDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCheckVatDetails                  controllers.CheckVatDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /checkVatDetails                        controllers.CheckVatDetailsController.onPageLoad
+POST       /checkVatDetails                        controllers.CheckVatDetailsController.onSubmit
 
-GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad()
+GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad

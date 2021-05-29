@@ -331,11 +331,9 @@ ivFailedIdentityVerification.title = We could not confirm your identity
 ivFailedIdentityVerification.heading = We could not confirm your identity
 ivFailedIdentityVerification.p = We could not confirm your identity
 
-checkVatDetails.title = checkVatDetails
-checkVatDetails.heading = checkVatDetails
-checkVatDetails.checkYourAnswersLabel = checkVatDetails
-checkVatDetails.error.required = Select yes if checkVatDetails
-checkVatDetails.change.hidden = CheckVatDetails
+checkVatDetails.title = Is this the VAT number you want to register for the One Stop Shop Scheme?
+checkVatDetails.heading = Is this the VAT number you want to register for the One Stop Shop Scheme?
+checkVatDetails.error.required = Select yes if this is the VAT number you want to register.
 
-useOtherAccount.title = useOtherAccount
-useOtherAccount.heading = useOtherAccount
+useOtherAccount.title = You need to login with a different Government Gateway
+useOtherAccount.heading = You need to login with a different Government Gateway
