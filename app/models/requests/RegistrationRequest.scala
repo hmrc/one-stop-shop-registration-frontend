@@ -32,6 +32,7 @@ final case class RegistrationRequest(
   ukVatRegisteredPostcode: String,
   vatRegisteredInEu: Boolean,
   euVatDetails: Seq[EuVatDetails],
+  startDate: LocalDate,
   businessAddress: BusinessAddress,
   businessContactDetails: BusinessContactDetails,
   websites: Seq[String]
