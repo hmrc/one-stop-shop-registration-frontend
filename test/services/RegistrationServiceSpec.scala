@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package service
+package services
 
 import base.SpecBase
-import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption, UserAnswers}
-import pages.{BusinessAddressPage, BusinessContactDetailsPage, HasTradingNamePage, PartOfVatGroupPage, RegisteredCompanyNamePage, StartDatePage, UkVatEffectiveDatePage, UkVatNumberPage, UkVatRegisteredPostcodePage, VatRegisteredInEuPage}
+import models.{Address, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption, UserAnswers}
+import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
-import services.RegistrationService
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.domain.Vrn
 
@@ -40,15 +39,15 @@ class RegistrationServiceSpec extends SpecBase with WireMockHelper {
       .set(VatRegisteredInEuPage, true).success.value
       .set(
         AllEuVatDetailsQuery,
-        List(EuVatDetails(Country("FR", "France"),"FR123456789"),
-             EuVatDetails(Country("ES", "Spain"),"ES123456789")
+        List(EuVatDetails(Country("FR", "France"),"FR123456789", false, None, None),
+             EuVatDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
         )).success.value
       .set(StartDatePage,
         StartDate(StartDateOption.NextPeriod, LocalDate.now())
       ).success.value
       .set(
         BusinessAddressPage,
-        BusinessAddress("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
+        Address("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
       ).success.value
       .set(
         BusinessContactDetailsPage,

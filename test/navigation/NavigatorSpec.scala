@@ -481,7 +481,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Business Address page to Check your Answers page" in {
 
-        val businessAddress = new BusinessAddress(
+        val businessAddress = new Address(
           "value 1",
           Some ("value 2"),
           "value 3",

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package models.domain
 
-import play.api.libs.json._
+import models.{Address, Country}
+import play.api.libs.json.{Json, OFormat}
 
-case class FixedEstablishmentAddress (
-                                       line1: String,
-                                       line2: Option[String],
-                                       townOrCity: String,
-                                       county: Option[String],
-                                       postCode: Option[String]
-                                     )
+final case class EuVatRegistration(
+                                    country: Country,
+                                    vatNumber: String,
+                                    fixedEstablishment: Option[FixedEstablishment]
+                                  )
 
-object FixedEstablishmentAddress {
-  implicit val format = Json.format[FixedEstablishmentAddress]
+object EuVatRegistration {
+
+  implicit val format: OFormat[EuVatRegistration] = Json.format[EuVatRegistration]
 }

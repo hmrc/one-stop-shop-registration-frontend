@@ -32,7 +32,13 @@ object FixedEstablishmentAddressSummary  {
     answers.get(FixedEstablishmentAddressPage(index)).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.field1).toString + "<br/>" + HtmlFormat.escape(answer.field2).toString
+        val value = Seq(
+          Some(HtmlFormat.escape(answer.line1).toString),
+          answer.line2.map(HtmlFormat.escape),
+          Some(HtmlFormat.escape(answer.townOrCity).toString),
+          answer.county.map(HtmlFormat.escape),
+          answer.postCode.map(HtmlFormat.escape)
+        ).flatten.mkString("<br/>")
 
         SummaryListRowViewModel(
           key     = "fixedEstablishmentAddress.checkYourAnswersLabel",

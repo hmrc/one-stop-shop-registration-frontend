@@ -44,7 +44,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
   private val index = Index(0)
   lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index).url
 
-  private val address         = FixedEstablishmentAddress("value 1", "value 2")
+  private val address         = FixedEstablishmentAddress("value 1", None, "value 2", None, None)
   private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
   private val userAnswers     = baseUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
@@ -99,7 +99,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
       running(application) {
         val request =
           FakeRequest(POST, fixedEstablishmentAddressRoute)
-            .withFormUrlEncodedBody(("field1", "value 1"), ("field2", "value 2"))
+            .withFormUrlEncodedBody(("line1", "value 1"), ("townOrCity", "value 2"))
 
         val result = route(application, request).value
 
@@ -149,7 +149,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
       running(application) {
         val request =
           FakeRequest(POST, fixedEstablishmentAddressRoute)
-            .withFormUrlEncodedBody(("field1", "value 1"), ("field2", "value 2"))
+            .withFormUrlEncodedBody(("line1", "value 1"), ("townOrCity", "value 2"))
 
         val result = route(application, request).value
 

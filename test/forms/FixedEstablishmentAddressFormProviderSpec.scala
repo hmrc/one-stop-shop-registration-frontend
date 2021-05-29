@@ -23,11 +23,11 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
 
   val form = new FixedEstablishmentAddressFormProvider()()
 
-  ".field1" - {
+  ".line1" - {
 
-    val fieldName = "field1"
-    val requiredKey = "fixedEstablishmentAddress.error.field1.required"
-    val lengthKey = "fixedEstablishmentAddress.error.field1.length"
+    val fieldName = "line1"
+    val requiredKey = "fixedEstablishmentAddress.error.line1.required"
+    val lengthKey = "fixedEstablishmentAddress.error.line1.length"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
@@ -50,11 +50,31 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
     )
   }
 
-  ".field2" - {
+  ".line2" - {
 
-    val fieldName = "field2"
-    val requiredKey = "fixedEstablishmentAddress.error.field2.required"
-    val lengthKey = "fixedEstablishmentAddress.error.field2.length"
+    val fieldName = "line2"
+    val lengthKey = "fixedEstablishmentAddress.error.line2.length"
+    val maxLength = 100
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+  }
+
+  ".townOrCity" - {
+
+    val fieldName = "townOrCity"
+    val requiredKey = "fixedEstablishmentAddress.error.townOrCity.required"
+    val lengthKey = "fixedEstablishmentAddress.error.townOrCity.length"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
@@ -74,6 +94,46 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+  
+  ".county" - {
+
+    val fieldName = "county"
+    val lengthKey = "fixedEstablishmentAddress.error.county.length"
+    val maxLength = 100
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+  }
+
+  ".postCode" - {
+
+    val fieldName = "postCode"
+    val lengthKey = "fixedEstablishmentAddress.error.postCode.length"
+    val maxLength = 100
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
   }
 }

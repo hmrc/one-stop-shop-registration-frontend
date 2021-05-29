@@ -17,20 +17,25 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
-import models.FixedEstablishmentAddress
+import models.{Address, FixedEstablishmentAddress}
 
 class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
 
    def apply(): Form[FixedEstablishmentAddress] = Form(
      mapping(
-      "field1" -> text("fixedEstablishmentAddress.error.field1.required")
-        .verifying(maxLength(100, "fixedEstablishmentAddress.error.field1.length")),
-      "field2" -> text("fixedEstablishmentAddress.error.field2.required")
-        .verifying(maxLength(100, "fixedEstablishmentAddress.error.field2.length"))
+       "line1" -> text("fixedEstablishmentAddress.error.line1.required")
+         .verifying(maxLength(100, "fixedEstablishmentAddress.error.line1.length")),
+       "line2" -> optional(text("fixedEstablishmentAddress.error.line2.required")
+         .verifying(maxLength(100, "fixedEstablishmentAddress.error.line2.length"))),
+       "townOrCity" -> text("fixedEstablishmentAddress.error.townOrCity.required")
+         .verifying(maxLength(100, "fixedEstablishmentAddress.error.townOrCity.length")),
+       "county" -> optional(text("fixedEstablishmentAddress.error.county.required")
+         .verifying(maxLength(100, "fixedEstablishmentAddress.error.county.length"))),
+       "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
+         .verifying(maxLength(100, "fixedEstablishmentAddress.error.postCode.length")))
     )(FixedEstablishmentAddress.apply)(FixedEstablishmentAddress.unapply)
    )
  }

@@ -16,26 +16,26 @@
 
 package models.requests
 
-import models.{BusinessAddress, BusinessContactDetails, EuVatDetails}
+import models.{Address, BusinessContactDetails, EuVatDetails}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 final case class RegistrationRequest(
-  registeredCompanyName: String,
-  hasTradingName: Boolean,
-  tradingNames: List[String],
-  partOfVatGroup: Boolean,
-  ukVatNumber: Vrn,
-  ukVatEffectiveDate: LocalDate,
-  ukVatRegisteredPostcode: String,
-  vatRegisteredInEu: Boolean,
-  euVatDetails: Seq[EuVatDetails],
-  startDate: LocalDate,
-  businessAddress: BusinessAddress,
-  businessContactDetails: BusinessContactDetails,
-  websites: Seq[String]
+                                      registeredCompanyName: String,
+                                      hasTradingName: Boolean,
+                                      tradingNames: List[String],
+                                      partOfVatGroup: Boolean,
+                                      ukVatNumber: Vrn,
+                                      ukVatEffectiveDate: LocalDate,
+                                      ukVatRegisteredPostcode: String,
+                                      vatRegisteredInEu: Boolean,
+                                      euVatDetails: Seq[EuVatDetails],
+                                      startDate: LocalDate,
+                                      businessAddress: Address,
+                                      businessContactDetails: BusinessContactDetails,
+                                      websites: Seq[String]
 )
 
 case object RegistrationRequest {

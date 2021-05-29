@@ -17,6 +17,7 @@
 package pages
 
 import models.{FixedEstablishmentAddress, Index, UserAnswers}
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
 class HasFixedEstablishmentPageSpec extends PageBehaviours {
@@ -33,32 +34,37 @@ class HasFixedEstablishmentPageSpec extends PageBehaviours {
 
     "must remove Fixed Establishment Trading Name and Address for this index when the answer is no" in {
 
+      val address1 = arbitrary[FixedEstablishmentAddress].sample.value
+      val address2 = arbitrary[FixedEstablishmentAddress].sample.value
+
       val answers =
         UserAnswers("id")
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
-          .set(FixedEstablishmentAddressPage(Index(0)), FixedEstablishmentAddress("first", "first")).success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), address1).success.value
           .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
-          .set(FixedEstablishmentAddressPage(Index(1)), FixedEstablishmentAddress("second", "second")).success.value
+          .set(FixedEstablishmentAddressPage(Index(1)), address2).success.value
 
       val result = answers.set(HasFixedEstablishmentPage(Index(1)), false).success.value
 
       result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
-      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual FixedEstablishmentAddress("first", "first")
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
       result.get(FixedEstablishmentTradingNamePage(Index(1))) mustBe empty
       result.get(FixedEstablishmentAddressPage(Index(1))) mustBe empty
     }
 
     "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
 
+      val address = arbitrary[FixedEstablishmentAddress].sample.value
+
       val answers =
         UserAnswers("id")
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
-          .set(FixedEstablishmentAddressPage(Index(0)), FixedEstablishmentAddress("first", "first")).success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), address).success.value
 
       val result = answers.set(HasFixedEstablishmentPage(Index(0)), true).success.value
 
       result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
-      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual FixedEstablishmentAddress("first", "first")
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address
     }
   }
 }

@@ -20,20 +20,49 @@
 
         <h1 class="govuk-heading-xl">@messages("fixedEstablishmentAddress.heading", country.name)</h1>
 
+
         @govukInput(
             InputViewModel(
-                field = form("field1"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.field1"))
+                field = form("line1"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.line1"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line1")
         )
 
         @govukInput(
             InputViewModel(
-                field = form("field2"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.field2"))
+                field = form("line2"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.line2"))
             )
             .withWidth(Full)
+            .withAutocomplete("address-line2")
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("townOrCity"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.townOrCity"))
+            )
+            .withWidth(TwoThirds)
+            .withAutocomplete("address-level2")
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("county"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.county"))
+            )
+            .withWidth(TwoThirds)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("postCode"),
+                label = LabelViewModel(messages("fixedEstablishmentAddress.postCode"))
+            )
+            .withWidth(Fixed10)
+            .withAutocomplete("postal-code")
         )
 
         @govukButton(
