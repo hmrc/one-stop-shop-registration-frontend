@@ -172,16 +172,45 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go to EU VAT Number from VAT Registered EU Member State" in {
+      "must go from VAT Registered EU Member State to EU VAT Number" in {
 
         navigator.nextPage(VatRegisteredEuMemberStatePage(index), NormalMode, emptyUserAnswers)
           .mustBe(routes.EuVatNumberController.onPageLoad(NormalMode, index))
       }
 
-      "must go to Add Additional EU VAT Details from EU VAT Number" in {
+      "must go from EU VAT Number to Has Fixed Establishment" in {
 
         navigator.nextPage(EuVatNumberPage(index), NormalMode, emptyUserAnswers)
-          .mustBe(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
+          .mustBe(routes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+      }
+
+      "must go from Has Fixed Establishment" - {
+
+        "to Fixed Establishment Trading Name when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value
+          navigator.nextPage(HasFixedEstablishmentPage(index), NormalMode, answers)
+            .mustBe(routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+        }
+
+        "to Check EU VAT Details Answers Name when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
+          navigator.nextPage(HasFixedEstablishmentPage(index), NormalMode, answers)
+            .mustBe(routes.CheckEuVatDetailsAnswersController.onPageLoad(index))
+        }
+      }
+
+      "must go from Fixed Establishment Trading Name to Fixed Establishment Address" in {
+
+        navigator.nextPage(FixedEstablishmentTradingNamePage(index), NormalMode, emptyUserAnswers)
+          .mustBe(routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index))
+      }
+
+      "must go from Fixed Establishment Address to Check EU VAT Details Answers" in {
+
+        navigator.nextPage(FixedEstablishmentAddressPage(index), NormalMode, emptyUserAnswers)
+          .mustBe(routes.CheckEuVatDetailsAnswersController.onPageLoad(index))
       }
 
       "must go from Add Additional EU VAT Details" - {

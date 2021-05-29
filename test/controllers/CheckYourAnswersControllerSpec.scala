@@ -48,7 +48,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
   "Check Your Answers Controller" - {
 
-    "must return 201 and the correct view for a GET" in {
+    "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -61,7 +61,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(list)(request, messages(application)).toString
       }
-
     }
 
     "on submit" - {

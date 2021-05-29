@@ -167,3 +167,6 @@ GET        /hasFixedEstablishment/:index                        controllers.HasF
 POST       /hasFixedEstablishment/:index                        controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET        /changeHasFixedEstablishment/:index                  controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST       /changeHasFixedEstablishment/:index                  controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /checkEuVatDetails/:index                           controllers.CheckEuVatDetailsAnswersController.onPageLoad(index: Index)
+POST        /checkEuVatDetails/:index                           controllers.CheckEuVatDetailsAnswersController.onSubmit(index: Index)
