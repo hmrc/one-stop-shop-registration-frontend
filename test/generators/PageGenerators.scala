@@ -22,6 +22,9 @@ import pages._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
+    Arbitrary(CheckVatDetailsPage)
+
   implicit lazy val arbitraryStartDatePage: Arbitrary[StartDatePage.type] =
     Arbitrary(StartDatePage)
 

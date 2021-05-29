@@ -147,3 +147,10 @@ GET         /account/agent-unsupported                                      cont
 GET         /account/provider-unsupported                                   controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
 GET         /account/credential-unsupported                                 controllers.auth.AuthController.insufficientEnrolments()
 GET         /account/role-unsupported                                       controllers.auth.AuthController.unsupportedCredentialRole
+
+GET        /checkVatDetails                        controllers.CheckVatDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /checkVatDetails                        controllers.CheckVatDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCheckVatDetails                  controllers.CheckVatDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCheckVatDetails                  controllers.CheckVatDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad()
