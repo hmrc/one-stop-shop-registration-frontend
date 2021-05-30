@@ -14,29 +14,35 @@
  * limitations under the License.
  *@
 
-@import views.html.components.application_complete_next_steps
+@import uk.gov.hmrc.domain.Vrn
 
 @this(
         layout: templates.Layout,
         govukButton: GovukButton
 )
 
-@(email: String)(implicit request: Request[_], messages: Messages)
+@(email: String, vrn: Vrn, feedbackLink: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title"))) {
     <div class="grid-row column-two-thirds" id="application_complete_id">
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
-            <div class="govuk-panel__body">@messages("applicationComplete.reference", "1234567890")</div>
+            <div class="govuk-panel__body">
+            @messages("applicationComplete.reference")
+                <br />
+                <strong>@vrn.vrn</strong>
+            </div>
         </div>
 
         <div class="govuk-body">
             @Html(messages("applicationComplete.confirmation", email))
         </div>
 
-        @application_complete_next_steps(
-            linkText = "What did you think of this service?",
-            backHref = "#"
-        )
+        <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
+        <p class="govuk-body">@messages("applicationComplete.caption")</p>
+        <p class="govuk-body">
+            <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
+            @messages("applicationComplete.feedback.30Seconds")
+        </p>
     </div>
 }

@@ -17,27 +17,83 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
+import connectors.RegistrationConnector
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import testutils.RegistrationData.registration
 import views.html.AlreadyRegisteredView
 
-class AlreadyRegisteredControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  private val mockConnector = mock[RegistrationConnector]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockConnector)
+  }
 
   "AlreadyRegistered Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "when the connector returns a registration" - {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      "must return OK and the correct view for a GET" in {
+
+        when(mockConnector.getRegistration(any())(any())) thenReturn Future.successful(Some(registration))
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AlreadyRegisteredView]
+          val config = application.injector.instanceOf[FrontendAppConfig]
+
+          status(result) mustEqual OK
+
+          val expectedContent =
+            view(
+              registration.registeredCompanyName,
+              vrn,
+              registration.contactDetails.emailAddress,
+              config.feedbackUrl(request)
+            )(request, messages(application)).toString
+
+          contentAsString(result) mustEqual expectedContent
+        }
+      }
+    }
+
+    "when the connector does not find an existing registration" - {
+
+      "must redirect the user to the start of the service" in {}
+
+      when(mockConnector.getRegistration(any())(any())) thenReturn Future.successful(None)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AlreadyRegisteredView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
       }
     }
   }
