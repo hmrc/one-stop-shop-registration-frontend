@@ -17,9 +17,11 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{created, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
+import models.responses.ConflictFound
 import play.api.Application
-import play.api.test.Helpers.running
+import play.api.libs.json.Json
+import play.api.test.Helpers._
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -36,7 +38,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
   "submitRegistration" - {
 
-    "must return OK when a new registration is created on the backend" in {
+    "must return Right when a new registration is created on the backend" in {
 
       val url = s"/one-stop-shop-registration/create"
 
@@ -50,6 +52,55 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         result mustEqual Right(())
       }
     }
+
+    "must return Left(ConflictFound) when the backend returns CONFLICT" in {
+
+      val url = s"/one-stop-shop-registration/create"
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(post(urlEqualTo(url)).willReturn(aResponse().withStatus(CONFLICT)))
+
+        val result = connector.submitRegistration(registration).futureValue
+
+        result mustEqual Left(ConflictFound)
+      }
+    }
   }
 
+  "get" - {
+
+    "must return a registration when the backend returns one" in {
+
+      val url = s"/one-stop-shop-registration/registration"
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val responseBody = Json.toJson(RegistrationData.registration).toString
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getRegistration(RegistrationData.registration.vrn).futureValue
+
+        result.value mustEqual RegistrationData.registration
+      }
+    }
+
+    "must return None when the backend returns NOT_FOUND" in {
+
+      val url = s"/one-stop-shop-registration/registration"
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(notFound()))
+
+        val result = connector.getRegistration(RegistrationData.registration.vrn).futureValue
+
+        result must not be defined
+      }
+    }
+  }
 }

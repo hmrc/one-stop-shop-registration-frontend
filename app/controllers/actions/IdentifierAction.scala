@@ -76,7 +76,7 @@ class AuthenticatedIdentifierAction @Inject()(
             if (confidence >= ConfidenceLevel.L250) {
               block(IdentifierRequest(request, internalId, vrn))
             } else {
-              throw InsufficientConfidenceLevel() // TODO: Change to an IV uplift journey
+              throw InsufficientConfidenceLevel()
             }
 
           case None =>
@@ -130,7 +130,7 @@ class AuthenticatedIdentifierAction @Inject()(
       .flatMap {
         enrolment =>
           enrolment.identifiers.find(_.key == "VRN").map(e => Vrn(e.value))
-      } orElse enrolments.enrolments.find(_.key == "HMRE-VATDEC-ORG")
+      } orElse enrolments.enrolments.find(_.key == "HMCE-VATDEC-ORG")
       .flatMap {
         enrolment =>
           enrolment.identifiers.find(_.key == "VATRegNo").map(e => Vrn(e.value))
