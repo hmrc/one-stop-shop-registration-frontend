@@ -18,38 +18,32 @@ package controllers
 
 import controllers.actions._
 import forms.AddAdditionalEuVatDetailsFormProvider
-
-import javax.inject.Inject
-import models.{Country, Mode}
 import models.requests.DataRequest
+import models.{Country, Mode}
 import navigation.Navigator
 import pages.AddAdditionalEuVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuVatRegisteredCountries
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.EuVatDetailsSummary
-import viewmodels.govuk.summarylist._
 import views.html.AddAdditionalEuVatDetailsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddAdditionalEuVatDetailsController @Inject()(
    override val messagesApi: MessagesApi,
-   sessionRepository: SessionRepository,
+   cc: AuthenticatedControllerComponents,
    navigator: Navigator,
-   identify: IdentifierAction,
-   getData: DataRetrievalAction,
-   requireData: DataRequiredAction,
    formProvider: AddAdditionalEuVatDetailsFormProvider,
-   val controllerComponents: MessagesControllerComponents,
    view: AddAdditionalEuVatDetailsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getNumberOfEuCountries {
         number =>
@@ -59,7 +53,7 @@ class AddAdditionalEuVatDetailsController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getNumberOfEuCountries {
         number =>
@@ -72,7 +66,7 @@ class AddAdditionalEuVatDetailsController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAdditionalEuVatDetailsPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
+                _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(AddAdditionalEuVatDetailsPage, mode, updatedAnswers))
           )
       }

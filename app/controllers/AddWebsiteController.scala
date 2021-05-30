@@ -26,7 +26,6 @@ import pages.AddWebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfWebsites
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.WebsiteSummary
 import views.html.AddWebsiteView
@@ -36,19 +35,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddWebsiteController @Inject()(
                                       override val messagesApi: MessagesApi,
-                                      sessionRepository: SessionRepository,
+                                      cc: AuthenticatedControllerComponents,
                                       navigator: Navigator,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
                                       formProvider: AddWebsiteFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
                                       view: AddWebsiteView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getNumberOfWebsites {
         number =>
@@ -57,7 +53,7 @@ class AddWebsiteController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getNumberOfWebsites {
         number =>
@@ -72,7 +68,7 @@ class AddWebsiteController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddWebsitePage, value))
-                _ <- sessionRepository.set(updatedAnswers)
+                _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(AddWebsitePage, mode, updatedAnswers))
           )
       }

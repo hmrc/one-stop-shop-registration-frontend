@@ -34,17 +34,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class VatRegisteredEuMemberStateController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
+                                        cc: AuthenticatedControllerComponents,
                                         navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
                                         formProvider: VatRegisteredEuMemberStateFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
                                         view: VatRegisteredEuMemberStateView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
       val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.vatRegisteredEuMemberState))
@@ -57,7 +55,7 @@ class VatRegisteredEuMemberStateController @Inject()(
       Ok(view(preparedForm, mode, index))
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.vatRegisteredEuMemberState))
@@ -69,7 +67,7 @@ class VatRegisteredEuMemberStateController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredEuMemberStatePage(index), value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(VatRegisteredEuMemberStatePage(index), mode, updatedAnswers))
       )
   }

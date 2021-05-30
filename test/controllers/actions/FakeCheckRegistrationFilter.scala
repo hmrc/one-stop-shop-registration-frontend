@@ -15,31 +15,17 @@
  */
 
 package controllers.actions
-
-import connectors.RegistrationConnector
-import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionFilter, Result}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import play.api.mvc.Result
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector)
-                                           (implicit val executionContext: ExecutionContext)
-  extends CheckRegistrationFilter {
+class FakeCheckRegistrationFilter() extends CheckRegistrationFilter {
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    connector.getRegistration(request.vrn) map {
-      case Some(_) => Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
-      case None    => None
-    }
+    Future.successful(None)
   }
-}
 
-trait CheckRegistrationFilter extends ActionFilter[IdentifierRequest]
+  override protected def executionContext: ExecutionContext =
+    scala.concurrent.ExecutionContext.Implicits.global
+}

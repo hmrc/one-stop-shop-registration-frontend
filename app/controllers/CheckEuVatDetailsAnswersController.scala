@@ -16,10 +16,9 @@
 
 package controllers
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.AuthenticatedControllerComponents
 import models.requests.DataRequest
 import models.{Country, Index, NormalMode}
-import navigation.Navigator
 import pages.VatRegisteredEuMemberStatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -33,14 +32,13 @@ import scala.concurrent.Future
 
 class CheckEuVatDetailsAnswersController @Inject()(
                                                     override val messagesApi: MessagesApi,
-                                                    identify: IdentifierAction,
-                                                    getData: DataRetrievalAction,
-                                                    requireData: DataRequiredAction,
-                                                    val controllerComponents: MessagesControllerComponents,
+                                                    cc: AuthenticatedControllerComponents,
                                                     view: CheckEuVatDetailsAnswersView
                                                   ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onPageLoad(index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -59,7 +57,7 @@ class CheckEuVatDetailsAnswersController @Inject()(
       }
   }
 
-  def onSubmit(index: Index): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onSubmit(index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
       Redirect(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
   }

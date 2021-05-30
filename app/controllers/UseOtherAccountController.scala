@@ -17,22 +17,22 @@
 package controllers
 
 import controllers.actions._
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.UseOtherAccountView
 
+import javax.inject.Inject
+
 class UseOtherAccountController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
+                                       cc: AuthenticatedControllerComponents,
                                        view: UseOtherAccountView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
       Ok(view())
   }

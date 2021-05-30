@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import connectors.RegistrationConnector
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.AuthenticatedControllerComponents
 import models.NormalMode
 import models.responses.ConflictFound
 import navigation.Navigator
@@ -37,17 +37,16 @@ import scala.concurrent.Future.successful
 
 class CheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
+  cc: AuthenticatedControllerComponents,
   registrationConnector: RegistrationConnector,
   registrationService: RegistrationService,
   navigator: Navigator,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(
@@ -70,7 +69,7 @@ class CheckYourAnswersController @Inject()(
       Ok(view(list))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       val registration = registrationService.fromUserAnswers(request.userAnswers, request.vrn)
 
