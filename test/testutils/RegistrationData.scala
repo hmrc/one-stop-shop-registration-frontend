@@ -16,51 +16,33 @@
 
 package testutils
 
-import models.requests.RegistrationRequest
-import models.{BusinessAddress, BusinessContactDetails, Country, EuVatDetails, StartDate, StartDateOption}
+import models.domain.{EuVatRegistration, Registration}
+import models.{Address, BusinessContactDetails, Country, EuVatDetails}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 object RegistrationData {
-  def createNewRegistration(): RegistrationRequest =
-    RegistrationRequest(
-      "foo",
-      true,
-      List("single", "double"),
-      true,
-      Vrn("GB123456789"),
-      LocalDate.now(),
-      "AA1 1AA",
-      true,
-      Seq(EuVatDetails(Country("FR", "France"),"FR123456789"), EuVatDetails(Country("ES", "Spain"),"ES123456789")),
-      LocalDate.now(),
+  val registration: Registration =
+    Registration(
+      vrn = Vrn("123456789"),
+      registeredCompanyName = "foo",
+      tradingNames = List("single", "double"),
+      partOfVatGroup = true,
+      vatEffectiveDate = LocalDate.now(),
+      vatRegisteredPostcode = "AA1 1AA",
+      Seq(
+        EuVatRegistration(Country("FR", "France"), "FR123456789", None),
+        EuVatRegistration(Country("ES", "Spain"), "ES123456789", None)
+      ),
       createBusinessAddress(),
       createBusinessContactDetails(),
-      Seq("website1", "website2")
+      Seq("website1", "website2"),
+      LocalDate.now()
     )
 
-  val registration: RegistrationRequest = createNewRegistration()
-
-  def createRegistrationRequest(): RegistrationRequest =
-    RegistrationRequest(
-      registration.registeredCompanyName,
-      registration.hasTradingName,
-      registration.tradingNames,
-      registration.partOfVatGroup,
-      registration.ukVatNumber,
-      registration.ukVatEffectiveDate,
-      registration.ukVatRegisteredPostcode,
-      registration.vatRegisteredInEu,
-      registration.euVatDetails,
-      registration.startDate,
-      registration.businessAddress,
-      registration.businessContactDetails,
-      registration.websites
-    )
-
-  private def createBusinessAddress(): BusinessAddress =
-    BusinessAddress(
+  private def createBusinessAddress(): Address =
+    Address(
       "123 Street",
       Some("Street"),
       "City",

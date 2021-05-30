@@ -1,0 +1,30 @@
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("hasFixedEstablishment.title", country.name))) {
+
+    @formHelper(action = routes.HasFixedEstablishmentController.onSubmit(mode, index), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("hasFixedEstablishment.heading", country.name)).asPageHeading()
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

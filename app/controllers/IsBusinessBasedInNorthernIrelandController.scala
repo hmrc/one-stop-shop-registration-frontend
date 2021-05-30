@@ -50,7 +50,7 @@ class IsBusinessBasedInNorthernIrelandController @Inject()(
 
       value =>
         if (value) {
-          Redirect(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+          Redirect(routes.CheckVatDetailsController.onPageLoad())
         } else {
           Redirect(routes.CannotRegisterForServiceController.onPageLoad())
         }

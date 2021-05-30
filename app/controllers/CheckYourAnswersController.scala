@@ -72,9 +72,9 @@ class CheckYourAnswersController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val registrationRequest = registrationService.fromUserAnswers(request.userAnswers)
+      val registration = registrationService.fromUserAnswers(request.userAnswers, request.vrn)
 
-      registrationRequest match {
+      registration match {
         case Some(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>

@@ -147,3 +147,26 @@ GET         /account/agent-unsupported                                      cont
 GET         /account/provider-unsupported                                   controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
 GET         /account/credential-unsupported                                 controllers.auth.AuthController.insufficientEnrolments()
 GET         /account/role-unsupported                                       controllers.auth.AuthController.unsupportedCredentialRole
+
+GET        /checkVatDetails                        controllers.CheckVatDetailsController.onPageLoad
+POST       /checkVatDetails                        controllers.CheckVatDetailsController.onSubmit
+
+GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad
+
+GET        /fixedEstablishmentAddress/:index                        controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /fixedEstablishmentAddress/:index                        controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeFixedEstablishmentAddress/:index                  controllers.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeFixedEstablishmentAddress/:index                  controllers.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /fixedEstablishmentTradingName/:index                        controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /fixedEstablishmentTradingName/:index                        controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeFixedEstablishmentTradingName/:index                  controllers.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeFixedEstablishmentTradingName/:index                  controllers.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /hasFixedEstablishment/:index                        controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /hasFixedEstablishment/:index                        controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeHasFixedEstablishment/:index                  controllers.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeHasFixedEstablishment/:index                  controllers.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /checkEuVatDetails/:index                           controllers.CheckEuVatDetailsAnswersController.onPageLoad(index: Index)
+POST        /checkEuVatDetails/:index                           controllers.CheckEuVatDetailsAnswersController.onSubmit(index: Index)

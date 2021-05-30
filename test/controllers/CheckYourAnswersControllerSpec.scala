@@ -18,7 +18,6 @@ package controllers
 
 import base.SpecBase
 import connectors.RegistrationConnector
-import models.requests.RegistrationRequest
 import models.responses.ConflictFound
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -36,7 +35,7 @@ import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with BeforeAndAfterEach {
 
-  private val registration = RegistrationData.createNewRegistration()
+  private val registration = RegistrationData.registration
 
   private val registrationService = mock[RegistrationService]
   private val registrationConnector = mock[RegistrationConnector]
@@ -48,7 +47,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
   "Check Your Answers Controller" - {
 
-    "must return 201 and the correct view for a GET" in {
+    "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -61,7 +60,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(list)(request, messages(application)).toString
       }
-
     }
 
     "on submit" - {
@@ -70,9 +68,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         "user should be redirected to Application Complete page" in {
 
-          val request = RegistrationData.createRegistrationRequest()
-
-          when(registrationService.fromUserAnswers(any())) thenReturn Some(request)
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -95,7 +91,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         "the user is redirected to Journey Recovery Page" in {
 
-          when(registrationService.fromUserAnswers(any())) thenReturn None
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn None
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(bind[RegistrationService].toInstance(registrationService)).build()
@@ -114,9 +110,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         "the user is redirected to Journey Recovery Page" in {
 
-          val request = RegistrationData.createRegistrationRequest()
-
-          when(registrationService.fromUserAnswers(any())) thenReturn Some(request)
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))

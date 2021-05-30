@@ -26,6 +26,17 @@ import java.time.LocalDate
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryFixedEstablishmentAddress: Arbitrary[FixedEstablishmentAddress] =
+    Arbitrary {
+      for {
+        line1      <- arbitrary[String]
+        line2      <- Gen.option(arbitrary[String])
+        townOrCity <- arbitrary[String]
+        county     <- Gen.option(arbitrary[String])
+        postCode   <- Gen.option(arbitrary[String])
+      } yield FixedEstablishmentAddress(line1, line2, townOrCity, county, postCode)
+    }
+
   implicit lazy val arbitraryCountry: Arbitrary[Country] =
     Arbitrary {
       Gen.oneOf(Country.euCountries)
@@ -46,7 +57,7 @@ trait ModelGenerators {
       } yield BusinessContactDetails(fullName, telephoneNumber, emailAddress)
     }
 
-  implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =
+  implicit lazy val arbitraryBusinessAddress: Arbitrary[Address] =
     Arbitrary {
       for {
         line1      <- arbitrary[String]
@@ -54,7 +65,7 @@ trait ModelGenerators {
         townOrCity <- arbitrary[String]
         county     <- Gen.option(arbitrary[String])
         postCode   <- arbitrary[String]
-      } yield BusinessAddress(line1, line2, townOrCity, county, postCode)
+      } yield Address(line1, line2, townOrCity, county, postCode)
     }
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {

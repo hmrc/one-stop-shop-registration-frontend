@@ -18,7 +18,7 @@ package connectors
 
 import config.Service
 import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
-import models.requests.RegistrationRequest
+import models.domain.Registration
 import models.responses.ErrorResponse
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
@@ -31,10 +31,10 @@ class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpCli
 
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
 
-  def submitRegistration(registrationRequest: RegistrationRequest)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Unit]] = {
+  def submitRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Unit]] = {
     val url = s"$baseUrl/create"
 
-    httpClient.POST[RegistrationRequest, RegistrationResultResponse](url, registrationRequest)
+    httpClient.POST[Registration, RegistrationResultResponse](url, registration)
  }
 
 }

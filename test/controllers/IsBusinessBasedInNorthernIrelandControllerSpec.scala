@@ -64,7 +64,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Registered Company Name page when true is selected" in {
+    "must redirect to the Check VAT Detials page when true is selected" in {
 
       val application = applicationBuilder().build()
 
@@ -76,7 +76,7 @@ class IsBusinessBasedInNorthernIrelandControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegisteredCompanyNameController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
       }
     }
 

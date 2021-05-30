@@ -1,0 +1,36 @@
+@import uk.gov.hmrc.domain.Vrn
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], vrn: Vrn)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("checkVatDetails.title"))) {
+
+    @formHelper(action = routes.CheckVatDetailsController.onSubmit(), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 class="govuk-heading-xl">@messages("checkVatDetails.heading")</h1>
+
+        <p class="govuk-body">@vrn.value</p>
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("checkVatDetails.heading")).withCssClass("govuk-visually-hidden")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

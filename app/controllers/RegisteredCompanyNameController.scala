@@ -37,6 +37,7 @@ class RegisteredCompanyNameController @Inject()(
                                         navigator: Navigator,
                                         identify: IdentifierAction,
                                         getData: DataRetrievalAction,
+                                        requireData: DataRequiredAction,
                                         formProvider: RegisteredCompanyNameFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: RegisteredCompanyNameView
@@ -44,10 +45,10 @@ class RegisteredCompanyNameController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.getOrElse(UserAnswers(request.userId)).get(RegisteredCompanyNamePage) match {
+      val preparedForm = request.userAnswers.get(RegisteredCompanyNamePage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -55,7 +56,7 @@ class RegisteredCompanyNameController @Inject()(
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
@@ -64,7 +65,7 @@ class RegisteredCompanyNameController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId)).set(RegisteredCompanyNamePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(RegisteredCompanyNamePage, value))
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(RegisteredCompanyNamePage, mode, updatedAnswers))
       )
