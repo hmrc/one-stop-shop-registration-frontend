@@ -18,18 +18,19 @@ package generators
 
 import models.Index
 import org.scalacheck.Arbitrary
-import pages._
+import pages.{euVatDetails, _}
+import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
 
 trait PageGenerators {
 
   implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
-    Arbitrary(HasFixedEstablishmentPage(Index(0)))
+    Arbitrary(euVatDetails.HasFixedEstablishmentPage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentTradingNamePage: Arbitrary[FixedEstablishmentTradingNamePage] =
-    Arbitrary(FixedEstablishmentTradingNamePage(Index(0)))
+    Arbitrary(euVatDetails.FixedEstablishmentTradingNamePage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage] =
-    Arbitrary(FixedEstablishmentAddressPage(Index(0)))
+    Arbitrary(euVatDetails.FixedEstablishmentAddressPage(Index(0)))
 
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)
@@ -53,10 +54,10 @@ trait PageGenerators {
     Arbitrary(VatRegisteredInEuPage)
 
   implicit lazy val arbitraryEuCountryPage: Arbitrary[EuCountryPage] =
-    Arbitrary(EuCountryPage(Index(0)))
+    Arbitrary(euVatDetails.EuCountryPage(Index(0)))
 
   implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
-    Arbitrary(EuVatNumberPage(Index(0)))
+    Arbitrary(euVatDetails.EuVatNumberPage(Index(0)))
 
   implicit lazy val arbitraryUkVatRegisteredPostcodePage: Arbitrary[UkVatRegisteredPostcodePage.type] =
     Arbitrary(UkVatRegisteredPostcodePage)

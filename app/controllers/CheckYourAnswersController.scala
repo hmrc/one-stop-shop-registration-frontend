@@ -29,6 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.euVatDetails.{EuVatDetailsSummary, VatRegisteredInEuSummary}
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 

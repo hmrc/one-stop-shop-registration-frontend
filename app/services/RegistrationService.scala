@@ -16,7 +16,7 @@
 
 package services
 
-import models.{EuVatDetails, UserAnswers}
+import models.UserAnswers
 import models.domain.{EuVatRegistration, FixedEstablishment, Registration}
 import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}

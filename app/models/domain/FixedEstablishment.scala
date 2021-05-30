@@ -16,7 +16,7 @@
 
 package models.domain
 
-import models.FixedEstablishmentAddress
+import models.euVatDetails.FixedEstablishmentAddress
 import play.api.libs.json.{Json, OFormat}
 
 final case class FixedEstablishment(tradingName: String, address: FixedEstablishmentAddress)
