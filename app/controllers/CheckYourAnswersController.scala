@@ -81,7 +81,7 @@ class CheckYourAnswersController @Inject()(
               successful(Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers)))
 
             case Left(ConflictFound) =>
-              successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+              successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit ${e.toString}")
