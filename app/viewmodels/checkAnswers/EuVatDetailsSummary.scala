@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
-import pages.AddAdditionalEuVatDetailsPage
+import pages.AddEuVatDetails
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuVatDetailsQuery
@@ -53,7 +53,7 @@ object EuVatDetailsSummary  {
           key     = "euVatDetails.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddAdditionalEuVatDetailsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddEuVatDetailsController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("euVatDetails.change.hidden"))
           )
         )

@@ -21,10 +21,10 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class AddAdditionalEuVatDetailsFormProvider @Inject() extends Mappings {
+class AddEuVatDetailsFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("addAdditionalEuVatDetails.error.required")
+      "value" -> boolean("addEuVatDetails.error.required")
     )
 }

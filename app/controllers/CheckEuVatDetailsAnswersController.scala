@@ -59,7 +59,7 @@ class CheckEuVatDetailsAnswersController @Inject()(
 
   def onSubmit(index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Redirect(routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode))
+      Redirect(routes.AddEuVatDetailsController.onPageLoad(NormalMode))
   }
 
   private def getCountry(index: Index)

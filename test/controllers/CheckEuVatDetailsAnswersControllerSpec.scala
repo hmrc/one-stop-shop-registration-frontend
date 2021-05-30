@@ -61,7 +61,7 @@ class CheckEuVatDetailsAnswersControllerSpec extends SpecBase with SummaryListFl
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.AddAdditionalEuVatDetailsController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.AddEuVatDetailsController.onPageLoad(NormalMode).url
       }
     }
   }

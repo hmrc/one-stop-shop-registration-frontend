@@ -19,12 +19,12 @@ package forms
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class AddAdditionalEuVatDetailsFormProviderSpec extends BooleanFieldBehaviours {
+class AddEuVatDetailsFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "addAdditionalEuVatDetails.error.required"
+  val requiredKey = "addEuVatDetails.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new AddAdditionalEuVatDetailsFormProvider()()
+  val form = new AddEuVatDetailsFormProvider()()
 
   ".value" - {
 

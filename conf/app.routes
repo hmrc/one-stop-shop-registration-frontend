@@ -68,10 +68,10 @@ POST        /vatRegisteredInEu                              controllers.VatRegis
 GET         /changeVatRegisteredInEu                        controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeVatRegisteredInEu                        controllers.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
 
-GET         /addAdditionalEuVatDetails                      controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /addAdditionalEuVatDetails                      controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /changeAddAdditionalEuVatDetails                controllers.AddAdditionalEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeAddAdditionalEuVatDetails                controllers.AddAdditionalEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /addAdditionalEuVatDetails                      controllers.AddEuVatDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /addAdditionalEuVatDetails                      controllers.AddEuVatDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /changeAddAdditionalEuVatDetails                controllers.AddEuVatDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeAddAdditionalEuVatDetails                controllers.AddEuVatDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /deleteEuVatDetails/:index                      controllers.DeleteEuVatDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /deleteEuVatDetails/:index                      controllers.DeleteEuVatDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)

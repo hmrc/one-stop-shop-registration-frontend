@@ -17,27 +17,27 @@
 package controllers
 
 import controllers.actions._
-import forms.AddAdditionalEuVatDetailsFormProvider
+import forms.AddEuVatDetailsFormProvider
 import models.requests.DataRequest
 import models.{Country, Mode}
 import navigation.Navigator
-import pages.AddAdditionalEuVatDetailsPage
+import pages.AddEuVatDetails
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuVatRegisteredCountries
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.EuVatDetailsSummary
-import views.html.AddAdditionalEuVatDetailsView
+import views.html.AddEuVatDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddAdditionalEuVatDetailsController @Inject()(
-   override val messagesApi: MessagesApi,
-   cc: AuthenticatedControllerComponents,
-   navigator: Navigator,
-   formProvider: AddAdditionalEuVatDetailsFormProvider,
-   view: AddAdditionalEuVatDetailsView
+class AddEuVatDetailsController @Inject()(
+                                           override val messagesApi: MessagesApi,
+                                           cc: AuthenticatedControllerComponents,
+                                           navigator: Navigator,
+                                           formProvider: AddEuVatDetailsFormProvider,
+                                           view: AddEuVatDetailsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -65,9 +65,9 @@ class AddAdditionalEuVatDetailsController @Inject()(
               ),
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddAdditionalEuVatDetailsPage, value))
-                _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AddAdditionalEuVatDetailsPage, mode, updatedAnswers))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuVatDetails, value))
+                _              <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddEuVatDetails, mode, updatedAnswers))
           )
       }
   }
