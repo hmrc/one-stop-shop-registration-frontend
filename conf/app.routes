@@ -170,3 +170,4 @@ POST       /changeHasFixedEstablishment/:index                  controllers.HasF
 
 GET         /checkEuVatDetails/:index                           controllers.CheckEuVatDetailsAnswersController.onPageLoad(index: Index)
 POST        /checkEuVatDetails/:index                           controllers.CheckEuVatDetailsAnswersController.onSubmit(index: Index)
+GET        /alreadyRegistered                       controllers.AlreadyRegisteredController.onPageLoad()

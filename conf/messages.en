@@ -374,3 +374,5 @@ hasFixedEstablishment.change.hidden = Change if you have a fixed establishment
 
 checkEuVatDetailsAnswers.title = Check your answers
 checkEuVatDetailsAnswers.heading = Check your answers
+alreadyRegistered.title = alreadyRegistered
+alreadyRegistered.heading = alreadyRegistered
