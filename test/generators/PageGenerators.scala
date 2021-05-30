@@ -46,14 +46,14 @@ trait PageGenerators {
   implicit lazy val arbitraryBusinessAddressPage: Arbitrary[BusinessAddressPage.type] =
     Arbitrary(BusinessAddressPage)
 
-  implicit lazy val arbitraryAddAdditionalEuVatDetailsPage: Arbitrary[AddEuVatDetails.type] =
-    Arbitrary(AddEuVatDetails)
+  implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuVatDetailsPage.type] =
+    Arbitrary(AddEuVatDetailsPage)
 
   implicit lazy val arbitraryVatRegisteredInEuPage: Arbitrary[VatRegisteredInEuPage.type] =
     Arbitrary(VatRegisteredInEuPage)
 
-  implicit lazy val arbitraryVatRegisteredEuMemberStatePage: Arbitrary[VatRegisteredEuMemberStatePage] =
-    Arbitrary(VatRegisteredEuMemberStatePage(Index(0)))
+  implicit lazy val arbitraryEuCountryPage: Arbitrary[EuCountryPage] =
+    Arbitrary(EuCountryPage(Index(0)))
 
   implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
     Arbitrary(EuVatNumberPage(Index(0)))

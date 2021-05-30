@@ -24,7 +24,7 @@
 
 @(form: Form[_], mode: Mode, index: Index, euVatDetails: EuVatDetails)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deleteEuVatDetails.title", euVatDetails.vatRegisteredEuMemberState.name))) {
+@layout(pageTitle = title(form, messages("deleteEuVatDetails.title", euVatDetails.euCountry.name))) {
 
     @formHelper(action = routes.DeleteEuVatDetailsController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -35,7 +35,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("deleteEuVatDetails.heading", euVatDetails.vatRegisteredEuMemberState.name)).asPageHeading()
+                legend = LegendViewModel(messages("deleteEuVatDetails.heading", euVatDetails.euCountry.name)).asPageHeading()
             )
         )
 

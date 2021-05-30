@@ -14,12 +14,12 @@ echo "POST       /changeVatRegisteredEuMemberState                  controllers.
 
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en
-echo "vatRegisteredEuMemberState.title = vatRegisteredEuMemberState" >> ../conf/messages.en
-echo "vatRegisteredEuMemberState.heading = vatRegisteredEuMemberState" >> ../conf/messages.en
-echo "vatRegisteredEuMemberState.checkYourAnswersLabel = vatRegisteredEuMemberState" >> ../conf/messages.en
-echo "vatRegisteredEuMemberState.error.required = Enter vatRegisteredEuMemberState" >> ../conf/messages.en
-echo "vatRegisteredEuMemberState.error.length = VatRegisteredEuMemberState must be 100 characters or less" >> ../conf/messages.en
-echo "vatRegisteredEuMemberState.change.hidden = VatRegisteredEuMemberState" >> ../conf/messages.en
+echo "euCountry.title = vatRegisteredEuMemberState" >> ../conf/messages.en
+echo "euCountry.heading = vatRegisteredEuMemberState" >> ../conf/messages.en
+echo "euCountry.checkYourAnswersLabel = vatRegisteredEuMemberState" >> ../conf/messages.en
+echo "euCountry.error.required = Enter vatRegisteredEuMemberState" >> ../conf/messages.en
+echo "euCountry.error.length = VatRegisteredEuMemberState must be 100 characters or less" >> ../conf/messages.en
+echo "euCountry.change.hidden = VatRegisteredEuMemberState" >> ../conf/messages.en
 
 echo "Adding to UserAnswersEntryGenerators"
 awk '/trait UserAnswersEntryGenerators/ {\

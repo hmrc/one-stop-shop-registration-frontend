@@ -64,6 +64,6 @@ class RegistrationService {
             case _ => None
           }
 
-          EuVatRegistration(detail.vatRegisteredEuMemberState, detail.euVatNumber, fixedEstablishment)
+          EuVatRegistration(detail.euCountry, detail.euVatNumber, fixedEstablishment)
     }
 }

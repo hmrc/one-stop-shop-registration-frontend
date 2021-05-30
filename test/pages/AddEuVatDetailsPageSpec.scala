@@ -16,11 +16,16 @@
 
 package pages
 
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case object AddEuVatDetails extends QuestionPage[Boolean] {
+class AddEuVatDetailsPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "AddAdditionalEuVatDetailsPage" - {
 
-  override def toString: String = "addEuVatDetails"
+    beRetrievable[Boolean](AddEuVatDetailsPage)
+
+    beSettable[Boolean](AddEuVatDetailsPage)
+
+    beRemovable[Boolean](AddEuVatDetailsPage)
+  }
 }

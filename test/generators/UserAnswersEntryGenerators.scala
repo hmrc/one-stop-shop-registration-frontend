@@ -88,10 +88,10 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddEuVatDetails.type, JsValue)] =
+  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddEuVatDetailsPage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[AddEuVatDetails.type]
+        page  <- arbitrary[AddEuVatDetailsPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
@@ -104,10 +104,10 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryVatRegisteredEuMemberStateUserAnswersEntry: Arbitrary[(VatRegisteredEuMemberStatePage, JsValue)] =
+  implicit lazy val arbitraryEuCountry: Arbitrary[(EuCountryPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[VatRegisteredEuMemberStatePage]
+        page  <- arbitrary[EuCountryPage]
         value <- arbitrary[Country].map(Json.toJson(_))
       } yield (page, value)
     }

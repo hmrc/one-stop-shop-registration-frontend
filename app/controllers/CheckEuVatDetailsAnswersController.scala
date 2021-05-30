@@ -19,7 +19,7 @@ package controllers
 import controllers.actions.AuthenticatedControllerComponents
 import models.requests.DataRequest
 import models.{Country, Index, NormalMode}
-import pages.VatRegisteredEuMemberStatePage
+import pages.EuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -45,7 +45,7 @@ class CheckEuVatDetailsAnswersController @Inject()(
 
           val list = SummaryListViewModel(
             rows = Seq(
-              VatRegisteredEuMemberStateSummary.row(request.userAnswers, index),
+              EuCountrySummary.row(request.userAnswers, index),
               EuVatNumberSummary.row(request.userAnswers, index),
               HasFixedEstablishmentSummary.row(request.userAnswers, index),
               FixedEstablishmentTradingNameSummary.row(request.userAnswers, index),
@@ -65,7 +65,7 @@ class CheckEuVatDetailsAnswersController @Inject()(
   private def getCountry(index: Index)
                         (block: Country => Future[Result])
                         (implicit request: DataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(VatRegisteredEuMemberStatePage(index)).map {
+    request.userAnswers.get(EuCountryPage(index)).map {
       country =>
         block(country)
     }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))

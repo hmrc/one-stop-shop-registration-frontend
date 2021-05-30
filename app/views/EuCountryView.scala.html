@@ -28,9 +28,9 @@
 
 @(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("vatRegisteredEuMemberState.title"))) {
+@layout(pageTitle = title(form, messages("euCountry.title"))) {
 
-    @formHelper(action = routes.VatRegisteredEuMemberStateController.onSubmit(mode, index)) {
+    @formHelper(action = routes.EuCountryController.onSubmit(mode, index)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -40,7 +40,7 @@
             SelectViewModel(
                 field = form("value"),
                 items = Country.euCountrySelectItems,
-                label = LabelViewModel(messages("vatRegisteredEuMemberState.heading")).asPageHeading()
+                label = LabelViewModel(messages("euCountry.heading")).asPageHeading()
             )
             .withCssClass(InputWidth.Fixed20.toString)
             .withCssClass("autocomplete")

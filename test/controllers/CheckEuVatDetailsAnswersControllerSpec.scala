@@ -18,11 +18,11 @@ package controllers
 
 import base.SpecBase
 import models.{Country, Index, NormalMode}
-import pages.VatRegisteredEuMemberStatePage
+import pages.EuCountryPage
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import viewmodels.checkAnswers.VatRegisteredEuMemberStateSummary
+import viewmodels.checkAnswers.EuCountrySummary
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckEuVatDetailsAnswersView
 
@@ -30,7 +30,7 @@ class CheckEuVatDetailsAnswersControllerSpec extends SpecBase with SummaryListFl
 
   private val index           = Index(0)
   private val country         = Country.euCountries.head
-  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
+  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
 
   "CheckEuVatDetailsAnswersController" - {
 
@@ -44,7 +44,7 @@ class CheckEuVatDetailsAnswersControllerSpec extends SpecBase with SummaryListFl
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuVatDetailsAnswersView]
         val list = SummaryListViewModel(
-          Seq(VatRegisteredEuMemberStateSummary.row(baseUserAnswers, index)).flatten
+          Seq(EuCountrySummary.row(baseUserAnswers, index)).flatten
         )
 
         status(result) mustEqual OK

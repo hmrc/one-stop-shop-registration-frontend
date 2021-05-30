@@ -23,7 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{FixedEstablishmentAddressPage, VatRegisteredEuMemberStatePage}
+import pages.{FixedEstablishmentAddressPage, EuCountryPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -45,7 +45,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
   lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index).url
 
   private val address         = FixedEstablishmentAddress("value 1", None, "value 2", None, None)
-  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
+  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
   private val userAnswers     = baseUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
   "FixedEstablishmentAddress Controller" - {

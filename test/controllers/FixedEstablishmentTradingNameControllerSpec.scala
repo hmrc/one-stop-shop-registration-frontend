@@ -23,7 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{FixedEstablishmentTradingNamePage, VatRegisteredEuMemberStatePage}
+import pages.{FixedEstablishmentTradingNamePage, EuCountryPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -44,7 +44,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
 
   lazy val fixedEstablishmentTradingNameRoute = routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = emptyUserAnswers.set(VatRegisteredEuMemberStatePage(index), country).success.value
+  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
 
   "FixedEstablishmentTradingName Controller" - {
 

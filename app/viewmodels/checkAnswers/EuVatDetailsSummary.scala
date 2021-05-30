@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
-import pages.AddEuVatDetails
+import pages.AddEuVatDetailsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuVatDetailsQuery
@@ -34,7 +34,7 @@ object EuVatDetailsSummary  {
     answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
-          name      = HtmlFormat.escape(details.vatRegisteredEuMemberState.name).toString,
+          name      = HtmlFormat.escape(details.euCountry.name).toString,
           changeUrl = routes.CheckEuVatDetailsAnswersController.onPageLoad(Index(index)).url,
           removeUrl = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url
         )
@@ -46,7 +46,7 @@ object EuVatDetailsSummary  {
 
         val value = euVatDetails.map {
           details =>
-            HtmlFormat.escape(details.vatRegisteredEuMemberState.name)
+            HtmlFormat.escape(details.euCountry.name)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(

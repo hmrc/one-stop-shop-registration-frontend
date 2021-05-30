@@ -17,17 +17,11 @@
 package pages
 
 import models.{Country, Index}
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
+case class EuCountryPage(index: Index) extends QuestionPage[Country] {
 
-class VatRegisteredEuMemberStatePageSpec(index: Index) extends PageBehaviours {
+  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
 
-  "VatRegisteredEuMemberStatePage" - {
-
-    beRetrievable[Country](VatRegisteredEuMemberStatePage(index))
-
-    beSettable[Country](VatRegisteredEuMemberStatePage(index))
-
-    beRemovable[Country](VatRegisteredEuMemberStatePage(index))
-  }
+  override def toString: String = "euCountry"
 }

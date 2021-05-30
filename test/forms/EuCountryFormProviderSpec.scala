@@ -21,13 +21,13 @@ import models.{Country, Index}
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
-class VatRegisteredEuMemberStateFormProviderSpec extends StringFieldBehaviours {
+class EuCountryFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "vatRegisteredEuMemberState.error.required"
+  val requiredKey = "euCountry.error.required"
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[Country]
 
-  val form = new VatRegisteredEuMemberStateFormProvider()(index, emptyExistingAnswers)
+  val form = new EuCountryFormProvider()(index, emptyExistingAnswers)
 
   ".value" - {
 
@@ -59,10 +59,10 @@ class VatRegisteredEuMemberStateFormProviderSpec extends StringFieldBehaviours {
     "must fail to bind when given a duplicate value" in {
       val existingAnswers = Seq(Country.euCountries.head, Country.euCountries.tail.head)
       val answer = Country.euCountries.tail.head
-      val form = new VatRegisteredEuMemberStateFormProvider()(index, existingAnswers)
+      val form = new EuCountryFormProvider()(index, existingAnswers)
 
       val result = form.bind(Map(fieldName ->  answer.code)).apply(fieldName)
-      result.errors must contain only FormError(fieldName, "vatRegisteredEuMemberState.error.duplicate")
+      result.errors must contain only FormError(fieldName, "euCountry.error.duplicate")
     }
   }
 }

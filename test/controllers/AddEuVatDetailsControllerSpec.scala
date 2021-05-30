@@ -23,7 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AddEuVatDetails, EuVatNumberPage, VatRegisteredEuMemberStatePage}
+import pages.{AddEuVatDetailsPage, EuVatNumberPage, EuCountryPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -46,7 +46,7 @@ class AddEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private val baseAnswers =
     emptyUserAnswers
-      .set(VatRegisteredEuMemberStatePage(Index(0)), Country.euCountries.head).success.value
+      .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(EuVatNumberPage(Index(0)), "foo").success.value
 
   "AddEuVatDetails Controller" - {
@@ -71,7 +71,7 @@ class AddEuVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(AddEuVatDetails, true).success.value
+      val userAnswers = baseAnswers.set(AddEuVatDetailsPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

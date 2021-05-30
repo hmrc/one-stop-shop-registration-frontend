@@ -18,25 +18,25 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, Index, UserAnswers}
-import pages.{EuVatNumberPage, VatRegisteredEuMemberStatePage}
+import pages.{EuVatNumberPage, EuCountryPage}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object VatRegisteredEuMemberStateSummary {
+object EuCountrySummary {
 
   def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(VatRegisteredEuMemberStatePage(index)).map {
+    answers.get(EuCountryPage(index)).map {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "vatRegisteredEuMemberState.checkYourAnswersLabel",
+          key     = "euCountry.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer.name).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.VatRegisteredEuMemberStateController.onPageLoad(CheckMode, index).url)
-              .withVisuallyHiddenText(messages("vatRegisteredEuMemberState.change.hidden"))
+            ActionItemViewModel("site.change", routes.EuCountryController.onPageLoad(CheckMode, index).url)
+              .withVisuallyHiddenText(messages("euCountry.change.hidden"))
           )
         )
     }

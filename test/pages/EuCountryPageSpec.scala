@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+import models.{Country, Index}
+import pages.behaviours.PageBehaviours
 
-case class EuVatDetails(
-                         euCountry: Country,
-                         euVatNumber: String,
-                         hasFixedEstablishment: Boolean,
-                         fixedEstablishmentTradingName: Option[String],
-                         fixedEstablishmentAddress: Option[FixedEstablishmentAddress]
-                       )
 
-object EuVatDetails {
+class EuCountryPageSpec(index: Index) extends PageBehaviours {
 
-  implicit val format: OFormat[EuVatDetails] =
-    Json.format[EuVatDetails]
+  "EuCountryPage" - {
+
+    beRetrievable[Country](EuCountryPage(index))
+
+    beSettable[Country](EuCountryPage(index))
+
+    beRemovable[Country](EuCountryPage(index))
+  }
 }

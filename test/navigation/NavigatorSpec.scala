@@ -155,12 +155,12 @@ class NavigatorSpec extends SpecBase {
 
       "must go from VAT Registered in EU" - {
 
-        "to VAT Registered EU Member State when the user answers true" in {
+        "to EU Country when the user answers true" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index))
+            .mustBe(routes.EuCountryController.onPageLoad(NormalMode, index))
         }
 
         "to Start Date when the user answers false" in {
@@ -172,9 +172,9 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from VAT Registered EU Member State to EU VAT Number" in {
+      "must go from EU Country to EU VAT Number" in {
 
-        navigator.nextPage(VatRegisteredEuMemberStatePage(index), NormalMode, emptyUserAnswers)
+        navigator.nextPage(EuCountryPage(index), NormalMode, emptyUserAnswers)
           .mustBe(routes.EuVatNumberController.onPageLoad(NormalMode, index))
       }
 
@@ -215,22 +215,22 @@ class NavigatorSpec extends SpecBase {
 
       "must go from EU VAT Details List" - {
 
-        "to VAT Registered EU Member State when the user answers true" in {
+        "to EU Country when the user answers true" in {
 
           val answers = emptyUserAnswers
-            .set(AddEuVatDetails, true).success.value
-            .set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
+            .set(AddEuVatDetailsPage, true).success.value
+            .set(EuCountryPage(index), Country("FR", "France")).success.value
             .set(EuVatNumberPage(index), "FR123456789").success.value
 
-          navigator.nextPage(AddEuVatDetails, NormalMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, Index(1)))
+          navigator.nextPage(AddEuVatDetailsPage, NormalMode, answers)
+            .mustBe(routes.EuCountryController.onPageLoad(NormalMode, Index(1)))
         }
 
         "to Start Date when the user answers false" in {
 
-          val answers = emptyUserAnswers.set(AddEuVatDetails, false).success.value
+          val answers = emptyUserAnswers.set(AddEuVatDetailsPage, false).success.value
 
-          navigator.nextPage(AddEuVatDetails, NormalMode, answers)
+          navigator.nextPage(AddEuVatDetailsPage, NormalMode, answers)
             .mustBe(routes.StartDateController.onPageLoad(NormalMode))
         }
       }
@@ -241,7 +241,7 @@ class NavigatorSpec extends SpecBase {
 
           val answers =
             emptyUserAnswers
-              .set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
+              .set(EuCountryPage(index), Country("FR", "France")).success.value
               .set(EuVatNumberPage(index), "VAT Number").success.value
 
           navigator.nextPage(DeleteEuVatDetailsPage(index), NormalMode, answers)
@@ -396,12 +396,12 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Vat Registered In EU page" - {
 
-        "to VAT Registered EU Member State page if true" in {
+        "to EU Country page if true" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, CheckMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(CheckMode, index))
+            .mustBe(routes.EuCountryController.onPageLoad(CheckMode, index))
         }
 
         "to Check Your Answers if false" in {
@@ -413,7 +413,7 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from VAT Registered EU Member State Page" - {
+      "must go from EU Country" - {
 
         "to Check EU VAT details when EU VAT number has been answered" in {
 
@@ -421,13 +421,13 @@ class NavigatorSpec extends SpecBase {
             emptyUserAnswers
               .set(EuVatNumberPage(index), "foo").success.value
 
-          navigator.nextPage(VatRegisteredEuMemberStatePage(index), CheckMode, answers)
+          navigator.nextPage(EuCountryPage(index), CheckMode, answers)
             .mustBe(routes.CheckEuVatDetailsAnswersController.onPageLoad(index))
         }
 
         "to EU VAT Number when that question has not been answered" in {
 
-          navigator.nextPage(VatRegisteredEuMemberStatePage(index), CheckMode, emptyUserAnswers)
+          navigator.nextPage(EuCountryPage(index), CheckMode, emptyUserAnswers)
             .mustBe(routes.EuVatNumberController.onPageLoad(CheckMode, index))
         }
       }
@@ -497,21 +497,21 @@ class NavigatorSpec extends SpecBase {
 
       "must go from EU VAT Details List page" - {
 
-        "to VAT Registered EU Member State page if true" in {
+        "to EU Country page if true" in {
 
-          val answers = emptyUserAnswers.set(AddEuVatDetails, true).success.value
-            .set(VatRegisteredEuMemberStatePage(index), Country("FR", "France")).success.value
+          val answers = emptyUserAnswers.set(AddEuVatDetailsPage, true).success.value
+            .set(EuCountryPage(index), Country("FR", "France")).success.value
             .set(EuVatNumberPage(index), "FR123456789").success.value
 
-          navigator.nextPage(AddEuVatDetails, CheckMode, answers)
-            .mustBe(routes.VatRegisteredEuMemberStateController.onPageLoad(CheckMode, Index(1)))
+          navigator.nextPage(AddEuVatDetailsPage, CheckMode, answers)
+            .mustBe(routes.EuCountryController.onPageLoad(CheckMode, Index(1)))
         }
 
         "to Check Your Answers if false" in {
 
-          val answers = emptyUserAnswers.set(AddEuVatDetails, false).success.value
+          val answers = emptyUserAnswers.set(AddEuVatDetailsPage, false).success.value
 
-          navigator.nextPage(AddEuVatDetails, CheckMode, answers)
+          navigator.nextPage(AddEuVatDetailsPage, CheckMode, answers)
             .mustBe(routes.CheckYourAnswersController.onPageLoad())
         }
       }

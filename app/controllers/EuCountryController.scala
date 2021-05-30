@@ -17,37 +17,35 @@
 package controllers
 
 import controllers.actions._
-import forms.VatRegisteredEuMemberStateFormProvider
-
-import javax.inject.Inject
+import forms.EuCountryFormProvider
 import models.{Index, Mode}
 import navigation.Navigator
-import pages.VatRegisteredEuMemberStatePage
+import pages.EuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{AllEuVatDetailsQuery, AllWebsites}
-import repositories.SessionRepository
+import queries.AllEuVatDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.VatRegisteredEuMemberStateView
+import views.html.EuCountryView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VatRegisteredEuMemberStateController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
-                                        formProvider: VatRegisteredEuMemberStateFormProvider,
-                                        view: VatRegisteredEuMemberStateView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class EuCountryController @Inject()(
+                                     override val messagesApi: MessagesApi,
+                                     cc: AuthenticatedControllerComponents,
+                                     navigator: Navigator,
+                                     formProvider: EuCountryFormProvider,
+                                     view: EuCountryView
+                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.vatRegisteredEuMemberState))
+      val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.euCountry))
 
-      val preparedForm = request.userAnswers.get(VatRegisteredEuMemberStatePage(index)) match {
+      val preparedForm = request.userAnswers.get(EuCountryPage(index)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -58,7 +56,7 @@ class VatRegisteredEuMemberStateController @Inject()(
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.vatRegisteredEuMemberState))
+      val form = formProvider(index, request.userAnswers.get(AllEuVatDetailsQuery).getOrElse(Seq.empty).map(_.euCountry))
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -66,9 +64,9 @@ class VatRegisteredEuMemberStateController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredEuMemberStatePage(index), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(EuCountryPage(index), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(VatRegisteredEuMemberStatePage(index), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(EuCountryPage(index), mode, updatedAnswers))
       )
   }
 }

@@ -21,7 +21,7 @@ import forms.AddEuVatDetailsFormProvider
 import models.requests.DataRequest
 import models.{Country, Mode}
 import navigation.Navigator
-import pages.AddEuVatDetails
+import pages.AddEuVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuVatRegisteredCountries
@@ -65,9 +65,9 @@ class AddEuVatDetailsController @Inject()(
               ),
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuVatDetails, value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuVatDetailsPage, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AddEuVatDetails, mode, updatedAnswers))
+              } yield Redirect(navigator.nextPage(AddEuVatDetailsPage, mode, updatedAnswers))
           )
       }
   }

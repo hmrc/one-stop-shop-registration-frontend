@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
+import javax.inject.Inject
+import forms.mappings.Mappings
 import models.{Country, Index}
-import play.api.libs.json.JsPath
+import play.api.data.Form
 
-case class VatRegisteredEuMemberStatePage(index: Index) extends QuestionPage[Country] {
+class EuCountryFormProvider @Inject() extends Mappings {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
-
-  override def toString: String = "vatRegisteredEuMemberState"
+  def apply(thisIndex: Index, existingAnswers: Seq[Country]): Form[Country] =
+    Form(
+      "value" -> text("euCountry.error.required")
+        .verifying("euCountry.error.required", value => Country.euCountries.exists(_.code == value))
+        .transform[Country](value => Country.euCountries.find(_.code == value).get, _.code)
+        .verifying(notADuplicate(thisIndex, existingAnswers, "euCountry.error.duplicate"))
+    )
 }

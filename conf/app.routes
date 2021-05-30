@@ -58,10 +58,10 @@ POST        /euVatNumber/:index                             controllers.EuVatNum
 GET         /changeEuVatNumber/:index                       controllers.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /changeEuVatNumber/:index                       controllers.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /vatRegisteredEuMemberState/:index              controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /vatRegisteredEuMemberState/:index              controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /changeVatRegisteredEuMemberState/:index        controllers.VatRegisteredEuMemberStateController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /changeVatRegisteredEuMemberState/:index        controllers.VatRegisteredEuMemberStateController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /vatRegisteredEuMemberState/:index              controllers.EuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /vatRegisteredEuMemberState/:index              controllers.EuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeVatRegisteredEuMemberState/:index        controllers.EuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeVatRegisteredEuMemberState/:index        controllers.EuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /vatRegisteredInEu                              controllers.VatRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
 POST        /vatRegisteredInEu                              controllers.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)

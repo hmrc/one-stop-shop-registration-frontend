@@ -21,7 +21,7 @@ import forms.FixedEstablishmentTradingNameFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
 import navigation.Navigator
-import pages.{FixedEstablishmentTradingNamePage, VatRegisteredEuMemberStatePage}
+import pages.{FixedEstablishmentTradingNamePage, EuCountryPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -78,7 +78,7 @@ class FixedEstablishmentTradingNameController @Inject()(
   private def getCountry(index: Index)
                         (block: Country => Future[Result])
                         (implicit request: DataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(VatRegisteredEuMemberStatePage(index)).map {
+    request.userAnswers.get(EuCountryPage(index)).map {
       country =>
         block(country)
     }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))

@@ -118,18 +118,18 @@ euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.length = VAT registration number must be 100 characters or less
 euVatNumber.change.hidden = your VAT registration number
 
-vatRegisteredEuMemberState.title = Which EU country?
-vatRegisteredEuMemberState.heading = Which EU country?
-vatRegisteredEuMemberState.checkYourAnswersLabel = EU country
-vatRegisteredEuMemberState.error.required = Enter an EU country
-vatRegisteredEuMemberState.error.duplicate = You have already added this country
-vatRegisteredEuMemberState.change.hidden = EU country
+euCountry.title = Which EU country?
+euCountry.heading = Which EU country?
+euCountry.checkYourAnswersLabel = EU country
+euCountry.error.required = Enter an EU country
+euCountry.error.duplicate = You have already added this country
+euCountry.change.hidden = EU country
 
 vatRegisteredInEu.title = Is your business registered for VAT in EU countries?
 vatRegisteredInEu.heading = Is your business registered for VAT in EU countries?
 vatRegisteredInEu.checkYourAnswersLabel = Registered for VAT in EU countries
 vatRegisteredInEu.error.required = Select yes if your business is registered for VAT in EU countries
-vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU member state
+vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU country
 
 addEuVatDetails.title.singular = You have added VAT details for one EU country
 addEuVatDetails.heading.singular = You have added VAT details for one EU country

@@ -33,16 +33,16 @@ class VatRegisteredInEuPageSpec extends PageBehaviours {
 
       val answers =
         UserAnswers("id")
-          .set(VatRegisteredEuMemberStatePage(Index(0)), Country.euCountries.head).success.value
+          .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
           .set(EuVatNumberPage(Index(0)), "reg 1").success.value
-          .set(VatRegisteredEuMemberStatePage(Index(1)), Country.euCountries.tail.head).success.value
+          .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
           .set(EuVatNumberPage(Index(1)), "reg 2").success.value
 
       val result = answers.set(VatRegisteredInEuPage, false).success.value
 
-      result.get(VatRegisteredEuMemberStatePage(Index(0))) must not be defined
+      result.get(EuCountryPage(Index(0))) must not be defined
       result.get(EuVatNumberPage(Index(0))) must not be defined
-      result.get(VatRegisteredEuMemberStatePage(Index(1))) must not be defined
+      result.get(EuCountryPage(Index(1))) must not be defined
       result.get(EuVatNumberPage(Index(1))) must not be defined
     }
 
@@ -50,16 +50,16 @@ class VatRegisteredInEuPageSpec extends PageBehaviours {
 
       val answers =
         UserAnswers("id")
-          .set(VatRegisteredEuMemberStatePage(Index(0)), Country.euCountries.head).success.value
+          .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
           .set(EuVatNumberPage(Index(0)), "reg 1").success.value
-          .set(VatRegisteredEuMemberStatePage(Index(1)), Country.euCountries.tail.head).success.value
+          .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
           .set(EuVatNumberPage(Index(1)), "reg 2").success.value
 
       val result = answers.set(VatRegisteredInEuPage, true).success.value
 
-      result.get(VatRegisteredEuMemberStatePage(Index(0))).value mustEqual Country.euCountries.head
+      result.get(EuCountryPage(Index(0))).value mustEqual Country.euCountries.head
       result.get(EuVatNumberPage(Index(0))).value mustEqual "reg 1"
-      result.get(VatRegisteredEuMemberStatePage(Index(1))).value mustEqual Country.euCountries.tail.head
+      result.get(EuCountryPage(Index(1))).value mustEqual Country.euCountries.tail.head
       result.get(EuVatNumberPage(Index(1))).value mustEqual "reg 2"
     }
   }

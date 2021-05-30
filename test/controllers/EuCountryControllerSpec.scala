@@ -17,46 +17,46 @@
 package controllers
 
 import base.SpecBase
-import forms.VatRegisteredEuMemberStateFormProvider
+import forms.EuCountryFormProvider
 import models.{Country, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.VatRegisteredEuMemberStatePage
+import pages.EuCountryPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.VatRegisteredEuMemberStateView
+import views.html.EuCountryView
 
 import scala.concurrent.Future
 
-class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSugar {
+class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
   private val onwardRoute = Call("GET", "/foo")
 
-  private val formProvider = new VatRegisteredEuMemberStateFormProvider()
+  private val formProvider = new EuCountryFormProvider()
   private val form = formProvider(index, Seq.empty)
 
-  private lazy val vatRegisteredEuMemberStateRoute = routes.VatRegisteredEuMemberStateController.onPageLoad(NormalMode, index).url
+  private lazy val euCountryRoute = routes.EuCountryController.onPageLoad(NormalMode, index).url
 
   private val country = Country.euCountries.head
 
-  "VatRegisteredEuMemberState Controller" - {
+  "EUCountry Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, vatRegisteredEuMemberStateRoute)
+        val request = FakeRequest(GET, euCountryRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[VatRegisteredEuMemberStateView]
+        val view = application.injector.instanceOf[EuCountryView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
@@ -65,14 +65,14 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(VatRegisteredEuMemberStatePage(index), country).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(EuCountryPage(index), country).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, vatRegisteredEuMemberStateRoute)
+        val request = FakeRequest(GET, euCountryRoute)
 
-        val view = application.injector.instanceOf[VatRegisteredEuMemberStateView]
+        val view = application.injector.instanceOf[EuCountryView]
 
         val result = route(application, request).value
 
@@ -97,7 +97,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, vatRegisteredEuMemberStateRoute)
+          FakeRequest(POST, euCountryRoute)
             .withFormUrlEncodedBody(("value", country.code))
 
         val result = route(application, request).value
@@ -113,12 +113,12 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, vatRegisteredEuMemberStateRoute)
+          FakeRequest(POST, euCountryRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[VatRegisteredEuMemberStateView]
+        val view = application.injector.instanceOf[EuCountryView]
 
         val result = route(application, request).value
 
@@ -132,7 +132,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, vatRegisteredEuMemberStateRoute)
+        val request = FakeRequest(GET, euCountryRoute)
 
         val result = route(application, request).value
 
@@ -147,7 +147,7 @@ class VatRegisteredEuMemberStateControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
         val request =
-          FakeRequest(POST, vatRegisteredEuMemberStateRoute)
+          FakeRequest(POST, euCountryRoute)
             .withFormUrlEncodedBody(("value", country.code))
 
         val result = route(application, request).value
