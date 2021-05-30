@@ -16,27 +16,33 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import pages.BusinessContactDetailsPage
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationCompleteView
 
+import javax.inject.Inject
+
 class ApplicationCompleteController @Inject()(
-   override val messagesApi: MessagesApi,
-   identify: IdentifierAction,
-   getData: DataRetrievalAction,
-   requireData: DataRequiredAction,
-   val controllerComponents: MessagesControllerComponents,
-   view: ApplicationCompleteView
+  override val messagesApi: MessagesApi,
+  cc: AuthenticatedControllerComponents,
+  view: ApplicationCompleteView,
+  frontendAppConfig: FrontendAppConfig
 ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onPageLoad: Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
     implicit request =>
       val businessContactDetailsPage = request.userAnswers.get(BusinessContactDetailsPage)
-        Ok(view(businessContactDetailsPage.get.emailAddress))
+        Ok(view(
+          HtmlFormat.escape(businessContactDetailsPage.get.emailAddress).toString,
+          request.vrn,
+          frontendAppConfig.feedbackUrl)
+        )
   }
 }

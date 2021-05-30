@@ -34,19 +34,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FixedEstablishmentAddressController @Inject()(
                                       override val messagesApi: MessagesApi,
-                                      sessionRepository: SessionRepository,
+                                      cc: AuthenticatedControllerComponents,
                                       navigator: Navigator,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
                                       formProvider: FixedEstablishmentAddressFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
                                       view: FixedEstablishmentAddressView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -60,7 +57,7 @@ class FixedEstablishmentAddressController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -72,7 +69,7 @@ class FixedEstablishmentAddressController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(FixedEstablishmentAddressPage(index), value))
-                _              <- sessionRepository.set(updatedAnswers)
+                _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(FixedEstablishmentAddressPage(index), mode, updatedAnswers))
           )
 

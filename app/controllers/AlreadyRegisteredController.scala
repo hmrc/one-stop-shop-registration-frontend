@@ -16,24 +16,43 @@
 
 package controllers
 
+import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import controllers.actions._
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.UseOtherAccountView
 
 import javax.inject.Inject
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.AlreadyRegisteredView
 
-class UseOtherAccountController @Inject()(
+import scala.concurrent.ExecutionContext
+
+class AlreadyRegisteredController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: UseOtherAccountView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                       view: AlreadyRegisteredView,
+                                       connector: RegistrationConnector,
+                                       config: FrontendAppConfig
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad: Action[AnyContent] = cc.identify.async {
     implicit request =>
-      Ok(view())
+      connector.getRegistration(request.vrn).map {
+        case Some(registration) =>
+          Ok(view(
+            HtmlFormat.escape(registration.registeredCompanyName).toString,
+            request.vrn,
+            HtmlFormat.escape(registration.contactDetails.emailAddress).toString,
+            config.feedbackUrl)
+          )
+
+        case None =>
+          Redirect(routes.IndexController.onPageLoad())
+      }
+
   }
 }

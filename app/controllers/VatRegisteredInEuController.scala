@@ -18,33 +18,29 @@ package controllers
 
 import controllers.actions._
 import forms.VatRegisteredInEuFormProvider
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.VatRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.VatRegisteredInEuView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class VatRegisteredInEuController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
+                                         cc: AuthenticatedControllerComponents,
                                          navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
                                          formProvider: VatRegisteredInEuFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
                                          view: VatRegisteredInEuView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(VatRegisteredInEuPage) match {
@@ -55,7 +51,7 @@ class VatRegisteredInEuController @Inject()(
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
@@ -65,7 +61,7 @@ class VatRegisteredInEuController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredInEuPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(VatRegisteredInEuPage, mode, updatedAnswers))
       )
   }

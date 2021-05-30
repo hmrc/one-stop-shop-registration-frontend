@@ -26,7 +26,6 @@ import pages.AddTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfTradingNames
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
@@ -36,19 +35,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddTradingNameController @Inject()(
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
+  cc: AuthenticatedControllerComponents,
   navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   formProvider: AddTradingNameFormProvider,
-  val controllerComponents: MessagesControllerComponents,
   view: AddTradingNameView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getNumberOfTradingNames {
         number =>
@@ -57,7 +53,7 @@ class AddTradingNameController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getNumberOfTradingNames {
         number =>
@@ -72,7 +68,7 @@ class AddTradingNameController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddTradingNamePage, value))
-                _ <- sessionRepository.set(updatedAnswers)
+                _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(AddTradingNamePage, mode, updatedAnswers))
           )
       }

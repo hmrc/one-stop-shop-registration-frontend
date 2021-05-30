@@ -19,32 +19,28 @@ package controllers
 import controllers.actions._
 import forms.FixedEstablishmentTradingNameFormProvider
 import models.requests.DataRequest
-
-import javax.inject.Inject
 import models.{Country, Index, Mode}
 import navigation.Navigator
 import pages.{FixedEstablishmentTradingNamePage, VatRegisteredEuMemberStatePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.FixedEstablishmentTradingNameView
 
-import scala.concurrent.{ExecutionContext, Future, blocking}
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class FixedEstablishmentTradingNameController @Inject()(
                                                          override val messagesApi: MessagesApi,
-                                                         sessionRepository: SessionRepository,
+                                                         cc: AuthenticatedControllerComponents,
                                                          navigator: Navigator,
-                                                         identify: IdentifierAction,
-                                                         getData: DataRetrievalAction,
-                                                         requireData: DataRequiredAction,
                                                          formProvider: FixedEstablishmentTradingNameFormProvider,
-                                                         val controllerComponents: MessagesControllerComponents,
                                                          view: FixedEstablishmentTradingNameView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -59,7 +55,7 @@ class FixedEstablishmentTradingNameController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -73,7 +69,7 @@ class FixedEstablishmentTradingNameController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(FixedEstablishmentTradingNamePage(index), value))
-                _              <- sessionRepository.set(updatedAnswers)
+                _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(FixedEstablishmentTradingNamePage(index), mode, updatedAnswers))
           )
       }

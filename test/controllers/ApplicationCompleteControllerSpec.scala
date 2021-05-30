@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.UserAnswers
 import pages.BusinessContactDetailsPage
 import play.api.libs.json.Json
@@ -26,7 +27,7 @@ import views.html.ApplicationCompleteView
 
 class ApplicationCompleteControllerSpec extends SpecBase {
 
-  val userAnswers = UserAnswers(
+  private  val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       BusinessContactDetailsPage.toString -> Json.obj(
@@ -48,12 +49,13 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+        val config = application.injector.instanceOf[FrontendAppConfig]
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ApplicationCompleteView]
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(emailAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(emailAddress, vrn, config.feedbackUrl(request))(request, messages(application)).toString
       }
     }
   }

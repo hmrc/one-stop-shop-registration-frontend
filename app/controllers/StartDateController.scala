@@ -36,23 +36,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class StartDateController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
+                                       cc: AuthenticatedControllerComponents,
                                        navigator: Navigator,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
                                        formProvider: StartDateFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
                                        view: StartDateView,
                                        startDateService: StartDateService
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
   private def earlierDateGuidanceKey: String =
     s"startDate.earlierDate.guidance.canRegisterLastMonth.${startDateService.canRegisterLastMonth}"
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(StartDatePage) match {
@@ -64,7 +61,7 @@ class StartDateController @Inject()(
       Ok(view(preparedForm, mode, startDateService.startOfNextPeriod.format(dateFormatter), earlierDateGuidanceKey))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
@@ -74,7 +71,7 @@ class StartDateController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(StartDatePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(StartDatePage, mode, updatedAnswers))
       )
   }

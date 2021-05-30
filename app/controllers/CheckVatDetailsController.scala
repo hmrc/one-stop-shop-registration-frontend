@@ -23,7 +23,6 @@ import navigation.Navigator
 import pages.CheckVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CheckVatDetailsView
 
@@ -32,18 +31,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckVatDetailsController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
+                                         cc: AuthenticatedControllerComponents,
                                          navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
                                          formProvider: CheckVatDetailsFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
                                          view: CheckVatDetailsView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) {
+  def onPageLoad(): Action[AnyContent] = (cc.identify andThen cc.getData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.getOrElse(UserAnswers(request.userId)).get(CheckVatDetailsPage) match {
@@ -54,7 +51,7 @@ class CheckVatDetailsController @Inject()(
       Ok(view(preparedForm, request.vrn))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData).async {
+  def onSubmit(): Action[AnyContent] = (cc.identify andThen cc.getData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
@@ -64,7 +61,7 @@ class CheckVatDetailsController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId)).set(CheckVatDetailsPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(CheckVatDetailsPage, NormalMode, updatedAnswers))
       )
   }

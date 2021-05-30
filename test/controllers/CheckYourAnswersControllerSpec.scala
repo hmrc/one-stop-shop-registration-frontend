@@ -106,9 +106,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         }
       }
 
-      "when the submission fails" - {
+      "when the submission fails because the user has already registered" - {
 
-        "the user is redirected to Journey Recovery Page" in {
+        "the user is redirected to Already Registered Page" in {
 
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
@@ -125,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            redirectLocation(result).value mustEqual routes.AlreadyRegisteredController.onPageLoad().url
           }
         }
       }

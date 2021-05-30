@@ -35,19 +35,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DeleteEuVatDetailsController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
+                                         cc: AuthenticatedControllerComponents,
                                          navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
                                          formProvider: DeleteEuVatDetailsFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
                                          view: DeleteEuVatDetailsView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getEuVatDetails(index) {
         details =>
@@ -55,7 +52,7 @@ class DeleteEuVatDetailsController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getEuVatDetails(index) {
         details =>
@@ -68,7 +65,7 @@ class DeleteEuVatDetailsController @Inject()(
               if (value) {
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuVatDetailsQuery(index)))
-                  _              <- sessionRepository.set(updatedAnswers)
+                  _              <- cc.sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, updatedAnswers))
               } else {
                 Future.successful(Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, request.userAnswers)))

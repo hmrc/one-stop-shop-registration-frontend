@@ -1,4 +1,4 @@
-service.name = Register for One Stop Shop
+service.name = Register for the One Stop Shop
 
 site.back = Back
 site.remove = Remove
@@ -206,11 +206,12 @@ cannotRegisterForService.change.hidden = Cannot register for service
 
 applicationComplete.title = Application complete
 applicationComplete.heading = Application complete
-applicationComplete.reference = Your reference number {0}
+applicationComplete.reference = Your reference number
 applicationComplete.next = What happens next
-
-applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>
-applicationComplete.caption = You will be able to submit your EU VAT returns on GOV.UK.
+applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
+applicationComplete.caption = We will send you details about how to submit returns and make payments before your first VAT return is due.
+applicationComplete.feedback.link.text = What did you think of this service?
+applicationComplete.feedback.30seconds = (takes 30 seconds)
 
 deleteTradingName.title = Are you sure you want to remove this trading name?
 deleteTradingName.heading = Are you sure you want to remove this trading name?
@@ -374,3 +375,13 @@ hasFixedEstablishment.change.hidden = Change if you have a fixed establishment
 
 checkEuVatDetailsAnswers.title = Check your answers
 checkEuVatDetailsAnswers.heading = Check your answers
+
+alreadyRegistered.title = Already registered
+alreadyRegistered.heading = {0} is already registered
+alreadyRegistered.reference = Your reference number
+alreadyRegistered.next = What happens next
+alreadyRegistered.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
+alreadyRegistered.p1 = You are now automatically set up for the online VAT return service.
+alreadyRegistered.p2 = We will send you details about how to submit returns and make payments before your first VAT return is due.
+alreadyRegistered.feedback.link.text = What did you think of this service?
+alreadyRegistered.feedback.30seconds = (takes 30 seconds)

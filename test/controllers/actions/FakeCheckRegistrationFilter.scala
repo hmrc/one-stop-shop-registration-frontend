@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(linkText: String, backHref: String)(implicit messages: Messages)
+package controllers.actions
+import models.requests.IdentifierRequest
+import play.api.mvc.Result
 
-<h2 class="govuk-heading-m mt-0 mb-2 pt-20">@messages("applicationComplete.next")</h2>
-<p class="govuk-body">@messages("applicationComplete.caption")</p>
-<p class="govuk-body"><a href="@backHref">@linkText</a></p>
+import scala.concurrent.{ExecutionContext, Future}
+
+class FakeCheckRegistrationFilter() extends CheckRegistrationFilter {
+
+  override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
+    Future.successful(None)
+  }
+
+  override protected def executionContext: ExecutionContext =
+    scala.concurrent.ExecutionContext.Implicits.global
+}
