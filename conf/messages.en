@@ -377,3 +377,17 @@ alreadyRegistered.p1 = You are now automatically set up for the online VAT retur
 alreadyRegistered.p2 = We will send you details about how to submit returns and make payments before your first VAT return is due.
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
+
+currentCountryOfRegistration.title = currentCountryOfRegistration
+currentCountryOfRegistration.heading = currentCountryOfRegistration
+currentCountryOfRegistration.option1 = Option 1
+currentCountryOfRegistration.option2 = Option 2
+currentCountryOfRegistration.checkYourAnswersLabel = currentCountryOfRegistration
+currentCountryOfRegistration.error.required = Select currentCountryOfRegistration
+currentCountryOfRegistration.change.hidden = CurrentCountryOfRegistration
+
+currentlyRegisteredInEu.title = currentlyRegisteredInEu
+currentlyRegisteredInEu.heading = currentlyRegisteredInEu
+currentlyRegisteredInEu.checkYourAnswersLabel = currentlyRegisteredInEu
+currentlyRegisteredInEu.error.required = Select yes if currentlyRegisteredInEu
+currentlyRegisteredInEu.change.hidden = CurrentlyRegisteredInEu
