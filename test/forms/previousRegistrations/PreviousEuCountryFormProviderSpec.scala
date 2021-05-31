@@ -17,15 +17,17 @@
 package forms.previousRegistrations
 
 import forms.behaviours.StringFieldBehaviours
+import models.{Country, Index}
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class PreviousEuCountryFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "previousEuCountry.error.required"
-  val lengthKey = "previousEuCountry.error.length"
-  val maxLength = 100
+  val index = Index(0)
+  val emptyExistingAnswers = Seq.empty[Country]
 
-  val form = new PreviousEuCountryFormProvider()()
+  val form = new PreviousEuCountryFormProvider()(index, emptyExistingAnswers)
 
   ".value" - {
 
@@ -34,14 +36,7 @@ class PreviousEuCountryFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      arbitrary[Country].map(_.code)
     )
 
     behave like mandatoryField(
@@ -49,5 +44,25 @@ class PreviousEuCountryFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind any values other than valid country codes" in {
+
+      val invalidAnswers = arbitrary[String] suchThat (x => !Country.euCountries.map(_.code).contains(x))
+
+      forAll(invalidAnswers) {
+        answer =>
+          val result = form.bind(Map("value" -> answer)).apply(fieldName)
+          result.errors must contain only FormError(fieldName, requiredKey)
+      }
+    }
+
+    "must fail to bind when given a duplicate value" in {
+      val existingAnswers = Seq(Country.euCountries.head, Country.euCountries.tail.head)
+      val answer = Country.euCountries.tail.head
+      val form = new PreviousEuCountryFormProvider()(index, existingAnswers)
+
+      val result = form.bind(Map(fieldName ->  answer.code)).apply(fieldName)
+      result.errors must contain only FormError(fieldName, "previousEuCountry.error.duplicate")
+    }
   }
 }

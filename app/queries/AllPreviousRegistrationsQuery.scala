@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package pages.previousRegistrations
+package queries
 
-import models.{Country, Index}
-import pages.behaviours.PageBehaviours
+import models.previousRegisrtations.PreviousRegistrationDetails
+import play.api.libs.json.JsPath
 
-class PreviousEuCountryPageSpec extends PageBehaviours {
+case object AllPreviousRegistrationsQuery extends Gettable[List[PreviousRegistrationDetails]] with Settable[List[PreviousRegistrationDetails]] {
 
-  private val index = Index(0)
-
-  "PreviousEuCountryPage" - {
-
-    beRetrievable[Country](PreviousEuCountryPage(index))
-
-    beSettable[Country](PreviousEuCountryPage(index))
-
-    beRemovable[Country](PreviousEuCountryPage(index))
-  }
+  override def path: JsPath = JsPath \ "previousRegistrations"
 }

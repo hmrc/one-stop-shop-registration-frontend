@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package pages.previousRegistrations
+package models.previousRegisrtations
 
-import models.{Country, Index}
-import pages.behaviours.PageBehaviours
+import models.Country
+import play.api.libs.json.{Json, OFormat}
 
-class PreviousEuCountryPageSpec extends PageBehaviours {
+case class PreviousRegistrationDetails(
+                                        previousEuCountry: Country,
+                                        previousEuVatNumber: String
+                                      )
 
-  private val index = Index(0)
+object PreviousRegistrationDetails {
 
-  "PreviousEuCountryPage" - {
-
-    beRetrievable[Country](PreviousEuCountryPage(index))
-
-    beSettable[Country](PreviousEuCountryPage(index))
-
-    beRemovable[Country](PreviousEuCountryPage(index))
-  }
+  implicit val format: OFormat[PreviousRegistrationDetails] = Json.format[PreviousRegistrationDetails]
 }

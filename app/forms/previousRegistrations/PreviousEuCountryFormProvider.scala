@@ -17,15 +17,18 @@
 package forms.previousRegistrations
 
 import forms.mappings.Mappings
+import models.{Country, Index}
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class PreviousEuCountryFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(thisIndex: Index, existingAnswers: Seq[Country]): Form[Country] =
     Form(
       "value" -> text("previousEuCountry.error.required")
-        .verifying(maxLength(100, "previousEuCountry.error.length"))
+        .verifying("previousEuCountry.error.required", value => Country.euCountries.exists(_.code == value))
+        .transform[Country](value => Country.euCountries.find(_.code == value).get, _.code)
+        .verifying(notADuplicate(thisIndex, existingAnswers, "previousEuCountry.error.duplicate"))
     )
 }

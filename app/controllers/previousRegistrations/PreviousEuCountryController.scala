@@ -23,6 +23,7 @@ import navigation.Navigator
 import pages.previousRegistrations.PreviousEuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousEuCountryView
 
@@ -37,11 +38,12 @@ class PreviousEuCountryController @Inject()(
                                         view: PreviousEuCountryView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
+
+      val form = formProvider(index, request.userAnswers.get(AllPreviousRegistrationsQuery).getOrElse(Seq.empty).map(_.previousEuCountry))
 
       val preparedForm = request.userAnswers.get(PreviousEuCountryPage(index)) match {
         case None => form
@@ -53,6 +55,8 @@ class PreviousEuCountryController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+
+      val form = formProvider(index, request.userAnswers.get(AllPreviousRegistrationsQuery).getOrElse(Seq.empty).map(_.previousEuCountry))
 
       form.bindFromRequest().fold(
         formWithErrors =>

@@ -16,11 +16,11 @@
 
 package pages.previousRegistrations
 
-import models.Index
+import models.{Country, Index}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class PreviousEuCountryPage(index: Index) extends QuestionPage[String] {
+case class PreviousEuCountryPage(index: Index) extends QuestionPage[Country] {
 
   override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ toString
 
