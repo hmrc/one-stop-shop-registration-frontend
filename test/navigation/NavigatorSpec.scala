@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.euVatDetails.{routes => euVatRoutes}
 import controllers.routes
 import models._
-import models.euVatDetails.{Country, FixedEstablishmentAddress}
+import models.euVatDetails.FixedEstablishmentAddress
 import pages._
 import pages.euVatDetails._
 

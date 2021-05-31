@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import models._
-import models.euVatDetails.{Country, EuVatDetails}
+import models.euVatDetails.EuVatDetails
 import pages._
 import pages.euVatDetails.VatRegisteredInEuPage
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}

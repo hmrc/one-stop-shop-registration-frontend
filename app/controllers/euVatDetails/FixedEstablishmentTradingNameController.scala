@@ -19,9 +19,8 @@ package controllers.euVatDetails
 import controllers.actions._
 import controllers.routes
 import forms.euVatDetails.FixedEstablishmentTradingNameFormProvider
-import models.euVatDetails.Country
 import models.requests.DataRequest
-import models.{Index, Mode}
+import models.{Country, Index, Mode}
 import navigation.Navigator
 import pages.euVatDetails.FixedEstablishmentTradingNamePage
 import pages.euVatDetails.{EuCountryPage, FixedEstablishmentTradingNamePage}

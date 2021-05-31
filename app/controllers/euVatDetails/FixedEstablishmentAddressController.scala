@@ -19,11 +19,10 @@ package controllers.euVatDetails
 import controllers.actions._
 import controllers.routes
 import forms.euVatDetails.FixedEstablishmentAddressFormProvider
-import models.euVatDetails.Country
 import models.requests.DataRequest
-import models.{Index, Mode}
+import models.{Country, Index, Mode}
 import navigation.Navigator
-import pages. euVatDetails.FixedEstablishmentAddressPage
+import pages.euVatDetails.FixedEstablishmentAddressPage
 import pages.euVatDetails.{EuCountryPage, FixedEstablishmentAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}

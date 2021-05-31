@@ -16,8 +16,7 @@
 
 package pages
 
-import models.UserAnswers
-import models.euVatDetails.Country
+import models.{Country, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class CurrentlyRegisteredInEuPageSpec extends PageBehaviours {

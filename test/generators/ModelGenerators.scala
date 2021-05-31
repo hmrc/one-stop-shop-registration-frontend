@@ -18,7 +18,7 @@ package generators
 
 import models.StartDateOption.EarlierDate
 import models._
-import models.euVatDetails.{Country, FixedEstablishmentAddress}
+import models.euVatDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Vrn

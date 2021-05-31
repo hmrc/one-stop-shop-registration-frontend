@@ -20,8 +20,7 @@ import controllers.actions._
 import forms.CurrentCountryOfRegistrationFormProvider
 
 import javax.inject.Inject
-import models.Mode
-import models.euVatDetails.Country
+import models.{Country, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.CurrentCountryOfRegistrationPage

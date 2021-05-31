@@ -18,8 +18,7 @@ package controllers.euVatDetails
 
 import base.SpecBase
 import forms.euVatDetails.EuCountryFormProvider
-import models.euVatDetails.Country
-import models.{Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

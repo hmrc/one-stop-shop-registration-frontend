@@ -17,8 +17,7 @@
 package controllers.euVatDetails
 
 import base.SpecBase
-import models.euVatDetails.Country
-import models.{Index, NormalMode}
+import models.{Country, Index, NormalMode}
 import pages.euVatDetails
 import play.api.i18n.Messages
 import play.api.test.FakeRequest

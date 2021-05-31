@@ -18,9 +18,8 @@ package controllers.euVatDetails
 
 import controllers.actions.AuthenticatedControllerComponents
 import controllers.routes
-import models.euVatDetails.Country
 import models.requests.DataRequest
-import models.{Index, NormalMode}
+import models.{Country, Index, NormalMode}
 import pages.euVatDetails
 import pages.euVatDetails.EuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}

@@ -16,9 +16,8 @@
 
 package services
 
-import models.UserAnswers
+import models.{Country, UserAnswers}
 import models.domain.{EuVatRegistration, FixedEstablishment, Registration}
-import models.euVatDetails.Country
 import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn

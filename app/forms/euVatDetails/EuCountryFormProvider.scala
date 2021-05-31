@@ -17,8 +17,7 @@
 package forms.euVatDetails
 
 import forms.mappings.Mappings
-import models.Index
-import models.euVatDetails.Country
+import models.{Country, Index}
 import play.api.data.Form
 
 import javax.inject.Inject
