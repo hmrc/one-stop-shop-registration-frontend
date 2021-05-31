@@ -27,11 +27,11 @@ trait PageGenerators {
   implicit lazy val arbitraryPreviouslyRegisteredPage: Arbitrary[PreviouslyRegisteredPage.type] =
     Arbitrary(PreviouslyRegisteredPage)
 
-  implicit lazy val arbitraryPreviousEuVatNumberPage: Arbitrary[PreviousEuVatNumberPage.type] =
-    Arbitrary(PreviousEuVatNumberPage)
+  implicit lazy val arbitraryPreviousEuVatNumberPage: Arbitrary[PreviousEuVatNumberPage] =
+    Arbitrary(PreviousEuVatNumberPage(Index(0)))
 
-  implicit lazy val arbitraryPreviousEuCountryPage: Arbitrary[PreviousEuCountryPage.type] =
-    Arbitrary(PreviousEuCountryPage)
+  implicit lazy val arbitraryPreviousEuCountryPage: Arbitrary[PreviousEuCountryPage] =
+    Arbitrary(PreviousEuCountryPage(Index(0)))
 
   implicit lazy val arbitraryAddPreviousRegistrationPage: Arbitrary[AddPreviousRegistrationPage.type] =
     Arbitrary(AddPreviousRegistrationPage)

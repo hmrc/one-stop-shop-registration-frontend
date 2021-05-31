@@ -16,17 +16,19 @@
 
 package pages.previousRegistrations
 
+import models.Index
 import pages.behaviours.PageBehaviours
-
 
 class PreviousEuVatNumberPageSpec extends PageBehaviours {
 
+  private val index = Index(0)
+
   "PreviousEuVatNumberPage" - {
 
-    beRetrievable[String](PreviousEuVatNumberPage)
+    beRetrievable[String](PreviousEuVatNumberPage(index))
 
-    beSettable[String](PreviousEuVatNumberPage)
+    beSettable[String](PreviousEuVatNumberPage(index))
 
-    beRemovable[String](PreviousEuVatNumberPage)
+    beRemovable[String](PreviousEuVatNumberPage(index))
   }
 }

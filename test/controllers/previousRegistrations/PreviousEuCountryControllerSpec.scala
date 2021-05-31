@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousEuCountryFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -35,12 +35,13 @@ import scala.concurrent.Future
 
 class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new PreviousEuCountryFormProvider()
-  val form = formProvider()
+  private val index = Index(0)
+  private val formProvider = new PreviousEuCountryFormProvider()
+  private val form = formProvider()
 
-  lazy val previousEuCountryRoute = routes.PreviousEuCountryController.onPageLoad(NormalMode).url
+  private lazy val previousEuCountryRoute = routes.PreviousEuCountryController.onPageLoad(NormalMode, index).url
 
   "PreviousEuCountry Controller" - {
 
@@ -56,13 +57,13 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousEuCountryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(PreviousEuCountryPage, "answer").success.value
+      val userAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +75,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -120,7 +121,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
       }
     }
 

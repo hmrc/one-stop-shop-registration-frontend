@@ -35,18 +35,18 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryPreviousEuVatNumberUserAnswersEntry: Arbitrary[(PreviousEuVatNumberPage.type, JsValue)] =
+  implicit lazy val arbitraryPreviousEuVatNumberUserAnswersEntry: Arbitrary[(PreviousEuVatNumberPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[PreviousEuVatNumberPage.type]
+        page  <- arbitrary[PreviousEuVatNumberPage]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryPreviousEuCountryUserAnswersEntry: Arbitrary[(PreviousEuCountryPage.type, JsValue)] =
+  implicit lazy val arbitraryPreviousEuCountryUserAnswersEntry: Arbitrary[(PreviousEuCountryPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[PreviousEuCountryPage.type]
+        page  <- arbitrary[PreviousEuCountryPage]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }

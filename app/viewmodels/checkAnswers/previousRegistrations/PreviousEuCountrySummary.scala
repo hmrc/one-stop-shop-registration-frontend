@@ -16,28 +16,18 @@
 
 package viewmodels.checkAnswers.previousRegistrations
 
+import controllers.euVatDetails.routes
 import controllers.previousRegistrations.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.previousRegistrations.PreviousEuCountryPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import queries.AllEuVatDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object PreviousEuCountrySummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PreviousEuCountryPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key = "previousEuCountry.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.PreviousEuCountryController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("previousEuCountry.change.hidden"))
-          )
-        )
-    }
 }

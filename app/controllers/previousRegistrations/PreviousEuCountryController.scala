@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousEuCountryFormProvider
-import models.Mode
+import models.{Index, Mode}
 import navigation.Navigator
 import pages.previousRegistrations.PreviousEuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -40,29 +40,29 @@ class PreviousEuCountryController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(PreviousEuCountryPage) match {
+      val preparedForm = request.userAnswers.get(PreviousEuCountryPage(index)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, index))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, index))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuCountryPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuCountryPage(index), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PreviousEuCountryPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(PreviousEuCountryPage(index), mode, updatedAnswers))
       )
   }
 }

@@ -27,17 +27,4 @@ import viewmodels.implicits._
 
 object PreviousEuVatNumberSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PreviousEuVatNumberPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key = "previousEuVatNumber.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.PreviousEuVatNumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("previousEuVatNumber.change.hidden"))
-          )
-        )
-    }
 }
