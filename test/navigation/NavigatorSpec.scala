@@ -23,7 +23,6 @@ import models._
 import models.euVatDetails.{Country, FixedEstablishmentAddress}
 import pages._
 import pages.euVatDetails._
-import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
@@ -223,12 +222,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(euVatRoutes.EuCountryController.onPageLoad(NormalMode, Index(1)))
         }
 
-        "to Start Date when the user answers false" in {
+        "to Currently Registered in EU when the user answers false" in {
 
           val answers = emptyUserAnswers.set(AddEuVatDetailsPage, false).success.value
 
           navigator.nextPage(AddEuVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.StartDateController.onPageLoad(NormalMode))
+            .mustBe(routes.CurrentlyRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
 
@@ -250,6 +249,29 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(pages.euVatDetails.DeleteEuVatDetailsPage(index), NormalMode, emptyUserAnswers)
             .mustBe(euVatRoutes.VatRegisteredInEuController.onPageLoad(NormalMode))
         }
+      }
+
+      "must go from Currently Registered in EU" - {
+
+        "to Current Country of Registration when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, true).success.value
+          navigator.nextPage(CurrentlyRegisteredInEuPage, NormalMode, answers)
+            .mustBe(routes.CurrentCountryOfRegistrationController.onPageLoad(NormalMode))
+        }
+
+        "to Start Date when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, false).success.value
+          navigator.nextPage(CurrentlyRegisteredInEuPage, NormalMode, answers)
+            .mustBe(routes.StartDateController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Current Country of Registration to Start Date" in {
+
+        navigator.nextPage(CurrentCountryOfRegistrationPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.StartDateController.onPageLoad(NormalMode))
       }
 
       "must go from Start Date to Business Address" in {

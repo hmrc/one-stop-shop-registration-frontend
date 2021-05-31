@@ -16,6 +16,8 @@
 
 package pages
 
+import models.UserAnswers
+import models.euVatDetails.Country
 import pages.behaviours.PageBehaviours
 
 class CurrentlyRegisteredInEuPageSpec extends PageBehaviours {
@@ -27,5 +29,13 @@ class CurrentlyRegisteredInEuPageSpec extends PageBehaviours {
     beSettable[Boolean](CurrentlyRegisteredInEuPage)
 
     beRemovable[Boolean](CurrentlyRegisteredInEuPage)
+
+    "must remove Current Country of Registration if the answer is no" in {
+
+      val answers = UserAnswers("id").set(CurrentCountryOfRegistrationPage, Country.euCountries.head).success.value
+      val result = answers.set(CurrentlyRegisteredInEuPage, false).success.value
+
+      result.get(CurrentCountryOfRegistrationPage) must not be defined
+    }
   }
 }

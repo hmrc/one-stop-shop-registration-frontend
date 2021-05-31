@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package viewmodels
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import models.euVatDetails.Country
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-import scala.util.Try
+class CurrentCountryOfRegistrationViewModel(countries: Seq[Country]) {
 
-case object CurrentlyRegisteredInEuPage extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "currentlyRegisteredInEu"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value.contains(false)) {
-      userAnswers.remove(CurrentCountryOfRegistrationPage)
-    } else {
-      super.cleanup(value, userAnswers)
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    countries.sortBy(_.name).zipWithIndex.map {
+      case (value, index) =>
+        RadioItem(
+          content = Text(value.name),
+          value   = Some(value.code),
+          id      = Some(s"value_$index")
+        )
     }
 }

@@ -16,17 +16,17 @@
 
 package pages
 
-import models.CurrentCountryOfRegistration
+import models.euVatDetails.Country
 import pages.behaviours.PageBehaviours
 
 class CurrentCountryOfRegistrationSpec extends PageBehaviours {
 
   "CurrentCountryOfRegistrationPage" - {
 
-    beRetrievable[CurrentCountryOfRegistration](CurrentCountryOfRegistrationPage)
+    beRetrievable[Country](CurrentCountryOfRegistrationPage)
 
-    beSettable[CurrentCountryOfRegistration](CurrentCountryOfRegistrationPage)
+    beSettable[Country](CurrentCountryOfRegistrationPage)
 
-    beRemovable[CurrentCountryOfRegistration](CurrentCountryOfRegistrationPage)
+    beRemovable[Country](CurrentCountryOfRegistrationPage)
   }
 }

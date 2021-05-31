@@ -16,10 +16,10 @@
 
 package pages
 
-import models.CurrentCountryOfRegistration
+import models.euVatDetails.Country
 import play.api.libs.json.JsPath
 
-case object CurrentCountryOfRegistrationPage extends QuestionPage[CurrentCountryOfRegistration] {
+case object CurrentCountryOfRegistrationPage extends QuestionPage[Country] {
 
   override def path: JsPath = JsPath \ toString
 

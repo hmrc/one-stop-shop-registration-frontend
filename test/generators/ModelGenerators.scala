@@ -27,11 +27,6 @@ import java.time.LocalDate
 
 trait ModelGenerators {
 
-  implicit lazy val arbitraryCurrentCountryOfRegistration: Arbitrary[CurrentCountryOfRegistration] =
-    Arbitrary {
-      Gen.oneOf(CurrentCountryOfRegistration.values.toSeq)
-    }
-
   implicit lazy val arbitraryFixedEstablishmentAddress: Arbitrary[FixedEstablishmentAddress] =
     Arbitrary {
       for {

@@ -378,16 +378,16 @@ alreadyRegistered.p2 = We will send you details about how to submit returns and 
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 
-currentCountryOfRegistration.title = currentCountryOfRegistration
-currentCountryOfRegistration.heading = currentCountryOfRegistration
+currentCountryOfRegistration.title = Which EU country is your business registered for the One Stop Shop in?
+currentCountryOfRegistration.heading = Which EU country is your business registered for the One Stop Shop in?
 currentCountryOfRegistration.option1 = Option 1
 currentCountryOfRegistration.option2 = Option 2
-currentCountryOfRegistration.checkYourAnswersLabel = currentCountryOfRegistration
-currentCountryOfRegistration.error.required = Select currentCountryOfRegistration
-currentCountryOfRegistration.change.hidden = CurrentCountryOfRegistration
+currentCountryOfRegistration.checkYourAnswersLabel = EU Country your business is registered in
+currentCountryOfRegistration.error.required = Select which EU country your business is registered in
+currentCountryOfRegistration.change.hidden = which EU country your business is registered in
 
-currentlyRegisteredInEu.title = currentlyRegisteredInEu
-currentlyRegisteredInEu.heading = currentlyRegisteredInEu
-currentlyRegisteredInEu.checkYourAnswersLabel = currentlyRegisteredInEu
-currentlyRegisteredInEu.error.required = Select yes if currentlyRegisteredInEu
-currentlyRegisteredInEu.change.hidden = CurrentlyRegisteredInEu
+currentlyRegisteredInEu.title = Are you registered for the One Stop Shop scheme in another EU country now?
+currentlyRegisteredInEu.heading = Are you registered for the One Stop Shop scheme in another EU country now?
+currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
+currentlyRegisteredInEu.error.required = Select yes if you are registered in another EU country now
+currentlyRegisteredInEu.change.hidden = if you are registered in another EU country

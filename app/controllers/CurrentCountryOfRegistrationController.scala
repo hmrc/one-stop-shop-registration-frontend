@@ -18,13 +18,18 @@ package controllers
 
 import controllers.actions._
 import forms.CurrentCountryOfRegistrationFormProvider
+
 import javax.inject.Inject
 import models.Mode
+import models.euVatDetails.Country
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.CurrentCountryOfRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.AllEuVatDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.CurrentCountryOfRegistrationViewModel
 import views.html.CurrentCountryOfRegistrationView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,32 +42,55 @@ class CurrentCountryOfRegistrationController @Inject()(
                                        view: CurrentCountryOfRegistrationView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountries {
+        countries =>
 
-      val preparedForm = request.userAnswers.get(CurrentCountryOfRegistrationPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val form         = formProvider(countries)
+          val preparedForm = request.userAnswers.get(CurrentCountryOfRegistrationPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          val viewModel = new CurrentCountryOfRegistrationViewModel(countries)
+
+          Future.successful(Ok(view(preparedForm, mode, viewModel)))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountries {
+        countries =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          val form      = formProvider(countries)
+          val viewModel = new CurrentCountryOfRegistrationViewModel(countries)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CurrentCountryOfRegistrationPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CurrentCountryOfRegistrationPage, mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, viewModel))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(CurrentCountryOfRegistrationPage, value))
+                _              <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(CurrentCountryOfRegistrationPage, mode, updatedAnswers))
+          )
+      }
+
   }
+
+  private def getCountries(block: Seq[Country] => Future[Result])
+                          (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(AllEuVatDetailsQuery).map {
+      vatDetails =>
+        if (vatDetails.nonEmpty) {
+          block(vatDetails.map(_.euCountry))
+        } else {
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
 }

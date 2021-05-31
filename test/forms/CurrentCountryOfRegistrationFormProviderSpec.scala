@@ -17,24 +17,41 @@
 package forms
 
 import forms.behaviours.OptionFieldBehaviours
-import models.CurrentCountryOfRegistration
+import models.euVatDetails.Country
 import play.api.data.FormError
 
 class CurrentCountryOfRegistrationFormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new CurrentCountryOfRegistrationFormProvider()()
+  val countries = Country.euCountries.take(10)
+  val form = new CurrentCountryOfRegistrationFormProvider()(countries)
 
   ".value" - {
 
     val fieldName = "value"
     val requiredKey = "currentCountryOfRegistration.error.required"
 
-    behave like optionsField[CurrentCountryOfRegistration](
-      form,
-      fieldName,
-      validValues  = CurrentCountryOfRegistration.values,
-      invalidError = FormError(fieldName, "error.invalid")
-    )
+
+    "bind all countries provided to the form" in {
+
+      for(value <- countries) {
+
+        val result = form.bind(Map(fieldName -> value.code)).apply(fieldName)
+        result.value.value mustEqual value.code
+        result.errors mustBe empty
+      }
+    }
+
+    "not bind invalid values" in {
+
+      val generator = stringsExceptSpecificValues(countries.map(_.code))
+
+      forAll(generator -> "invalidValue") {
+        value =>
+
+          val result = form.bind(Map(fieldName -> value)).apply(fieldName)
+          result.errors must contain only FormError(fieldName, "currentCountryOfRegistration.error.required")
+      }
+    }
 
     behave like mandatoryField(
       form,

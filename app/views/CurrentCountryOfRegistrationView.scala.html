@@ -1,3 +1,5 @@
+@import viewmodels.CurrentCountryOfRegistrationViewModel
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -6,7 +8,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, viewModel: CurrentCountryOfRegistrationViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("currentCountryOfRegistration.title"))) {
 
@@ -20,7 +22,7 @@
             RadiosViewModel(
                 field  = form("value"),
                 legend = LegendViewModel(messages("currentCountryOfRegistration.heading")).asPageHeading(),
-                items  = CurrentCountryOfRegistration.options
+                items  = viewModel.options
             )
         )
 
