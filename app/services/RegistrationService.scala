@@ -18,6 +18,7 @@ package services
 
 import models.UserAnswers
 import models.domain.{EuVatRegistration, FixedEstablishment, Registration}
+import models.euVatDetails.Country
 import pages._
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
@@ -26,16 +27,17 @@ class RegistrationService {
 
   def fromUserAnswers(userAnswers: UserAnswers, vrn: Vrn): Option[Registration] =
     for {
-      registeredCompanyName   <- userAnswers.get(RegisteredCompanyNamePage)
-      tradingNames            = getTradingNames(userAnswers)
-      partOfVatGroup          <- userAnswers.get(PartOfVatGroupPage)
-      ukVatEffectiveDate      <- userAnswers.get(UkVatEffectiveDatePage)
-      ukVatRegisteredPostcode <- userAnswers.get(UkVatRegisteredPostcodePage)
-      euVatRegistrations      = buildEuVatRegistrations(userAnswers)
-      startDate               <- userAnswers.get(StartDatePage)
-      businessAddress         <- userAnswers.get(BusinessAddressPage)
-      businessContactDetails  <- userAnswers.get(BusinessContactDetailsPage)
-      websites                <- userAnswers.get(AllWebsites)
+      registeredCompanyName        <- userAnswers.get(RegisteredCompanyNamePage)
+      tradingNames                 = getTradingNames(userAnswers)
+      partOfVatGroup               <- userAnswers.get(PartOfVatGroupPage)
+      ukVatEffectiveDate           <- userAnswers.get(UkVatEffectiveDatePage)
+      ukVatRegisteredPostcode      <- userAnswers.get(UkVatRegisteredPostcodePage)
+      euVatRegistrations           = buildEuVatRegistrations(userAnswers)
+      startDate                    <- userAnswers.get(StartDatePage)
+      businessAddress              <- userAnswers.get(BusinessAddressPage)
+      businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
+      websites                     <- userAnswers.get(AllWebsites)
+      currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
     } yield Registration(
       vrn,
       registeredCompanyName,
@@ -47,7 +49,8 @@ class RegistrationService {
       businessAddress,
       businessContactDetails,
       websites,
-      startDate.date
+      startDate.date,
+      currentCountryOfRegistration
     )
 
   private def getTradingNames(userAnswers: UserAnswers): List[String] =

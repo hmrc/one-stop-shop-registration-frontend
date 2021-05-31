@@ -32,14 +32,15 @@ object RegistrationData {
       partOfVatGroup = true,
       vatEffectiveDate = LocalDate.now(),
       vatRegisteredPostcode = "AA1 1AA",
-      Seq(
+      euVatRegistrations = Seq(
         EuVatRegistration(Country("FR", "France"), "FR123456789", None),
         EuVatRegistration(Country("ES", "Spain"), "ES123456789", None)
       ),
-      createBusinessAddress(),
-      createBusinessContactDetails(),
-      Seq("website1", "website2"),
-      LocalDate.now()
+      businessAddress = createBusinessAddress(),
+      contactDetails = createBusinessContactDetails(),
+      websites = Seq("website1", "website2"),
+      startDate = LocalDate.now(),
+      currentCountryOfRegistration = Some(Country("FR", "France"))
     )
 
   private def createBusinessAddress(): Address =

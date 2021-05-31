@@ -16,6 +16,7 @@
 
 package models.domain
 
+import models.euVatDetails.Country
 import models.{Address, BusinessContactDetails}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
@@ -33,7 +34,8 @@ final case class Registration(
                                businessAddress: Address,
                                contactDetails: BusinessContactDetails,
                                websites: Seq[String],
-                               startDate: LocalDate
+                               startDate: LocalDate,
+                               currentCountryOfRegistration: Option[Country]
                              )
 
 object Registration {

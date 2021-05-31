@@ -54,6 +54,8 @@ class RegistrationServiceSpec extends SpecBase {
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs","01112223344","email@email.com")).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
+      .set(CurrentlyRegisteredInEuPage, true).success.value
+      .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
 
   private val registrationService = new RegistrationService()
 
