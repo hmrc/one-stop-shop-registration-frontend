@@ -55,7 +55,6 @@ class CheckYourAnswersController @Inject()(
           HasTradingNameSummary.row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
-          UkVatNumberSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
           UkVatRegisteredPostcodeSummary.row(request.userAnswers),
           VatRegisteredInEuSummary.row(request.userAnswers),

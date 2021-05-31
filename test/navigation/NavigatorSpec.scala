@@ -132,15 +132,9 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Part of VAT Group to UK VAT Number" in {
+      "must go from Part of VAT Group to UK VAT Effective Date" in {
 
         navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.UkVatNumberController.onPageLoad(NormalMode))
-      }
-
-      "must go from UK VAT Number to UK VAT Effective Date" in {
-
-        navigator.nextPage(UkVatNumberPage, NormalMode, emptyUserAnswers)
           .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
       }
 
@@ -370,14 +364,6 @@ class NavigatorSpec extends SpecBase {
         val answers = emptyUserAnswers.set(PartOfVatGroupPage, true ).success.value
 
         navigator.nextPage(PartOfVatGroupPage, CheckMode, answers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "must go from UK VAT Number page to Check Your Answers page" in {
-
-        val answers = emptyUserAnswers.set(UkVatNumberPage, new Vrn("GB123456789")).success.value
-
-        navigator.nextPage(UkVatNumberPage, CheckMode, answers)
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 

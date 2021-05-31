@@ -130,14 +130,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryUkVatNumberUserAnswersEntry: Arbitrary[(UkVatNumberPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[UkVatNumberPage.type]
-        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryUkVatEffectiveDateUserAnswersEntry: Arbitrary[(UkVatEffectiveDatePage.type, JsValue)] =
     Arbitrary {
       for {

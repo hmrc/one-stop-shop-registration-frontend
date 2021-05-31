@@ -94,14 +94,6 @@ ukVatEffectiveDate.error.required = Your UK VAT registration date must include {
 ukVatEffectiveDate.error.invalid = Enter a real date
 ukVatEffectiveDate.change.hidden = your UK VAT registration date
 
-ukVatNumber.title = What is your UK VAT registration number?
-ukVatNumber.heading = What is your UK VAT registration number?
-ukVatNumber.hint = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.
-ukVatNumber.checkYourAnswersLabel =UK VAT registration number
-ukVatNumber.error.required = Enter your UK VAT registration number
-ukVatNumber.error.invalid = UK VAT number must be GB followed by 9 digits
-ukVatNumber.change.hidden = your UK VAT registration number
-
 ukVatRegisteredPostcode.title = What is the postcode where your business is registered for UK VAT?
 ukVatRegisteredPostcode.heading = What is the postcode where your business is registered for UK VAT?
 ukVatRegisteredPostcode.hint = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.

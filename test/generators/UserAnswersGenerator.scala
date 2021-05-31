@@ -41,7 +41,6 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(EuCountryPage, JsValue)] ::
     arbitrary[(EuVatNumberPage, JsValue)] ::
     arbitrary[(UkVatRegisteredPostcodePage.type, JsValue)] ::
-    arbitrary[(UkVatNumberPage.type, JsValue)] ::
     arbitrary[(UkVatEffectiveDatePage.type, JsValue)] ::
     arbitrary[(TradingNamePage, JsValue)] ::
     arbitrary[(RegisteredCompanyNamePage.type, JsValue)] ::
