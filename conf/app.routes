@@ -167,3 +167,13 @@ GET         /checkEuVatDetails/:index                           controllers.euVa
 POST        /checkEuVatDetails/:index                           controllers.euVatDetails.CheckEuVatDetailsAnswersController.onSubmit(index: Index)
 
 GET        /alreadyRegistered                       controllers.AlreadyRegisteredController.onPageLoad()
+
+GET        /currentCountryOfRegistration                        controllers.CurrentCountryOfRegistrationController.onPageLoad(mode: Mode = NormalMode)
+POST       /currentCountryOfRegistration                        controllers.CurrentCountryOfRegistrationController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCurrentCountryOfRegistration                  controllers.CurrentCountryOfRegistrationController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCurrentCountryOfRegistration                  controllers.CurrentCountryOfRegistrationController.onSubmit(mode: Mode = CheckMode)
+
+GET        /currentlyRegisteredInEu                        controllers.CurrentlyRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
+POST       /currentlyRegisteredInEu                        controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCurrentlyRegisteredInEu                  controllers.CurrentlyRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCurrentlyRegisteredInEu                  controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = CheckMode)

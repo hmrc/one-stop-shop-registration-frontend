@@ -59,6 +59,8 @@ class CheckYourAnswersController @Inject()(
           UkVatRegisteredPostcodeSummary.row(request.userAnswers),
           VatRegisteredInEuSummary.row(request.userAnswers),
           EuVatDetailsSummary.checkAnswersRow(request.userAnswers),
+          CurrentlyRegisteredInEuSummary.row(request.userAnswers),
+          CurrentCountryOfRegistrationSummary.row(request.userAnswers),
           StartDateSummary.row(request.userAnswers),
           BusinessAddressSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),

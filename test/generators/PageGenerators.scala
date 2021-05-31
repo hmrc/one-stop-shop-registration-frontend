@@ -23,6 +23,12 @@ import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, 
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryCurrentlyRegisteredInEuPage: Arbitrary[CurrentlyRegisteredInEuPage.type] =
+    Arbitrary(CurrentlyRegisteredInEuPage)
+
+  implicit lazy val arbitraryCurrentCountryOfRegistrationPage: Arbitrary[CurrentCountryOfRegistrationPage.type] =
+    Arbitrary(CurrentCountryOfRegistrationPage)
+
   implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
     Arbitrary(euVatDetails.HasFixedEstablishmentPage(Index(0)))
 
