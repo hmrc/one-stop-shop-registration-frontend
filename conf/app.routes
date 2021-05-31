@@ -177,3 +177,23 @@ GET        /currentlyRegisteredInEu                        controllers.Currently
 POST       /currentlyRegisteredInEu                        controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCurrentlyRegisteredInEu                  controllers.CurrentlyRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCurrentlyRegisteredInEu                  controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+
+GET        /addPreviousRegistration                        controllers.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
+POST       /addPreviousRegistration                        controllers.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode)
+GET        /changeAddPreviousRegistration                  controllers.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeAddPreviousRegistration                  controllers.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode)
+
+GET        /previousEuCountry                        controllers.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode)
+POST       /previousEuCountry                        controllers.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode)
+GET        /changePreviousEuCountry                  controllers.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode)
+POST       /changePreviousEuCountry                  controllers.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode)
+
+GET        /previousEuVatNumber                        controllers.PreviousEuVatNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /previousEuVatNumber                        controllers.PreviousEuVatNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changePreviousEuVatNumber                  controllers.PreviousEuVatNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changePreviousEuVatNumber                  controllers.PreviousEuVatNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /previouslyRegistered                        controllers.PreviouslyRegisteredController.onPageLoad(mode: Mode = NormalMode)
+POST       /previouslyRegistered                        controllers.PreviouslyRegisteredController.onSubmit(mode: Mode = NormalMode)
+GET        /changePreviouslyRegistered                  controllers.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
+POST       /changePreviouslyRegistered                  controllers.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)

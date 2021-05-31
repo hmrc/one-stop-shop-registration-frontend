@@ -391,3 +391,29 @@ currentlyRegisteredInEu.heading = Are you registered for the One Stop Shop schem
 currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
 currentlyRegisteredInEu.error.required = Select yes if you are registered in another EU country now
 currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
+
+addPreviousRegistration.title = addPreviousRegistration
+addPreviousRegistration.heading = addPreviousRegistration
+addPreviousRegistration.checkYourAnswersLabel = addPreviousRegistration
+addPreviousRegistration.error.required = Select yes if addPreviousRegistration
+addPreviousRegistration.change.hidden = AddPreviousRegistration
+
+previousEuCountry.title = previousEuCountry
+previousEuCountry.heading = previousEuCountry
+previousEuCountry.checkYourAnswersLabel = previousEuCountry
+previousEuCountry.error.required = Enter previousEuCountry
+previousEuCountry.error.length = PreviousEuCountry must be 100 characters or less
+previousEuCountry.change.hidden = PreviousEuCountry
+
+previousEuVatNumber.title = previousEuVatNumber
+previousEuVatNumber.heading = previousEuVatNumber
+previousEuVatNumber.checkYourAnswersLabel = previousEuVatNumber
+previousEuVatNumber.error.required = Enter previousEuVatNumber
+previousEuVatNumber.error.length = PreviousEuVatNumber must be 100 characters or less
+previousEuVatNumber.change.hidden = PreviousEuVatNumber
+
+previouslyRegistered.title = previouslyRegistered
+previouslyRegistered.heading = previouslyRegistered
+previouslyRegistered.checkYourAnswersLabel = previouslyRegistered
+previouslyRegistered.error.required = Select yes if previouslyRegistered
+previouslyRegistered.change.hidden = PreviouslyRegistered
