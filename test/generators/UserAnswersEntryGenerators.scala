@@ -17,9 +17,11 @@
 package generators
 
 import models._
+import models.euVatDetails.{Country, FixedEstablishmentAddress}
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
+import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
@@ -88,10 +90,10 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddAdditionalEuVatDetailsPage.type, JsValue)] =
+  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddEuVatDetailsPage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[AddAdditionalEuVatDetailsPage.type]
+        page  <- arbitrary[AddEuVatDetailsPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
@@ -104,10 +106,10 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryVatRegisteredEuMemberStateUserAnswersEntry: Arbitrary[(VatRegisteredEuMemberStatePage, JsValue)] =
+  implicit lazy val arbitraryEuCountry: Arbitrary[(EuCountryPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[VatRegisteredEuMemberStatePage]
+        page  <- arbitrary[EuCountryPage]
         value <- arbitrary[Country].map(Json.toJson(_))
       } yield (page, value)
     }
@@ -124,14 +126,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[UkVatRegisteredPostcodePage.type]
-        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryUkVatNumberUserAnswersEntry: Arbitrary[(UkVatNumberPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[UkVatNumberPage.type]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }

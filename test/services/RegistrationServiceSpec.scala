@@ -18,10 +18,11 @@ package services
 
 import base.SpecBase
 import models._
+import models.euVatDetails.{Country, EuVatDetails}
 import pages._
+import pages.euVatDetails.VatRegisteredInEuPage
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
-import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
@@ -33,7 +34,6 @@ class RegistrationServiceSpec extends SpecBase {
       .set(HasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
       .set(PartOfVatGroupPage, true).success.value
-      .set(UkVatNumberPage, Vrn("GB123456789")).success.value
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
       .set(UkVatRegisteredPostcodePage, "AA1 1AA").success.value
       .set(VatRegisteredInEuPage, true).success.value

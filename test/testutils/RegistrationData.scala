@@ -17,7 +17,8 @@
 package testutils
 
 import models.domain.{EuVatRegistration, Registration}
-import models.{Address, BusinessContactDetails, Country, EuVatDetails}
+import models.euVatDetails.Country
+import models.{Address, BusinessContactDetails}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate

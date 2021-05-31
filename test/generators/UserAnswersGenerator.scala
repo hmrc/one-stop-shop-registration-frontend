@@ -21,6 +21,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
+import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersGenerator extends TryValues {
@@ -35,12 +36,11 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(WebsitePage, JsValue)] ::
     arbitrary[(BusinessContactDetailsPage.type, JsValue)] ::
     arbitrary[(BusinessAddressPage.type, JsValue)] ::
-    arbitrary[(AddAdditionalEuVatDetailsPage.type, JsValue)] ::
+    arbitrary[(AddEuVatDetailsPage.type, JsValue)] ::
     arbitrary[(VatRegisteredInEuPage.type, JsValue)] ::
-    arbitrary[(VatRegisteredEuMemberStatePage, JsValue)] ::
+    arbitrary[(EuCountryPage, JsValue)] ::
     arbitrary[(EuVatNumberPage, JsValue)] ::
     arbitrary[(UkVatRegisteredPostcodePage.type, JsValue)] ::
-    arbitrary[(UkVatNumberPage.type, JsValue)] ::
     arbitrary[(UkVatEffectiveDatePage.type, JsValue)] ::
     arbitrary[(TradingNamePage, JsValue)] ::
     arbitrary[(RegisteredCompanyNamePage.type, JsValue)] ::

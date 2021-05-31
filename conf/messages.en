@@ -94,14 +94,6 @@ ukVatEffectiveDate.error.required = Your UK VAT registration date must include {
 ukVatEffectiveDate.error.invalid = Enter a real date
 ukVatEffectiveDate.change.hidden = your UK VAT registration date
 
-ukVatNumber.title = What is your UK VAT registration number?
-ukVatNumber.heading = What is your UK VAT registration number?
-ukVatNumber.hint = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.
-ukVatNumber.checkYourAnswersLabel =UK VAT registration number
-ukVatNumber.error.required = Enter your UK VAT registration number
-ukVatNumber.error.invalid = UK VAT number must be GB followed by 9 digits
-ukVatNumber.change.hidden = your UK VAT registration number
-
 ukVatRegisteredPostcode.title = What is the postcode where your business is registered for UK VAT?
 ukVatRegisteredPostcode.heading = What is the postcode where your business is registered for UK VAT?
 ukVatRegisteredPostcode.hint = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
@@ -118,29 +110,29 @@ euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.length = VAT registration number must be 100 characters or less
 euVatNumber.change.hidden = your VAT registration number
 
-vatRegisteredEuMemberState.title = Which EU country?
-vatRegisteredEuMemberState.heading = Which EU country?
-vatRegisteredEuMemberState.checkYourAnswersLabel = EU country
-vatRegisteredEuMemberState.error.required = Enter an EU country
-vatRegisteredEuMemberState.error.duplicate = You have already added this country
-vatRegisteredEuMemberState.change.hidden = EU country
+euCountry.title = Which EU country?
+euCountry.heading = Which EU country?
+euCountry.checkYourAnswersLabel = EU country
+euCountry.error.required = Enter an EU country
+euCountry.error.duplicate = You have already added this country
+euCountry.change.hidden = EU country
 
 vatRegisteredInEu.title = Is your business registered for VAT in EU countries?
 vatRegisteredInEu.heading = Is your business registered for VAT in EU countries?
 vatRegisteredInEu.checkYourAnswersLabel = Registered for VAT in EU countries
 vatRegisteredInEu.error.required = Select yes if your business is registered for VAT in EU countries
-vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU member state
+vatRegisteredInEu.change.hidden = if your business is VAT registered in an EU country
 
-addAdditionalEuVatDetails.title.singular = You have added VAT details for one EU country
-addAdditionalEuVatDetails.heading.singular = You have added VAT details for one EU country
-addAdditionalEuVatDetails.title = You have added VAT details for {0} EU countries
-addAdditionalEuVatDetails.heading = You have added VAT details for {0} EU countries
-addAdditionalEuVatDetails.maximumReached = You have added details for every EU country
-addAdditionalEuVatDetails.error.required = Select yes if you need to add VAT details for another EU country
-addAdditionalEuVatDetails.change.hidden = VAT details for {0}
-addAdditionalEuVatDetails.remove.hidden = VAT details for {0}
-addAdditionalEuVatDetails.addAnother = Do you need to add VAT details for another EU country?
-addAdditionalEuVatDetails.addAnother.hint = You must tell us about all your VAT registrations in EU countries.
+addEuVatDetails.title.singular = You have added VAT details for one EU country
+addEuVatDetails.heading.singular = You have added VAT details for one EU country
+addEuVatDetails.title = You have added VAT details for {0} EU countries
+addEuVatDetails.heading = You have added VAT details for {0} EU countries
+addEuVatDetails.maximumReached = You have added details for every EU country
+addEuVatDetails.error.required = Select yes if you need to add VAT details for another EU country
+addEuVatDetails.change.hidden = VAT details for {0}
+addEuVatDetails.remove.hidden = VAT details for {0}
+addEuVatDetails.addAnother = Do you need to add VAT details for another EU country?
+addEuVatDetails.addAnother.hint = You must tell us about all your VAT registrations in EU countries.
 
 deleteEuVatDetails.title = Are you sure you want to remove the VAT details for {0}?
 deleteEuVatDetails.heading = Are you sure you want to remove the VAT details for {0}?

@@ -16,7 +16,7 @@
 
 package queries
 
-import models.EuVatDetails
+import models.euVatDetails.EuVatDetails
 import play.api.libs.json.JsPath
 
 case object AllEuVatDetailsQuery extends Gettable[List[EuVatDetails]] with Settable[List[EuVatDetails]] {
