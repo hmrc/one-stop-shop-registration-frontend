@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
-import models.previousRegistrations.PreviousRegistration
+import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.DataRequest
 import models.{Index, Mode}
 import navigation.Navigator
@@ -75,7 +75,7 @@ class DeletePreviousRegistrationController @Inject()(
 
 
   private def getPreviousRegistration(index: Index)
-                             (block: PreviousRegistration => Future[Result])
+                             (block: PreviousRegistrationDetails => Future[Result])
                              (implicit request: DataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousRegistrationQuery(index)).map {
       details =>

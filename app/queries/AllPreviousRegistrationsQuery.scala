@@ -16,10 +16,10 @@
 
 package queries
 
-import models.previousRegistrations.PreviousRegistration
+import models.previousRegistrations.PreviousRegistrationDetails
 import play.api.libs.json.JsPath
 
-case object AllPreviousRegistrationsQuery extends Gettable[List[PreviousRegistration]] with Settable[List[PreviousRegistration]] {
+case object AllPreviousRegistrationsQuery extends Gettable[List[PreviousRegistrationDetails]] with Settable[List[PreviousRegistrationDetails]] {
 
   override def path: JsPath = JsPath \ "previousRegistrations"
 }

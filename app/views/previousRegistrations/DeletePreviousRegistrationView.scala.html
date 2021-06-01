@@ -14,7 +14,7 @@
 * limitations under the License.
 *@
 
-@import models.previousRegistrations.PreviousRegistration
+@import models.previousRegistrations.PreviousRegistrationDetails
 
 @this(
         layout: templates.Layout,
@@ -24,7 +24,7 @@
         govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index, previousRegistration: PreviousRegistration)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, previousRegistration: PreviousRegistrationDetails)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("deletePreviousRegistration.title", previousRegistration.previousEuCountry.name))) {
 

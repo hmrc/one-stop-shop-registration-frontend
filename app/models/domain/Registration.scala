@@ -34,7 +34,8 @@ final case class Registration(
                                contactDetails: BusinessContactDetails,
                                websites: Seq[String],
                                startDate: LocalDate,
-                               currentCountryOfRegistration: Option[Country]
+                               currentCountryOfRegistration: Option[Country],
+                               previousRegistrations: Seq[PreviousRegistration]
                              )
 
 object Registration {

@@ -16,7 +16,7 @@
 
 package testutils
 
-import models.domain.{EuVatRegistration, Registration}
+import models.domain.{EuVatRegistration, PreviousRegistration, Registration}
 import models.{Address, BusinessContactDetails, Country}
 import uk.gov.hmrc.domain.Vrn
 
@@ -39,7 +39,10 @@ object RegistrationData {
       contactDetails = createBusinessContactDetails(),
       websites = Seq("website1", "website2"),
       startDate = LocalDate.now(),
-      currentCountryOfRegistration = Some(Country("FR", "France"))
+      currentCountryOfRegistration = Some(Country("FR", "France")),
+      previousRegistrations = Seq(
+        PreviousRegistration(Country("DE", "Germany"), "DE123")
+      )
     )
 
   private def createBusinessAddress(): Address =

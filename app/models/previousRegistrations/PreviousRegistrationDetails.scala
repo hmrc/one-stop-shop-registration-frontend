@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package queries
+package models.previousRegistrations
 
-import models.Index
-import models.euVatDetails.EuVatDetails
-import models.previousRegistrations.PreviousRegistrationDetails
-import play.api.libs.json.JsPath
+import models.Country
+import play.api.libs.json.{Json, OFormat}
 
-case class PreviousRegistrationQuery(index: Index) extends Gettable[PreviousRegistrationDetails] with Settable[PreviousRegistrationDetails] {
+case class PreviousRegistrationDetails(
+                                        previousEuCountry: Country,
+                                        previousEuVatNumber: String
+                                      )
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position
+object PreviousRegistrationDetails {
+
+  implicit val format: OFormat[PreviousRegistrationDetails] = Json.format[PreviousRegistrationDetails]
 }

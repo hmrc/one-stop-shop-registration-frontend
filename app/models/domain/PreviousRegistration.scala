@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package models.previousRegistrations
+package models.domain
 
 import models.Country
 import play.api.libs.json.{Json, OFormat}
 
-case class PreviousRegistration(
-                                        previousEuCountry: Country,
-                                        previousEuVatNumber: String
-                                      )
+case class PreviousRegistration(country: Country, vatNumber: String)
 
 object PreviousRegistration {
 

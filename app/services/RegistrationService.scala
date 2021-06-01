@@ -16,10 +16,10 @@
 
 package services
 
-import models.{Country, UserAnswers}
-import models.domain.{EuVatRegistration, FixedEstablishment, Registration}
+import models.UserAnswers
+import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration}
 import pages._
-import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
+import queries.{AllEuVatDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
 
 class RegistrationService {
@@ -37,6 +37,7 @@ class RegistrationService {
       businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
       websites                     <- userAnswers.get(AllWebsites)
       currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
+      previousRegistrations         = buildPreviousRegistrations(userAnswers)
     } yield Registration(
       vrn,
       registeredCompanyName,
@@ -49,7 +50,8 @@ class RegistrationService {
       businessContactDetails,
       websites,
       startDate.date,
-      currentCountryOfRegistration
+      currentCountryOfRegistration,
+      previousRegistrations
     )
 
   private def getTradingNames(userAnswers: UserAnswers): List[String] =
@@ -68,4 +70,13 @@ class RegistrationService {
 
           EuVatRegistration(detail.euCountry, detail.euVatNumber, fixedEstablishment)
     }
+
+  private def buildPreviousRegistrations(answers: UserAnswers): List[PreviousRegistration] =
+    answers
+      .get(AllPreviousRegistrationsQuery)
+      .getOrElse(List.empty)
+      .map {
+        detail =>
+          PreviousRegistration(detail.previousEuCountry, detail.previousEuVatNumber)
+      }
 }
