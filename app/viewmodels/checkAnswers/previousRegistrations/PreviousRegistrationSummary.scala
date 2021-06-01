@@ -27,7 +27,7 @@ import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-class PreviousRegistrationSummary {
+object PreviousRegistrationSummary {
 
   def addToListRows(answers: UserAnswers): Seq[ListItem] =
     answers.get(AllPreviousRegistrationsQuery).getOrElse(List.empty).zipWithIndex.map {

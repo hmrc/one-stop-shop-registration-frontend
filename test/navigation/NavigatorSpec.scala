@@ -18,11 +18,13 @@ package navigation
 
 import base.SpecBase
 import controllers.euVatDetails.{routes => euVatRoutes}
+import controllers.previousRegistrations.{routes => previousRegRoutes}
 import controllers.routes
 import models._
 import models.euVatDetails.FixedEstablishmentAddress
 import pages._
 import pages.euVatDetails._
+import pages.previousRegistrations.{AddPreviousRegistrationPage, DeletePreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 import java.time.LocalDate
 
@@ -159,12 +161,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(euVatRoutes.EuCountryController.onPageLoad(NormalMode, index))
         }
 
-        "to Start Date when the user answers false" in {
+        "to Previously Registered when the user answers false" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
 
           navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
-            .mustBe(routes.StartDateController.onPageLoad(NormalMode))
+            .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
         }
       }
 
@@ -209,7 +211,7 @@ class NavigatorSpec extends SpecBase {
           .mustBe(euVatRoutes.CheckEuVatDetailsAnswersController.onPageLoad(index))
       }
 
-      "must go from EU VAT Details List" - {
+      "must go from Add EU VAT Details" - {
 
         "to EU Country when the user answers true" in {
 
@@ -233,7 +235,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Delete EU VAT Details" - {
 
-        "to EU VAT Details List when there are still some EU VAT details" in {
+        "to Add EU VAT Details when there are still some EU VAT details" in {
 
           val answers =
             emptyUserAnswers
@@ -260,18 +262,94 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.CurrentCountryOfRegistrationController.onPageLoad(NormalMode))
         }
 
-        "to Start Date when the user answers no" in {
+        "to Previously Registered when the user answers no" in {
 
           val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, false).success.value
           navigator.nextPage(CurrentlyRegisteredInEuPage, NormalMode, answers)
+            .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Current Country of Registration to Previously Registered" in {
+
+        navigator.nextPage(CurrentCountryOfRegistrationPage, NormalMode, emptyUserAnswers)
+          .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+      }
+
+      "must go from Previously Registered" - {
+
+        "to Previous EU Country when the user answers yes" in {
+          
+          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+          navigator.nextPage(PreviouslyRegisteredPage, NormalMode, answers)
+            .mustBe(previousRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(0)))
+        }
+        
+        "to Start Date when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+          navigator.nextPage(PreviouslyRegisteredPage, NormalMode, answers)
+            .mustBe(routes.StartDateController.onPageLoad(NormalMode))
+        }
+      }
+      
+      "must go from Previous EU Country to Previous VAT Number" in {
+        
+        navigator.nextPage(PreviousEuCountryPage(index), NormalMode, emptyUserAnswers)
+          .mustBe(previousRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index))
+      }
+      
+      "must go from Previous VAT Number to Add Previous Registration" in {
+        
+        navigator.nextPage(PreviousEuVatNumberPage(index), NormalMode, emptyUserAnswers)
+          .mustBe(previousRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
+      }
+      
+      "must go from Add Previous Registration" - {
+        
+        "to Previous EU Country for the next index when the user answers yes" in {
+          
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(index), Country("FR", "France")).success.value
+              .set(PreviousEuVatNumberPage(index), "foo").success.value
+              .set(AddPreviousRegistrationPage, true).success.value
+
+          navigator.nextPage(AddPreviousRegistrationPage, NormalMode, answers)
+            .mustBe(previousRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(1)))
+        }
+
+        "to Start Date when the user answers no" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(index), Country("FR", "France")).success.value
+              .set(PreviousEuVatNumberPage(index), "foo").success.value
+              .set(AddPreviousRegistrationPage, false).success.value
+
+          navigator.nextPage(AddPreviousRegistrationPage, NormalMode, answers)
             .mustBe(routes.StartDateController.onPageLoad(NormalMode))
         }
       }
 
-      "must go from Current Country of Registration to Start Date" in {
+      "must go from Delete Previous Registration" - {
 
-        navigator.nextPage(CurrentCountryOfRegistrationPage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.StartDateController.onPageLoad(NormalMode))
+        "to Add Previous Registration when there are still some previous registrations" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(index), Country("FR", "France")).success.value
+              .set(PreviousEuVatNumberPage(index), "foo").success.value
+
+          navigator.nextPage(DeletePreviousRegistrationPage(index), NormalMode, answers)
+            .mustBe(previousRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
+        }
+
+        "to Previously Registered when there are no previous registrations left" in {
+
+          navigator.nextPage(DeletePreviousRegistrationPage(index), NormalMode, emptyUserAnswers)
+            .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+        }
       }
 
       "must go from Start Date to Business Address" in {
@@ -506,7 +584,7 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from EU VAT Details List page" - {
+      "must go from Add EU VAT Details page" - {
 
         "to EU Country page if true" in {
 

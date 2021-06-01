@@ -18,35 +18,42 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.AddPreviousRegistrationPage
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
 import views.html.previousRegistrations.AddPreviousRegistrationView
 
 import scala.concurrent.Future
 
 class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AddPreviousRegistrationFormProvider()
-  val form = formProvider()
+  private val formProvider = new AddPreviousRegistrationFormProvider()
+  private val form = formProvider()
 
-  lazy val addPreviousRegistrationRoute = routes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+  private lazy val addPreviousRegistrationRoute = routes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+      .set(PreviousEuVatNumberPage(Index(0)), "foo").success.value
 
   "AddPreviousRegistration Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addPreviousRegistrationRoute)
@@ -54,27 +61,11 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(AddPreviousRegistrationPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addPreviousRegistrationRoute)
-
-        val view = application.injector.instanceOf[AddPreviousRegistrationView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -85,7 +76,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -106,7 +97,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -116,11 +107,13 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val boundForm = form.bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers)
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 

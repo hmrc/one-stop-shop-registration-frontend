@@ -392,17 +392,16 @@ currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
 currentlyRegisteredInEu.error.required = Select yes if you are registered in another EU country now
 currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
 
-
-addEuVatDetails.title.singular = You have added one old registration for One Stop Shop
-addEuVatDetails.heading.singular = You have added one old registration for One Stop Shop
-addEuVatDetails.title = You have added {0} old registrations for One Stop Shop
-addEuVatDetails.heading = You have added {0} old registrations for One Stop Shop
-addEuVatDetails.maximumReached = You have added details for every EU country
-addEuVatDetails.error.required = Select yes if you need to add another old registration for the One Stop Shop
-addEuVatDetails.change.hidden = old registration in {0}
-addEuVatDetails.remove.hidden = old registration for {0}
-addEuVatDetails.addAnother = Do you need to add another old registration for the One Stop Shop
-addEuVatDetails.addAnother.hint = You must tell us about all your old registrations for the One Stop Shop.
+addPreviousRegistration.title.singular = You have added one old registration for One Stop Shop
+addPreviousRegistration.heading.singular = You have added one old registration for One Stop Shop
+addPreviousRegistration.title = You have added {0} old registrations for One Stop Shop
+addPreviousRegistration.heading = You have added {0} old registrations for One Stop Shop
+addPreviousRegistration.maximumReached = You have added details for every EU country
+addPreviousRegistration.error.required = Select yes if you need to add another old registration for the One Stop Shop
+addPreviousRegistration.change.hidden = old registration in {0}
+addPreviousRegistration.remove.hidden = old registration for {0}
+addPreviousRegistration.addAnother = Do you need to add another old registration for the One Stop Shop
+addPreviousRegistration.addAnother.hint = You must tell us about all your old registrations for the One Stop Shop.
 
 previousEuCountry.title = Which EU country?
 previousEuCountry.heading = Which EU Country

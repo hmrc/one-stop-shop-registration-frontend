@@ -18,12 +18,15 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.Mode
+import models.{Country, Mode}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
 import views.html.previousRegistrations.AddPreviousRegistrationView
 
 import javax.inject.Inject
@@ -40,29 +43,43 @@ class AddPreviousRegistrationController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getNumberOfPreviousRegistrations {
+        number =>
 
-      val preparedForm = request.userAnswers.get(AddPreviousRegistrationPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val canAddCountries = number < Country.euCountries.size
+          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers)
+
+          Future.successful(Ok(view(form, mode, previousRegistrations, canAddCountries)))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getNumberOfPreviousRegistrations {
+        number =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          val canAddCountries = number < Country.euCountries.size
+          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AddPreviousRegistrationPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AddPreviousRegistrationPage, mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, previousRegistrations, canAddCountries))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddPreviousRegistrationPage, value))
+                _              <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AddPreviousRegistrationPage, mode, updatedAnswers))
+          )
+      }
   }
+
+  private def getNumberOfPreviousRegistrations(block: Int => Future[Result])
+                                              (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(DeriveNumberOfPreviousRegistrations).map {
+      number =>
+        block(number)
+    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
