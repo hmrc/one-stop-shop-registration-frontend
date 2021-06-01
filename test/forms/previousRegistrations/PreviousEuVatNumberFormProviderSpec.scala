@@ -17,6 +17,8 @@
 package forms.previousRegistrations
 
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
@@ -25,7 +27,9 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "previousEuVatNumber.error.length"
   val maxLength = 100
 
-  val form = new PreviousEuVatNumberFormProvider()()
+  val country: Country = arbitrary[Country].sample.value
+
+  val form = new PreviousEuVatNumberFormProvider()(country)
 
   ".value" - {
 
@@ -47,7 +51,7 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

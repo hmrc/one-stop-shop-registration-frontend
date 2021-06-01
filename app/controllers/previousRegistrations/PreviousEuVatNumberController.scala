@@ -18,11 +18,12 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousEuVatNumberFormProvider
-import models.{Index, Mode}
+import models.requests.DataRequest
+import models.{Country, Index, Mode}
 import navigation.Navigator
-import pages.previousRegistrations.PreviousEuVatNumberPage
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousEuVatNumberView
 
@@ -37,32 +38,50 @@ class PreviousEuVatNumberController @Inject()(
                                         view: PreviousEuVatNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountry(index) {
+        country =>
 
-      val preparedForm = request.userAnswers.get(PreviousEuVatNumberPage(index)) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val form = formProvider(country)
+
+          val preparedForm = request.userAnswers.get(PreviousEuVatNumberPage(index)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Future.successful(Ok(view(preparedForm, mode, index, country)))
       }
-
-      Ok(view(preparedForm, mode, index))
   }
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountry(index) {
+        country =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+          val form = formProvider(country)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuVatNumberPage(index), value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PreviousEuVatNumberPage(index), mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuVatNumberPage(index), value))
+                _              <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(PreviousEuVatNumberPage(index), mode, updatedAnswers))
+          )
+      }
+
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: DataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(PreviousEuCountryPage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }

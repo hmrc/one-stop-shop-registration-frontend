@@ -8,9 +8,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("previousEuVatNumber.title"))) {
+@layout(pageTitle = title(form, messages("previousEuVatNumber.title", country.name))) {
 
     @formHelper(action = controllers.previousRegistrations.routes.PreviousEuVatNumberController.onSubmit(mode, index)) {
 
@@ -21,7 +21,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("previousEuVatNumber.heading")).asPageHeading()
+                label = LabelViewModel(messages("previousEuVatNumber.heading", country.name)).asPageHeading()
             )
             .withWidth(Full)
         )

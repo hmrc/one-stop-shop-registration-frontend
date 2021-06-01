@@ -17,15 +17,16 @@
 package forms.previousRegistrations
 
 import forms.mappings.Mappings
+import models.Country
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class PreviousEuVatNumberFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(country: Country): Form[String] =
     Form(
-      "value" -> text("previousEuVatNumber.error.required")
+      "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
         .verifying(maxLength(100, "previousEuVatNumber.error.length"))
     )
 }
