@@ -34,7 +34,7 @@ object CurrentCountryOfRegistrationSummary  {
 
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"currentCountryOfRegistration.$answer"))
+            HtmlFormat.escape(messages(s"currentCountryOfRegistration.${answer.name}"))
           )
         )
 
