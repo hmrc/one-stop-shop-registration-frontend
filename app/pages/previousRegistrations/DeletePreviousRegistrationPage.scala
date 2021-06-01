@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package models.previousRegisrtations
+package pages.previousRegistrations
 
-import models.Country
-import play.api.libs.json.{Json, OFormat}
+import models.Index
+import pages.Page
 
-case class PreviousRegistrationDetails(
-                                        previousEuCountry: Country,
-                                        previousEuVatNumber: String
-                                      )
-
-object PreviousRegistrationDetails {
-
-  implicit val format: OFormat[PreviousRegistrationDetails] = Json.format[PreviousRegistrationDetails]
-}
+case class DeletePreviousRegistrationPage(index: Index) extends Page

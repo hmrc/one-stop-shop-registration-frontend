@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package queries
+package forms.previousRegistrations
 
-import models.previousRegistrations.PreviousRegistration
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object AllPreviousRegistrationsQuery extends Gettable[List[PreviousRegistration]] with Settable[List[PreviousRegistration]] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ "previousRegistrations"
+class DeletePreviousRegistrationFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("deletePreviousRegistration.error.required")
+    )
 }

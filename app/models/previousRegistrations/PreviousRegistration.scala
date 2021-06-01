@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.previousRegistrations
+package models.previousRegistrations
 
-import controllers.previousRegistrations.routes
-import models.{CheckMode, UserAnswers}
-import pages.previousRegistrations.PreviousEuVatNumberPage
-import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import models.Country
+import play.api.libs.json.{Json, OFormat}
 
-object PreviousEuVatNumberSummary {
+case class PreviousRegistration(
+                                        previousEuCountry: Country,
+                                        previousEuVatNumber: String
+                                      )
 
+object PreviousRegistration {
+
+  implicit val format: OFormat[PreviousRegistration] = Json.format[PreviousRegistration]
 }

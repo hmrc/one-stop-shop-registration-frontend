@@ -14,46 +14,46 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.euVatDetails
+package viewmodels.checkAnswers.previousRegistrations
 
-import controllers.euVatDetails.routes
+import controllers.previousRegistrations.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.AllEuVatDetailsQuery
+import queries.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object EuVatDetailsSummary {
+class PreviousRegistrationSummary {
 
   def addToListRows(answers: UserAnswers): Seq[ListItem] =
-    answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
+    answers.get(AllPreviousRegistrationsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
-          name = HtmlFormat.escape(details.euCountry.name).toString,
-          changeUrl = routes.CheckEuVatDetailsAnswersController.onPageLoad(Index(index)).url,
-          removeUrl = routes.DeleteEuVatDetailsController.onPageLoad(NormalMode, Index(index)).url
+          name = HtmlFormat.escape(details.previousEuCountry.name).toString,
+          changeUrl = routes.PreviousEuCountryController.onPageLoad(NormalMode, Index(index)).url,
+          removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(NormalMode, Index(index)).url
         )
     }
 
   def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllEuVatDetailsQuery).map {
-      euVatDetails =>
+    answers.get(AllPreviousRegistrationsQuery).map {
+      previousRegistrations =>
 
-        val value = euVatDetails.map {
+        val value = previousRegistrations.map {
           details =>
-            HtmlFormat.escape(details.euCountry.name)
+            HtmlFormat.escape(details.previousEuCountry.name)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
-          key = "euVatDetails.checkYourAnswersLabel",
+          key = "previousRegistrations.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddEuVatDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("euVatDetails.change.hidden"))
+            ActionItemViewModel("site.change", routes.AddPreviousRegistrationController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
           )
         )
     }

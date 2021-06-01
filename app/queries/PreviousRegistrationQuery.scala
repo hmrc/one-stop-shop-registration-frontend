@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.previousRegistrations
+package queries
 
-import controllers.euVatDetails.routes
-import controllers.previousRegistrations.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
-import pages.previousRegistrations.PreviousEuCountryPage
-import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import queries.AllEuVatDetailsQuery
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import models.Index
+import models.euVatDetails.EuVatDetails
+import models.previousRegistrations.PreviousRegistration
+import play.api.libs.json.JsPath
 
-object PreviousEuCountrySummary {
+case class PreviousRegistrationQuery(index: Index) extends Gettable[PreviousRegistration] with Settable[PreviousRegistration] {
 
+  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position
 }

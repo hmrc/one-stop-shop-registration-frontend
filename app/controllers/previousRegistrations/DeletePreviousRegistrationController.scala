@@ -14,38 +14,38 @@
  * limitations under the License.
  */
 
-package controllers.euVatDetails
+package controllers.previousRegistrations
 
 import controllers.actions._
-import forms.euVatDetails.DeleteEuVatDetailsFormProvider
-import models.euVatDetails.EuVatDetails
+import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
+import models.previousRegistrations.PreviousRegistration
 import models.requests.DataRequest
 import models.{Index, Mode}
 import navigation.Navigator
-import pages.euVatDetails.DeleteEuVatDetailsPage
+import pages.previousRegistrations.DeletePreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.EuVatDetailsQuery
+import queries.PreviousRegistrationQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.euVatDetails.DeleteEuVatDetailsView
+import views.html.previousRegistrations.DeletePreviousRegistrationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeleteEuVatDetailsController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
-                                         formProvider: DeleteEuVatDetailsFormProvider,
-                                         view: DeleteEuVatDetailsView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class DeletePreviousRegistrationController @Inject()(
+                                              override val messagesApi: MessagesApi,
+                                              cc: AuthenticatedControllerComponents,
+                                              navigator: Navigator,
+                                              formProvider: DeletePreviousRegistrationFormProvider,
+                                              view: DeletePreviousRegistrationView
+                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getEuVatDetails(index) {
+      getPreviousRegistration(index) {
         details =>
           Future.successful(Ok(view(form, mode, index, details)))
       }
@@ -53,7 +53,7 @@ class DeleteEuVatDetailsController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getEuVatDetails(index) {
+      getPreviousRegistration(index) {
         details =>
 
           form.bindFromRequest().fold(
@@ -63,21 +63,21 @@ class DeleteEuVatDetailsController @Inject()(
             value =>
               if (value) {
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuVatDetailsQuery(index)))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(PreviousRegistrationQuery(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(DeletePreviousRegistrationPage(index), mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, request.userAnswers)))
+                Future.successful(Redirect(navigator.nextPage(DeletePreviousRegistrationPage(index), mode, request.userAnswers)))
               }
           )
       }
   }
 
 
-  private def getEuVatDetails(index: Index)
-                             (block: EuVatDetails => Future[Result])
+  private def getPreviousRegistration(index: Index)
+                             (block: PreviousRegistration => Future[Result])
                              (implicit request: DataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuVatDetailsQuery(index)).map {
+    request.userAnswers.get(PreviousRegistrationQuery(index)).map {
       details =>
         block(details)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
