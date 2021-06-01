@@ -18,8 +18,8 @@ package forms
 
 import javax.inject.Inject
 import forms.mappings.Mappings
+import models.Country
 import play.api.data.Form
-import models.euVatDetails.Country
 
 class CurrentCountryOfRegistrationFormProvider @Inject() extends Mappings {
 

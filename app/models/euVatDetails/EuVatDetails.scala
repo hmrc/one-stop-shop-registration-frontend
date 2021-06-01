@@ -16,6 +16,7 @@
 
 package models.euVatDetails
 
+import models.Country
 import play.api.libs.json.{Json, OFormat}
 
 case class EuVatDetails(

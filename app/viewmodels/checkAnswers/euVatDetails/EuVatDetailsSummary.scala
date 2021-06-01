@@ -29,7 +29,7 @@ import viewmodels.implicits._
 
 object EuVatDetailsSummary {
 
-  def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers): Seq[ListItem] =
     answers.get(AllEuVatDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(

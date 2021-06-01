@@ -17,13 +17,11 @@
 package controllers.euVatDetails
 
 import controllers.actions._
-import controllers.routes
 import forms.euVatDetails.DeleteEuVatDetailsFormProvider
 import models.euVatDetails.EuVatDetails
 import models.requests.DataRequest
 import models.{Index, Mode}
 import navigation.Navigator
-import pages.euVatDetails
 import pages.euVatDetails.DeleteEuVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -67,9 +65,9 @@ class DeleteEuVatDetailsController @Inject()(
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuVatDetailsQuery(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(euVatDetails.DeleteEuVatDetailsPage(index), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(navigator.nextPage(euVatDetails.DeleteEuVatDetailsPage(index), mode, request.userAnswers)))
+                Future.successful(Redirect(navigator.nextPage(DeleteEuVatDetailsPage(index), mode, request.userAnswers)))
               }
           )
       }

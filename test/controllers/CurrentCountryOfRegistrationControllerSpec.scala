@@ -18,8 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.CurrentCountryOfRegistrationFormProvider
-import models.euVatDetails.Country
-import models.{Index, NormalMode}
+import models.{Country, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

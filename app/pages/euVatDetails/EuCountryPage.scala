@@ -16,8 +16,7 @@
 
 package pages.euVatDetails
 
-import models.Index
-import models.euVatDetails.Country
+import models.{Country, Index}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 

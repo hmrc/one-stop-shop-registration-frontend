@@ -18,8 +18,8 @@ package controllers.euVatDetails
 
 import base.SpecBase
 import forms.euVatDetails.DeleteEuVatDetailsFormProvider
-import models.euVatDetails.{Country, EuVatDetails}
-import models.{Index, NormalMode}
+import models.euVatDetails.EuVatDetails
+import models.{Country, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}

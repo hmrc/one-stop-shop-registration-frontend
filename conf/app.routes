@@ -177,3 +177,29 @@ GET        /currentlyRegisteredInEu                        controllers.Currently
 POST       /currentlyRegisteredInEu                        controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
 GET        /changeCurrentlyRegisteredInEu                  controllers.CurrentlyRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCurrentlyRegisteredInEu                  controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+
+GET        /addPreviousRegistration                        controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
+POST       /addPreviousRegistration                        controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode)
+GET        /changeAddPreviousRegistration                  controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeAddPreviousRegistration                  controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode)
+
+GET        /previousEuCountry/:index                        controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /previousEuCountry/:index                        controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changePreviousEuCountry/:index                  controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changePreviousEuCountry/:index                  controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /previousEuVatNumber/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /previousEuVatNumber/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changePreviousEuVatNumber/:index                  controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changePreviousEuVatNumber/:index                  controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /previouslyRegistered                        controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = NormalMode)
+POST       /previouslyRegistered                        controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = NormalMode)
+GET        /changePreviouslyRegistered                  controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
+POST       /changePreviouslyRegistered                  controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)
+
+
+GET         /deletePreviousRegistration/:index                      controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /deletePreviousRegistration/:index                      controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeDeletePreviousRegistration/:index                controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeDeletePreviousRegistration/:index                controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = CheckMode, index: Index)

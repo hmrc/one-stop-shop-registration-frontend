@@ -391,3 +391,40 @@ currentlyRegisteredInEu.heading = Are you registered for the One Stop Shop schem
 currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
 currentlyRegisteredInEu.error.required = Select yes if you are registered in another EU country now
 currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
+
+addPreviousRegistration.title.singular = You have added one old registration for One Stop Shop
+addPreviousRegistration.heading.singular = You have added one old registration for One Stop Shop
+addPreviousRegistration.title = You have added {0} old registrations for One Stop Shop
+addPreviousRegistration.heading = You have added {0} old registrations for One Stop Shop
+addPreviousRegistration.maximumReached = You have added details for every EU country
+addPreviousRegistration.error.required = Select yes if you need to add another old registration for the One Stop Shop
+addPreviousRegistration.change.hidden = old registration in {0}
+addPreviousRegistration.remove.hidden = old registration for {0}
+addPreviousRegistration.addAnother = Do you need to add another old registration for the One Stop Shop
+addPreviousRegistration.addAnother.hint = You must tell us about all your old registrations for the One Stop Shop.
+
+previousEuCountry.title = Which EU country?
+previousEuCountry.heading = Which EU Country
+previousEuCountry.checkYourAnswersLabel = EU country
+previousEuCountry.error.required = Enter the EU country
+previousEuCountry.change.hidden = the EU country
+
+previousEuVatNumber.title = What was the VAT number for {0}?
+previousEuVatNumber.heading = What was the VAT number for {0}?
+previousEuVatNumber.checkYourAnswersLabel = VAT number
+previousEuVatNumber.error.required = Enter the VAT number
+previousEuVatNumber.error.length = VAT number must be 100 characters or less
+previousEuVatNumber.change.hidden = the VAT number
+
+previouslyRegistered.title = Has your business been registered in the past for the One Stop Shop in an EU country
+previouslyRegistered.heading = Has your business been registered in the past for the One Stop Shop in an EU country
+previouslyRegistered.checkYourAnswersLabel = Previously registered
+previouslyRegistered.error.required = Select yes if your business was registered in the past
+previouslyRegistered.change.hidden = if your business was previously registered
+
+deletePreviousRegistration.title = Are you sure you want to remove the old One Stop Shop registration in {0}?
+deletePreviousRegistration.heading = Are you sure you want to remove the old One Stop Shop registration in {0}?
+deletePreviousRegistration.error.required = Select yes if you are sure you want to remove the old registration
+
+previousRegistrations.checkYourAnswersLabel = Old registrations
+previousRegistrations.change.hidden = your old registrations

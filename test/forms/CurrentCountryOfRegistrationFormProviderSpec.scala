@@ -17,7 +17,7 @@
 package forms
 
 import forms.behaviours.OptionFieldBehaviours
-import models.euVatDetails.Country
+import models.Country
 import play.api.data.FormError
 
 class CurrentCountryOfRegistrationFormProviderSpec extends OptionFieldBehaviours {

@@ -16,7 +16,7 @@
 
 package pages
 
-import models.euVatDetails.Country
+import models.Country
 import play.api.libs.json.JsPath
 
 case object CurrentCountryOfRegistrationPage extends QuestionPage[Country] {

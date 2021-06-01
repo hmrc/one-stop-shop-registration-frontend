@@ -19,8 +19,7 @@ package controllers.euVatDetails
 import controllers.actions._
 import controllers.routes
 import forms.euVatDetails.AddEuVatDetailsFormProvider
-import models.Mode
-import models.euVatDetails.Country
+import models.{Country, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.euVatDetails.AddEuVatDetailsPage

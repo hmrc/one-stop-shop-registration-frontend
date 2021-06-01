@@ -17,14 +17,47 @@
 package generators
 
 import models._
-import models.euVatDetails.{Country, FixedEstablishmentAddress}
+import models.euVatDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
 import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
+
+  implicit lazy val arbitraryPreviouslyRegisteredUserAnswersEntry: Arbitrary[(PreviouslyRegisteredPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[PreviouslyRegisteredPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryPreviousEuVatNumberUserAnswersEntry: Arbitrary[(PreviousEuVatNumberPage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[PreviousEuVatNumberPage]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryPreviousEuCountryUserAnswersEntry: Arbitrary[(PreviousEuCountryPage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[PreviousEuCountryPage]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryAddPreviousRegistrationUserAnswersEntry: Arbitrary[(AddPreviousRegistrationPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[AddPreviousRegistrationPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryCurrentlyRegisteredInEuUserAnswersEntry: Arbitrary[(CurrentlyRegisteredInEuPage.type, JsValue)] =
     Arbitrary {

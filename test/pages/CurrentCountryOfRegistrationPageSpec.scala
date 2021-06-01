@@ -16,7 +16,7 @@
 
 package pages
 
-import models.euVatDetails.Country
+import models.Country
 import pages.behaviours.PageBehaviours
 
 class CurrentCountryOfRegistrationSpec extends PageBehaviours {

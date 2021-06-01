@@ -17,8 +17,7 @@
 package forms.euVatDetails
 
 import forms.behaviours.StringFieldBehaviours
-import models.Index
-import models.euVatDetails.Country
+import models.{Country, Index}
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 

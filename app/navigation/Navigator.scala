@@ -19,10 +19,12 @@ package navigation
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.Call
 import controllers.euVatDetails.{routes => euVatRoutes}
+import controllers.previousRegistrations.{routes => previousRegRoutes}
 import controllers.routes
 import pages._
 import models._
 import pages.euVatDetails._
+import pages.previousRegistrations._
 import queries._
 
 @Singleton
@@ -47,7 +49,12 @@ class Navigator @Inject()() {
     case AddEuVatDetailsPage                      => addEuVatDetailsRoute
     case DeleteEuVatDetailsPage(_)                => deleteEuVatDetailsRoute
     case CurrentlyRegisteredInEuPage              => currentlyRegisteredInEuRoute
-    case CurrentCountryOfRegistrationPage         => _ => routes.StartDateController.onPageLoad(NormalMode)
+    case CurrentCountryOfRegistrationPage         => _ => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+    case PreviouslyRegisteredPage                 => previouslyRegisteredRoute
+    case PreviousEuCountryPage(index)             => _ => previousRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index)
+    case PreviousEuVatNumberPage(_)               => _ => previousRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode)
+    case AddPreviousRegistrationPage              => addPreviousRegistrationRoute
+    case DeletePreviousRegistrationPage(_)        => deletePreviousRegistrationRoute
     case StartDatePage                            => _ => routes.BusinessAddressController.onPageLoad(NormalMode)
     case BusinessAddressPage                      => _ => routes.WebsiteController.onPageLoad(NormalMode, Index(0))
     case WebsitePage(_)                           => _ => routes.AddWebsiteController.onPageLoad(NormalMode)
@@ -85,7 +92,7 @@ class Navigator @Inject()() {
 
   private def isEuVatRegistered(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
     case Some(true)  => euVatRoutes.EuCountryController.onPageLoad(NormalMode, Index(0))
-    case Some(false) => routes.StartDateController.onPageLoad(NormalMode)
+    case Some(false) => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -105,7 +112,7 @@ class Navigator @Inject()() {
   private def currentlyRegisteredInEuRoute(answers: UserAnswers): Call =
     answers.get(CurrentlyRegisteredInEuPage) match {
       case Some(true)  => routes.CurrentCountryOfRegistrationController.onPageLoad(NormalMode)
-      case Some(false) => routes.StartDateController.onPageLoad(NormalMode)
+      case Some(false) => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -113,6 +120,26 @@ class Navigator @Inject()() {
     answers.get(DeriveNumberOfEuVatRegisteredCountries) match {
       case Some(n) if n > 0 => euVatRoutes.AddEuVatDetailsController.onPageLoad(NormalMode)
       case _                => euVatRoutes.VatRegisteredInEuController.onPageLoad(NormalMode)
+    }
+
+  private def previouslyRegisteredRoute(answers: UserAnswers): Call =
+    answers.get(PreviouslyRegisteredPage) match {
+      case Some(true)  => previousRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(0))
+      case Some(false) => routes.StartDateController.onPageLoad(NormalMode)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def addPreviousRegistrationRoute(answers: UserAnswers): Call =
+    (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
+      case (Some(true), Some(size)) => previousRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _)         => routes.StartDateController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def deletePreviousRegistrationRoute(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfPreviousRegistrations) match {
+      case Some(n) if n > 0 => previousRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode)
+      case _                => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     }
 
   private def addWebsiteRoute(answers: UserAnswers): Call =

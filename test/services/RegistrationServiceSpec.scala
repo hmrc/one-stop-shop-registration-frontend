@@ -18,9 +18,10 @@ package services
 
 import base.SpecBase
 import models._
-import models.euVatDetails.{Country, EuVatDetails}
+import models.euVatDetails.EuVatDetails
 import pages._
 import pages.euVatDetails.VatRegisteredInEuPage
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
@@ -56,6 +57,9 @@ class RegistrationServiceSpec extends SpecBase {
       .set(AllWebsites, List("website1", "website2")).success.value
       .set(CurrentlyRegisteredInEuPage, true).success.value
       .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
+      .set(PreviouslyRegisteredPage, true).success.value
+      .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+      .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
 
   private val registrationService = new RegistrationService()
 

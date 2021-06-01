@@ -16,8 +16,7 @@
 
 package pages.euVatDetails
 
-import models.Index
-import models.euVatDetails.Country
+import models.{Country, Index}
 import pages.behaviours.PageBehaviours
 import pages.euVatDetails
 
