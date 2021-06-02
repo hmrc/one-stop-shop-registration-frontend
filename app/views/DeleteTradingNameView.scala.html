@@ -24,7 +24,7 @@
 
 @(form: Form[_], mode: Mode, index: Index, tradingName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deleteTradingName.title"))) {
+@layout(pageTitle = title(form, messages("deleteTradingName.title", tradingName))) {
 
     @formHelper(action = routes.DeleteTradingNameController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -35,7 +35,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("deleteTradingName.heading")).asPageHeading()
+                legend = LegendViewModel(messages("deleteTradingName.heading", tradingName)).asPageHeading()
             )
         )
 
