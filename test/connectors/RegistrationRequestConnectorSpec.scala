@@ -82,7 +82,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
 
-        val result = connector.getRegistration(RegistrationData.registration.vrn).futureValue
+        val result = connector.getRegistration().futureValue
 
         result.value mustEqual RegistrationData.registration
       }
@@ -97,7 +97,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         server.stubFor(get(urlEqualTo(url)).willReturn(notFound()))
 
-        val result = connector.getRegistration(RegistrationData.registration.vrn).futureValue
+        val result = connector.getRegistration().futureValue
 
         result must not be defined
       }

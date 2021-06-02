@@ -41,7 +41,7 @@ class AlreadyRegisteredController @Inject()(
 
   def onPageLoad: Action[AnyContent] = cc.identify.async {
     implicit request =>
-      connector.getRegistration(request.vrn).map {
+      connector.getRegistration().map {
         case Some(registration) =>
           Ok(view(
             HtmlFormat.escape(registration.registeredCompanyName).toString,

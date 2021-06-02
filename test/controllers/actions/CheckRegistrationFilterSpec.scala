@@ -51,7 +51,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
     "must return None when an existing registration is not found" in {
 
-      when(mockConnector.getRegistration(any())(any())) thenReturn Future.successful(None)
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
@@ -67,7 +67,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
     "must redirect to Already Registered when an existing registration is found" in {
 
-      when(mockConnector.getRegistration(any())(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 

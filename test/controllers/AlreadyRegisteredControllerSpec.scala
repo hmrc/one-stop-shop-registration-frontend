@@ -46,7 +46,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
       "must return OK and the correct view for a GET" in {
 
-        when(mockConnector.getRegistration(any())(any())) thenReturn Future.successful(Some(registration))
+        when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
         val application =
           applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -80,7 +80,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
       "must redirect the user to the start of the service" in {}
 
-      when(mockConnector.getRegistration(any())(any())) thenReturn Future.successful(None)
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
