@@ -30,9 +30,9 @@ class BusinessContactDetailsFormProvider @Inject() extends Mappings {
       "fullName" -> text("businessContactDetails.error.fullName.required")
         .verifying(maxLength(100, "businessContactDetails.error.fullName.length")),
       "telephoneNumber" -> text("businessContactDetails.error.telephoneNumber.required")
-        .verifying(maxLength(100, "businessContactDetails.error.telephoneNumber.length")),
+        .verifying(maxLength(20, "businessContactDetails.error.telephoneNumber.length")),
        "emailAddress" -> text("businessContactDetails.error.emailAddress.required")
-         .verifying(maxLength(100, "businessContactDetails.error.emailAddress.length"))
+         .verifying(maxLength(50, "businessContactDetails.error.emailAddress.length"))
     )(BusinessContactDetails.apply)(BusinessContactDetails.unapply)
    )
  }

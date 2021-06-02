@@ -25,7 +25,7 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "euVatNumber.error.required"
   val lengthKey = "euVatNumber.error.length"
-  val maxLength = 100
+  val maxLength = 50
 
   val country: Country = arbitrary[Country].sample.value
 

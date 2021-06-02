@@ -24,7 +24,7 @@ class WebsiteFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "website.error.required"
   val lengthKey = "website.error.length"
-  val maxLength = 100
+  val maxLength = 250
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[String]
 
