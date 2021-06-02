@@ -28,7 +28,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line1"
     val requiredKey = "businessAddress.error.line1.required"
     val lengthKey = "businessAddress.error.line1.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -54,7 +54,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "line2"
     val lengthKey = "businessAddress.error.line2.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -75,7 +75,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "townOrCity"
     val requiredKey = "businessAddress.error.townOrCity.required"
     val lengthKey = "businessAddress.error.townOrCity.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -101,7 +101,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "county"
     val lengthKey = "businessAddress.error.county.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -122,7 +122,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "postCode"
     val requiredKey = "businessAddress.error.postCode.required"
     val lengthKey = "businessAddress.error.postCode.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
