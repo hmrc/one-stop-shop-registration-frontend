@@ -40,7 +40,7 @@ class CheckVatDetailsController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = (cc.identify andThen cc.getData) {
+  def onPageLoad(): Action[AnyContent] = (cc.identify andThen cc.checkRegistration andThen cc.getData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.getOrElse(UserAnswers(request.userId)).get(CheckVatDetailsPage) match {
@@ -51,7 +51,7 @@ class CheckVatDetailsController @Inject()(
       Ok(view(preparedForm, request.vrn))
   }
 
-  def onSubmit(): Action[AnyContent] = (cc.identify andThen cc.getData).async {
+  def onSubmit(): Action[AnyContent] = (cc.identify andThen cc.checkRegistration andThen cc.getData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
