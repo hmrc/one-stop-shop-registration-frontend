@@ -205,8 +205,8 @@ applicationComplete.caption = We will send you details about how to submit retur
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
-deleteTradingName.title = Are you sure you want to remove this trading name?
-deleteTradingName.heading = Are you sure you want to remove this trading name?
+deleteTradingName.title = Are you sure you want to remove {0}?
+deleteTradingName.heading = Are you sure you want to remove {0}?
 deleteTradingName.error.required = Select yes if you want to remove this trading name
 
 addTradingName.title.singular = You have added one trading name
@@ -228,8 +228,8 @@ website.error.length = Website must be 100 characters or less
 website.error.duplicate = You have already added this website
 website.change.hidden = Website
 
-deleteWebsite.title = Are you sure you want to remove this website?
-deleteWebsite.heading = Are you sure you want to remove this website?
+deleteWebsite.title = Are you sure you want to remove {0}?
+deleteWebsite.heading = Are you sure you want to remove {0}?
 deleteWebsite.error.required = Select yes if you want to remove this website
 
 addWebsite.name.singular = website address
