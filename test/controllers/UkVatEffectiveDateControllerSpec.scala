@@ -46,8 +46,6 @@ class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val ukVatEffectiveDateRoute = routes.UkVatEffectiveDateController.onPageLoad(NormalMode).url
 
-  override val emptyUserAnswers = UserAnswers(userAnswersId)
-
   def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, ukVatEffectiveDateRoute)
 

@@ -1,4 +1,4 @@
-@import uk.gov.hmrc.domain.Vrn
+@import viewmodels.CheckVatDetailsViewModel
 
 @this(
     layout: templates.Layout,
@@ -8,7 +8,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], vrn: Vrn)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("checkVatDetails.title"))) {
 
@@ -20,7 +20,7 @@
 
         <h1 class="govuk-heading-xl">@messages("checkVatDetails.heading")</h1>
 
-        <p class="govuk-body">@vrn.value</p>
+        <p class="govuk-body">@viewModel.vrn.value</p>
 
         @govukRadios(
             RadiosViewModel.yesNo(
