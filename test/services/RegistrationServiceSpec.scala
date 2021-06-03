@@ -37,7 +37,6 @@ class RegistrationServiceSpec extends SpecBase {
       .set(AllTradingNames, List("single", "double")).success.value
       .set(PartOfVatGroupPage, true).success.value
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
-      .set(UkVatRegisteredPostcodePage, "AA1 1AA").success.value
       .set(VatRegisteredInEuPage, true).success.value
       .set(
         AllEuVatDetailsQuery,
@@ -81,7 +80,6 @@ class RegistrationServiceSpec extends SpecBase {
 
       val userAnswers =
         answers.copy(vatInfo = Some(vatInfo))
-          .remove(UkVatRegisteredPostcodePage).success.value
           .remove(UkVatEffectiveDatePage).success.value
           .remove(BusinessAddressPage).success.value
 

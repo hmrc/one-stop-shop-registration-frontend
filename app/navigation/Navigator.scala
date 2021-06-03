@@ -38,8 +38,7 @@ class Navigator @Inject()() {
     case AddTradingNamePage                       => addTradingNameRoute
     case DeleteTradingNamePage(_)                 => deleteTradingNameRoute
     case PartOfVatGroupPage                       => _ => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
-    case UkVatEffectiveDatePage                   => _ => routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode)
-    case UkVatRegisteredPostcodePage              => _ => euVatRoutes.VatRegisteredInEuController.onPageLoad(NormalMode)
+    case UkVatEffectiveDatePage                   => _ => euVatRoutes.VatRegisteredInEuController.onPageLoad(NormalMode)
     case VatRegisteredInEuPage                    => isEuVatRegistered
     case EuCountryPage(index)                     => _ => euVatRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
     case EuVatNumberPage(index)                   => _ => euVatRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)

@@ -24,7 +24,7 @@ import models._
 import models.euVatDetails.FixedEstablishmentAddress
 import pages._
 import pages.euVatDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, DeletePreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations._
 
 import java.time.LocalDate
 
@@ -139,15 +139,9 @@ class NavigatorSpec extends SpecBase {
           .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
       }
 
-      "must go from UK VAT Effective Date to UK VAT Registered Postcode" in {
+      "must go from UK VAT Effective Date to VAT Registered in EU" in {
 
         navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.UkVatRegisteredPostcodeController.onPageLoad(NormalMode))
-      }
-
-      "must go from UK VAT Registered Postcode to VAT Registered in EU" in {
-
-        navigator.nextPage(UkVatRegisteredPostcodePage, NormalMode, emptyUserAnswers)
           .mustBe(euVatRoutes.VatRegisteredInEuController.onPageLoad(NormalMode))
       }
 
@@ -472,14 +466,6 @@ class NavigatorSpec extends SpecBase {
         val answers = emptyUserAnswers.set(UkVatEffectiveDatePage, LocalDate.now()).success.value
 
         navigator.nextPage(UkVatEffectiveDatePage, CheckMode, answers)
-          .mustBe(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "must go from Uk VAT Registered Postcode Page to Check Your Answers page" in {
-
-        val answers = emptyUserAnswers.set(UkVatRegisteredPostcodePage, "AA11 AAA").success.value
-
-        navigator.nextPage(UkVatRegisteredPostcodePage, CheckMode, answers)
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 

@@ -43,11 +43,6 @@ POST        /ukVatEffectiveDate                             controllers.UkVatEff
 GET         /changeUkVatEffectiveDate                       controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeUkVatEffectiveDate                       controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
 
-GET         /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = NormalMode)
-POST        /ukVatRegisteredPostcode                        controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = NormalMode)
-GET         /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeUkVatRegisteredPostcode                  controllers.UkVatRegisteredPostcodeController.onSubmit(mode: Mode = CheckMode)
-
 GET         /euVatNumber/:index                             controllers.euVatDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /euVatNumber/:index                             controllers.euVatDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /changeEuVatNumber/:index                       controllers.euVatDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)

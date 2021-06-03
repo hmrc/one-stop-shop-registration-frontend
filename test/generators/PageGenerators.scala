@@ -78,9 +78,6 @@ trait PageGenerators {
   implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
     Arbitrary(euVatDetails.EuVatNumberPage(Index(0)))
 
-  implicit lazy val arbitraryUkVatRegisteredPostcodePage: Arbitrary[UkVatRegisteredPostcodePage.type] =
-    Arbitrary(UkVatRegisteredPostcodePage)
-
   implicit lazy val arbitraryUkVatEffectiveDatePage: Arbitrary[UkVatEffectiveDatePage.type] =
     Arbitrary(UkVatEffectiveDatePage)
 
