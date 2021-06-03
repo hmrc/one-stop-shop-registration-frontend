@@ -18,6 +18,7 @@ package services
 
 import base.SpecBase
 import models._
+import models.domain.{DesAddress, VatCustomerInfo, VatDetails}
 import models.euVatDetails.EuVatDetails
 import pages._
 import pages.euVatDetails.VatRegisteredInEuPage
@@ -65,13 +66,33 @@ class RegistrationServiceSpec extends SpecBase {
 
   "fromUserAnswers" - {
 
-    "must return a Registration when user answers are provided" in {
+    "must return a Registration when user answers are provided and the user manually entered their VAT details" in {
 
       val registration = registrationService.fromUserAnswers(answers, vrn)
 
       val expectedRegistration = RegistrationData.registration
 
       registration.value mustBe expectedRegistration
+    }
+
+    "must return a Registration when user answers are provided and we have VAT information on the user" in {
+
+      val vatInfo = VatCustomerInfo(LocalDate.of(2000, 1, 1), DesAddress("Line 1", None, None, None, "BB22 2BB"))
+
+      val userAnswers =
+        answers.copy(vatInfo = Some(vatInfo))
+          .remove(UkVatRegisteredPostcodePage).success.value
+          .remove(UkVatEffectiveDatePage).success.value
+          .remove(BusinessAddressPage).success.value
+
+      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+
+      val expectedRegistration =
+        RegistrationData.registration.copy(
+          vatDetails = VatDetails(vatInfo, partOfVatGroup = true)
+        )
+
+      registration.value mustEqual expectedRegistration
     }
 
     "must return a Registration when no trading names or EU country details were provided" in {

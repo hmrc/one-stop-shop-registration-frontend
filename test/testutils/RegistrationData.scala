@@ -16,7 +16,7 @@
 
 package testutils
 
-import models.domain.{EuVatRegistration, PreviousRegistration, Registration}
+import models.domain.{EuVatRegistration, PreviousRegistration, Registration, VatDetails}
 import models.{Address, BusinessContactDetails, Country}
 import uk.gov.hmrc.domain.Vrn
 
@@ -28,14 +28,15 @@ object RegistrationData {
       vrn = Vrn("123456789"),
       registeredCompanyName = "foo",
       tradingNames = List("single", "double"),
-      partOfVatGroup = true,
-      vatEffectiveDate = LocalDate.now(),
-      vatRegisteredPostcode = "AA1 1AA",
+      vatDetails = VatDetails(
+        registrationDate = LocalDate.now,
+        address = createBusinessAddress(),
+        partOfVatGroup = true
+      ),
       euVatRegistrations = Seq(
         EuVatRegistration(Country("FR", "France"), "FR123456789", None),
         EuVatRegistration(Country("ES", "Spain"), "ES123456789", None)
       ),
-      businessAddress = createBusinessAddress(),
       contactDetails = createBusinessContactDetails(),
       websites = Seq("website1", "website2"),
       startDate = LocalDate.now(),

@@ -17,7 +17,7 @@
 package services
 
 import models.UserAnswers
-import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration}
+import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, VatDetails}
 import pages._
 import queries.{AllEuVatDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
@@ -28,12 +28,9 @@ class RegistrationService {
     for {
       registeredCompanyName        <- userAnswers.get(RegisteredCompanyNamePage)
       tradingNames                 = getTradingNames(userAnswers)
-      partOfVatGroup               <- userAnswers.get(PartOfVatGroupPage)
-      ukVatEffectiveDate           <- userAnswers.get(UkVatEffectiveDatePage)
-      ukVatRegisteredPostcode      <- userAnswers.get(UkVatRegisteredPostcodePage)
+      vatDetails                   <- buildVatDetails(userAnswers)
       euVatRegistrations           = buildEuVatRegistrations(userAnswers)
       startDate                    <- userAnswers.get(StartDatePage)
-      businessAddress              <- userAnswers.get(BusinessAddressPage)
       businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
       websites                     <- userAnswers.get(AllWebsites)
       currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
@@ -42,11 +39,8 @@ class RegistrationService {
       vrn,
       registeredCompanyName,
       tradingNames,
-      partOfVatGroup,
-      ukVatEffectiveDate,
-      ukVatRegisteredPostcode,
+      vatDetails,
       euVatRegistrations,
-      businessAddress,
       businessContactDetails,
       websites,
       startDate.date,
@@ -79,4 +73,19 @@ class RegistrationService {
         detail =>
           PreviousRegistration(detail.previousEuCountry, detail.previousEuVatNumber)
       }
+
+  private def buildVatDetails(answers: UserAnswers): Option[VatDetails] =
+    answers.vatInfo.map {
+      vatInfo =>
+        answers.get(PartOfVatGroupPage).map {
+          partOfVatGroup =>
+            VatDetails(vatInfo, partOfVatGroup)
+        }
+    }.getOrElse {
+      for {
+        registrationDate <- answers.get(UkVatEffectiveDatePage)
+        address          <- answers.get(BusinessAddressPage)
+        partOfVatGroup   <- answers.get(PartOfVatGroupPage)
+      } yield VatDetails(registrationDate, address, partOfVatGroup)
+    }
 }
