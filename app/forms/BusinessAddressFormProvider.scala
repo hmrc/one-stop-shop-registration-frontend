@@ -25,6 +25,8 @@ import models.Address
 
 class BusinessAddressFormProvider @Inject() extends Mappings {
 
+  val postCodePattern = """^[ ]*[A-Za-z][ ]*[A-Za-z]{0,1}[ ]*[0-9][ ]*[0-9A-Za-z]{0,1}[ ]*[0-9][ ]*[A-Za-z][ ]*[A-Za-z][ ]*$"""
+
    def apply(): Form[Address] = Form(
      mapping(
       "line1" -> text("businessAddress.error.line1.required")
@@ -36,7 +38,9 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
        "county" -> optional(text("businessAddress.error.county.required")
          .verifying(maxLength(250, "businessAddress.error.county.length"))),
        "postCode" -> text("businessAddress.error.postCode.required")
-         .verifying(maxLength(250, "businessAddress.error.postCode.length"))
+         .verifying(firstError(
+           maxLength(250, "businessAddress.error.postCode.length"),
+           regexp(postCodePattern, "businessAddress.error.postCode.invalid")))
     )(Address.apply)(Address.unapply)
    )
  }

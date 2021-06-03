@@ -172,7 +172,9 @@ businessContactDetails.error.telephoneNumber.required = Enter a telephone number
 businessContactDetails.error.emailAddress.required = Enter an email address
 businessContactDetails.error.fullName.length = Full name must be 100 characters or less
 businessContactDetails.error.telephoneNumber.length = Telephone number must be 100 characters or less
+businessContactDetails.error.telephoneNumber.invalid = Enter valid telephone number
 businessContactDetails.error.emailAddress.length = Email address must be 100 characters or less
+businessContactDetails.error.emailAddress.invalid = Enter valid email address
 businessContactDetails.fullName.change.hidden = Full name
 businessContactDetails.telephoneNumber.change.hidden = Telephone number
 businessContactDetails.emailAddress.change.hidden = Email address
@@ -226,6 +228,7 @@ website.checkYourAnswersLabel = Website
 website.error.required = Enter a website
 website.error.length = Website must be 100 characters or less
 website.error.duplicate = You have already added this website
+website.error.invalid = Enter a valid website
 website.change.hidden = Website
 
 deleteWebsite.title = Are you sure you want to remove {0}?

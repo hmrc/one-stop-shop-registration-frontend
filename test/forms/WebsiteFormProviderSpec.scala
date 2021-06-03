@@ -18,17 +18,21 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import models.Index
-import play.api.data.FormError
+import play.api.data.Forms.nonEmptyText
+import play.api.data.{Field, Form, FormError}
 
 class WebsiteFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "website.error.required"
   val lengthKey = "website.error.length"
+  val invalidKey = "website.error.invalid"
   val maxLength = 250
+  val validData = "www.validwebsite.com"
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[String]
 
-  val form = new WebsiteFormProvider()(index, emptyExistingAnswers)
+  val formProvider: WebsiteFormProvider = new WebsiteFormProvider()
+  val form = formProvider(index, emptyExistingAnswers)
 
   ".value" - {
 
@@ -37,8 +41,14 @@ class WebsiteFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
+
+    "must not bind invalid website data" in {
+      val invalidWebsite = "invalid"
+      val result = form.bind(Map(fieldName -> invalidWebsite)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.websitePattern)))
+    }
 
     behave like fieldWithMaxLength(
       form,

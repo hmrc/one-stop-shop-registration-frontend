@@ -21,7 +21,8 @@ import play.api.data.FormError
 
 class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new BusinessContactDetailsFormProvider()()
+  val formProvider = new BusinessContactDetailsFormProvider()
+  val form = formProvider()
 
   ".fullName" - {
 
@@ -55,13 +56,21 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "telephoneNumber"
     val requiredKey = "businessContactDetails.error.telephoneNumber.required"
     val lengthKey = "businessContactDetails.error.telephoneNumber.length"
+    val invalidKey = "businessContactDetails.error.telephoneNumber.invalid"
     val maxLength = 20
+    val validData = "0111 2223334"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
+
+    "must not bind invalid telephone data" in {
+      val invalidTelephone = "invalid"
+      val result = form.bind(Map(fieldName -> invalidTelephone)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.telephonePattern)))
+    }
 
     behave like fieldWithMaxLength(
       form,
@@ -82,13 +91,21 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "emailAddress"
     val requiredKey = "businessContactDetails.error.emailAddress.required"
     val lengthKey = "businessContactDetails.error.emailAddress.length"
+    val invalidKey = "businessContactDetails.error.emailAddress.invalid"
+    val validData = "bar@example.com"
     val maxLength = 50
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
+
+    "must not bind invalid email address data" in {
+      val invalidEmail = "invalid"
+      val result = form.bind(Map(fieldName -> invalidEmail)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.emailPattern)))
+    }
 
     behave like fieldWithMaxLength(
       form,
@@ -103,4 +120,5 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
   }
+
 }

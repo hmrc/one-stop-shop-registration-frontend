@@ -21,7 +21,8 @@ import play.api.data.FormError
 
 class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new BusinessAddressFormProvider()()
+  val formProvider = new BusinessAddressFormProvider()
+  val form = formProvider()
 
   ".line1" - {
 
@@ -122,13 +123,21 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "postCode"
     val requiredKey = "businessAddress.error.postCode.required"
     val lengthKey = "businessAddress.error.postCode.length"
+    val invalidKey = "businessAddress.error.postCode.invalid"
+    val validData = "AA11 1AA"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
+
+    "must not bind invalid Post Code data" in {
+      val invalidPostCode = "invalid"
+      val result = form.bind(Map(fieldName -> invalidPostCode)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.postCodePattern)))
+    }
 
     behave like fieldWithMaxLength(
       form,
