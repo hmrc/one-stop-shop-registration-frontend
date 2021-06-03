@@ -133,10 +133,19 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Part of VAT Group to UK VAT Effective Date" in {
+      "must go from Part of VAT Group" - {
 
-        navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+        "to UK Effective Date when we do not know the user's VAT details" in {
+
+          navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswers)
+            .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+        }
+
+        "to VAT Registered in the EU when we know the user's VAT details" in {
+
+          navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswersWithVatInfo)
+            .mustBe(euVatRoutes.VatRegisteredInEuController.onPageLoad(NormalMode))
+        }
       }
 
       "must go from UK VAT Effective Date to VAT Registered in EU" in {
@@ -346,10 +355,19 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Start Date to Business Address" in {
+      "must go from Start Date" - {
 
-        navigator.nextPage(StartDatePage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+        "to Business Address when we do not know the user's VAT details" in {
+
+          navigator.nextPage(StartDatePage, NormalMode, emptyUserAnswers)
+            .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+        }
+
+        "to Website when we know the user's VAT details" in {
+
+          navigator.nextPage(StartDatePage, NormalMode, emptyUserAnswersWithVatInfo)
+            .mustBe(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
+        }
       }
 
       "must go from Business Address to Website" in {
