@@ -27,6 +27,6 @@ class PreviousEuVatNumberFormProvider @Inject() extends Mappings {
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
-        .verifying(maxLength(100, "previousEuVatNumber.error.length"))
+        .verifying(maxLength(12, "previousEuVatNumber.error.length"))
     )
 }

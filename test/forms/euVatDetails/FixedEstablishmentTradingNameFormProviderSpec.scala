@@ -25,7 +25,7 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
 
   val requiredKey = "fixedEstablishmentTradingName.error.required"
   val lengthKey = "fixedEstablishmentTradingName.error.length"
-  val maxLength = 100
+  val maxLength = 160
 
   val country: Country = arbitrary[Country].sample.value
   val form = new FixedEstablishmentTradingNameFormProvider()(country)
