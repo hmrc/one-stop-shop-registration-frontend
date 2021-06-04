@@ -116,6 +116,18 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(emailPattern)))
     }
 
+    "must not bind invalid email address data with missing @" in {
+      val invalidEmail = "email.com"
+      val result = form.bind(Map(fieldName -> invalidEmail)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(emailPattern)))
+    }
+
+    "must not bind invalid email address data with missing ." in {
+      val invalidEmail = "email@"
+      val result = form.bind(Map(fieldName -> invalidEmail)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(emailPattern)))
+    }
+
     behave like fieldWithMaxLength(
       form,
       fieldName,
