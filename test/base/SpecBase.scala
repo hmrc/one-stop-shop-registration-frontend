@@ -18,8 +18,8 @@ package base
 
 import controllers.actions._
 import generators.Generators
-import models.UserAnswers
-import models.domain.{DesAddress, VatCustomerInfo}
+import models.domain.VatCustomerInfo
+import models.{DesAddress, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -52,7 +52,13 @@ trait SpecBase
 
   val userAnswersId: String = "id"
 
-  val vatInfo: VatCustomerInfo = VatCustomerInfo(LocalDate.now(stubClockAtArbitraryDate), DesAddress("Line 1", None, None, None, "AA11 1AA"))
+  val vatInfo: VatCustomerInfo =
+    VatCustomerInfo(
+      registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
+      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup   = Some(true),
+      organisationName = None
+    )
 
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatInfo))

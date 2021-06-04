@@ -16,11 +16,17 @@
 
 package models.domain
 
+import models.DesAddress
 import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class VatCustomerInfo(registrationDate: LocalDate, address: DesAddress)
+case class VatCustomerInfo(
+                            address: DesAddress,
+                            registrationDate: Option[LocalDate],
+                            partOfVatGroup: Option[Boolean],
+                            organisationName: Option[String]
+                          )
 
 object VatCustomerInfo {
 

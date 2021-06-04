@@ -18,7 +18,8 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
-import models.domain.{DesAddress, VatCustomerInfo}
+import models.DesAddress
+import models.domain.VatCustomerInfo
 import models.responses.{ConflictFound, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
@@ -117,7 +118,13 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
-        val vatInfo = VatCustomerInfo(LocalDate.now, DesAddress("Line 1", Some("Line 2"), None, None, "AA11 1AA"))
+        val vatInfo = VatCustomerInfo(
+          registrationDate = Some(LocalDate.now),
+          address          = DesAddress("Line 1", Some("Line 2"), None, None, None, Some("AA11 1AA"), "GB"),
+          partOfVatGroup   = None,
+          organisationName = None
+        )
+
         val responseBody = Json.toJson(vatInfo).toString
 
         server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))

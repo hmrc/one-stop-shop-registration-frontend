@@ -16,17 +16,17 @@
 
 package pages
 
-import models.Address
+import models.UkAddress
 import pages.behaviours.PageBehaviours
 
 class BusinessAddressPageSpec extends PageBehaviours {
 
   "BusinessAddressPage" - {
 
-    beRetrievable[Address](BusinessAddressPage)
+    beRetrievable[UkAddress](BusinessAddressPage)
 
-    beSettable[Address](BusinessAddressPage)
+    beSettable[UkAddress](BusinessAddressPage)
 
-    beRemovable[Address](BusinessAddressPage)
+    beRemovable[UkAddress](BusinessAddressPage)
   }
 }

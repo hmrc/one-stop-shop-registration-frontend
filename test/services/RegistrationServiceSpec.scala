@@ -18,7 +18,8 @@ package services
 
 import base.SpecBase
 import models._
-import models.domain.{DesAddress, VatCustomerInfo, VatDetails}
+import models.domain.VatDetailSource.UserEntered
+import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
 import models.euVatDetails.EuVatDetails
 import pages._
 import pages.euVatDetails.VatRegisteredInEuPage
@@ -49,7 +50,7 @@ class RegistrationServiceSpec extends SpecBase {
       ).success.value
       .set(
         BusinessAddressPage,
-        Address("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
+        UkAddress("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
       ).success.value
       .set(
         BusinessContactDetailsPage,
@@ -65,29 +66,38 @@ class RegistrationServiceSpec extends SpecBase {
 
   "fromUserAnswers" - {
 
-    "must return a Registration when user answers are provided and the user manually entered their VAT details" in {
+    "must return a Registration when user answers are provided and the user manually entered all their VAT details" in {
 
       val registration = registrationService.fromUserAnswers(answers, vrn)
 
-      val expectedRegistration = RegistrationData.registration
+      val expectedRegistration = RegistrationData.registration copy (vatDetails = RegistrationData.registration.vatDetails.copy (source = UserEntered))
 
       registration.value mustBe expectedRegistration
     }
 
-    "must return a Registration when user answers are provided and we have VAT information on the user" in {
+    "must return a Registration when user answers are provided and we have full VAT information on the user" in {
 
-      val vatInfo = VatCustomerInfo(LocalDate.of(2000, 1, 1), DesAddress("Line 1", None, None, None, "BB22 2BB"))
+      val regDate = LocalDate.of(2000, 1, 1)
+      val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
+      val vatInfo = VatCustomerInfo(
+        registrationDate = Some(regDate),
+        address          = address,
+        partOfVatGroup   = Some(true),
+        organisationName = Some("bar")
+      )
 
       val userAnswers =
         answers.copy(vatInfo = Some(vatInfo))
           .remove(UkVatEffectiveDatePage).success.value
           .remove(BusinessAddressPage).success.value
+          .remove(PartOfVatGroupPage).success.value
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)
 
       val expectedRegistration =
         RegistrationData.registration.copy(
-          vatDetails = VatDetails(vatInfo, partOfVatGroup = true)
+          vatDetails = VatDetails(regDate, address, true, VatDetailSource.Etmp),
+          registeredCompanyName = "bar"
         )
 
       registration.value mustEqual expectedRegistration
@@ -104,7 +114,8 @@ class RegistrationServiceSpec extends SpecBase {
       val expectedRegistration =
         RegistrationData.registration copy (
           tradingNames       = Seq.empty,
-          euVatRegistrations = Seq.empty
+          euVatRegistrations = Seq.empty,
+          vatDetails         = RegistrationData.registration.vatDetails copy (source = UserEntered)
         )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)

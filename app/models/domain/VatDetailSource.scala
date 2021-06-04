@@ -16,17 +16,19 @@
 
 package models.domain
 
-import play.api.libs.json.{Json, OFormat}
+import models.{Enumerable, WithName}
 
-case class DesAddress(
-                       line1: String,
-                       line2: Option[String],
-                       line3: Option[String],
-                       line4: Option[String],
-                       postCode: String
-                     )
+sealed trait VatDetailSource
 
-object DesAddress {
+object VatDetailSource extends Enumerable.Implicits {
+  case object Etmp        extends WithName("etmp") with VatDetailSource
+  case object UserEntered extends WithName("userEntered") with VatDetailSource
+  case object Mixed       extends WithName("mixed") with VatDetailSource
 
-  implicit val format: OFormat[DesAddress] = Json.format[DesAddress]
+  val values: Seq[VatDetailSource] = Seq(
+    Etmp, UserEntered, Mixed
+  )
+
+  implicit val enumerable: Enumerable[VatDetailSource] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

@@ -17,15 +17,16 @@
 package viewmodels
 
 import formats.Format.dateFormatter
-import models.domain.{DesAddress, VatCustomerInfo}
+import models.DesAddress
+import models.domain.VatCustomerInfo
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 
-case class CheckVatDetailsViewModel(vrn: Vrn, registrationDate: LocalDate, address: DesAddress) {
+case class CheckVatDetailsViewModel(vrn: Vrn, registrationDate: Option[LocalDate], address: DesAddress) {
 
-  def formattedDate: String = registrationDate.format(dateFormatter)
+  def formattedDate: Option[String] = registrationDate.map(_.format(dateFormatter))
 }
 
 object CheckVatDetailsViewModel {

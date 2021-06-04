@@ -16,8 +16,8 @@
 
 package testutils
 
-import models.domain.{EuVatRegistration, PreviousRegistration, Registration, VatDetails}
-import models.{Address, BusinessContactDetails, Country}
+import models.domain.{EuVatRegistration, PreviousRegistration, Registration, VatDetailSource, VatDetails}
+import models.{BusinessContactDetails, Country, UkAddress}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -30,8 +30,9 @@ object RegistrationData {
       tradingNames = List("single", "double"),
       vatDetails = VatDetails(
         registrationDate = LocalDate.now,
-        address = createBusinessAddress(),
-        partOfVatGroup = true
+        address          = createBusinessAddress(),
+        partOfVatGroup   = true,
+        source           = VatDetailSource.Etmp
       ),
       euVatRegistrations = Seq(
         EuVatRegistration(Country("FR", "France"), "FR123456789", None),
@@ -46,8 +47,8 @@ object RegistrationData {
       )
     )
 
-  private def createBusinessAddress(): Address =
-    Address(
+  private def createBusinessAddress(): UkAddress =
+    UkAddress(
       "123 Street",
       Some("Street"),
       "City",
