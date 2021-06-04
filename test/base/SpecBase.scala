@@ -52,16 +52,16 @@ trait SpecBase
 
   val userAnswersId: String = "id"
 
-  val vatInfo: VatCustomerInfo =
+  val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
       registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
       address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
       partOfVatGroup   = Some(true),
-      organisationName = None
+      organisationName = Some("Company name")
     )
 
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
-  val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatInfo))
+  val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
 
   val vrn: Vrn = Vrn("123456789")
 

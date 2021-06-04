@@ -74,13 +74,13 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar with Befo
 
             val application = appBuilder(answers = None).build()
 
-            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatInfo))
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
             when(mockRepository.set(any())) thenReturn Future.successful(true)
 
             running(application) {
               val request = FakeRequest(GET, checkVatDetailsRoute)
               val view = application.injector.instanceOf[CheckVatDetailsView]
-              val viewModel = CheckVatDetailsViewModel(vrn, vatInfo)
+              val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
               val result = route(application, request).value
 
@@ -126,7 +126,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar with Befo
             running(application) {
               val request = FakeRequest(GET, checkVatDetailsRoute)
               val view = application.injector.instanceOf[CheckVatDetailsView]
-              val viewModel = CheckVatDetailsViewModel(vrn, vatInfo)
+              val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
               val result = route(application, request).value
 
@@ -224,7 +224,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar with Befo
               val boundForm = form.bind(Map("value" -> ""))
 
               val view      = application.injector.instanceOf[CheckVatDetailsView]
-              val viewModel = CheckVatDetailsViewModel(vrn, vatInfo)
+              val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
               val result = route(application, request).value
 

@@ -46,18 +46,50 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Check VAT Details" - {
 
-        "to Registered Company Name when the user answers yes" in {
+        "when the user answers yes" - {
 
-          val answers = emptyUserAnswers.set(CheckVatDetailsPage, true).success.value
-          navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+          "and we have VAT details including the organisation name" in {
+
+            val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, true).success.value
+
+            navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+              .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+          }
+
+          "and we have VAT details without the organisation name" - {
+
+            "to Registered Company Name" in {
+
+              val updatedVatInfo = vatCustomerInfo copy (organisationName = None)
+              val answers =
+                emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+                  .set(CheckVatDetailsPage, true).success.value
+
+              navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+            }
+          }
+
+          "and we do not have VAT details" - {
+
+            "to Registered Company Name" in {
+
+              val answers = emptyUserAnswers.set(CheckVatDetailsPage, true).success.value
+              navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+            }
+          }
         }
 
-        "to User Other Account when the user answers no" in {
+        "when the user answers no" - {
 
-          val answers = emptyUserAnswers.set(CheckVatDetailsPage, false).success.value
-          navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
-            .mustBe(routes.UseOtherAccountController.onPageLoad())
+          "to User Other Account" in {
+
+            val answers = emptyUserAnswers.set(CheckVatDetailsPage, false).success.value
+            navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+              .mustBe(routes.UseOtherAccountController.onPageLoad())
+          }
+
         }
       }
 

@@ -42,30 +42,30 @@ class HasTradingNameController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getRegisteredCompanyName {
-        registeredCompanyName =>
+      getCompanyName {
+        companyName =>
 
-          val form = formProvider(registeredCompanyName)
+          val form = formProvider(companyName)
 
           val preparedForm = request.userAnswers.get(HasTradingNamePage) match {
             case None => form
             case Some(value) => form.fill(value)
           }
 
-          Future.successful(Ok(view(preparedForm, mode, registeredCompanyName)))
+          Future.successful(Ok(view(preparedForm, mode, companyName)))
       }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getRegisteredCompanyName {
-        registeredCompanyName =>
+      getCompanyName {
+        companyName =>
 
-          val form = formProvider(registeredCompanyName)
+          val form = formProvider(companyName)
 
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, registeredCompanyName))),
+              Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
 
             value =>
               for {
@@ -76,10 +76,19 @@ class HasTradingNameController @Inject()(
       }
   }
 
-  private def getRegisteredCompanyName(block: String => Future[Result])
-                                      (implicit request: DataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(RegisteredCompanyNamePage).map {
-      name =>
-        block(name)
-    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+  private def getCompanyName(block: String => Future[Result])
+                            (implicit request: DataRequest[AnyContent]): Future[Result] = {
+    request.userAnswers.vatInfo match {
+      case Some(vatInfo) =>
+        val name = vatInfo.organisationName orElse request.userAnswers.get(RegisteredCompanyNamePage)
+        name
+          .map(block)
+          .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+      case None =>
+        request.userAnswers
+          .get(RegisteredCompanyNamePage)
+          .map(block)
+          .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+    }
+  }
 }

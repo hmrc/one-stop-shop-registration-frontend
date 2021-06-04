@@ -64,11 +64,13 @@ class Navigator @Inject()() {
     case _                                        => _ => routes.IndexController.onPageLoad()
   }
 
-  private def checkVatDetailsRoute(answers: UserAnswers): Call = answers.get(CheckVatDetailsPage) match {
-    case Some(true)  => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
-    case Some(false) => routes.UseOtherAccountController.onPageLoad()
-    case None        => routes.JourneyRecoveryController.onPageLoad()
-  }
+  private def checkVatDetailsRoute(answers: UserAnswers): Call =
+    (answers.get(CheckVatDetailsPage), answers.vatInfo) match {
+      case (Some(true), Some(vatInfo)) if vatInfo.organisationName.isDefined => routes.HasTradingNameController.onPageLoad(NormalMode)
+      case (Some(true), _)                                                   => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
+      case (Some(false), _)                                                  => routes.UseOtherAccountController.onPageLoad()
+      case (None, _)                                                         => routes.JourneyRecoveryController.onPageLoad()
+    }
 
   private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
     case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))

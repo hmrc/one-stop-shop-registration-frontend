@@ -37,7 +37,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private val registeredCompanyName = "foo"
+  private val registeredCompanyName = "Company name"
   private val formProvider = new HasTradingNameFormProvider()
   private val form = formProvider(registeredCompanyName)
 
@@ -47,7 +47,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   "HasTradingName Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when the user has answered the registered company name question" in {
 
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
@@ -60,6 +60,22 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, registeredCompanyName)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when we have the user's company name in their VAT details" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasTradingNameRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HasTradingNameView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, vatCustomerInfo.organisationName.value)(request, messages(application)).toString
       }
     }
 
@@ -141,7 +157,8 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET if Registered Company Name has not been answered" in {
+    "must redirect to Journey Recovery for a GET if Registered Company Name has not been answered" +
+      "and we don't have the user's company in their VAT details" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -171,7 +188,8 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if Registered Company Name has not been answered" in {
+    "must redirect to Journey Recovery for a POST if Registered Company Name has not been answered" +
+      "and we don't have the user's company name in their VAT details" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
