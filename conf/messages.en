@@ -352,6 +352,7 @@ fixedEstablishmentAddress.error.line2.length = Line2 must be 100 characters or l
 fixedEstablishmentAddress.error.townOrCity.length = Town or city must be 100 characters or less
 fixedEstablishmentAddress.error.county.length = County must be 100 characters or less
 fixedEstablishmentAddress.error.postCode.length = Postcode must be 100 characters or less
+fixedEstablishmentAddress.error.postCode.invalid = Enter valid postcode
 fixedEstablishmentAddress.line1.change.hidden = Building and street
 fixedEstablishmentAddress.line2.change.hidden = Line2
 fixedEstablishmentAddress.townOrCity.change.hidden = Town or city

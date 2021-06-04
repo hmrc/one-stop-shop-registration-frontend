@@ -25,6 +25,8 @@ import javax.inject.Inject
 
 class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
 
+  val postcodePattern: String = """^[A-Za-z0-9 ]{0,100}$"""
+
    def apply(): Form[FixedEstablishmentAddress] = Form(
      mapping(
        "line1" -> text("fixedEstablishmentAddress.error.line1.required")
@@ -36,7 +38,9 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
        "county" -> optional(text("fixedEstablishmentAddress.error.county.required")
          .verifying(maxLength(100, "fixedEstablishmentAddress.error.county.length"))),
        "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.postCode.length")))
-    )(FixedEstablishmentAddress.apply)(FixedEstablishmentAddress.unapply)
+         .verifying(firstError(
+           maxLength(100, "fixedEstablishmentAddress.error.postCode.length"),
+           regexp(postcodePattern, "fixedEstablishmentAddress.error.postCode.invalid"))))
+     )(FixedEstablishmentAddress.apply)(FixedEstablishmentAddress.unapply)
    )
  }
