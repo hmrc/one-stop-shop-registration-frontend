@@ -16,6 +16,8 @@
 
 package forms
 
+import forms.Validation.Validation.commonNamePattern
+
 import javax.inject.Inject
 import forms.mappings.Mappings
 import models.Index
@@ -26,7 +28,9 @@ class TradingNameFormProvider @Inject() extends Mappings {
   def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
     Form(
       "value" -> text("tradingName.error.required")
-        .verifying(maxLength(160, "tradingName.error.length"))
-        .verifying(notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"))
+        .verifying(firstError(
+          maxLength(160, "tradingName.error.length"),
+          notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
+          regexp(commonNamePattern, "tradingName.error.invalid")))
     )
 }

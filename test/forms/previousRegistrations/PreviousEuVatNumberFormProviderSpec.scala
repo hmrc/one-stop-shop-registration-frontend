@@ -16,6 +16,7 @@
 
 package forms.previousRegistrations
 
+import forms.Validation.Validation.euVatNumberPattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -25,11 +26,14 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "previousEuVatNumber.error.required"
   val lengthKey = "previousEuVatNumber.error.length"
+  val invalidKey = "previousEuVatNumber.error.invalid"
+  val validData = "DE+854123"
   val maxLength = 12
 
   val country: Country = arbitrary[Country].sample.value
 
-  val form = new PreviousEuVatNumberFormProvider()(country)
+  val formProvider: PreviousEuVatNumberFormProvider = new PreviousEuVatNumberFormProvider()
+  val form = formProvider(country)
 
   ".value" - {
 
@@ -38,7 +42,7 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -53,5 +57,11 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
+
+    "must not bind invalid Previous EU VAT number" in {
+      val invalidEuVatNumber = "-. @abc"
+      val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(euVatNumberPattern)))
+    }
   }
 }

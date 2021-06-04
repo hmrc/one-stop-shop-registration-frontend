@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.postCodePattern
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
@@ -36,7 +37,9 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
        "county" -> optional(text("businessAddress.error.county.required")
          .verifying(maxLength(250, "businessAddress.error.county.length"))),
        "postCode" -> text("businessAddress.error.postCode.required")
-         .verifying(maxLength(250, "businessAddress.error.postCode.length"))
+         .verifying(firstError(
+           maxLength(250, "businessAddress.error.postCode.length"),
+           regexp(postCodePattern, "businessAddress.error.postCode.invalid")))
     )(Address.apply)(Address.unapply)
    )
  }

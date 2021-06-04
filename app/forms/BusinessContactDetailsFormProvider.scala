@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.{commonNamePattern, emailPattern, telephonePattern}
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
@@ -25,14 +26,20 @@ import models.BusinessContactDetails
 
 class BusinessContactDetailsFormProvider @Inject() extends Mappings {
 
-   def apply(): Form[BusinessContactDetails] = Form(
+  def apply(): Form[BusinessContactDetails] = Form(
      mapping(
       "fullName" -> text("businessContactDetails.error.fullName.required")
-        .verifying(maxLength(105, "businessContactDetails.error.fullName.length")),
+        .verifying(firstError(
+          maxLength(105, "businessContactDetails.error.fullName.length"),
+          regexp(commonNamePattern, "businessContactDetails.error.fullName.invalid"))),
       "telephoneNumber" -> text("businessContactDetails.error.telephoneNumber.required")
-        .verifying(maxLength(20, "businessContactDetails.error.telephoneNumber.length")),
+        .verifying(firstError(
+          maxLength(20, "businessContactDetails.error.telephoneNumber.length"),
+          regexp(telephonePattern, "businessContactDetails.error.telephoneNumber.invalid"))),
        "emailAddress" -> text("businessContactDetails.error.emailAddress.required")
-         .verifying(maxLength(254, "businessContactDetails.error.emailAddress.length"))
+         .verifying(firstError(
+           maxLength(254, "businessContactDetails.error.emailAddress.length"),
+           regexp(emailPattern, "businessContactDetails.error.emailAddress.invalid")))
     )(BusinessContactDetails.apply)(BusinessContactDetails.unapply)
    )
  }

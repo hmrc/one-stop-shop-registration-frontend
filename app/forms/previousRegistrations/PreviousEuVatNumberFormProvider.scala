@@ -16,6 +16,7 @@
 
 package forms.previousRegistrations
 
+import forms.Validation.Validation.euVatNumberPattern
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -27,6 +28,8 @@ class PreviousEuVatNumberFormProvider @Inject() extends Mappings {
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
-        .verifying(maxLength(12, "previousEuVatNumber.error.length"))
+        .verifying(firstError(
+          maxLength(12, "previousEuVatNumber.error.length"),
+            regexp(euVatNumberPattern, "previousEuVatNumber.error.invalid")))
     )
 }

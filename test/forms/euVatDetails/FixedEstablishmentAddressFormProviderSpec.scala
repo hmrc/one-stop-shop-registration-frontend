@@ -16,12 +16,14 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.postcodePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
 class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new FixedEstablishmentAddressFormProvider()()
+  val formProvider = new FixedEstablishmentAddressFormProvider()
+  val form = formProvider()
 
   ".line1" - {
 
@@ -121,12 +123,14 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "postCode"
     val lengthKey = "fixedEstablishmentAddress.error.postCode.length"
+    val invalidKey = "fixedEstablishmentAddress.error.postCode.invalid"
     val maxLength = 100
+    val validData = "75700 PARIS CEDEX"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -135,5 +139,11 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
+
+    "must not bind invalid postcode" in {
+      val invalidPostcode = "*@[]%abc"
+      val result = form.bind(Map(fieldName -> invalidPostcode)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(postcodePattern)))
+    }
   }
 }

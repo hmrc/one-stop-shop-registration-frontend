@@ -16,6 +16,8 @@
 
 package forms
 
+import forms.Validation.Validation.websitePattern
+
 import javax.inject.Inject
 import forms.mappings.Mappings
 import models.Index
@@ -26,7 +28,9 @@ class WebsiteFormProvider @Inject() extends Mappings {
   def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
     Form(
       "value" -> text("website.error.required")
-        .verifying(maxLength(250, "website.error.length"))
-        .verifying(notADuplicate(thisIndex, existingAnswers, "website.error.duplicate"))
+        .verifying(firstError(
+          maxLength(250, "website.error.length"),
+          notADuplicate(thisIndex, existingAnswers, "website.error.duplicate"),
+          regexp(websitePattern, "website.error.invalid")))
     )
 }

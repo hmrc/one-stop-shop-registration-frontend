@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.Validation.Validation.commonNamePattern
 import forms.behaviours.StringFieldBehaviours
 import models.Index
 import play.api.data.FormError
@@ -24,11 +25,14 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "tradingName.error.required"
   val lengthKey = "tradingName.error.length"
+  val invalidKey = "tradingName.error.invalid"
   val maxLength = 160
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[String]
+  val validData = "Delicious Chocolate Company"
 
-  val form = new TradingNameFormProvider()(index, emptyExistingAnswers)
+  val formProvider: TradingNameFormProvider = new TradingNameFormProvider()
+  val form = formProvider(index, emptyExistingAnswers)
 
   ".value" - {
 
@@ -37,7 +41,7 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -60,6 +64,12 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
 
       val result = form.bind(Map(fieldName ->  answer)).apply(fieldName)
       result.errors must contain only FormError(fieldName, "tradingName.error.duplicate")
+    }
+
+    "must not bind invalid Trading Name" in {
+      val invalidTradingName = "^Invalid~ tr@ding=nam£"
+      val result = form.bind(Map(fieldName -> invalidTradingName)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
     }
   }
 }
