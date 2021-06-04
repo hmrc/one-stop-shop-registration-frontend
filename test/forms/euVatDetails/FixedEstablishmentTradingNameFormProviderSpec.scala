@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.commonNamePattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -60,7 +61,7 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
     "must not bind invalid Trading Name" in {
       val invalidFixedEstablishmentTradingName = "^Fixed est~ tr@ding=nam£"
       val result = form.bind(Map(fieldName -> invalidFixedEstablishmentTradingName)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.fixedEstablishmentTradingNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
     }
   }
 }

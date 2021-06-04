@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.Validation.Validation.commonNamePattern
 import forms.behaviours.StringFieldBehaviours
 import models.Index
 import play.api.data.FormError
@@ -68,7 +69,7 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Trading Name" in {
       val invalidTradingName = "^Invalid~ tr@ding=nam£"
       val result = form.bind(Map(fieldName -> invalidTradingName)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.tradingNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
     }
   }
 }

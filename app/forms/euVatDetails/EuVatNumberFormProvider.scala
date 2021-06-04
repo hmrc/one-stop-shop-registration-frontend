@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.euVatNumberPattern
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -23,8 +24,6 @@ import play.api.data.Form
 import javax.inject.Inject
 
 class EuVatNumberFormProvider @Inject() extends Mappings {
-
-  val euVatNumberPattern = """^[A-Z\d\*\+]{1,12}$"""
 
   def apply(country: Country): Form[String] =
     Form(

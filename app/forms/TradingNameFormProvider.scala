@@ -16,6 +16,8 @@
 
 package forms
 
+import forms.Validation.Validation.commonNamePattern
+
 import javax.inject.Inject
 import forms.mappings.Mappings
 import models.Index
@@ -23,14 +25,12 @@ import play.api.data.Form
 
 class TradingNameFormProvider @Inject() extends Mappings {
 
-  val tradingNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
-
   def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
     Form(
       "value" -> text("tradingName.error.required")
         .verifying(firstError(
           maxLength(160, "tradingName.error.length"),
           notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
-          regexp(tradingNamePattern, "tradingName.error.invalid")))
+          regexp(commonNamePattern, "tradingName.error.invalid")))
     )
 }

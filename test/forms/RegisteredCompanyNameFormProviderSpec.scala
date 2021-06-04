@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.Validation.Validation.commonNamePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -56,7 +57,7 @@ class RegisteredCompanyNameFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Registered Company Name" in {
       val invalidRegisteredCompanyName = "Invalid%comp@ny name?*]"
       val result = form.bind(Map(fieldName -> invalidRegisteredCompanyName)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.registeredCompanyNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
     }
   }
 }

@@ -16,6 +16,7 @@
 
 package forms.previousRegistrations
 
+import forms.Validation.Validation.euVatNumberPattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -60,7 +61,7 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Previous EU VAT number" in {
       val invalidEuVatNumber = "-. @abc"
       val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.previousEuVatNumberPattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(euVatNumberPattern)))
     }
   }
 }

@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.postcodePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -142,7 +143,7 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid postcode" in {
       val invalidPostcode = "*@[]%abc"
       val result = form.bind(Map(fieldName -> invalidPostcode)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.postcodePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(postcodePattern)))
     }
   }
 }

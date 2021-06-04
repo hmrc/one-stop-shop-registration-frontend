@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.commonNamePattern
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -24,13 +25,11 @@ import javax.inject.Inject
 
 class FixedEstablishmentTradingNameFormProvider @Inject() extends Mappings {
 
-  val fixedEstablishmentTradingNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
-
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("fixedEstablishmentTradingName.error.required", Seq(country.name))
         .verifying(firstError(
           maxLength(160, "fixedEstablishmentTradingName.error.length"),
-          regexp(fixedEstablishmentTradingNamePattern, "fixedEstablishmentTradingName.error.invalid")))
+          regexp(commonNamePattern, "fixedEstablishmentTradingName.error.invalid")))
     )
 }

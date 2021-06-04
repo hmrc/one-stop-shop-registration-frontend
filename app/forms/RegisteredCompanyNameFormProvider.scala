@@ -16,20 +16,19 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.commonNamePattern
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
 class RegisteredCompanyNameFormProvider @Inject() extends Mappings {
-
-  val registeredCompanyNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
 
   def apply(): Form[String] =
     Form(
       "value" -> text("registeredCompanyName.error.required")
         .verifying(firstError(
           maxLength(105, "registeredCompanyName.error.length"),
-          regexp(registeredCompanyNamePattern, "registeredCompanyName.error.invalid")))
+          regexp(commonNamePattern, "registeredCompanyName.error.invalid")))
     )
 }

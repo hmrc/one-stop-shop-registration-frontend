@@ -16,16 +16,15 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.postCodePattern
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
 import models.Address
 
 class BusinessAddressFormProvider @Inject() extends Mappings {
-
-  val postCodePattern = """^[ ]*[A-Za-z][ ]*[A-Za-z]{0,1}[ ]*[0-9][ ]*[0-9A-Za-z]{0,1}[ ]*[0-9][ ]*[A-Za-z][ ]*[A-Za-z][ ]*$"""
 
    def apply(): Form[Address] = Form(
      mapping(

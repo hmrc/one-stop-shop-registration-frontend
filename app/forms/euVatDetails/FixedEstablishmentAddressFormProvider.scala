@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.postcodePattern
 import forms.mappings.Mappings
 import models.euVatDetails.FixedEstablishmentAddress
 import play.api.data.Form
@@ -24,8 +25,6 @@ import play.api.data.Forms._
 import javax.inject.Inject
 
 class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
-
-  val postcodePattern: String = """^[A-Za-z0-9 ]{0,100}$"""
 
    def apply(): Form[FixedEstablishmentAddress] = Form(
      mapping(

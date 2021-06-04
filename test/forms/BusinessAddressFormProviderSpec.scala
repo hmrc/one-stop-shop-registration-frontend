@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.Validation.Validation.postCodePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -136,7 +137,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Post Code data" in {
       val invalidPostCode = "invalid"
       val result = form.bind(Map(fieldName -> invalidPostCode)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.postCodePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(postCodePattern)))
     }
 
     behave like fieldWithMaxLength(

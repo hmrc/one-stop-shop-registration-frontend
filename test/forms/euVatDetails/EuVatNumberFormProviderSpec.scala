@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.euVatNumberPattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -60,7 +61,7 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid EU VAT number" in {
       val invalidEuVatNumber = "abc?123"
       val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.euVatNumberPattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(euVatNumberPattern)))
     }
   }
 }

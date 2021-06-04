@@ -16,10 +16,10 @@
 
 package forms
 
+import forms.Validation.Validation.websitePattern
 import forms.behaviours.StringFieldBehaviours
 import models.Index
-import play.api.data.Forms.nonEmptyText
-import play.api.data.{Field, Form, FormError}
+import play.api.data.FormError
 
 class WebsiteFormProviderSpec extends StringFieldBehaviours {
 
@@ -47,7 +47,7 @@ class WebsiteFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid website data" in {
       val invalidWebsite = "invalid"
       val result = form.bind(Map(fieldName -> invalidWebsite)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.websitePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(websitePattern)))
     }
 
     behave like fieldWithMaxLength(

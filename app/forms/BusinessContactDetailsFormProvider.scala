@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.{commonNamePattern, emailPattern, telephonePattern}
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
@@ -25,16 +26,12 @@ import models.BusinessContactDetails
 
 class BusinessContactDetailsFormProvider @Inject() extends Mappings {
 
-  val fullNamePattern: String = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
-  val emailPattern: String = """^.+[@].+[.].+$"""
-  val telephonePattern: String = """^\+[0-9 ]{1,18}$|^[0-9 ]{1,19}$|^(?=.{2,22}$)\+[0-9 ]*\(0\)[0-9 ]*$|^(?=.{1,22}$)[0-9 ]*\(0\)[0-9 ]*$"""
-
   def apply(): Form[BusinessContactDetails] = Form(
      mapping(
       "fullName" -> text("businessContactDetails.error.fullName.required")
         .verifying(firstError(
           maxLength(105, "businessContactDetails.error.fullName.length"),
-          regexp(fullNamePattern, "businessContactDetails.error.fullName.invalid"))),
+          regexp(commonNamePattern, "businessContactDetails.error.fullName.invalid"))),
       "telephoneNumber" -> text("businessContactDetails.error.telephoneNumber.required")
         .verifying(firstError(
           maxLength(20, "businessContactDetails.error.telephoneNumber.length"),

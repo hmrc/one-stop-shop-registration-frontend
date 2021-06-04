@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.Validation.Validation.{commonNamePattern, emailPattern, telephonePattern}
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -55,7 +56,7 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid full name" in {
       val invalidFullName = "*@tom [smith]"
       val result = form.bind(Map(fieldName -> invalidFullName)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.fullNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
     }
   }
 
@@ -77,7 +78,7 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid telephone data" in {
       val invalidTelephone = "invalid"
       val result = form.bind(Map(fieldName -> invalidTelephone)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.telephonePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(telephonePattern)))
     }
 
     behave like fieldWithMaxLength(
@@ -112,7 +113,7 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid email address data" in {
       val invalidEmail = "invalid"
       val result = form.bind(Map(fieldName -> invalidEmail)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.emailPattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(emailPattern)))
     }
 
     behave like fieldWithMaxLength(
