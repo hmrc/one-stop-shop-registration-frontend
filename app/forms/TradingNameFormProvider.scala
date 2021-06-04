@@ -26,7 +26,7 @@ class TradingNameFormProvider @Inject() extends Mappings {
   def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
     Form(
       "value" -> text("tradingName.error.required")
-        .verifying(maxLength(100, "tradingName.error.length"))
+        .verifying(maxLength(160, "tradingName.error.length"))
         .verifying(notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"))
     )
 }

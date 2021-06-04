@@ -23,7 +23,7 @@ class RegisteredCompanyNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "registeredCompanyName.error.required"
   val lengthKey = "registeredCompanyName.error.length"
-  val maxLength = 100
+  val maxLength = 105
 
   val form = new RegisteredCompanyNameFormProvider()()
 
