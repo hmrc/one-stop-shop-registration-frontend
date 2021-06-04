@@ -73,6 +73,7 @@ registeredCompanyName.hint = If your business is incorporated with Companies Hou
 registeredCompanyName.checkYourAnswersLabel = Registered business name
 registeredCompanyName.error.required = Enter your business name
 registeredCompanyName.error.length = The business name must be 100 characters or less
+registeredCompanyName.error.invalid = Enter a valid business name
 registeredCompanyName.change.hidden = the registered business name
 
 tradingName.title = What is your trading name?
@@ -81,6 +82,7 @@ tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liabi
 tradingName.error.required = Enter your trading name
 tradingName.error.length = Your trading name must be 100 characters or less
 tradingName.error.duplicate = You have already added this trading name
+tradingName.error.invalid = Enter a valid trading name
 tradingName.change.hidden = your trading name
 
 ukVatEffectiveDate.title = What is your UK VAT registration date?

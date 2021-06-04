@@ -29,12 +29,14 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "fullName"
     val requiredKey = "businessContactDetails.error.fullName.required"
     val lengthKey = "businessContactDetails.error.fullName.length"
+    val invalidKey = "businessContactDetails.error.fullName.invalid"
     val maxLength = 100
+    val validData = "Tom Smith"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -49,6 +51,12 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind invalid full name" in {
+      val invalidFullName = "*@tom [smith]"
+      val result = form.bind(Map(fieldName -> invalidFullName)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.fullNamePattern)))
+    }
   }
 
   ".telephoneNumber" - {

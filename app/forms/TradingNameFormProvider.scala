@@ -23,10 +23,14 @@ import play.api.data.Form
 
 class TradingNameFormProvider @Inject() extends Mappings {
 
+  val tradingNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
+
   def apply(thisIndex: Index, existingAnswers: Seq[String]): Form[String] =
     Form(
       "value" -> text("tradingName.error.required")
-        .verifying(maxLength(100, "tradingName.error.length"))
-        .verifying(notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"))
+        .verifying(firstError(
+          maxLength(100, "tradingName.error.length"),
+          notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
+          regexp(tradingNamePattern, "tradingName.error.invalid")))
     )
 }

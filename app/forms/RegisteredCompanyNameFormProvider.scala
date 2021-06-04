@@ -23,9 +23,13 @@ import play.api.data.Form
 
 class RegisteredCompanyNameFormProvider @Inject() extends Mappings {
 
+  val registeredCompanyNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
+
   def apply(): Form[String] =
     Form(
       "value" -> text("registeredCompanyName.error.required")
-        .verifying(maxLength(100, "registeredCompanyName.error.length"))
+        .verifying(firstError(
+          maxLength(100, "registeredCompanyName.error.length"),
+          regexp(registeredCompanyNamePattern, "registeredCompanyName.error.invalid")))
     )
 }

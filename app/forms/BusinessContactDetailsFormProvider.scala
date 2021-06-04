@@ -25,13 +25,16 @@ import models.BusinessContactDetails
 
 class BusinessContactDetailsFormProvider @Inject() extends Mappings {
 
+  val fullNamePattern: String = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
   val emailPattern: String = """^.+[@].+[.].+$"""
   val telephonePattern: String = """^\+[0-9 ]{1,18}$|^[0-9 ]{1,19}$|^(?=.{2,22}$)\+[0-9 ]*\(0\)[0-9 ]*$|^(?=.{1,22}$)[0-9 ]*\(0\)[0-9 ]*$"""
 
   def apply(): Form[BusinessContactDetails] = Form(
      mapping(
       "fullName" -> text("businessContactDetails.error.fullName.required")
-        .verifying(maxLength(100, "businessContactDetails.error.fullName.length")),
+        .verifying(firstError(
+          maxLength(100, "businessContactDetails.error.fullName.length"),
+          regexp(fullNamePattern, "businessContactDetails.error.fullName.invalid"))),
       "telephoneNumber" -> text("businessContactDetails.error.telephoneNumber.required")
         .verifying(firstError(
           maxLength(20, "businessContactDetails.error.telephoneNumber.length"),

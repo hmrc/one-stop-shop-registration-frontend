@@ -24,9 +24,13 @@ import javax.inject.Inject
 
 class FixedEstablishmentTradingNameFormProvider @Inject() extends Mappings {
 
+  val fixedEstablishmentTradingNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
+
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("fixedEstablishmentTradingName.error.required", Seq(country.name))
-        .verifying(maxLength(100, "fixedEstablishmentTradingName.error.length"))
+        .verifying(firstError(
+          maxLength(100, "fixedEstablishmentTradingName.error.length"),
+          regexp(fixedEstablishmentTradingNamePattern, "fixedEstablishmentTradingName.error.invalid")))
     )
 }
