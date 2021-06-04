@@ -26,8 +26,8 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "previousEuVatNumber.error.required"
   val lengthKey = "previousEuVatNumber.error.length"
   val invalidKey = "previousEuVatNumber.error.invalid"
-  val maxLength = 100
   val validData = "DE+854123"
+  val maxLength = 12
 
   val country: Country = arbitrary[Country].sample.value
 

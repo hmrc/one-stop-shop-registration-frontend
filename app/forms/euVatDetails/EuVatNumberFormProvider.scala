@@ -30,7 +30,7 @@ class EuVatNumberFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("euVatNumber.error.required", Seq(country.name))
         .verifying(firstError(
-          maxLength(50, "euVatNumber.error.length"),
+          maxLength(12, "euVatNumber.error.length"),
           regexp(euVatNumberPattern, "euVatNumber.error.invalid")))
     )
 }

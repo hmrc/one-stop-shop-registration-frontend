@@ -25,7 +25,7 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "tradingName.error.required"
   val lengthKey = "tradingName.error.length"
   val invalidKey = "tradingName.error.invalid"
-  val maxLength = 100
+  val maxLength = 160
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[String]
   val validData = "Delicious Chocolate Company"

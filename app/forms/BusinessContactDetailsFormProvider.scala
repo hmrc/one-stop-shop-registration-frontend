@@ -33,7 +33,7 @@ class BusinessContactDetailsFormProvider @Inject() extends Mappings {
      mapping(
       "fullName" -> text("businessContactDetails.error.fullName.required")
         .verifying(firstError(
-          maxLength(100, "businessContactDetails.error.fullName.length"),
+          maxLength(105, "businessContactDetails.error.fullName.length"),
           regexp(fullNamePattern, "businessContactDetails.error.fullName.invalid"))),
       "telephoneNumber" -> text("businessContactDetails.error.telephoneNumber.required")
         .verifying(firstError(
@@ -41,7 +41,7 @@ class BusinessContactDetailsFormProvider @Inject() extends Mappings {
           regexp(telephonePattern, "businessContactDetails.error.telephoneNumber.invalid"))),
        "emailAddress" -> text("businessContactDetails.error.emailAddress.required")
          .verifying(firstError(
-           maxLength(50, "businessContactDetails.error.emailAddress.length"),
+           maxLength(254, "businessContactDetails.error.emailAddress.length"),
            regexp(emailPattern, "businessContactDetails.error.emailAddress.invalid")))
     )(BusinessContactDetails.apply)(BusinessContactDetails.unapply)
    )
