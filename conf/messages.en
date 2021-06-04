@@ -108,6 +108,7 @@ euVatNumber.heading = What is your VAT registration number for {0}?
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.length = VAT registration number must be 100 characters or less
+euVatNumber.error.invalid = Enter a valid EU VAT number
 euVatNumber.change.hidden = your VAT registration number
 
 euCountry.title = Which EU country?
@@ -417,6 +418,7 @@ previousEuVatNumber.heading = What was the VAT number for {0}?
 previousEuVatNumber.checkYourAnswersLabel = VAT number
 previousEuVatNumber.error.required = Enter the VAT number
 previousEuVatNumber.error.length = VAT number must be 100 characters or less
+previousEuVatNumber.error.invalid = Enter a valid EU Vat number
 previousEuVatNumber.change.hidden = the VAT number
 
 previouslyRegistered.title = Has your business been registered in the past for the One Stop Shop in an EU country

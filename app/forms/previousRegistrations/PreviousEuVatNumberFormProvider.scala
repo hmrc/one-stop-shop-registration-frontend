@@ -24,9 +24,13 @@ import javax.inject.Inject
 
 class PreviousEuVatNumberFormProvider @Inject() extends Mappings {
 
+  val previousEuVatNumberPattern = """^[A-Z\d\*\+]{1,12}$"""
+
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
-        .verifying(maxLength(100, "previousEuVatNumber.error.length"))
+        .verifying(firstError(
+          maxLength(100, "previousEuVatNumber.error.length"),
+            regexp(previousEuVatNumberPattern, "previousEuVatNumber.error.invalid")))
     )
 }

@@ -25,11 +25,14 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "euVatNumber.error.required"
   val lengthKey = "euVatNumber.error.length"
+  val invalidKey = "euVatNumber.error.invalid"
   val maxLength = 50
+  val validData = "ES123456789*"
 
   val country: Country = arbitrary[Country].sample.value
 
-  val form = new EuVatNumberFormProvider()(country)
+  val formProvider: EuVatNumberFormProvider = new EuVatNumberFormProvider()
+  val form = formProvider(country)
 
   ".value" - {
 
@@ -38,7 +41,7 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -53,5 +56,11 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
+
+    "must not bind invalid EU VAT number" in {
+      val invalidEuVatNumber = "abc?123"
+      val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(formProvider.euVatNumberPattern)))
+    }
   }
 }
