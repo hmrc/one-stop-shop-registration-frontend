@@ -14,34 +14,26 @@
  * limitations under the License.
  */
 
-package forms
+package forms.euDetails
 
-import forms.behaviours.StringFieldBehaviours
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class EuTaxReferenceFormProviderSpec extends StringFieldBehaviours {
+class TaxRegisteredInEuFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "euTaxReference.error.required"
-  val lengthKey = "euTaxReference.error.length"
-  val maxLength = 100
+  val requiredKey = "taxRegisteredInEu.error.required"
+  val invalidKey = "error.boolean"
 
-  val form = new EuTaxReferenceFormProvider()()
+  val form = new TaxRegisteredInEuFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidData(
+    behave like booleanField(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

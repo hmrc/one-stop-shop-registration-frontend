@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package pages.euDetails
 
-import pages.behaviours.PageBehaviours
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
+case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
-class EuTaxReferencePageSpec extends PageBehaviours {
+  override def path: JsPath = JsPath \ toString
 
-  "EuTaxReferencePage" - {
-
-    beRetrievable[String](EuTaxReferencePage)
-
-    beSettable[String](EuTaxReferencePage)
-
-    beRemovable[String](EuTaxReferencePage)
-  }
+  override def toString: String = "taxRegisteredInEu"
 }

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms.euDetails
 
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class TaxRegisteredInEuFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "taxRegisteredInEu"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("taxRegisteredInEu.error.required")
+    )
 }

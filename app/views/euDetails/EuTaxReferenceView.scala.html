@@ -12,7 +12,7 @@
 
 @layout(pageTitle = title(form, messages("euTaxReference.title"))) {
 
-    @formHelper(action = routes.EuTaxReferenceController.onSubmit(mode)) {
+    @formHelper(action = controllers.euDetails.routes.EuTaxReferenceController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

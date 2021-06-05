@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.euDetails
 
 import controllers.actions._
-import forms.EuTaxReferenceFormProvider
-import javax.inject.Inject
+import forms.euDetails.TaxRegisteredInEuFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.EuTaxReferencePage
+import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.EuTaxReferenceView
+import views.html.euDetails.TaxRegisteredInEuView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EuTaxReferenceController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
-                                        formProvider: EuTaxReferenceFormProvider,
-                                        view: EuTaxReferenceView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class TaxRegisteredInEuController @Inject()(
+                                         override val messagesApi: MessagesApi,
+                                         cc: AuthenticatedControllerComponents,
+                                         navigator: Navigator,
+                                         formProvider: TaxRegisteredInEuFormProvider,
+                                         view: TaxRegisteredInEuView
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -43,7 +43,7 @@ class EuTaxReferenceController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(EuTaxReferencePage) match {
+      val preparedForm = request.userAnswers.get(TaxRegisteredInEuPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -60,9 +60,9 @@ class EuTaxReferenceController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(EuTaxReferencePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(EuTaxReferencePage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(TaxRegisteredInEuPage, mode, updatedAnswers))
       )
   }
 }

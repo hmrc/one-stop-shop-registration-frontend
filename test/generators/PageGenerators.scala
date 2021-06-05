@@ -19,7 +19,7 @@ package generators
 import models.Index
 import org.scalacheck.Arbitrary
 import pages.{euDetails, _}
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredInEuPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {

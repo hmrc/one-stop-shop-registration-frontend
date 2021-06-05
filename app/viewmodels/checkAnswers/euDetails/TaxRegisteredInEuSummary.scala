@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.euDetails
 
-import controllers.routes
+import controllers.euDetails.routes
 import models.{CheckMode, UserAnswers}
-import pages.TaxRegisteredInEuPage
+import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object TaxRegisteredInEuSummary  {
+object TaxRegisteredInEuSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TaxRegisteredInEuPage).map {
@@ -33,8 +33,8 @@ object TaxRegisteredInEuSummary  {
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = "taxRegisteredInEu.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
+          key = "taxRegisteredInEu.checkYourAnswersLabel",
+          value = ValueViewModel(value),
           actions = Seq(
             ActionItemViewModel("site.change", routes.TaxRegisteredInEuController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("taxRegisteredInEu.change.hidden"))

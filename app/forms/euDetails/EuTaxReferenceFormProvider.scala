@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package forms
-
-import javax.inject.Inject
+package forms.euDetails
 
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class TaxRegisteredInEuFormProvider @Inject() extends Mappings {
+import javax.inject.Inject
 
-  def apply(): Form[Boolean] =
+class EuTaxReferenceFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
     Form(
-      "value" -> boolean("taxRegisteredInEu.error.required")
+      "value" -> text("euTaxReference.error.required")
+        .verifying(maxLength(100, "euTaxReference.error.length"))
     )
 }
