@@ -17,27 +17,27 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, UserAnswers}
-import pages.euDetails.VatRegisteredInEuPage
+import models.{CheckMode, Index, UserAnswers}
+import pages.euDetails.VatRegisteredPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object VatRegisteredInEuSummary {
+object VatRegisteredSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(VatRegisteredInEuPage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(VatRegisteredPage(index)).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key = "vatRegisteredInEu.checkYourAnswersLabel",
+          key = "vatRegistered.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.VatRegisteredInEuController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("vatRegisteredInEu.change.hidden"))
+            ActionItemViewModel("site.change", routes.VatRegisteredController.onPageLoad(CheckMode, index).url)
+              .withVisuallyHiddenText(messages("vatRegistered.change.hidden"))
           )
         )
     }

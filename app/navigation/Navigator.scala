@@ -38,8 +38,8 @@ class Navigator @Inject()() {
     case AddTradingNamePage                       => addTradingNameRoute
     case DeleteTradingNamePage(_)                 => deleteTradingNameRoute
     case PartOfVatGroupPage                       => partOfVatGroupRoute
-    case UkVatEffectiveDatePage                   => _ => euRoutes.VatRegisteredInEuController.onPageLoad(NormalMode)
-    case VatRegisteredInEuPage                    => isEuVatRegistered
+    case UkVatEffectiveDatePage                   => _ => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
+    case TaxRegisteredInEuPage                    => isEuTaxRegistered
     case EuCountryPage(index)                     => _ => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
     case EuVatNumberPage(index)                   => _ => euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
     case HasFixedEstablishmentPage(index)         => hasFixedEstablishmentRoute(index)
@@ -87,7 +87,7 @@ class Navigator @Inject()() {
 
   private def partOfVatGroupRoute(answers: UserAnswers): Call =
     if (answers.vatInfo.isDefined) {
-      euRoutes.VatRegisteredInEuController.onPageLoad(NormalMode)
+      euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
     }
     else {
       routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
@@ -99,7 +99,7 @@ class Navigator @Inject()() {
       case _                => routes.HasTradingNameController.onPageLoad(NormalMode)
     }
 
-  private def isEuVatRegistered(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
+  private def isEuTaxRegistered(answers: UserAnswers): Call = answers.get(TaxRegisteredInEuPage) match {
     case Some(true)  => euRoutes.EuCountryController.onPageLoad(NormalMode, Index(0))
     case Some(false) => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
@@ -128,7 +128,7 @@ class Navigator @Inject()() {
   private def deleteEuVatDetailsRoute(answers: UserAnswers): Call =
     answers.get(DeriveNumberOfEuVatRegisteredCountries) match {
       case Some(n) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
-      case _                => euRoutes.VatRegisteredInEuController.onPageLoad(NormalMode)
+      case _                => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
     }
 
   private def previouslyRegisteredRoute(answers: UserAnswers): Call =
@@ -173,8 +173,8 @@ class Navigator @Inject()() {
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case HasTradingNamePage                       => hasTradingNameRoute(CheckMode)
-    case AddEuDetailsPage                      => addEuVatDetailsRoute(CheckMode)
-    case VatRegisteredInEuPage                    => vatRegisteredInEuRoute(CheckMode)
+    case AddEuDetailsPage                         => addEuVatDetailsRoute(CheckMode)
+    case TaxRegisteredInEuPage                    => taxRegisteredInEuRoute(CheckMode)
     case EuCountryPage(index)                     => euCountryCheckRoute(index)
     case EuVatNumberPage(index)                   => euVatNumberCheckRoute(index)
     case HasFixedEstablishmentPage(index)         => hasFixedEstablishmentCheckRoute(index)
@@ -189,7 +189,7 @@ class Navigator @Inject()() {
     case None         => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private def vatRegisteredInEuRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(VatRegisteredInEuPage) match {
+  private def taxRegisteredInEuRoute(mode: Mode)(answers: UserAnswers): Call = answers.get(TaxRegisteredInEuPage) match {
     case Some(true)   => euRoutes.EuCountryController.onPageLoad(mode, Index(0))
     case Some(false)  => routes.CheckYourAnswersController.onPageLoad()
     case None         => routes.JourneyRecoveryController.onPageLoad()
@@ -200,7 +200,7 @@ class Navigator @Inject()() {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(mode, Index(size))
       case (Some(false), _ )        => routes.CheckYourAnswersController.onPageLoad()
       case (None, Some(n)) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(mode)
-      case _                        => vatRegisteredInEuRoute(mode)(answers)
+      case _                        => taxRegisteredInEuRoute(mode)(answers)
   }
 
   private def euCountryCheckRoute(index: Index)(answers: UserAnswers): Call =

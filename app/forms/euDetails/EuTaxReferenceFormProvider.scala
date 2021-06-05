@@ -17,15 +17,16 @@
 package forms.euDetails
 
 import forms.mappings.Mappings
+import models.Country
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class EuTaxReferenceFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(country: Country): Form[String] =
     Form(
-      "value" -> text("euTaxReference.error.required")
+      "value" -> text("euTaxReference.error.required", Seq(country.name))
         .verifying(maxLength(100, "euTaxReference.error.length"))
     )
 }

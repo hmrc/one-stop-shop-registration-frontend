@@ -173,34 +173,34 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
         }
 
-        "to VAT Registered in the EU when we know the user's VAT details" in {
+        "to Tax Registered in the EU when we know the user's UK VAT details" in {
 
           navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswersWithVatInfo)
-            .mustBe(euRoutes.VatRegisteredInEuController.onPageLoad(NormalMode))
+            .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
 
-      "must go from UK VAT Effective Date to VAT Registered in EU" in {
+      "must go from UK VAT Effective Date to Tax Registered in EU" in {
 
         navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
-          .mustBe(euRoutes.VatRegisteredInEuController.onPageLoad(NormalMode))
+          .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
       }
 
-      "must go from VAT Registered in EU" - {
+      "must go from Tax Registered in EU" - {
 
         "to EU Country when the user answers true" in {
 
-          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
 
-          navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
+          navigator.nextPage(TaxRegisteredInEuPage, NormalMode, answers)
             .mustBe(euRoutes.EuCountryController.onPageLoad(NormalMode, index))
         }
 
         "to Previously Registered when the user answers false" in {
 
-          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
 
-          navigator.nextPage(VatRegisteredInEuPage, NormalMode, answers)
+          navigator.nextPage(TaxRegisteredInEuPage, NormalMode, answers)
             .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
         }
       }
@@ -281,10 +281,10 @@ class NavigatorSpec extends SpecBase {
             .mustBe(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
         }
 
-        "to VAT Registered in EU when there are no EU VAT details left" in {
+        "to Tax Registered in EU when there are no EU VAT details left" in {
 
           navigator.nextPage(pages.euDetails.DeleteEuDetailsPage(index), NormalMode, emptyUserAnswers)
-            .mustBe(euRoutes.VatRegisteredInEuController.onPageLoad(NormalMode))
+            .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
 
@@ -519,21 +519,21 @@ class NavigatorSpec extends SpecBase {
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "must go from Vat Registered In EU page" - {
+      "must go from Tax Registered In EU page" - {
 
         "to EU Country page if true" in {
 
-          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, true).success.value
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
 
-          navigator.nextPage(VatRegisteredInEuPage, CheckMode, answers)
+          navigator.nextPage(TaxRegisteredInEuPage, CheckMode, answers)
             .mustBe(euRoutes.EuCountryController.onPageLoad(CheckMode, index))
         }
 
         "to Check Your Answers if false" in {
 
-          val answers = emptyUserAnswers.set(VatRegisteredInEuPage, false).success.value
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
 
-          navigator.nextPage(VatRegisteredInEuPage, CheckMode, answers)
+          navigator.nextPage(TaxRegisteredInEuPage, CheckMode, answers)
             .mustBe(routes.CheckYourAnswersController.onPageLoad())
         }
       }

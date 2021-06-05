@@ -22,7 +22,7 @@ import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
 import models.euDetails.EuDetails
 import pages._
-import pages.euDetails.VatRegisteredInEuPage
+import pages.euDetails.{TaxRegisteredInEuPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import queries.{AllEuDetailsQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
@@ -38,7 +38,7 @@ class RegistrationServiceSpec extends SpecBase {
       .set(AllTradingNames, List("single", "double")).success.value
       .set(PartOfVatGroupPage, true).success.value
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
-      .set(VatRegisteredInEuPage, true).success.value
+      .set(TaxRegisteredInEuPage, true).success.value
       .set(
         AllEuDetailsQuery,
         List(

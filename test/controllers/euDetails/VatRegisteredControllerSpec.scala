@@ -17,64 +17,68 @@
 package controllers.euDetails
 
 import base.SpecBase
-import forms.euDetails.VatRegisteredInEuFormProvider
-import models.{NormalMode, UserAnswers}
+import forms.euDetails.VatRegisteredFormProvider
+import models.{Country, Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.VatRegisteredInEuPage
+import pages.euDetails.{EuCountryPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.euDetails.VatRegisteredInEuView
+import views.html.euDetails.VatRegisteredView
 
 import scala.concurrent.Future
 
-class VatRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
+class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val index = Index(0)
+  private val onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new VatRegisteredInEuFormProvider()
-  val form = formProvider()
+  private val country = Country.euCountries.head
+  private val formProvider = new VatRegisteredFormProvider()
+  private val form = formProvider(country)
 
-  lazy val vatRegisteredInEuRoute = routes.VatRegisteredInEuController.onPageLoad(NormalMode).url
+  private lazy val vatRegisteredRoute = routes.VatRegisteredController.onPageLoad(NormalMode, index).url
 
-  "VatRegisteredInEu Controller" - {
+  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
+
+  "VatRegistered Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, vatRegisteredInEuRoute)
+        val request = FakeRequest(GET, vatRegisteredRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[VatRegisteredInEuView]
+        val view = application.injector.instanceOf[VatRegisteredView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(VatRegisteredInEuPage, true).success.value
+      val userAnswers = baseUserAnswers.set(VatRegisteredPage(index), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, vatRegisteredInEuRoute)
+        val request = FakeRequest(GET, vatRegisteredRoute)
 
-        val view = application.injector.instanceOf[VatRegisteredInEuView]
+        val view = application.injector.instanceOf[VatRegisteredView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
@@ -85,7 +89,7 @@ class VatRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -94,7 +98,7 @@ class VatRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, vatRegisteredInEuRoute)
+          FakeRequest(POST, vatRegisteredRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -106,21 +110,21 @@ class VatRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, vatRegisteredInEuRoute)
+          FakeRequest(POST, vatRegisteredRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[VatRegisteredInEuView]
+        val view = application.injector.instanceOf[VatRegisteredView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
@@ -129,7 +133,7 @@ class VatRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, vatRegisteredInEuRoute)
+        val request = FakeRequest(GET, vatRegisteredRoute)
 
         val result = route(application, request).value
 
@@ -144,7 +148,7 @@ class VatRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, vatRegisteredInEuRoute)
+          FakeRequest(POST, vatRegisteredRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

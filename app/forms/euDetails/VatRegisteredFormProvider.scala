@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package pages.euDetails
+package forms.euDetails
 
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.AllEuDetailsQuery
+import forms.mappings.Mappings
+import models.Country
+import play.api.data.Form
 
-import scala.util.Try
+import javax.inject.Inject
 
-case object VatRegisteredInEuPage extends QuestionPage[Boolean] {
+class VatRegisteredFormProvider @Inject() extends Mappings {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "vatRegisteredInEu"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(AllEuDetailsQuery)
-      case _ => super.cleanup(value, userAnswers)
-    }
+  def apply(country: Country): Form[Boolean] =
+    Form(
+      "value" -> boolean("vatRegistered.error.required", args = Seq(country.name))
+    )
 }

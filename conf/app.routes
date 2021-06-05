@@ -53,10 +53,10 @@ POST        /vatRegisteredEuMemberState/:index              controllers.euDetail
 GET         /changeVatRegisteredEuMemberState/:index        controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /changeVatRegisteredEuMemberState/:index        controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /vatRegisteredInEu                              controllers.euDetails.VatRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
-POST        /vatRegisteredInEu                              controllers.euDetails.VatRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
-GET         /changeVatRegisteredInEu                        controllers.euDetails.VatRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeVatRegisteredInEu                        controllers.euDetails.VatRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+GET         /vatRegisteredInEu/:index                              controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /vatRegisteredInEu/:index                              controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeVatRegisteredInEu/:index                        controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeVatRegisteredInEu/:index                        controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /addAdditionalEuVatDetails                      controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /addAdditionalEuVatDetails                      controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = NormalMode)
@@ -207,10 +207,10 @@ POST       /currentlyRegisteredInCountry                        controllers.Curr
 GET        /changeCurrentlyRegisteredInCountry                  controllers.CurrentlyRegisteredInCountryController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeCurrentlyRegisteredInCountry                  controllers.CurrentlyRegisteredInCountryController.onSubmit(mode: Mode = CheckMode)
 
-GET        /euTaxReference                        controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST       /euTaxReference                        controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode)
-GET        /changeEuTaxReference                  controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeEuTaxReference                  controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckMode)
+GET        /euTaxReference/:index                        controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /euTaxReference/:index                        controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeEuTaxReference/:index                  controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeEuTaxReference/:index                  controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET        /hasWebsite                        controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
 POST       /hasWebsite                        controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)

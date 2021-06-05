@@ -16,17 +16,20 @@
 
 package pages.euDetails
 
+import models.Index
 import pages.behaviours.PageBehaviours
 
 
 class EuTaxReferencePageSpec extends PageBehaviours {
 
+  private val index = Index(0)
+
   "EuTaxReferencePage" - {
 
-    beRetrievable[String](EuTaxReferencePage)
+    beRetrievable[String](EuTaxReferencePage(index))
 
-    beSettable[String](EuTaxReferencePage)
+    beSettable[String](EuTaxReferencePage(index))
 
-    beRemovable[String](EuTaxReferencePage)
+    beRemovable[String](EuTaxReferencePage(index))
   }
 }

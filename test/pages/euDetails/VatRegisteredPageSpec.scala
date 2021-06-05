@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 
-package forms.euDetails
+package pages.euDetails
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import models.Index
+import pages.behaviours.PageBehaviours
 
-class VatRegisteredInEuFormProviderSpec extends BooleanFieldBehaviours {
+class VatRegisteredPageSpec extends PageBehaviours {
 
-  val requiredKey = "vatRegisteredInEu.error.required"
-  val invalidKey = "error.boolean"
+  private val index = Index(0)
 
-  val form = new VatRegisteredInEuFormProvider()()
+  "VatRegisteredInEuPage" - {
 
-  ".value" - {
+    beRetrievable[Boolean](VatRegisteredPage(index))
 
-    val fieldName = "value"
+    beSettable[Boolean](VatRegisteredPage(index))
 
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
-    )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    beRemovable[Boolean](VatRegisteredPage(index))
   }
 }

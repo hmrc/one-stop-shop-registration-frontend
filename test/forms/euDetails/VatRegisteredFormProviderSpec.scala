@@ -16,36 +16,28 @@
 
 package forms.euDetails
 
-import forms.behaviours.StringFieldBehaviours
+import forms.behaviours.BooleanFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
-class EuTaxReferenceFormProviderSpec extends StringFieldBehaviours {
+class VatRegisteredFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "euTaxReference.error.required"
-  val lengthKey = "euTaxReference.error.length"
-  val maxLength = 100
+  val requiredKey = "vatRegistered.error.required"
+  val invalidKey = "error.boolean"
 
   val country: Country = arbitrary[Country].sample.value
 
-  val form = new EuTaxReferenceFormProvider()(country)
+  val form = new VatRegisteredFormProvider()(country)
 
   ".value" - {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidData(
+    behave like booleanField(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      invalidError = FormError(fieldName, invalidKey, Seq(country.name))
     )
 
     behave like mandatoryField(

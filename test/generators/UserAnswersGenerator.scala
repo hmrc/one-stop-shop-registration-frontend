@@ -21,7 +21,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredInEuPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
 
@@ -33,7 +33,7 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(SellsGoodsFromNiPage.type, JsValue)] ::
     arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] ::
     arbitrary[(HasWebsitePage.type, JsValue)] ::
-    arbitrary[(EuTaxReferencePage.type, JsValue)] ::
+    arbitrary[(EuTaxReferencePage, JsValue)] ::
     arbitrary[(CurrentlyRegisteredInCountryPage.type, JsValue)] ::
     arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::
@@ -51,7 +51,7 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(BusinessContactDetailsPage.type, JsValue)] ::
     arbitrary[(BusinessAddressPage.type, JsValue)] ::
     arbitrary[(AddEuDetailsPage.type, JsValue)] ::
-    arbitrary[(VatRegisteredInEuPage.type, JsValue)] ::
+    arbitrary[(VatRegisteredPage, JsValue)] ::
     arbitrary[(EuCountryPage, JsValue)] ::
     arbitrary[(EuVatNumberPage, JsValue)] ::
     arbitrary[(UkVatEffectiveDatePage.type, JsValue)] ::

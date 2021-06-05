@@ -19,7 +19,7 @@ package generators
 import models.Index
 import org.scalacheck.Arbitrary
 import pages.{euDetails, _}
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredInEuPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
@@ -36,8 +36,8 @@ trait PageGenerators {
   implicit lazy val arbitraryHasWebsitePage: Arbitrary[HasWebsitePage.type] =
     Arbitrary(HasWebsitePage)
 
-  implicit lazy val arbitraryEuTaxReferencePage: Arbitrary[EuTaxReferencePage.type] =
-    Arbitrary(EuTaxReferencePage)
+  implicit lazy val arbitraryEuTaxReferencePage: Arbitrary[EuTaxReferencePage] =
+    Arbitrary(EuTaxReferencePage(Index(0)))
 
   implicit lazy val arbitraryCurrentlyRegisteredInCountryPage: Arbitrary[CurrentlyRegisteredInCountryPage.type] =
     Arbitrary(CurrentlyRegisteredInCountryPage)
@@ -90,8 +90,8 @@ trait PageGenerators {
   implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuDetailsPage.type] =
     Arbitrary(AddEuDetailsPage)
 
-  implicit lazy val arbitraryVatRegisteredInEuPage: Arbitrary[VatRegisteredInEuPage.type] =
-    Arbitrary(VatRegisteredInEuPage)
+  implicit lazy val arbitraryVatRegisteredPage: Arbitrary[VatRegisteredPage] =
+    Arbitrary(VatRegisteredPage(Index(0)))
 
   implicit lazy val arbitraryEuCountryPage: Arbitrary[EuCountryPage] =
     Arbitrary(euDetails.EuCountryPage(Index(0)))
