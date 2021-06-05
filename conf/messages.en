@@ -1,4 +1,4 @@
-service.name = Register for the One Stop Shop
+service.name = Register to pay VAT on sales of goods from Northern Ireland to the EU
 
 site.back = Back
 site.remove = Remove
@@ -120,11 +120,11 @@ euCountry.error.required = Enter an EU country
 euCountry.error.duplicate = You have already added this country
 euCountry.change.hidden = EU country
 
-vatRegistered.title = Is your business registered for VAT in {0}?
-vatRegistered.heading = Is your business registered for VAT in {0}?
+vatRegistered.title = Are you VAT registered in {0}?
+vatRegistered.heading = Are you VAT registered for VAT in {0}?
 vatRegistered.checkYourAnswersLabel = Registered for VAT
-vatRegistered.error.required = Select yes if your business is registered for VAT in {0}
-vatRegistered.change.hidden = if your business is VAT registered
+vatRegistered.error.required = Select yes if you are registered for VAT in {0}
+vatRegistered.change.hidden = if you are VAT registered
 
 addEuVatDetails.title.singular = You have added VAT details for one EU country
 addEuVatDetails.heading.singular = You have added VAT details for one EU country
@@ -321,19 +321,28 @@ ivNotEnoughEvidenceSources.p2 = You can try again later by signing into Governme
 
 ivFailedMatching.title = We could not confirm your identity
 ivFailedMatching.heading = We could not confirm your identity
-ivFailedMatching.p = We could not confirm your identity
+ivFailedMatching.p = We could not confirm your identity.
 
 ivFailedIdentityVerification.title = We could not confirm your identity
 ivFailedIdentityVerification.heading = We could not confirm your identity
 ivFailedIdentityVerification.p = We could not confirm your identity
 
-checkVatDetails.title = Are these the VAT details you want to register for the One Stop Shop Scheme?
-checkVatDetails.heading = Are these the VAT details you want to register for the One Stop Shop Scheme?
-checkVatDetails.error.required = Select yes if these are the VAT details you want to register.
+checkVatDetails.title = These are the UK VAT registration details linked to your Government Gateway
+checkVatDetails.heading = These are the UK VAT registration details linked to your Government Gateway
+checkVatDetails.error.required = Select yes if these are the VAT details you want to register for the scheme
+checkVatDetails.vrn.label = UK VAT registration number
+checkVatDetails.organisationName.label = Organisation name
+checkVatDetails.partOfVatGroup.label = Part of a VAT group
+checkVatDetails.address.label = UK VAT registration address
+checkVatDetails.yes = Yes
+checkVatDetails.detailsIncorrect = No, some of the VAT details for this business are incorrect
+checkVatDetails.wrongAccount = No, I want to register a different business
 
-checkVatNumber.title = Is this the VAT number you want to register for the One Stop Shop Scheme?
-checkVatNumber.heading = Is this the VAT number you want to register for the One Stop Shop Scheme?
-checkVatNumber.error.required = Select yes if this is the VAT number you want to register.
+checkVatNumber.title = Confirm UK VAT details for business
+checkVatNumber.heading = Confirm UK VAT details for business
+checkVatNumber.error.required = Select yes if you want to register this business for the One Stop Shop
+checkVatNumber.label = Do you want to register this business for the One Stop Shop?
+checkVatNumber.vrn.title = UK VAT registration number
 
 useOtherAccount.title = You need to login with a different Government Gateway
 useOtherAccount.heading = You need to login with a different Government Gateway
@@ -439,54 +448,56 @@ deletePreviousRegistration.error.required = Select yes if you are sure you want 
 previousRegistrations.checkYourAnswersLabel = Old registrations
 previousRegistrations.change.hidden = your old registrations
 
-bankDetails.title = bankDetails
-bankDetails.heading = bankDetails
-bankDetails.accountName = accountName
-bankDetails.bic = bic
-bankDetails.checkYourAnswersLabel = BankDetails
-bankDetails.error.accountName.required = Enter accountName
-bankDetails.error.bic.required = Enter bic
-bankDetails.error.accountName.length = accountName must be 100 characters or less
-bankDetails.error.bic.length = bic must be 8 characters or less
-bankDetails.accountName.change.hidden = accountName
-bankDetails.bic.change.hidden = bic
+bankDetails.title = Enter your bank or building society account details
+bankDetails.heading = Enter your bank or building society account details
+bankDetails.accountName = Account name
+bankDetails.bic = BIC number
+bankDetails.bic.hint = Must be 8 digits long
+bankDetails.checkYourAnswersLabel = Bank account details
+bankDetails.error.accountName.required = Enter the account name
+bankDetails.error.bic.required = Enter the BIC number
+bankDetails.error.accountName.length = Account name must be 100 characters or less
+bankDetails.error.bic.length = BIC number must be 8 characters or less
+bankDetails.accountName.change.hidden = account name
+bankDetails.bic.change.hidden = BIC number
 
-currentlyRegisteredInCountry.title = currentlyRegisteredInCountry
-currentlyRegisteredInCountry.heading = currentlyRegisteredInCountry
-currentlyRegisteredInCountry.checkYourAnswersLabel = currentlyRegisteredInCountry
-currentlyRegisteredInCountry.error.required = Select yes if currentlyRegisteredInCountry
-currentlyRegisteredInCountry.change.hidden = CurrentlyRegisteredInCountry
+currentlyRegisteredInCountry.title = Is your business registered for the One Stop SHop in {0}?
+currentlyRegisteredInCountry.heading = Is your business registered for the One Stop SHop in {0}?
+currentlyRegisteredInCountry.checkYourAnswersLabel = Registered for the One Stop Shop
+currentlyRegisteredInCountry.error.required = Select yes if your business is registered for the One Stop Shop in {0}
+currentlyRegisteredInCountry.change.hidden = if your business is registered for the One Stop Shop
 
-euTaxReference.title = euTaxReference
-euTaxReference.heading = euTaxReference
-euTaxReference.checkYourAnswersLabel = euTaxReference
-euTaxReference.error.required = Enter euTaxReference
+euTaxReference.title = What is your tax reference number for {0}?
+euTaxReference.heading = What is your tax reference number for {0}?
+euTaxReference.checkYourAnswersLabel = Tax reference number
+euTaxReference.error.required = Enter your tax reference number for {0}
 euTaxReference.error.length = EuTaxReference must be 100 characters or less
 euTaxReference.change.hidden = EuTaxReference
 
-hasWebsite.title = hasWebsite
-hasWebsite.heading = hasWebsite
-hasWebsite.checkYourAnswersLabel = hasWebsite
-hasWebsite.error.required = Select yes if hasWebsite
-hasWebsite.change.hidden = HasWebsite
+hasWebsite.title = Do you want to tell us about the websites that you use to sell your goods?
+hasWebsite.heading = Do you want to tell us about the websites that you use to sell your goods?
+hasWebsite.checkYourAnswersLabel = Do you want to tell us about the websites that you use to sell your goods?
+hasWebsite.error.required = Select yes if you want to tell us about the websites you use to sell your goods
+hasWebsite.change.hidden = if you want to tell us about the websites you use to sell your goods
 
-inControlOfMovingGoods.title = inControlOfMovingGoods
-inControlOfMovingGoods.heading = inControlOfMovingGoods
-inControlOfMovingGoods.checkYourAnswersLabel = inControlOfMovingGoods
-inControlOfMovingGoods.error.required = Select yes if inControlOfMovingGoods
-inControlOfMovingGoods.change.hidden = InControlOfMovingGoods
+inControlOfMovingGoods.title = Will your business be in control of moving goods from Northern Ireland to consumers in the EU?
+inControlOfMovingGoods.heading = Will your business be in control of moving goods from Northern Ireland to consumers in the EU?
+inControlOfMovingGoods.checkYourAnswersLabel = Will your business be in control of moving goods from Northern Ireland to consumers in the EU?
+inControlOfMovingGoods.error.required = Select yes if your business will be in control of moving goods
+inControlOfMovingGoods.change.hidden = if your business will be in control of moving goods
 
-sellsGoodsFromNi.title = sellsGoodsFromNi
-sellsGoodsFromNi.heading = sellsGoodsFromNi
-sellsGoodsFromNi.checkYourAnswersLabel = sellsGoodsFromNi
-sellsGoodsFromNi.error.required = Select yes if sellsGoodsFromNi
-sellsGoodsFromNi.change.hidden = SellsGoodsFromNi
+sellsGoodsFromNi.title = Will your business sell goods online from Northern Ireland to consumers in the EU?
+sellsGoodsFromNi.heading = Will your business sell goods online from Northern Ireland to consumers in the EU?
+sellsGoodsFromNi.checkYourAnswersLabel = Will your business sell goods online from Northern Ireland to consumers in the EU?
+sellsGoodsFromNi.error.required = Select yes if your business will sell goods online from Northern Ireland to consumers in the EU
+sellsGoodsFromNi.change.hidden = if your business will sell goods online from Northern Ireland to consumers in the EU
 
-taxRegisteredInEu.title = taxRegisteredInEu
-taxRegisteredInEu.heading = taxRegisteredInEu
-taxRegisteredInEu.checkYourAnswersLabel = taxRegisteredInEu
-taxRegisteredInEu.error.required = Select yes if taxRegisteredInEu
-taxRegisteredInEu.change.hidden = TaxRegisteredInEu
+taxRegisteredInEu.title = Is your business registered for taxes in any EU countries?
+taxRegisteredInEu.heading = Is your business registered for taxes in any EU countries?
+taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
+taxRegisteredInEu.error.required = Select yes if your business is registered for taxes in any EU countries
+taxRegisteredInEu.change.hidden = if your business is registered for taxes in any EU countries
 
-updateVatDetails.title = updateVatDetails
-updateVatDetails.heading = updateVatDetails
+updateVatDetails.title = You cannot use this service
+updateVatDetails.heading = You cannot use this service
+updateVatDetails.guidance = You will need to update the details of your VAT registration before registering for the One Stop Shop scheme.
