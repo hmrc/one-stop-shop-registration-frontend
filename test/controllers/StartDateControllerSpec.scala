@@ -52,10 +52,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, startDateRoute)
@@ -73,10 +70,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId).set(StartDatePage, StartDate(StartDateOption.NextPeriod, startDateService.startOfNextPeriod)).success.value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, startDateRoute)
@@ -101,8 +95,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[Clock].toInstance(stubClockAtArbitraryDate)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -120,10 +113,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -143,10 +133,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application =
-        applicationBuilder(userAnswers = None)
-          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
-          .build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, startDateRoute)
@@ -160,10 +147,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application =
-        applicationBuilder(userAnswers = None)
-          .overrides(bind[Clock].toInstance(stubClockAtArbitraryDate))
-          .build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

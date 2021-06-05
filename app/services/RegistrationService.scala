@@ -16,37 +16,34 @@
 
 package services
 
-import models.UserAnswers
-import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration}
+import models.domain.VatDetailSource.{Etmp, Mixed, UserEntered}
+import models.{Address, UserAnswers}
+import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, VatDetailSource, VatDetails}
 import pages._
 import queries.{AllEuVatDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
+
+import java.time.LocalDate
 
 class RegistrationService {
 
   def fromUserAnswers(userAnswers: UserAnswers, vrn: Vrn): Option[Registration] =
     for {
-      registeredCompanyName        <- userAnswers.get(RegisteredCompanyNamePage)
+      registeredCompanyName        <- getName(userAnswers)
       tradingNames                 = getTradingNames(userAnswers)
-      partOfVatGroup               <- userAnswers.get(PartOfVatGroupPage)
-      ukVatEffectiveDate           <- userAnswers.get(UkVatEffectiveDatePage)
-      ukVatRegisteredPostcode      <- userAnswers.get(UkVatRegisteredPostcodePage)
+      vatDetails                   <- buildVatDetails(userAnswers)
       euVatRegistrations           = buildEuVatRegistrations(userAnswers)
       startDate                    <- userAnswers.get(StartDatePage)
-      businessAddress              <- userAnswers.get(BusinessAddressPage)
       businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
       websites                     <- userAnswers.get(AllWebsites)
       currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
-      previousRegistrations         = buildPreviousRegistrations(userAnswers)
+      previousRegistrations        = buildPreviousRegistrations(userAnswers)
     } yield Registration(
       vrn,
       registeredCompanyName,
       tradingNames,
-      partOfVatGroup,
-      ukVatEffectiveDate,
-      ukVatRegisteredPostcode,
+      vatDetails,
       euVatRegistrations,
-      businessAddress,
       businessContactDetails,
       websites,
       startDate.date,
@@ -79,4 +76,54 @@ class RegistrationService {
         detail =>
           PreviousRegistration(detail.previousEuCountry, detail.previousEuVatNumber)
       }
+
+  private def buildVatDetails(answers: UserAnswers): Option[VatDetails] =
+    for {
+      address          <- getAddress(answers)
+      registrationDate <- getRegistrationDate(answers)
+      partOfVatGroup   <- getPartOfVatGroup(answers)
+      source           = getVatDetailSource(answers)
+    } yield VatDetails(registrationDate, address, partOfVatGroup, source)
+
+  private def getPartOfVatGroup(answers: UserAnswers): Option[Boolean] =
+    answers.vatInfo match {
+      case Some(vatInfo) =>
+        vatInfo.partOfVatGroup orElse answers.get(PartOfVatGroupPage)
+      case None =>
+        answers.get(PartOfVatGroupPage)
+    }
+
+  private def getRegistrationDate(answers: UserAnswers): Option[LocalDate] =
+    answers.vatInfo match {
+      case Some(vatInfo) =>
+        vatInfo.registrationDate orElse answers.get(UkVatEffectiveDatePage)
+      case None =>
+        answers.get(UkVatEffectiveDatePage)
+    }
+
+  private def getAddress(answers: UserAnswers): Option[Address] =
+    answers.vatInfo match {
+      case Some(vatInfo) =>
+        Some(vatInfo.address)
+      case None =>
+        answers.get(BusinessAddressPage)
+    }
+
+  private def getName(answers: UserAnswers): Option[String] =
+    answers.vatInfo match {
+      case Some(vatInfo) =>
+        vatInfo.organisationName orElse answers.get(RegisteredCompanyNamePage)
+      case None =>
+        answers.get(RegisteredCompanyNamePage)
+    }
+
+  private def getVatDetailSource(answers: UserAnswers): VatDetailSource =
+    answers.vatInfo match {
+      case Some(vatInfo) if vatInfo.registrationDate.isDefined & vatInfo.partOfVatGroup.isDefined & vatInfo.organisationName.isDefined =>
+        Etmp
+      case Some(_) =>
+        Mixed
+      case None =>
+        UserEntered
+    }
 }

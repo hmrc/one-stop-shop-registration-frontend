@@ -18,12 +18,17 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
-import models.responses.ConflictFound
+import models.DesAddress
+import models.domain.VatCustomerInfo
+import models.responses.{ConflictFound, NotFound, UnexpectedResponseStatus}
+import org.scalacheck.Gen
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.http.HeaderCarrier
+
+import java.time.LocalDate
 
 class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
@@ -69,7 +74,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
     }
   }
 
-  "get" - {
+  "getRegistration" - {
 
     "must return a registration when the backend returns one" in {
 
@@ -82,7 +87,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
 
-        val result = connector.getRegistration(RegistrationData.registration.vrn).futureValue
+        val result = connector.getRegistration().futureValue
 
         result.value mustEqual RegistrationData.registration
       }
@@ -97,9 +102,64 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         server.stubFor(get(urlEqualTo(url)).willReturn(notFound()))
 
-        val result = connector.getRegistration(RegistrationData.registration.vrn).futureValue
+        val result = connector.getRegistration().futureValue
 
         result must not be defined
+      }
+    }
+  }
+
+  "getVatCustomerInfo" - {
+
+    val url = s"/one-stop-shop-registration/vat-information"
+
+    "must return information when the backend returns some" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val vatInfo = VatCustomerInfo(
+          registrationDate = Some(LocalDate.now),
+          address          = DesAddress("Line 1", Some("Line 2"), None, None, None, Some("AA11 1AA"), "GB"),
+          partOfVatGroup   = None,
+          organisationName = None
+        )
+
+        val responseBody = Json.toJson(vatInfo).toString
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getVatCustomerInfo().futureValue
+
+        result mustEqual Right(vatInfo)
+      }
+    }
+
+    "must return Left(NotFound) when the backend returns NOT_FOUND" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(notFound()))
+
+        val result = connector.getVatCustomerInfo().futureValue
+
+        result mustEqual Left(NotFound)
+      }
+    }
+
+    "must return Left(UnexpectedStatus) when the backend returns another error code" in {
+
+      val status = Gen.oneOf(400, 500, 501, 502, 503).sample.value
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(status)))
+
+        val result = connector.getVatCustomerInfo().futureValue
+
+        result mustEqual Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
       }
     }
   }

@@ -332,9 +332,13 @@ ivFailedIdentityVerification.title = We could not confirm your identity
 ivFailedIdentityVerification.heading = We could not confirm your identity
 ivFailedIdentityVerification.p = We could not confirm your identity
 
-checkVatDetails.title = Is this the VAT number you want to register for the One Stop Shop Scheme?
-checkVatDetails.heading = Is this the VAT number you want to register for the One Stop Shop Scheme?
-checkVatDetails.error.required = Select yes if this is the VAT number you want to register.
+checkVatDetails.title = Are these the VAT details you want to register for the One Stop Shop Scheme?
+checkVatDetails.heading = Are these the VAT details you want to register for the One Stop Shop Scheme?
+checkVatDetails.error.required = Select yes if these are the VAT details you want to register.
+
+checkVatNumber.title = Is this the VAT number you want to register for the One Stop Shop Scheme?
+checkVatNumber.heading = Is this the VAT number you want to register for the One Stop Shop Scheme?
+checkVatNumber.error.required = Select yes if this is the VAT number you want to register.
 
 useOtherAccount.title = You need to login with a different Government Gateway
 useOtherAccount.heading = You need to login with a different Government Gateway

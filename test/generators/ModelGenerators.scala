@@ -58,7 +58,7 @@ trait ModelGenerators {
       } yield BusinessContactDetails(fullName, telephoneNumber, emailAddress)
     }
 
-  implicit lazy val arbitraryBusinessAddress: Arbitrary[Address] =
+  implicit lazy val arbitraryBusinessAddress: Arbitrary[UkAddress] =
     Arbitrary {
       for {
         line1      <- arbitrary[String]
@@ -66,7 +66,7 @@ trait ModelGenerators {
         townOrCity <- arbitrary[String]
         county     <- Gen.option(arbitrary[String])
         postCode   <- arbitrary[String]
-      } yield Address(line1, line2, townOrCity, county, postCode)
+      } yield UkAddress(line1, line2, townOrCity, county, postCode)
     }
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {

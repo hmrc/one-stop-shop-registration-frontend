@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.BusinessAddressFormProvider
-import models.{NormalMode, Address, UserAnswers}
+import models.{NormalMode, UkAddress, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -86,7 +86,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Address("value 1", Some("value 2"), "value 3", Some("value 4"), "AA11 1AA")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(UkAddress("value 1", Some("value 2"), "value 3", Some("value 4"), "AA11 1AA")), NormalMode)(request, messages(application)).toString
       }
     }
 

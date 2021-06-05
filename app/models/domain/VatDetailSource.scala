@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package pages
+package models.domain
 
-import models.UkAddress
-import play.api.libs.json.JsPath
+import models.{Enumerable, WithName}
 
-case object BusinessAddressPage extends QuestionPage[UkAddress] {
+sealed trait VatDetailSource
 
-  override def path: JsPath = JsPath \ toString
+object VatDetailSource extends Enumerable.Implicits {
+  case object Etmp        extends WithName("etmp") with VatDetailSource
+  case object UserEntered extends WithName("userEntered") with VatDetailSource
+  case object Mixed       extends WithName("mixed") with VatDetailSource
 
-  override def toString: String = "businessAddress"
+  val values: Seq[VatDetailSource] = Seq(
+    Etmp, UserEntered, Mixed
+  )
+
+  implicit val enumerable: Enumerable[VatDetailSource] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

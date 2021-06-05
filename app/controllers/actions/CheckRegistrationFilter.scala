@@ -35,7 +35,7 @@ class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector)
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    connector.getRegistration(request.vrn) map {
+    connector.getRegistration() map {
       case Some(_) => Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
       case None    => None
     }

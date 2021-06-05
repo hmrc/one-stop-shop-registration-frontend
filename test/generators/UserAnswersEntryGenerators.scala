@@ -135,7 +135,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[BusinessAddressPage.type]
-        value <- arbitrary[Address].map(Json.toJson(_))
+        value <- arbitrary[UkAddress].map(Json.toJson(_))
       } yield (page, value)
     }
 
@@ -167,14 +167,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[EuVatNumberPage]
-        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryUkVatRegisteredPostcodeUserAnswersEntry: Arbitrary[(UkVatRegisteredPostcodePage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[UkVatRegisteredPostcodePage.type]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }

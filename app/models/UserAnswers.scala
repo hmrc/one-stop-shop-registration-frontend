@@ -16,6 +16,7 @@
 
 package models
 
+import models.domain.VatCustomerInfo
 import play.api.libs.json._
 import queries.{Derivable, Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -26,6 +27,7 @@ import scala.util.{Failure, Success, Try}
 final case class UserAnswers(
                               id: String,
                               data: JsObject = Json.obj(),
+                              vatInfo: Option[VatCustomerInfo] = None,
                               lastUpdated: Instant = Instant.now
                             ) {
 
@@ -77,6 +79,7 @@ object UserAnswers {
     (
       (__ \ "_id").read[String] and
       (__ \ "data").read[JsObject] and
+      (__ \"vatInfo").readNullable[VatCustomerInfo] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     ) (UserAnswers.apply _)
   }
@@ -88,6 +91,7 @@ object UserAnswers {
     (
       (__ \ "_id").write[String] and
       (__ \ "data").write[JsObject] and
+      (__ \ "vatInfo").writeNullable[VatCustomerInfo] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
     ) (unlift(UserAnswers.unapply))
   }

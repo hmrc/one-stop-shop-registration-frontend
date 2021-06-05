@@ -18,7 +18,8 @@ package base
 
 import controllers.actions._
 import generators.Generators
-import models.UserAnswers
+import models.domain.VatCustomerInfo
+import models.{DesAddress, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -32,7 +33,7 @@ import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 
-import java.time.{Clock, LocalDate, ZoneId}
+import java.time.{Clock, Instant, LocalDate, ZoneId}
 
 trait SpecBase
   extends AnyFreeSpec
@@ -43,16 +44,26 @@ trait SpecBase
     with IntegrationPatience
     with Generators {
 
-  val userAnswersId: String = "id"
-
-  def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
-
-  val vrn: Vrn = Vrn("123456789")
-
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   val arbitraryDate: LocalDate        = datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31)).sample.value
-  val stubClockAtArbitraryDate: Clock = Clock.fixed(arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
+  val arbitraryInstant: Instant       = arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant
+  val stubClockAtArbitraryDate: Clock = Clock.fixed(arbitraryInstant, ZoneId.systemDefault)
+
+  val userAnswersId: String = "id"
+
+  val vatCustomerInfo: VatCustomerInfo =
+    VatCustomerInfo(
+      registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
+      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup   = Some(true),
+      organisationName = Some("Company name")
+    )
+
+  val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
+  val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
+
+  val vrn: Vrn = Vrn("123456789")
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
@@ -60,7 +71,8 @@ trait SpecBase
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers, vrn)),
-        bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter())
+        bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
+        bind[Clock].toInstance(stubClockAtArbitraryDate)
       )
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =

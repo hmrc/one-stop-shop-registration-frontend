@@ -22,11 +22,11 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
-import models.Address
+import models.UkAddress
 
 class BusinessAddressFormProvider @Inject() extends Mappings {
 
-   def apply(): Form[Address] = Form(
+   def apply(): Form[UkAddress] = Form(
      mapping(
       "line1" -> text("businessAddress.error.line1.required")
         .verifying(maxLength(250, "businessAddress.error.line1.length")),
@@ -40,6 +40,6 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
          .verifying(firstError(
            maxLength(250, "businessAddress.error.postCode.length"),
            regexp(postCodePattern, "businessAddress.error.postCode.invalid")))
-    )(Address.apply)(Address.unapply)
+    )(UkAddress.apply)(UkAddress.unapply)
    )
  }

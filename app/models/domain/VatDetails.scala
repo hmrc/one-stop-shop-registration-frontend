@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package forms
+package models.domain
 
-import javax.inject.Inject
+import models.Address
+import play.api.libs.json.{Json, OFormat}
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import java.time.LocalDate
 
-class UkVatRegisteredPostcodeFormProvider @Inject() extends Mappings {
+case class VatDetails (
+                        registrationDate: LocalDate,
+                        address: Address,
+                        partOfVatGroup: Boolean,
+                        source: VatDetailSource
+                      )
 
-  val pattern: String = """^[ ]*[A-Za-z][ ]*[A-Za-z]{0,1}[ ]*[0-9][ ]*[0-9A-Za-z]{0,1}[ ]*[0-9][ ]*[A-Za-z][ ]*[A-Za-z][ ]*$"""
+object VatDetails {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("ukVatRegisteredPostcode.error.required")
-        .verifying(regexp(pattern, "ukVatRegisteredPostcode.error.invalid"))
-    )
+  implicit val format: OFormat[VatDetails] = Json.format[VatDetails]
 }

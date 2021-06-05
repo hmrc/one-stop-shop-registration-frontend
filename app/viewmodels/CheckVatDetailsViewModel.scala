@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package pages
+package viewmodels
 
-import play.api.libs.json.JsPath
+import formats.Format.dateFormatter
+import models.DesAddress
+import models.domain.VatCustomerInfo
+import uk.gov.hmrc.domain.Vrn
 
-case object UkVatRegisteredPostcodePage extends QuestionPage[String] {
+import java.time.LocalDate
 
-  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "ukVatRegisteredPostcode"
+case class CheckVatDetailsViewModel(vrn: Vrn, registrationDate: Option[LocalDate], address: DesAddress) {
+
+  def formattedDate: Option[String] = registrationDate.map(_.format(dateFormatter))
+}
+
+object CheckVatDetailsViewModel {
+
+  def apply(vrn: Vrn, vatCustomerInfo: VatCustomerInfo): CheckVatDetailsViewModel =
+    CheckVatDetailsViewModel(vrn, vatCustomerInfo.registrationDate, vatCustomerInfo.address)
 }

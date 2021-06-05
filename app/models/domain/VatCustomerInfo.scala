@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package pages
+package models.domain
 
-import pages.behaviours.PageBehaviours
+import models.DesAddress
+import play.api.libs.json.{Json, OFormat}
 
+import java.time.LocalDate
 
-class UkVatRegisteredPostcodePageSpec extends PageBehaviours {
+case class VatCustomerInfo(
+                            address: DesAddress,
+                            registrationDate: Option[LocalDate],
+                            partOfVatGroup: Option[Boolean],
+                            organisationName: Option[String]
+                          )
 
-  "UkVatRegisteredPostcodePage" - {
+object VatCustomerInfo {
 
-    beRetrievable[String](UkVatRegisteredPostcodePage)
-
-    beSettable[String](UkVatRegisteredPostcodePage)
-
-    beRemovable[String](UkVatRegisteredPostcodePage)
-  }
+  implicit val format: OFormat[VatCustomerInfo] = Json.format[VatCustomerInfo]
 }
