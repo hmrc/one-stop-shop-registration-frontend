@@ -443,3 +443,55 @@ deletePreviousRegistration.error.required = Select yes if you are sure you want 
 
 previousRegistrations.checkYourAnswersLabel = Old registrations
 previousRegistrations.change.hidden = your old registrations
+
+bankDetails.title = bankDetails
+bankDetails.heading = bankDetails
+bankDetails.accountName = accountName
+bankDetails.bic = bic
+bankDetails.checkYourAnswersLabel = BankDetails
+bankDetails.error.accountName.required = Enter accountName
+bankDetails.error.bic.required = Enter bic
+bankDetails.error.accountName.length = accountName must be 100 characters or less
+bankDetails.error.bic.length = bic must be 8 characters or less
+bankDetails.accountName.change.hidden = accountName
+bankDetails.bic.change.hidden = bic
+
+currentlyRegisteredInCountry.title = currentlyRegisteredInCountry
+currentlyRegisteredInCountry.heading = currentlyRegisteredInCountry
+currentlyRegisteredInCountry.checkYourAnswersLabel = currentlyRegisteredInCountry
+currentlyRegisteredInCountry.error.required = Select yes if currentlyRegisteredInCountry
+currentlyRegisteredInCountry.change.hidden = CurrentlyRegisteredInCountry
+
+euTaxReference.title = euTaxReference
+euTaxReference.heading = euTaxReference
+euTaxReference.checkYourAnswersLabel = euTaxReference
+euTaxReference.error.required = Enter euTaxReference
+euTaxReference.error.length = EuTaxReference must be 100 characters or less
+euTaxReference.change.hidden = EuTaxReference
+
+hasWebsite.title = hasWebsite
+hasWebsite.heading = hasWebsite
+hasWebsite.checkYourAnswersLabel = hasWebsite
+hasWebsite.error.required = Select yes if hasWebsite
+hasWebsite.change.hidden = HasWebsite
+
+inControlOfMovingGoods.title = inControlOfMovingGoods
+inControlOfMovingGoods.heading = inControlOfMovingGoods
+inControlOfMovingGoods.checkYourAnswersLabel = inControlOfMovingGoods
+inControlOfMovingGoods.error.required = Select yes if inControlOfMovingGoods
+inControlOfMovingGoods.change.hidden = InControlOfMovingGoods
+
+sellsGoodsFromNi.title = sellsGoodsFromNi
+sellsGoodsFromNi.heading = sellsGoodsFromNi
+sellsGoodsFromNi.checkYourAnswersLabel = sellsGoodsFromNi
+sellsGoodsFromNi.error.required = Select yes if sellsGoodsFromNi
+sellsGoodsFromNi.change.hidden = SellsGoodsFromNi
+
+taxRegisteredInEu.title = taxRegisteredInEu
+taxRegisteredInEu.heading = taxRegisteredInEu
+taxRegisteredInEu.checkYourAnswersLabel = taxRegisteredInEu
+taxRegisteredInEu.error.required = Select yes if taxRegisteredInEu
+taxRegisteredInEu.change.hidden = TaxRegisteredInEu
+
+updateVatDetails.title = updateVatDetails
+updateVatDetails.heading = updateVatDetails

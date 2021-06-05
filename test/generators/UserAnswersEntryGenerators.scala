@@ -27,6 +27,62 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
+  implicit lazy val arbitraryTaxRegisteredInEuUserAnswersEntry: Arbitrary[(TaxRegisteredInEuPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[TaxRegisteredInEuPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitrarySellsGoodsFromNiUserAnswersEntry: Arbitrary[(SellsGoodsFromNiPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[SellsGoodsFromNiPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryInControlOfMovingGoodsUserAnswersEntry: Arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[InControlOfMovingGoodsPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryHasWebsiteUserAnswersEntry: Arbitrary[(HasWebsitePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[HasWebsitePage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryEuTaxReferenceUserAnswersEntry: Arbitrary[(EuTaxReferencePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[EuTaxReferencePage.type]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryCurrentlyRegisteredInCountryUserAnswersEntry: Arbitrary[(CurrentlyRegisteredInCountryPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[CurrentlyRegisteredInCountryPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryBankDetailsUserAnswersEntry: Arbitrary[(BankDetailsPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[BankDetailsPage.type]
+        value <- arbitrary[BankDetails].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitraryPreviouslyRegisteredUserAnswersEntry: Arbitrary[(PreviouslyRegisteredPage.type, JsValue)] =
     Arbitrary {
       for {

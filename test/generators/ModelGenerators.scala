@@ -27,6 +27,14 @@ import java.time.LocalDate
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryBankDetails: Arbitrary[BankDetails] =
+    Arbitrary {
+      for {
+        accountName <- arbitrary[String]
+        bic <- arbitrary[String]
+      } yield BankDetails(accountName, bic)
+    }
+
   implicit lazy val arbitraryFixedEstablishmentAddress: Arbitrary[FixedEstablishmentAddress] =
     Arbitrary {
       for {

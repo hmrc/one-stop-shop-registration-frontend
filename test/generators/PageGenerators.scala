@@ -24,6 +24,27 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryTaxRegisteredInEuPage: Arbitrary[TaxRegisteredInEuPage.type] =
+    Arbitrary(TaxRegisteredInEuPage)
+
+  implicit lazy val arbitrarySellsGoodsFromNiPage: Arbitrary[SellsGoodsFromNiPage.type] =
+    Arbitrary(SellsGoodsFromNiPage)
+
+  implicit lazy val arbitraryInControlOfMovingGoodsPage: Arbitrary[InControlOfMovingGoodsPage.type] =
+    Arbitrary(InControlOfMovingGoodsPage)
+
+  implicit lazy val arbitraryHasWebsitePage: Arbitrary[HasWebsitePage.type] =
+    Arbitrary(HasWebsitePage)
+
+  implicit lazy val arbitraryEuTaxReferencePage: Arbitrary[EuTaxReferencePage.type] =
+    Arbitrary(EuTaxReferencePage)
+
+  implicit lazy val arbitraryCurrentlyRegisteredInCountryPage: Arbitrary[CurrentlyRegisteredInCountryPage.type] =
+    Arbitrary(CurrentlyRegisteredInCountryPage)
+
+  implicit lazy val arbitraryBankDetailsPage: Arbitrary[BankDetailsPage.type] =
+    Arbitrary(BankDetailsPage)
+
   implicit lazy val arbitraryPreviouslyRegisteredPage: Arbitrary[PreviouslyRegisteredPage.type] =
     Arbitrary(PreviouslyRegisteredPage)
 

@@ -198,3 +198,40 @@ GET         /deletePreviousRegistration/:index                      controllers.
 POST        /deletePreviousRegistration/:index                      controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /changeDeletePreviousRegistration/:index                controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /changeDeletePreviousRegistration/:index                controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET        /bankDetails                        controllers.BankDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /bankDetails                        controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBankDetails                  controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBankDetails                  controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /currentlyRegisteredInCountry                        controllers.CurrentlyRegisteredInCountryController.onPageLoad(mode: Mode = NormalMode)
+POST       /currentlyRegisteredInCountry                        controllers.CurrentlyRegisteredInCountryController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCurrentlyRegisteredInCountry                  controllers.CurrentlyRegisteredInCountryController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCurrentlyRegisteredInCountry                  controllers.CurrentlyRegisteredInCountryController.onSubmit(mode: Mode = CheckMode)
+
+GET        /euTaxReference                        controllers.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /euTaxReference                        controllers.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /changeEuTaxReference                  controllers.EuTaxReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeEuTaxReference                  controllers.EuTaxReferenceController.onSubmit(mode: Mode = CheckMode)
+
+GET        /hasWebsite                        controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
+POST       /hasWebsite                        controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
+GET        /changeHasWebsite                  controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeHasWebsite                  controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
+
+GET        /inControlOfMovingGoods                        controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = NormalMode)
+POST       /inControlOfMovingGoods                        controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeInControlOfMovingGoods                  controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeInControlOfMovingGoods                  controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sellsGoodsFromNi                        controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = NormalMode)
+POST       /sellsGoodsFromNi                        controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = NormalMode)
+GET        /changeSellsGoodsFromNi                  controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeSellsGoodsFromNi                  controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = CheckMode)
+
+GET        /taxRegisteredInEu                        controllers.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
+POST       /taxRegisteredInEu                        controllers.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTaxRegisteredInEu                  controllers.TaxRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTaxRegisteredInEu                  controllers.TaxRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+
+GET        /updateVatDetails                       controllers.UpdateVatDetailsController.onPageLoad()
