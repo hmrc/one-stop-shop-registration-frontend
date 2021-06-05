@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CurrentCountryOfRegistrationPage
-import pages.euVatDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage}
+import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest

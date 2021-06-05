@@ -18,8 +18,8 @@ package generators
 
 import models.Index
 import org.scalacheck.Arbitrary
-import pages.{euVatDetails, _}
-import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
+import pages.{euDetails, _}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
@@ -64,13 +64,13 @@ trait PageGenerators {
     Arbitrary(CurrentCountryOfRegistrationPage)
 
   implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
-    Arbitrary(euVatDetails.HasFixedEstablishmentPage(Index(0)))
+    Arbitrary(euDetails.HasFixedEstablishmentPage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentTradingNamePage: Arbitrary[FixedEstablishmentTradingNamePage] =
-    Arbitrary(euVatDetails.FixedEstablishmentTradingNamePage(Index(0)))
+    Arbitrary(euDetails.FixedEstablishmentTradingNamePage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage] =
-    Arbitrary(euVatDetails.FixedEstablishmentAddressPage(Index(0)))
+    Arbitrary(euDetails.FixedEstablishmentAddressPage(Index(0)))
 
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)
@@ -87,17 +87,17 @@ trait PageGenerators {
   implicit lazy val arbitraryBusinessAddressPage: Arbitrary[BusinessAddressPage.type] =
     Arbitrary(BusinessAddressPage)
 
-  implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuVatDetailsPage.type] =
-    Arbitrary(AddEuVatDetailsPage)
+  implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuDetailsPage.type] =
+    Arbitrary(AddEuDetailsPage)
 
   implicit lazy val arbitraryVatRegisteredInEuPage: Arbitrary[VatRegisteredInEuPage.type] =
     Arbitrary(VatRegisteredInEuPage)
 
   implicit lazy val arbitraryEuCountryPage: Arbitrary[EuCountryPage] =
-    Arbitrary(euVatDetails.EuCountryPage(Index(0)))
+    Arbitrary(euDetails.EuCountryPage(Index(0)))
 
   implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
-    Arbitrary(euVatDetails.EuVatNumberPage(Index(0)))
+    Arbitrary(euDetails.EuVatNumberPage(Index(0)))
 
   implicit lazy val arbitraryUkVatEffectiveDatePage: Arbitrary[UkVatEffectiveDatePage.type] =
     Arbitrary(UkVatEffectiveDatePage)

@@ -20,11 +20,11 @@ import base.SpecBase
 import models._
 import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
-import models.euVatDetails.EuVatDetails
+import models.euDetails.EuDetails
 import pages._
-import pages.euVatDetails.VatRegisteredInEuPage
+import pages.euDetails.VatRegisteredInEuPage
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
-import queries.{AllEuVatDetailsQuery, AllTradingNames, AllWebsites}
+import queries.{AllEuDetailsQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
 import java.time.LocalDate
@@ -40,10 +40,10 @@ class RegistrationServiceSpec extends SpecBase {
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
       .set(VatRegisteredInEuPage, true).success.value
       .set(
-        AllEuVatDetailsQuery,
+        AllEuDetailsQuery,
         List(
-          EuVatDetails(Country("FR", "France"),"FR123456789", false, None, None),
-          EuVatDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
+          EuDetails(Country("FR", "France"),"FR123456789", false, None, None),
+          EuDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
         )).success.value
       .set(StartDatePage,
         StartDate(StartDateOption.NextPeriod, LocalDate.now())
@@ -109,7 +109,7 @@ class RegistrationServiceSpec extends SpecBase {
         answers
           .set(HasTradingNamePage, false).success.value
           .remove(AllTradingNames).success.value
-          .remove(AllEuVatDetailsQuery).success.value
+          .remove(AllEuDetailsQuery).success.value
 
       val expectedRegistration =
         RegistrationData.registration copy (

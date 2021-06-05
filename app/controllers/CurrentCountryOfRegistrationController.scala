@@ -26,7 +26,7 @@ import navigation.Navigator
 import pages.CurrentCountryOfRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.AllEuVatDetailsQuery
+import queries.AllEuDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.CurrentCountryOfRegistrationViewModel
 import views.html.CurrentCountryOfRegistrationView
@@ -84,7 +84,7 @@ class CurrentCountryOfRegistrationController @Inject()(
 
   private def getCountries(block: Seq[Country] => Future[Result])
                           (implicit request: DataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(AllEuVatDetailsQuery).map {
+    request.userAnswers.get(AllEuDetailsQuery).map {
       vatDetails =>
         if (vatDetails.nonEmpty) {
           block(vatDetails.map(_.euCountry))

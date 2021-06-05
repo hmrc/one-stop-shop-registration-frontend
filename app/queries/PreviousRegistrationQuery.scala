@@ -17,7 +17,7 @@
 package queries
 
 import models.Index
-import models.euVatDetails.EuVatDetails
+import models.euDetails.EuDetails
 import models.previousRegistrations.PreviousRegistrationDetails
 import play.api.libs.json.JsPath
 

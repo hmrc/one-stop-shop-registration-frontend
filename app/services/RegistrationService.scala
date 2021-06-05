@@ -20,7 +20,7 @@ import models.domain.VatDetailSource.{Etmp, Mixed, UserEntered}
 import models.{Address, UserAnswers}
 import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, VatDetailSource, VatDetails}
 import pages._
-import queries.{AllEuVatDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
+import queries.{AllEuDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -56,7 +56,7 @@ class RegistrationService {
 
   private def buildEuVatRegistrations(answers: UserAnswers): List[EuVatRegistration] =
     answers
-      .get(AllEuVatDetailsQuery).getOrElse(List.empty)
+      .get(AllEuDetailsQuery).getOrElse(List.empty)
       .map {
         detail =>
           val fixedEstablishment = (detail.fixedEstablishmentTradingName, detail.fixedEstablishmentAddress) match {

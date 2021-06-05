@@ -29,7 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
-import viewmodels.checkAnswers.euVatDetails.{EuVatDetailsSummary, VatRegisteredInEuSummary}
+import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, VatRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
@@ -58,7 +58,7 @@ class CheckYourAnswersController @Inject()(
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
           VatRegisteredInEuSummary.row(request.userAnswers),
-          EuVatDetailsSummary.checkAnswersRow(request.userAnswers),
+          EuDetailsSummary.checkAnswersRow(request.userAnswers),
           CurrentlyRegisteredInEuSummary.row(request.userAnswers),
           CurrentCountryOfRegistrationSummary.row(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
