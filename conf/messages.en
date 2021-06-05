@@ -193,11 +193,6 @@ websites.change.hidden = your websites
 tradingNames.checkYourAnswersLabel = Trading names
 tradingNames.change.hidden = your trading names
 
-isBusinessBasedInNorthernIreland.title = Is your business based in Northern Ireland?
-isBusinessBasedInNorthernIreland.title = Is your business based in Northern Ireland?
-isBusinessBasedInNorthernIreland.heading = Is your business based in Northern Ireland?
-isBusinessBasedInNorthernIreland.error.required = Select yes if your business is based in Northern Ireland
-
 cannotRegisterForService.title = You cannot use this service
 cannotRegisterForService.heading = You cannot use this service
 cannotRegisterForService.can-register-in-eu-country = You can register for the One-Stop Shop scheme in an EU country.

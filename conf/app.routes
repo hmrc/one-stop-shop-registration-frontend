@@ -78,8 +78,6 @@ POST        /businessContactDetails                         controllers.Business
 GET         /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onPageLoad()
-POST        /isBusinessBasedInNorthernIreland               controllers.IsBusinessBasedInNorthernIrelandController.onSubmit()
 GET         /cannotRegisterForService                       controllers.CannotRegisterForServiceController.onPageLoad()
 
 GET        /applicationComplete                             controllers.ApplicationCompleteController.onPageLoad()

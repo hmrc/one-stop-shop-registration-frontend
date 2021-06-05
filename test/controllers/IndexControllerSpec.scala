@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
@@ -24,7 +25,7 @@ class IndexControllerSpec extends SpecBase {
 
   "Index Controller" - {
 
-    "must return SEE OTHER and go to Is Business Based In Northern Ireland page" in {
+    "must return SEE OTHER and go to the Sells Goods from Ni page" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -35,7 +36,7 @@ class IndexControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustBe routes.IsBusinessBasedInNorthernIrelandController.onPageLoad().url
+        redirectLocation(result).value mustBe routes.SellsGoodsFromNiController.onPageLoad(NormalMode).url
       }
     }
   }
