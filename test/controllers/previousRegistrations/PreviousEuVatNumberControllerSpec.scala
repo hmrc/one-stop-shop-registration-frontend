@@ -45,6 +45,8 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
   private lazy val previousEuVatNumberRoute = routes.PreviousEuVatNumberController.onPageLoad(NormalMode, index).url
 
   private val baseAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
+
+
   "PreviousEuVatNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -98,7 +100,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousEuVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "FR1234567"))
 
         val result = route(application, request).value
 

@@ -24,7 +24,7 @@
 
 @(form: Form[_], mode: Mode, index: Index, website: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deleteWebsite.title"))) {
+@layout(pageTitle = title(form, messages("deleteWebsite.title", website))) {
 
     @formHelper(action = routes.DeleteWebsiteController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -35,7 +35,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("deleteWebsite.heading")).asPageHeading()
+                legend = LegendViewModel(messages("deleteWebsite.heading", website)).asPageHeading()
             )
         )
 

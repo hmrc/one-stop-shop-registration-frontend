@@ -16,19 +16,21 @@
 
 package forms
 
+import forms.Validation.Validation.postCodePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
 class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new BusinessAddressFormProvider()()
+  val formProvider = new BusinessAddressFormProvider()
+  val form = formProvider()
 
   ".line1" - {
 
     val fieldName = "line1"
     val requiredKey = "businessAddress.error.line1.required"
     val lengthKey = "businessAddress.error.line1.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -54,7 +56,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "line2"
     val lengthKey = "businessAddress.error.line2.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -75,7 +77,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "townOrCity"
     val requiredKey = "businessAddress.error.townOrCity.required"
     val lengthKey = "businessAddress.error.townOrCity.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -101,7 +103,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "county"
     val lengthKey = "businessAddress.error.county.length"
-    val maxLength = 100
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
@@ -122,13 +124,21 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "postCode"
     val requiredKey = "businessAddress.error.postCode.required"
     val lengthKey = "businessAddress.error.postCode.length"
-    val maxLength = 100
+    val invalidKey = "businessAddress.error.postCode.invalid"
+    val validData = "AA11 1AA"
+    val maxLength = 250
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
+
+    "must not bind invalid Post Code data" in {
+      val invalidPostCode = "invalid"
+      val result = form.bind(Map(fieldName -> invalidPostCode)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(postCodePattern)))
+    }
 
     behave like fieldWithMaxLength(
       form,

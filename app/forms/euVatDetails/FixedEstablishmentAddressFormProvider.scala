@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.postcodePattern
 import forms.mappings.Mappings
 import models.euVatDetails.FixedEstablishmentAddress
 import play.api.data.Form
@@ -36,7 +37,9 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
        "county" -> optional(text("fixedEstablishmentAddress.error.county.required")
          .verifying(maxLength(100, "fixedEstablishmentAddress.error.county.length"))),
        "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.postCode.length")))
-    )(FixedEstablishmentAddress.apply)(FixedEstablishmentAddress.unapply)
+         .verifying(firstError(
+           maxLength(100, "fixedEstablishmentAddress.error.postCode.length"),
+           regexp(postcodePattern, "fixedEstablishmentAddress.error.postCode.invalid"))))
+     )(FixedEstablishmentAddress.apply)(FixedEstablishmentAddress.unapply)
    )
  }

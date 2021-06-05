@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.postCodePattern
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
@@ -28,15 +29,17 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
    def apply(): Form[UkAddress] = Form(
      mapping(
       "line1" -> text("businessAddress.error.line1.required")
-        .verifying(maxLength(100, "businessAddress.error.line1.length")),
+        .verifying(maxLength(250, "businessAddress.error.line1.length")),
       "line2" -> optional(text("businessAddress.error.line2.required")
-        .verifying(maxLength(100, "businessAddress.error.line2.length"))),
+        .verifying(maxLength(250, "businessAddress.error.line2.length"))),
        "townOrCity" -> text("businessAddress.error.townOrCity.required")
-         .verifying(maxLength(100, "businessAddress.error.townOrCity.length")),
+         .verifying(maxLength(250, "businessAddress.error.townOrCity.length")),
        "county" -> optional(text("businessAddress.error.county.required")
-         .verifying(maxLength(100, "businessAddress.error.county.length"))),
+         .verifying(maxLength(250, "businessAddress.error.county.length"))),
        "postCode" -> text("businessAddress.error.postCode.required")
-         .verifying(maxLength(100, "businessAddress.error.postCode.length"))
+         .verifying(firstError(
+           maxLength(250, "businessAddress.error.postCode.length"),
+           regexp(postCodePattern, "businessAddress.error.postCode.invalid")))
     )(UkAddress.apply)(UkAddress.unapply)
    )
  }

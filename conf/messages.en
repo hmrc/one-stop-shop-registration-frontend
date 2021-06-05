@@ -73,6 +73,7 @@ registeredCompanyName.hint = If your business is incorporated with Companies Hou
 registeredCompanyName.checkYourAnswersLabel = Registered business name
 registeredCompanyName.error.required = Enter your business name
 registeredCompanyName.error.length = The business name must be 100 characters or less
+registeredCompanyName.error.invalid = Enter a valid business name
 registeredCompanyName.change.hidden = the registered business name
 
 tradingName.title = What is your trading name?
@@ -81,6 +82,7 @@ tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liabi
 tradingName.error.required = Enter your trading name
 tradingName.error.length = Your trading name must be 100 characters or less
 tradingName.error.duplicate = You have already added this trading name
+tradingName.error.invalid = Enter a valid trading name
 tradingName.change.hidden = your trading name
 
 ukVatEffectiveDate.title = What is your UK VAT registration date?
@@ -108,6 +110,7 @@ euVatNumber.heading = What is your VAT registration number for {0}?
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.length = VAT registration number must be 100 characters or less
+euVatNumber.error.invalid = Enter a valid EU VAT number
 euVatNumber.change.hidden = your VAT registration number
 
 euCountry.title = Which EU country?
@@ -154,6 +157,7 @@ businessAddress.error.line2.length = Line2 must be 100 characters or less
 businessAddress.error.townOrCity.length = Town or city must be 100 characters or less
 businessAddress.error.county.length = County must be 100 characters or less
 businessAddress.error.postCode.length = Postcode must be 100 characters or less
+businessAddress.error.postCode.invalid = Enter a valid postcode
 businessAddress.line1.change.hidden = Building and street
 businessAddress.line2.change.hidden = Line2
 businessAddress.townOrCity.change.hidden = Town or city
@@ -171,8 +175,11 @@ businessContactDetails.error.fullName.required = Enter a full name
 businessContactDetails.error.telephoneNumber.required = Enter a telephone number
 businessContactDetails.error.emailAddress.required = Enter an email address
 businessContactDetails.error.fullName.length = Full name must be 100 characters or less
+businessContactDetails.error.fullName.invalid = Enter a valid name
 businessContactDetails.error.telephoneNumber.length = Telephone number must be 100 characters or less
+businessContactDetails.error.telephoneNumber.invalid = Enter valid telephone number
 businessContactDetails.error.emailAddress.length = Email address must be 100 characters or less
+businessContactDetails.error.emailAddress.invalid = Enter valid email address
 businessContactDetails.fullName.change.hidden = Full name
 businessContactDetails.telephoneNumber.change.hidden = Telephone number
 businessContactDetails.emailAddress.change.hidden = Email address
@@ -205,8 +212,8 @@ applicationComplete.caption = We will send you details about how to submit retur
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
-deleteTradingName.title = Are you sure you want to remove this trading name?
-deleteTradingName.heading = Are you sure you want to remove this trading name?
+deleteTradingName.title = Are you sure you want to remove {0}?
+deleteTradingName.heading = Are you sure you want to remove {0}?
 deleteTradingName.error.required = Select yes if you want to remove this trading name
 
 addTradingName.title.singular = You have added one trading name
@@ -226,10 +233,11 @@ website.checkYourAnswersLabel = Website
 website.error.required = Enter a website
 website.error.length = Website must be 100 characters or less
 website.error.duplicate = You have already added this website
+website.error.invalid = Enter a valid website
 website.change.hidden = Website
 
-deleteWebsite.title = Are you sure you want to remove this website?
-deleteWebsite.heading = Are you sure you want to remove this website?
+deleteWebsite.title = Are you sure you want to remove {0}?
+deleteWebsite.heading = Are you sure you want to remove {0}?
 deleteWebsite.error.required = Select yes if you want to remove this website
 
 addWebsite.name.singular = website address
@@ -350,6 +358,7 @@ fixedEstablishmentAddress.error.line2.length = Line2 must be 100 characters or l
 fixedEstablishmentAddress.error.townOrCity.length = Town or city must be 100 characters or less
 fixedEstablishmentAddress.error.county.length = County must be 100 characters or less
 fixedEstablishmentAddress.error.postCode.length = Postcode must be 100 characters or less
+fixedEstablishmentAddress.error.postCode.invalid = Enter valid postcode
 fixedEstablishmentAddress.line1.change.hidden = Building and street
 fixedEstablishmentAddress.line2.change.hidden = Line2
 fixedEstablishmentAddress.townOrCity.change.hidden = Town or city
@@ -362,6 +371,7 @@ fixedEstablishmentTradingName.checkYourAnswersLabel = Trading name
 fixedEstablishmentTradingName.error.required = Enter the trading name of the fixed establishment in {0}
 fixedEstablishmentTradingName.error.length = Trading name must be 100 characters or less
 fixedEstablishmentTradingName.change.hidden = Change the trading name
+fixedEstablishmentTradingName.error.invalid = Enter a valid trading name
 
 hasFixedEstablishment.title = Do you have a fixed establishment in {0}?
 hasFixedEstablishment.heading = Do you have a fixed establishment in {0}?
@@ -418,6 +428,7 @@ previousEuVatNumber.heading = What was the VAT number for {0}?
 previousEuVatNumber.checkYourAnswersLabel = VAT number
 previousEuVatNumber.error.required = Enter the VAT number
 previousEuVatNumber.error.length = VAT number must be 100 characters or less
+previousEuVatNumber.error.invalid = Enter a valid EU Vat number
 previousEuVatNumber.change.hidden = the VAT number
 
 previouslyRegistered.title = Has your business been registered in the past for the One Stop Shop in an EU country

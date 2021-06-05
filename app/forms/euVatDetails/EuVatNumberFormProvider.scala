@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.euVatNumberPattern
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -27,6 +28,8 @@ class EuVatNumberFormProvider @Inject() extends Mappings {
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("euVatNumber.error.required", Seq(country.name))
-        .verifying(maxLength(100, "euVatNumber.error.length"))
+        .verifying(firstError(
+          maxLength(12, "euVatNumber.error.length"),
+          regexp(euVatNumberPattern, "euVatNumber.error.invalid")))
     )
 }

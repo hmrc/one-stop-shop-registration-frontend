@@ -48,8 +48,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
     Json.obj(
       BusinessContactDetailsPage.toString -> Json.obj(
         "fullName" -> "value 1",
-        "telephoneNumber" -> "value 2",
-        "emailAddress" -> "value 3"
+        "telephoneNumber" -> "0111 2223334",
+        "emailAddress" -> "email@email.com"
       )
     )
   )
@@ -84,7 +84,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BusinessContactDetails("value 1", "value 2", "value 3")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(BusinessContactDetails("value 1", "0111 2223334", "email@email.com")), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -105,7 +105,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, businessContactDetailsRoute)
-            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "value 2"), ("emailAddress", "value 3"))
+            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@email.com"))
 
         val result = route(application, request).value
 
@@ -155,7 +155,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, businessContactDetailsRoute)
-            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "value 2"), ("emailAddress", "value 3"))
+            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@email.com"))
 
         val result = route(application, request).value
 

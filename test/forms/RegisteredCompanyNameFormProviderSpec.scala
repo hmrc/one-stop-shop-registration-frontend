@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.Validation.Validation.commonNamePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -23,9 +24,12 @@ class RegisteredCompanyNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "registeredCompanyName.error.required"
   val lengthKey = "registeredCompanyName.error.length"
-  val maxLength = 100
+  val invalidKey = "registeredCompanyName.error.invalid"
+  val validData = "Delicious Chocolate Co"
+  val maxLength = 105
 
-  val form = new RegisteredCompanyNameFormProvider()()
+  val formProvider = new RegisteredCompanyNameFormProvider()
+  val form = formProvider()
 
   ".value" - {
 
@@ -34,7 +38,7 @@ class RegisteredCompanyNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -49,5 +53,11 @@ class RegisteredCompanyNameFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind invalid Registered Company Name" in {
+      val invalidRegisteredCompanyName = "Invalid%comp@ny name?*]"
+      val result = form.bind(Map(fieldName -> invalidRegisteredCompanyName)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+    }
   }
 }

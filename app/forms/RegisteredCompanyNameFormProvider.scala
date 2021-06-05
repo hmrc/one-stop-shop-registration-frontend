@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.commonNamePattern
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -26,6 +27,8 @@ class RegisteredCompanyNameFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("registeredCompanyName.error.required")
-        .verifying(maxLength(100, "registeredCompanyName.error.length"))
+        .verifying(firstError(
+          maxLength(105, "registeredCompanyName.error.length"),
+          regexp(commonNamePattern, "registeredCompanyName.error.invalid")))
     )
 }

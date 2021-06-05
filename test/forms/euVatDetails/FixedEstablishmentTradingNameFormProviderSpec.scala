@@ -16,6 +16,7 @@
 
 package forms.euVatDetails
 
+import forms.Validation.Validation.commonNamePattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -25,10 +26,14 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
 
   val requiredKey = "fixedEstablishmentTradingName.error.required"
   val lengthKey = "fixedEstablishmentTradingName.error.length"
-  val maxLength = 100
+  val invalidKey = "fixedEstablishmentTradingName.error.invalid"
+  val validData = "Another trading name"
+  val maxLength = 160
 
   val country: Country = arbitrary[Country].sample.value
-  val form = new FixedEstablishmentTradingNameFormProvider()(country)
+
+  val formProvider: FixedEstablishmentTradingNameFormProvider = new FixedEstablishmentTradingNameFormProvider()
+  val form = formProvider(country)
 
   ".value" - {
 
@@ -37,7 +42,7 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -52,5 +57,11 @@ class FixedEstablishmentTradingNameFormProviderSpec extends StringFieldBehaviour
       fieldName,
       requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
+
+    "must not bind invalid Trading Name" in {
+      val invalidFixedEstablishmentTradingName = "^Fixed est~ tr@ding=nam£"
+      val result = form.bind(Map(fieldName -> invalidFixedEstablishmentTradingName)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+    }
   }
 }
