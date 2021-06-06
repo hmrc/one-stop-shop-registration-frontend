@@ -16,7 +16,7 @@
 
 package models.domain
 
-import models.{UkAddress, BusinessContactDetails, Country}
+import models.{BankDetails, BusinessContactDetails, Country}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
 
@@ -32,7 +32,8 @@ final case class Registration(
                                websites: Seq[String],
                                startDate: LocalDate,
                                currentCountryOfRegistration: Option[Country],
-                               previousRegistrations: Seq[PreviousRegistration]
+                               previousRegistrations: Seq[PreviousRegistration],
+                               bankDetails: BankDetails
                              )
 
 object Registration {

@@ -18,7 +18,7 @@ package testutils
 
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, EuTaxRegistration, EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, RegistrationWithFixedEstablishment, VatDetailSource, VatDetails}
 import models.euDetails.FixedEstablishmentAddress
-import models.{BusinessContactDetails, Country, UkAddress}
+import models.{BankDetails, BusinessContactDetails, Country, UkAddress}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -54,7 +54,8 @@ object RegistrationData {
       currentCountryOfRegistration = Some(Country("FR", "France")),
       previousRegistrations = Seq(
         PreviousRegistration(Country("DE", "Germany"), "DE123")
-      )
+      ),
+      bankDetails = BankDetails("Account name", "12345678", "GB12345678")
     )
 
   private def createBusinessAddress(): UkAddress =

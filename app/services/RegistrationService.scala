@@ -39,6 +39,7 @@ class RegistrationService {
       websites                     = getWebsites(userAnswers)
       currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
       previousRegistrations        = buildPreviousRegistrations(userAnswers)
+      bankDetails                  <- userAnswers.get(BankDetailsPage)
     } yield Registration(
       vrn,
       registeredCompanyName,
@@ -49,7 +50,8 @@ class RegistrationService {
       websites,
       startDate.date,
       currentCountryOfRegistration,
-      previousRegistrations
+      previousRegistrations,
+      bankDetails
     )
 
   private def getTradingNames(userAnswers: UserAnswers): List[String] =
