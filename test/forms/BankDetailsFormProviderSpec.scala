@@ -17,7 +17,6 @@
 package forms
 
 import forms.Validation.Validation.bicPattern
-import org.scalacheck.Arbitrary.arbitrary
 import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError

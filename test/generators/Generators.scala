@@ -152,19 +152,19 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
     Gen.const('|')
   )
 
-  def safeInputsWithMaxLength(maxLength: Int): Gen[String] = for {
+  def safeInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
     length <- choose(1, maxLength)
     chars  <- listOfN(length, safeInputs)
-  } yield chars.mkString
+  } yield chars.mkString).suchThat(_.trim.nonEmpty)
 
-  def unsafeInputsWithMaxLength(maxLength: Int): Gen[String] = for {
+  def unsafeInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
     length      <- choose(2, maxLength)
     invalidChar <- unsafeInputs
     validChars  <- listOfN(length - 1, safeInputs)
-  } yield (validChars :+ invalidChar).mkString
+  } yield (validChars :+ invalidChar).mkString).suchThat(_.trim.nonEmpty)
 
-  def safeInputsShorterThan(length: Int): Gen[String] = for {
+  def safeInputsShorterThan(length: Int): Gen[String] = (for {
     length <- choose(1, length - 1)
     chars  <- listOfN(length, safeInputs)
-  } yield chars.mkString
+  } yield chars.mkString).suchThat(_.trim.nonEmpty)
 }
