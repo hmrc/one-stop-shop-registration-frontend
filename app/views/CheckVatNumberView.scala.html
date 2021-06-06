@@ -12,7 +12,7 @@
 
 @layout(pageTitle = title(form, messages("checkVatNumber.title"))) {
 
-    @formHelper(action = routes.CheckVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.CheckVatNumberController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

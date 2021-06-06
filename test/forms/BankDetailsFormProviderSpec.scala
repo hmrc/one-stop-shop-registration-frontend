@@ -56,11 +56,10 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
   ".bic" - {
 
     val fieldName = "bic"
-    val requiredKey = "bankDetails.error.bic.required"
     val invalidKey = "bankDetails.error.bic.invalid"
-    val maxLength = 8
+    val maxLength = 11
 
-    val validData = Gen.listOfN(maxLength, Gen.numChar).map(_.mkString)
+    val validData = Gen.listOfN(maxLength, Gen.oneOf(Gen.numChar, Gen.alphaUpperChar)).map(_.mkString)
 
     behave like fieldThatBindsValidData(
       form,
@@ -68,23 +67,11 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       validData
     )
 
-    "not bind anything other than 8 digit strings" in {
+    "not bind any strings containing characters other than digits or alpha characters" in {
 
-      forAll(arbitrary[String]) {
-        value =>
-
-          whenever(!value.matches(bicPattern) && value.nonEmpty) {
-            val result = form.bind(Map(fieldName -> value)).apply(fieldName)
-            result.errors must contain only FormError(fieldName, invalidKey, Seq(bicPattern))
-          }
-      }
+      val result = form.bind(Map(fieldName -> "invalid.")).apply(fieldName)
+      result.errors must contain only FormError(fieldName, invalidKey, Seq(bicPattern))
     }
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
   }
 
   ".iban" - {

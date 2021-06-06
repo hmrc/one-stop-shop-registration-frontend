@@ -26,21 +26,23 @@ import models.BankDetails
 
 class BankDetailsFormProvider @Inject() extends Mappings {
 
-   def apply(): Form[BankDetails] = Form(
-     mapping(
-      "accountName" -> text("bankDetails.error.accountName.required")
+  def apply(): Form[BankDetails] = Form(
+    mapping(
+     "accountName" -> text("bankDetails.error.accountName.required")
+       .verifying(firstError(
+         maxLength(100, "bankDetails.error.accountName.length"),
+         regexp(commonNamePattern, "bankDetails.error.accountName.invalid")
+       )),
+     "bic" -> optional(text("bankDetails.error.bic.required")
+       .verifying(firstError(maxLength(11, "bankDetails.error.bic.length"),
+         regexp(bicPattern, "bankDetails.error.bic.invalid")
+       ))),
+      "iban" -> text("bankDetails.error.iban.required")
         .verifying(firstError(
-          maxLength(100, "bankDetails.error.accountName.length"),
-          regexp(commonNamePattern, "bankDetails.error.accountName.invalid")
-        )),
-      "bic" -> text("bankDetails.error.bic.required")
-        .verifying(regexp(bicPattern, "bankDetails.error.bic.invalid")),
-       "iban" -> text("bankDetails.error.iban.required")
-         .verifying(firstError(
-           minLength(5, "bankDetails.error.iban.min"),
-           maxLength(34, "bankDetails.error.iban.max"),
-           regexp(ibanPattern, "bankDetails.error.iban.invalid"))
-         )
-    )(BankDetails.apply)(BankDetails.unapply)
-   )
- }
+          minLength(5, "bankDetails.error.iban.min"),
+          maxLength(34, "bankDetails.error.iban.max"),
+          regexp(ibanPattern, "bankDetails.error.iban.invalid"))
+        )
+   )(BankDetails.apply)(BankDetails.unapply)
+  )
+}

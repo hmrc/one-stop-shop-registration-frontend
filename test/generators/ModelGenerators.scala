@@ -50,10 +50,10 @@ trait ModelGenerators {
     Arbitrary {
       for {
         accountName <- arbitrary[String]
-        bic <- Gen.listOfN(8, Gen.numChar)
+        bic <- Gen.option(Gen.listOfN(11, Gen.alphaNumChar).map(_.mkString))
         ibanChars <- Gen.choose(5, 34)
         iban <- Gen.listOfN(ibanChars, Gen.oneOf(Gen.alphaChar, Gen.numChar))
-      } yield BankDetails(accountName, bic.mkString, iban.mkString)
+      } yield BankDetails(accountName, bic, iban.mkString)
     }
 
   implicit lazy val arbitraryFixedEstablishmentAddress: Arbitrary[FixedEstablishmentAddress] =

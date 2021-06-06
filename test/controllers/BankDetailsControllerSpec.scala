@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
-import models.{NormalMode, BankDetails, UserAnswers}
+import models.{BankDetails, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -36,14 +36,14 @@ import scala.concurrent.Future
 
 class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new BankDetailsFormProvider()
-  val form = formProvider()
+  private val formProvider = new BankDetailsFormProvider()
+  private val form = formProvider()
 
-  lazy val bankDetailsRoute = routes.BankDetailsController.onPageLoad(NormalMode).url
+  private lazy val bankDetailsRoute = routes.BankDetailsController.onPageLoad(NormalMode).url
 
-  val userAnswers = UserAnswers(
+  private val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       BankDetailsPage.toString -> Json.obj(
@@ -84,7 +84,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BankDetails("value 1", "12345678", "GB123456789")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(BankDetails("value 1", Some("12345678"), "GB123456789")), NormalMode)(request, messages(application)).toString
       }
     }
 

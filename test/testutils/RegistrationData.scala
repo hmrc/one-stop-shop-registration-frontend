@@ -55,7 +55,7 @@ object RegistrationData {
       previousRegistrations = Seq(
         PreviousRegistration(Country("DE", "Germany"), "DE123")
       ),
-      bankDetails = BankDetails("Account name", "12345678", "GB12345678")
+      bankDetails = BankDetails("Account name", Some("12345678"), "GB12345678")
     )
 
   private def createBusinessAddress(): UkAddress =
