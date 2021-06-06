@@ -454,11 +454,17 @@ bankDetails.heading = Enter your bank or building society account details
 bankDetails.accountName = Account name
 bankDetails.bic = BIC number
 bankDetails.bic.hint = Must be 8 digits long
+bankDetails.iban = IBAN number
 bankDetails.checkYourAnswersLabel = Bank account details
 bankDetails.error.accountName.required = Enter the account name
 bankDetails.error.bic.required = Enter the BIC number
+bankDetails.error.iban.required = Enter the IBAN number
 bankDetails.error.accountName.length = Account name must be 100 characters or less
 bankDetails.error.bic.length = BIC number must be 8 characters or less
+bankDetails.error.bic.invalid = BIC number must be 8 digits
+bankDetails.error.iban.min = IBAN number must be at least {0} characters
+bankDetails.error.iban.max = IBAN number must be {0} characters or less
+bankDetails.error.iban.invalid = IBAN can only be letters or numbers
 bankDetails.accountName.change.hidden = account name
 bankDetails.bic.change.hidden = BIC number
 

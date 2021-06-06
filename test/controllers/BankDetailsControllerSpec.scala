@@ -48,7 +48,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
     Json.obj(
       BankDetailsPage.toString -> Json.obj(
         "accountName" -> "value 1",
-        "bic" -> "value 2"
+        "bic"         -> "12345678",
+        "iban"        -> "GB123456789"
       )
     )
   )
@@ -83,7 +84,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BankDetails("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(BankDetails("value 1", "12345678", "GB123456789")), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -104,7 +105,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "value 1"), ("bic", "value 2"))
+            .withFormUrlEncodedBody(("accountName", "value 1"), ("bic", "12354678"), ("iban", "GB123456789"))
 
         val result = route(application, request).value
 
@@ -154,7 +155,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "value 1"), ("bic", "value 2"))
+            .withFormUrlEncodedBody(("accountName", "value 1"), ("bic", "12345678"), ("iban", "GB123456789"))
 
         val result = route(application, request).value
 

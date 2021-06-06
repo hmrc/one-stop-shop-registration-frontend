@@ -33,7 +33,18 @@
                 field = form("bic"),
                 label = LabelViewModel(messages("bankDetails.bic"))
             )
-            .withWidth(Full)
+            .asNumeric()
+            .withWidth(Fixed10)
+            .withHint(HintViewModel(messages("bankDetails.bic.hint")))
+        )
+
+
+        @govukInput(
+            InputViewModel(
+                field = form("iban"),
+                label = LabelViewModel(messages("bankDetails.iban"))
+            )
+            .withWidth(Fixed30)
         )
 
         @govukButton(

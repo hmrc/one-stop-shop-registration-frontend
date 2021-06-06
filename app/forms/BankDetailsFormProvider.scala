@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.Validation.Validation.{bicPattern, commonNamePattern, ibanPattern}
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
@@ -28,9 +29,18 @@ class BankDetailsFormProvider @Inject() extends Mappings {
    def apply(): Form[BankDetails] = Form(
      mapping(
       "accountName" -> text("bankDetails.error.accountName.required")
-        .verifying(maxLength(100, "bankDetails.error.accountName.length")),
+        .verifying(firstError(
+          maxLength(100, "bankDetails.error.accountName.length"),
+          regexp(commonNamePattern, "bankDetails.error.accountName.invalid")
+        )),
       "bic" -> text("bankDetails.error.bic.required")
-        .verifying(maxLength(8, "bankDetails.error.bic.length"))
+        .verifying(regexp(bicPattern, "bankDetails.error.bic.invalid")),
+       "iban" -> text("bankDetails.error.iban.required")
+         .verifying(firstError(
+           minLength(5, "bankDetails.error.iban.min"),
+           maxLength(34, "bankDetails.error.iban.max"),
+           regexp(ibanPattern, "bankDetails.error.iban.invalid"))
+         )
     )(BankDetails.apply)(BankDetails.unapply)
    )
  }

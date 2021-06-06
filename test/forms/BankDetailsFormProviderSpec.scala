@@ -16,7 +16,10 @@
 
 package forms
 
+import forms.Validation.Validation.bicPattern
+import org.scalacheck.Arbitrary.arbitrary
 import forms.behaviours.StringFieldBehaviours
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class BankDetailsFormProviderSpec extends StringFieldBehaviours {
@@ -33,7 +36,7 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeInputsWithMaxLength(maxLength)
     )
 
     behave like fieldWithMaxLength(
@@ -54,20 +57,68 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "bic"
     val requiredKey = "bankDetails.error.bic.required"
-    val lengthKey = "bankDetails.error.bic.length"
+    val invalidKey = "bankDetails.error.bic.invalid"
     val maxLength = 8
+
+    val validData = Gen.listOfN(maxLength, Gen.numChar).map(_.mkString)
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
+    )
+
+    "not bind anything other than 8 digit strings" in {
+
+      forAll(arbitrary[String]) {
+        value =>
+
+          whenever(!value.matches(bicPattern) && value.nonEmpty) {
+            val result = form.bind(Map(fieldName -> value)).apply(fieldName)
+            result.errors must contain only FormError(fieldName, invalidKey, Seq(bicPattern))
+          }
+      }
+    }
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+
+  ".iban" - {
+
+    val fieldName = "iban"
+    val requiredKey = "bankDetails.error.iban.required"
+    val maxKey = "bankDetails.error.iban.max"
+    val minKey = "bankDetails.error.iban.min"
+    val maxLength = 34
+    val minLength = 5
+
+    val validData = for {
+      ibanChars <- Gen.choose(minLength, maxLength)
+      iban <- Gen.listOfN(ibanChars, Gen.oneOf(Gen.alphaChar, Gen.numChar))
+    } yield iban.mkString
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      validData
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, maxKey, Seq(maxLength))
+    )
+
+    behave like fieldWithMinLength(
+      form,
+      fieldName,
+      minLength = minLength,
+      lengthError = FormError(fieldName, minKey, Seq(minLength))
     )
 
     behave like mandatoryField(
