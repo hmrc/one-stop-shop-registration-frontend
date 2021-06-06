@@ -34,10 +34,7 @@ object EuCountrySummary {
         SummaryListRowViewModel(
           key = "euCountry.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer.name).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.EuCountryController.onPageLoad(CheckMode, index).url)
-              .withVisuallyHiddenText(messages("euCountry.change.hidden"))
-          )
+          actions = Seq.empty
         )
     }
 }
