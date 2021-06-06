@@ -19,11 +19,11 @@ package controllers
 import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
+import logging.Logging
 import models.NormalMode
 import models.responses.ConflictFound
 import navigation.Navigator
 import pages.CheckYourAnswersPage
-import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RegistrationService
@@ -44,7 +44,7 @@ class CheckYourAnswersController @Inject()(
   registrationService: RegistrationService,
   navigator: Navigator,
   view: CheckYourAnswersView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -87,7 +87,7 @@ class CheckYourAnswersController @Inject()(
               successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
 
             case Left(e) =>
-              logger.error(s"Unexpected result on submit ${e.toString}")
+              logger.error(s"Unexpected result on submit: ${e.toString}")
               successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
         case None =>

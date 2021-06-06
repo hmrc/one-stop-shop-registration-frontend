@@ -116,19 +116,23 @@ class RegistrationServiceSpec extends SpecBase {
       registration.value mustEqual expectedRegistration
     }
 
-    "must return a Registration when no trading names or EU country details were provided" in {
+    "must return a Registration when no trading names, EU countries or websites were provided" in {
 
       val userAnswers =
         answers
           .set(HasTradingNamePage, false).success.value
           .remove(AllTradingNames).success.value
+          .set(TaxRegisteredInEuPage, false).success.value
           .remove(AllEuDetailsQuery).success.value
+          .set(HasWebsitePage, false).success.value
+          .remove(AllWebsites).success.value
 
       val expectedRegistration =
         RegistrationData.registration copy (
           tradingNames     = Seq.empty,
           euRegistrations  = Seq.empty,
-          vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered)
+          vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered),
+          websites         = Seq.empty
         )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)

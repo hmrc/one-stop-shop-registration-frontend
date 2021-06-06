@@ -36,7 +36,7 @@ class RegistrationService {
       euRegistrations              = buildEuRegistrations(userAnswers)
       startDate                    <- userAnswers.get(StartDatePage)
       businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
-      websites                     <- userAnswers.get(AllWebsites)
+      websites                     = getWebsites(userAnswers)
       currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
       previousRegistrations        = buildPreviousRegistrations(userAnswers)
     } yield Registration(
@@ -54,6 +54,9 @@ class RegistrationService {
 
   private def getTradingNames(userAnswers: UserAnswers): List[String] =
     userAnswers.get(AllTradingNames).getOrElse(List.empty)
+
+  private def getWebsites(userAnswers: UserAnswers): List[String] =
+    userAnswers.get(AllWebsites).getOrElse(List.empty)
 
   private def buildEuRegistrations(answers: UserAnswers): List[EuTaxRegistration] =
     answers
