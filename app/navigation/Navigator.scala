@@ -52,10 +52,11 @@ class Navigator @Inject()() {
     case EuTaxReferencePage(index)                => _ => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
     case FixedEstablishmentTradingNamePage(index) => _ => euRoutes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index)
     case FixedEstablishmentAddressPage(index)     => _ => euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
-    case AddEuDetailsPage                         => addEuVatDetailsRoute
+    case AddEuDetailsPage                         => addEuDetailsRoute
     case DeleteEuDetailsPage(_)                   => deleteEuVatDetailsRoute
     case CurrentlyRegisteredInEuPage              => currentlyRegisteredInEuRoute
     case CurrentCountryOfRegistrationPage         => _ => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+    case CurrentlyRegisteredInCountryPage         => _ => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     case PreviouslyRegisteredPage                 => previouslyRegisteredRoute
     case PreviousEuCountryPage(index)             => _ => previousRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index)
     case PreviousEuVatNumberPage(_)               => _ => previousRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode)
@@ -161,11 +162,19 @@ class Navigator @Inject()() {
     case _                         => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private def addEuVatDetailsRoute(answers: UserAnswers): Call =
-    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuVatRegisteredCountries)) match {
+  private def addEuDetailsRoute(answers: UserAnswers): Call = {
+
+    def noRoute: Call = answers.get(DeriveNumberOfEuVatRegistrations) match {
+      case Some(size) if size == 1 => routes.CurrentlyRegisteredInCountryController.onPageLoad(NormalMode)
+      case Some(size) if size > 1  => routes.CurrentlyRegisteredInEuController.onPageLoad(NormalMode)
+      case _                       => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+    }
+
+    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _)         => routes.CurrentlyRegisteredInEuController.onPageLoad(NormalMode)
+      case (Some(false), _)         => noRoute
       case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
   }
 
   private def currentlyRegisteredInEuRoute(answers: UserAnswers): Call =
@@ -176,7 +185,7 @@ class Navigator @Inject()() {
     }
 
   private def deleteEuVatDetailsRoute(answers: UserAnswers): Call =
-    answers.get(DeriveNumberOfEuVatRegisteredCountries) match {
+    answers.get(DeriveNumberOfEuRegistrations) match {
       case Some(n) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
       case _                => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
     }
@@ -245,7 +254,7 @@ class Navigator @Inject()() {
   }
 
   private def addEuVatDetailsRoute(mode: Mode)(answers: UserAnswers): Call =
-    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuVatRegisteredCountries)) match {
+    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(mode, Index(size))
       case (Some(false), _ )        => routes.CheckYourAnswersController.onPageLoad()
       case (None, Some(n)) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(mode)

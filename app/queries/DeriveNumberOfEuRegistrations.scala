@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package forms
+package queries
 
-import javax.inject.Inject
-import forms.mappings.Mappings
-import models.Country
-import play.api.data.Form
+import play.api.libs.json.{JsObject, JsPath}
 
-class CurrentlyRegisteredInCountryFormProvider @Inject() extends Mappings {
-
-  def apply(country: Country): Form[Boolean] =
-    Form(
-      "value" -> boolean("currentlyRegisteredInCountry.error.required", args = Seq(country.name))
-    )
+case object DeriveNumberOfEuRegistrations extends Derivable[List[JsObject], Int] {
+  override val derive: List[JsObject] => Int = _.size
+  override def path: JsPath = JsPath \ "euVatDetails"
 }

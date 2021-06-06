@@ -24,7 +24,7 @@ import navigation.Navigator
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.DeriveNumberOfEuVatRegisteredCountries
+import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
 import views.html.euDetails.AddEuDetailsView
@@ -74,7 +74,7 @@ class AddEuDetailsController @Inject()(
 
   private def getNumberOfEuCountries(block: Int => Future[Result])
                                     (implicit request: DataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(DeriveNumberOfEuVatRegisteredCountries).map {
+    request.userAnswers.get(DeriveNumberOfEuRegistrations).map {
       number =>
         block(number)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

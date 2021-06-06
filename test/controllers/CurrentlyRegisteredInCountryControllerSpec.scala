@@ -18,12 +18,14 @@ package controllers
 
 import base.SpecBase
 import forms.CurrentlyRegisteredInCountryFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
-import pages.CurrentlyRegisteredInCountryPage
+import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
+import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -35,18 +37,26 @@ import scala.concurrent.Future
 
 class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new CurrentlyRegisteredInCountryFormProvider()
-  val form = formProvider()
+  private val country      = arbitrary[Country].sample.value
+  private val formProvider = new CurrentlyRegisteredInCountryFormProvider()
+  private val form         = formProvider(country)
 
-  lazy val currentlyRegisteredInCountryRoute = routes.CurrentlyRegisteredInCountryController.onPageLoad(NormalMode).url
+  private lazy val currentlyRegisteredInCountryRoute = routes.CurrentlyRegisteredInCountryController.onPageLoad(NormalMode).url
+
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(EuCountryPage(Index(0)),country).success.value
+      .set(VatRegisteredPage(Index(0)), true).success.value
+      .set(EuVatNumberPage(Index(0)), "123456789").success.value
+      .set(HasFixedEstablishmentPage(Index(0)), false).success.value
 
   "CurrentlyRegisteredInCountry Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, currentlyRegisteredInCountryRoute)
@@ -56,13 +66,13 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[CurrentlyRegisteredInCountryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, country)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CurrentlyRegisteredInCountryPage, true).success.value
+      val userAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,39 +84,84 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, country)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "when the user answers yes" - {
 
-      val mockSessionRepository = mock[SessionRepository]
+      "must save the answer and the country, and redirect to the next page when valid data is submitted" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        val mockSessionRepository = mock[SessionRepository]
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, currentlyRegisteredInCountryRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
 
-        val result = route(application, request).value
+        running(application) {
+          val request =
+            FakeRequest(POST, currentlyRegisteredInCountryRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+
+          val expectedSavedData =
+            baseAnswers
+              .set(CurrentlyRegisteredInCountryPage, true).success.value
+              .set(CurrentCountryOfRegistrationPage, country).success.value
+
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedSavedData))
+        }
+      }
+    }
+
+    "when the user answers no" - {
+
+      "must save the answer and remove the country if present, and redirect to the next page when valid data is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, currentlyRegisteredInCountryRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+
+          val expectedSavedData =
+            baseAnswers
+              .set(CurrentlyRegisteredInCountryPage, false).success.value
+
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedSavedData))
+        }
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -120,7 +175,7 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, country)(request, messages(application)).toString
       }
     }
 
@@ -141,6 +196,82 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, currentlyRegisteredInCountryRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if no VAT registered countries are found" in {
+
+      val answers = baseAnswers.set(VatRegisteredPage(Index(0)), false).success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, currentlyRegisteredInCountryRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if more than one VAT registered countries are found" in {
+
+      val answers =
+        baseAnswers
+          .set(EuCountryPage(Index(1)),country).success.value
+          .set(VatRegisteredPage(Index(1)), true).success.value
+          .set(EuVatNumberPage(Index(1)), "123456789").success.value
+          .set(HasFixedEstablishmentPage(Index(1)), false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, currentlyRegisteredInCountryRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no VAT registered countries are found" in {
+
+      val answers = baseAnswers.set(VatRegisteredPage(Index(0)), false).success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, currentlyRegisteredInCountryRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if more than one VAT registered countries are found" in {
+
+      val answers =
+        baseAnswers
+          .set(EuCountryPage(Index(1)),country).success.value
+          .set(VatRegisteredPage(Index(1)), true).success.value
+          .set(EuVatNumberPage(Index(1)), "123456789").success.value
+          .set(HasFixedEstablishmentPage(Index(1)), false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request =

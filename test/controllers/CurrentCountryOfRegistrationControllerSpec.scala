@@ -72,6 +72,28 @@ class CurrentCountryOfRegistrationControllerSpec extends SpecBase with MockitoSu
       }
     }
 
+    "must only include countries where the user is VAT registered in the list of options" in {
+
+      val answers =
+        baseAnswers
+          .set(EuCountryPage(Index(1)), Country("XX", "Fake country")).success.value
+          .set(VatRegisteredPage(Index(1)), false).success.value
+          .set(HasFixedEstablishmentPage(Index(1)), false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, currentCountryOfRegistrationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[CurrentCountryOfRegistrationView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, viewModel)(request, messages(application)).toString
+      }
+    }
+
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = baseAnswers.set(CurrentCountryOfRegistrationPage, countries.head).success.value

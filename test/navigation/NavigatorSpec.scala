@@ -464,23 +464,80 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Add EU VAT Details" - {
 
-        "to EU Country when the user answers true" in {
+        "when the user answers yes" - {
 
-          val answers = emptyUserAnswers
-            .set(AddEuDetailsPage, true).success.value
-            .set(pages.euDetails.EuCountryPage(index), Country("FR", "France")).success.value
-            .set(pages.euDetails.EuVatNumberPage(index), "FR123456789").success.value
+          "to EU Country for the next index" in {
 
-          navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
-            .mustBe(euRoutes.EuCountryController.onPageLoad(NormalMode, Index(1)))
+            val answers = emptyUserAnswers
+              .set(AddEuDetailsPage, true).success.value
+              .set(pages.euDetails.EuCountryPage(index), Country("FR", "France")).success.value
+              .set(pages.euDetails.EuVatNumberPage(index), "FR123456789").success.value
+
+            navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
+              .mustBe(euRoutes.EuCountryController.onPageLoad(NormalMode, Index(1)))
+          }
         }
 
-        "to Currently Registered in EU when the user answers false" in {
+        "when the user answers no" - {
 
-          val answers = emptyUserAnswers.set(AddEuDetailsPage, false).success.value
+          "and has entered one country with a VAT registration" - {
 
-          navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
-            .mustBe(routes.CurrentlyRegisteredInEuController.onPageLoad(NormalMode))
+            "must be Currently Registered in Country" in {
+
+              val answers = emptyUserAnswers
+                .set(AddEuDetailsPage, false).success.value
+                .set(pages.euDetails.EuCountryPage(index), Country("FR", "France")).success.value
+                .set(pages.euDetails.VatRegisteredPage(index), true).success.value
+                .set(pages.euDetails.EuVatNumberPage(index), "FR123456789").success.value
+                .set(pages.euDetails.HasFixedEstablishmentPage(index), false).success.value
+
+              navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
+                .mustBe(routes.CurrentlyRegisteredInCountryController.onPageLoad(NormalMode))
+            }
+          }
+
+          "and has entered multiple countries with VAT registrations" - {
+
+            "must be Currently Registered in EU" in {
+              val answers = emptyUserAnswers
+                .set(AddEuDetailsPage, false).success.value
+                .set(pages.euDetails.EuCountryPage(index), Country("FR", "France")).success.value
+                .set(pages.euDetails.VatRegisteredPage(index), true).success.value
+                .set(pages.euDetails.EuVatNumberPage(index), "FR123456789").success.value
+                .set(pages.euDetails.HasFixedEstablishmentPage(index), false).success.value
+                .set(pages.euDetails.EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
+                .set(pages.euDetails.VatRegisteredPage(Index(1)), true).success.value
+                .set(pages.euDetails.EuVatNumberPage(Index(1)), "DE123456789").success.value
+                .set(pages.euDetails.HasFixedEstablishmentPage(Index(1)), false).success.value
+
+              navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
+                .mustBe(routes.CurrentlyRegisteredInEuController.onPageLoad(NormalMode))
+            }
+          }
+
+          "and has entered no countries" - {
+
+            "must be Previously Registered" in {
+
+              val answers = emptyUserAnswers.set(AddEuDetailsPage, false).success.value
+              navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
+                .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+            }
+          }
+
+          "and has entered only countries without VAT registrations" - {
+
+            "must be Previously Registered" in {
+
+              val answers = emptyUserAnswers
+                .set(AddEuDetailsPage, false).success.value
+                .set(pages.euDetails.EuCountryPage(index), Country("FR", "France")).success.value
+                .set(pages.euDetails.VatRegisteredPage(index), false).success.value
+
+              navigator.nextPage(AddEuDetailsPage, NormalMode, answers)
+                .mustBe(previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+            }
+          }
         }
       }
 

@@ -16,9 +16,11 @@
 
 package queries
 
-import play.api.libs.json.{JsObject, JsPath}
 
-case object DeriveNumberOfEuVatRegisteredCountries extends Derivable[List[JsObject], Int] {
-  override val derive: List[JsObject] => Int = _.size
+import models.euDetails.EuDetails
+import play.api.libs.json.JsPath
+
+case object DeriveNumberOfEuVatRegistrations extends Derivable[List[EuDetails], Int] {
+  override val derive: List[EuDetails] => Int = _.count(_.vatRegistered)
   override def path: JsPath = JsPath \ "euVatDetails"
 }

@@ -86,8 +86,10 @@ class CurrentCountryOfRegistrationController @Inject()(
                           (implicit request: DataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(AllEuDetailsQuery).map {
       vatDetails =>
-        if (vatDetails.nonEmpty) {
-          block(vatDetails.map(_.euCountry))
+        val filtered = vatDetails.filter(_.vatRegistered)
+
+        if (filtered.nonEmpty) {
+          block(filtered.map(_.euCountry))
         } else {
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         }

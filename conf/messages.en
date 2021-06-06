@@ -468,8 +468,8 @@ bankDetails.error.iban.invalid = IBAN can only be letters or numbers
 bankDetails.accountName.change.hidden = account name
 bankDetails.bic.change.hidden = BIC number
 
-currentlyRegisteredInCountry.title = Is your business registered for the One Stop SHop in {0}?
-currentlyRegisteredInCountry.heading = Is your business registered for the One Stop SHop in {0}?
+currentlyRegisteredInCountry.title = Is your business registered for the One Stop Shop in {0}?
+currentlyRegisteredInCountry.heading = Is your business registered for the One Stop Shop in {0}?
 currentlyRegisteredInCountry.checkYourAnswersLabel = Registered for the One Stop Shop
 currentlyRegisteredInCountry.error.required = Select yes if your business is registered for the One Stop Shop in {0}
 currentlyRegisteredInCountry.change.hidden = if your business is registered for the One Stop Shop
