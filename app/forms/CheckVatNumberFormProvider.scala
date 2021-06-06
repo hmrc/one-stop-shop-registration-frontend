@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package pages.euDetails
+package forms
 
-import models.Index
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+class CheckVatNumberFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "euTaxReference"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("checkVatNumber.error.required")
+    )
 }

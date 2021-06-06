@@ -159,6 +159,14 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[CheckVatDetailsPage.type]
+        value <- arbitrary[CheckVatDetails].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryCheckVaNumberUserAnswersEntry: Arbitrary[(CheckVatNumberPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[CheckVatNumberPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }

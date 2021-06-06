@@ -20,9 +20,9 @@ import base.SpecBase
 import models._
 import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
-import models.euDetails.EuDetails
+import models.euDetails.FixedEstablishmentAddress
 import pages._
-import pages.euDetails.{TaxRegisteredInEuPage}
+import pages.euDetails._
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import queries.{AllEuDetailsQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
@@ -39,12 +39,25 @@ class RegistrationServiceSpec extends SpecBase {
       .set(PartOfVatGroupPage, true).success.value
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
       .set(TaxRegisteredInEuPage, true).success.value
-      .set(
-        AllEuDetailsQuery,
-        List(
-          EuDetails(Country("FR", "France"),"FR123456789", false, None, None),
-          EuDetails(Country("ES", "Spain"),"ES123456789", false, None, None)
-        )).success.value
+      .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+      .set(VatRegisteredPage(Index(0)), true).success.value
+      .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
+      .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+      .set(EuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+      .set(VatRegisteredPage(Index(1)), true).success.value
+      .set(EuVatNumberPage(Index(1)), "ES123456789").success.value
+      .set(HasFixedEstablishmentPage(Index(1)), true).success.value
+      .set(FixedEstablishmentTradingNamePage(Index(1)), "Spanish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(1)), FixedEstablishmentAddress("Line 1", None, "Town", None, None)).success.value
+      .set(EuCountryPage(Index(2)), Country("DE", "Germany")).success.value
+      .set(VatRegisteredPage(Index(2)), false).success.value
+      .set(HasFixedEstablishmentPage(Index(2)), true).success.value
+      .set(EuTaxReferencePage(Index(2)), "DE123456789").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(2)), "German trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(2)), FixedEstablishmentAddress("Line 1", None, "Town", None, None)).success.value
+      .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
+      .set(VatRegisteredPage(Index(3)), false).success.value
+      .set(HasFixedEstablishmentPage(Index(3)), false).success.value
       .set(StartDatePage,
         StartDate(StartDateOption.NextPeriod, LocalDate.now())
       ).success.value
@@ -113,9 +126,9 @@ class RegistrationServiceSpec extends SpecBase {
 
       val expectedRegistration =
         RegistrationData.registration copy (
-          tradingNames       = Seq.empty,
-          euVatRegistrations = Seq.empty,
-          vatDetails         = RegistrationData.registration.vatDetails copy (source = UserEntered)
+          tradingNames     = Seq.empty,
+          euRegistrations  = Seq.empty,
+          vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered)
         )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)

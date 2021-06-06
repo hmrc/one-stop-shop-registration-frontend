@@ -17,14 +17,14 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
+import models.CheckVatDetails
 import play.api.data.Form
 
 class CheckVatDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(): Form[CheckVatDetails] =
     Form(
-      "value" -> boolean("checkVatDetails.error.required")
+      "value" -> enumerable[CheckVatDetails]("checkVatDetails.error.required")
     )
 }

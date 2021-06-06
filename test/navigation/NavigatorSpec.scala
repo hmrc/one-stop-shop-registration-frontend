@@ -44,13 +44,63 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from Index" - {
+
+        "to Sells Goods from NI" in {
+
+          navigator.nextPage(FirstAuthedPage, NormalMode, emptyUserAnswersWithVatInfo)
+            .mustBe(routes.SellsGoodsFromNiController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from Sells Goods from NI" - {
+
+        "to In Control of Moving Goods when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, true).success.value
+          navigator.nextPage(SellsGoodsFromNiPage,NormalMode, answers)
+            .mustBe(routes.InControlOfMovingGoodsController.onPageLoad(NormalMode))
+        }
+
+        "to Cannot Register for Service when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
+          navigator.nextPage(SellsGoodsFromNiPage,NormalMode, answers)
+            .mustBe(routes.CannotRegisterForServiceController.onPageLoad())
+        }
+      }
+
+      "must go from In Control Of Moving Goods" - {
+
+        "to Check VAT Details when the user answers yes and we have some VAT details" in {
+
+          val answers = emptyUserAnswersWithVatInfo.set(InControlOfMovingGoodsPage, true).success.value
+          navigator.nextPage(InControlOfMovingGoodsPage,NormalMode, answers)
+            .mustBe(routes.CheckVatDetailsController.onPageLoad(NormalMode))
+        }
+
+        "to Check VAT Number when the user answers yes and we don't have any VAT details" in {
+
+          val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
+          navigator.nextPage(InControlOfMovingGoodsPage,NormalMode, answers)
+            .mustBe(routes.CheckVatNumberController.onPageLoad(NormalMode))
+        }
+
+        "to Cannot Register for Service when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
+          navigator.nextPage(InControlOfMovingGoodsPage,NormalMode, answers)
+            .mustBe(routes.CannotRegisterForServiceController.onPageLoad())
+        }
+      }
+
       "must go from Check VAT Details" - {
 
         "when the user answers yes" - {
 
           "and we have VAT details including the organisation name" in {
 
-            val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, true).success.value
+            val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
             navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
               .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
@@ -63,33 +113,32 @@ class NavigatorSpec extends SpecBase {
               val updatedVatInfo = vatCustomerInfo copy (organisationName = None)
               val answers =
                 emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
-                  .set(CheckVatDetailsPage, true).success.value
+                  .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
-              navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
-                .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
-            }
-          }
-
-          "and we do not have VAT details" - {
-
-            "to Registered Company Name" in {
-
-              val answers = emptyUserAnswers.set(CheckVatDetailsPage, true).success.value
               navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
                 .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
             }
           }
         }
 
-        "when the user answers no" - {
+        "when the user answers Wrong Account" - {
 
           "to User Other Account" in {
 
-            val answers = emptyUserAnswers.set(CheckVatDetailsPage, false).success.value
+            val answers = emptyUserAnswers.set(CheckVatDetailsPage, CheckVatDetails.WrongAccount).success.value
             navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
               .mustBe(routes.UseOtherAccountController.onPageLoad())
           }
 
+          "when the user answers Details Incorrect" - {
+
+            "to Update VAT Details" in {
+
+              val answers = emptyUserAnswers.set(CheckVatDetailsPage, CheckVatDetails.DetailsIncorrect).success.value
+              navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                .mustBe(routes.UpdateVatDetailsController.onPageLoad())
+            }
+          }
         }
       }
 
@@ -205,10 +254,27 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from EU Country to EU VAT Number" in {
+      "must go from EU Country to VAT Registered" in {
 
         navigator.nextPage(EuCountryPage(index), NormalMode, emptyUserAnswers)
-          .mustBe(euRoutes.EuVatNumberController.onPageLoad(NormalMode, index))
+          .mustBe(euRoutes.VatRegisteredController.onPageLoad(NormalMode, index))
+      }
+
+      "must go from VAT Registered" - {
+
+        "to EU VAT Number when the answer is yes" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+          navigator.nextPage(VatRegisteredPage(index), NormalMode, answers)
+            .mustBe(euRoutes.EuVatNumberController.onPageLoad(NormalMode, index))
+        }
+
+        "to Has Fixed Establishment when the answer is no" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+          navigator.nextPage(VatRegisteredPage(index), NormalMode, answers)
+            .mustBe(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+        }
       }
 
       "must go from EU VAT Number to Has Fixed Establishment" in {
@@ -219,11 +285,26 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Has Fixed Establishment" - {
 
-        "to Fixed Establishment Trading Name when the user answers yes" in {
+        "to Fixed Establishment Trading Name when the user answers yes and has given a VAT number" in {
 
-          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value
+          val answers =
+            emptyUserAnswers
+              .set(VatRegisteredPage(index), true).success.value
+              .set(HasFixedEstablishmentPage(index), true).success.value
+
           navigator.nextPage(pages.euDetails.HasFixedEstablishmentPage(index), NormalMode, answers)
             .mustBe(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+        }
+
+        "to EU Tax Reference when the user answers yes and has not given a VAT number" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(VatRegisteredPage(index), false).success.value
+              .set(HasFixedEstablishmentPage(index), true).success.value
+
+          navigator.nextPage(pages.euDetails.HasFixedEstablishmentPage(index), NormalMode, answers)
+            .mustBe(euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index))
         }
 
         "to Check EU VAT Details Answers Name when the user answers yes" in {

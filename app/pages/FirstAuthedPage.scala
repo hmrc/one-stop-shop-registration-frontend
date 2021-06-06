@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 
-package pages.euDetails
+package pages
 
-import models.Index
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
-
-  override def toString: String = "euTaxReference"
-}
+case object FirstAuthedPage extends Page

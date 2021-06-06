@@ -19,273 +19,176 @@ package controllers
 import base.SpecBase
 import connectors.RegistrationConnector
 import forms.CheckVatDetailsFormProvider
-import models.UserAnswers
-import models.responses
+import models.{CheckVatDetails, NormalMode, StartDate, StartDateOption, UserAnswers, responses}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.CheckVatDetailsPage
+import pages.{CheckVatDetailsPage, StartDatePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import viewmodels.CheckVatDetailsViewModel
-import views.html.{CheckVatDetailsView, CheckVatNumberView}
+import views.html.{CheckVatDetailsView, CheckVatNumberView, StartDateView}
 
 import scala.concurrent.Future
 
-class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new CheckVatDetailsFormProvider()
   private val form = formProvider()
 
-  private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad().url
-
-  private val mockConnector  = mock[RegistrationConnector]
-  private val mockRepository = mock[SessionRepository]
-
-  private def appBuilder(answers: Option[UserAnswers]) =
-    applicationBuilder(answers)
-      .overrides(
-        bind[RegistrationConnector].toInstance(mockConnector),
-        bind[SessionRepository].toInstance(mockRepository)
-      )
-
-  override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector)
-    Mockito.reset(mockRepository)
-  }
+  private val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
+  private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad(NormalMode).url
 
   "CheckVatDetails Controller" - {
 
-    ".onPageLoad" - {
+    "must return OK and the correct view for a GET" in {
 
-      "when the user has not already answered this question" - {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
 
-        "and we can find their VAT details" - {
+      running(application) {
+        val request = FakeRequest(GET, checkVatDetailsRoute)
 
-          "must create user answers with their VAT details, return OK and the Check Vat Details view" in {
+        val result = route(application, request).value
 
-            val application = appBuilder(answers = None).build()
+        val view = application.injector.instanceOf[CheckVatDetailsView]
 
-            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-            when(mockRepository.set(any())) thenReturn Future.successful(true)
-
-            running(application) {
-              val request = FakeRequest(GET, checkVatDetailsRoute)
-              val view = application.injector.instanceOf[CheckVatDetailsView]
-              val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
-
-              val result = route(application, request).value
-
-              status(result) mustEqual OK
-              contentAsString(result) mustEqual view(form, viewModel)(request, messages(application)).toString
-              verify(mockRepository, times(1)).set(eqTo(emptyUserAnswersWithVatInfo))
-            }
-          }
-        }
-
-        "and we cannot find their VAT details" - {
-
-          "must create user answers with no VAT details, return OK and the Check Vat Number view" in {
-
-            val application = appBuilder(answers = None).build()
-
-            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(responses.NotFound))
-            when(mockRepository.set(any())) thenReturn Future.successful(true)
-
-            running(application) {
-              val request = FakeRequest(GET, checkVatDetailsRoute)
-              val view = application.injector.instanceOf[CheckVatNumberView]
-
-              val result = route(application, request).value
-
-              status(result) mustEqual OK
-              contentAsString(result) mustEqual view(form, vrn)(request, messages(application)).toString
-              verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
-            }
-          }
-        }
-      }
-
-      "when the user has already answered this question" - {
-
-        "and we had found their VAT details" - {
-
-          "must not make another call to get details nor update user answers, and must return OK and the Check Vat Details view" in {
-
-            val answers     = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, true).success.value
-            val application = appBuilder(answers = Some(answers)).build()
-
-            running(application) {
-              val request = FakeRequest(GET, checkVatDetailsRoute)
-              val view = application.injector.instanceOf[CheckVatDetailsView]
-              val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
-
-              val result = route(application, request).value
-
-              status(result) mustEqual OK
-              contentAsString(result) mustEqual view(form.fill(true), viewModel)(request, messages(application)).toString
-              verify(mockConnector, never()).getVatCustomerInfo()(any())
-              verify(mockRepository, never()).set(any())
-            }
-          }
-        }
-
-        "and we had not found their VAT details" - {
-
-          "must not make another call to get details nor update user answers, and must return OK and the Check Vat Number view" in {
-
-            val answers     = emptyUserAnswers.set(CheckVatDetailsPage, true).success.value
-            val application = appBuilder(answers = Some(answers)).build()
-
-            running(application) {
-              val request = FakeRequest(GET, checkVatDetailsRoute)
-              val view = application.injector.instanceOf[CheckVatNumberView]
-
-              val result = route(application, request).value
-
-              status(result) mustEqual OK
-              contentAsString(result) mustEqual view(form.fill(true), vrn)(request, messages(application)).toString
-              verify(mockConnector, never()).getVatCustomerInfo()(any())
-              verify(mockRepository, never()).set(any())
-            }
-          }
-        }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, viewModel)(request, messages(application)).toString
       }
     }
 
-    ".onSubmit" - {
+    "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      "when the user hasn't answered any questions" - {
+      val userAnswers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
-        "must redirect to JourneyRecovery" in {
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-          val application = appBuilder(None).build()
+      running(application) {
+        val request = FakeRequest(GET, checkVatDetailsRoute)
 
-          running(application) {
-            val request =
-              FakeRequest(POST, checkVatDetailsRoute)
-                .withFormUrlEncodedBody(("value", "true"))
+        val view = application.injector.instanceOf[CheckVatDetailsView]
 
-            val result = route(application, request).value
+        val result = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-          }
-        }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual
+          view(form.fill(CheckVatDetails.Yes), NormalMode, viewModel)(request, messages(application)).toString
       }
+    }
 
-      "when we found the user's VAT details" - {
+    "must redirect to the next page when valid data is submitted" in {
 
-        "and the user answers the question" - {
+      val mockSessionRepository = mock[SessionRepository]
 
-          "must save the answer and redirect to the next page" in {
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-            when(mockRepository.set(any())) thenReturn Future.successful(true)
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
 
-            val application =
-              appBuilder(Some(emptyUserAnswersWithVatInfo))
-                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-                .build()
+      running(application) {
+        val request =
+          FakeRequest(POST, checkVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", CheckVatDetails.Yes.toString))
 
-            running(application) {
-              val request =
-                FakeRequest(POST, checkVatDetailsRoute)
-                  .withFormUrlEncodedBody(("value", "true"))
+        val result = route(application, request).value
 
-              val result = route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual onwardRoute.url
-
-              val expectedUpdatedAnswers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, true).success.value
-              verify(mockRepository, times(1)).set(eqTo(expectedUpdatedAnswers))
-            }
-          }
-        }
-
-        "and the user submits a bad request" - {
-
-          "must return Bad Request and the Check Vat Details page" in {
-            val application = appBuilder(Some(emptyUserAnswersWithVatInfo)).build
-
-            running(application) {
-              val request =
-                FakeRequest(POST, checkVatDetailsRoute)
-                  .withFormUrlEncodedBody(("value", ""))
-
-              val boundForm = form.bind(Map("value" -> ""))
-
-              val view      = application.injector.instanceOf[CheckVatDetailsView]
-              val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
-
-              val result = route(application, request).value
-
-              status(result) mustEqual BAD_REQUEST
-              contentAsString(result) mustEqual view(boundForm, viewModel)(request, messages(application)).toString
-            }
-          }
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
+    }
 
-      "when we didn't find the user's VAT details" - {
+    "must return a Bad Request and errors when invalid data is submitted" in {
 
-        "and the user answers the question" - {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
 
-          "must save the answer and redirect to the next page" in {
+      running(application) {
+        val request =
+          FakeRequest(POST, checkVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-            when(mockRepository.set(any())) thenReturn Future.successful(true)
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
-            val application =
-              appBuilder(Some(emptyUserAnswers))
-                .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-                .build()
+        val view = application.injector.instanceOf[CheckVatDetailsView]
 
-            running(application) {
-              val request =
-                FakeRequest(POST, checkVatDetailsRoute)
-                  .withFormUrlEncodedBody(("value", "true"))
+        val result = route(application, request).value
 
-              val result = route(application, request).value
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode,viewModel)(request, messages(application)).toString
+      }
+    }
 
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual onwardRoute.url
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-              val expectedUpdatedAnswers = emptyUserAnswers.set(CheckVatDetailsPage, true).success.value
-              verify(mockRepository, times(1)).set(eqTo(expectedUpdatedAnswers))
-            }
-          }
-        }
+      val application = applicationBuilder(userAnswers = None).build()
 
-        "and the user submits a bad request" - {
+      running(application) {
+        val request = FakeRequest(GET, checkVatDetailsRoute)
 
-          "must return Bad Request and the Check Vat Details page" in {
+        val result = route(application, request).value
 
-            val application = appBuilder(Some(emptyUserAnswers)).build
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
 
-            running(application) {
-              val request =
-                FakeRequest(POST, checkVatDetailsRoute)
-                  .withFormUrlEncodedBody(("value", ""))
+    "must redirect to Journey Recovery for a GET if no VAT data is found" in {
 
-              val boundForm = form.bind(Map("value" -> ""))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-              val view      = application.injector.instanceOf[CheckVatNumberView]
+      running(application) {
+        val request = FakeRequest(GET, checkVatDetailsRoute)
 
-              val result = route(application, request).value
+        val result = route(application, request).value
 
-              status(result) mustEqual BAD_REQUEST
-              contentAsString(result) mustEqual view(boundForm, vrn)(request, messages(application)).toString
-            }
-          }
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "redirect to Journey Recovery for a POST if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, checkVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", StartDateOption.NextPeriod.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "redirect to Journey Recovery for a POST if no VAT data is found" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, checkVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", StartDateOption.NextPeriod.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

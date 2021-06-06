@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models.domain
+package pages
 
-import models.Country
-import play.api.libs.json.{Json, OFormat}
+import pages.behaviours.PageBehaviours
 
-final case class EuVatRegistration(
-                                    country: Country,
-                                    vatNumber: String,
-                                    fixedEstablishment: Option[FixedEstablishment]
-                                  )
+class CheckVatNumberPageSpec extends PageBehaviours {
 
-object EuVatRegistration {
+  "CheckVatNumberPage" - {
 
-  implicit val format: OFormat[EuVatRegistration] = Json.format[EuVatRegistration]
+    beRetrievable[Boolean](CheckVatNumberPage)
+
+    beSettable[Boolean](CheckVatNumberPage)
+
+    beRemovable[Boolean](CheckVatNumberPage)
+  }
 }

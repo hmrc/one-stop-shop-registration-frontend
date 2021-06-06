@@ -8,11 +8,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("checkVatDetails.title"))) {
 
-    @formHelper(action = routes.CheckVatDetailsController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.CheckVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -23,9 +23,10 @@
         <p class="govuk-body">@viewModel.vrn.value</p>
 
         @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("checkVatDetails.heading")).withCssClass("govuk-visually-hidden")
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("checkVatDetails.question")),
+                items  = CheckVatDetails.options
             )
         )
 

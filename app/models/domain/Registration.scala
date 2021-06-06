@@ -27,7 +27,7 @@ final case class Registration(
                                registeredCompanyName: String,
                                tradingNames: Seq[String],
                                vatDetails: VatDetails,
-                               euVatRegistrations: Seq[EuVatRegistration],
+                               euRegistrations: Seq[EuTaxRegistration],
                                contactDetails: BusinessContactDetails,
                                websites: Seq[String],
                                startDate: LocalDate,

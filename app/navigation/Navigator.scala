@@ -31,6 +31,9 @@ import queries._
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
+    case FirstAuthedPage                          => _ => routes.SellsGoodsFromNiController.onPageLoad(NormalMode)
+    case SellsGoodsFromNiPage                     => sellsGoodsFromNiRoute
+    case InControlOfMovingGoodsPage               => inControlOfMovingGoodsRoute
     case CheckVatDetailsPage                      => checkVatDetailsRoute
     case RegisteredCompanyNamePage                => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
     case HasTradingNamePage                       => hasTradingNameRoute
@@ -40,13 +43,15 @@ class Navigator @Inject()() {
     case PartOfVatGroupPage                       => partOfVatGroupRoute
     case UkVatEffectiveDatePage                   => _ => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
     case TaxRegisteredInEuPage                    => isEuTaxRegistered
-    case EuCountryPage(index)                     => _ => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
+    case EuCountryPage(index)                     => _ => euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
+    case VatRegisteredPage(index)                 => vatRegisteredRoute(index)
     case EuVatNumberPage(index)                   => _ => euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
     case HasFixedEstablishmentPage(index)         => hasFixedEstablishmentRoute(index)
+    case EuTaxReferencePage(index)                => _ => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
     case FixedEstablishmentTradingNamePage(index) => _ => euRoutes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index)
     case FixedEstablishmentAddressPage(index)     => _ => euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
-    case AddEuDetailsPage                      => addEuVatDetailsRoute
-    case DeleteEuDetailsPage(_)                => deleteEuVatDetailsRoute
+    case AddEuDetailsPage                         => addEuVatDetailsRoute
+    case DeleteEuDetailsPage(_)                   => deleteEuVatDetailsRoute
     case CurrentlyRegisteredInEuPage              => currentlyRegisteredInEuRoute
     case CurrentCountryOfRegistrationPage         => _ => previousRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     case PreviouslyRegisteredPage                 => previouslyRegisteredRoute
@@ -64,13 +69,31 @@ class Navigator @Inject()() {
     case _                                        => _ => routes.IndexController.onPageLoad()
   }
 
-  private def checkVatDetailsRoute(answers: UserAnswers): Call =
+  private def sellsGoodsFromNiRoute(answers: UserAnswers): Call = answers.get(SellsGoodsFromNiPage) match {
+    case Some(true)  => routes.InControlOfMovingGoodsController.onPageLoad(NormalMode)
+    case Some(false) => routes.CannotRegisterForServiceController.onPageLoad()
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  private def inControlOfMovingGoodsRoute(answers: UserAnswers): Call =
+    (answers.get(InControlOfMovingGoodsPage), answers.vatInfo) match {
+      case (Some(true), Some(_)) => routes.CheckVatDetailsController.onPageLoad(NormalMode)
+      case (Some(true), None)    => routes.CheckVatNumberController.onPageLoad(NormalMode)
+      case (Some(false), _)      => routes.CannotRegisterForServiceController.onPageLoad()
+      case _                     => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  private def checkVatDetailsRoute(answers: UserAnswers): Call = {
+    import CheckVatDetails._
+
     (answers.get(CheckVatDetailsPage), answers.vatInfo) match {
-      case (Some(true), Some(vatInfo)) if vatInfo.organisationName.isDefined => routes.HasTradingNameController.onPageLoad(NormalMode)
-      case (Some(true), _)                                                   => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
-      case (Some(false), _)                                                  => routes.UseOtherAccountController.onPageLoad()
-      case (None, _)                                                         => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(Yes), Some(vatInfo)) if vatInfo.organisationName.isDefined => routes.HasTradingNameController.onPageLoad(NormalMode)
+      case (Some(Yes), _)                                                   => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
+      case (Some(WrongAccount), _)                                          => routes.UseOtherAccountController.onPageLoad()
+      case (Some(DetailsIncorrect), _)                                      => routes.UpdateVatDetailsController.onPageLoad()
+      case _                                                                => routes.JourneyRecoveryController.onPageLoad()
     }
+  }
 
   private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
     case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))
@@ -105,10 +128,19 @@ class Navigator @Inject()() {
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private def hasFixedEstablishmentRoute(index: Index)(answers: UserAnswers): Call = answers.get(pages.euDetails.HasFixedEstablishmentPage(index)) match {
-    case Some(true)  => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
-    case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
-    case None        => routes.JourneyRecoveryController.onPageLoad()
+  private def vatRegisteredRoute(index: Index)(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true)  => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def hasFixedEstablishmentRoute(index: Index)(answers: UserAnswers): Call =
+    (answers.get(pages.euDetails.HasFixedEstablishmentPage(index)), answers.get(pages.euDetails.VatRegisteredPage(index))) match {
+    case (Some(true), Some(true))  => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
+    case (Some(true), Some(false)) => euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index)
+    case (Some(false), _)          => euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
+    case _                         => routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def addEuVatDetailsRoute(answers: UserAnswers): Call =

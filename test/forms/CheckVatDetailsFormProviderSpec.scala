@@ -16,13 +16,14 @@
 
 package forms
 
-import forms.behaviours.BooleanFieldBehaviours
+import forms.behaviours.{BooleanFieldBehaviours, OptionFieldBehaviours}
+import models.CheckVatDetails
 import play.api.data.FormError
 
-class CheckVatDetailsFormProviderSpec extends BooleanFieldBehaviours {
+class CheckVatDetailsFormProviderSpec extends OptionFieldBehaviours {
 
   val requiredKey = "checkVatDetails.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey = "error.invalid"
 
   val form = new CheckVatDetailsFormProvider()()
 
@@ -30,9 +31,10 @@ class CheckVatDetailsFormProviderSpec extends BooleanFieldBehaviours {
 
     val fieldName = "value"
 
-    behave like booleanField(
+    behave like optionsField(
       form,
       fieldName,
+      CheckVatDetails.values,
       invalidError = FormError(fieldName, invalidKey)
     )
 

@@ -91,5 +91,7 @@ class CurrentCountryOfRegistrationController @Inject()(
         } else {
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         }
-    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse {
+      Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
 }

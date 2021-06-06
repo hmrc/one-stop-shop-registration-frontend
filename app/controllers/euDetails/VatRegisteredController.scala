@@ -73,7 +73,6 @@ class VatRegisteredController @Inject()(
                 _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(VatRegisteredPage(index), mode, updatedAnswers))
           )
-
       }
   }
 

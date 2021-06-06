@@ -17,64 +17,64 @@
 package controllers
 
 import base.SpecBase
-import forms.HasWebsiteFormProvider
+import forms.CheckVatNumberFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.HasWebsitePage
+import pages.CheckVatNumberPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.HasWebsiteView
+import views.html.CheckVatNumberView
 
 import scala.concurrent.Future
 
-class HasWebsiteControllerSpec extends SpecBase with MockitoSugar {
+class CheckVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private def onwardRoute = Call("GET", "/foo")
 
-  private val formProvider = new HasWebsiteFormProvider()
+  private val formProvider = new CheckVatNumberFormProvider()
   private val form = formProvider()
 
-  private lazy val hasWebsiteRoute = routes.HasWebsiteController.onPageLoad(NormalMode).url
+  private lazy val checkVatNumberRoute = routes.CheckVatNumberController.onPageLoad(NormalMode).url
 
-  "HasWebsite Controller" - {
+  "CheckVatNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasWebsiteRoute)
+        val request = FakeRequest(GET, checkVatNumberRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[HasWebsiteView]
+        val view = application.injector.instanceOf[CheckVatNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, vrn)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(HasWebsitePage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(CheckVatNumberPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasWebsiteRoute)
+        val request = FakeRequest(GET, checkVatNumberRoute)
 
-        val view = application.injector.instanceOf[HasWebsiteView]
+        val view = application.injector.instanceOf[CheckVatNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, vrn)(request, messages(application)).toString
       }
     }
 
@@ -94,7 +94,7 @@ class HasWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, hasWebsiteRoute)
+          FakeRequest(POST, checkVatNumberRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -110,17 +110,17 @@ class HasWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, hasWebsiteRoute)
+          FakeRequest(POST, checkVatNumberRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[HasWebsiteView]
+        val view = application.injector.instanceOf[CheckVatNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, vrn)(request, messages(application)).toString
       }
     }
 
@@ -129,7 +129,7 @@ class HasWebsiteControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasWebsiteRoute)
+        val request = FakeRequest(GET, checkVatNumberRoute)
 
         val result = route(application, request).value
 
@@ -144,7 +144,7 @@ class HasWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, hasWebsiteRoute)
+          FakeRequest(POST, checkVatNumberRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

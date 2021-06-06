@@ -17,26 +17,106 @@
 package controllers
 
 import base.SpecBase
-import models.NormalMode
+import connectors.RegistrationConnector
+import models.{UserAnswers, responses}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito
+import org.mockito.Mockito.{never, times, verify, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.SessionRepository
 
-class IndexControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  private val onwardRoute = Call("GET", "/foo")
+
+  private val mockConnector  = mock[RegistrationConnector]
+  private val mockRepository = mock[SessionRepository]
+
+  private def appBuilder(answers: Option[UserAnswers]) =
+    applicationBuilder(answers)
+      .overrides(
+        bind[RegistrationConnector].toInstance(mockConnector),
+        bind[SessionRepository].toInstance(mockRepository),
+        bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+      )
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockConnector, mockRepository)
+  }
 
   "Index Controller" - {
 
-    "must return SEE OTHER and go to the Sells Goods from Ni page" in {
+    "when we already have some user answers" - {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      "must redirect to the next page without makings calls to get data or updating the user answers" in {
 
-      running(application) {
-        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+        val application = appBuilder(Some(emptyUserAnswers)).build()
 
-        val result = route(application, request).value
+        when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
+        when(mockRepository.set(any())) thenReturn Future.successful(true)
 
-        status(result) mustEqual SEE_OTHER
+        running(application) {
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+          val result = route(application, request).value
 
-        redirectLocation(result).value mustBe routes.SellsGoodsFromNiController.onPageLoad(NormalMode).url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+          verify(mockConnector, never()).getVatCustomerInfo()(any())
+          verify(mockRepository, never()).set(any())
+        }
+      }
+    }
+
+    "when we don't already have user answers" - {
+
+      "and we can find their VAT details" - {
+
+        "must create user answers with their VAT details, then redirect to the next page" in {
+
+          val application = appBuilder(None).build()
+
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
+          when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+          running(application) {
+
+            val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual onwardRoute.url
+            verify(mockRepository, times(1)).set(eqTo(emptyUserAnswersWithVatInfo))
+          }
+        }
+      }
+
+      "and we cannot find their VAT details" - {
+
+        "must create user answers with no VAT details, then redirect to the next page" in {
+
+          val application = appBuilder(None).build()
+
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(responses.NotFound))
+          when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+          running(application) {
+
+            val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual onwardRoute.url
+            verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
+          }
+        }
       }
     }
   }

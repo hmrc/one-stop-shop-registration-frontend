@@ -24,7 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage}
+import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -43,13 +43,14 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
   private val country = Country.euCountries.head
-  private val euVatDetails = EuDetails(country, "VAT Number", false, None, None)
+  private val euVatDetails = EuDetails(country, true, Some("VAT Number"), false, None, None, None)
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, index).url
 
   private val baseUserAnswers =
     emptyUserAnswers
       .set(EuCountryPage(index), euVatDetails.euCountry).success.value
-      .set(EuVatNumberPage(index), euVatDetails.euVatNumber).success.value
+      .set(VatRegisteredPage(index), true).success.value
+      .set(EuVatNumberPage(index), "VAT Number").success.value
       .set(HasFixedEstablishmentPage(index), euVatDetails.hasFixedEstablishment).success.value
 
   "DeleteEuVatDetails Controller" - {

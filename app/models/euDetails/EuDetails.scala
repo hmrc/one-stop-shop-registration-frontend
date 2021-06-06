@@ -21,8 +21,10 @@ import play.api.libs.json.{Json, OFormat}
 
 case class EuDetails(
                          euCountry: Country,
-                         euVatNumber: String,
+                         vatRegistered: Boolean,
+                         euVatNumber: Option[String],
                          hasFixedEstablishment: Boolean,
+                         euTaxReference: Option[String],
                          fixedEstablishmentTradingName: Option[String],
                          fixedEstablishmentAddress: Option[FixedEstablishmentAddress]
                        )

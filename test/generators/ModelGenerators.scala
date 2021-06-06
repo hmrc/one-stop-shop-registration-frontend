@@ -26,6 +26,10 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 
 trait ModelGenerators {
+  implicit lazy val arbitraryCheckVatDetails: Arbitrary[CheckVatDetails] =
+    Arbitrary {
+      Gen.oneOf(CheckVatDetails.values)
+    }
 
   implicit lazy val arbitraryBankDetails: Arbitrary[BankDetails] =
     Arbitrary {

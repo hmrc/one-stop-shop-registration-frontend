@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CurrentCountryOfRegistrationPage
-import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage}
+import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -47,7 +47,8 @@ class CurrentCountryOfRegistrationControllerSpec extends SpecBase with MockitoSu
   private val baseAnswers =
     emptyUserAnswers
       .set(EuCountryPage(Index(0)), countries.head).success.value
-      .set(EuVatNumberPage(Index(0)), "foo").success.value
+      .set(VatRegisteredPage(Index(0)), true).success.value
+      .set(EuVatNumberPage(Index(0)), "123456789").success.value
       .set(HasFixedEstablishmentPage(Index(0)), false).success.value
 
   private val viewModel = new CurrentCountryOfRegistrationViewModel(countries)

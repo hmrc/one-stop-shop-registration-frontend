@@ -14,15 +14,32 @@
  * limitations under the License.
  */
 
-package pages.euDetails
+package forms
 
-import models.Index
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
+class CheckVatNumberFormProviderSpec extends BooleanFieldBehaviours {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+  val requiredKey = "checkVatNumber.error.required"
+  val invalidKey = "error.boolean"
 
-  override def toString: String = "euTaxReference"
+  val form = new CheckVatNumberFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

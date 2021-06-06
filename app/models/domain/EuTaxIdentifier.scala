@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package pages.euDetails
+package models.domain
 
-import models.Index
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
+case class EuTaxIdentifier(identifierType: EuTaxIdentifierType, value: String)
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+object EuTaxIdentifier {
 
-  override def toString: String = "euTaxReference"
+  implicit val format: OFormat[EuTaxIdentifier] = Json.format[EuTaxIdentifier]
 }

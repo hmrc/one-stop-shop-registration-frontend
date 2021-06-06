@@ -121,7 +121,7 @@ euCountry.error.duplicate = You have already added this country
 euCountry.change.hidden = EU country
 
 vatRegistered.title = Are you VAT registered in {0}?
-vatRegistered.heading = Are you VAT registered for VAT in {0}?
+vatRegistered.heading = Are you VAT registered in {0}?
 vatRegistered.checkYourAnswersLabel = Registered for VAT
 vatRegistered.error.required = Select yes if you are registered for VAT in {0}
 vatRegistered.change.hidden = if you are VAT registered
@@ -330,6 +330,7 @@ ivFailedIdentityVerification.p = We could not confirm your identity
 checkVatDetails.title = These are the UK VAT registration details linked to your Government Gateway
 checkVatDetails.heading = These are the UK VAT registration details linked to your Government Gateway
 checkVatDetails.error.required = Select yes if these are the VAT details you want to register for the scheme
+checkVatDetails.question = Are these the VAT registration details you want to use to register for the scheme?
 checkVatDetails.vrn.label = UK VAT registration number
 checkVatDetails.organisationName.label = Organisation name
 checkVatDetails.partOfVatGroup.label = Part of a VAT group
