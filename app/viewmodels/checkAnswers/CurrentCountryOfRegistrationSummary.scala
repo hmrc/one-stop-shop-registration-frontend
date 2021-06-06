@@ -30,11 +30,11 @@ object CurrentCountryOfRegistrationSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(CurrentCountryOfRegistrationPage).map {
-      answer =>
+      country =>
 
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"currentCountryOfRegistration.${answer.name}"))
+            HtmlFormat.escape(country.name)
           )
         )
 
