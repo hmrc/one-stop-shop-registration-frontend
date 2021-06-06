@@ -94,29 +94,80 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
+      "must go from Check VAT number" - {
+
+        "to Registered Company Name when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(CheckVatNumberPage, true).success.value
+          navigator.nextPage(CheckVatNumberPage, NormalMode, answers)
+            .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+        }
+
+        "to Use Other Account when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(CheckVatNumberPage, false).success.value
+          navigator.nextPage(CheckVatNumberPage, NormalMode, answers)
+            .mustBe(routes.UseOtherAccountController.onPageLoad())
+        }
+      }
+
       "must go from Check VAT Details" - {
 
         "when the user answers yes" - {
 
-          "and we have VAT details including the organisation name" in {
+          "and we have VAT details" - {
 
-            val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+            "including all items" - {
 
-            navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
-              .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
-          }
+              "to Has Trading Name" in {
 
-          "and we have VAT details without the organisation name" - {
+                val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
-            "to Registered Company Name" in {
+                navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                  .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+              }
+            }
 
-              val updatedVatInfo = vatCustomerInfo copy (organisationName = None)
-              val answers =
-                emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
-                  .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+            "without the organisation name" - {
 
-              navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
-                .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+              "to Registered Company Name" in {
+
+                val updatedVatInfo = vatCustomerInfo copy (organisationName = None)
+                val answers =
+                  emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+                    .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+
+                navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                  .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+              }
+            }
+
+            "without Part of VAT Group" - {
+
+              "to Part of VAT Group" in {
+
+                val updatedVatInfo = vatCustomerInfo copy (partOfVatGroup = None)
+                val answers =
+                  emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+                    .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+
+                navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                  .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+              }
+            }
+
+            "without VAT registration date" - {
+
+              "to UK VAT Effective Date" in {
+
+                val updatedVatInfo = vatCustomerInfo copy (registrationDate =  None)
+                val answers =
+                  emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+                    .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+
+                navigator.nextPage(CheckVatDetailsPage, NormalMode, answers)
+                  .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+              }
             }
           }
         }
@@ -142,9 +193,114 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Registered Company Name to Has Trading Name" in {
+      "must go from Registered Company Name" - {
 
-        navigator.nextPage(RegisteredCompanyNamePage, NormalMode, emptyUserAnswers)
+        "when we don't have any VAT details" - {
+
+          "to Part of VAT Group" in {
+
+            navigator.nextPage(RegisteredCompanyNamePage, NormalMode, emptyUserAnswers)
+              .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+          }
+        }
+
+        "when we have VAT details" - {
+
+          "that include all items" - {
+
+            "to Has Trading Name" in {
+
+              navigator.nextPage(RegisteredCompanyNamePage, NormalMode, emptyUserAnswersWithVatInfo)
+                .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+            }
+          }
+
+          "that do not include Part of VAT Group" - {
+
+            "to Part of VAT Group" in {
+
+              val updatedVatInfo = vatCustomerInfo copy (partOfVatGroup = None)
+              val answers = emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+
+              navigator.nextPage(RegisteredCompanyNamePage, NormalMode, answers)
+                .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+            }
+          }
+
+          "that do not include registration date" - {
+
+            "to UK VAT Effective Date" in {
+
+              val updatedVatInfo = vatCustomerInfo copy (registrationDate =  None)
+              val answers = emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+
+              navigator.nextPage(RegisteredCompanyNamePage, NormalMode, answers)
+                .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+            }
+          }
+        }
+      }
+
+      "must go from Part of VAT Group" - {
+
+        "when we do not have VAT details" - {
+
+          "to UK Effective Date" in {
+
+            navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswers)
+              .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+          }
+        }
+
+        "when we have VAT details" - {
+
+          "that include registered date" - {
+
+            "to has Trading Name" in {
+
+              navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswersWithVatInfo)
+                .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+            }
+          }
+
+          "that do not include registered date" - {
+
+            "to UK VAT Effective Date" in {
+
+              val updatedVatInfo = vatCustomerInfo copy (registrationDate =  None)
+              val answers = emptyUserAnswersWithVatInfo.copy(vatInfo = Some(updatedVatInfo))
+
+              navigator.nextPage(PartOfVatGroupPage, NormalMode, answers)
+                .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+            }
+          }
+        }
+      }
+
+      "must go from UK VAT Effective Date" - {
+
+        "when we do not have VAT details" - {
+
+          "to Business Address" in {
+
+            navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
+              .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+          }
+        }
+
+        "when we have VAT details" - {
+
+          "to Has Trading Name" in {
+
+            navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswersWithVatInfo)
+              .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+          }
+        }
+      }
+
+      "must go from Business Address to Has Trading Name" in {
+
+        navigator.nextPage(BusinessAddressPage, NormalMode, emptyUserAnswers)
           .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
 
@@ -158,12 +314,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(0)))
         }
 
-        "to Part of VAT Group when the user answers false" in {
+        "to Tax Registered in EU when the user answers false" in {
 
           val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
 
           navigator.nextPage(HasTradingNamePage, NormalMode, answers)
-            .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+            .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
 
@@ -186,12 +342,12 @@ class NavigatorSpec extends SpecBase {
             .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(1)))
         }
 
-        "to Part of VAT Group when the user answers no" in {
+        "to Tax Registered in EU when the user answers no" in {
 
           val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
 
           navigator.nextPage(AddTradingNamePage, NormalMode, answers)
-            .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+            .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
         }
       }
 
@@ -212,27 +368,6 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(DeleteTradingNamePage(Index(0)), NormalMode, emptyUserAnswers)
             .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
         }
-      }
-
-      "must go from Part of VAT Group" - {
-
-        "to UK Effective Date when we do not know the user's VAT details" in {
-
-          navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswers)
-            .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
-        }
-
-        "to Tax Registered in the EU when we know the user's UK VAT details" in {
-
-          navigator.nextPage(PartOfVatGroupPage, NormalMode, emptyUserAnswersWithVatInfo)
-            .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
-        }
-      }
-
-      "must go from UK VAT Effective Date to Tax Registered in EU" in {
-
-        navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
-          .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
       }
 
       "must go from Tax Registered in EU" - {
@@ -470,23 +605,28 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Start Date" - {
 
-        "to Business Address when we do not know the user's VAT details" in {
+        "to Has Website" in {
 
           navigator.nextPage(StartDatePage, NormalMode, emptyUserAnswers)
-            .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
-        }
-
-        "to Website when we know the user's VAT details" in {
-
-          navigator.nextPage(StartDatePage, NormalMode, emptyUserAnswersWithVatInfo)
-            .mustBe(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
+            .mustBe(routes.HasWebsiteController.onPageLoad(NormalMode))
         }
       }
 
-      "must go from Business Address to Website" in {
+      "must go from Has Website" - {
 
-        navigator.nextPage(BusinessAddressPage, NormalMode, emptyUserAnswers)
-          .mustBe(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
+        "to Website when the user answers yes" in {
+
+          val answers = emptyUserAnswers.set(HasWebsitePage, true).success.value
+          navigator.nextPage(HasWebsitePage, NormalMode, answers)
+            .mustBe(routes.WebsiteController.onPageLoad(NormalMode, index))
+        }
+
+        "to Business Contact when the user answers no" in {
+
+          val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
+          navigator.nextPage(HasWebsitePage, NormalMode, answers)
+            .mustBe(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
+        }
       }
 
       "must go from Website to Add Website" in {
@@ -536,9 +676,15 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Business Contact Details to Check Your Answers" in {
+      "must go from Business Contact Details to Bank Details" in {
 
         navigator.nextPage(BusinessContactDetailsPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.BankDetailsController.onPageLoad(NormalMode))
+      }
+
+      "must go from Bank Details to Check Your Answers" in {
+
+        navigator.nextPage(BankDetailsPage, NormalMode, emptyUserAnswers)
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 
