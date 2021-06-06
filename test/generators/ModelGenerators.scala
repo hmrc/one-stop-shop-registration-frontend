@@ -18,7 +18,8 @@ package generators
 
 import models.StartDateOption.EarlierDate
 import models._
-import models.euVatDetails.FixedEstablishmentAddress
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
+import models.euDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Vrn
@@ -26,6 +27,34 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 
 trait ModelGenerators {
+
+  implicit val arbitraryEuTaxIdentifierType: Arbitrary[EuTaxIdentifierType] =
+    Arbitrary {
+      Gen.oneOf(EuTaxIdentifierType.values)
+    }
+
+  implicit val arbitraryEuTaxIdentifier: Arbitrary[EuTaxIdentifier] =
+    Arbitrary {
+      for {
+        identifierType <- arbitrary[EuTaxIdentifierType]
+        value          <- arbitrary[Int].map(_.toString)
+      } yield EuTaxIdentifier(identifierType, value)
+    }
+
+  implicit lazy val arbitraryCheckVatDetails: Arbitrary[CheckVatDetails] =
+    Arbitrary {
+      Gen.oneOf(CheckVatDetails.values)
+    }
+
+  implicit lazy val arbitraryBankDetails: Arbitrary[BankDetails] =
+    Arbitrary {
+      for {
+        accountName <- arbitrary[String]
+        bic <- Gen.option(Gen.listOfN(11, Gen.alphaNumChar).map(_.mkString))
+        ibanChars <- Gen.choose(5, 34)
+        iban <- Gen.listOfN(ibanChars, Gen.oneOf(Gen.alphaChar, Gen.numChar))
+      } yield BankDetails(accountName, bic, iban.mkString)
+    }
 
   implicit lazy val arbitraryFixedEstablishmentAddress: Arbitrary[FixedEstablishmentAddress] =
     Arbitrary {
@@ -36,6 +65,14 @@ trait ModelGenerators {
         county     <- Gen.option(arbitrary[String])
         postCode   <- Gen.option(arbitrary[String])
       } yield FixedEstablishmentAddress(line1, line2, townOrCity, county, postCode)
+    }
+
+  implicit lazy val arbitraryFixedEstablishment: Arbitrary[FixedEstablishment] =
+    Arbitrary {
+      for {
+        tradingName <- arbitrary[String]
+        address     <- arbitrary[FixedEstablishmentAddress]
+      } yield FixedEstablishment(tradingName, address)
     }
 
   implicit lazy val arbitraryCountry: Arbitrary[Country] =

@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CurrentCountryOfRegistrationPage
-import pages.euVatDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage}
+import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -47,7 +47,8 @@ class CurrentCountryOfRegistrationControllerSpec extends SpecBase with MockitoSu
   private val baseAnswers =
     emptyUserAnswers
       .set(EuCountryPage(Index(0)), countries.head).success.value
-      .set(EuVatNumberPage(Index(0)), "foo").success.value
+      .set(VatRegisteredPage(Index(0)), true).success.value
+      .set(EuVatNumberPage(Index(0)), "123456789").success.value
       .set(HasFixedEstablishmentPage(Index(0)), false).success.value
 
   private val viewModel = new CurrentCountryOfRegistrationViewModel(countries)
@@ -58,6 +59,28 @@ class CurrentCountryOfRegistrationControllerSpec extends SpecBase with MockitoSu
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, currentCountryOfRegistrationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[CurrentCountryOfRegistrationView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, viewModel)(request, messages(application)).toString
+      }
+    }
+
+    "must only include countries where the user is VAT registered in the list of options" in {
+
+      val answers =
+        baseAnswers
+          .set(EuCountryPage(Index(1)), Country("XX", "Fake country")).success.value
+          .set(VatRegisteredPage(Index(1)), false).success.value
+          .set(HasFixedEstablishmentPage(Index(1)), false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, currentCountryOfRegistrationRoute)

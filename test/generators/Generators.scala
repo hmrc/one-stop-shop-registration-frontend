@@ -87,7 +87,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
     for {
       length <- choose(1, maxLength)
-      chars <- listOfN(length, arbitrary[Char])
+      chars <- listOfN(length, Gen.alphaNumChar)
     } yield chars.mkString
 
   def stringsLongerThan(minLength: Int): Gen[String] = for {
@@ -95,6 +95,15 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
     length    <- Gen.chooseNum(minLength + 1, maxLength)
     chars     <- listOfN(length, arbitrary[Char])
   } yield chars.mkString
+
+  def stringsShorterThan(maxLength: Int): Gen[String] = {
+    require(maxLength > 1, "Max length must be greater than 1")
+
+    for {
+      length <- Gen.choose(1, maxLength - 1)
+      chars  <- listOfN(length, arbitrary[Char])
+    } yield chars.mkString
+  }
 
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
@@ -117,4 +126,45 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  def safeInputs: Gen[Char] = Gen.oneOf(
+    Gen.alphaNumChar,
+    Gen.const('"'),
+    Gen.const('\''),
+    Gen.const('.'),
+    Gen.const(','),
+    Gen.const('/'),
+    Gen.const('-'),
+    Gen.const('_'),
+    Gen.const(' '),
+    Gen.const('&'),
+    Gen.const('’'),
+    Gen.const('('),
+    Gen.const(')'),
+    Gen.const('!'),
+    Gen.oneOf('À' to 'ÿ')
+  )
+
+  def unsafeInputs: Gen[Char] = Gen.oneOf(
+    Gen.const('<'),
+    Gen.const('>'),
+    Gen.const('='),
+    Gen.const('|')
+  )
+
+  def safeInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
+    length <- choose(1, maxLength)
+    chars  <- listOfN(length, safeInputs)
+  } yield chars.mkString).suchThat(_.trim.nonEmpty)
+
+  def unsafeInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
+    length      <- choose(2, maxLength)
+    invalidChar <- unsafeInputs
+    validChars  <- listOfN(length - 1, safeInputs)
+  } yield (validChars :+ invalidChar).mkString).suchThat(_.trim.nonEmpty)
+
+  def safeInputsShorterThan(length: Int): Gen[String] = (for {
+    length <- choose(1, length - 1)
+    chars  <- listOfN(length, safeInputs)
+  } yield chars.mkString).suchThat(_.trim.nonEmpty)
 }

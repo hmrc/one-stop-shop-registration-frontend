@@ -16,8 +16,9 @@
 
 package testutils
 
-import models.domain.{EuVatRegistration, PreviousRegistration, Registration, VatDetailSource, VatDetails}
-import models.{BusinessContactDetails, Country, UkAddress}
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, EuTaxRegistration, EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, RegistrationWithFixedEstablishment, VatDetailSource, VatDetails}
+import models.euDetails.FixedEstablishmentAddress
+import models.{BankDetails, BusinessContactDetails, Country, UkAddress}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -34,9 +35,18 @@ object RegistrationData {
         partOfVatGroup   = true,
         source           = VatDetailSource.Etmp
       ),
-      euVatRegistrations = Seq(
-        EuVatRegistration(Country("FR", "France"), "FR123456789", None),
-        EuVatRegistration(Country("ES", "Spain"), "ES123456789", None)
+      euRegistrations = Seq(
+        EuVatRegistration(Country("FR", "France"), "FR123456789"),
+        RegistrationWithFixedEstablishment(
+          Country("ES", "Spain"),
+          EuTaxIdentifier(EuTaxIdentifierType.Vat, "ES123456789"),
+          FixedEstablishment("Spanish trading name", FixedEstablishmentAddress("Line 1", None, "Town", None, None))
+        ),
+        RegistrationWithFixedEstablishment(
+          Country("DE", "Germany"),
+          EuTaxIdentifier(EuTaxIdentifierType.Other, "DE123456789"),
+          FixedEstablishment("German trading name", FixedEstablishmentAddress("Line 1", None, "Town", None, None))
+        )
       ),
       contactDetails = createBusinessContactDetails(),
       websites = Seq("website1", "website2"),
@@ -44,7 +54,8 @@ object RegistrationData {
       currentCountryOfRegistration = Some(Country("FR", "France")),
       previousRegistrations = Seq(
         PreviousRegistration(Country("DE", "Germany"), "DE123")
-      )
+      ),
+      bankDetails = BankDetails("Account name", Some("12345678"), "GB12345678")
     )
 
   private def createBusinessAddress(): UkAddress =

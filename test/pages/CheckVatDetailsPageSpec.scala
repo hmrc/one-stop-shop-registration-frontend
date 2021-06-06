@@ -16,16 +16,17 @@
 
 package pages
 
+import models.CheckVatDetails
 import pages.behaviours.PageBehaviours
 
 class CheckVatDetailsPageSpec extends PageBehaviours {
 
   "CheckVatDetailsPage" - {
 
-    beRetrievable[Boolean](CheckVatDetailsPage)
+    beRetrievable[CheckVatDetails](CheckVatDetailsPage)
 
-    beSettable[Boolean](CheckVatDetailsPage)
+    beSettable[CheckVatDetails](CheckVatDetailsPage)
 
-    beRemovable[Boolean](CheckVatDetailsPage)
+    beRemovable[CheckVatDetails](CheckVatDetailsPage)
   }
 }

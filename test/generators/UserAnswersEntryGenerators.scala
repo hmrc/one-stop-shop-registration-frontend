@@ -17,15 +17,71 @@
 package generators
 
 import models._
-import models.euVatDetails.FixedEstablishmentAddress
+import models.euDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
-import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
+
+  implicit lazy val arbitraryTaxRegisteredInEuUserAnswersEntry: Arbitrary[(TaxRegisteredInEuPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[TaxRegisteredInEuPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitrarySellsGoodsFromNiUserAnswersEntry: Arbitrary[(SellsGoodsFromNiPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[SellsGoodsFromNiPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryInControlOfMovingGoodsUserAnswersEntry: Arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[InControlOfMovingGoodsPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryHasWebsiteUserAnswersEntry: Arbitrary[(HasWebsitePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[HasWebsitePage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryEuTaxReferenceUserAnswersEntry: Arbitrary[(EuTaxReferencePage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[EuTaxReferencePage]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryCurrentlyRegisteredInCountryUserAnswersEntry: Arbitrary[(CurrentlyRegisteredInCountryPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[CurrentlyRegisteredInCountryPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryBankDetailsUserAnswersEntry: Arbitrary[(BankDetailsPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[BankDetailsPage.type]
+        value <- arbitrary[BankDetails].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryPreviouslyRegisteredUserAnswersEntry: Arbitrary[(PreviouslyRegisteredPage.type, JsValue)] =
     Arbitrary {
@@ -103,6 +159,14 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[CheckVatDetailsPage.type]
+        value <- arbitrary[CheckVatDetails].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryCheckVaNumberUserAnswersEntry: Arbitrary[(CheckVatNumberPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[CheckVatNumberPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
@@ -139,18 +203,18 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddEuVatDetailsPage.type, JsValue)] =
+  implicit lazy val arbitraryAddAdditionalEuVatDetailsUserAnswersEntry: Arbitrary[(AddEuDetailsPage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[AddEuVatDetailsPage.type]
+        page  <- arbitrary[AddEuDetailsPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryVatRegisteredInEuUserAnswersEntry: Arbitrary[(VatRegisteredInEuPage.type, JsValue)] =
+  implicit lazy val arbitraryVatRegisteredInEuUserAnswersEntry: Arbitrary[(VatRegisteredPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[VatRegisteredInEuPage.type]
+        page  <- arbitrary[VatRegisteredPage]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }

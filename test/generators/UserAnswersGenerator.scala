@@ -21,7 +21,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
-import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
 
@@ -29,6 +29,13 @@ trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[_], JsValue)]] =
+    arbitrary[(TaxRegisteredInEuPage.type, JsValue)] ::
+    arbitrary[(SellsGoodsFromNiPage.type, JsValue)] ::
+    arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] ::
+    arbitrary[(HasWebsitePage.type, JsValue)] ::
+    arbitrary[(EuTaxReferencePage, JsValue)] ::
+    arbitrary[(CurrentlyRegisteredInCountryPage.type, JsValue)] ::
+    arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::
     arbitrary[(PreviousEuVatNumberPage, JsValue)] ::
     arbitrary[(PreviousEuCountryPage, JsValue)] ::
@@ -39,12 +46,13 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(FixedEstablishmentTradingNamePage, JsValue)] ::
     arbitrary[(FixedEstablishmentAddressPage, JsValue)] ::
     arbitrary[(CheckVatDetailsPage.type, JsValue)] ::
+    arbitrary[(CheckVatNumberPage.type, JsValue)] ::
     arbitrary[(StartDatePage.type, JsValue)] ::
     arbitrary[(WebsitePage, JsValue)] ::
     arbitrary[(BusinessContactDetailsPage.type, JsValue)] ::
     arbitrary[(BusinessAddressPage.type, JsValue)] ::
-    arbitrary[(AddEuVatDetailsPage.type, JsValue)] ::
-    arbitrary[(VatRegisteredInEuPage.type, JsValue)] ::
+    arbitrary[(AddEuDetailsPage.type, JsValue)] ::
+    arbitrary[(VatRegisteredPage, JsValue)] ::
     arbitrary[(EuCountryPage, JsValue)] ::
     arbitrary[(EuVatNumberPage, JsValue)] ::
     arbitrary[(UkVatEffectiveDatePage.type, JsValue)] ::

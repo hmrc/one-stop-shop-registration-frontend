@@ -18,11 +18,32 @@ package generators
 
 import models.Index
 import org.scalacheck.Arbitrary
-import pages.{euVatDetails, _}
-import pages.euVatDetails.{AddEuVatDetailsPage, EuCountryPage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, VatRegisteredInEuPage}
+import pages.{euDetails, _}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryTaxRegisteredInEuPage: Arbitrary[TaxRegisteredInEuPage.type] =
+    Arbitrary(TaxRegisteredInEuPage)
+
+  implicit lazy val arbitrarySellsGoodsFromNiPage: Arbitrary[SellsGoodsFromNiPage.type] =
+    Arbitrary(SellsGoodsFromNiPage)
+
+  implicit lazy val arbitraryInControlOfMovingGoodsPage: Arbitrary[InControlOfMovingGoodsPage.type] =
+    Arbitrary(InControlOfMovingGoodsPage)
+
+  implicit lazy val arbitraryHasWebsitePage: Arbitrary[HasWebsitePage.type] =
+    Arbitrary(HasWebsitePage)
+
+  implicit lazy val arbitraryEuTaxReferencePage: Arbitrary[EuTaxReferencePage] =
+    Arbitrary(EuTaxReferencePage(Index(0)))
+
+  implicit lazy val arbitraryCurrentlyRegisteredInCountryPage: Arbitrary[CurrentlyRegisteredInCountryPage.type] =
+    Arbitrary(CurrentlyRegisteredInCountryPage)
+
+  implicit lazy val arbitraryBankDetailsPage: Arbitrary[BankDetailsPage.type] =
+    Arbitrary(BankDetailsPage)
 
   implicit lazy val arbitraryPreviouslyRegisteredPage: Arbitrary[PreviouslyRegisteredPage.type] =
     Arbitrary(PreviouslyRegisteredPage)
@@ -43,16 +64,19 @@ trait PageGenerators {
     Arbitrary(CurrentCountryOfRegistrationPage)
 
   implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
-    Arbitrary(euVatDetails.HasFixedEstablishmentPage(Index(0)))
+    Arbitrary(euDetails.HasFixedEstablishmentPage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentTradingNamePage: Arbitrary[FixedEstablishmentTradingNamePage] =
-    Arbitrary(euVatDetails.FixedEstablishmentTradingNamePage(Index(0)))
+    Arbitrary(euDetails.FixedEstablishmentTradingNamePage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage] =
-    Arbitrary(euVatDetails.FixedEstablishmentAddressPage(Index(0)))
+    Arbitrary(euDetails.FixedEstablishmentAddressPage(Index(0)))
 
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)
+
+  implicit lazy val arbitraryCheckVatNumberPage: Arbitrary[CheckVatNumberPage.type] =
+    Arbitrary(CheckVatNumberPage)
 
   implicit lazy val arbitraryStartDatePage: Arbitrary[StartDatePage.type] =
     Arbitrary(StartDatePage)
@@ -66,17 +90,17 @@ trait PageGenerators {
   implicit lazy val arbitraryBusinessAddressPage: Arbitrary[BusinessAddressPage.type] =
     Arbitrary(BusinessAddressPage)
 
-  implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuVatDetailsPage.type] =
-    Arbitrary(AddEuVatDetailsPage)
+  implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuDetailsPage.type] =
+    Arbitrary(AddEuDetailsPage)
 
-  implicit lazy val arbitraryVatRegisteredInEuPage: Arbitrary[VatRegisteredInEuPage.type] =
-    Arbitrary(VatRegisteredInEuPage)
+  implicit lazy val arbitraryVatRegisteredPage: Arbitrary[VatRegisteredPage] =
+    Arbitrary(VatRegisteredPage(Index(0)))
 
   implicit lazy val arbitraryEuCountryPage: Arbitrary[EuCountryPage] =
-    Arbitrary(euVatDetails.EuCountryPage(Index(0)))
+    Arbitrary(euDetails.EuCountryPage(Index(0)))
 
   implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
-    Arbitrary(euVatDetails.EuVatNumberPage(Index(0)))
+    Arbitrary(euDetails.EuVatNumberPage(Index(0)))
 
   implicit lazy val arbitraryUkVatEffectiveDatePage: Arbitrary[UkVatEffectiveDatePage.type] =
     Arbitrary(UkVatEffectiveDatePage)

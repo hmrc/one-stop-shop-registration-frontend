@@ -19,17 +19,17 @@ package controllers
 import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
+import logging.Logging
 import models.NormalMode
 import models.responses.ConflictFound
 import navigation.Navigator
 import pages.CheckYourAnswersPage
-import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
-import viewmodels.checkAnswers.euVatDetails.{EuVatDetailsSummary, VatRegisteredInEuSummary}
+import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
@@ -44,7 +44,7 @@ class CheckYourAnswersController @Inject()(
   registrationService: RegistrationService,
   navigator: Navigator,
   view: CheckYourAnswersView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -57,8 +57,8 @@ class CheckYourAnswersController @Inject()(
           TradingNameSummary.checkAnswersRow(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
-          VatRegisteredInEuSummary.row(request.userAnswers),
-          EuVatDetailsSummary.checkAnswersRow(request.userAnswers),
+          TaxRegisteredInEuSummary.row(request.userAnswers),
+          EuDetailsSummary.checkAnswersRow(request.userAnswers),
           CurrentlyRegisteredInEuSummary.row(request.userAnswers),
           CurrentCountryOfRegistrationSummary.row(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
@@ -87,7 +87,7 @@ class CheckYourAnswersController @Inject()(
               successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
 
             case Left(e) =>
-              logger.error(s"Unexpected result on submit ${e.toString}")
+              logger.error(s"Unexpected result on submit: ${e.toString}")
               successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
         case None =>

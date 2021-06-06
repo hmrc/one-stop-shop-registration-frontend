@@ -17,10 +17,11 @@
 package services
 
 import models.domain.VatDetailSource.{Etmp, Mixed, UserEntered}
+import models.domain._
+import models.euDetails.EuDetails
 import models.{Address, UserAnswers}
-import models.domain.{EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, VatDetailSource, VatDetails}
 import pages._
-import queries.{AllEuVatDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
+import queries.{AllEuDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -32,41 +33,60 @@ class RegistrationService {
       registeredCompanyName        <- getName(userAnswers)
       tradingNames                 = getTradingNames(userAnswers)
       vatDetails                   <- buildVatDetails(userAnswers)
-      euVatRegistrations           = buildEuVatRegistrations(userAnswers)
+      euRegistrations              = buildEuRegistrations(userAnswers)
       startDate                    <- userAnswers.get(StartDatePage)
       businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
-      websites                     <- userAnswers.get(AllWebsites)
+      websites                     = getWebsites(userAnswers)
       currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
       previousRegistrations        = buildPreviousRegistrations(userAnswers)
+      bankDetails                  <- userAnswers.get(BankDetailsPage)
     } yield Registration(
       vrn,
       registeredCompanyName,
       tradingNames,
       vatDetails,
-      euVatRegistrations,
+      euRegistrations,
       businessContactDetails,
       websites,
       startDate.date,
       currentCountryOfRegistration,
-      previousRegistrations
+      previousRegistrations,
+      bankDetails
     )
 
   private def getTradingNames(userAnswers: UserAnswers): List[String] =
     userAnswers.get(AllTradingNames).getOrElse(List.empty)
 
-  private def buildEuVatRegistrations(answers: UserAnswers): List[EuVatRegistration] =
-    answers
-      .get(AllEuVatDetailsQuery).getOrElse(List.empty)
-      .map {
-        detail =>
-          val fixedEstablishment = (detail.fixedEstablishmentTradingName, detail.fixedEstablishmentAddress) match {
-            case (Some(tradingName), Some(address)) =>
-              Some(FixedEstablishment(tradingName, address))
-            case _ => None
-          }
+  private def getWebsites(userAnswers: UserAnswers): List[String] =
+    userAnswers.get(AllWebsites).getOrElse(List.empty)
 
-          EuVatRegistration(detail.euCountry, detail.euVatNumber, fixedEstablishment)
+  private def buildEuRegistrations(answers: UserAnswers): List[EuTaxRegistration] =
+    answers
+      .get(AllEuDetailsQuery).getOrElse(List.empty)
+      .flatMap {
+        detail =>
+          buildRegistrationWithFixedEstablishment(detail) orElse buildEuVatRegistration(detail)
     }
+
+  private def buildRegistrationWithFixedEstablishment(euDetails: EuDetails): Option[RegistrationWithFixedEstablishment] =
+    for {
+      tradingName <- euDetails.fixedEstablishmentTradingName
+      address     <- euDetails.fixedEstablishmentAddress
+      country     = euDetails.euCountry
+      identifier  <- buildEuTaxIdentifier(euDetails)
+    } yield RegistrationWithFixedEstablishment(country, identifier, FixedEstablishment(tradingName, address))
+
+  private def buildEuTaxIdentifier(euDetails: EuDetails): Option[EuTaxIdentifier] = {
+    import EuTaxIdentifierType._
+
+    euDetails.euVatNumber.map(EuTaxIdentifier(Vat, _)) orElse euDetails.euTaxReference.map(EuTaxIdentifier(Other, _))
+  }
+
+  private def buildEuVatRegistration(euDetails: EuDetails): Option[EuVatRegistration] =
+    for {
+      vatNumber <- euDetails.euVatNumber
+      country   = euDetails.euCountry
+    } yield EuVatRegistration(country, vatNumber)
 
   private def buildPreviousRegistrations(answers: UserAnswers): List[PreviousRegistration] =
     answers
