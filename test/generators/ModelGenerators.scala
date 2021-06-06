@@ -18,6 +18,7 @@ package generators
 
 import models.StartDateOption.EarlierDate
 import models._
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
 import models.euDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -26,6 +27,20 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 
 trait ModelGenerators {
+
+  implicit val arbitraryEuTaxIdentifierType: Arbitrary[EuTaxIdentifierType] =
+    Arbitrary {
+      Gen.oneOf(EuTaxIdentifierType.values)
+    }
+
+  implicit val arbitraryEuTaxIdentifier: Arbitrary[EuTaxIdentifier] =
+    Arbitrary {
+      for {
+        identifierType <- arbitrary[EuTaxIdentifierType]
+        value          <- arbitrary[Int].map(_.toString)
+      } yield EuTaxIdentifier(identifierType, value)
+    }
+
   implicit lazy val arbitraryCheckVatDetails: Arbitrary[CheckVatDetails] =
     Arbitrary {
       Gen.oneOf(CheckVatDetails.values)
@@ -48,6 +63,14 @@ trait ModelGenerators {
         county     <- Gen.option(arbitrary[String])
         postCode   <- Gen.option(arbitrary[String])
       } yield FixedEstablishmentAddress(line1, line2, townOrCity, county, postCode)
+    }
+
+  implicit lazy val arbitraryFixedEstablishment: Arbitrary[FixedEstablishment] =
+    Arbitrary {
+      for {
+        tradingName <- arbitrary[String]
+        address     <- arbitrary[FixedEstablishmentAddress]
+      } yield FixedEstablishment(tradingName, address)
     }
 
   implicit lazy val arbitraryCountry: Arbitrary[Country] =

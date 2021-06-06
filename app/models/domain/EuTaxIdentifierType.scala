@@ -26,7 +26,7 @@ object EuTaxIdentifierType {
   case object Vat extends WithName("vat") with EuTaxIdentifierType
   case object Other extends WithName("other") with EuTaxIdentifierType
 
-  val values: Seq[WithName with EuTaxIdentifierType] =
+  val values: Seq[EuTaxIdentifierType] =
     Seq(Vat, Other)
 
   val enumerable: Enumerable[EuTaxIdentifierType] =
