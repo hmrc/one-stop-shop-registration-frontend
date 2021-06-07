@@ -28,6 +28,14 @@ import java.time.LocalDate
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
+    Arbitrary {
+      for {
+        line1 <- arbitrary[String]
+        line2 <- arbitrary[String]
+      } yield InternationalAddress(line1, line2)
+    }
+
   implicit val arbitraryEuTaxIdentifierType: Arbitrary[EuTaxIdentifierType] =
     Arbitrary {
       Gen.oneOf(EuTaxIdentifierType.values)

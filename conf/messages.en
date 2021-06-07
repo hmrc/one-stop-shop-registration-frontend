@@ -508,3 +508,21 @@ taxRegisteredInEu.change.hidden = if your business is registered for taxes in an
 updateVatDetails.title = You cannot use this service
 updateVatDetails.heading = You cannot use this service
 updateVatDetails.guidance = You will need to update the details of your VAT registration before registering for the One Stop Shop scheme.
+
+businessAddressInUk.title = businessAddressInUk
+businessAddressInUk.heading = businessAddressInUk
+businessAddressInUk.checkYourAnswersLabel = businessAddressInUk
+businessAddressInUk.error.required = Select yes if businessAddressInUk
+businessAddressInUk.change.hidden = BusinessAddressInUk
+
+internationalAddress.title = internationalAddress
+internationalAddress.heading = internationalAddress
+internationalAddress.line1 = line1
+internationalAddress.line2 = line2
+internationalAddress.checkYourAnswersLabel = InternationalAddress
+internationalAddress.error.line1.required = Enter line1
+internationalAddress.error.line2.required = Enter line2
+internationalAddress.error.line1.length = line1 must be 100 characters or less
+internationalAddress.error.line2.length = line2 must be 100 characters or less
+internationalAddress.line1.change.hidden = line1
+internationalAddress.line2.change.hidden = line2

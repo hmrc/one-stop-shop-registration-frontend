@@ -24,6 +24,12 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryInternationalAddressPage: Arbitrary[InternationalAddressPage.type] =
+    Arbitrary(InternationalAddressPage)
+
+  implicit lazy val arbitraryBusinessAddressInUkPage: Arbitrary[BusinessAddressInUkPage.type] =
+    Arbitrary(BusinessAddressInUkPage)
+
   implicit lazy val arbitraryTaxRegisteredInEuPage: Arbitrary[TaxRegisteredInEuPage.type] =
     Arbitrary(TaxRegisteredInEuPage)
 
