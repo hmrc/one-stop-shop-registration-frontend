@@ -18,8 +18,16 @@ package models
 
 import play.api.libs.json._
 
-case class InternationalAddress (line1: String, line2: String)
+case class InternationalAddress (
+                                  line1: String,
+                                  line2: Option[String],
+                                  townOrCity: String,
+                                  stateOrRegion: Option[String],
+                                  postCode: Option[String],
+                                  country: Country
+                                )
 
 object InternationalAddress {
-  implicit val format = Json.format[InternationalAddress]
+
+  implicit val format: OFormat[InternationalAddress] = Json.format[InternationalAddress]
 }

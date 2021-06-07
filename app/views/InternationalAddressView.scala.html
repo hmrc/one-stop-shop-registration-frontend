@@ -5,6 +5,7 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
+    govukSelect: GovukSelect,
     govukButton: GovukButton
 )
 
@@ -33,7 +34,41 @@
                 field = form("line2"),
                 label = LabelViewModel(messages("internationalAddress.line2"))
             )
-            .withWidth(Full)
+                    .withWidth(Full)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("townOrCity"),
+                label = LabelViewModel(messages("internationalAddress.townOrCity"))
+            )
+                    .withWidth(TwoThirds)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("stateOrRegion"),
+                label = LabelViewModel(messages("internationalAddress.stateOrRegion"))
+            )
+            .withWidth(TwoThirds)
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("postCode"),
+                label = LabelViewModel(messages("internationalAddress.postCode"))
+            )
+            .withWidth(Fixed10)
+        )
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("country"),
+                items = Country.euCountrySelectItems,
+                label = LabelViewModel(messages("internationalAddress.country"))
+            )
+            .withCssClass(Fixed20.toString)
+            .withCssClass("autocomplete")
         )
 
         @govukButton(

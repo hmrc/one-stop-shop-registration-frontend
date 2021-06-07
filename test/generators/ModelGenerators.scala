@@ -31,9 +31,13 @@ trait ModelGenerators {
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
-        line1 <- arbitrary[String]
-        line2 <- arbitrary[String]
-      } yield InternationalAddress(line1, line2)
+        line1         <- arbitrary[String]
+        line2         <- Gen.option(arbitrary[String])
+        townOrCity    <- arbitrary[String]
+        stateOrRegion <- Gen.option(arbitrary[String])
+        postCode      <- Gen.option(arbitrary[String])
+        country       <- arbitrary[Country]
+      } yield InternationalAddress(line1, line2, townOrCity, stateOrRegion, postCode, country)
     }
 
   implicit val arbitraryEuTaxIdentifierType: Arbitrary[EuTaxIdentifierType] =

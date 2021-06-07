@@ -32,7 +32,14 @@ object InternationalAddressSummary  {
     answers.get(InternationalAddressPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.line1).toString + "<br/>" + HtmlFormat.escape(answer.line2).toString
+        val value = Seq(
+          Some(HtmlFormat.escape(answer.line1).toString),
+          answer.line2.map(HtmlFormat.escape),
+          Some(HtmlFormat.escape(answer.townOrCity).toString),
+          answer.stateOrRegion.map(HtmlFormat.escape),
+          answer.postCode.map(HtmlFormat.escape),
+          Some(HtmlFormat.escape(answer.country.name).toString)
+        ).flatten.mkString("<br/>")
 
         SummaryListRowViewModel(
           key     = "internationalAddress.checkYourAnswersLabel",

@@ -17,20 +17,28 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
-import models.InternationalAddress
+import models.{Country, InternationalAddress}
 
 class InternationalAddressFormProvider @Inject() extends Mappings {
 
-   def apply(): Form[InternationalAddress] = Form(
-     mapping(
+  def apply(): Form[InternationalAddress] = Form(
+    mapping(
       "line1" -> text("internationalAddress.error.line1.required")
         .verifying(maxLength(100, "internationalAddress.error.line1.length")),
-      "line2" -> text("internationalAddress.error.line2.required")
-        .verifying(maxLength(100, "internationalAddress.error.line2.length"))
+      "line2" -> optional(text("internationalAddress.error.line2.required")
+        .verifying(maxLength(100, "internationalAddress.error.line2.length"))),
+      "townOrCity" -> text("internationalAddress.error.townOrCity.required")
+        .verifying(maxLength(100, "internationalAddress.error.townOrCity.length")),
+      "stateOrRegion" -> optional(text("internationalAddress.error.stateOrRegion.required")
+        .verifying(maxLength(100, "internationalAddress.error.stateOrRegion.length"))),
+      "postCode" -> optional(text("internationalAddress.error.postCode.required")
+        .verifying(maxLength(100, "internationalAddress.error.postCode.length"))),
+      "country" -> text("internationalAddress.error.country.required")
+        .verifying("internationalAddress.error.country.required", value => Country.euCountries.exists(_.code == value))
+        .transform[Country](value => Country.euCountries.find(_.code == value).get, _.code)
     )(InternationalAddress.apply)(InternationalAddress.unapply)
-   )
- }
+  )
+}
