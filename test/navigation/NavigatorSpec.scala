@@ -281,10 +281,10 @@ class NavigatorSpec extends SpecBase {
 
         "when we do not have VAT details" - {
 
-          "to Business Address" in {
+          "to UK Address" in {
 
             navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
-              .mustBe(routes.BusinessAddressController.onPageLoad(NormalMode))
+              .mustBe(routes.UkAddressController.onPageLoad(NormalMode))
           }
         }
 
@@ -300,7 +300,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from Business Address to Has Trading Name" in {
 
-        navigator.nextPage(BusinessAddressPage, NormalMode, emptyUserAnswers)
+        navigator.nextPage(UkAddressPage, NormalMode, emptyUserAnswers)
           .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
 
@@ -925,9 +925,9 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Business Address page to Check your Answers page" in {
+      "must go from UK Address page to Check your Answers page" in {
 
-        val businessAddress = new UkAddress(
+        val ukAddress = new UkAddress(
           "value 1",
           Some ("value 2"),
           "value 3",
@@ -935,9 +935,9 @@ class NavigatorSpec extends SpecBase {
           "value 4"
         )
 
-        val answers = emptyUserAnswers.set(BusinessAddressPage, businessAddress).success.value
+        val answers = emptyUserAnswers.set(UkAddressPage, ukAddress).success.value
 
-        navigator.nextPage(BusinessAddressPage, CheckMode, answers)
+        navigator.nextPage(UkAddressPage, CheckMode, answers)
           .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
 

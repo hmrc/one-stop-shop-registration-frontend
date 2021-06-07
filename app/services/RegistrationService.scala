@@ -126,7 +126,7 @@ class RegistrationService {
       case Some(vatInfo) =>
         Some(vatInfo.address)
       case None =>
-        answers.get(BusinessAddressPage)
+        answers.get(UkAddressPage)
     }
 
   private def getName(answers: UserAnswers): Option[String] =

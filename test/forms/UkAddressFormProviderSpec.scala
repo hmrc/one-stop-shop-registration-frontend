@@ -20,16 +20,16 @@ import forms.Validation.Validation.postCodePattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
-class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
+class UkAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val formProvider = new BusinessAddressFormProvider()
+  val formProvider = new UkAddressFormProvider()
   val form = formProvider()
 
   ".line1" - {
 
     val fieldName = "line1"
-    val requiredKey = "businessAddress.error.line1.required"
-    val lengthKey = "businessAddress.error.line1.length"
+    val requiredKey = "ukAddress.error.line1.required"
+    val lengthKey = "ukAddress.error.line1.length"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -55,7 +55,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".line2" - {
 
     val fieldName = "line2"
-    val lengthKey = "businessAddress.error.line2.length"
+    val lengthKey = "ukAddress.error.line2.length"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -75,8 +75,8 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".townOrCity" - {
 
     val fieldName = "townOrCity"
-    val requiredKey = "businessAddress.error.townOrCity.required"
-    val lengthKey = "businessAddress.error.townOrCity.length"
+    val requiredKey = "ukAddress.error.townOrCity.required"
+    val lengthKey = "ukAddress.error.townOrCity.length"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -102,7 +102,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".county" - {
 
     val fieldName = "county"
-    val lengthKey = "businessAddress.error.county.length"
+    val lengthKey = "ukAddress.error.county.length"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -122,9 +122,9 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".postCode" - {
 
     val fieldName = "postCode"
-    val requiredKey = "businessAddress.error.postCode.required"
-    val lengthKey = "businessAddress.error.postCode.length"
-    val invalidKey = "businessAddress.error.postCode.invalid"
+    val requiredKey = "ukAddress.error.postCode.required"
+    val lengthKey = "ukAddress.error.postCode.length"
+    val invalidKey = "ukAddress.error.postCode.invalid"
     val validData = "AA11 1AA"
     val maxLength = 250
 

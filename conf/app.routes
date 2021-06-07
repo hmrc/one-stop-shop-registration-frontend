@@ -68,10 +68,10 @@ POST        /deleteEuVatDetails/:index                      controllers.euDetail
 GET         /changeDeleteEuVatDetails/:index                controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /changeDeleteEuVatDetails/:index                controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /businessAddress                                controllers.BusinessAddressController.onPageLoad(mode: Mode = NormalMode)
-POST        /businessAddress                                controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
-GET         /changeBusinessAddress                          controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeBusinessAddress                          controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
+GET         /businessAddress                                controllers.UkAddressController.onPageLoad(mode: Mode = NormalMode)
+POST        /businessAddress                                controllers.UkAddressController.onSubmit(mode: Mode = NormalMode)
+GET         /changeBusinessAddress                          controllers.UkAddressController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeBusinessAddress                          controllers.UkAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET         /businessContactDetails                         controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /businessContactDetails                         controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)

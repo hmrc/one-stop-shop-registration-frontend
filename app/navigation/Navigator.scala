@@ -39,7 +39,7 @@ class Navigator @Inject()() {
     case RegisteredCompanyNamePage                => registeredCompanyNameRoute
     case PartOfVatGroupPage                       => partOfVatGroupRoute
     case UkVatEffectiveDatePage                   => ukVatEffectiveDateRoute
-    case BusinessAddressPage                      => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
+    case UkAddressPage                      => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
     case HasTradingNamePage                       => hasTradingNameRoute
     case TradingNamePage(_)                       => _ => routes.AddTradingNameController.onPageLoad(NormalMode)
     case AddTradingNamePage                       => addTradingNameRoute
@@ -119,7 +119,7 @@ class Navigator @Inject()() {
     if (answers.vatInfo.isDefined) {
       routes.HasTradingNameController.onPageLoad(NormalMode)
     } else {
-      routes.BusinessAddressController.onPageLoad(NormalMode)
+      routes.UkAddressController.onPageLoad(NormalMode)
     }
 
   private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {

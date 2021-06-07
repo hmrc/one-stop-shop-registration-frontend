@@ -17,24 +17,24 @@
 package controllers
 
 import controllers.actions._
-import forms.BusinessAddressFormProvider
+import forms.UkAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.BusinessAddressPage
+import pages.UkAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.BusinessAddressView
+import views.html.UkAddressView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessAddressController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      cc: AuthenticatedControllerComponents,
-                                      navigator: Navigator,
-                                      formProvider: BusinessAddressFormProvider,
-                                      view: BusinessAddressView
+class UkAddressController @Inject()(
+                                     override val messagesApi: MessagesApi,
+                                     cc: AuthenticatedControllerComponents,
+                                     navigator: Navigator,
+                                     formProvider: UkAddressFormProvider,
+                                     view: UkAddressView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -43,7 +43,7 @@ class BusinessAddressController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(BusinessAddressPage) match {
+      val preparedForm = request.userAnswers.get(UkAddressPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -60,9 +60,9 @@ class BusinessAddressController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UkAddressPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BusinessAddressPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(UkAddressPage, mode, updatedAnswers))
       )
   }
 }

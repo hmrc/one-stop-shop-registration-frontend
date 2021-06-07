@@ -64,7 +64,7 @@ class CheckYourAnswersController @Inject()(
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
           StartDateSummary.row(request.userAnswers),
-          BusinessAddressSummary.row(request.userAnswers),
+          UkAddressSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers)
         ).flatten

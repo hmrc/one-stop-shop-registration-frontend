@@ -19,14 +19,14 @@ package pages
 import models.UkAddress
 import pages.behaviours.PageBehaviours
 
-class BusinessAddressPageSpec extends PageBehaviours {
+class UkAddressPageSpec extends PageBehaviours {
 
-  "BusinessAddressPage" - {
+  "UkAddressPage" - {
 
-    beRetrievable[UkAddress](BusinessAddressPage)
+    beRetrievable[UkAddress](UkAddressPage)
 
-    beSettable[UkAddress](BusinessAddressPage)
+    beSettable[UkAddress](UkAddressPage)
 
-    beRemovable[UkAddress](BusinessAddressPage)
+    beRemovable[UkAddress](UkAddressPage)
   }
 }

@@ -50,7 +50,7 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(StartDatePage.type, JsValue)] ::
     arbitrary[(WebsitePage, JsValue)] ::
     arbitrary[(BusinessContactDetailsPage.type, JsValue)] ::
-    arbitrary[(BusinessAddressPage.type, JsValue)] ::
+    arbitrary[(UkAddressPage.type, JsValue)] ::
     arbitrary[(AddEuDetailsPage.type, JsValue)] ::
     arbitrary[(VatRegisteredPage, JsValue)] ::
     arbitrary[(EuCountryPage, JsValue)] ::

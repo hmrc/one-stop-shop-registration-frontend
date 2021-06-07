@@ -62,7 +62,7 @@ class RegistrationServiceSpec extends SpecBase {
         StartDate(StartDateOption.NextPeriod, LocalDate.now())
       ).success.value
       .set(
-        BusinessAddressPage,
+        UkAddressPage,
         UkAddress("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
       ).success.value
       .set(
@@ -103,7 +103,7 @@ class RegistrationServiceSpec extends SpecBase {
       val userAnswers =
         answers.copy(vatInfo = Some(vatInfo))
           .remove(UkVatEffectiveDatePage).success.value
-          .remove(BusinessAddressPage).success.value
+          .remove(UkAddressPage).success.value
           .remove(PartOfVatGroupPage).success.value
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)
