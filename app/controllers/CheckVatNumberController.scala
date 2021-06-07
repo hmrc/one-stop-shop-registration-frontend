@@ -54,7 +54,6 @@ class CheckVatNumberController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      println("*"*50)
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, request.vrn))),

@@ -38,6 +38,7 @@ class RegistrationServiceSpec extends SpecBase {
       .set(AllTradingNames, List("single", "double")).success.value
       .set(PartOfVatGroupPage, true).success.value
       .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
+      .set(BusinessAddressInUkPage, true).success.value
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
       .set(VatRegisteredPage(Index(0)), true).success.value
@@ -134,6 +135,27 @@ class RegistrationServiceSpec extends SpecBase {
           euRegistrations  = Seq.empty,
           vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered),
           websites         = Seq.empty
+        )
+
+      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+      registration.value mustEqual expectedRegistration
+    }
+
+    "must return a registration when an International address is given" in {
+
+      val address = InternationalAddress("line 1", None, "town", None, None, Country("FR", "France"))
+      val userAnswers =
+        answers
+          .set(BusinessAddressInUkPage, false).success.value
+          .set(InternationalAddressPage, address).success.value
+          .remove(UkAddressPage).success.value
+
+      val expectedRegistration =
+        RegistrationData.registration copy (
+          vatDetails = RegistrationData.registration.vatDetails copy (
+            address = address,
+            source  = UserEntered
+          )
         )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)

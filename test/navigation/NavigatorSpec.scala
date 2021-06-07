@@ -281,10 +281,10 @@ class NavigatorSpec extends SpecBase {
 
         "when we do not have VAT details" - {
 
-          "to UK Address" in {
+          "to Business Address in UK" in {
 
             navigator.nextPage(UkVatEffectiveDatePage, NormalMode, emptyUserAnswers)
-              .mustBe(routes.UkAddressController.onPageLoad(NormalMode))
+              .mustBe(routes.BusinessAddressInUkController.onPageLoad(NormalMode))
           }
         }
 
@@ -298,9 +298,32 @@ class NavigatorSpec extends SpecBase {
         }
       }
 
-      "must go from Business Address to Has Trading Name" in {
+      "must go from Business Address in UK" - {
+
+        "to UK Address when the answer is yes" in {
+
+          val answers = emptyUserAnswers.set(BusinessAddressInUkPage, true).success.value
+          navigator.nextPage(BusinessAddressInUkPage, NormalMode, answers)
+            .mustBe(routes.UkAddressController.onPageLoad(NormalMode))
+        }
+
+        "to International Address when the answer is no" in {
+
+          val answers = emptyUserAnswers.set(BusinessAddressInUkPage, false).success.value
+          navigator.nextPage(BusinessAddressInUkPage, NormalMode, answers)
+            .mustBe(routes.InternationalAddressController.onPageLoad(NormalMode))
+        }
+      }
+
+      "must go from UK Address to Has Trading Name" in {
 
         navigator.nextPage(UkAddressPage, NormalMode, emptyUserAnswers)
+          .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+
+      "must go from International Address to Has Trading Name" in {
+
+        navigator.nextPage(InternationalAddressPage, NormalMode, emptyUserAnswers)
           .mustBe(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
 

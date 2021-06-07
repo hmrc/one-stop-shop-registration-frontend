@@ -47,11 +47,15 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
     userAnswersId,
     Json.obj(
       UkAddressPage.toString -> Json.obj(
-        "line1" -> "value 1",
-        "line2" -> "value 2",
+        "line1"      -> "value 1",
+        "line2"      -> "value 2",
         "townOrCity" -> "value 3",
-        "county" -> "value 4",
-        "postCode" -> "AA11 1AA"
+        "county"     -> "value 4",
+        "postCode"   -> "AA11 1AA",
+        "country"    -> Json.obj(
+          "code" -> "GB",
+          "name" -> "UnitedKingdom"
+        )
       )
     )
   )
