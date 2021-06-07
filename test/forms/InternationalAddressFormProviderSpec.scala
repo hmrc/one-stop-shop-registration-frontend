@@ -16,21 +16,21 @@
 
 package forms
 
-import forms.Validation.Validation.postCodePattern
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
-class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
+class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val formProvider = new BusinessAddressFormProvider()
-  val form = formProvider()
+  val form = new InternationalAddressFormProvider()()
 
   ".line1" - {
 
     val fieldName = "line1"
-    val requiredKey = "businessAddress.error.line1.required"
-    val lengthKey = "businessAddress.error.line1.length"
-    val maxLength = 250
+    val requiredKey = "internationalAddress.error.line1.required"
+    val lengthKey = "internationalAddress.error.line1.length"
+    val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
@@ -55,8 +55,8 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".line2" - {
 
     val fieldName = "line2"
-    val lengthKey = "businessAddress.error.line2.length"
-    val maxLength = 250
+    val lengthKey = "internationalAddress.error.line2.length"
+    val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
@@ -75,9 +75,9 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".townOrCity" - {
 
     val fieldName = "townOrCity"
-    val requiredKey = "businessAddress.error.townOrCity.required"
-    val lengthKey = "businessAddress.error.townOrCity.length"
-    val maxLength = 250
+    val requiredKey = "internationalAddress.error.townOrCity.required"
+    val lengthKey = "internationalAddress.error.townOrCity.length"
+    val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
@@ -99,11 +99,11 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     )
   }
 
-  ".county" - {
+  ".stateOrRegion" - {
 
-    val fieldName = "county"
-    val lengthKey = "businessAddress.error.county.length"
-    val maxLength = 250
+    val fieldName = "stateOrRegion"
+    val lengthKey = "internationalAddress.error.stateOrRegion.length"
+    val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
@@ -122,23 +122,14 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".postCode" - {
 
     val fieldName = "postCode"
-    val requiredKey = "businessAddress.error.postCode.required"
-    val lengthKey = "businessAddress.error.postCode.length"
-    val invalidKey = "businessAddress.error.postCode.invalid"
-    val validData = "AA11 1AA"
-    val maxLength = 250
+    val lengthKey = "internationalAddress.error.postCode.length"
+    val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      validData
+      stringsWithMaxLength(maxLength)
     )
-
-    "must not bind invalid Post Code data" in {
-      val invalidPostCode = "invalid"
-      val result = form.bind(Map(fieldName -> invalidPostCode)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(postCodePattern)))
-    }
 
     behave like fieldWithMaxLength(
       form,
@@ -146,11 +137,34 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
+  }
+
+  ".country" - {
+
+    val fieldName = "country"
+    val requiredKey = "internationalAddress.error.country.required"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      arbitrary[Country].map(_.code)
+    )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind any values other than valid country codes" in {
+
+      val invalidAnswers = arbitrary[String] suchThat (x => !Country.euCountries.map(_.code).contains(x))
+
+      forAll(invalidAnswers) {
+        answer =>
+          val result = form.bind(Map("value" -> answer)).apply(fieldName)
+          result.errors must contain only FormError(fieldName, requiredKey)
+      }
+    }
   }
 }

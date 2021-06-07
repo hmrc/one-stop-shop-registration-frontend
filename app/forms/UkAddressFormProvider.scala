@@ -24,22 +24,22 @@ import play.api.data.Form
 import play.api.data.Forms._
 import models.UkAddress
 
-class BusinessAddressFormProvider @Inject() extends Mappings {
+class UkAddressFormProvider @Inject() extends Mappings {
 
    def apply(): Form[UkAddress] = Form(
      mapping(
-      "line1" -> text("businessAddress.error.line1.required")
-        .verifying(maxLength(250, "businessAddress.error.line1.length")),
-      "line2" -> optional(text("businessAddress.error.line2.required")
-        .verifying(maxLength(250, "businessAddress.error.line2.length"))),
-       "townOrCity" -> text("businessAddress.error.townOrCity.required")
-         .verifying(maxLength(250, "businessAddress.error.townOrCity.length")),
-       "county" -> optional(text("businessAddress.error.county.required")
-         .verifying(maxLength(250, "businessAddress.error.county.length"))),
-       "postCode" -> text("businessAddress.error.postCode.required")
+      "line1" -> text("ukAddress.error.line1.required")
+        .verifying(maxLength(250, "ukAddress.error.line1.length")),
+      "line2" -> optional(text("ukAddress.error.line2.required")
+        .verifying(maxLength(250, "ukAddress.error.line2.length"))),
+       "townOrCity" -> text("ukAddress.error.townOrCity.required")
+         .verifying(maxLength(250, "ukAddress.error.townOrCity.length")),
+       "county" -> optional(text("ukAddress.error.county.required")
+         .verifying(maxLength(250, "ukAddress.error.county.length"))),
+       "postCode" -> text("ukAddress.error.postCode.required")
          .verifying(firstError(
-           maxLength(250, "businessAddress.error.postCode.length"),
-           regexp(postCodePattern, "businessAddress.error.postCode.invalid")))
+           maxLength(250, "ukAddress.error.postCode.length"),
+           regexp(postCodePattern, "ukAddress.error.postCode.invalid")))
     )(UkAddress.apply)(UkAddress.unapply)
    )
  }
