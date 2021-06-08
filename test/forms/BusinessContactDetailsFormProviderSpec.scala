@@ -110,6 +110,13 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       validData
     )
 
+    "must bind valid email address data with .co.uk" in {
+      val validEmail = "test@email.co.uk"
+      val result = form.bind(Map(fieldName -> validEmail)).apply(fieldName)
+      result.value.value mustBe validEmail
+      result.errors mustBe empty
+    }
+
     "must not bind invalid email address data" in {
       val invalidEmail = "invalid"
       val result = form.bind(Map(fieldName -> invalidEmail)).apply(fieldName)
