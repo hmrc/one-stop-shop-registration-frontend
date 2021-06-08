@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.UkVatEffectiveDateFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.UkVatEffectiveDatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
