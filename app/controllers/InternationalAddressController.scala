@@ -17,25 +17,25 @@
 package controllers
 
 import controllers.actions._
-import forms.CheckVatNumberFormProvider
+import forms.InternationalAddressFormProvider
+import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.CheckVatNumberPage
+import pages.InternationalAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.CheckVatNumberView
+import views.html.InternationalAddressView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckVatNumberController @Inject()(
-                                          override val messagesApi: MessagesApi,
-                                          cc: AuthenticatedControllerComponents,
-                                          navigator: Navigator,
-                                          formProvider: CheckVatNumberFormProvider,
-                                          view: CheckVatNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class InternationalAddressController @Inject()(
+                                      override val messagesApi: MessagesApi,
+                                      cc: AuthenticatedControllerComponents,
+                                      navigator: Navigator,
+                                      formProvider: InternationalAddressFormProvider,
+                                      view: InternationalAddressView
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -43,12 +43,12 @@ class CheckVatNumberController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(CheckVatNumberPage) match {
+      val preparedForm = request.userAnswers.get(InternationalAddressPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.vrn))
+      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
@@ -56,13 +56,13 @@ class CheckVatNumberController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.vrn))),
+          Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckVatNumberPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(InternationalAddressPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CheckVatNumberPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(InternationalAddressPage, mode, updatedAnswers))
       )
   }
 }

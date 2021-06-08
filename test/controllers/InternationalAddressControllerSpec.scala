@@ -17,55 +17,57 @@
 package controllers
 
 import base.SpecBase
-import forms.BusinessAddressFormProvider
-import models.{NormalMode, UkAddress, UserAnswers}
+import forms.InternationalAddressFormProvider
+import models.{Country, InternationalAddress, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.BusinessAddressPage
+import pages.InternationalAddressPage
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.BusinessAddressView
+import views.html.InternationalAddressView
 
 import scala.concurrent.Future
 
-class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
+class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new BusinessAddressFormProvider()
-  val form = formProvider()
+  private val formProvider = new InternationalAddressFormProvider()
+  private val form = formProvider()
 
-  lazy val businessAddressRoute = routes.BusinessAddressController.onPageLoad(NormalMode).url
+  private lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
 
-  val userAnswers = UserAnswers(
+  private val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
-      BusinessAddressPage.toString -> Json.obj(
-        "line1" -> "value 1",
-        "line2" -> "value 2",
-        "townOrCity" -> "value 3",
-        "county" -> "value 4",
-        "postCode" -> "AA11 1AA"
+      InternationalAddressPage.toString -> Json.obj(
+        "line1" -> "line 1",
+        "line2" -> "line 2",
+        "townOrCity" -> "town",
+        "country" -> Json.obj(
+          "code" -> "FR",
+          "name" -> "France"
+        )
       )
     )
   )
 
-  "BusinessAddress Controller" - {
+  "InternationalAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, businessAddressRoute)
+        val request = FakeRequest(GET, internationalAddressRoute)
 
-        val view = application.injector.instanceOf[BusinessAddressView]
+        val view = application.injector.instanceOf[InternationalAddressView]
 
         val result = route(application, request).value
 
@@ -79,14 +81,14 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, businessAddressRoute)
+        val request = FakeRequest(GET, internationalAddressRoute)
 
-        val view = application.injector.instanceOf[BusinessAddressView]
+        val view = application.injector.instanceOf[InternationalAddressView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(UkAddress("value 1", Some("value 2"), "value 3", Some("value 4"), "AA11 1AA")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(InternationalAddress("line 1", Some("line 2"), "town", None, None, Country("FR", "France"))), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -106,8 +108,8 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, businessAddressRoute)
-            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "value 3"), ("county", "value 4"),("postCode", "AA11 1AA"))
+          FakeRequest(POST, internationalAddressRoute)
+            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "town"), ("country", "FR"))
 
         val result = route(application, request).value
 
@@ -122,12 +124,12 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, businessAddressRoute)
+          FakeRequest(POST, internationalAddressRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[BusinessAddressView]
+        val view = application.injector.instanceOf[InternationalAddressView]
 
         val result = route(application, request).value
 
@@ -141,7 +143,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, businessAddressRoute)
+        val request = FakeRequest(GET, internationalAddressRoute)
 
         val result = route(application, request).value
 
@@ -156,8 +158,8 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, businessAddressRoute)
-            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "value 3"), ("county", "value 4"),("postCode", "AA11 1AA"))
+          FakeRequest(POST, internationalAddressRoute)
+            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "town"), ("country", "FR"))
 
         val result = route(application, request).value
 

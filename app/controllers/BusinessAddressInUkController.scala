@@ -17,33 +17,33 @@
 package controllers
 
 import controllers.actions._
-import forms.BusinessAddressFormProvider
+import forms.BusinessAddressInUkFormProvider
+import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.BusinessAddressPage
+import pages.BusinessAddressInUkPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.BusinessAddressView
+import views.html.BusinessAddressInUkView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessAddressController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      cc: AuthenticatedControllerComponents,
-                                      navigator: Navigator,
-                                      formProvider: BusinessAddressFormProvider,
-                                      view: BusinessAddressView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class BusinessAddressInUkController @Inject()(
+                                         override val messagesApi: MessagesApi,
+                                         cc: AuthenticatedControllerComponents,
+                                         navigator: Navigator,
+                                         formProvider: BusinessAddressInUkFormProvider,
+                                         view: BusinessAddressInUkView
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(BusinessAddressPage) match {
+      val preparedForm = request.userAnswers.get(BusinessAddressInUkPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -60,9 +60,9 @@ class BusinessAddressController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessAddressPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessAddressInUkPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BusinessAddressPage, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(BusinessAddressInUkPage, mode, updatedAnswers))
       )
   }
 }

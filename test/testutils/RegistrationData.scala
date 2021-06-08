@@ -31,7 +31,7 @@ object RegistrationData {
       tradingNames = List("single", "double"),
       vatDetails = VatDetails(
         registrationDate = LocalDate.now,
-        address          = createBusinessAddress(),
+        address          = createUkAddress(),
         partOfVatGroup   = true,
         source           = VatDetailSource.Etmp
       ),
@@ -58,7 +58,7 @@ object RegistrationData {
       bankDetails = BankDetails("Account name", Some("12345678"), "GB12345678")
     )
 
-  private def createBusinessAddress(): UkAddress =
+  private def createUkAddress(): UkAddress =
     UkAddress(
       "123 Street",
       Some("Street"),

@@ -27,6 +27,8 @@ import pages.euDetails._
 import pages.previousRegistrations._
 import queries._
 
+// TODO: Decompose this monster!
+//scalastyle:off
 @Singleton
 class Navigator @Inject()() {
 
@@ -39,7 +41,9 @@ class Navigator @Inject()() {
     case RegisteredCompanyNamePage                => registeredCompanyNameRoute
     case PartOfVatGroupPage                       => partOfVatGroupRoute
     case UkVatEffectiveDatePage                   => ukVatEffectiveDateRoute
-    case BusinessAddressPage                      => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
+    case BusinessAddressInUkPage                  => businessAddressInUkRoute
+    case UkAddressPage                            => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
+    case InternationalAddressPage                 => _ => routes.HasTradingNameController.onPageLoad(NormalMode)
     case HasTradingNamePage                       => hasTradingNameRoute
     case TradingNamePage(_)                       => _ => routes.AddTradingNameController.onPageLoad(NormalMode)
     case AddTradingNamePage                       => addTradingNameRoute
@@ -119,8 +123,14 @@ class Navigator @Inject()() {
     if (answers.vatInfo.isDefined) {
       routes.HasTradingNameController.onPageLoad(NormalMode)
     } else {
-      routes.BusinessAddressController.onPageLoad(NormalMode)
+      routes.BusinessAddressInUkController.onPageLoad(NormalMode)
     }
+
+  private def businessAddressInUkRoute(answers: UserAnswers): Call = answers.get(BusinessAddressInUkPage) match {
+    case Some(true)  => routes.UkAddressController.onPageLoad(NormalMode)
+    case Some(false) => routes.InternationalAddressController.onPageLoad(NormalMode)
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
 
   private def hasTradingNameRoute(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
     case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))

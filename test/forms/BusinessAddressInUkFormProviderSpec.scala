@@ -14,14 +14,32 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import models.UkAddress
-import play.api.libs.json.JsPath
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-case object BusinessAddressPage extends QuestionPage[UkAddress] {
+class BusinessAddressInUkFormProviderSpec extends BooleanFieldBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  val requiredKey = "businessAddressInUk.error.required"
+  val invalidKey = "error.boolean"
 
-  override def toString: String = "businessAddress"
+  val form = new BusinessAddressInUkFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }
