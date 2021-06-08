@@ -16,23 +16,21 @@
 
 package pages
 
+import base.SpecBase
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
 
-import java.time.LocalDate
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+class CheckYourAnswersPageSpec extends SpecBase {
 
-case object UkVatEffectiveDatePage extends QuestionPage[LocalDate] {
+  "CheckYourAnswersPage" - {
 
-  override def path: JsPath = JsPath \ toString
+    "must navigate in Normal mode" - {
 
-  override def toString: String = "ukVatEffectiveDate"
+      "to Application Complete" in {
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    if(answers.vatInfo.isDefined) {
-      routes.HasTradingNameController.onPageLoad(NormalMode)
-    } else {
-      routes.BusinessAddressInUkController.onPageLoad(NormalMode)
+        CheckYourAnswersPage.navigate(NormalMode, emptyUserAnswers)
+          .mustBe(routes.ApplicationCompleteController.onPageLoad())
+      }
     }
+  }
 }

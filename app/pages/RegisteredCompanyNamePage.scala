@@ -16,11 +16,19 @@
 
 package pages
 
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object RegisteredCompanyNamePage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "registeredCompanyName"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.vatInfo match {
+    case Some(vatInfo) if vatInfo.partOfVatGroup.isDefined => PartOfVatGroupPage.navigate(NormalMode, answers)
+    case _                                                 => routes.PartOfVatGroupController.onPageLoad(NormalMode)
+  }
 }

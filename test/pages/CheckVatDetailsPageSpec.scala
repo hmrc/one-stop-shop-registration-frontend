@@ -16,10 +16,13 @@
 
 package pages
 
-import models.CheckVatDetails
+import base.SpecBase
+import controllers.routes
+import models.CheckVatDetails.{DetailsIncorrect, WrongAccount, Yes}
+import models.{CheckVatDetails, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class CheckVatDetailsPageSpec extends PageBehaviours {
+class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
   "CheckVatDetailsPage" - {
 
@@ -28,5 +31,73 @@ class CheckVatDetailsPageSpec extends PageBehaviours {
     beSettable[CheckVatDetails](CheckVatDetailsPage)
 
     beRemovable[CheckVatDetails](CheckVatDetailsPage)
+
+    "must navigate in Normal mode" - {
+
+      "when the user answers Yes" - {
+
+        "when we have VAT details" - {
+
+          "with the organisation name" - {
+
+            "to wherever the Registered Company Name page would navigate to" in {
+
+              val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
+
+              CheckVatDetailsPage.navigate(NormalMode, answers)
+                .mustEqual(RegisteredCompanyNamePage.navigate(NormalMode, emptyUserAnswersWithVatInfo))
+            }
+          }
+
+          "Without the organisation name" - {
+
+            "to Registered Company Name" in {
+
+              val vatInfo = vatCustomerInfo copy (organisationName = None)
+              val answers =
+                emptyUserAnswersWithVatInfo
+                  .copy(vatInfo = Some(vatInfo))
+                  .set(CheckVatDetailsPage, Yes).success.value
+
+              CheckVatDetailsPage.navigate(NormalMode, answers)
+                .mustEqual(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+            }
+          }
+        }
+
+        "when we don't have VAT details" - {
+
+          "to Registered Company Name" in {
+
+            val answers = emptyUserAnswers.set(CheckVatDetailsPage, Yes).success.value
+
+            CheckVatDetailsPage.navigate(NormalMode, answers)
+              .mustEqual(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+          }
+        }
+      }
+
+      "when the user answers Wrong Account" - {
+
+        "to Use Other Account" in {
+
+          val answers = emptyUserAnswers.set(CheckVatDetailsPage, WrongAccount).success.value
+
+          CheckVatDetailsPage.navigate(NormalMode, answers)
+            .mustEqual(routes.UseOtherAccountController.onPageLoad())
+        }
+      }
+
+      "when the user answers Details Incorrect" - {
+
+        "to Update VAT Details" in {
+
+          val answers = emptyUserAnswers.set(CheckVatDetailsPage, DetailsIncorrect).success.value
+
+          CheckVatDetailsPage.navigate(NormalMode, answers)
+            .mustEqual(routes.UpdateVatDetailsController.onPageLoad())
+        }
+      }
+    }
   }
 }

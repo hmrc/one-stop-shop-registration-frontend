@@ -16,6 +16,16 @@
 
 package pages
 
-import models.Index
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
+import play.api.mvc.Call
+import queries.DeriveNumberOfTradingNames
 
-case class DeleteTradingNamePage(index: Index) extends Page
+case class DeleteTradingNamePage(index: Index) extends Page {
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfTradingNames) match {
+      case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(NormalMode)
+      case _                => routes.HasTradingNameController.onPageLoad(NormalMode)
+    }
+}

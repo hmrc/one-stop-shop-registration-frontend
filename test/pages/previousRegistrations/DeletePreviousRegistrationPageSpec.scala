@@ -18,46 +18,35 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import controllers.routes
 import models.{Country, Index, NormalMode}
-import pages.behaviours.PageBehaviours
 
-class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
+class DeletePreviousRegistrationPageSpec extends SpecBase {
 
-  "AddPreviousRegistrationPage" - {
-
-    beRetrievable[Boolean](AddPreviousRegistrationPage)
-
-    beSettable[Boolean](AddPreviousRegistrationPage)
-
-    beRemovable[Boolean](AddPreviousRegistrationPage)
+  "DeletePreviousRegistrationPage" - {
 
     "must navigate in Normal mode" - {
 
-      "when the answer is yes" - {
+      "when there are still some previous registrations" - {
 
-        "to Previous EU Country with an index equal to the number of previous registrations already answered" in {
+        "to Add Previous Registration" in {
 
           val answers =
             emptyUserAnswers
-              .set(PreviouslyRegisteredPage, true).success.value
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
               .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
-              .set(AddPreviousRegistrationPage, true).success.value
 
-          AddPreviousRegistrationPage.navigate(NormalMode, answers)
-            .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(1)))
+          DeletePreviousRegistrationPage(Index(0)).navigate(NormalMode, answers)
+            .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
         }
       }
 
-      "when the answer is no" - {
 
-        "to Start Date" in {
+      "when there are no previous registrations left" - {
 
-          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+        "to Previously Registered" in {
 
-          PreviouslyRegisteredPage.navigate(NormalMode, answers)
-            .mustEqual(routes.StartDateController.onPageLoad(NormalMode))
+          DeletePreviousRegistrationPage(Index(0)).navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
         }
       }
     }

@@ -16,12 +16,17 @@
 
 package pages
 
-import models.Country
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{Country, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object CurrentCountryOfRegistrationPage extends QuestionPage[Country] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "currentCountryOfRegistration"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
 }

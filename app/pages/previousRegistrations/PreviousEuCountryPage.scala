@@ -16,13 +16,18 @@
 
 package pages.previousRegistrations
 
-import models.{Country, Index}
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{Country, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class PreviousEuCountryPage(index: Index) extends QuestionPage[Country] {
 
   override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ toString
 
   override def toString: String = "previousEuCountry"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index)
 }

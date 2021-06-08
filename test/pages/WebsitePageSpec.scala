@@ -16,10 +16,12 @@
 
 package pages
 
-import models.Index
+import base.SpecBase
+import controllers.routes
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class WebsitePageSpec extends PageBehaviours {
+class WebsitePageSpec extends SpecBase with PageBehaviours {
 
   val index: Index = Index(0)
 
@@ -30,5 +32,14 @@ class WebsitePageSpec extends PageBehaviours {
     beSettable[String](WebsitePage(index))
 
     beRemovable[String](WebsitePage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Add Website" in {
+
+        WebsitePage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

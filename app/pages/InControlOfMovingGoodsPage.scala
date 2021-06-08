@@ -16,11 +16,21 @@
 
 package pages
 
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object InControlOfMovingGoodsPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "inControlOfMovingGoods"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = (answers.get(InControlOfMovingGoodsPage), answers.vatInfo) match {
+    case (Some(true), Some(_)) => routes.CheckVatDetailsController.onPageLoad(NormalMode)
+    case (Some(true), None)    => routes.CheckVatNumberController.onPageLoad(NormalMode)
+    case (Some(false), _)      => routes.CannotRegisterForServiceController.onPageLoad()
+    case _                     => routes.JourneyRecoveryController.onPageLoad()
+  }
 }

@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class InControlOfMovingGoodsPageSpec extends PageBehaviours {
+class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
 
   "InControlOfMovingGoodsPage" - {
 
@@ -27,5 +30,29 @@ class InControlOfMovingGoodsPageSpec extends PageBehaviours {
     beSettable[Boolean](InControlOfMovingGoodsPage)
 
     beRemovable[Boolean](InControlOfMovingGoodsPage)
+
+    "must navigate in Normal Mode" - {
+
+      "to Check Vat Details when the answer is yes and we have the user's VAT info" in {
+
+        val answers = emptyUserAnswersWithVatInfo.set(InControlOfMovingGoodsPage, true).success.value
+        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CheckVatDetailsController.onPageLoad(NormalMode))
+      }
+
+      "to Check Vat Number when the answer is yes and we do not have the user's VAT info" in {
+
+        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
+        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CheckVatNumberController.onPageLoad(NormalMode))
+      }
+
+      "to Cannot Register when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
+        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+      }
+    }
   }
 }

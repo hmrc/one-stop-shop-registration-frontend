@@ -16,12 +16,15 @@
 
 package pages
 
-import java.time.LocalDate
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 
+import java.time.LocalDate
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
 
-class UkVatEffectiveDatePageSpec extends PageBehaviours {
+class UkVatEffectiveDatePageSpec extends SpecBase with PageBehaviours {
 
   "UkVatEffectiveDatePage" - {
 
@@ -34,5 +37,20 @@ class UkVatEffectiveDatePageSpec extends PageBehaviours {
     beSettable[LocalDate](UkVatEffectiveDatePage)
 
     beRemovable[LocalDate](UkVatEffectiveDatePage)
+
+    "must navigate in Normal mode" - {
+
+      "to Has Trading Name if we have the user's VAT info" in {
+
+        UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+
+      "to Business Address in UK if we don't have the user's VAT info" in {
+
+        UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.BusinessAddressInUkController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

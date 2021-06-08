@@ -16,12 +16,17 @@
 
 package pages
 
-import models.BankDetails
+import controllers.routes
+import models.{BankDetails, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object BankDetailsPage extends QuestionPage[BankDetails] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "bankDetails"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

@@ -16,13 +16,23 @@
 
 package pages.euDetails
 
-import models.Index
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
 
   override def toString: String = "vatRegistered"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true)  => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

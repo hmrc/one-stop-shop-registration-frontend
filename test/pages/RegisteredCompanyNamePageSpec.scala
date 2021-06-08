@@ -16,10 +16,13 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
 
-class RegisteredCompanyNamePageSpec extends PageBehaviours {
+class RegisteredCompanyNamePageSpec extends SpecBase with PageBehaviours {
 
   "RegisteredCompanyNamePage" - {
 
@@ -28,5 +31,38 @@ class RegisteredCompanyNamePageSpec extends PageBehaviours {
     beSettable[String](RegisteredCompanyNamePage)
 
     beRemovable[String](RegisteredCompanyNamePage)
+
+    "must navigate in Normal mode" - {
+
+      "when we have VAT details including Part of VAT Group" - {
+
+        "to wherever the Part of VAT Group page would navigate to" in {
+
+          RegisteredCompanyNamePage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+            .mustBe(PartOfVatGroupPage.navigate(NormalMode, emptyUserAnswersWithVatInfo))
+        }
+      }
+
+      "when we have VAT details that don't include Part of VAT Group" - {
+
+        "to Part of VAT Group" in {
+
+          val vatInfo = vatCustomerInfo copy (partOfVatGroup = None)
+          val answers = emptyUserAnswers copy (vatInfo = Some(vatInfo))
+
+          RegisteredCompanyNamePage.navigate(NormalMode, answers)
+            .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+        }
+      }
+
+      "when we don't have VAT details" - {
+
+        "to Part of VAT Group" in {
+
+          RegisteredCompanyNamePage.navigate(NormalMode, emptyUserAnswers)
+            .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
+        }
+      }
+    }
   }
 }

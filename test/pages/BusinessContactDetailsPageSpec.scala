@@ -16,10 +16,12 @@
 
 package pages
 
-import models.BusinessContactDetails
+import base.SpecBase
+import controllers.routes
+import models.{BusinessContactDetails, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class BusinessContactDetailsPageSpec extends PageBehaviours {
+class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
 
   "BusinessContactDetailsPage" - {
 
@@ -28,5 +30,14 @@ class BusinessContactDetailsPageSpec extends PageBehaviours {
     beSettable[BusinessContactDetails](BusinessContactDetailsPage)
 
     beRemovable[BusinessContactDetails](BusinessContactDetailsPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Bank Details" in {
+
+        BusinessContactDetailsPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.BankDetailsController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

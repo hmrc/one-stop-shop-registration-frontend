@@ -16,16 +16,49 @@
 
 package pages
 
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class AddTradingNamePageSpec extends PageBehaviours {
+class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
 
-  "AddAdditionalEuVatDetailsPage" - {
+  "AddTradingNamePage" - {
 
     beRetrievable[Boolean](AddTradingNamePage)
 
     beSettable[Boolean](AddTradingNamePage)
 
     beRemovable[Boolean](AddTradingNamePage)
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "to Trading Name with index equal to the number of names already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo").success.value
+              .set(TradingNamePage(Index(1)), "bar").success.value
+              .set(AddTradingNamePage, true).success.value
+
+          AddTradingNamePage.navigate(NormalMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(NormalMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Tax Registered in EU" in {
+
+          val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
+
+          AddTradingNamePage.navigate(NormalMode, answers)
+            .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
+        }
+      }
+    }
   }
 }

@@ -16,13 +16,18 @@
 
 package pages.euDetails
 
-import models.{Country, Index}
+import controllers.euDetails.{routes => euRoutes}
+import models.{Country, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class EuCountryPage(index: Index) extends QuestionPage[Country] {
 
   override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
 
   override def toString: String = "euCountry"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
 }

@@ -16,8 +16,11 @@
 
 package pages
 
-import models.UserAnswers
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 import queries.AllTradingNames
 
 import scala.util.Try
@@ -27,6 +30,12 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "hasTradingName"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
+    case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))
+    case Some(false) => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {

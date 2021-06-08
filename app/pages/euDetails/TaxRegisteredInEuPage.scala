@@ -16,9 +16,13 @@
 
 package pages.euDetails
 
-import models.UserAnswers
+import controllers.euDetails.{routes => euRoutes}
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 import queries.AllEuDetailsQuery
 
 import scala.util.Try
@@ -36,4 +40,12 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
       super.cleanup(value, userAnswers)
     }
   }
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(TaxRegisteredInEuPage) match {
+      case Some(true)  => euRoutes.EuCountryController.onPageLoad(NormalMode, Index(0))
+      case Some(false) => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
 }

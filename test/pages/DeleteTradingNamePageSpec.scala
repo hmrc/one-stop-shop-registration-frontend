@@ -18,24 +18,25 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{NormalMode, UkAddress}
-import pages.behaviours.PageBehaviours
+import models.{Index, NormalMode}
 
-class UkAddressPageSpec extends SpecBase with PageBehaviours {
+class DeleteTradingNamePageSpec extends SpecBase {
 
-  "UkAddressPage" - {
-
-    beRetrievable[UkAddress](UkAddressPage)
-
-    beSettable[UkAddress](UkAddressPage)
-
-    beRemovable[UkAddress](UkAddressPage)
+  "DeleteTradingNamePage" - {
 
     "must navigate in Normal mode" - {
 
-      "to Has Trading Name" in {
+      "to Add Trading Name when there are still trading names present" in {
 
-        UkAddressPage.navigate(NormalMode, emptyUserAnswers)
+        val answers = emptyUserAnswers.set(TradingNamePage(Index(0)), "foo").success.value
+
+        DeleteTradingNamePage(Index(0)).navigate(NormalMode, answers)
+          .mustEqual(routes.AddTradingNameController.onPageLoad(NormalMode))
+      }
+
+      "to Has Trading Name when there are no trading names present" in {
+
+        DeleteTradingNamePage(Index(0)).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
     }

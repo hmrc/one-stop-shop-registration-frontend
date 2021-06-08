@@ -16,11 +16,14 @@
 
 package pages.euDetails
 
-import models.{Country, Index, UserAnswers}
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{Country, Index, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
-class TaxRegisteredInEuPageSpec extends PageBehaviours {
+class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
   "TaxRegisteredInEuPage" - {
 
@@ -29,6 +32,31 @@ class TaxRegisteredInEuPageSpec extends PageBehaviours {
     beSettable[Boolean](TaxRegisteredInEuPage)
 
     beRemovable[Boolean](TaxRegisteredInEuPage)
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "to EU Country for index 0" in {
+
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+          TaxRegisteredInEuPage.navigate(NormalMode, answers)
+            .mustEqual(euRoutes.EuCountryController.onPageLoad(NormalMode, Index(0)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Previously Registered" in {
+
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
+
+          TaxRegisteredInEuPage.navigate(NormalMode, answers)
+            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+        }
+      }
+    }
 
     // TODO: Include other data
     "must remove all EU VAT details when the answer is false" in {

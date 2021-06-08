@@ -15,5 +15,12 @@
  */
 
 package pages
+import controllers.routes
+import models.{NormalMode, UserAnswers}
+import play.api.mvc.Call
 
-case object FirstAuthedPage extends Page
+case object FirstAuthedPage extends Page {
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.SellsGoodsFromNiController.onPageLoad(NormalMode)
+}

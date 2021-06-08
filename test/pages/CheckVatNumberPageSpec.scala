@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class CheckVatNumberPageSpec extends PageBehaviours {
+class CheckVatNumberPageSpec extends SpecBase with PageBehaviours {
 
   "CheckVatNumberPage" - {
 
@@ -27,5 +30,22 @@ class CheckVatNumberPageSpec extends PageBehaviours {
     beSettable[Boolean](CheckVatNumberPage)
 
     beRemovable[Boolean](CheckVatNumberPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Registered Company Name when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(CheckVatNumberPage, true).success.value
+        CheckVatNumberPage.navigate(NormalMode, answers)
+          .mustBe(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+      }
+
+      "to Use Other Account when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(CheckVatNumberPage, false).success.value
+        CheckVatNumberPage.navigate(NormalMode, answers)
+          .mustBe(routes.UseOtherAccountController.onPageLoad())
+      }
+    }
   }
 }

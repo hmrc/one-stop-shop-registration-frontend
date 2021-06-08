@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class HasWebsitePageSpec extends PageBehaviours {
+class HasWebsitePageSpec extends SpecBase with PageBehaviours {
 
   "HasWebsitePage" - {
 
@@ -27,5 +30,22 @@ class HasWebsitePageSpec extends PageBehaviours {
     beSettable[Boolean](HasWebsitePage)
 
     beRemovable[Boolean](HasWebsitePage)
+
+    "must navigate in Normal mode" - {
+
+      "to Website (index 0) when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(HasWebsitePage, true).success.value
+        HasWebsitePage.navigate(NormalMode, answers)
+          .mustEqual(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
+      }
+
+      "to Contact Details when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
+        HasWebsitePage.navigate(NormalMode, answers)
+          .mustEqual(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

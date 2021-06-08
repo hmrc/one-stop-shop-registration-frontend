@@ -16,11 +16,23 @@
 
 package pages
 
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import queries.DeriveNumberOfTradingNames
 
 case object AddTradingNamePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "addTradingName"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
+      case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _)         => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
