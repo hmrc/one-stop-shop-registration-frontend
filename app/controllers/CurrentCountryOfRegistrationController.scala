@@ -18,11 +18,8 @@ package controllers
 
 import controllers.actions._
 import forms.CurrentCountryOfRegistrationFormProvider
-
-import javax.inject.Inject
-import models.{Country, Mode}
 import models.requests.DataRequest
-import navigation.Navigator
+import models.{Country, Mode}
 import pages.CurrentCountryOfRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -31,12 +28,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.CurrentCountryOfRegistrationViewModel
 import views.html.CurrentCountryOfRegistrationView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CurrentCountryOfRegistrationController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       navigator: Navigator,
                                        formProvider: CurrentCountryOfRegistrationFormProvider,
                                        view: CurrentCountryOfRegistrationView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -76,7 +73,7 @@ class CurrentCountryOfRegistrationController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CurrentCountryOfRegistrationPage, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(CurrentCountryOfRegistrationPage, mode, updatedAnswers))
+              } yield Redirect(CurrentCountryOfRegistrationPage.navigate(mode, updatedAnswers))
           )
       }
 

@@ -19,7 +19,6 @@ package controllers
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import models.{NormalMode, UserAnswers, responses}
-import navigation.Navigator
 import pages.FirstAuthedPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class IndexController @Inject()(
                                  override val messagesApi: MessagesApi,
                                  cc: AuthenticatedControllerComponents,
-                                 navigator: Navigator,
                                  connector: RegistrationConnector,
                                  clock: Clock,
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -44,7 +42,7 @@ class IndexController @Inject()(
 
       request.userAnswers match {
         case Some(answers) =>
-          Future.successful(Redirect(navigator.nextPage(FirstAuthedPage, NormalMode, answers)))
+          Future.successful(Redirect(FirstAuthedPage.navigate(NormalMode, answers)))
 
         case None =>
           connector.getVatCustomerInfo().flatMap {
@@ -52,14 +50,14 @@ class IndexController @Inject()(
               val answers = UserAnswers(request.userId, vatInfo = Some(vatInfo), lastUpdated = Instant.now(clock))
               cc.sessionRepository.set(answers).map {
                 _ =>
-                  Redirect(navigator.nextPage(FirstAuthedPage, NormalMode, answers))
+                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
               }
 
             case Left(responses.NotFound) =>
               val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
               cc.sessionRepository.set(answers).map {
                 _ =>
-                  Redirect(navigator.nextPage(FirstAuthedPage, NormalMode, answers))
+                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
               }
 
             case Left(_) =>

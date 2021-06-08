@@ -17,12 +17,9 @@
 package controllers.euDetails
 
 import controllers.actions._
-import controllers.routes
 import forms.euDetails.EuVatNumberFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
-import navigation.Navigator
-import pages.euDetails.EuVatNumberPage
 import pages.euDetails.{EuCountryPage, EuVatNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class EuVatNumberController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: EuVatNumberFormProvider,
                                         view: EuVatNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -73,7 +69,7 @@ class EuVatNumberController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(EuVatNumberPage(index), mode, updatedAnswers))
+              } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
           )
       }
   }

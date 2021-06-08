@@ -19,23 +19,19 @@ package controllers
 import controllers.actions._
 import forms.DeleteWebsiteFormProvider
 import models.requests.DataRequest
-
-import javax.inject.Inject
 import models.{Index, Mode}
-import navigation.Navigator
 import pages.{DeleteWebsitePage, WebsitePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteWebsiteView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DeleteWebsiteController @Inject()(
                                              override val messagesApi: MessagesApi,
                                              cc: AuthenticatedControllerComponents,
-                                             navigator: Navigator,
                                              formProvider: DeleteWebsiteFormProvider,
                                              view: DeleteWebsiteView
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -65,9 +61,9 @@ class DeleteWebsiteController @Inject()(
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.remove(WebsitePage(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeleteWebsitePage(index), mode, updatedAnswers))
+                } yield Redirect(DeleteWebsitePage(index).navigate(mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(navigator.nextPage(DeleteWebsitePage(index), mode, request.userAnswers)))
+                Future.successful(Redirect(DeleteWebsitePage(index).navigate(mode, request.userAnswers)))
               }
           )
       }

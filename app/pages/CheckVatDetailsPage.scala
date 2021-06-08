@@ -16,12 +16,24 @@
 
 package pages
 
-import models.CheckVatDetails
+import controllers.routes
+import models.{CheckVatDetails, NormalMode, UserAnswers}
+import models.CheckVatDetails._
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object CheckVatDetailsPage extends QuestionPage[CheckVatDetails] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "checkVatDetails"
+
+  override def navigateInNormalMode(answers: UserAnswers): Call =
+    (answers.get(CheckVatDetailsPage), answers.vatInfo) match {
+      case (Some(Yes), Some(vatInfo)) if vatInfo.organisationName.isDefined => RegisteredCompanyNamePage.navigate(NormalMode, answers)
+      case (Some(Yes), _)                                                   => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
+      case (Some(WrongAccount), _)                                          => routes.UseOtherAccountController.onPageLoad()
+      case (Some(DetailsIncorrect), _)                                      => routes.UpdateVatDetailsController.onPageLoad()
+      case _                                                                => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

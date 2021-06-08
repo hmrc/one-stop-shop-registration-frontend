@@ -21,7 +21,6 @@ import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.DataRequest
 import models.{Index, Mode}
-import navigation.Navigator
 import pages.previousRegistrations.DeletePreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +34,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class DeletePreviousRegistrationController @Inject()(
                                               override val messagesApi: MessagesApi,
                                               cc: AuthenticatedControllerComponents,
-                                              navigator: Navigator,
                                               formProvider: DeletePreviousRegistrationFormProvider,
                                               view: DeletePreviousRegistrationView
                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -65,9 +63,9 @@ class DeletePreviousRegistrationController @Inject()(
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.remove(PreviousRegistrationQuery(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeletePreviousRegistrationPage(index), mode, updatedAnswers))
+                } yield Redirect(DeletePreviousRegistrationPage(index).navigate(mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(navigator.nextPage(DeletePreviousRegistrationPage(index), mode, request.userAnswers)))
+                Future.successful(Redirect(DeletePreviousRegistrationPage(index).navigate(mode, request.userAnswers)))
               }
           )
       }

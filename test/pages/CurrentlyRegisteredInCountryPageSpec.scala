@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class CurrentlyRegisteredInCountryPageSpec extends PageBehaviours {
+class CurrentlyRegisteredInCountryPageSpec extends SpecBase with PageBehaviours {
 
   "CurrentlyRegisteredInCountryPage" - {
 
@@ -27,5 +30,14 @@ class CurrentlyRegisteredInCountryPageSpec extends PageBehaviours {
     beSettable[Boolean](CurrentlyRegisteredInCountryPage)
 
     beRemovable[Boolean](CurrentlyRegisteredInCountryPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Previously Registered" in {
+
+        CurrentlyRegisteredInCountryPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

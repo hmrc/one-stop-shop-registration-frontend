@@ -16,13 +16,18 @@
 
 package pages.euDetails
 
-import models.Index
+import controllers.euDetails.{routes => euRoutes}
+import models.{Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
 
   override def toString: String = "euVatNumber"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
 }

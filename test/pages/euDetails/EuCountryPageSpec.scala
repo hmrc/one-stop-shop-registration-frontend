@@ -16,12 +16,17 @@
 
 package pages.euDetails
 
-import models.{Country, Index}
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
 
-class EuCountryPageSpec(index: Index) extends PageBehaviours {
+class EuCountryPageSpec extends SpecBase with PageBehaviours {
+
+  private val index = Index(0)
 
   "EuCountryPage" - {
 
@@ -30,5 +35,14 @@ class EuCountryPageSpec(index: Index) extends PageBehaviours {
     beSettable[Country](euDetails.EuCountryPage(index))
 
     beRemovable[Country](euDetails.EuCountryPage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Vat Registered for the same index" in {
+
+        EuCountryPage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(euRoutes.VatRegisteredController.onPageLoad(NormalMode, index))
+      }
+    }
   }
 }

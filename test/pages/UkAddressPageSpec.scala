@@ -16,10 +16,12 @@
 
 package pages
 
-import models.UkAddress
+import base.SpecBase
+import controllers.routes
+import models.{NormalMode, UkAddress}
 import pages.behaviours.PageBehaviours
 
-class UkAddressPageSpec extends PageBehaviours {
+class UkAddressPageSpec extends SpecBase with PageBehaviours {
 
   "UkAddressPage" - {
 
@@ -28,5 +30,14 @@ class UkAddressPageSpec extends PageBehaviours {
     beSettable[UkAddress](UkAddressPage)
 
     beRemovable[UkAddress](UkAddressPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Has Trading Name" in {
+
+        UkAddressPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

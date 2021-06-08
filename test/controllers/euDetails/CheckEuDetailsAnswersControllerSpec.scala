@@ -19,6 +19,7 @@ package controllers.euDetails
 import base.SpecBase
 import models.{Country, Index, NormalMode}
 import pages.euDetails
+import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -52,7 +53,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       }
     }
 
-    "must redirect to Add Eu VAT Details on a POST" in {
+    "must redirect to the next page on a POST" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -61,7 +62,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.AddEuDetailsController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, emptyUserAnswers).url
       }
     }
   }

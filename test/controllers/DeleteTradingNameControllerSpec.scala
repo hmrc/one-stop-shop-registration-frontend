@@ -19,13 +19,11 @@ package controllers
 import base.SpecBase
 import forms.DeleteTradingNameFormProvider
 import models.{Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.TradingNamePage
+import pages.{DeleteTradingNamePage, TradingNamePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -34,8 +32,6 @@ import views.html.DeleteTradingNameView
 import scala.concurrent.Future
 
 class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new DeleteTradingNameFormProvider()
   private val form = formProvider()
@@ -73,7 +69,6 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -84,10 +79,11 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.remove(TradingNamePage(index)).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository, times(1)).set(any())
+        redirectLocation(result).value mustEqual DeleteTradingNamePage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -101,7 +97,6 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -114,8 +109,8 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository, never()).set(any())
+        redirectLocation(result).value mustEqual DeleteTradingNamePage(index).navigate(NormalMode, baseUserAnswers).url
+        verify(mockSessionRepository, never()).set(eqTo(baseUserAnswers))
       }
     }
 

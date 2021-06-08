@@ -15,5 +15,12 @@
  */
 
 package pages
+import controllers.routes
+import models.UserAnswers
+import play.api.mvc.Call
 
-case object CheckYourAnswersPage extends Page
+case object CheckYourAnswersPage extends Page {
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.ApplicationCompleteController.onPageLoad()
+}

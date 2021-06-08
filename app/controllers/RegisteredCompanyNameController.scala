@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.RegisteredCompanyNameFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.RegisteredCompanyNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class RegisteredCompanyNameController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: RegisteredCompanyNameFormProvider,
                                         view: RegisteredCompanyNameView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class RegisteredCompanyNameController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(RegisteredCompanyNamePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(RegisteredCompanyNamePage, mode, updatedAnswers))
+          } yield Redirect(RegisteredCompanyNamePage.navigate(mode, updatedAnswers))
       )
   }
 }

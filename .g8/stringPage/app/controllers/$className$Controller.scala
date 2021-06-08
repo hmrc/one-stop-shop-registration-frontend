@@ -4,7 +4,6 @@ import controllers.actions._
 import forms.$className$FormProvider
 import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.$className$Page
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -16,7 +15,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class $className$Controller @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: $className$FormProvider,
                                         view: $className$View
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -46,7 +44,7 @@ class $className$Controller @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage($className$Page, mode, updatedAnswers))
+          } yield Redirect($className$Page.navigate(mode, updatedAnswers))
       )
   }
 }

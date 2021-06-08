@@ -16,11 +16,22 @@
 
 package pages
 
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import queries.DeriveNumberOfWebsites
 
 case object AddWebsitePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "addWebsite"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    (answers.get(AddWebsitePage), answers.get(DeriveNumberOfWebsites)) match {
+      case (Some(true), Some(size)) => routes.WebsiteController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _)         => routes.BusinessContactDetailsController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

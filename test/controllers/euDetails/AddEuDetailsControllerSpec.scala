@@ -19,14 +19,12 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
 import models.{Country, Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuVatNumberPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,8 +34,6 @@ import views.html.euDetails.AddEuDetailsView
 import scala.concurrent.Future
 
 class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new AddEuDetailsFormProvider()
   private val form = formProvider()
@@ -49,7 +45,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(EuVatNumberPage(Index(0)), "foo").success.value
 
-  "AddEuVatDetails Controller" - {
+  "AddEuDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -89,7 +85,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -97,10 +93,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -109,9 +102,11 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
+        val expectedAnswers = baseAnswers.set(AddEuDetailsPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual AddEuDetailsPage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

@@ -16,10 +16,12 @@
 
 package pages
 
-import models.InternationalAddress
+import base.SpecBase
+import controllers.routes
+import models.{InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class InternationalAddressPageSpec extends PageBehaviours {
+class InternationalAddressPageSpec extends SpecBase with PageBehaviours {
 
   "InternationalAddressPage" - {
 
@@ -28,5 +30,14 @@ class InternationalAddressPageSpec extends PageBehaviours {
     beSettable[InternationalAddress](InternationalAddressPage)
 
     beRemovable[InternationalAddress](InternationalAddressPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Has Trading Name" in {
+
+        InternationalAddressPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

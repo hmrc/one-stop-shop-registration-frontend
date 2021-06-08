@@ -16,10 +16,13 @@
 
 package pages
 
-import models.{Index, UserAnswers}
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 
-class HasTradingNamePageSpec extends PageBehaviours {
+class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
 
   "HasTradingNamePage" - {
 
@@ -28,6 +31,25 @@ class HasTradingNamePageSpec extends PageBehaviours {
     beSettable[Boolean](HasTradingNamePage)
 
     beRemovable[Boolean](HasTradingNamePage)
+
+    "must navigate in Normal mode" - {
+
+      "to Trading Name (index 0) when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(HasTradingNamePage, true).success.value
+
+        HasTradingNamePage.navigate(NormalMode, answers)
+          .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(0)))
+      }
+
+      "to Tax Registered in EU when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+
+        HasTradingNamePage.navigate(NormalMode, answers)
+          .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
+      }
+    }
 
     "must remove all trading names when the answer is false" in {
 

@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,12 +31,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       cc: AuthenticatedControllerComponents,
-                                      navigator: Navigator,
                                       formProvider: BusinessContactDetailsFormProvider,
                                       view: BusinessContactDetailsView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
@@ -62,7 +60,7 @@ class BusinessContactDetailsController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BusinessContactDetailsPage, mode, updatedAnswers))
+          } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
       )
   }
 }

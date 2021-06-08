@@ -16,13 +16,15 @@
 
 package pages.euDetails
 
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.FixedEstablishmentAddress
-import models.{Index, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
-class HasFixedEstablishmentPageSpec extends PageBehaviours {
+class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
@@ -33,6 +35,53 @@ class HasFixedEstablishmentPageSpec extends PageBehaviours {
     beSettable[Boolean](euDetails.HasFixedEstablishmentPage(index))
 
     beRemovable[Boolean](euDetails.HasFixedEstablishmentPage(index))
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "and the user answered that they are VAT registered in this country" - {
+
+          "to Fixed Establishment Trading Name for the same index" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), true).success.value
+                .set(HasFixedEstablishmentPage(index), true).success.value
+
+            HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
+              .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+          }
+        }
+
+        "and the user answered that they are not VAT registered in this country" - {
+
+          "to EU Tax Reference for the same index" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), false).success.value
+                .set(HasFixedEstablishmentPage(index), true).success.value
+
+            HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
+              .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index))
+          }
+        }
+      }
+
+      "when the user answers no" - {
+
+        "to Check EU Details Answers" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(HasFixedEstablishmentPage(index), false).success.value
+
+          HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+        }
+      }
+    }
 
     "must remove Fixed Establishment Trading Name and Address for this index when the answer is no" in {
 

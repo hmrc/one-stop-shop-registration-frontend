@@ -16,12 +16,17 @@
 
 package pages
 
-import models.InternationalAddress
+import controllers.routes
+import models.{InternationalAddress, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object InternationalAddressPage extends QuestionPage[InternationalAddress] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "internationalAddress"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.HasTradingNameController.onPageLoad(NormalMode)
 }

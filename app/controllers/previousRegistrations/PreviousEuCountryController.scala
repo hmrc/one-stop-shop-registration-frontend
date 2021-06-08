@@ -19,7 +19,6 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.PreviousEuCountryFormProvider
 import models.{Index, Mode}
-import navigation.Navigator
 import pages.previousRegistrations.PreviousEuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class PreviousEuCountryController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: PreviousEuCountryFormProvider,
                                         view: PreviousEuCountryView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -66,7 +64,7 @@ class PreviousEuCountryController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuCountryPage(index), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PreviousEuCountryPage(index), mode, updatedAnswers))
+          } yield Redirect(PreviousEuCountryPage(index).navigate(mode, updatedAnswers))
       )
   }
 }

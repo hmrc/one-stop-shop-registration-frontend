@@ -16,11 +16,12 @@
 
 package pages.euDetails
 
-import models.Index
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-
-class EuTaxReferencePageSpec extends PageBehaviours {
+class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
@@ -31,5 +32,14 @@ class EuTaxReferencePageSpec extends PageBehaviours {
     beSettable[String](EuTaxReferencePage(index))
 
     beRemovable[String](EuTaxReferencePage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Fixed Establishment Trading Name" in {
+
+        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+      }
+    }
   }
 }

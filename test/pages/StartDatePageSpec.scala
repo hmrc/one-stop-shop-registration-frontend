@@ -16,10 +16,12 @@
 
 package pages
 
-import models.StartDate
+import base.SpecBase
+import controllers.routes
+import models.{NormalMode, StartDate}
 import pages.behaviours.PageBehaviours
 
-class StartDateSpec extends PageBehaviours {
+class StartDatePageSpec extends SpecBase with PageBehaviours {
 
   "StartDatePage" - {
 
@@ -28,5 +30,14 @@ class StartDateSpec extends PageBehaviours {
     beSettable[StartDate](StartDatePage)
 
     beRemovable[StartDate](StartDatePage)
+
+    "must navigate in Normal mode" - {
+
+      "to Has Website" in {
+
+        StartDatePage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

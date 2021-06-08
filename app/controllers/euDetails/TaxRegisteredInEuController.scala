@@ -19,7 +19,6 @@ package controllers.euDetails
 import controllers.actions._
 import forms.euDetails.TaxRegisteredInEuFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxRegisteredInEuController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: TaxRegisteredInEuFormProvider,
                                          view: TaxRegisteredInEuView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class TaxRegisteredInEuController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(TaxRegisteredInEuPage, mode, updatedAnswers))
+          } yield Redirect(TaxRegisteredInEuPage.navigate(mode, updatedAnswers))
       )
   }
 }

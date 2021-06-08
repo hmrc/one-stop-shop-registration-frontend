@@ -16,7 +16,17 @@
 
 package pages.previousRegistrations
 
-import models.Index
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{Index, NormalMode, UserAnswers}
 import pages.Page
+import play.api.mvc.Call
+import queries.DeriveNumberOfPreviousRegistrations
 
-case class DeletePreviousRegistrationPage(index: Index) extends Page
+case class DeletePreviousRegistrationPage(index: Index) extends Page {
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfPreviousRegistrations) match {
+      case Some(n) if n > 0 => prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode)
+      case _                => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+    }
+}

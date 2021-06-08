@@ -18,22 +18,19 @@ package controllers
 
 import controllers.actions._
 import forms.HasWebsiteFormProvider
-import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.HasWebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HasWebsiteView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class HasWebsiteController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: HasWebsiteFormProvider,
                                          view: HasWebsiteView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -63,7 +60,7 @@ class HasWebsiteController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HasWebsitePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HasWebsitePage, mode, updatedAnswers))
+          } yield Redirect(HasWebsitePage.navigate(mode, updatedAnswers))
       )
   }
 }

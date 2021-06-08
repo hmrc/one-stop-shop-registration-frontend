@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class PartOfVatGroupPageSpec extends PageBehaviours {
+class PartOfVatGroupPageSpec extends SpecBase with PageBehaviours {
 
   "PartOfVatGroupPage" - {
 
@@ -27,5 +30,38 @@ class PartOfVatGroupPageSpec extends PageBehaviours {
     beSettable[Boolean](PartOfVatGroupPage)
 
     beRemovable[Boolean](PartOfVatGroupPage)
+    
+    "must navigate in Normal mode" - {
+
+      "when we have VAT details including Registration Date" - {
+
+        "to wherever the UK VAT Effective Date page would navigate to" in {
+
+          PartOfVatGroupPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+            .mustBe(UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswersWithVatInfo))
+        }
+      }
+
+      "when we have VAT details that don't include Registration Date" - {
+
+        "to UK VAT Effective Date" in {
+
+          val vatInfo = vatCustomerInfo copy (registrationDate  = None)
+          val answers = emptyUserAnswers copy (vatInfo = Some(vatInfo))
+
+          PartOfVatGroupPage.navigate(NormalMode, answers)
+            .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+        }
+      }
+
+      "when we don't have VAT details" - {
+
+        "to UK VAT Effective Date" in {
+
+          PartOfVatGroupPage.navigate(NormalMode, emptyUserAnswers)
+            .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
+        }
+      }
+    }
   }
 }

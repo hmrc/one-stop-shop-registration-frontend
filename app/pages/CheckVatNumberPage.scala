@@ -16,11 +16,20 @@
 
 package pages
 
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object CheckVatNumberPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "checkVatNumber"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(CheckVatNumberPage) match {
+    case Some(true)  => routes.RegisteredCompanyNameController.onPageLoad(NormalMode)
+    case Some(false) => routes.UseOtherAccountController.onPageLoad()
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
 }

@@ -16,10 +16,12 @@
 
 package pages.previousRegistrations
 
-import models.Index
+import base.SpecBase
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class PreviousEuVatNumberPageSpec extends PageBehaviours {
+class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
@@ -30,5 +32,14 @@ class PreviousEuVatNumberPageSpec extends PageBehaviours {
     beSettable[String](PreviousEuVatNumberPage(index))
 
     beRemovable[String](PreviousEuVatNumberPage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Add Previous Registration" in {
+
+        PreviousEuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

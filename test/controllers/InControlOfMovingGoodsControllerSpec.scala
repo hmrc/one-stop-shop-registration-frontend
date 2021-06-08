@@ -19,13 +19,11 @@ package controllers
 import base.SpecBase
 import forms.InControlOfMovingGoodsFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.InControlOfMovingGoodsPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -35,12 +33,10 @@ import scala.concurrent.Future
 
 class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new InControlOfMovingGoodsFormProvider()
+  private val form = formProvider()
 
-  val formProvider = new InControlOfMovingGoodsFormProvider()
-  val form = formProvider()
-
-  lazy val inControlOfMovingGoodsRoute = routes.InControlOfMovingGoodsController.onPageLoad(NormalMode).url
+  private lazy val inControlOfMovingGoodsRoute = routes.InControlOfMovingGoodsController.onPageLoad(NormalMode).url
 
   "InControlOfMovingGoods Controller" - {
 
@@ -87,7 +83,6 @@ class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -98,9 +93,11 @@ class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual InControlOfMovingGoodsPage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

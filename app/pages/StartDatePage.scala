@@ -16,12 +16,17 @@
 
 package pages
 
-import models.StartDate
+import controllers.routes
+import models.{NormalMode, StartDate, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object StartDatePage extends QuestionPage[StartDate] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "startDate"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.HasWebsiteController.onPageLoad(NormalMode)
 }

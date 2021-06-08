@@ -16,12 +16,13 @@
 
 package pages.euDetails
 
-import models.Index
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
-
-class FixedEstablishmentTradingNamePageSpec extends PageBehaviours {
+class FixedEstablishmentTradingNamePageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
@@ -32,5 +33,14 @@ class FixedEstablishmentTradingNamePageSpec extends PageBehaviours {
     beSettable[String](euDetails.FixedEstablishmentTradingNamePage(index))
 
     beRemovable[String](euDetails.FixedEstablishmentTradingNamePage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Fixed Establishment Address" in {
+
+        FixedEstablishmentTradingNamePage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index))
+      }
+    }
   }
 }

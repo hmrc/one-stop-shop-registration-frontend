@@ -21,7 +21,6 @@ import forms.euDetails.DeleteEuDetailsFormProvider
 import models.euDetails.EuDetails
 import models.requests.DataRequest
 import models.{Index, Mode}
-import navigation.Navigator
 import pages.euDetails.DeleteEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +34,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class DeleteEuDetailsController @Inject()(
                                            override val messagesApi: MessagesApi,
                                            cc: AuthenticatedControllerComponents,
-                                           navigator: Navigator,
                                            formProvider: DeleteEuDetailsFormProvider,
                                            view: DeleteEuDetailsView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -65,9 +63,9 @@ class DeleteEuDetailsController @Inject()(
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuDetailsQuery(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeleteEuDetailsPage(index), mode, updatedAnswers))
+                } yield Redirect(DeleteEuDetailsPage(index).navigate(mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(navigator.nextPage(DeleteEuDetailsPage(index), mode, request.userAnswers)))
+                Future.successful(Redirect(DeleteEuDetailsPage(index).navigate(mode, request.userAnswers)))
               }
           )
       }

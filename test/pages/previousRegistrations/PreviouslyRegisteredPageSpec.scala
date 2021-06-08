@@ -16,9 +16,13 @@
 
 package pages.previousRegistrations
 
+import base.SpecBase
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class PreviouslyRegisteredPageSpec extends PageBehaviours {
+class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
 
   "PreviouslyRegisteredPage" - {
 
@@ -27,5 +31,30 @@ class PreviouslyRegisteredPageSpec extends PageBehaviours {
     beSettable[Boolean](PreviouslyRegisteredPage)
 
     beRemovable[Boolean](PreviouslyRegisteredPage)
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "to Previous EU Country for index 0" in {
+
+          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+
+          PreviouslyRegisteredPage.navigate(NormalMode, answers)
+            .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(0)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Start Date" in {
+
+          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+
+          PreviouslyRegisteredPage.navigate(NormalMode, answers)
+            .mustEqual(routes.StartDateController.onPageLoad(NormalMode))
+        }
+      }
+    }
   }
 }

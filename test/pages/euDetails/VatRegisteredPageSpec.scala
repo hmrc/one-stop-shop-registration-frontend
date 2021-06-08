@@ -16,10 +16,12 @@
 
 package pages.euDetails
 
-import models.Index
+import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class VatRegisteredPageSpec extends PageBehaviours {
+class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
@@ -30,5 +32,30 @@ class VatRegisteredPageSpec extends PageBehaviours {
     beSettable[Boolean](VatRegisteredPage(index))
 
     beRemovable[Boolean](VatRegisteredPage(index))
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "to EU VAT Number for the same index" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+
+          VatRegisteredPage(index).navigate(NormalMode, answers)
+            .mustEqual(euRoutes.EuVatNumberController.onPageLoad(NormalMode, index))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Has Fixed Establishment for the same index" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+
+          VatRegisteredPage(index).navigate(NormalMode, answers)
+            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+        }
+      }
+    }
   }
 }

@@ -3,9 +3,8 @@ package controllers
 import base.SpecBase
 import forms.$className$FormProvider
 import models.{NormalMode, $className$, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.$className$Page
 import play.api.inject.bind
@@ -20,22 +19,13 @@ import scala.concurrent.Future
 
 class $className$ControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new $className$FormProvider()
+  private val form = formProvider()
 
-  val formProvider = new $className$FormProvider()
-  val form = formProvider()
+  private lazy val $className;format="decap"$Route = routes.$className$Controller.onPageLoad(NormalMode).url
+  private val $className;format="decap"$ = $className$("value 1", "value 2")
 
-  lazy val $className;format="decap"$Route = routes.$className$Controller.onPageLoad(NormalMode).url
-
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      $className$Page.toString -> Json.obj(
-        "$field1Name$" -> "value 1",
-        "$field2Name$" -> "value 2"
-      )
-    )
-  )
+  val userAnswers = emptyUserAnswers.set($className$Page, $className;format="decap"$)
 
   "$className$ Controller" - {
 
@@ -71,7 +61,7 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -79,10 +69,7 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -91,9 +78,11 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("$field1Name$", "value 1"), ("$field2Name$", "value 2"))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set($className$Page, £className;format="decap"$).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual $className$Page.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

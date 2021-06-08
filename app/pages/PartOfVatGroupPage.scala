@@ -16,11 +16,19 @@
 
 package pages
 
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object PartOfVatGroupPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "partOfVatGroup"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.vatInfo match {
+    case Some(vatInfo) if vatInfo.registrationDate.isDefined => UkVatEffectiveDatePage.navigate(NormalMode, answers)
+    case _                                                   => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
+  }
 }

@@ -16,10 +16,12 @@
 
 package pages
 
-import models.BankDetails
+import base.SpecBase
+import controllers.routes
+import models.{BankDetails, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class BankDetailsPageSpec extends PageBehaviours {
+class BankDetailsPageSpec extends SpecBase with PageBehaviours {
 
   "BankDetailsPage" - {
 
@@ -28,5 +30,14 @@ class BankDetailsPageSpec extends PageBehaviours {
     beSettable[BankDetails](BankDetailsPage)
 
     beRemovable[BankDetails](BankDetailsPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Check Your Answers" in {
+
+        BankDetailsPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+    }
   }
 }

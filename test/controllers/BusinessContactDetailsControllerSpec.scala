@@ -18,15 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.BusinessContactDetailsFormProvider
-import models.{NormalMode, BusinessContactDetails, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.{BusinessContactDetails, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BusinessContactDetailsPage
 import play.api.inject.bind
-import play.api.libs.json.Json
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,23 +33,13 @@ import scala.concurrent.Future
 
 class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new BusinessContactDetailsFormProvider()
+  private val form = formProvider()
 
-  val formProvider = new BusinessContactDetailsFormProvider()
-  val form = formProvider()
+  private lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
 
-  lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
-
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      BusinessContactDetailsPage.toString -> Json.obj(
-        "fullName" -> "value 1",
-        "telephoneNumber" -> "0111 2223334",
-        "emailAddress" -> "email@email.com"
-      )
-    )
-  )
+  private val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
+  private val userAnswers = emptyUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
   "BusinessContactDetails Controller" - {
 
@@ -84,11 +71,11 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BusinessContactDetails("value 1", "0111 2223334", "email@email.com")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(contactDetails), NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -97,7 +84,6 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -105,12 +91,14 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, businessContactDetailsRoute)
-            .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@email.com"))
+            .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual BusinessContactDetailsPage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

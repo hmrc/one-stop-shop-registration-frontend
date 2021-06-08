@@ -16,12 +16,23 @@
 
 package pages.previousRegistrations
 
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "previouslyRegistered"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(PreviouslyRegisteredPage) match {
+      case Some(true)  => prevRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(0))
+      case Some(false) => routes.StartDateController.onPageLoad(NormalMode)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

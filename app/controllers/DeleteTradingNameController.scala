@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.DeleteTradingNameFormProvider
 import models.requests.DataRequest
 import models.{Index, Mode}
-import navigation.Navigator
 import pages.{DeleteTradingNamePage, TradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class DeleteTradingNameController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: DeleteTradingNameFormProvider,
                                          view: DeleteTradingNameView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -63,9 +61,9 @@ class DeleteTradingNameController @Inject()(
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.remove(TradingNamePage(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeleteTradingNamePage(index), mode, updatedAnswers))
+                } yield Redirect(DeleteTradingNamePage(index).navigate(mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(navigator.nextPage(DeleteTradingNamePage(index), mode, request.userAnswers)))
+                Future.successful(Redirect(DeleteTradingNamePage(index).navigate(mode, request.userAnswers)))
               }
           )
       }

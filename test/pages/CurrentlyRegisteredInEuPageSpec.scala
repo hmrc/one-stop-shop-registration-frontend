@@ -16,10 +16,13 @@
 
 package pages
 
-import models.{Country, UserAnswers}
+import base.SpecBase
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
+import models.{Country, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 
-class CurrentlyRegisteredInEuPageSpec extends PageBehaviours {
+class CurrentlyRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
   "CurrentlyRegisteredInEuPage" - {
 
@@ -28,6 +31,25 @@ class CurrentlyRegisteredInEuPageSpec extends PageBehaviours {
     beSettable[Boolean](CurrentlyRegisteredInEuPage)
 
     beRemovable[Boolean](CurrentlyRegisteredInEuPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Current Country of Registration when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, true).success.value
+
+        CurrentlyRegisteredInEuPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CurrentCountryOfRegistrationController.onPageLoad(NormalMode))
+      }
+
+      "to Previously Registered when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, false).success.value
+
+        CurrentlyRegisteredInEuPage.navigate(NormalMode, answers)
+          .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+      }
+    }
 
     "must remove Current Country of Registration if the answer is no" in {
 

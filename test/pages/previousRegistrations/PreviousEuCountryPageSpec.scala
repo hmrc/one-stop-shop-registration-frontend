@@ -16,10 +16,12 @@
 
 package pages.previousRegistrations
 
-import models.{Country, Index}
+import base.SpecBase
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class PreviousEuCountryPageSpec extends PageBehaviours {
+class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
@@ -30,5 +32,14 @@ class PreviousEuCountryPageSpec extends PageBehaviours {
     beSettable[Country](PreviousEuCountryPage(index))
 
     beRemovable[Country](PreviousEuCountryPage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Previous EU VAT Number for the same index" in {
+
+        PreviousEuCountryPage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index))
+      }
+    }
   }
 }

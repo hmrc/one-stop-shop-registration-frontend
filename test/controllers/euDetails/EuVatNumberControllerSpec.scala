@@ -19,13 +19,11 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.EuVatNumberFormProvider
 import models.{Country, Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuVatNumberPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,7 +34,6 @@ import scala.concurrent.Future
 class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private val onwardRoute = Call("GET", "/foo")
 
   private val country = Country.euCountries.head
   private val formProvider = new EuVatNumberFormProvider()
@@ -82,7 +79,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -90,10 +87,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -102,9 +96,11 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "FR1234567"))
 
         val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), "FR1234567").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

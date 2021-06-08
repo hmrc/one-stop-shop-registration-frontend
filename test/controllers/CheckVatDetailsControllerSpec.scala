@@ -17,29 +17,22 @@
 package controllers
 
 import base.SpecBase
-import connectors.RegistrationConnector
 import forms.CheckVatDetailsFormProvider
-import models.{CheckVatDetails, NormalMode, StartDate, StartDateOption, UserAnswers, responses}
-import navigation.{FakeNavigator, Navigator}
+import models.{CheckVatDetails, NormalMode, StartDateOption}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
-import org.mockito.Mockito.{never, times, verify, when}
-import org.scalatest.BeforeAndAfterEach
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CheckVatDetailsPage, StartDatePage}
+import pages.CheckVatDetailsPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import viewmodels.CheckVatDetailsViewModel
-import views.html.{CheckVatDetailsView, CheckVatNumberView, StartDateView}
+import views.html.CheckVatDetailsView
 
 import scala.concurrent.Future
 
 class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new CheckVatDetailsFormProvider()
   private val form = formProvider()
@@ -93,7 +86,6 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -104,9 +96,11 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", CheckVatDetails.Yes.toString))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual CheckVatDetailsPage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

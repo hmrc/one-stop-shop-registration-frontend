@@ -18,9 +18,8 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.VatRegisteredFormProvider
-import models.{Country, Index, Mode}
 import models.requests.DataRequest
-import navigation.Navigator
+import models.{Country, Index, Mode}
 import pages.euDetails.{EuCountryPage, VatRegisteredPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class VatRegisteredController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: VatRegisteredFormProvider,
                                          view: VatRegisteredView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -71,7 +69,7 @@ class VatRegisteredController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredPage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(VatRegisteredPage(index), mode, updatedAnswers))
+              } yield Redirect(VatRegisteredPage(index).navigate(mode, updatedAnswers))
           )
       }
   }

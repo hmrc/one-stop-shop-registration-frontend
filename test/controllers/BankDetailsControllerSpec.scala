@@ -18,15 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
-import models.{BankDetails, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.{BankDetails, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BankDetailsPage
 import play.api.inject.bind
-import play.api.libs.json.Json
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,23 +33,13 @@ import scala.concurrent.Future
 
 class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val onwardRoute = Call("GET", "/foo")
-
   private val formProvider = new BankDetailsFormProvider()
   private val form = formProvider()
 
   private lazy val bankDetailsRoute = routes.BankDetailsController.onPageLoad(NormalMode).url
 
-  private val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      BankDetailsPage.toString -> Json.obj(
-        "accountName" -> "value 1",
-        "bic"         -> "12345678",
-        "iban"        -> "GB123456789"
-      )
-    )
-  )
+  private val bankDetails = BankDetails("account name", Some("12345678"), "GB123456789")
+  private val userAnswers = emptyUserAnswers.set(BankDetailsPage, bankDetails).success.value
 
   "BankDetails Controller" - {
 
@@ -84,7 +71,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BankDetails("value 1", Some("12345678"), "GB123456789")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(bankDetails), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -97,7 +84,6 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -105,12 +91,14 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "value 1"), ("bic", "12354678"), ("iban", "GB123456789"))
+            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", "12345678"), ("iban", "GB123456789"))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(BankDetailsPage, bankDetails).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual BankDetailsPage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -155,7 +143,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "value 1"), ("bic", "12345678"), ("iban", "GB123456789"))
+            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", "12345678"), ("iban", "GB123456789"))
 
         val result = route(application, request).value
 

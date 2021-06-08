@@ -20,23 +20,20 @@ import base.SpecBase
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.{Country, Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations._
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.PreviousRegistrationQuery
 import repositories.SessionRepository
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
 import scala.concurrent.Future
 
 class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new DeletePreviousRegistrationFormProvider()
   private val form = formProvider()
@@ -77,10 +74,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -89,10 +83,13 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
+        val expectedAnswers =
+          baseUserAnswers
+            .remove(PreviousRegistrationQuery(index)).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository, times(1)).set(any())
+        redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -105,10 +102,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -119,7 +113,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index).navigate(NormalMode, baseUserAnswers).url
         verify(mockSessionRepository, never()).set(any())
       }
     }

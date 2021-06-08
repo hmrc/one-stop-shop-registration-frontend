@@ -16,7 +16,17 @@
 
 package pages.euDetails
 
-import models.Index
+import controllers.euDetails.{routes => euRoutes}
+import models.{Index, NormalMode, UserAnswers}
 import pages.Page
+import play.api.mvc.Call
+import queries.DeriveNumberOfEuRegistrations
 
-case class DeleteEuDetailsPage(index: Index) extends Page
+case class DeleteEuDetailsPage(index: Index) extends Page {
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfEuRegistrations) match {
+      case Some(n) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
+      case _                => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
+    }
+}

@@ -16,8 +16,11 @@
 
 package pages
 
-import models.UserAnswers
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 import scala.util.Try
 
@@ -26,6 +29,13 @@ case object CurrentlyRegisteredInEuPage extends QuestionPage[Boolean] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "currentlyRegisteredInEu"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(CurrentlyRegisteredInEuPage) match {
+      case Some(true)  => routes.CurrentCountryOfRegistrationController.onPageLoad(NormalMode)
+      case Some(false) => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if (value.contains(false)) {

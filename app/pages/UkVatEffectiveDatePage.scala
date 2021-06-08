@@ -16,13 +16,23 @@
 
 package pages
 
-import java.time.LocalDate
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 
+import java.time.LocalDate
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object UkVatEffectiveDatePage extends QuestionPage[LocalDate] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "ukVatEffectiveDate"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    if(answers.vatInfo.isDefined) {
+      routes.HasTradingNameController.onPageLoad(NormalMode)
+    } else {
+      routes.BusinessAddressInUkController.onPageLoad(NormalMode)
+    }
 }

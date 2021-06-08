@@ -16,6 +16,16 @@
 
 package pages
 
-import models.Index
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
+import play.api.mvc.Call
+import queries.DeriveNumberOfWebsites
 
-case class DeleteWebsitePage(index: Index) extends Page
+case class DeleteWebsitePage(index: Index) extends Page {
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfWebsites) match {
+      case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(NormalMode)
+      case _                => routes.HasWebsiteController.onPageLoad(NormalMode)
+    }
+}

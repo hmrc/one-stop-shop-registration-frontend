@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class SellsGoodsFromNiPageSpec extends PageBehaviours {
+class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
 
   "SellsGoodsFromNiPage" - {
 
@@ -27,5 +30,22 @@ class SellsGoodsFromNiPageSpec extends PageBehaviours {
     beSettable[Boolean](SellsGoodsFromNiPage)
 
     beRemovable[Boolean](SellsGoodsFromNiPage)
+
+    "must navigate in Normal Mode" - {
+
+      "to In Control of Moving Goods when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, true).success.value
+        SellsGoodsFromNiPage.navigate(NormalMode, answers)
+          .mustEqual(routes.InControlOfMovingGoodsController.onPageLoad(NormalMode))
+      }
+
+      "to Cannot Register when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
+        SellsGoodsFromNiPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+      }
+    }
   }
 }

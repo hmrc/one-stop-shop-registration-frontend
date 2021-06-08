@@ -16,11 +16,13 @@
 
 package pages
 
-import models.Index
+import base.SpecBase
+import controllers.routes
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 
-class TradingNamePageSpec extends PageBehaviours {
+class TradingNamePageSpec extends SpecBase with PageBehaviours {
 
   val index: Index = Index(0)
 
@@ -31,5 +33,14 @@ class TradingNamePageSpec extends PageBehaviours {
     beSettable[String](TradingNamePage(index))
 
     beRemovable[String](TradingNamePage(index))
+
+    "must navigate in Normal mode" - {
+
+      "to Add Trading Name" in {
+
+        TradingNamePage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustBe(routes.AddTradingNameController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

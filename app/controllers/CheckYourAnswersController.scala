@@ -22,7 +22,6 @@ import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.NormalMode
 import models.responses.ConflictFound
-import navigation.Navigator
 import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -42,7 +41,6 @@ class CheckYourAnswersController @Inject()(
   cc: AuthenticatedControllerComponents,
   registrationConnector: RegistrationConnector,
   registrationService: RegistrationService,
-  navigator: Navigator,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
@@ -81,7 +79,7 @@ class CheckYourAnswersController @Inject()(
         case Some(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
-              successful(Redirect(navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers)))
+              successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
 
             case Left(ConflictFound) =>
               successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))

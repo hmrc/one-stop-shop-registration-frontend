@@ -19,15 +19,13 @@ package controllers
 import base.SpecBase
 import forms.CurrentlyRegisteredInCountryFormProvider
 import models.{Country, Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
 import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,8 +34,6 @@ import views.html.CurrentlyRegisteredInCountryView
 import scala.concurrent.Future
 
 class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private val country      = arbitrary[Country].sample.value
   private val formProvider = new CurrentlyRegisteredInCountryFormProvider()
@@ -99,7 +95,6 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
@@ -110,16 +105,14 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
               .withFormUrlEncodedBody(("value", "true"))
 
           val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
-
-          val expectedSavedData =
+          val expectedAnswers =
             baseAnswers
               .set(CurrentlyRegisteredInCountryPage, true).success.value
               .set(CurrentCountryOfRegistrationPage, country).success.value
 
-          verify(mockSessionRepository, times(1)).set(eqTo(expectedSavedData))
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual CurrentlyRegisteredInCountryPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
     }
@@ -135,7 +128,6 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
@@ -146,15 +138,11 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
               .withFormUrlEncodedBody(("value", "false"))
 
           val result = route(application, request).value
+          val expectedAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, false).success.value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
-
-          val expectedSavedData =
-            baseAnswers
-              .set(CurrentlyRegisteredInCountryPage, false).success.value
-
-          verify(mockSessionRepository, times(1)).set(eqTo(expectedSavedData))
+          redirectLocation(result).value mustEqual CurrentlyRegisteredInCountryPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
     }

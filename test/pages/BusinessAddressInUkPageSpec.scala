@@ -16,9 +16,12 @@
 
 package pages
 
+import base.SpecBase
+import controllers.routes
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class BusinessAddressInUkPageSpec extends PageBehaviours {
+class BusinessAddressInUkPageSpec extends SpecBase with PageBehaviours {
 
   "BusinessAddressInUkPage" - {
 
@@ -27,5 +30,22 @@ class BusinessAddressInUkPageSpec extends PageBehaviours {
     beSettable[Boolean](BusinessAddressInUkPage)
 
     beRemovable[Boolean](BusinessAddressInUkPage)
+
+    "must navigate in Normal mode" - {
+
+      "to UK address when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(BusinessAddressInUkPage, true).success.value
+        BusinessAddressInUkPage.navigate(NormalMode, answers)
+          .mustEqual(routes.UkAddressController.onPageLoad(NormalMode))
+      }
+
+      "to International address when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(BusinessAddressInUkPage, false).success.value
+        BusinessAddressInUkPage.navigate(NormalMode, answers)
+          .mustEqual(routes.InternationalAddressController.onPageLoad(NormalMode))
+      }
+    }
   }
 }

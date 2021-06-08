@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package navigation
+package pages.euDetails
 
+import controllers.euDetails.{routes => euRoutes}
+import models.{NormalMode, UserAnswers}
+import pages.Page
 import play.api.mvc.Call
-import pages._
-import models.{Mode, UserAnswers}
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+case object CheckEuDetailsAnswersPage extends Page {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
-    desiredRoute
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
 }

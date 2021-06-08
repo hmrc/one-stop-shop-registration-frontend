@@ -19,25 +19,20 @@ package controllers
 import controllers.actions._
 import formats.Format.dateFormatter
 import forms.StartDateFormProvider
-
-import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.StartDatePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.StartDateView
 
-import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class StartDateController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       navigator: Navigator,
                                        formProvider: StartDateFormProvider,
                                        view: StartDateView,
                                        startDateService: StartDateService
@@ -72,7 +67,7 @@ class StartDateController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(StartDatePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(StartDatePage, mode, updatedAnswers))
+          } yield Redirect(StartDatePage.navigate(mode, updatedAnswers))
       )
   }
 }

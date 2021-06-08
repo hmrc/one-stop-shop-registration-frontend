@@ -16,12 +16,17 @@
 
 package pages
 
-import models.Index
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class WebsitePage(index: Index) extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ "websites" \ index.position
 
   override def toString: String = "website"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.AddWebsiteController.onPageLoad(NormalMode)
 }

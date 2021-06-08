@@ -17,12 +17,9 @@
 package controllers.euDetails
 
 import controllers.actions._
-import controllers.routes
 import forms.euDetails.FixedEstablishmentTradingNameFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
-import navigation.Navigator
-import pages.euDetails.FixedEstablishmentTradingNamePage
 import pages.euDetails.{EuCountryPage, FixedEstablishmentTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class FixedEstablishmentTradingNameController @Inject()(
                                                          override val messagesApi: MessagesApi,
                                                          cc: AuthenticatedControllerComponents,
-                                                         navigator: Navigator,
                                                          formProvider: FixedEstablishmentTradingNameFormProvider,
                                                          view: FixedEstablishmentTradingNameView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -72,7 +68,7 @@ class FixedEstablishmentTradingNameController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(FixedEstablishmentTradingNamePage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(FixedEstablishmentTradingNamePage(index), mode, updatedAnswers))
+              } yield Redirect(FixedEstablishmentTradingNamePage(index).navigate(mode, updatedAnswers))
           )
       }
   }

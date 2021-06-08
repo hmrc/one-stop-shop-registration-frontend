@@ -19,7 +19,6 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.PreviouslyRegisteredFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class PreviouslyRegisteredController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: PreviouslyRegisteredFormProvider,
                                          view: PreviouslyRegisteredView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class PreviouslyRegisteredController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviouslyRegisteredPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PreviouslyRegisteredPage, mode, updatedAnswers))
+          } yield Redirect(PreviouslyRegisteredPage.navigate(mode, updatedAnswers))
       )
   }
 }

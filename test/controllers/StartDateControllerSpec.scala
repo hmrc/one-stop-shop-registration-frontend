@@ -20,25 +20,20 @@ import base.SpecBase
 import formats.Format.dateFormatter
 import forms.StartDateFormProvider
 import models.{NormalMode, StartDate, StartDateOption, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.StartDatePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import services.StartDateService
 import views.html.StartDateView
 
-import java.time.Clock
 import scala.concurrent.Future
 
 class StartDateControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private lazy val startDateRoute = routes.StartDateController.onPageLoad(NormalMode).url
 
@@ -85,7 +80,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -93,10 +88,7 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -104,10 +96,16 @@ class StartDateControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, startDateRoute)
             .withFormUrlEncodedBody(("choice", StartDateOption.NextPeriod.toString))
 
+        val startDateService = application.injector.instanceOf[StartDateService]
+        val nextPeriodDate = startDateService.startOfNextPeriod
+
         val result = route(application, request).value
+        val expectedStartDate = StartDate(StartDateOption.NextPeriod, nextPeriodDate)
+        val expectedAnswers = emptyUserAnswers.set(StartDatePage, expectedStartDate).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual StartDatePage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

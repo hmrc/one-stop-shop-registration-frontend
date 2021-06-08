@@ -18,14 +18,12 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.VatRegisteredFormProvider
-import models.{Country, Index, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.{Country, Index, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, VatRegisteredPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,7 +34,6 @@ import scala.concurrent.Future
 class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private val onwardRoute = Call("GET", "/foo")
 
   private val country = Country.euCountries.head
   private val formProvider = new VatRegisteredFormProvider()
@@ -90,10 +87,7 @@ class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -102,9 +96,11 @@ class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.set(VatRegisteredPage(index), true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual VatRegisteredPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
