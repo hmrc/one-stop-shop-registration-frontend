@@ -19,7 +19,6 @@ package controllers.euDetails
 import controllers.actions._
 import forms.euDetails.TaxRegisteredInEuFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

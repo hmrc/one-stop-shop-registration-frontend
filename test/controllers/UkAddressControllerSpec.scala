@@ -18,15 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.UkAddressFormProvider
-import models.{NormalMode, UkAddress, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.{NormalMode, UkAddress}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.UkAddressPage
 import play.api.inject.bind
-import play.api.libs.json.Json
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -74,7 +71,7 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(UkAddress("value 1", Some("value 2"), "value 3", Some("value 4"), "AA11 1AA")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(address), NormalMode)(request, messages(application)).toString
       }
     }
 

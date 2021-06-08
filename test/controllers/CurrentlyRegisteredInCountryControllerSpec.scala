@@ -19,15 +19,13 @@ package controllers
 import base.SpecBase
 import forms.CurrentlyRegisteredInCountryFormProvider
 import models.{Country, Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
 import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
