@@ -19,13 +19,11 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.FixedEstablishmentTradingNameFormProvider
 import models.{Country, Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, FixedEstablishmentTradingNamePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -35,14 +33,12 @@ import scala.concurrent.Future
 
 class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
-
   private val country = Country.euCountries.head
-  val formProvider = new FixedEstablishmentTradingNameFormProvider()
-  val form = formProvider(country)
+  private val formProvider = new FixedEstablishmentTradingNameFormProvider()
+  private val form = formProvider(country)
   private val index = Index(0)
 
-  lazy val fixedEstablishmentTradingNameRoute = routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index).url
+  private lazy val fixedEstablishmentTradingNameRoute = routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index).url
 
   private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
 
@@ -82,7 +78,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -90,10 +86,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -102,9 +95,11 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.set(FixedEstablishmentTradingNamePage(index), "answer").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual FixedEstablishmentTradingNamePage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

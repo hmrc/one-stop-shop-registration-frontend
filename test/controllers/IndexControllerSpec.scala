@@ -18,15 +18,14 @@ package controllers
 
 import base.SpecBase
 import connectors.RegistrationConnector
-import models.{UserAnswers, responses}
-import navigation.{FakeNavigator, Navigator}
+import models.{NormalMode, UserAnswers, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
+import pages.FirstAuthedPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -35,8 +34,6 @@ import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  private val onwardRoute = Call("GET", "/foo")
-
   private val mockConnector  = mock[RegistrationConnector]
   private val mockRepository = mock[SessionRepository]
 
@@ -44,8 +41,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
     applicationBuilder(answers)
       .overrides(
         bind[RegistrationConnector].toInstance(mockConnector),
-        bind[SessionRepository].toInstance(mockRepository),
-        bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+        bind[SessionRepository].toInstance(mockRepository)
       )
 
   override def beforeEach(): Unit = {
@@ -60,15 +56,12 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
         val application = appBuilder(Some(emptyUserAnswers)).build()
 
-        when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-        when(mockRepository.set(any())) thenReturn Future.successful(true)
-
         running(application) {
           val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
+          redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
           verify(mockConnector, never()).getVatCustomerInfo()(any())
           verify(mockRepository, never()).set(any())
         }
@@ -92,7 +85,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual onwardRoute.url
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo).url
             verify(mockRepository, times(1)).set(eqTo(emptyUserAnswersWithVatInfo))
           }
         }
@@ -113,7 +106,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual onwardRoute.url
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
             verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
           }
         }

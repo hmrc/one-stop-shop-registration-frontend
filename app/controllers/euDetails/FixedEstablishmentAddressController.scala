@@ -17,12 +17,9 @@
 package controllers.euDetails
 
 import controllers.actions._
-import controllers.routes
 import forms.euDetails.FixedEstablishmentAddressFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
-import navigation.Navigator
-import pages.euDetails.FixedEstablishmentAddressPage
 import pages.euDetails.{EuCountryPage, FixedEstablishmentAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class FixedEstablishmentAddressController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       cc: AuthenticatedControllerComponents,
-                                      navigator: Navigator,
                                       formProvider: FixedEstablishmentAddressFormProvider,
                                       view: FixedEstablishmentAddressView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -70,7 +66,7 @@ class FixedEstablishmentAddressController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(FixedEstablishmentAddressPage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(FixedEstablishmentAddressPage(index), mode, updatedAnswers))
+              } yield Redirect(FixedEstablishmentAddressPage(index).navigate(mode, updatedAnswers))
           )
 
       }

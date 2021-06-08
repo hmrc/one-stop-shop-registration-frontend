@@ -16,40 +16,36 @@
 
 package controllers
 
-import java.time.{LocalDate, ZoneOffset}
-
 import base.SpecBase
 import forms.UkVatEffectiveDateFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.UkVatEffectiveDatePage
 import play.api.inject.bind
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import views.html.UkVatEffectiveDateView
 
+import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
 class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new UkVatEffectiveDateFormProvider()
-  private def form = formProvider()
+  private val formProvider = new UkVatEffectiveDateFormProvider()
+  private val form = formProvider()
 
-  def onwardRoute = Call("GET", "/foo")
+  private val validAnswer = LocalDate.now(ZoneOffset.UTC)
 
-  val validAnswer = LocalDate.now(ZoneOffset.UTC)
+  private lazy val ukVatEffectiveDateRoute = routes.UkVatEffectiveDateController.onPageLoad(NormalMode).url
 
-  lazy val ukVatEffectiveDateRoute = routes.UkVatEffectiveDateController.onPageLoad(NormalMode).url
-
-  def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
+  private def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, ukVatEffectiveDateRoute)
 
-  def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
+  private def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, ukVatEffectiveDateRoute)
       .withFormUrlEncodedBody(
         "value.day"   -> validAnswer.getDayOfMonth.toString,
@@ -89,7 +85,7 @@ class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -97,17 +93,16 @@ class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val result = route(application, postRequest).value
+        val expectedAnswers = emptyUserAnswers.set(UkVatEffectiveDatePage, validAnswer).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual UkVatEffectiveDatePage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

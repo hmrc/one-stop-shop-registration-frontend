@@ -18,15 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.InternationalAddressFormProvider
-import models.{Country, InternationalAddress, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.{Country, InternationalAddress, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.InternationalAddressPage
 import play.api.inject.bind
-import play.api.libs.json.Json
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,27 +33,13 @@ import scala.concurrent.Future
 
 class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  private def onwardRoute = Call("GET", "/foo")
-
   private val formProvider = new InternationalAddressFormProvider()
   private val form = formProvider()
 
   private lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
 
-  private val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      InternationalAddressPage.toString -> Json.obj(
-        "line1" -> "line 1",
-        "line2" -> "line 2",
-        "townOrCity" -> "town",
-        "country" -> Json.obj(
-          "code" -> "FR",
-          "name" -> "France"
-        )
-      )
-    )
-  )
+  private val address = InternationalAddress("line 1", Some("line 2"), "town", None, None, Country("FR", "France"))
+  private val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
 
@@ -88,7 +71,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(InternationalAddress("line 1", Some("line 2"), "town", None, None, Country("FR", "France"))), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(address), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -101,7 +84,6 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -109,12 +91,13 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, internationalAddressRoute)
-            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "town"), ("country", "FR"))
+            .withFormUrlEncodedBody(("line1", "line 1"), ("line2", "line 2"), ("townOrCity", "town"), ("country", "FR"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual InternationalAddressPage.navigate(NormalMode, userAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(userAnswers))
       }
     }
 
@@ -159,7 +142,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, internationalAddressRoute)
-            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"), ("townOrCity", "town"), ("country", "FR"))
+            .withFormUrlEncodedBody(("line1", "line 1"), ("line2", "line 2"), ("townOrCity", "town"), ("country", "FR"))
 
         val result = route(application, request).value
 

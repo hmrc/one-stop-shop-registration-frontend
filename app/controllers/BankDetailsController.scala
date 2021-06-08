@@ -18,21 +18,19 @@ package controllers
 
 import controllers.actions._
 import forms.BankDetailsFormProvider
-import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.BankDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BankDetailsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       cc: AuthenticatedControllerComponents,
-                                      navigator: Navigator,
                                       formProvider: BankDetailsFormProvider,
                                       view: BankDetailsView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class BankDetailsController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BankDetailsPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BankDetailsPage, mode, updatedAnswers))
+          } yield Redirect(BankDetailsPage.navigate(mode, updatedAnswers))
       )
   }
 }

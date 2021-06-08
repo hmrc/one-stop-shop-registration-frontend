@@ -20,8 +20,8 @@ import base.SpecBase
 import forms.WebsiteFormProvider
 import models.{Index, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Gen
 import org.scalatestplus.mockito.MockitoSugar
 import pages.WebsitePage
@@ -37,7 +37,6 @@ import scala.concurrent.Future
 class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new WebsiteFormProvider()
   private val form = formProvider(index, Seq.empty)
@@ -88,21 +87,20 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, websiteRoute)
-            .withFormUrlEncodedBody(("value", "www.whatever.com"))
+            .withFormUrlEncodedBody(("value", "www.example.com"))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(WebsitePage(index), "www.example.com").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual WebsitePage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

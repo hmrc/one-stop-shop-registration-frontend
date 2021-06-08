@@ -20,7 +20,6 @@ import config.Constants
 import controllers.actions._
 import forms.WebsiteFormProvider
 import models.{Index, Mode}
-import navigation.Navigator
 import pages.WebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class WebsiteController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: WebsiteFormProvider,
                                         view: WebsiteView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -69,7 +67,7 @@ class WebsiteController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(WebsitePage(index), value))
               _              <- cc.sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(WebsitePage(index), mode, updatedAnswers))
+            } yield Redirect(WebsitePage(index).navigate(mode, updatedAnswers))
         )
     }
 }

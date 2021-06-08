@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.previousRegistrations.PreviousEuVatNumberFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
-import navigation.Navigator
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class PreviousEuVatNumberController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: PreviousEuVatNumberFormProvider,
                                         view: PreviousEuVatNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -71,7 +69,7 @@ class PreviousEuVatNumberController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuVatNumberPage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(PreviousEuVatNumberPage(index), mode, updatedAnswers))
+              } yield Redirect(PreviousEuVatNumberPage(index).navigate(mode, updatedAnswers))
           )
       }
 

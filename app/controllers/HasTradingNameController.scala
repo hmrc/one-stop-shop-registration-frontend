@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.HasTradingNameFormProvider
 import models.Mode
 import models.requests.DataRequest
-import navigation.Navigator
 import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class HasTradingNameController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: HasTradingNameFormProvider,
                                          view: HasTradingNameView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -71,7 +69,7 @@ class HasTradingNameController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(HasTradingNamePage, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(HasTradingNamePage, mode, updatedAnswers))
+              } yield Redirect(HasTradingNamePage.navigate(mode, updatedAnswers))
         )
       }
   }

@@ -21,11 +21,10 @@ import forms.RegisteredCompanyNameFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.RegisteredCompanyNamePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -35,12 +34,10 @@ import scala.concurrent.Future
 
 class RegisteredCompanyNameControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider = new RegisteredCompanyNameFormProvider()
+  private val form = formProvider()
 
-  val formProvider = new RegisteredCompanyNameFormProvider()
-  val form = formProvider()
-
-  lazy val registeredCompanyNameRoute = routes.RegisteredCompanyNameController.onPageLoad(NormalMode).url
+  private lazy val registeredCompanyNameRoute = routes.RegisteredCompanyNameController.onPageLoad(NormalMode).url
 
   "RegisteredCompanyName Controller" - {
 
@@ -86,10 +83,7 @@ class RegisteredCompanyNameControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -98,9 +92,11 @@ class RegisteredCompanyNameControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(RegisteredCompanyNamePage, "answer").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual RegisteredCompanyNamePage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(expectedAnswers)
       }
     }
 
@@ -131,8 +127,6 @@ class RegisteredCompanyNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, registeredCompanyNameRoute)
 
-        val view = application.injector.instanceOf[RegisteredCompanyNameView]
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -142,17 +136,7 @@ class RegisteredCompanyNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

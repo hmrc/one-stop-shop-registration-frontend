@@ -18,21 +18,19 @@ package controllers
 
 import controllers.actions._
 import forms.BusinessAddressInUkFormProvider
-import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.BusinessAddressInUkPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BusinessAddressInUkView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessAddressInUkController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: BusinessAddressInUkFormProvider,
                                          view: BusinessAddressInUkView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class BusinessAddressInUkController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessAddressInUkPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BusinessAddressInUkPage, mode, updatedAnswers))
+          } yield Redirect(BusinessAddressInUkPage.navigate(mode, updatedAnswers))
       )
   }
 }

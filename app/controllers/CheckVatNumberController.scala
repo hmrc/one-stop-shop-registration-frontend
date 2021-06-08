@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.CheckVatNumberFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.CheckVatNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class CheckVatNumberController @Inject()(
                                           override val messagesApi: MessagesApi,
                                           cc: AuthenticatedControllerComponents,
-                                          navigator: Navigator,
                                           formProvider: CheckVatNumberFormProvider,
                                           view: CheckVatNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class CheckVatNumberController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckVatNumberPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CheckVatNumberPage, mode, updatedAnswers))
+          } yield Redirect(CheckVatNumberPage.navigate(mode, updatedAnswers))
       )
   }
 }

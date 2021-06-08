@@ -33,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class EuCountryController @Inject()(
                                      override val messagesApi: MessagesApi,
                                      cc: AuthenticatedControllerComponents,
-                                     navigator: Navigator,
                                      formProvider: EuCountryFormProvider,
                                      view: EuCountryView
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -66,7 +65,7 @@ class EuCountryController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(EuCountryPage(index), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(EuCountryPage(index), mode, updatedAnswers))
+          } yield Redirect(EuCountryPage(index).navigate(mode, updatedAnswers))
       )
   }
 }

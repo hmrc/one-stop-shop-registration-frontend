@@ -18,22 +18,19 @@ package controllers
 
 import controllers.actions._
 import forms.SellsGoodsFromNiFormProvider
-import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.SellsGoodsFromNiPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SellsGoodsFromNiView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SellsGoodsFromNiController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: SellsGoodsFromNiFormProvider,
                                          view: SellsGoodsFromNiView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -63,7 +60,7 @@ class SellsGoodsFromNiController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SellsGoodsFromNiPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SellsGoodsFromNiPage, mode, updatedAnswers))
+          } yield Redirect(SellsGoodsFromNiPage.navigate(mode, updatedAnswers))
       )
   }
 }

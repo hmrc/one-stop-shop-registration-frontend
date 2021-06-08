@@ -19,13 +19,11 @@ package controllers
 import base.SpecBase
 import forms.DeleteWebsiteFormProvider
 import models.{Index, NormalMode}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.WebsitePage
+import pages.{DeleteWebsitePage, WebsitePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -34,8 +32,6 @@ import views.html.DeleteWebsiteView
 import scala.concurrent.Future
 
 class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new DeleteWebsiteFormProvider()
   private val form = formProvider()
@@ -73,7 +69,6 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -84,10 +79,11 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.remove(WebsitePage(index)).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository, times(1)).set(any())
+        redirectLocation(result).value mustEqual DeleteWebsitePage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -101,7 +97,6 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -114,8 +109,8 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockSessionRepository, never()).set(any())
+        redirectLocation(result).value mustEqual DeleteWebsitePage(index).navigate(NormalMode, baseUserAnswers).url
+        verify(mockSessionRepository, never()).set(eqTo(baseUserAnswers))
       }
     }
 

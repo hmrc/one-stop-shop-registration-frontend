@@ -20,6 +20,7 @@ import controllers.actions.AuthenticatedControllerComponents
 import models.requests.DataRequest
 import models.{Country, Index, NormalMode}
 import pages.euDetails
+import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -59,7 +60,7 @@ class CheckEuDetailsAnswersController @Inject()(
 
   def onSubmit(index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Redirect(routes.AddEuDetailsController.onPageLoad(NormalMode))
+      Redirect(CheckEuDetailsAnswersPage.navigate(NormalMode, request.userAnswers))
   }
 
   private def getCountry(index: Index)

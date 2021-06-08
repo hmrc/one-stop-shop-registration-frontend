@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.UkAddressFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.UkAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class UkAddressController @Inject()(
                                      override val messagesApi: MessagesApi,
                                      cc: AuthenticatedControllerComponents,
-                                     navigator: Navigator,
                                      formProvider: UkAddressFormProvider,
                                      view: UkAddressView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class UkAddressController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UkAddressPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(UkAddressPage, mode, updatedAnswers))
+          } yield Redirect(UkAddressPage.navigate(mode, updatedAnswers))
       )
   }
 }

@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.PartOfVatGroupFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.PartOfVatGroupPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class PartOfVatGroupController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: PartOfVatGroupFormProvider,
                                          view: PartOfVatGroupView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +60,7 @@ class PartOfVatGroupController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PartOfVatGroupPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PartOfVatGroupPage, mode, updatedAnswers))
+          } yield Redirect(PartOfVatGroupPage.navigate(mode, updatedAnswers))
       )
   }
 }

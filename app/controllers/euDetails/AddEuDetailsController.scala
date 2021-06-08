@@ -18,9 +18,8 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.AddEuDetailsFormProvider
-import models.{Country, Mode}
 import models.requests.DataRequest
-import navigation.Navigator
+import models.{Country, Mode}
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +34,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddEuDetailsController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: AddEuDetailsFormProvider,
                                         view: AddEuDetailsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -67,7 +65,7 @@ class AddEuDetailsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuDetailsPage, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AddEuDetailsPage, mode, updatedAnswers))
+              } yield Redirect(AddEuDetailsPage.navigate(mode, updatedAnswers))
           )
       }
   }

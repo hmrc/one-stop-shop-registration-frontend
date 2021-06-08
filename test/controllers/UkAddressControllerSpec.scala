@@ -20,8 +20,8 @@ import base.SpecBase
 import forms.UkAddressFormProvider
 import models.{NormalMode, UkAddress, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.UkAddressPage
 import play.api.inject.bind
@@ -36,29 +36,13 @@ import scala.concurrent.Future
 
 class UkAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  private def onwardRoute = Call("GET", "/foo")
-
   private val formProvider = new UkAddressFormProvider()
   private val form = formProvider()
 
   private lazy val ukAddressRoute = routes.UkAddressController.onPageLoad(NormalMode).url
 
-  private val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      UkAddressPage.toString -> Json.obj(
-        "line1"      -> "value 1",
-        "line2"      -> "value 2",
-        "townOrCity" -> "value 3",
-        "county"     -> "value 4",
-        "postCode"   -> "AA11 1AA",
-        "country"    -> Json.obj(
-          "code" -> "GB",
-          "name" -> "UnitedKingdom"
-        )
-      )
-    )
-  )
+  private val address = UkAddress("value 1", Some("value 2"), "value 3", Some("value 4"), "AA11 1AA")
+  private val userAnswers = emptyUserAnswers.set(UkAddressPage, address).success.value
 
   "UkAddress Controller" - {
 
@@ -102,10 +86,7 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -116,7 +97,8 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual UkAddressPage.navigate(NormalMode, userAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(userAnswers))
       }
     }
 

@@ -19,13 +19,12 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.EuCountryFormProvider
 import models.{Country, Index, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
+import pages.euDetails.EuCountryPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -36,7 +35,6 @@ import scala.concurrent.Future
 class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private val onwardRoute = Call("GET", "/foo")
 
   private val formProvider = new EuCountryFormProvider()
   private val form = formProvider(index, Seq.empty)
@@ -81,7 +79,7 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -89,10 +87,7 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -101,9 +96,11 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", country.code))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual EuCountryPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

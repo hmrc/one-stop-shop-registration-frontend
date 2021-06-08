@@ -32,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxRegisteredInEuController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: TaxRegisteredInEuFormProvider,
                                          view: TaxRegisteredInEuView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +61,7 @@ class TaxRegisteredInEuController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(TaxRegisteredInEuPage, mode, updatedAnswers))
+          } yield Redirect(TaxRegisteredInEuPage.navigate(mode, updatedAnswers))
       )
   }
 }

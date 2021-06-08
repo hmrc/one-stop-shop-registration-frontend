@@ -21,7 +21,6 @@ import controllers.actions._
 import forms.AddWebsiteFormProvider
 import models.Mode
 import models.requests.DataRequest
-import navigation.Navigator
 import pages.AddWebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -36,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddWebsiteController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       cc: AuthenticatedControllerComponents,
-                                      navigator: Navigator,
                                       formProvider: AddWebsiteFormProvider,
                                       view: AddWebsiteView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -69,7 +67,7 @@ class AddWebsiteController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddWebsitePage, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AddWebsitePage, mode, updatedAnswers))
+              } yield Redirect(AddWebsitePage.navigate(mode, updatedAnswers))
           )
       }
   }

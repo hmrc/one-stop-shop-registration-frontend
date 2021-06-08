@@ -37,8 +37,6 @@ import scala.concurrent.Future
 
 class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSugar {
 
-  private def onwardRoute = Call("GET", "/foo")
-
   private val country      = arbitrary[Country].sample.value
   private val formProvider = new CurrentlyRegisteredInCountryFormProvider()
   private val form         = formProvider(country)
@@ -99,7 +97,6 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
@@ -110,16 +107,14 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
               .withFormUrlEncodedBody(("value", "true"))
 
           val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
-
-          val expectedSavedData =
+          val expectedAnswers =
             baseAnswers
               .set(CurrentlyRegisteredInCountryPage, true).success.value
               .set(CurrentCountryOfRegistrationPage, country).success.value
 
-          verify(mockSessionRepository, times(1)).set(eqTo(expectedSavedData))
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual CurrentlyRegisteredInCountryPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
     }
@@ -135,7 +130,6 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
               bind[SessionRepository].toInstance(mockSessionRepository)
             )
             .build()
@@ -146,15 +140,11 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
               .withFormUrlEncodedBody(("value", "false"))
 
           val result = route(application, request).value
+          val expectedAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, false).success.value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
-
-          val expectedSavedData =
-            baseAnswers
-              .set(CurrentlyRegisteredInCountryPage, false).success.value
-
-          verify(mockSessionRepository, times(1)).set(eqTo(expectedSavedData))
+          redirectLocation(result).value mustEqual CurrentlyRegisteredInCountryPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
     }

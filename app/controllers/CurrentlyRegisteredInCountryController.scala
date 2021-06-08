@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.CurrentlyRegisteredInCountryFormProvider
 import models.requests.DataRequest
 import models.{Country, Mode, UserAnswers}
-import navigation.Navigator
 import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -34,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class CurrentlyRegisteredInCountryController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: CurrentlyRegisteredInCountryFormProvider,
                                          view: CurrentlyRegisteredInCountryView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -71,7 +69,7 @@ class CurrentlyRegisteredInCountryController @Inject()(
               for {
                 updatedAnswers <- updateUserAnswers(request.userAnswers, value, country)
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(CurrentlyRegisteredInCountryPage, mode, updatedAnswers))
+              } yield Redirect(CurrentlyRegisteredInCountryPage.navigate(mode, updatedAnswers))
           )
       }
   }

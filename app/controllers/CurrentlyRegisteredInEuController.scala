@@ -18,22 +18,19 @@ package controllers
 
 import controllers.actions._
 import forms.CurrentlyRegisteredInEuFormProvider
-import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.CurrentlyRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CurrentlyRegisteredInEuView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CurrentlyRegisteredInEuController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: CurrentlyRegisteredInEuFormProvider,
                                          view: CurrentlyRegisteredInEuView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -63,7 +60,7 @@ class CurrentlyRegisteredInEuController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(CurrentlyRegisteredInEuPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CurrentlyRegisteredInEuPage, mode, updatedAnswers))
+          } yield Redirect(CurrentlyRegisteredInEuPage.navigate(mode, updatedAnswers))
       )
   }
 }

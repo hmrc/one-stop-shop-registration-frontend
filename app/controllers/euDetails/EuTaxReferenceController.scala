@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.euDetails.EuTaxReferenceFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
-import navigation.Navigator
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class EuTaxReferenceController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: EuTaxReferenceFormProvider,
                                         view: EuTaxReferenceView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -71,7 +69,7 @@ class EuTaxReferenceController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(EuTaxReferencePage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(EuTaxReferencePage(index), mode, updatedAnswers))
+              } yield Redirect(EuTaxReferencePage(index).navigate(mode, updatedAnswers))
           )
       }
   }

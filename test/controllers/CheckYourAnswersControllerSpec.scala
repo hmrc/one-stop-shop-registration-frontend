@@ -18,11 +18,14 @@ package controllers
 
 import base.SpecBase
 import connectors.RegistrationConnector
+import models.NormalMode
 import models.responses.ConflictFound
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.MockitoSugar.{mock, when}
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import pages.CheckYourAnswersPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
@@ -33,7 +36,7 @@ import views.html.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with BeforeAndAfterEach {
+class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
   private val registration = RegistrationData.registration
 
@@ -66,7 +69,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-        "user should be redirected to Application Complete page" in {
+        "user should be redirected to the next page" in {
 
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
@@ -82,7 +85,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.ApplicationCompleteController.onPageLoad().url
+            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, emptyUserAnswers).url
           }
         }
       }

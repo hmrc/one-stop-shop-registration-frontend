@@ -17,12 +17,9 @@
 package controllers.euDetails
 
 import controllers.actions._
-import controllers.routes
 import forms.euDetails.HasFixedEstablishmentFormProvider
 import models.requests.DataRequest
 import models.{Country, Index, Mode}
-import navigation.Navigator
-import pages.euDetails.HasFixedEstablishmentPage
 import pages.euDetails.{EuCountryPage, HasFixedEstablishmentPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -35,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class HasFixedEstablishmentController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         navigator: Navigator,
                                          formProvider: HasFixedEstablishmentFormProvider,
                                          view: HasFixedEstablishmentView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -72,7 +68,7 @@ class HasFixedEstablishmentController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(HasFixedEstablishmentPage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(HasFixedEstablishmentPage(index), mode, updatedAnswers))
+              } yield Redirect(HasFixedEstablishmentPage(index).navigate(mode, updatedAnswers))
           )
       }
   }

@@ -32,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class UkVatEffectiveDateController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
-                                        navigator: Navigator,
                                         formProvider: UkVatEffectiveDateFormProvider,
                                         view: UkVatEffectiveDateView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -62,7 +61,7 @@ class UkVatEffectiveDateController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UkVatEffectiveDatePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(UkVatEffectiveDatePage, mode, updatedAnswers))
+          } yield Redirect(UkVatEffectiveDatePage.navigate(mode, updatedAnswers))
       )
   }
 }
