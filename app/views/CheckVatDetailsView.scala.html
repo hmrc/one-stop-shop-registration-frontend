@@ -8,11 +8,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("checkVatDetails.title"))) {
 
-    @formHelper(action = routes.CheckVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.CheckVatDetailsController.onSubmit(), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

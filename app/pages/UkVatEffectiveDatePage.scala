@@ -18,10 +18,10 @@ package pages
 
 import controllers.routes
 import models.{NormalMode, UserAnswers}
-
-import java.time.LocalDate
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+
+import java.time.LocalDate
 
 case object UkVatEffectiveDatePage extends QuestionPage[LocalDate] {
 
@@ -35,4 +35,7 @@ case object UkVatEffectiveDatePage extends QuestionPage[LocalDate] {
     } else {
       routes.BusinessAddressInUkController.onPageLoad(NormalMode)
     }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

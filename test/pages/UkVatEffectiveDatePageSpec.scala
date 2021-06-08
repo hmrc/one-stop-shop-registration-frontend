@@ -18,11 +18,11 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
-
-import java.time.LocalDate
+import models.{CheckMode, NormalMode}
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
+
+import java.time.LocalDate
 
 class UkVatEffectiveDatePageSpec extends SpecBase with PageBehaviours {
 
@@ -50,6 +50,15 @@ class UkVatEffectiveDatePageSpec extends SpecBase with PageBehaviours {
 
         UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.BusinessAddressInUkController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        UkVatEffectiveDatePage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

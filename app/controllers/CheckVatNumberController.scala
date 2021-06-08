@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.CheckVatNumberFormProvider
-import models.Mode
+import models.NormalMode
 import pages.CheckVatNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -38,7 +38,7 @@ class CheckVatNumberController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(CheckVatNumberPage) match {
@@ -46,21 +46,21 @@ class CheckVatNumberController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.vrn))
+      Ok(view(preparedForm, request.vrn))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.vrn))),
+          Future.successful(BadRequest(view(formWithErrors, request.vrn))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckVatNumberPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(CheckVatNumberPage.navigate(mode, updatedAnswers))
+          } yield Redirect(CheckVatNumberPage.navigate(NormalMode, updatedAnswers))
       )
   }
 }

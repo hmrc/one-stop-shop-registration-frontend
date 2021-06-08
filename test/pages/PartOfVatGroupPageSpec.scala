@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PartOfVatGroupPageSpec extends SpecBase with PageBehaviours {
@@ -61,6 +61,15 @@ class PartOfVatGroupPageSpec extends SpecBase with PageBehaviours {
           PartOfVatGroupPage.navigate(NormalMode, emptyUserAnswers)
             .mustBe(routes.UkVatEffectiveDateController.onPageLoad(NormalMode))
         }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        PartOfVatGroupPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

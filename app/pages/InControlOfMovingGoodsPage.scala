@@ -28,9 +28,15 @@ case object InControlOfMovingGoodsPage extends QuestionPage[Boolean] {
   override def toString: String = "inControlOfMovingGoods"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = (answers.get(InControlOfMovingGoodsPage), answers.vatInfo) match {
-    case (Some(true), Some(_)) => routes.CheckVatDetailsController.onPageLoad(NormalMode)
-    case (Some(true), None)    => routes.CheckVatNumberController.onPageLoad(NormalMode)
+    case (Some(true), Some(_)) => routes.CheckVatDetailsController.onPageLoad()
+    case (Some(true), None)    => routes.CheckVatNumberController.onPageLoad()
     case (Some(false), _)      => routes.CannotRegisterForServiceController.onPageLoad()
     case _                     => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(InControlOfMovingGoodsPage) match {
+    case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
+    case Some(false) => routes.CannotRegisterForServiceController.onPageLoad()
+    case _           => routes.JourneyRecoveryController.onPageLoad()
   }
 }

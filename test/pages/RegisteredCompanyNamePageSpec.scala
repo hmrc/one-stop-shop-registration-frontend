@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 
@@ -62,6 +62,15 @@ class RegisteredCompanyNamePageSpec extends SpecBase with PageBehaviours {
           RegisteredCompanyNamePage.navigate(NormalMode, emptyUserAnswers)
             .mustBe(routes.PartOfVatGroupController.onPageLoad(NormalMode))
         }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        RegisteredCompanyNamePage.navigate(CheckMode, emptyUserAnswers)
+          .mustBe(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

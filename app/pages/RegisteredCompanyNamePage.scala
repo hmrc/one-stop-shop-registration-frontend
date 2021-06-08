@@ -31,4 +31,7 @@ case object RegisteredCompanyNamePage extends QuestionPage[String] {
     case Some(vatInfo) if vatInfo.partOfVatGroup.isDefined => PartOfVatGroupPage.navigate(NormalMode, answers)
     case _                                                 => routes.PartOfVatGroupController.onPageLoad(NormalMode)
   }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

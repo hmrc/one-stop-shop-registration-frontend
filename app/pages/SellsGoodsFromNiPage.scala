@@ -32,4 +32,10 @@ case object SellsGoodsFromNiPage extends QuestionPage[Boolean] {
     case Some(false) => routes.CannotRegisterForServiceController.onPageLoad()
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(SellsGoodsFromNiPage) match {
+    case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
+    case Some(false) => routes.CannotRegisterForServiceController.onPageLoad()
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
 }

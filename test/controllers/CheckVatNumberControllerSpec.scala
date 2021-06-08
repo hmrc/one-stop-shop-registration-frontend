@@ -36,7 +36,7 @@ class CheckVatNumberControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new CheckVatNumberFormProvider()
   private val form = formProvider()
 
-  private lazy val checkVatNumberRoute = routes.CheckVatNumberController.onPageLoad(NormalMode).url
+  private lazy val checkVatNumberRoute = routes.CheckVatNumberController.onPageLoad().url
 
   "CheckVatNumber Controller" - {
 
@@ -52,7 +52,7 @@ class CheckVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CheckVatNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, vrn)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, vrn)(request, messages(application)).toString
       }
     }
 
@@ -70,7 +70,7 @@ class CheckVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, vrn)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), vrn)(request, messages(application)).toString
       }
     }
 
@@ -117,7 +117,7 @@ class CheckVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, vrn)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, vrn)(request, messages(application)).toString
       }
     }
 
