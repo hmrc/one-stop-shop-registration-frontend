@@ -1,11 +1,12 @@
 package pages
 
+import base.SpecBase
 import java.time.LocalDate
 
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
 
-class $className$PageSpec extends PageBehaviours {
+class $className$PageSpec extends SpecBase with PageBehaviours {
 
   "$className$Page" - {
 
