@@ -18,7 +18,7 @@ package pages
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.DeriveNumberOfTradingNames
@@ -35,4 +35,12 @@ case object AddTradingNamePage extends QuestionPage[Boolean] {
       case (Some(false), _)         => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
       case _                        => routes.JourneyRecoveryController.onPageLoad()
     }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
+      case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(CheckMode, Index(size))
+      case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
 }

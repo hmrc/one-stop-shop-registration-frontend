@@ -18,7 +18,7 @@ package pages
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllTradingNames
@@ -36,6 +36,13 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
     case Some(false) => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(true), _)                                           => routes.TradingNameController.onPageLoad(CheckMode, Index(0))
+      case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()
+    }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
