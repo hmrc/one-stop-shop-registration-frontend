@@ -29,4 +29,7 @@ case object StartDatePage extends QuestionPage[StartDate] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     routes.HasWebsiteController.onPageLoad(NormalMode)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }
