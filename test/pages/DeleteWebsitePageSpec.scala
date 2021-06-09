@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{Index, NormalMode}
+import models.{CheckMode, Index, NormalMode}
 
 class DeleteWebsitePageSpec extends SpecBase {
 
@@ -38,6 +38,23 @@ class DeleteWebsitePageSpec extends SpecBase {
 
         DeleteWebsitePage(Index(0)).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Add Website when there are still websites present" in {
+
+        val answers = emptyUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
+
+        DeleteWebsitePage(Index(0)).navigate(CheckMode, answers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
+      }
+
+      "to Has Website when there are no websites present" in {
+
+        DeleteWebsitePage(Index(0)).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(CheckMode))
       }
     }
   }
