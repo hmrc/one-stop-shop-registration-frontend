@@ -18,7 +18,7 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Index, NormalMode}
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
@@ -39,6 +39,15 @@ class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
         PreviousEuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Add Previous Registration" in {
+
+        PreviousEuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
       }
     }
   }

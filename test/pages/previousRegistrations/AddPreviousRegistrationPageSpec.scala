@@ -19,7 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{Country, Index, NormalMode}
+import models.{CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
@@ -58,6 +58,37 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
           PreviouslyRegisteredPage.navigate(NormalMode, answers)
             .mustEqual(routes.StartDateController.onPageLoad(NormalMode))
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "to Previous EU Country with index equal to the number of countries already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+              .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousEuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+              .set(PreviousEuVatNumberPage(Index(1)), "ES123").success.value
+              .set(AddPreviousRegistrationPage, true).success.value
+
+          AddPreviousRegistrationPage.navigate(CheckMode, answers)
+            .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(AddPreviousRegistrationPage, false).success.value
+
+          AddPreviousRegistrationPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }
     }

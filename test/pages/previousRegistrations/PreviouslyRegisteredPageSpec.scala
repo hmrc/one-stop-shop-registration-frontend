@@ -19,7 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{Index, NormalMode}
+import models.{CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -55,6 +55,75 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.StartDateController.onPageLoad(NormalMode))
         }
       }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "and there are already some previous registrations in the user's answers" - {
+
+          "to Check Your Answers" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(PreviouslyRegisteredPage, true).success.value
+                .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+                .set(PreviousEuVatNumberPage(Index(0)), "123").success.value
+
+            PreviouslyRegisteredPage.navigate(CheckMode, answers)
+              .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+          }
+        }
+
+        "and there are no previous registrations in the user's answers" - {
+
+          "to Previous EU Country with index 0" in {
+
+            val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+
+            PreviouslyRegisteredPage.navigate(CheckMode, answers)
+              .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(0)))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+
+          PreviouslyRegisteredPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+    }
+
+    "must remove all previous registrations when the answer is no" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+          .set(PreviousEuVatNumberPage(Index(0)), "123").success.value
+
+      val result = answers.set(PreviouslyRegisteredPage, false).success.value
+
+      result.get(PreviousEuCountryPage(Index(0))) must not be defined
+      result.get(PreviousEuVatNumberPage(Index(0))) must not be defined
+    }
+
+    "must leave all previous registrations in place when the answer is yes" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+          .set(PreviousEuVatNumberPage(Index(0)), "123").success.value
+
+      val result = answers.set(PreviouslyRegisteredPage, true).success.value
+
+      result.get(PreviousEuCountryPage(Index(0))).value mustEqual Country("FR", "France")
+      result.get(PreviousEuVatNumberPage(Index(0))).value mustEqual "123"
     }
   }
 }
