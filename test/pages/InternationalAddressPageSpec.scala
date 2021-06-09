@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{InternationalAddress, NormalMode}
+import models.{CheckMode, InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class InternationalAddressPageSpec extends SpecBase with PageBehaviours {
@@ -37,6 +37,15 @@ class InternationalAddressPageSpec extends SpecBase with PageBehaviours {
 
         InternationalAddressPage.navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        InternationalAddressPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }
