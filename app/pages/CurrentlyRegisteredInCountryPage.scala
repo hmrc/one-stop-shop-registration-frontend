@@ -17,6 +17,7 @@
 package pages
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
 import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -29,4 +30,7 @@ case object CurrentlyRegisteredInCountryPage extends QuestionPage[Boolean] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

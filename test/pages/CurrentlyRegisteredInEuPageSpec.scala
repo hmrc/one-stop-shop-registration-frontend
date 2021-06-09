@@ -19,7 +19,7 @@ package pages
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{Country, NormalMode, UserAnswers}
+import models.{CheckMode, Country, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class CurrentlyRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
@@ -48,6 +48,42 @@ class CurrentlyRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
         CurrentlyRegisteredInEuPage.navigate(NormalMode, answers)
           .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "to Current Country of Registration when that question has not been answered" in {
+
+          val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, true).success.value
+
+          CurrentlyRegisteredInEuPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CurrentCountryOfRegistrationController.onPageLoad(CheckMode))
+        }
+
+        "to Check Your Answers when that question has already been answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(CurrentlyRegisteredInEuPage, true).success.value
+              .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
+
+          CurrentlyRegisteredInEuPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(CurrentlyRegisteredInEuPage, false).success.value
+
+          CurrentlyRegisteredInEuPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
       }
     }
 
