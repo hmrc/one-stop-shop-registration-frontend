@@ -47,7 +47,9 @@ class AddEuDetailsController @Inject()(
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          Future.successful(Ok(view(form, mode, EuDetailsSummary.addToListRows(request.userAnswers), canAddCountries)))
+          val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+
+          Future.successful(Ok(view(form, mode, list, canAddCountries)))
       }
   }
 
@@ -57,10 +59,11 @@ class AddEuDetailsController @Inject()(
         number =>
           val canAddCountries = number < Country.euCountries.size
           form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(
-                BadRequest(view(formWithErrors, mode, EuDetailsSummary.addToListRows(request.userAnswers), canAddCountries))
-              ),
+            formWithErrors => {
+              val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+
+              Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
+            },
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuDetailsPage, value))

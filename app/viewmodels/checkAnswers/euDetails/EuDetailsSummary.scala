@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuDetailsQuery
@@ -29,15 +29,23 @@ import viewmodels.implicits._
 
 object EuDetailsSummary {
 
-  def addToListRows(answers: UserAnswers): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, currentMode: Mode): Seq[ListItem] = {
+
+    val changeLinkMode = currentMode match {
+      case NormalMode    => CheckLoopMode
+      case CheckMode     => CheckMode
+      case CheckLoopMode => CheckLoopMode  // TODO: Is this / should this be possible?
+    }
+
     answers.get(AllEuDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.euCountry.name).toString,
-          changeUrl = routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(index)).url,
-          removeUrl = routes.DeleteEuDetailsController.onPageLoad(NormalMode, Index(index)).url
+          changeUrl = routes.CheckEuDetailsAnswersController.onPageLoad(changeLinkMode, Index(index)).url,
+          removeUrl = routes.DeleteEuDetailsController.onPageLoad(currentMode, Index(index)).url
         )
     }
+  }
 
   def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllEuDetailsQuery).map {
