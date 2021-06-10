@@ -19,11 +19,11 @@ package pages.euDetails
 import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import queries.AllEuDetailsQuery
+import queries.EuDetailsTopLevelNode
 
 import scala.util.Try
 
@@ -33,14 +33,6 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
   override def toString: String = "taxRegisteredInEu"
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
-    if (value contains(false)) {
-      userAnswers.remove(AllEuDetailsQuery)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
-  }
-
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(TaxRegisteredInEuPage) match {
       case Some(true)  => euRoutes.EuCountryController.onPageLoad(NormalMode, Index(0))
@@ -48,4 +40,28 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    answers.get(TaxRegisteredInEuPage) match {
+      case Some(true) =>
+        if(answers.get(EuCountryPage(Index(0))).isDefined) {
+          routes.CheckYourAnswersController.onPageLoad()
+        } else {
+          euRoutes.EuCountryController.onPageLoad(CheckMode, Index(0))
+        }
+
+      case Some(false) =>
+        routes.CheckYourAnswersController.onPageLoad()
+
+      case None =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
+    if (value contains false) {
+      userAnswers.remove(EuDetailsTopLevelNode)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+  }
 }

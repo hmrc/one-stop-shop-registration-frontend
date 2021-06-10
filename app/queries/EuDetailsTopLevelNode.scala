@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package queries
 
-import play.api.mvc.JavascriptLiteral
+import play.api.libs.json.{JsObject, JsPath}
 
-sealed trait Mode
+case object EuDetailsTopLevelNode extends Settable[JsObject] {
 
-case object CheckMode extends Mode
-case object NormalMode extends Mode
-case object CheckLoopMode extends Mode
-
-object Mode {
-
-  implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
-    override def to(value: Mode): String = value match {
-      case NormalMode    => "NormalMode"
-      case CheckMode     => "CheckMode"
-      case CheckLoopMode => "CheckLoopMode"
-    }
-  }
+  override def path: JsPath = AllEuDetailsQuery.path
 }

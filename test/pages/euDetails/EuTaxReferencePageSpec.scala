@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
@@ -39,6 +39,52 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
         EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when Fixed Establishment Trading Name has not been answered" - {
+
+        "to Fixed Establishment Trading Name" in {
+
+          EuTaxReferencePage(index).navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index))
+        }
+      }
+
+      "when Fixed Establishment Trading Name has been answered" - {
+
+        "to wherever Fixed Establishment Trading Name would navigate to" in {
+
+          val answers = emptyUserAnswers.set(FixedEstablishmentTradingNamePage(index), "foo").success.value
+
+          EuTaxReferencePage(index).navigate(CheckMode, answers)
+            .mustEqual(FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers))
+        }
+      }
+    }
+
+    "must navigate in Check Loop mode" - {
+
+      "when Fixed Establishment Trading Name has not been answered" - {
+
+        "to Fixed Establishment Trading Name" in {
+
+          EuTaxReferencePage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index))
+        }
+      }
+
+      "when Fixed Establishment Trading Name has been answered" - {
+
+        "to wherever Fixed Establishment Trading Name would navigate to" in {
+
+          val answers = emptyUserAnswers.set(FixedEstablishmentTradingNamePage(index), "foo").success.value
+
+          EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
+            .mustEqual(FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers))
+        }
       }
     }
   }

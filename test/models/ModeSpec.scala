@@ -16,21 +16,32 @@
 
 package models
 
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import play.api.mvc.JavascriptLiteral
 
-sealed trait Mode
+class ModeSpec extends AnyFreeSpec with Matchers {
 
-case object CheckMode extends Mode
-case object NormalMode extends Mode
-case object CheckLoopMode extends Mode
+  "Mode" - {
 
-object Mode {
+    val literal = implicitly[JavascriptLiteral[Mode]]
 
-  implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
-    override def to(value: Mode): String = value match {
-      case NormalMode    => "NormalMode"
-      case CheckMode     => "CheckMode"
-      case CheckLoopMode => "CheckLoopMode"
+    "must convert as a JsLiteral" - {
+
+      "from NormalMode" in {
+
+        literal.to(NormalMode) mustEqual "NormalMode"
+      }
+
+      "from CheckMode" in {
+
+        literal.to(CheckMode) mustEqual "CheckMode"
+      }
+
+      "from CheckLoopMode" in {
+
+        literal.to(CheckLoopMode) mustEqual "CheckLoopMode"
+      }
     }
   }
 }

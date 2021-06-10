@@ -18,8 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import controllers.routes
-import models.{Country, Index, NormalMode}
+import models.{CheckMode, Country, Index, NormalMode}
 
 class DeleteEuDetailsPageSpec extends SpecBase {
 
@@ -42,6 +41,26 @@ class DeleteEuDetailsPageSpec extends SpecBase {
 
         DeleteEuDetailsPage(Index(0)).navigate(NormalMode, answers)
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Tax Registered in EU when there are no countries left in the user's answers" in {
+
+        DeleteEuDetailsPage(Index(0)).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(CheckMode))
+      }
+
+      "to Add EU Details when we still have countries in the user's answers" in {
+
+        val answers =
+          emptyUserAnswers
+            .set(pages.euDetails.EuCountryPage(Index(0)), Country("FR", "France")).success.value
+            .set(pages.euDetails.EuVatNumberPage(Index(0)), "VAT Number").success.value
+
+        DeleteEuDetailsPage(Index(0)).navigate(CheckMode, answers)
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(CheckMode))
       }
     }
   }

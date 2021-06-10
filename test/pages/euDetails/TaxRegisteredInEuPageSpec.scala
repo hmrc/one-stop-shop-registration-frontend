@@ -19,7 +19,8 @@ package pages.euDetails
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Country, Index, NormalMode, UserAnswers}
+import controllers.routes
+import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -54,6 +55,50 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
           TaxRegisteredInEuPage.navigate(NormalMode, answers)
             .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "and country details have already been given" - {
+
+          "to Check Your Answers" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(TaxRegisteredInEuPage, true).success.value
+                .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+                .set(VatRegisteredPage(Index(0)), false).success.value
+                .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+
+            TaxRegisteredInEuPage.navigate(CheckMode, answers)
+              .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+          }
+        }
+
+        "and no country details have already been given" - {
+
+          "to EU Country (index 0)" in {
+
+            val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+            TaxRegisteredInEuPage.navigate(CheckMode, answers)
+              .mustEqual(euRoutes.EuCountryController.onPageLoad(CheckMode, Index(0)))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
+
+          TaxRegisteredInEuPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }
     }

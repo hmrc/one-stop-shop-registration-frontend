@@ -19,7 +19,7 @@ package pages.euDetails
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.FixedEstablishmentAddress
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
@@ -78,6 +78,166 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
               .set(HasFixedEstablishmentPage(index), false).success.value
 
           HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "and the user answered that they are VAT registered in this country" - {
+
+          "and have not entered their Fixed Establishment Trading Name" - {
+
+            "to Fixed Establishment Trading Name" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), true).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+                .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index))
+            }
+          }
+
+          "and have already entered their Fixed Establishment Trading Name" - {
+
+            "to wherever Fixed Establishment Trading Name would navigate to" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), true).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+                  .set(FixedEstablishmentTradingNamePage(index), "foo").success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+                .mustEqual(FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers))
+            }
+          }
+        }
+
+        "and the user answered that they are not VAT registered in this country" - {
+
+          "and have not entered their EU Tax Reference" - {
+
+            "to EU Tax Reference" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), false).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+                .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(CheckMode, index))
+            }
+          }
+
+          "and have already entered EU Tax Reference" - {
+
+            "to wherever EU Tax Reference would navigate to" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), false).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+                  .set(EuTaxReferencePage(index), "123").success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+                .mustEqual(EuTaxReferencePage(index).navigate(CheckMode, answers))
+            }
+          }
+        }
+      }
+
+      "when the user answers no" - {
+
+        "to Check EU Details" in {
+
+          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
+          HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+        }
+      }
+    }
+
+    "must navigate in Check Loop mode" - {
+
+      "when the answer is yes" - {
+
+        "and the user answered that they are VAT registered in this country" - {
+
+          "and have not entered their Fixed Establishment Trading Name" - {
+
+            "to Fixed Establishment Trading Name" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), true).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+                .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index))
+            }
+          }
+
+          "and have already entered their Fixed Establishment Trading Name" - {
+
+            "to wherever Fixed Establishment Trading Name would navigate to" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), true).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+                  .set(FixedEstablishmentTradingNamePage(index), "foo").success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+                .mustEqual(FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers))
+            }
+          }
+        }
+
+        "and the user answered that they are not VAT registered in this country" - {
+
+          "and have not entered their EU Tax Reference" - {
+
+            "to EU Tax Reference" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), false).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+                .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index))
+            }
+          }
+
+          "and have already entered EU Tax Reference" - {
+
+            "to wherever EU Tax Reference would navigate to" in {
+
+              val answers =
+                emptyUserAnswers
+                  .set(VatRegisteredPage(index), false).success.value
+                  .set(HasFixedEstablishmentPage(index), true).success.value
+                  .set(EuTaxReferencePage(index), "123").success.value
+
+              HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+                .mustEqual(EuTaxReferencePage(index).navigate(CheckLoopMode, answers))
+            }
+          }
+        }
+      }
+
+      "when the user answers no" - {
+
+        "to Check EU Details" in {
+
+          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
+          HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
             .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
         }
       }
