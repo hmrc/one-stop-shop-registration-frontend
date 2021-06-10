@@ -25,7 +25,7 @@ import play.api.mvc.Call
 
 case class FixedEstablishmentAddressPage(index: Index) extends QuestionPage[FixedEstablishmentAddress] {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "fixedEstablishmentAddress"
 

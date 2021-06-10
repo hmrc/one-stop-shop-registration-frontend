@@ -131,10 +131,11 @@ class RegistrationServiceSpec extends SpecBase {
 
       val expectedRegistration =
         RegistrationData.registration copy (
-          tradingNames     = Seq.empty,
-          euRegistrations  = Seq.empty,
-          vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered),
-          websites         = Seq.empty
+          tradingNames                 = Seq.empty,
+          euRegistrations              = Seq.empty,
+          vatDetails                   = RegistrationData.registration.vatDetails copy (source = UserEntered),
+          websites                     = Seq.empty,
+          currentCountryOfRegistration = None
         )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)

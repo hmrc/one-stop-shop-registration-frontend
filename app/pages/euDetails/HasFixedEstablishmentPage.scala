@@ -27,7 +27,7 @@ import scala.util.Try
 
 case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "hasFixedEstablishment"
 

@@ -20,7 +20,7 @@ import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
-import pages.QuestionPage
+import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage, QuestionPage}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.EuDetailsTopLevelNode
@@ -59,7 +59,11 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
     if (value contains false) {
-      userAnswers.remove(EuDetailsTopLevelNode)
+      userAnswers
+        .remove(EuDetailsTopLevelNode)
+        .flatMap(_.remove(CurrentlyRegisteredInEuPage))
+        .flatMap(_.remove(CurrentlyRegisteredInCountryPage))
+        .flatMap(_.remove(CurrentCountryOfRegistrationPage))
     } else {
       super.cleanup(value, userAnswers)
     }

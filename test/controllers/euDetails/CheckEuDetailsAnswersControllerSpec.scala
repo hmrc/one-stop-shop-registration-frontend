@@ -18,20 +18,34 @@ package controllers.euDetails
 
 import base.SpecBase
 import models.{Country, Index, NormalMode}
-import pages.euDetails
-import pages.euDetails.CheckEuDetailsAnswersPage
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito
+import org.mockito.Mockito.{times, verify, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import pages.{CurrentlyRegisteredInCountryPage, euDetails}
+import pages.euDetails.{CheckEuDetailsAnswersPage, EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.SessionRepository
 import viewmodels.checkAnswers.euDetails.EuCountrySummary
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
+import play.api.inject.bind
 
-class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluency {
+import scala.concurrent.Future
 
-  private val index           = Index(0)
-  private val country         = Country.euCountries.head
-  private val baseUserAnswers = emptyUserAnswers.set(euDetails.EuCountryPage(index), country).success.value
+class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
+
+  private val index                 = Index(0)
+  private val country               = Country.euCountries.head
+  private val baseUserAnswers       = emptyUserAnswers.set(euDetails.EuCountryPage(index), country).success.value
+  private val mockSessionRepository = mock[SessionRepository]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockSessionRepository)
+  }
 
   "CheckEuVatDetailsAnswersController" - {
 
@@ -53,17 +67,60 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       }
     }
 
-    "must redirect to the next page on a POST" in {
+    "on a POST" - {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      "must redirect to the next page" in {
 
-      running(application) {
-        val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index).url)
-        val result = route(application, request).value
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, emptyUserAnswers).url
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, emptyUserAnswers).url
+        }
       }
+
     }
+      "when there are two or more VAT registered countries in the user's answers" - {
+
+        "must remove the answer to Currently Registered in Country" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+              .set(VatRegisteredPage(Index(0)), true).success.value
+              .set(EuVatNumberPage(Index(0)), "123").success.value
+              .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+              .set(EuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+              .set(VatRegisteredPage(Index(1)), true).success.value
+              .set(EuVatNumberPage(Index(1)), "123").success.value
+              .set(HasFixedEstablishmentPage(Index(1)), false).success.value
+              .set(CurrentlyRegisteredInCountryPage, true).success.value
+
+          val application =
+            applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+              .build()
+
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index).url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            val expectedAnswers = answers.remove(CurrentlyRegisteredInCountryPage).success.value
+
+            verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+          }
+        }
+      }
   }
 }
