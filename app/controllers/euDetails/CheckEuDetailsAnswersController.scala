@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import controllers.actions.AuthenticatedControllerComponents
 import models.requests.DataRequest
-import models.{Country, Index, NormalMode}
+import models.{Country, Index, Mode}
 import pages.euDetails
 import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -39,7 +39,7 @@ class CheckEuDetailsAnswersController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -54,13 +54,13 @@ class CheckEuDetailsAnswersController @Inject()(
             ).flatten
           )
 
-          Future.successful(Ok(view(list, index, country)))
+          Future.successful(Ok(view(list, mode, index, country)))
       }
   }
 
-  def onSubmit(index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Redirect(CheckEuDetailsAnswersPage.navigate(NormalMode, request.userAnswers))
+      Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
   }
 
   private def getCountry(index: Index)

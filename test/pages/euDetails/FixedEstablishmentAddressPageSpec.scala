@@ -37,20 +37,19 @@ class FixedEstablishmentAddressPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Check Eu Details Answers" in {
+      "to Check Eu Details Answers in Normal mode" in {
 
         FixedEstablishmentAddressPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
       }
     }
 
-    // TODO: This page needs a mode adding!!
     "must navigate in Check mode" - {
 
-      "to Check Eu Details Answers" in {
+      "to Check Eu Details Answers in Check mode" in {
 
         FixedEstablishmentAddressPage(index).navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index))
       }
     }
 
@@ -59,7 +58,7 @@ class FixedEstablishmentAddressPageSpec extends SpecBase with PageBehaviours {
       "to Check Eu Details Answers in Normal mode" in {
 
         FixedEstablishmentAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers)
-          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
       }
     }
   }

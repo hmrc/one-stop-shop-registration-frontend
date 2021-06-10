@@ -41,7 +41,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
       running(application) {
         implicit val msgs: Messages = messages(application)
-        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(index).url)
+        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
         val list = SummaryListViewModel(
@@ -49,7 +49,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         )
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(list, NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
@@ -58,7 +58,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(index).url)
+        val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

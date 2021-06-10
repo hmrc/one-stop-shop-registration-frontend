@@ -171,8 +171,10 @@ POST       /changeHasFixedEstablishment/:index/checking-answers                 
 GET        /changeHasFixedEstablishment/:index                  controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST       /changeHasFixedEstablishment/:index                  controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
-GET         /checkEuVatDetails/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(index: Index)
-POST        /checkEuVatDetails/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(index: Index)
+GET         /checkEuVatDetails/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /checkEuVatDetails/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /changeCheckEuVatDetails/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /changeCheckEuVatDetails/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET        /alreadyRegistered                       controllers.AlreadyRegisteredController.onPageLoad()
 

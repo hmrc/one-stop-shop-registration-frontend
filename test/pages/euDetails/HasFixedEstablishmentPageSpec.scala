@@ -71,14 +71,14 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
       "when the user answers no" - {
 
-        "to Check EU Details Answers" in {
+        "to Check EU Details Answers in Normal mode" in {
 
           val answers =
             emptyUserAnswers
               .set(HasFixedEstablishmentPage(index), false).success.value
 
           HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
         }
       }
     }
@@ -154,11 +154,11 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
       "when the user answers no" - {
 
-        "to Check EU Details" in {
+        "to Check EU Details in Check mode" in {
 
           val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
           HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index))
         }
       }
     }
@@ -234,11 +234,11 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
       "when the user answers no" - {
 
-        "to Check EU Details" in {
+        "to Check EU Details in Normal mode" in {
 
           val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
           HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(index))
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
         }
       }
     }

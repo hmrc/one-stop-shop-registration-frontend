@@ -34,7 +34,7 @@ object EuDetailsSummary {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.euCountry.name).toString,
-          changeUrl = routes.CheckEuDetailsAnswersController.onPageLoad(Index(index)).url,
+          changeUrl = routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(index)).url,
           removeUrl = routes.DeleteEuDetailsController.onPageLoad(NormalMode, Index(index)).url
         )
     }

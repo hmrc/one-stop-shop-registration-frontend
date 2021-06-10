@@ -35,7 +35,7 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
     (answers.get(HasFixedEstablishmentPage(index)), answers.get(VatRegisteredPage(index))) match {
       case (Some(true), Some(true))  => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
       case (Some(true), Some(false)) => euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index)
-      case (Some(false), _)          => euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
+      case (Some(false), _)          => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
       case _                         => routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -57,7 +57,7 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
         }
 
       case (Some(false), _) =>
-        euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -81,7 +81,7 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
         }
 
       case (Some(false), _) =>
-        euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
