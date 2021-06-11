@@ -1,0 +1,7 @@
+{
+  "to": ["user@domain.com"],
+  "templateId": "oss_registration_confirmation",
+  "parameters": {
+    "reference": "VRN"
+  }
+}

@@ -17,45 +17,70 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalToJson, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
+import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT, EMAIL_UNSENDABLE}
 import models.emails._
-import org.apache.http.HttpStatus
 import play.api.Application
 import play.api.test.Helpers.running
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.ResourceFiles
-import utils.JsonFormatters._
 
-class EmailConnectorSpec extends SpecBase with WireMockHelper with ResourceFiles {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class EmailConnectorSpec extends SpecBase with WireMockHelper {
+
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+
+  private val request = EmailToSendRequest(
+    to = List("name@example.com"),
+    templateId = "oss_registration_confirmation",
+    parameters = RegistrationConfirmationEmailParameters(
+      "123456789"
+    ))
 
   private def application: Application =
     applicationBuilder()
-      .configure("microservice.services.hmrc-email-renderer.port" -> server.port)
+      .configure("microservice.services.email.port" -> server.port)
       .build()
 
-  private val emailParams = RegistrationConfirmationEmailParameters("VRN")
-  private val email = RegistrationConfirmationEmail(Seq("user@domain.com"), emailParams)
-  private val hmrcEmailRendererUrl = s"/hmrc-email-renderer/templates/${EmailType.REGISTRATION_CONFIRMATION}"
+  "EmailConnector.send" - {
+    "should return EMAIL_ACCEPTED when status >= 200 and < 300" in {
+      running(application) {
 
-  "EmailConnector.generate" - {
+        val connector = application.injector.instanceOf[EmailConnector]
 
-    "should return an email template when called with parameters" in {
+        server.stubFor(
+          post(urlEqualTo("/hmrc/email"))
+            .willReturn(aResponse.withStatus(200))
+        )
+
+        connector.send(request).futureValue mustBe EMAIL_ACCEPTED
+      }
+    }
+
+    "should return EMAIL_UNSENDABLE when status >= 400 and < 500" in {
       running(application) {
         val connector = application.injector.instanceOf[EmailConnector]
 
         server.stubFor(
-          post(urlEqualTo(hmrcEmailRendererUrl))
-            .withRequestBody(equalToJson(fromResource("emails/email_template-request.json")))
-            .willReturn(
-              aResponse()
-                .withBody(fromResource("emails/email_template-response.json"))
-                .withStatus(HttpStatus.SC_OK)
-            )
+          post(urlEqualTo("/hmrc/email"))
+            .willReturn(aResponse.withStatus(400))
         )
 
-        connector.generate(email).futureValue mustBe EmailTemplate("text", "html", "from", "subject", "service")
+        connector.send(request).futureValue mustBe EMAIL_UNSENDABLE
+      }
+    }
+
+    "should return EMAIL_NOT_SENT when status >= 500 and < 600" in {
+      running(application) {
+        val connector = application.injector.instanceOf[EmailConnector]
+
+        server.stubFor(
+          post(urlEqualTo("/hmrc/email"))
+            .willReturn(aResponse.withStatus(500))
+        )
+
+        connector.send(request).futureValue mustBe EMAIL_NOT_SENT
       }
     }
   }

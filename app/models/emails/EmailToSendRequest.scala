@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package utils
+package models.emails
 
-import scala.io.Source
+import play.api.libs.json.{Json, Reads, Writes}
 
-trait ResourceFiles {
+case class EmailToSendRequest(
+   to: List[String],
+   templateId: String,
+   parameters: EmailParameters,
+   force: Boolean = false
+)
 
-  protected def fromResource(path: String): String = {
-    val url = getClass.getClassLoader.getResource(path)
-    Source.fromURL(url, "UTF-8").getLines().mkString
-  }
+object EmailToSendRequest {
+  implicit val reads: Reads[EmailToSendRequest] = Json.reads[EmailToSendRequest]
+  implicit val writes: Writes[EmailToSendRequest] = Json.writes[EmailToSendRequest]
 }

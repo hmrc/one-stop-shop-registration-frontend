@@ -18,39 +18,36 @@ package services
 
 import base.SpecBase
 import connectors.EmailConnector
-import models.emails.{EmailTemplate, RegistrationConfirmationEmail, RegistrationConfirmationEmailParameters}
-import org.mockito.BDDMockito.`given`
+import models.emails.EmailSendingResult.EMAIL_ACCEPTED
+import models.emails.{EmailToSendRequest, RegistrationConfirmationEmailParameters}
 import org.mockito.ArgumentMatchers.{any, refEq}
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future.successful
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class EmailServiceSpec extends SpecBase {
 
   private val connector = mock[EmailConnector]
   private val emailService = new EmailService(connector)
-  private val template = mock[EmailTemplate]
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "EmailService.sendConfirmationEmail" - {
 
-    "should generate the correct email and call connector.generate with correct email and parameters" in {
+    "call sendConfirmationEmail with the correct parameters" in {
       forAll(validVRNs, validEmails) {
         (vatNum: String, validEmail: String) =>
             val emailParams = RegistrationConfirmationEmailParameters(vatNum)
-            val email = RegistrationConfirmationEmail(Seq(validEmail), emailParams)
+            val emailToSendRequest = EmailToSendRequest(List(validEmail), "oss_registration_confirmation", emailParams)
 
-            given(connector.generate(any[RegistrationConfirmationEmail])(any[HeaderCarrier], any[Format[RegistrationConfirmationEmailParameters]]))
-              .willReturn(successful(template))
+            when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
 
-            emailService.sendConfirmationEmail(vatNum, validEmail).futureValue mustBe template
+            emailService.sendConfirmationEmail(vatNum, validEmail).futureValue mustBe EMAIL_ACCEPTED
 
-            verify(connector)
-              .generate(refEq(email))(any[HeaderCarrier], any[Format[RegistrationConfirmationEmailParameters]])
+            verify(connector, times(1)).send(refEq(emailToSendRequest))(any(), any())
       }
     }
   }

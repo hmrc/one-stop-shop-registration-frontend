@@ -18,12 +18,9 @@ package connectors
 
 import com.google.inject.Inject
 import config.Service
-import models.emails.{Email, EmailTemplate}
-import play.api.libs.json.Format
-import utils.Base64Utils
-import uk.gov.hmrc.http.HttpReadsInstances.readFromJson
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import utils.JsonFormatters.emailTemplateFormat
+import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT, EMAIL_UNSENDABLE}
+import models.emails.{EmailSendingResult, EmailToSendRequest}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import play.api.Configuration
 
 import javax.inject.Singleton
@@ -35,18 +32,22 @@ class EmailConnector @Inject()(
   client: HttpClient
 )(implicit ec: ExecutionContext) {
 
-  private val baseUrl = config.get[Service]("microservice.services.hmrc-email-renderer")
+  private val baseUrl = config.get[Service]("microservice.services.email")
+  private val identityReads: HttpReads[HttpResponse] = (_: String, _: String, response: HttpResponse) => response
 
-  def generate[T](e: Email[T])(implicit hc: HeaderCarrier, writes: Format[T]): Future[EmailTemplate] = {
-    val url = s"$baseUrl/templates/${e.templateId}"
-
-    client.POST[Map[String, T], EmailTemplate](url, Map("parameters" -> e.parameters)).map(decodingContent)
-  }
-
-  private def decodingContent: EmailTemplate => EmailTemplate = { t: EmailTemplate =>
-    t.copy(
-      plain = Base64Utils.decode(t.plain),
-      html  = Base64Utils.decode(t.html)
-    )
+  def send(email: EmailToSendRequest)
+          (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[EmailSendingResult] = {
+    client.POST[EmailToSendRequest, HttpResponse](
+      s"${baseUrl}hmrc/email", email
+    )(implicitly, identityReads, implicitly, implicitly).map {
+      case r if r.status >= 200 && r.status < 300 =>
+        EMAIL_ACCEPTED
+      case r if r.status >= 400 && r.status < 500 =>
+        EMAIL_UNSENDABLE
+      case r if r.status >= 500 && r.status < 600 =>
+        EMAIL_NOT_SENT
+      case r =>
+        EMAIL_ACCEPTED
+    }
   }
 }

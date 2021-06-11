@@ -20,4 +20,6 @@ object Constants {
 
   val maxTradingNames: Int = 10
   val maxWebsites: Int = 10
+
+  val registrationConfirmationTemplateId = "oss_registration_confirmation"
 }

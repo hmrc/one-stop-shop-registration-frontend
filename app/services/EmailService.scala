@@ -16,21 +16,25 @@
 
 package services
 
+import config.Constants.registrationConfirmationTemplateId
 import connectors.EmailConnector
-import models.emails.{EmailTemplate, RegistrationConfirmationEmail, RegistrationConfirmationEmailParameters}
+import models.emails.{EmailSendingResult, EmailToSendRequest, RegistrationConfirmationEmailParameters}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.JsonFormatters.emailCompleteParamsFormat
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailService@Inject() (connector: EmailConnector) {
+class EmailService@Inject()(emailConnector: EmailConnector)(implicit executionContext: ExecutionContext) {
 
-  def sendConfirmationEmail(vrn: String, emailAddress: String)(implicit hc: HeaderCarrier): Future[EmailTemplate] = {
-    val emailParams = RegistrationConfirmationEmailParameters(vrn)
-    val email = RegistrationConfirmationEmail(Seq(emailAddress), emailParams)
+  def sendConfirmationEmail(vrn: String, emailAddress: String)
+                           (implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
+    val emailToSendRequest = EmailToSendRequest(
+      List(emailAddress),
+      registrationConfirmationTemplateId,
+      RegistrationConfirmationEmailParameters(vrn)
+    )
 
-    connector.generate(email)
+    emailConnector.send(emailToSendRequest)
   }
 }

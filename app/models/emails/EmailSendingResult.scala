@@ -16,10 +16,10 @@
 
 package models.emails
 
-case class EmailTemplate(
-  plain: String,
-  html: String,
-  fromAddress: String,
-  subject: String,
-  service: String
-)
+sealed trait EmailSendingResult
+
+object EmailSendingResult {
+  case object EMAIL_ACCEPTED extends  EmailSendingResult
+  case object EMAIL_NOT_SENT extends  EmailSendingResult
+  case object EMAIL_UNSENDABLE extends  EmailSendingResult
+}
