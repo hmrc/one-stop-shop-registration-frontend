@@ -41,6 +41,7 @@ case object HasWebsitePage extends QuestionPage[Boolean] {
       case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
       case (Some(true), _)                                           => routes.WebsiteController.onPageLoad(CheckMode, Index(0))
       case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()
+      case _                                                         => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
