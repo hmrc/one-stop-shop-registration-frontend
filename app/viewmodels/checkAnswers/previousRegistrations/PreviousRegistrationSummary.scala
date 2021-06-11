@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllPreviousRegistrationsQuery
@@ -29,13 +29,13 @@ import viewmodels.implicits._
 
 object PreviousRegistrationSummary {
 
-  def addToListRows(answers: UserAnswers): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
     answers.get(AllPreviousRegistrationsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-          changeUrl = routes.PreviousEuCountryController.onPageLoad(NormalMode, Index(index)).url,
-          removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(NormalMode, Index(index)).url
+          changeUrl = routes.PreviousEuCountryController.onPageLoad(mode, Index(index)).url,
+          removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
         )
     }
 

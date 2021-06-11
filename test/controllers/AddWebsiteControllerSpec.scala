@@ -53,7 +53,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers)
+        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -86,7 +86,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(answers)
+        val list                    = WebsiteSummary.addToListRows(answers, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
@@ -104,7 +104,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers)
+        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -153,7 +153,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers)
+        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 

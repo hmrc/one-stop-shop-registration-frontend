@@ -47,7 +47,7 @@ class AddPreviousRegistrationController @Inject()(
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers)
+          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers, mode)
 
           Future.successful(Ok(view(form, mode, previousRegistrations, canAddCountries)))
       }
@@ -59,7 +59,7 @@ class AddPreviousRegistrationController @Inject()(
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers)
+          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers, mode)
 
           form.bindFromRequest().fold(
             formWithErrors =>

@@ -51,7 +51,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
-        val list                    = TradingNameSummary.addToListRows(baseAnswers)
+        val list                    = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -87,7 +87,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form, NormalMode, TradingNameSummary.addToListRows(answers), canAddTradingNames = false)(request, implicitly).toString
+          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false)(request, implicitly).toString
       }
     }
 
@@ -102,7 +102,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
-        val list                    = TradingNameSummary.addToListRows(baseAnswers)
+        val list                    = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -151,7 +151,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
-        val list                    = TradingNameSummary.addToListRows(baseAnswers)
+        val list                    = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
 
 
         val result = route(application, request).value
