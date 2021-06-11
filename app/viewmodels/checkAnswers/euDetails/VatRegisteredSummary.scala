@@ -31,6 +31,7 @@ object VatRegisteredSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
+      case CheckLoopMode => throw new IllegalArgumentException("VatRegisteredSummary.row cannot be rendered in Check Loop Mode")
     }
 
     answers.get(VatRegisteredPage(index)).map {

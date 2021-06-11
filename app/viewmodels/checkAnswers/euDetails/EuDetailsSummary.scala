@@ -34,7 +34,7 @@ object EuDetailsSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
-      case CheckLoopMode => CheckLoopMode  // TODO: Is this / should this be possible?
+      case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }
 
     answers.get(AllEuDetailsQuery).getOrElse(List.empty).zipWithIndex.map {

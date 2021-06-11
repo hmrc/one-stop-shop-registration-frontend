@@ -32,6 +32,7 @@ object FixedEstablishmentTradingNameSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
+      case CheckLoopMode => throw new IllegalArgumentException("FixedEstablishmentTradingName.row cannot be rendered in Check Loop Mode")
     }
 
     answers.get(euDetails.FixedEstablishmentTradingNamePage(index)).map {

@@ -32,6 +32,7 @@ object EuTaxReferenceSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
+      case CheckLoopMode => throw new IllegalArgumentException("EuTaxReferenceSummary.row cannot be rendered in Check Loop Mode")
     }
 
     answers.get(EuTaxReferencePage(index)).map {
