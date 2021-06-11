@@ -8,7 +8,6 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "0.64.0-play-28",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping"  % "1.9.0-play-28",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"     % "5.3.0",
-    "uk.gov.hmrc"       %% "play-json-union-formatter"      % "1.12.0-play-27",
     "uk.gov.hmrc"       %% "play-language"                  % "5.0.0-play-28",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % "0.50.0",
     "uk.gov.hmrc"       %% "domain"                         % "5.11.0-play-27"
