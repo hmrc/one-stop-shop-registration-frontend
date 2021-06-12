@@ -18,11 +18,11 @@ package pages
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{CurrentlyRegisteredInCountry, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object CurrentlyRegisteredInCountryPage extends QuestionPage[Boolean] {
+case object CurrentlyRegisteredInCountryPage extends QuestionPage[CurrentlyRegisteredInCountry] {
 
   override def path: JsPath = JsPath \ toString
 

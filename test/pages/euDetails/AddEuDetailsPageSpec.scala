@@ -20,6 +20,7 @@ import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import base.SpecBase
+import models.CurrentlyRegisteredInCountry.No
 import models.{CheckMode, Country, Index, NormalMode}
 import pages.{CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage}
 import pages.behaviours.PageBehaviours
@@ -165,7 +166,7 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
                   .set(VatRegisteredPage(Index(0)), true).success.value
                   .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
                   .set(HasFixedEstablishmentPage(Index(0)), false).success.value
-                  .set(CurrentlyRegisteredInCountryPage, true).success.value
+                  .set(CurrentlyRegisteredInCountryPage, No).success.value
 
               AddEuDetailsPage.navigate(CheckMode, answers)
                 .mustEqual(routes.CheckYourAnswersController.onPageLoad())

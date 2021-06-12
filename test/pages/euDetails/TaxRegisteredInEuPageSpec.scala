@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
+import models.CurrentlyRegisteredInCountry.No
 import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
 import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage}
 import pages.behaviours.PageBehaviours
@@ -115,7 +116,7 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
           .set(EuVatNumberPage(Index(1)), "reg 2").success.value
           .set(CurrentlyRegisteredInEuPage, true).success.value
           .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
-          .set(CurrentlyRegisteredInCountryPage, true).success.value
+          .set(CurrentlyRegisteredInCountryPage, No).success.value
 
       val result = answers.set(TaxRegisteredInEuPage, false).success.value
 

@@ -82,7 +82,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
     if (value contains false) {
       userAnswers.remove(EuVatNumberPage(index))
     } else {
-      super.cleanup(value, userAnswers)
+      userAnswers.remove(EuTaxReferencePage(index))
     }
   }
 }

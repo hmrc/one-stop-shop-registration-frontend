@@ -22,7 +22,6 @@ import models.euDetails.FixedEstablishmentAddress
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
-import pages.euDetails
 
 class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
@@ -32,9 +31,9 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
     beRetrievable[Boolean](HasFixedEstablishmentPage(index))
 
-    beSettable[Boolean](euDetails.HasFixedEstablishmentPage(index))
+    beSettable[Boolean](HasFixedEstablishmentPage(index))
 
-    beRemovable[Boolean](euDetails.HasFixedEstablishmentPage(index))
+    beRemovable[Boolean](HasFixedEstablishmentPage(index))
 
     "must navigate in Normal mode" - {
 
@@ -243,39 +242,45 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
       }
     }
 
-    "must remove Fixed Establishment Trading Name and Address for this index when the answer is no" in {
+    "must remove EU Tax Reference number, Fixed Establishment Trading Name and Address for this index when the answer is no" in {
 
       val address1 = arbitrary[FixedEstablishmentAddress].sample.value
       val address2 = arbitrary[FixedEstablishmentAddress].sample.value
 
       val answers =
         UserAnswers("id")
+          .set(EuTaxReferencePage(Index(0)), "123").success.value
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
           .set(FixedEstablishmentAddressPage(Index(0)), address1).success.value
-          .set(euDetails.FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
-          .set(euDetails.FixedEstablishmentAddressPage(Index(1)), address2).success.value
+          .set(EuTaxReferencePage(Index(1)), "123").success.value
+          .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
+          .set(FixedEstablishmentAddressPage(Index(1)), address2).success.value
 
-      val result = answers.set(euDetails.HasFixedEstablishmentPage(Index(1)), false).success.value
+      val result = answers.set(HasFixedEstablishmentPage(Index(1)), false).success.value
 
-      result.get(euDetails.FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
-      result.get(euDetails.FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
-      result.get(euDetails.FixedEstablishmentTradingNamePage(Index(1))) mustBe empty
-      result.get(euDetails.FixedEstablishmentAddressPage(Index(1))) mustBe empty
+      result.get(EuTaxReferencePage(Index(0))).value mustEqual "123"
+      result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
+      result.get(EuTaxReferencePage(Index(1))) must not be defined
+      result.get(FixedEstablishmentTradingNamePage(Index(1))) must not be defined
+      result.get(FixedEstablishmentAddressPage(Index(1))) must not be defined
     }
 
-    "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
+    "must preserve EU Tax Reference, Fixed Establishment Trading Name and Address when the answer is no" in {
 
       val address = arbitrary[FixedEstablishmentAddress].sample.value
 
       val answers =
         UserAnswers("id")
-          .set(euDetails.FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
-          .set(euDetails.FixedEstablishmentAddressPage(Index(0)), address).success.value
+          .set(EuTaxReferencePage(Index(0)), "123").success.value
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), address).success.value
 
-      val result = answers.set(euDetails.HasFixedEstablishmentPage(Index(0)), true).success.value
+      val result = answers.set(HasFixedEstablishmentPage(Index(0)), true).success.value
 
-      result.get(euDetails.FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
-      result.get(euDetails.FixedEstablishmentAddressPage(Index(0))).value mustEqual address
+      result.get(EuTaxReferencePage(Index(0))).value mustEqual "123"
+      result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address
     }
   }
 }

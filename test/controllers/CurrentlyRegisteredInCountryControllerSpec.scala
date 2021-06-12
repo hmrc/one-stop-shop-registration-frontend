@@ -18,13 +18,14 @@ package controllers
 
 import base.SpecBase
 import forms.CurrentlyRegisteredInCountryFormProvider
+import models.CurrentlyRegisteredInCountry.{No, Yes}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
+import pages.CurrentlyRegisteredInCountryPage
 import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
-import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -68,7 +69,7 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, true).success.value
+      val userAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, No).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -80,7 +81,7 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(false), NormalMode, country)(request, messages(application)).toString
       }
     }
 
@@ -107,8 +108,7 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
           val result = route(application, request).value
           val expectedAnswers =
             baseAnswers
-              .set(CurrentlyRegisteredInCountryPage, true).success.value
-              .set(CurrentCountryOfRegistrationPage, country).success.value
+              .set(CurrentlyRegisteredInCountryPage, Yes(country)).success.value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual CurrentlyRegisteredInCountryPage.navigate(NormalMode, expectedAnswers).url
@@ -119,7 +119,7 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
 
     "when the user answers no" - {
 
-      "must save the answer and remove the country if present, and redirect to the next page when valid data is submitted" in {
+      "must save the answer and redirect to the next page when valid data is submitted" in {
 
         val mockSessionRepository = mock[SessionRepository]
 
@@ -138,7 +138,7 @@ class CurrentlyRegisteredInCountryControllerSpec extends SpecBase with MockitoSu
               .withFormUrlEncodedBody(("value", "false"))
 
           val result = route(application, request).value
-          val expectedAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, false).success.value
+          val expectedAnswers = baseAnswers.set(CurrentlyRegisteredInCountryPage, No).success.value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual CurrentlyRegisteredInCountryPage.navigate(NormalMode, expectedAnswers).url

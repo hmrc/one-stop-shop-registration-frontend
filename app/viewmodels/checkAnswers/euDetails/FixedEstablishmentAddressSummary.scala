@@ -33,7 +33,7 @@ object FixedEstablishmentAddressSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
-      case CheckLoopMode => throw new IllegalArgumentException("FixedEstablishmentAddressSummary.row cannot be rendered in Check Loop Mode")
+      case CheckLoopMode => CheckLoopMode
     }
 
     answers.get(euDetails.FixedEstablishmentAddressPage(index)).map {

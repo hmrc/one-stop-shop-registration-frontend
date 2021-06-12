@@ -181,20 +181,28 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
     "must delete EU VAT number when the answer is no" in {
 
-      val baseAnswers = emptyUserAnswers.set(EuVatNumberPage(index), "123").success.value
+      val baseAnswers =
+        emptyUserAnswers
+          .set(EuVatNumberPage(index), "123").success.value
+          .set(EuTaxReferencePage(index), "456").success.value
 
       val result = baseAnswers.set(VatRegisteredPage(index), false).success.value
 
       result.get(EuVatNumberPage(index)) must not be defined
+      result.get(EuTaxReferencePage(index)).value mustEqual "456"
     }
 
-    "must not delete EU VAT number when the answer is yes" in {
+    "must delete EU Tax Reference number when the answer is yes" in {
 
-      val baseAnswers = emptyUserAnswers.set(EuVatNumberPage(index), "123").success.value
+      val baseAnswers =
+        emptyUserAnswers
+          .set(EuVatNumberPage(index), "123").success.value
+          .set(EuTaxReferencePage(index), "456").success.value
 
       val result = baseAnswers.set(VatRegisteredPage(index), true).success.value
 
       result.get(EuVatNumberPage(index)).value mustEqual "123"
+      result.get(EuTaxReferencePage(index)) must not be defined
     }
   }
 }

@@ -19,18 +19,18 @@ package pages
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import models.{CheckMode, CurrentlyRegisteredInCountry, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class CurrentlyRegisteredInCountryPageSpec extends SpecBase with PageBehaviours {
 
   "CurrentlyRegisteredInCountryPage" - {
 
-    beRetrievable[Boolean](CurrentlyRegisteredInCountryPage)
+    beRetrievable[CurrentlyRegisteredInCountry](CurrentlyRegisteredInCountryPage)
 
-    beSettable[Boolean](CurrentlyRegisteredInCountryPage)
+    beSettable[CurrentlyRegisteredInCountry](CurrentlyRegisteredInCountryPage)
 
-    beRemovable[Boolean](CurrentlyRegisteredInCountryPage)
+    beRemovable[CurrentlyRegisteredInCountry](CurrentlyRegisteredInCountryPage)
 
     "must navigate in Normal mode" - {
 

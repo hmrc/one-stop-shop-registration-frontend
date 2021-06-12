@@ -32,7 +32,7 @@ object EuVatNumberSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
-      case CheckLoopMode => throw new IllegalArgumentException("EuVatNumberSummary.row cannot be rendered in Check Loop Mode")
+      case CheckLoopMode => CheckLoopMode
     }
 
     answers.get(euDetails.EuVatNumberPage(index)).map {

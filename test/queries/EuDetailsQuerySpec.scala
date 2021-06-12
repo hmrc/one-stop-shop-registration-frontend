@@ -17,6 +17,7 @@
 package queries
 
 import base.SpecBase
+import models.CurrentlyRegisteredInCountry.No
 import models.{Country, Index, UserAnswers}
 import pages.euDetails.{EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage}
@@ -52,7 +53,7 @@ class EuDetailsQuerySpec extends SpecBase {
           val answers =
             emptyUserAnswers
               .addVatRegisteredCountry(Index(0))
-              .set(CurrentlyRegisteredInCountryPage, true).success.value
+              .set(CurrentlyRegisteredInCountryPage, No).success.value
 
           val result = answers.remove(EuDetailsQuery(Index(0))).success.value
 
@@ -69,7 +70,7 @@ class EuDetailsQuerySpec extends SpecBase {
             emptyUserAnswers
               .addNonVatRegisteredCountry(Index(0))
               .addVatRegisteredCountry(Index(1))
-              .set(CurrentlyRegisteredInCountryPage, true).success.value
+              .set(CurrentlyRegisteredInCountryPage, No).success.value
               .set(CurrentlyRegisteredInEuPage, true).success.value
               .set(CurrentCountryOfRegistrationPage, country(1)).success.value
 
@@ -91,7 +92,7 @@ class EuDetailsQuerySpec extends SpecBase {
             emptyUserAnswers
               .addNonVatRegisteredCountry(Index(0))
               .addVatRegisteredCountry(Index(1))
-              .set(CurrentlyRegisteredInCountryPage, true).success.value
+              .set(CurrentlyRegisteredInCountryPage, No).success.value
 
           val result = answers.remove(EuDetailsQuery(Index(0))).success.value
 

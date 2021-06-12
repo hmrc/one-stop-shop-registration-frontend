@@ -17,6 +17,7 @@
 package controllers.euDetails
 
 import base.SpecBase
+import models.CurrentlyRegisteredInCountry.No
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
@@ -102,7 +103,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
               .set(VatRegisteredPage(Index(1)), true).success.value
               .set(EuVatNumberPage(Index(1)), "123").success.value
               .set(HasFixedEstablishmentPage(Index(1)), false).success.value
-              .set(CurrentlyRegisteredInCountryPage, true).success.value
+              .set(CurrentlyRegisteredInCountryPage, No).success.value
 
           val application =
             applicationBuilder(userAnswers = Some(answers))

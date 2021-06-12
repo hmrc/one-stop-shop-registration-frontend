@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.CurrentlyRegisteredInCountryFormProvider
+import models.CurrentlyRegisteredInCountry.{No, Yes}
 import models.requests.DataRequest
 import models.{Country, Mode, UserAnswers}
 import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage}
@@ -47,7 +48,7 @@ class CurrentlyRegisteredInCountryController @Inject()(
           val form         = formProvider(country)
           val preparedForm = request.userAnswers.get(CurrentlyRegisteredInCountryPage) match {
             case None => form
-            case Some(value) => form.fill(value)
+            case Some(value) => form.fill(value.asBoolean)
           }
 
           Future.successful(Ok(view(preparedForm, mode, country)))
@@ -65,25 +66,16 @@ class CurrentlyRegisteredInCountryController @Inject()(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, country))),
 
-            value =>
+            value => {
+              val answer = if (value) Yes(country) else No
               for {
-                updatedAnswers <- updateUserAnswers(request.userAnswers, value, country)
-                _              <- cc.sessionRepository.set(updatedAnswers)
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(CurrentlyRegisteredInCountryPage, answer))
+                _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CurrentlyRegisteredInCountryPage.navigate(mode, updatedAnswers))
+            }
           )
       }
   }
-
-  private def updateUserAnswers(userAnswers: UserAnswers, currentlyRegistered: Boolean, country: Country): Future[UserAnswers] =
-    if (currentlyRegistered) {
-      Future.fromTry(
-        userAnswers
-          .set(CurrentlyRegisteredInCountryPage, true)
-          .flatMap(_.set(CurrentCountryOfRegistrationPage, country))
-      )
-    } else {
-      Future.fromTry(userAnswers.set(CurrentlyRegisteredInCountryPage, false))
-    }
 
   private def getCountry(block: Country => Future[Result])
                         (implicit request: DataRequest[AnyContent]): Future[Result] =
