@@ -81,6 +81,8 @@ class CheckYourAnswersController @Inject()(
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
               emailService.sendConfirmationEmail(
+                registration.contactDetails.fullName,
+                registration.registeredCompanyName,
                 request.vrn.toString(),
                 registration.contactDetails.emailAddress
               ) flatMap {

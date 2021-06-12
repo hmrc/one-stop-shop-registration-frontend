@@ -78,6 +78,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
           when(emailService.sendConfirmationEmail(
+            eqTo(registration.contactDetails.fullName),
+            eqTo(registration.registeredCompanyName),
             eqTo(vrn.toString()),
             eqTo(registration.contactDetails.emailAddress)
           )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
@@ -100,7 +102,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, emptyUserAnswers).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any())(any())
+              .sendConfirmationEmail(any(), any(), any(), any())(any())
           }
         }
       }

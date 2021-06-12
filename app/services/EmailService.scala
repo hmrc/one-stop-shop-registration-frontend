@@ -27,12 +27,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EmailService@Inject()(emailConnector: EmailConnector)(implicit executionContext: ExecutionContext) {
 
-  def sendConfirmationEmail(vrn: String, emailAddress: String)
+  def sendConfirmationEmail(recipientName_line1: String, businessName: String, reference: String, emailAddress: String)
                            (implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
     val emailToSendRequest = EmailToSendRequest(
       List(emailAddress),
       registrationConfirmationTemplateId,
-      RegistrationConfirmationEmailParameters(vrn)
+      RegistrationConfirmationEmailParameters(recipientName_line1, businessName, reference)
     )
 
     emailConnector.send(emailToSendRequest)

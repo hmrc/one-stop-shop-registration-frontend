@@ -38,14 +38,25 @@ class EmailServiceSpec extends SpecBase {
   "EmailService.sendConfirmationEmail" - {
 
     "call sendConfirmationEmail with the correct parameters" in {
-      forAll(validVRNs, validEmails) {
-        (vatNum: String, validEmail: String) =>
-            val emailParams = RegistrationConfirmationEmailParameters(vatNum)
-            val emailToSendRequest = EmailToSendRequest(List(validEmail), "oss_registration_confirmation", emailParams)
+
+      val maxLengthBusiness = 160
+      val maxLengthContactName = 105
+
+      forAll(
+        validVRNs,
+        validEmails,
+        safeInputsWithMaxLength(maxLengthBusiness),
+        safeInputsWithMaxLength(maxLengthContactName)
+      ) {
+        (vatNum: String, email: String, businessName: String, contactName: String) =>
+            val emailParams = RegistrationConfirmationEmailParameters(contactName, businessName, vatNum)
+            val emailToSendRequest = EmailToSendRequest(List(email), "oss_registration_confirmation", emailParams)
 
             when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
 
-            emailService.sendConfirmationEmail(vatNum, validEmail).futureValue mustBe EMAIL_ACCEPTED
+            emailService.sendConfirmationEmail(
+              contactName, businessName, vatNum, email
+            ).futureValue mustBe EMAIL_ACCEPTED
 
             verify(connector, times(1)).send(refEq(emailToSendRequest))(any(), any())
       }

@@ -28,7 +28,7 @@ object EmailParameters {
   implicit val reads: Reads[EmailParameters] = Json.reads[EmailParameters]
 }
 
-case class RegistrationConfirmationEmailParameters(vrn: String) extends EmailParameters
+case class RegistrationConfirmationEmailParameters(recipientName_line1: String, businessName:String, reference: String) extends EmailParameters
 
 object RegistrationConfirmationEmailParameters {
   implicit val writes: Writes[RegistrationConfirmationEmailParameters] = Json.writes[RegistrationConfirmationEmailParameters]
