@@ -327,16 +327,16 @@ ivFailedIdentityVerification.title = We could not confirm your identity
 ivFailedIdentityVerification.heading = We could not confirm your identity
 ivFailedIdentityVerification.p = We could not confirm your identity
 
-checkVatDetails.title = These are the UK VAT registration details linked to your Government Gateway
-checkVatDetails.heading = These are the UK VAT registration details linked to your Government Gateway
-checkVatDetails.error.required = Select yes if these are the VAT details you want to register for the scheme
-checkVatDetails.question = Are these the VAT registration details you want to use to register for the scheme?
-checkVatDetails.vrn.label = UK VAT registration number
-checkVatDetails.organisationName.label = Organisation name
-checkVatDetails.partOfVatGroup.label = Part of a VAT group
-checkVatDetails.address.label = UK VAT registration address
+checkVatDetails.title = Confirm VAT details for your business
+checkVatDetails.heading = Confirm VAT details for your business
+checkVatDetails.error.required = Select yes if you want to register this business for the scheme
+checkVatDetails.question = Do you want to register this business for the scheme?
+checkVatDetails.vrn = UK VAT registration number
+checkVatDetails.organisationName = Business name
+checkVatDetails.partOfVatGroup = Part of a UK VAT group
+checkVatDetails.address = Principle place of business address
 checkVatDetails.yes = Yes
-checkVatDetails.detailsIncorrect = No, some of the VAT details for this business are incorrect
+checkVatDetails.detailsIncorrect = Yes, but some of the VAT details are incorrect
 checkVatDetails.wrongAccount = No, I want to register a different business
 
 checkVatNumber.title = Confirm UK VAT details for business

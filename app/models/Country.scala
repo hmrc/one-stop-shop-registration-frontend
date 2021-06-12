@@ -66,4 +66,6 @@ object Country {
         )
     }
   }
+
+  val allCountries: Seq[Country] = euCountries // TODO: Awaiting confirmation of where to source this country list
 }
