@@ -17,20 +17,37 @@
 package viewmodels
 
 import formats.Format.dateFormatter
-import models.DesAddress
+import models.{Country, DesAddress}
 import models.domain.VatCustomerInfo
+import play.api.i18n.Messages
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 
-case class CheckVatDetailsViewModel(vrn: Vrn, registrationDate: Option[LocalDate], address: DesAddress) {
+case class CheckVatDetailsViewModel(vrn: Vrn, vatCustomerInfo: VatCustomerInfo)(implicit messages: Messages) {
 
-  def formattedDate: Option[String] = registrationDate.map(_.format(dateFormatter))
-}
+  val organisationName: Option[String] = vatCustomerInfo.organisationName.map(HtmlFormat.escape).map(_.toString)
 
-object CheckVatDetailsViewModel {
+  val formattedDate: Option[String] = vatCustomerInfo.registrationDate.map(_.format(dateFormatter))
 
-  def apply(vrn: Vrn, vatCustomerInfo: VatCustomerInfo): CheckVatDetailsViewModel =
-    CheckVatDetailsViewModel(vrn, vatCustomerInfo.registrationDate, vatCustomerInfo.address)
+  private val country: Option[Country] = Country.allCountries.find(_.code == vatCustomerInfo.address.countryCode)
+
+  val formattedAddress: Html = Html(
+    Seq(
+      Some(HtmlFormat.escape(vatCustomerInfo.address.line1)),
+      vatCustomerInfo.address.line2.map(HtmlFormat.escape),
+      vatCustomerInfo.address.line3.map(HtmlFormat.escape),
+      vatCustomerInfo.address.line4.map(HtmlFormat.escape),
+      vatCustomerInfo.address.line5.map(HtmlFormat.escape),
+      vatCustomerInfo.address.postCode.map(HtmlFormat.escape),
+      country.map(_.name)
+    ).flatten.mkString("<br/>")
+  )
+
+  val partOfVatGroup: Option[String] = (vatCustomerInfo).partOfVatGroup.map {
+    case true  => messages("site.yes")
+    case false => messages("site.no")
+  }
 }
