@@ -16,10 +16,11 @@
 
 package services
 
+import models.CurrentlyRegisteredInCountry.Yes
 import models.domain.VatDetailSource.{Etmp, Mixed, UserEntered}
 import models.domain._
 import models.euDetails.EuDetails
-import models.{Address, UserAnswers}
+import models.{Address, Country, UserAnswers}
 import pages._
 import queries.{AllEuDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.domain.Vrn
@@ -37,7 +38,7 @@ class RegistrationService {
       startDate                    <- userAnswers.get(StartDatePage)
       businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
       websites                     = getWebsites(userAnswers)
-      currentCountryOfRegistration = userAnswers.get(CurrentCountryOfRegistrationPage)
+      currentCountryOfRegistration = getCurrentCountry(userAnswers)
       previousRegistrations        = buildPreviousRegistrations(userAnswers)
       bankDetails                  <- userAnswers.get(BankDetailsPage)
     } yield Registration(
@@ -150,4 +151,13 @@ class RegistrationService {
       case None =>
         UserEntered
     }
+
+  private def getCurrentCountry(answers: UserAnswers): Option[Country] = {
+    answers.get(CurrentCountryOfRegistrationPage).orElse(
+      answers.get(CurrentlyRegisteredInCountryPage) match {
+        case Some(Yes(country)) => Some(country)
+        case _ => None
+      }
+    )
+  }
 }

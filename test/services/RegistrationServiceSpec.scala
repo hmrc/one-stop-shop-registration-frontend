@@ -17,13 +17,14 @@
 package services
 
 import base.SpecBase
+import models.CurrentlyRegisteredInCountry.Yes
 import models._
 import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
 import models.euDetails.FixedEstablishmentAddress
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
 import queries.{AllEuDetailsQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
@@ -70,9 +71,7 @@ class RegistrationServiceSpec extends SpecBase {
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs","01112223344","email@email.com")).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
-      .set(CurrentlyRegisteredInEuPage, true).success.value
-      .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
-      .set(PreviouslyRegisteredPage, true).success.value
+      .set(CurrentlyRegisteredInCountryPage, Yes(Country("FR", "France"))).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some("12345678"), "GB12345678")).success.value
@@ -158,6 +157,24 @@ class RegistrationServiceSpec extends SpecBase {
             source  = UserEntered
           )
         )
+
+      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+      registration.value mustEqual expectedRegistration
+    }
+
+    "must return a registration when Currently Registered in EU was answered" in {
+
+      val userAnswers =
+        answers
+          .remove(CurrentlyRegisteredInCountryPage).success.value
+          .set(CurrentlyRegisteredInEuPage, true).success.value
+          .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
+
+      val expectedRegistration =
+        RegistrationData.registration copy (
+          vatDetails = RegistrationData.registration.vatDetails copy (
+            source  = UserEntered
+          ))
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)
       registration.value mustEqual expectedRegistration
