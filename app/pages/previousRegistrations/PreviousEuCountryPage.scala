@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Country, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -30,4 +30,10 @@ case class PreviousEuCountryPage(index: Index) extends QuestionPage[Country] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    answers.get(PreviousEuVatNumberPage(index)) match {
+      case Some(_) => prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode)
+      case None    => prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index)
+    }
 }

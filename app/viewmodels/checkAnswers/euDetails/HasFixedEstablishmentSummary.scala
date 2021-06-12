@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, Index, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,14 @@ import viewmodels.implicits._
 
 object HasFixedEstablishmentSummary {
 
-  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
+
+    val changeLinkMode = currentMode match {
+      case NormalMode    => CheckLoopMode
+      case CheckMode     => CheckMode
+      case CheckLoopMode => CheckLoopMode
+    }
+
     answers.get(euDetails.HasFixedEstablishmentPage(index)).map {
       answer =>
 
@@ -36,9 +43,10 @@ object HasFixedEstablishmentSummary {
           key = "hasFixedEstablishment.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.HasFixedEstablishmentController.onPageLoad(CheckMode, index).url)
+            ActionItemViewModel("site.change", routes.HasFixedEstablishmentController.onPageLoad(changeLinkMode, index).url)
               .withVisuallyHiddenText(messages("hasFixedEstablishment.change.hidden"))
           )
         )
     }
+  }
 }

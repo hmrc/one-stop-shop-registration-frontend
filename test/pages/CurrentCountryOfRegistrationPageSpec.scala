@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Country, NormalMode}
+import controllers.routes
+import models.{CheckMode, Country, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class CurrentCountryOfRegistrationPageSpec extends SpecBase with PageBehaviours {
@@ -37,6 +38,15 @@ class CurrentCountryOfRegistrationPageSpec extends SpecBase with PageBehaviours 
 
         CurrentCountryOfRegistrationPage.navigate(NormalMode, emptyUserAnswers)
           .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        CurrentCountryOfRegistrationPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

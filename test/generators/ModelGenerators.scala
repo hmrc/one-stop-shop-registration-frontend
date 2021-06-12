@@ -16,6 +16,7 @@
 
 package generators
 
+import models.CurrentlyRegisteredInCountry.{No, Yes}
 import models.StartDateOption.EarlierDate
 import models._
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
@@ -27,6 +28,11 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryCurrentlyRegisteredInCountry: Arbitrary[CurrentlyRegisteredInCountry] =
+    Arbitrary {
+      Gen.oneOf(Gen.const(No), arbitrary[Country].map(Yes))
+    }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {

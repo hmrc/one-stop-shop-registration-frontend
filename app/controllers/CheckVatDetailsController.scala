@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.CheckVatDetailsFormProvider
-import models.Mode
+import models.NormalMode
 import pages.CheckVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,7 +39,7 @@ class CheckVatDetailsController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
       request.userAnswers.vatInfo match {
@@ -50,14 +50,14 @@ class CheckVatDetailsController @Inject()(
           }
 
           val viewModel = CheckVatDetailsViewModel(request.vrn, vatInfo)
-          Ok(view(preparedForm, mode, viewModel))
+          Ok(view(preparedForm, viewModel))
 
         case None =>
           Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       request.userAnswers.vatInfo match {
@@ -65,14 +65,14 @@ class CheckVatDetailsController @Inject()(
           form.bindFromRequest().fold(
             formWithErrors => {
               val viewModel = CheckVatDetailsViewModel(request.vrn, vatInfo)
-              Future.successful(BadRequest(view(formWithErrors, mode, viewModel)))
+              Future.successful(BadRequest(view(formWithErrors, viewModel)))
             },
 
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckVatDetailsPage, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(CheckVatDetailsPage.navigate(mode, updatedAnswers))
+              } yield Redirect(CheckVatDetailsPage.navigate(NormalMode, updatedAnswers))
           )
 
         case None =>

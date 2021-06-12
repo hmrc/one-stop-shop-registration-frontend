@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{Index, NormalMode}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class HasWebsitePageSpec extends SpecBase with PageBehaviours {
@@ -46,6 +46,68 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
         HasWebsitePage.navigate(NormalMode, answers)
           .mustEqual(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
       }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "to Website (index 0) when there are no websites in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasWebsitePage ,true).success.value
+
+          HasWebsitePage.navigate(CheckMode, answers)
+            .mustEqual(routes.WebsiteController.onPageLoad(CheckMode, Index(0)))
+        }
+
+        "to Check Your Answers when there are websites in the user's answers" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(WebsitePage(Index(0)), "foo").success.value
+              .set(HasWebsitePage ,true).success.value
+
+          HasWebsitePage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
+
+          HasWebsitePage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+    }
+
+    "must remove all websites when the answer is no" in {
+
+      val answers =
+        UserAnswers("id")
+          .set(WebsitePage(Index(0)), "website 1").success.value
+          .set(WebsitePage(Index(1)), "website 2").success.value
+
+      val result = answers.set(HasWebsitePage, false).success.value
+
+      result.get(WebsitePage(Index(0))) must not be defined
+      result.get(WebsitePage(Index(1))) must not be defined
+    }
+
+    "must not remove any websites when the answer is yes" in {
+
+      val answers =
+        UserAnswers("id")
+          .set(WebsitePage(Index(0)), "website 1").success.value
+          .set(WebsitePage(Index(1)), "website 2").success.value
+
+      val result = answers.set(HasWebsitePage, true).success.value
+
+      result.get(WebsitePage(Index(0))).value mustEqual "website 1"
+      result.get(WebsitePage(Index(1))).value mustEqual "website 2"
     }
   }
 }

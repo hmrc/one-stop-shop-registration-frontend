@@ -18,7 +18,8 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -40,6 +41,54 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
         EuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when Has Fixed Establishment has not been answered" - {
+
+        "to Has Fixed Establishment" in {
+
+          EuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index))
+        }
+      }
+
+      "when Has Fixed Establishment has been answered" - {
+
+        "to wherever Has Fixed Establishment would navigate to" in {
+
+          val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
+          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
+
+          EuVatNumberPage(index).navigate(CheckMode, answers)
+            .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
+        }
+      }
+    }
+
+    "must navigate in Check Loop mode" - {
+
+      "when Has Fixed Establishment has not been answered" - {
+
+        "to Has Fixed Establishment" in {
+
+          EuVatNumberPage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index))
+        }
+      }
+
+      "when Has Fixed Establishment has been answered" - {
+
+        "to wherever Has Fixed Establishment would navigate to" in {
+
+          val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
+          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
+
+          EuVatNumberPage(index).navigate(CheckLoopMode, answers)
+            .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
+        }
       }
     }
   }

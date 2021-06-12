@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{Index, NormalMode}
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class WebsitePageSpec extends SpecBase with PageBehaviours {
@@ -39,6 +39,15 @@ class WebsitePageSpec extends SpecBase with PageBehaviours {
 
         WebsitePage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.AddWebsiteController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Add Website" in {
+
+        WebsitePage(index).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
       }
     }
   }

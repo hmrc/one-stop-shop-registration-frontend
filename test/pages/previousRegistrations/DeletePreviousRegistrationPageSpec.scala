@@ -18,7 +18,7 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Country, Index, NormalMode}
+import models.{CheckMode, Country, Index, NormalMode}
 
 class DeletePreviousRegistrationPageSpec extends SpecBase {
 
@@ -47,6 +47,33 @@ class DeletePreviousRegistrationPageSpec extends SpecBase {
 
           DeletePreviousRegistrationPage(Index(0)).navigate(NormalMode, emptyUserAnswers)
             .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when there are still some previous registrations" - {
+
+        "to Add Previous Registration" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+              .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+
+          DeletePreviousRegistrationPage(Index(0)).navigate(CheckMode, answers)
+            .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
+        }
+      }
+
+
+      "when there are no previous registrations left" - {
+
+        "to Previously Registered" in {
+
+          DeletePreviousRegistrationPage(Index(0)).navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode))
         }
       }
     }

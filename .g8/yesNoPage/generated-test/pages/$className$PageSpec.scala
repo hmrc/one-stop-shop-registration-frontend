@@ -1,8 +1,9 @@
 package pages
 
+import base.SpecBase
 import pages.behaviours.PageBehaviours
 
-class $className$PageSpec extends PageBehaviours {
+class $className$PageSpec SpecBase with extends PageBehaviours {
 
   "$className$Page" - {
 

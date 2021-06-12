@@ -16,11 +16,46 @@
 
 package queries
 
-import models.Index
+import models.{Index, UserAnswers}
 import models.euDetails.EuDetails
+import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage}
 import play.api.libs.json.JsPath
+
+import scala.util.Try
 
 case class EuDetailsQuery(index: Index) extends Gettable[EuDetails] with Settable[EuDetails] {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position
+  override def path: JsPath = JsPath \ "euDetails" \ index.position
+
+  override def cleanup(value: Option[EuDetails], userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.get(AllEuDetailsQuery).map(_.filter(_.vatRegistered)) match {
+      case Some(Nil) | None =>
+        userAnswers
+          .remove(CurrentlyRegisteredInCountryPage)
+          .flatMap(_.remove(CurrentlyRegisteredInEuPage))
+          .flatMap(_.remove(CurrentCountryOfRegistrationPage))
+
+      case Some(singleItem :: Nil) =>
+        if (userAnswers.get(CurrentCountryOfRegistrationPage).contains(singleItem.euCountry)) {
+          super.cleanup(value, userAnswers)
+        } else {
+          userAnswers
+            .remove(CurrentlyRegisteredInEuPage)
+            .flatMap(_.remove(CurrentCountryOfRegistrationPage))
+        }
+
+      case Some(items) =>
+        userAnswers.get(CurrentCountryOfRegistrationPage).map {
+          country =>
+            if (items.map(_.euCountry) contains country) {
+              super.cleanup(value, userAnswers)
+            } else {
+              userAnswers
+                .remove(CurrentlyRegisteredInEuPage)
+                .flatMap(_.remove(CurrentCountryOfRegistrationPage))
+            }
+        } getOrElse {
+          super.cleanup(value, userAnswers)
+        }
+    }
 }

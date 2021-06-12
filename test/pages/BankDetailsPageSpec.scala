@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{BankDetails, NormalMode}
+import models.{BankDetails, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class BankDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -36,6 +36,15 @@ class BankDetailsPageSpec extends SpecBase with PageBehaviours {
       "to Check Your Answers" in {
 
         BankDetailsPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        BankDetailsPage.navigate(CheckMode, emptyUserAnswers)
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }

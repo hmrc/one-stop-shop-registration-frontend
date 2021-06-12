@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{BusinessContactDetails, NormalMode}
+import models.{BusinessContactDetails, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -37,6 +37,15 @@ class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
 
         BusinessContactDetailsPage.navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.BankDetailsController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        BusinessContactDetailsPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

@@ -30,7 +30,7 @@ object CurrentlyRegisteredInCountrySummary  {
     answers.get(CurrentlyRegisteredInCountryPage).map {
       answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer.asBoolean) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
           key     = "currentlyRegisteredInCountry.checkYourAnswersLabel",

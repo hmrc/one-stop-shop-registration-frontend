@@ -18,14 +18,16 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
+import scala.util.Try
+
 case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "vatRegistered"
 
@@ -35,4 +37,52 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
       case Some(false) => euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(CheckMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
+        }
+
+      case Some(false) =>
+        if (answers.get(HasFixedEstablishmentPage(index)).isDefined) {
+          HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+        } else {
+          euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
+        }
+
+      case None =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(CheckLoopMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
+        }
+
+      case Some(false) =>
+        if (answers.get(HasFixedEstablishmentPage(index)).isDefined) {
+          HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+        } else {
+          euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
+        }
+
+      case None =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
+    if (value contains false) {
+      userAnswers.remove(EuVatNumberPage(index))
+    } else {
+      userAnswers.remove(EuTaxReferencePage(index))
+    }
+  }
 }

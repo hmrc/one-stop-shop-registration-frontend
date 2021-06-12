@@ -38,7 +38,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider()
 
   private val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
-  private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad(NormalMode).url
+  private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad().url
 
   "CheckVatDetails Controller" - {
 
@@ -54,7 +54,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CheckVatDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, viewModel)(request, messages(application)).toString
       }
     }
 
@@ -73,7 +73,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(CheckVatDetails.Yes), NormalMode, viewModel)(request, messages(application)).toString
+          view(form.fill(CheckVatDetails.Yes), viewModel)(request, messages(application)).toString
       }
     }
 
@@ -120,7 +120,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel)(request, messages(application)).toString
       }
     }
 

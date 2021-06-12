@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import models.euDetails.FixedEstablishmentAddress
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -25,10 +25,16 @@ import play.api.mvc.Call
 
 case class FixedEstablishmentAddressPage(index: Index) extends QuestionPage[FixedEstablishmentAddress] {
 
-  override def path: JsPath = JsPath \ "euVatDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "fixedEstablishmentAddress"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.CheckEuDetailsAnswersController.onPageLoad(index)
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
 }

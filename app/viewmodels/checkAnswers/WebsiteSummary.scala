@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllWebsites
@@ -29,13 +29,13 @@ import viewmodels.implicits._
 
 object WebsiteSummary {
 
-  def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Seq[ListItem] =
     answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {
       case (website, index) =>
         ListItem(
           name      = HtmlFormat.escape(website).toString,
-          changeUrl = routes.WebsiteController.onPageLoad(NormalMode, Index(index)).url,
-          removeUrl = routes.DeleteWebsiteController.onPageLoad(NormalMode, Index(index)).url
+          changeUrl = routes.WebsiteController.onPageLoad(mode, Index(index)).url,
+          removeUrl = routes.DeleteWebsiteController.onPageLoad(mode, Index(index)).url
         )
     }
 

@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{Index, NormalMode}
+import models.{CheckMode, Index, NormalMode}
 
 class DeleteTradingNamePageSpec extends SpecBase {
 
@@ -38,6 +38,23 @@ class DeleteTradingNamePageSpec extends SpecBase {
 
         DeleteTradingNamePage(Index(0)).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Add Trading Name when there are still trading names present" in {
+
+        val answers = emptyUserAnswers.set(TradingNamePage(Index(0)), "foo").success.value
+
+        DeleteTradingNamePage(Index(0)).navigate(CheckMode, answers)
+          .mustEqual(routes.AddTradingNameController.onPageLoad(CheckMode))
+      }
+
+      "to Has Trading Name when there are no trading names present" in {
+
+        DeleteTradingNamePage(Index(0)).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(CheckMode))
       }
     }
   }

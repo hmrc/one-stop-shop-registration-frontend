@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
@@ -44,6 +44,23 @@ class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
         SellsGoodsFromNiPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, true).success.value
+        SellsGoodsFromNiPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Cannot Register for Service when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
+        SellsGoodsFromNiPage.navigate(CheckMode, answers)
           .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
       }
     }

@@ -47,7 +47,7 @@ class AddTradingNameController @Inject()(
       getNumberOfTradingNames {
         number =>
           val canAddTradingNames = number < Constants.maxTradingNames
-          Future.successful(Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers), canAddTradingNames)))
+          Future.successful(Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers, mode), canAddTradingNames)))
       }
   }
 
@@ -60,7 +60,7 @@ class AddTradingNameController @Inject()(
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(
-                BadRequest(view(formWithErrors, mode, TradingNameSummary.addToListRows(request.userAnswers), canAddTradingNames))
+                BadRequest(view(formWithErrors, mode, TradingNameSummary.addToListRows(request.userAnswers, mode), canAddTradingNames))
               ),
 
             value =>

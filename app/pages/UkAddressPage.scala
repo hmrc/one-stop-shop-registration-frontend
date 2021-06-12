@@ -29,4 +29,7 @@ case object UkAddressPage extends QuestionPage[UkAddress] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     routes.HasTradingNameController.onPageLoad(NormalMode)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

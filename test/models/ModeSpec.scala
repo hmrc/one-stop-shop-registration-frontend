@@ -14,12 +14,34 @@
  * limitations under the License.
  */
 
-package queries
+package models
 
-import models.euDetails.EuDetails
-import play.api.libs.json.{JsObject, JsPath}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import play.api.mvc.JavascriptLiteral
 
-case object AllEuDetailsQuery extends Gettable[List[EuDetails]] with Settable[List[EuDetails]] {
+class ModeSpec extends AnyFreeSpec with Matchers {
 
-  override def path: JsPath = JsPath \ "euDetails"
+  "Mode" - {
+
+    val literal = implicitly[JavascriptLiteral[Mode]]
+
+    "must convert as a JsLiteral" - {
+
+      "from NormalMode" in {
+
+        literal.to(NormalMode) mustEqual "NormalMode"
+      }
+
+      "from CheckMode" in {
+
+        literal.to(CheckMode) mustEqual "CheckMode"
+      }
+
+      "from CheckLoopMode" in {
+
+        literal.to(CheckLoopMode) mustEqual "CheckLoopMode"
+      }
+    }
+  }
 }

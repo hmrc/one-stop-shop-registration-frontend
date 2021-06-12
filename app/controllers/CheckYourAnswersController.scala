@@ -50,21 +50,28 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(
+          SellsGoodsFromNiSummary.row(request.userAnswers),
+          InControlOfMovingGoodsSummary.row(request.userAnswers),
           RegisteredCompanyNameSummary.row(request.userAnswers),
-          HasTradingNameSummary.row(request.userAnswers),
-          TradingNameSummary.checkAnswersRow(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
+          BusinessAddressInUkSummary.row(request.userAnswers),
+          UkAddressSummary.row(request.userAnswers),
+          InternationalAddressSummary.row(request.userAnswers),
+          HasTradingNameSummary.row(request.userAnswers),
+          TradingNameSummary.checkAnswersRow(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
           CurrentlyRegisteredInEuSummary.row(request.userAnswers),
           CurrentCountryOfRegistrationSummary.row(request.userAnswers),
+          CurrentlyRegisteredInCountrySummary.row(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
           StartDateSummary.row(request.userAnswers),
-          UkAddressSummary.row(request.userAnswers),
+          HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
-          BusinessContactDetailsSummary.row(request.userAnswers)
+          BusinessContactDetailsSummary.row(request.userAnswers),
+          BankDetailsSummary.row(request.userAnswers)
         ).flatten
       )
 

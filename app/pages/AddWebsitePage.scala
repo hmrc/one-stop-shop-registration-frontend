@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.DeriveNumberOfWebsites
@@ -32,6 +32,13 @@ case object AddWebsitePage extends QuestionPage[Boolean] {
     (answers.get(AddWebsitePage), answers.get(DeriveNumberOfWebsites)) match {
       case (Some(true), Some(size)) => routes.WebsiteController.onPageLoad(NormalMode, Index(size))
       case (Some(false), _)         => routes.BusinessContactDetailsController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(AddWebsitePage), answers.get(DeriveNumberOfWebsites)) match {
+      case (Some(true), Some(size)) => routes.WebsiteController.onPageLoad(CheckMode, Index(size))
+      case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
       case _                        => routes.JourneyRecoveryController.onPageLoad()
     }
 }

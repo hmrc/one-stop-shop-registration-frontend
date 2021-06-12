@@ -18,7 +18,7 @@ package pages
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -35,6 +35,14 @@ case object CurrentlyRegisteredInEuPage extends QuestionPage[Boolean] {
       case Some(true)  => routes.CurrentCountryOfRegistrationController.onPageLoad(NormalMode)
       case Some(false) => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(CurrentlyRegisteredInEuPage), answers.get(CurrentCountryOfRegistrationPage)) match {
+      case (Some(true), Some(_)) => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(true), None)    => routes.CurrentCountryOfRegistrationController.onPageLoad(CheckMode)
+      case (Some(false), _)      => routes.CheckYourAnswersController.onPageLoad()
+      case _                     => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =

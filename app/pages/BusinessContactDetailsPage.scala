@@ -29,4 +29,7 @@ case object BusinessContactDetailsPage extends QuestionPage[BusinessContactDetai
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     routes.BankDetailsController.onPageLoad(NormalMode)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

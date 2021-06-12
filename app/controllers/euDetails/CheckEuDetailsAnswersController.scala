@@ -18,28 +18,29 @@ package controllers.euDetails
 
 import controllers.actions.AuthenticatedControllerComponents
 import models.requests.DataRequest
-import models.{Country, Index, NormalMode}
-import pages.euDetails
+import models.{Country, Index, Mode, UserAnswers}
+import pages.{CurrentlyRegisteredInCountryPage, euDetails}
 import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.AllEuDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.euDetails._
 import viewmodels.govuk.summarylist._
 import views.html.euDetails.CheckEuDetailsAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckEuDetailsAnswersController @Inject()(
                                                     override val messagesApi: MessagesApi,
                                                     cc: AuthenticatedControllerComponents,
                                                     view: CheckEuDetailsAnswersView
-                                                  ) extends FrontendBaseController with I18nSupport {
+                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
@@ -47,20 +48,25 @@ class CheckEuDetailsAnswersController @Inject()(
           val list = SummaryListViewModel(
             rows = Seq(
               EuCountrySummary.row(request.userAnswers, index),
-              EuVatNumberSummary.row(request.userAnswers, index),
-              HasFixedEstablishmentSummary.row(request.userAnswers, index),
-              FixedEstablishmentTradingNameSummary.row(request.userAnswers, index),
-              FixedEstablishmentAddressSummary.row(request.userAnswers, index)
+              VatRegisteredSummary.row(request.userAnswers, index, mode),
+              EuVatNumberSummary.row(request.userAnswers, index, mode),
+              HasFixedEstablishmentSummary.row(request.userAnswers, index, mode),
+              EuTaxReferenceSummary.row(request.userAnswers, index, mode),
+              FixedEstablishmentTradingNameSummary.row(request.userAnswers, index, mode),
+              FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode)
             ).flatten
           )
 
-          Future.successful(Ok(view(list, index, country)))
+          Future.successful(Ok(view(list, mode, index, country)))
       }
   }
 
-  def onSubmit(index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      Redirect(CheckEuDetailsAnswersPage.navigate(NormalMode, request.userAnswers))
+      updateCurrentRegistration(request.userAnswers).map {
+        _ =>
+          Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
+      }
   }
 
   private def getCountry(index: Index)
@@ -70,4 +76,16 @@ class CheckEuDetailsAnswersController @Inject()(
       country =>
         block(country)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+  private def updateCurrentRegistration(answers: UserAnswers)(implicit ec: ExecutionContext): Future[Boolean] =
+    answers.get(AllEuDetailsQuery).map(_.filter(_.vatRegistered)) match {
+      case Some(details) if details.size >= 2 =>
+        Future.fromTry(answers.remove(CurrentlyRegisteredInCountryPage)).flatMap {
+          updatedAnswers =>
+            cc.sessionRepository.set(updatedAnswers)
+        }
+
+      case _ =>
+        Future.successful(true)
+    }
 }

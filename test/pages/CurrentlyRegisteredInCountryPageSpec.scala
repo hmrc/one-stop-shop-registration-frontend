@@ -18,18 +18,19 @@ package pages
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.NormalMode
+import controllers.routes
+import models.{CheckMode, CurrentlyRegisteredInCountry, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class CurrentlyRegisteredInCountryPageSpec extends SpecBase with PageBehaviours {
 
   "CurrentlyRegisteredInCountryPage" - {
 
-    beRetrievable[Boolean](CurrentlyRegisteredInCountryPage)
+    beRetrievable[CurrentlyRegisteredInCountry](CurrentlyRegisteredInCountryPage)
 
-    beSettable[Boolean](CurrentlyRegisteredInCountryPage)
+    beSettable[CurrentlyRegisteredInCountry](CurrentlyRegisteredInCountryPage)
 
-    beRemovable[Boolean](CurrentlyRegisteredInCountryPage)
+    beRemovable[CurrentlyRegisteredInCountry](CurrentlyRegisteredInCountryPage)
 
     "must navigate in Normal mode" - {
 
@@ -37,6 +38,15 @@ class CurrentlyRegisteredInCountryPageSpec extends SpecBase with PageBehaviours 
 
         CurrentlyRegisteredInCountryPage.navigate(NormalMode, emptyUserAnswers)
           .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        CurrentlyRegisteredInCountryPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

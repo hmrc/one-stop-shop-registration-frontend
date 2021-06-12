@@ -18,7 +18,7 @@ package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -34,6 +34,13 @@ case object AddPreviousRegistrationPage extends QuestionPage[Boolean] {
     (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
       case (Some(true), Some(size)) => prevRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(size))
       case (Some(false), _)         => routes.StartDateController.onPageLoad(NormalMode)
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
+      case (Some(true), Some(size)) => prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(size))
+      case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
       case _                        => routes.JourneyRecoveryController.onPageLoad()
     }
 }
