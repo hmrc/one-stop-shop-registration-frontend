@@ -35,6 +35,7 @@
             )
             .asNumeric()
             .withWidth(Fixed10)
+            .withHint(HintViewModel(messages("bankDetails.bic.hint")))
         )
 
 
@@ -44,6 +45,7 @@
                 label = LabelViewModel(messages("bankDetails.iban"))
             )
             .withWidth(Fixed30)
+            .withHint(HintViewModel(messages("bankDetails.iban.hint")))
         )
 
         @govukButton(

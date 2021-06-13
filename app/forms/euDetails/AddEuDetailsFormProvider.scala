@@ -25,6 +25,6 @@ class AddEuDetailsFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("addEuVatDetails.error.required")
+      "value" -> boolean("addEuDetails.error.required")
     )
 }

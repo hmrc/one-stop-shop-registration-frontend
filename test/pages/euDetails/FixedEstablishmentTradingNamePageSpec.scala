@@ -18,8 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.FixedEstablishmentAddress
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
@@ -60,7 +59,7 @@ class FixedEstablishmentTradingNamePageSpec extends SpecBase with PageBehaviours
 
         "to wherever Fixed Establishment Address would navigate to" in {
 
-          val address = arbitrary[FixedEstablishmentAddress].sample.value
+          val address = arbitrary[InternationalAddress].sample.value
           val answers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
           FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers)
@@ -84,7 +83,7 @@ class FixedEstablishmentTradingNamePageSpec extends SpecBase with PageBehaviours
 
         "to wherever Fixed Establishment Address would navigate to" in {
 
-          val address = arbitrary[FixedEstablishmentAddress].sample.value
+          val address = arbitrary[InternationalAddress].sample.value
           val answers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
           FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)

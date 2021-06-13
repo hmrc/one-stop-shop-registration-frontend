@@ -29,7 +29,7 @@
 @(form: Form[_], mode: Mode, list: Seq[ListItem], canAddCountries: Boolean)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
-    @layout(pageTitle = title(form, messages("addEuVatDetails.title" + messageSuffix, list.size))) {
+    @layout(pageTitle = title(form, messages("addEuDetails.title" + messageSuffix, list.size))) {
 
         @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode), 'autoComplete -> "off") {
 
@@ -37,7 +37,7 @@
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
 
-            <h1 class="govuk-heading-xl">@messages("addEuVatDetails.heading" + messageSuffix, list.size)</h1>
+            <h1 class="govuk-heading-xl">@messages("addEuDetails.heading" + messageSuffix, list.size)</h1>
 
             @addToList(list, Long)
 
@@ -45,11 +45,11 @@
                 @govukRadios(
                     RadiosViewModel.yesNo(
                         field = form("value"),
-                        legend = LegendViewModel(messages("addEuVatDetails.addAnother")).withSize(LegendSize.Medium)
-                    ).withHint(HintViewModel(messages("addEuVatDetails.addAnother.hint")))
+                        legend = LegendViewModel(messages("addEuDetails.addAnother")).withSize(LegendSize.Medium)
+                    ).withHint(HintViewModel(messages("addEuDetails.addAnother.hint")))
                 )
             } else {
-                <p class="govuk-body">@messages("addEuVatDetails.maximumReached")</p>
+                <p class="govuk-body">@messages("addEuDetails.maximumReached")</p>
                 <input type="hidden" name="value" id="value" value="false"/>
             }
 

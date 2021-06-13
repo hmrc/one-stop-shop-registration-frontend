@@ -16,20 +16,23 @@
 
 package controllers
 
+import controllers.actions._
+
+import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.CannotRegisterForServiceView
+import views.html.NotSellingGoodsFromNiView
 
-import javax.inject.Inject
+class NotSellingGoodsFromNiController @Inject()(
+                                       override val messagesApi: MessagesApi,
+                                       cc: AuthenticatedControllerComponents,
+                                       view: NotSellingGoodsFromNiView
+                                     ) extends FrontendBaseController with I18nSupport {
 
-class CannotRegisterForServiceController @Inject()(
-    override val messagesApi: MessagesApi,
-    val controllerComponents: MessagesControllerComponents,
-    view: CannotRegisterForServiceView
-) extends FrontendBaseController with I18nSupport {
+  protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
       Ok(view())
   }

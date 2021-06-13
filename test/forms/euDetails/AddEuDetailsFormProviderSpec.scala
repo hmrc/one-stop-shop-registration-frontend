@@ -21,7 +21,7 @@ import play.api.data.FormError
 
 class AddEuDetailsFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "addEuVatDetails.error.required"
+  val requiredKey = "addEuDetails.error.required"
   val invalidKey = "error.boolean"
 
   val form = new AddEuDetailsFormProvider()()

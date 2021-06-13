@@ -18,8 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.FixedEstablishmentAddressFormProvider
-import models.euDetails.FixedEstablishmentAddress
-import models.{Country, Index, NormalMode}
+import models.{Country, Index, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,12 +35,12 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
 
   private val country = Country.euCountries.head
   private val formProvider = new FixedEstablishmentAddressFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(country)
 
   private val index = Index(0)
   private lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index).url
 
-  private val address         = FixedEstablishmentAddress("value 1", None, "value 2", None, None)
+  private val address         = InternationalAddress("value 1", None, "value 2", None, None, country)
   private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
   private val userAnswers     = baseUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 

@@ -17,11 +17,10 @@
 package generators
 
 import models._
-import models.euDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails._
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
 
@@ -167,7 +166,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[FixedEstablishmentAddressPage]
-        value <- arbitrary[FixedEstablishmentAddress].map(Json.toJson(_))
+        value <- arbitrary[InternationalAddress].map(Json.toJson(_))
       } yield (page, value)
     }
 

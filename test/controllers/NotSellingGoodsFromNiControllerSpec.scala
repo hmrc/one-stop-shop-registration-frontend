@@ -19,25 +19,25 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.UseOtherAccountView
+import views.html.NotSellingGoodsFromNiView
 
-class UseOtherAccountControllerSpec extends SpecBase {
+class NotSellingGoodsFromNiControllerSpec extends SpecBase {
 
-  "UseOtherAccount Controller" - {
+  "NotSellingGoodsFromNi Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.UseOtherAccountController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.NotSellingGoodsFromNiController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[UseOtherAccountView]
+        val view = application.injector.instanceOf[NotSellingGoodsFromNiView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(vrn)(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
   }
