@@ -36,13 +36,14 @@ class FixedEstablishmentAddressController @Inject()(
                                       view: FixedEstablishmentAddressView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
+
+          val form = formProvider(country)
 
           val preparedForm = request.userAnswers.get(FixedEstablishmentAddressPage(index)) match {
             case None => form
@@ -57,6 +58,8 @@ class FixedEstablishmentAddressController @Inject()(
     implicit request =>
       getCountry(index) {
         country =>
+
+          val form = formProvider(country)
 
           form.bindFromRequest().fold(
             formWithErrors =>

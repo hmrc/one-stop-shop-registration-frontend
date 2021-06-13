@@ -43,7 +43,7 @@ object FixedEstablishmentAddressSummary {
           Some(HtmlFormat.escape(answer.line1).toString),
           answer.line2.map(HtmlFormat.escape),
           Some(HtmlFormat.escape(answer.townOrCity).toString),
-          answer.county.map(HtmlFormat.escape),
+          answer.stateOrRegion.map(HtmlFormat.escape),
           answer.postCode.map(HtmlFormat.escape)
         ).flatten.mkString("<br/>")
 

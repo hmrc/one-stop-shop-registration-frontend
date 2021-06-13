@@ -16,9 +16,8 @@
 
 package testutils
 
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, EuTaxRegistration, EuVatRegistration, FixedEstablishment, PreviousRegistration, Registration, RegistrationWithFixedEstablishment, VatDetailSource, VatDetails}
-import models.euDetails.FixedEstablishmentAddress
-import models.{BankDetails, BusinessContactDetails, Country, UkAddress}
+import models.domain._
+import models.{BankDetails, BusinessContactDetails, Country, InternationalAddress, UkAddress}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -40,12 +39,12 @@ object RegistrationData {
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
           EuTaxIdentifier(EuTaxIdentifierType.Vat, "ES123456789"),
-          FixedEstablishment("Spanish trading name", FixedEstablishmentAddress("Line 1", None, "Town", None, None))
+          FixedEstablishment("Spanish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain")))
         ),
         RegistrationWithFixedEstablishment(
           Country("DE", "Germany"),
           EuTaxIdentifier(EuTaxIdentifierType.Other, "DE123456789"),
-          FixedEstablishment("German trading name", FixedEstablishmentAddress("Line 1", None, "Town", None, None))
+          FixedEstablishment("German trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany")))
         )
       ),
       contactDetails = createBusinessContactDetails(),

@@ -18,8 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.FixedEstablishmentAddress
-import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
@@ -244,8 +243,8 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
     "must remove EU Tax Reference number, Fixed Establishment Trading Name and Address for this index when the answer is no" in {
 
-      val address1 = arbitrary[FixedEstablishmentAddress].sample.value
-      val address2 = arbitrary[FixedEstablishmentAddress].sample.value
+      val address1 = arbitrary[InternationalAddress].sample.value
+      val address2 = arbitrary[InternationalAddress].sample.value
 
       val answers =
         UserAnswers("id")
@@ -268,7 +267,7 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
     "must preserve EU Tax Reference, Fixed Establishment Trading Name and Address when the answer is no" in {
 
-      val address = arbitrary[FixedEstablishmentAddress].sample.value
+      val address = arbitrary[InternationalAddress].sample.value
 
       val answers =
         UserAnswers("id")

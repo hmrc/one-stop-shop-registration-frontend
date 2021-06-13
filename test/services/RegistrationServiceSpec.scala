@@ -21,7 +21,6 @@ import models.CurrentlyRegisteredInCountry.Yes
 import models._
 import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
-import models.euDetails.FixedEstablishmentAddress
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
@@ -50,13 +49,13 @@ class RegistrationServiceSpec extends SpecBase {
       .set(EuVatNumberPage(Index(1)), "ES123456789").success.value
       .set(HasFixedEstablishmentPage(Index(1)), true).success.value
       .set(FixedEstablishmentTradingNamePage(Index(1)), "Spanish trading name").success.value
-      .set(FixedEstablishmentAddressPage(Index(1)), FixedEstablishmentAddress("Line 1", None, "Town", None, None)).success.value
+      .set(FixedEstablishmentAddressPage(Index(1)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
       .set(EuCountryPage(Index(2)), Country("DE", "Germany")).success.value
       .set(VatRegisteredPage(Index(2)), false).success.value
       .set(HasFixedEstablishmentPage(Index(2)), true).success.value
       .set(EuTaxReferencePage(Index(2)), "DE123456789").success.value
       .set(FixedEstablishmentTradingNamePage(Index(2)), "German trading name").success.value
-      .set(FixedEstablishmentAddressPage(Index(2)), FixedEstablishmentAddress("Line 1", None, "Town", None, None)).success.value
+      .set(FixedEstablishmentAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany"))).success.value
       .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value

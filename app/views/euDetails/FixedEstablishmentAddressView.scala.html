@@ -20,7 +20,6 @@
 
         <h1 class="govuk-heading-xl">@messages("fixedEstablishmentAddress.heading", country.name)</h1>
 
-
         @govukInput(
             InputViewModel(
                 field = form("line1"),
@@ -51,7 +50,7 @@
         @govukInput(
             InputViewModel(
                 field = form("county"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.county"))
+                label = LabelViewModel(messages("fixedEstablishmentAddress.stateOrRegion"))
             )
             .withWidth(TwoThirds)
         )

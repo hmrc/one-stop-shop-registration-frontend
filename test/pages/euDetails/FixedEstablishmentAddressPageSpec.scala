@@ -18,8 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
-import models.euDetails.FixedEstablishmentAddress
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -29,11 +28,11 @@ class FixedEstablishmentAddressPageSpec extends SpecBase with PageBehaviours {
 
   "FixedEstablishmentAddressPage" - {
 
-    beRetrievable[FixedEstablishmentAddress](FixedEstablishmentAddressPage(index))
+    beRetrievable[InternationalAddress](FixedEstablishmentAddressPage(index))
 
-    beSettable[FixedEstablishmentAddress](euDetails.FixedEstablishmentAddressPage(index))
+    beSettable[InternationalAddress](euDetails.FixedEstablishmentAddressPage(index))
 
-    beRemovable[FixedEstablishmentAddress](euDetails.FixedEstablishmentAddressPage(index))
+    beRemovable[InternationalAddress](euDetails.FixedEstablishmentAddressPage(index))
 
     "must navigate in Normal mode" - {
 

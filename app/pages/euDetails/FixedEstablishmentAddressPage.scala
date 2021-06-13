@@ -17,13 +17,12 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckMode, Index, NormalMode, UserAnswers}
-import models.euDetails.FixedEstablishmentAddress
+import models.{CheckMode, Index, InternationalAddress, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class FixedEstablishmentAddressPage(index: Index) extends QuestionPage[FixedEstablishmentAddress] {
+case class FixedEstablishmentAddressPage(index: Index) extends QuestionPage[InternationalAddress] {
 
   override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
