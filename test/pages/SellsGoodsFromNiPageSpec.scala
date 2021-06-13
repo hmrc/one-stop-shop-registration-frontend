@@ -40,11 +40,11 @@ class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.InControlOfMovingGoodsController.onPageLoad(NormalMode))
       }
 
-      "to Cannot Register when the answer is no" in {
+      "to Do Not Need To Register when the answer is no" in {
 
         val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
         SellsGoodsFromNiPage.navigate(NormalMode, answers)
-          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+          .mustEqual(routes.DoNotNeedToRegisterController.onPageLoad())
       }
     }
 
@@ -57,11 +57,11 @@ class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "to Cannot Register for Service when the answer is no" in {
+      "to Do Not Need To Register for Service when the answer is no" in {
 
         val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
         SellsGoodsFromNiPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+          .mustEqual(routes.DoNotNeedToRegisterController.onPageLoad())
       }
     }
   }
