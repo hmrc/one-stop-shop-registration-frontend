@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.DoNotNeedToRegisterView
+import views.html.NotSellingGoodsToEuView
 
 class NotSellingGoodsToEuControllerSpec extends SpecBase {
 
@@ -34,7 +34,7 @@ class NotSellingGoodsToEuControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[DoNotNeedToRegisterView]
+        val view = application.injector.instanceOf[NotSellingGoodsToEuView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString

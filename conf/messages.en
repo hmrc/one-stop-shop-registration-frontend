@@ -193,10 +193,10 @@ websites.change.hidden = your websites
 tradingNames.checkYourAnswersLabel = Trading names
 tradingNames.change.hidden = your trading names
 
-cannotRegisterForService.title = You cannot use this service
-cannotRegisterForService.heading = You cannot use this service
-cannotRegisterForService.can-register-in-eu-country = You can register for the One-Stop Shop scheme in an EU country.
-cannotRegisterForService.change.hidden = Cannot register for service
+notInControlOfMovingGoods.title = You do not need to register
+notInControlOfMovingGoods.heading = You do not need to register
+notInControlOfMovingGoods.p1 = If your business sells goods on online marketplaces, but is not in control of moving goods, your business is not responsible for paying VAT to EU countries.
+notInControlOfMovingGoods.p2 = The online marketplaces in control of moving the goods will be responsible for paying the VAT and registering for this scheme.
 
 applicationComplete.title = Application complete
 applicationComplete.heading = Application complete
@@ -389,11 +389,10 @@ checkEuVatDetailsAnswers.heading = Check your answers
 
 alreadyRegistered.title = Already registered
 alreadyRegistered.heading = {0} is already registered
-alreadyRegistered.reference = Your reference number
+alreadyRegistered.reference = Your VAT registration number
+alreadyRegistered.confirmation = Check your email for the confirmation.
 alreadyRegistered.next = What happens next
-alreadyRegistered.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-alreadyRegistered.p1 = You are now automatically set up for the online VAT return service.
-alreadyRegistered.p2 = We will send you details about how to submit returns and make payments before your first VAT return is due.
+alreadyRegistered.p1 = We will send you details about how to submit returns and make payments before your first VAT return is due.
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 

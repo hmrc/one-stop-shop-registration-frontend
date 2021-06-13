@@ -67,7 +67,6 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
             view(
               registration.registeredCompanyName,
               vrn,
-              registration.contactDetails.emailAddress,
               config.feedbackUrl(request)
             )(request, messages(application)).toString
 

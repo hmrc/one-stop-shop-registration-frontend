@@ -47,11 +47,11 @@ class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckVatNumberController.onPageLoad())
       }
 
-      "to Cannot Register when the answer is no" in {
+      "to Not in Control of Moving Goods when the answer is no" in {
 
         val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
         InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
       }
     }
 
@@ -64,11 +64,11 @@ class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "to Cannot Register for Service when the answer is no" in {
+      "to Not in Control of Moving Goods for Service when the answer is no" in {
 
         val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
         InControlOfMovingGoodsPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
       }
     }
   }

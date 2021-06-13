@@ -14,18 +14,17 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
-
 @this(
     layout: templates.Layout
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("cannotRegisterForService.title"))) {
+@layout(pageTitle = titleNoForm(messages("notInControlOfMovingGoods.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("cannotRegisterForService.title")</h1>
+    <h1 class="govuk-heading-xl">@messages("notInControlOfMovingGoods.heading")</h1>
 
-    <p class="govuk-body">@messages("cannotRegisterForService.can-register-in-eu-country")</p>
+    <p class="govuk-body">@messages("notInControlOfMovingGoods.p1")</p>
 
+    <p class="govuk-body">@messages("notInControlOfMovingGoods.p2")</p>
 }

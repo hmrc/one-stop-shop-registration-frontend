@@ -84,7 +84,7 @@ POST        /businessContactDetails                         controllers.Business
 GET         /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /cannotRegisterForService                       controllers.CannotRegisterForServiceController.onPageLoad()
+GET         /notInControlOfMovingGoods                       controllers.NotInControlOfMovingGoodsController.onPageLoad()
 
 GET        /applicationComplete                             controllers.ApplicationCompleteController.onPageLoad()
 
