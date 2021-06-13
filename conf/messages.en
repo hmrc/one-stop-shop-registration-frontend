@@ -534,6 +534,6 @@ internationalAddress.error.stateOrRegion.length = State or region must be 100 ch
 internationalAddress.error.postCode.length = Postcode must be 100 characters or less
 internationalAddress.change.hidden = your principal place of business address
 
-doNotNeedToRegister.title = You do not need to register
-doNotNeedToRegister.heading = You do not need to register
-doNotNeedToRegister.p = This service is only for businesses that sell goods online from Northern Ireland to consumers in the EU.
+notSellingGoodsToEu.title = You do not need to register
+notSellingGoodsToEu.heading = You do not need to register
+notSellingGoodsToEu.p = This service is only for businesses that sell goods online from Northern Ireland to consumers in the EU.

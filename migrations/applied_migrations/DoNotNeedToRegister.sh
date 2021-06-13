@@ -9,7 +9,7 @@ echo "GET        /doNotNeedToRegister                       controllers.DoNotNee
 
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en
-echo "doNotNeedToRegister.title = doNotNeedToRegister" >> ../conf/messages.en
-echo "doNotNeedToRegister.heading = doNotNeedToRegister" >> ../conf/messages.en
+echo "notSellingGoodsToEu.title = doNotNeedToRegister" >> ../conf/messages.en
+echo "notSellingGoodsToEu.heading = doNotNeedToRegister" >> ../conf/messages.en
 
 echo "Migration DoNotNeedToRegister completed"

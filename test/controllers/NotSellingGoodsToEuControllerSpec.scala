@@ -21,16 +21,16 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.DoNotNeedToRegisterView
 
-class DoNotNeedToRegisterControllerSpec extends SpecBase {
+class NotSellingGoodsToEuControllerSpec extends SpecBase {
 
-  "DoNotNeedToRegister Controller" - {
+  "NotSellingGoodsToEu Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.DoNotNeedToRegisterController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.NotSellingGoodsToEuController.onPageLoad().url)
 
         val result = route(application, request).value
 

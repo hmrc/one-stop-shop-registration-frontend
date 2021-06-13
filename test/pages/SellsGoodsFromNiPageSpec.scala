@@ -44,7 +44,7 @@ class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
         SellsGoodsFromNiPage.navigate(NormalMode, answers)
-          .mustEqual(routes.DoNotNeedToRegisterController.onPageLoad())
+          .mustEqual(routes.NotSellingGoodsToEuController.onPageLoad())
       }
     }
 
@@ -61,7 +61,7 @@ class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
         SellsGoodsFromNiPage.navigate(CheckMode, answers)
-          .mustEqual(routes.DoNotNeedToRegisterController.onPageLoad())
+          .mustEqual(routes.NotSellingGoodsToEuController.onPageLoad())
       }
     }
   }
