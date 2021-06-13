@@ -533,3 +533,6 @@ internationalAddress.error.townOrCity.length = Town or city must be 100 characte
 internationalAddress.error.stateOrRegion.length = State or region must be 100 characters or less
 internationalAddress.error.postCode.length = Postcode must be 100 characters or less
 internationalAddress.change.hidden = your principal place of business address
+
+doNotNeedToRegister.title = doNotNeedToRegister
+doNotNeedToRegister.heading = doNotNeedToRegister

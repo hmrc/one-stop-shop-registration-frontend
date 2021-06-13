@@ -264,3 +264,5 @@ GET        /internationalAddress                        controllers.Internationa
 POST       /internationalAddress                        controllers.InternationalAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /changeInternationalAddress                  controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeInternationalAddress                  controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /doNotNeedToRegister                       controllers.DoNotNeedToRegisterController.onPageLoad()
