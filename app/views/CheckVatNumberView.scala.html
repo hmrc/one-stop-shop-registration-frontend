@@ -1,4 +1,5 @@
 @import uk.gov.hmrc.domain.Vrn
+@import viewmodels.LegendSize
 
 @this(
         layout: templates.Layout,
@@ -20,12 +21,18 @@
 
         <h1 class="govuk-heading-xl">@messages("checkVatNumber.heading")</h1>
 
-        <p class="govuk-body">@vrn.value</p>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.vrn")</dt>
+                <dt class="govuk-summary-list__value govuk-!-width-one-half">@vrn.vrn</dt>
+            </div>
+        </dl>
 
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("checkVatNumber.heading")).withCssClass("govuk-visually-hidden")
+                legend = LegendViewModel(messages("checkVatNumber.question")).withSize(LegendSize.Medium)
             )
         )
 

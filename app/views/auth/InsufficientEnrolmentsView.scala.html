@@ -26,4 +26,11 @@
 
     <p class="govuk-body">@messages("insufficientEnrolments.p1")</p>
 
+    <p class="govuk-body">
+        @messages("insufficientEnrolments.p2.1")
+        <a href="@controllers.auth.routes.AuthController.redirectToLogin(routes.IndexController.onPageLoad().url).url" class="govuk-link">
+            @messages("insufficientEnrolments.p2.link.text")
+        </a>
+        @messages("insufficientEnrolments.p2.2")
+    </p>
 }

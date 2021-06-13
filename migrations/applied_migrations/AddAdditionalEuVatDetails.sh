@@ -14,11 +14,11 @@ echo "POST       /changeAddAdditionalEuVatDetails                  controllers.A
 
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en
-echo "addEuVatDetails.title = addAdditionalEuVatDetails" >> ../conf/messages.en
-echo "addEuVatDetails.heading = addAdditionalEuVatDetails" >> ../conf/messages.en
-echo "addEuVatDetails.checkYourAnswersLabel = addAdditionalEuVatDetails" >> ../conf/messages.en
-echo "addEuVatDetails.error.required = Select yes if addAdditionalEuVatDetails" >> ../conf/messages.en
-echo "addEuVatDetails.change.hidden = AddAdditionalEuVatDetails" >> ../conf/messages.en
+echo "addEuDetails.title = addAdditionalEuVatDetails" >> ../conf/messages.en
+echo "addEuDetails.heading = addAdditionalEuVatDetails" >> ../conf/messages.en
+echo "addEuDetails.checkYourAnswersLabel = addAdditionalEuVatDetails" >> ../conf/messages.en
+echo "addEuDetails.error.required = Select yes if addAdditionalEuVatDetails" >> ../conf/messages.en
+echo "addEuDetails.change.hidden = AddAdditionalEuVatDetails" >> ../conf/messages.en
 
 echo "Adding to UserAnswersEntryGenerators"
 awk '/trait UserAnswersEntryGenerators/ {\
