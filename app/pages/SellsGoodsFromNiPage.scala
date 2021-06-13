@@ -29,13 +29,13 @@ case object SellsGoodsFromNiPage extends QuestionPage[Boolean] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(SellsGoodsFromNiPage) match {
     case Some(true)  => routes.InControlOfMovingGoodsController.onPageLoad(NormalMode)
-    case Some(false) => routes.NotSellingGoodsToEuController.onPageLoad()
+    case Some(false) => routes.NotSellingGoodsFromNiController.onPageLoad()
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(SellsGoodsFromNiPage) match {
     case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
-    case Some(false) => routes.NotSellingGoodsToEuController.onPageLoad()
+    case Some(false) => routes.NotSellingGoodsFromNiController.onPageLoad()
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
 }

@@ -22,12 +22,12 @@ import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.NotSellingGoodsToEuView
+import views.html.NotSellingGoodsFromNiView
 
-class NotSellingGoodsToEuController @Inject()(
+class NotSellingGoodsFromNiController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: NotSellingGoodsToEuView
+                                       view: NotSellingGoodsFromNiView
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
