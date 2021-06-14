@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package models.requests
+package models.audit
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.domain.Vrn
+import models.{Enumerable, WithName}
 
-case class IdentifierRequest[A] (
-                                  request: Request[A],
-                                  credentials: Credentials,
-                                  vrn: Vrn
-                                ) extends WrappedRequest[A](request) {
+sealed trait SubmissionResult
 
-  val userId: String = credentials.providerId
+object SubmissionResult extends Enumerable.Implicits {
+
+  case object Success extends WithName("success") with SubmissionResult
+  case object Failure extends WithName("failure") with SubmissionResult
+  case object Duplicate extends WithName("failure-duplicate-submission") with SubmissionResult
+
+  val values = Seq(Success, Failure, Duplicate)
+
+  implicit val enumerable: Enumerable[SubmissionResult] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }
