@@ -58,7 +58,7 @@ unauthorised.heading = You can’t access this service with this account
 hasTradingName.title = Does your business trade using a different name in the UK?
 hasTradingName.heading = Does your business trade using a name that is different from {0} in the UK?
 hasTradingName.checkYourAnswersLabel = Does your business have a different trading name
-hasTradingName.error.required = Select yes if your business trades using a name that is different from {0} in the UK
+hasTradingName.error.required = Select yes if you use a different trading name in the UK
 hasTradingName.change.hidden = if your business trades using a name that is different from {0} in the UK
 
 partOfVatGroup.title = Is your business part of a UK VAT group?
@@ -74,8 +74,8 @@ registeredCompanyName.hint = Make sure it matches the name on your VAT certifica
 registeredCompanyName.hint.link.text = business tax account
 registeredCompanyName.checkYourAnswersLabel = Registered business name
 registeredCompanyName.error.required = Enter your business name
-registeredCompanyName.error.length = Your business name must be 100 characters or less
-registeredCompanyName.error.invalid = Enter a valid business name
+registeredCompanyName.error.length = Business name must be 105 characters or less
+registeredCompanyName.error.invalid = Business name must only include letters a to z, numbers, hyphens, spaces and apostrophes
 registeredCompanyName.change.hidden = the registered business name
 
 tradingName.title = What is your UK trading name?
@@ -333,7 +333,7 @@ ivFailedIdentityVerification.p = We could not confirm your identity
 
 checkVatDetails.title = Confirm VAT details for your business
 checkVatDetails.heading = Confirm VAT details for your business
-checkVatDetails.error.required = Select yes if you want to register this business for the scheme
+checkVatDetails.error.required = Select if you want to register this business for the VAT One Stop Shop
 checkVatDetails.question = Do you want to register this business for the scheme?
 checkVatDetails.vrn = UK VAT registration number
 checkVatDetails.organisationName = Business name
@@ -346,7 +346,7 @@ checkVatDetails.wrongAccount = No, I want to register a different business
 checkVatNumber.title = Confirm VAT details for your business
 checkVatNumber.heading = Confirm VAT details for your business
 checkVatNumber.question = Do you want to register this business for the scheme?
-checkVatNumber.error.required = Select yes if you want to register this business for the scheme
+checkVatNumber.error.required = Select yes if you want to register this business for the VAT One Stop Shop
 checkVatNumber.vrn.title = UK VAT registration number
 
 useOtherAccount.title = Sign in with a different Government Gateway
@@ -497,7 +497,7 @@ inControlOfMovingGoods.change.hidden = if your business will be in control of mo
 sellsGoodsFromNi.title = Will your business sell goods online from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.heading = Will your business sell goods online from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.checkYourAnswersLabel = Will your business sell goods online from Northern Ireland to consumers in the EU?
-sellsGoodsFromNi.error.required = Select yes if your business will sell goods online from Northern Ireland to consumers in the EU
+sellsGoodsFromNi.error.required = Select yes if the business sells goods online from Northern Ireland to consumers in the EU
 sellsGoodsFromNi.change.hidden = if your business will sell goods online from Northern Ireland to consumers in the EU
 
 taxRegisteredInEu.title = Is your business registered for tax in EU countries?

@@ -18,20 +18,20 @@ POST        /check-your-answers                             controllers.CheckYou
 
 GET         /unauthorised                                   controllers.UnauthorisedController.onPageLoad
 
-GET         /hasTradingName                                 controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /hasTradingName                                 controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET         /changeHasTradingName                           controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeHasTradingName                           controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /have-uk-trading-name                           controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /have-uk-trading-name                           controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /check-have-uk-trading-name                     controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-have-uk-trading-name                     controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
 
 GET         /partOfVatGroup                                 controllers.PartOfVatGroupController.onPageLoad(mode: Mode = NormalMode)
 POST        /partOfVatGroup                                 controllers.PartOfVatGroupController.onSubmit(mode: Mode = NormalMode)
 GET         /changePartOfVatGroup                           controllers.PartOfVatGroupController.onPageLoad(mode: Mode = CheckMode)
 POST        /changePartOfVatGroup                           controllers.PartOfVatGroupController.onSubmit(mode: Mode = CheckMode)
 
-GET         /registeredCompanyName                          controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /registeredCompanyName                          controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = NormalMode)
-GET         /changeRegisteredCompanyName                    controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeRegisteredCompanyName                    controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = CheckMode)
+GET         /business-name                                  controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /business-name                                  controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = NormalMode)
+GET         /check-business-name                            controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-business-name                            controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = CheckMode)
 
 GET         /tradingName/:index                             controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /tradingName/:index                             controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -84,7 +84,7 @@ POST        /businessContactDetails                         controllers.Business
 GET         /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /notInControlOfMovingGoods                       controllers.NotInControlOfMovingGoodsController.onPageLoad()
+GET         /do-not-move-goods                              controllers.NotInControlOfMovingGoodsController.onPageLoad()
 
 GET        /applicationComplete                             controllers.ApplicationCompleteController.onPageLoad()
 
@@ -142,13 +142,13 @@ GET         /account/provider-unsupported                                   cont
 GET         /account/credential-unsupported                                 controllers.auth.AuthController.insufficientEnrolments()
 GET         /account/role-unsupported                                       controllers.auth.AuthController.unsupportedCredentialRole
 
-GET        /checkVatDetails                        controllers.CheckVatDetailsController.onPageLoad
-POST       /checkVatDetails                        controllers.CheckVatDetailsController.onSubmit
+GET        /confirm-vat-details                    controllers.CheckVatDetailsController.onPageLoad
+POST       /confirm-vat-details                    controllers.CheckVatDetailsController.onSubmit
 
-GET         /checkVatNumber                         controllers.CheckVatNumberController.onPageLoad
-POST        /checkVatNumber                         controllers.CheckVatNumberController.onSubmit
+GET         /confirm-vat-number                     controllers.CheckVatNumberController.onPageLoad
+POST        /confirm-vat-number                     controllers.CheckVatNumberController.onSubmit
 
-GET        /useOtherAccount                       controllers.UseOtherAccountController.onPageLoad
+GET        /register-different-business                       controllers.UseOtherAccountController.onPageLoad
 
 GET        /fixedEstablishmentAddress/:index                        controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST       /fixedEstablishmentAddress/:index                        controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -238,22 +238,22 @@ POST       /hasWebsite                        controllers.HasWebsiteController.o
 GET        /changeHasWebsite                  controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeHasWebsite                  controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
 
-GET        /inControlOfMovingGoods                        controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = NormalMode)
-POST       /inControlOfMovingGoods                        controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeInControlOfMovingGoods                  controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeInControlOfMovingGoods                  controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = CheckMode)
+GET        /move-goods                                    controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = NormalMode)
+POST       /move-goods                                    controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = NormalMode)
+GET        /check-move-goods                              controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = CheckMode)
+POST       /check-move-goods                              controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /sellsGoodsFromNi                        controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = NormalMode)
-POST       /sellsGoodsFromNi                        controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = NormalMode)
-GET        /changeSellsGoodsFromNi                  controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeSellsGoodsFromNi                  controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = CheckMode)
+GET        /sell-online                             controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = NormalMode)
+POST       /sell-online                             controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = NormalMode)
+GET        /change-sell-online                      controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-sell-online                      controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = CheckMode)
 
 GET        /taxRegisteredInEu                        controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
 POST       /taxRegisteredInEu                        controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
 GET        /changeTaxRegisteredInEu                  controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeTaxRegisteredInEu                  controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
 
-GET        /updateVatDetails                       controllers.UpdateVatDetailsController.onPageLoad()
+GET        /update-vat-details                       controllers.UpdateVatDetailsController.onPageLoad()
 
 GET        /businessAddressInUk                        controllers.BusinessAddressInUkController.onPageLoad(mode: Mode = NormalMode)
 POST       /businessAddressInUk                        controllers.BusinessAddressInUkController.onSubmit(mode: Mode = NormalMode)
@@ -265,4 +265,4 @@ POST       /internationalAddress                        controllers.Internationa
 GET        /changeInternationalAddress                  controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeInternationalAddress                  controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /notSellingGoodsFromNi                       controllers.NotSellingGoodsFromNiController.onPageLoad()
+GET        /do-not-sell-online                          controllers.NotSellingGoodsFromNiController.onPageLoad()
