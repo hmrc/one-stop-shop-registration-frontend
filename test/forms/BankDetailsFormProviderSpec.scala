@@ -56,6 +56,8 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "bic"
     val invalidKey = "bankDetails.error.bic.invalid"
+    val lengthKey = "bankDetails.error.bic.length"
+    val minLength = 8
     val maxLength = 11
 
     val validData = Gen.listOfN(maxLength, Gen.oneOf(Gen.numChar, Gen.alphaUpperChar)).map(_.mkString)
@@ -64,6 +66,20 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       validData
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like fieldWithMinLength(
+      form,
+      fieldName,
+      minLength = minLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(minLength))
     )
 
     "not bind any strings containing characters other than digits or alpha characters" in {
@@ -77,8 +93,7 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "iban"
     val requiredKey = "bankDetails.error.iban.required"
-    val maxKey = "bankDetails.error.iban.max"
-    val minKey = "bankDetails.error.iban.min"
+    val lengthKey = "bankDetails.error.iban.length"
     val maxLength = 34
     val minLength = 5
 
@@ -97,14 +112,14 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, maxKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
     behave like fieldWithMinLength(
       form,
       fieldName,
       minLength = minLength,
-      lengthError = FormError(fieldName, minKey, Seq(minLength))
+      lengthError = FormError(fieldName, lengthKey, Seq(minLength))
     )
 
     behave like mandatoryField(
