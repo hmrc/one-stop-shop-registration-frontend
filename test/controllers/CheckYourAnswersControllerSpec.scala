@@ -17,15 +17,17 @@
 package controllers
 
 import base.SpecBase
+import cats.data.NonEmptyChain
+import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
-import models.NormalMode
+import models.{DataMissingError, NormalMode}
 import models.responses.ConflictFound
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.CheckYourAnswersPage
+import pages.{CheckYourAnswersPage, HasTradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
@@ -71,7 +73,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "user should be redirected to the next page" in {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -94,7 +96,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "the user is redirected to Journey Recovery Page" in {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn None
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(bind[RegistrationService].toInstance(registrationService)).build()
@@ -113,7 +115,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "the user is redirected to Already Registered Page" in {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))

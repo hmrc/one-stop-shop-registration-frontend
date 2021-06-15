@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.data.Validated.{Invalid, Valid}
 import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
@@ -83,7 +84,7 @@ class CheckYourAnswersController @Inject()(
       val registration = registrationService.fromUserAnswers(request.userAnswers, request.vrn)
 
       registration match {
-        case Some(registration) =>
+        case Valid(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
               successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
@@ -95,8 +96,10 @@ class CheckYourAnswersController @Inject()(
               logger.error(s"Unexpected result on submit: ${e.toString}")
               successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
-        case None =>
-          logger.error("Unable to create a registration request from user answers")
+
+        case Invalid(errors) =>
+          val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
+          logger.error(s"Unable to create a registration request from user answers: $errorMessages")
           successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
