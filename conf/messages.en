@@ -65,7 +65,7 @@ partOfVatGroup.title = Is your business part of a UK VAT group?
 partOfVatGroup.heading = Is your business part of a UK VAT group?
 partOfVatGroup.guidance = VAT groups are when 2 or more companies or limited liability partnerships register as one ‘taxable’ person for VAT.
 partOfVatGroup.checkYourAnswersLabel = Is the business part of a UK VAT group?
-partOfVatGroup.error.required = Select yes if the business is part of a UK VAT group
+partOfVatGroup.error.required = Select yes if your business is part of a UK VAT group
 partOfVatGroup.change.hidden = if the business is part of a UK VAT group
 
 registeredCompanyName.title = What is your business name?
@@ -82,9 +82,9 @@ tradingName.title = What is your UK trading name?
 tradingName.heading = What is your UK trading name?
 tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
 tradingName.error.required = Enter your UK trading name
-tradingName.error.length = Your UK trading name must be 100 characters or less
-tradingName.error.duplicate = You have already added this UK trading name
-tradingName.error.invalid = Enter a valid UK trading name
+tradingName.error.length = Trading name must be 160 characters or less
+tradingName.error.duplicate = You entered this trading name already. Enter a different one.
+tradingName.error.invalid = Trading name must only include letters a to z, numbers, hyphens, spaces and apostrophes
 tradingName.change.hidden = your UK trading name
 
 ukVatEffectiveDate.title = What is your UK VAT registration date?
@@ -112,19 +112,19 @@ euVatNumber.heading = What is your VAT registration number for {0}?
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.length = VAT registration number must be 100 characters or less
-euVatNumber.error.invalid = Enter a valid EU VAT number
+euVatNumber.error.invalid = EU VAT registration number must only include letters A to Z and numbers
 euVatNumber.change.hidden = your VAT registration number
 
 euCountry.title = Enter an EU country where your business is registered for tax
 euCountry.heading = Enter an EU country where your business is registered for tax
 euCountry.checkYourAnswersLabel = Country of registration
-euCountry.error.required = Enter an EU country where your business is registered for tax
-euCountry.error.duplicate = You have already added this country
+euCountry.error.required = Select an EU country where your business is registered for tax
+euCountry.error.duplicate = You selected this country already. Select a different one.
 
 vatRegistered.title = Are you registered for VAT in {0}?
 vatRegistered.heading = Are you registered for VAT in {0}?
 vatRegistered.checkYourAnswersLabel = Registered for VAT
-vatRegistered.error.required = Select yes if you are registered for VAT in {0}
+vatRegistered.error.required = Select yes if you are registered for VAT in this country
 vatRegistered.change.hidden = if you are registered for VAT
 
 addEuDetails.title.singular = You added tax details for one EU country
@@ -153,14 +153,18 @@ ukAddress.townOrCity = Town or city
 ukAddress.county = County
 ukAddress.postCode = Postcode
 ukAddress.checkYourAnswersLabel = UK business address
-ukAddress.error.line1.required = Enter building and street
-ukAddress.error.townOrCity.required = Enter town or city
-ukAddress.error.postCode.required = Enter postcode
-ukAddress.error.line1.length = Building and street must be 100 characters or less
-ukAddress.error.line2.length = Line2 must be 100 characters or less
-ukAddress.error.townOrCity.length = Town or city must be 100 characters or less
-ukAddress.error.county.length = County must be 100 characters or less
-ukAddress.error.postCode.length = Postcode must be 100 characters or less
+ukAddress.error.line1.required = Enter the building and street
+ukAddress.error.townOrCity.required = Enter the town or city
+ukAddress.error.postCode.required = Enter the postcode
+ukAddress.error.line1.length = Building and street must be 250 characters or less
+ukAddress.error.line1.invalid = Building and street must only include letters a to z, numbers, hyphens, spaces and apostrophes
+ukAddress.error.line2.length = Building and street must be 250 characters or less
+ukAddress.error.line2.invalid = Building and street must only include letters a to z, numbers, hyphens, spaces and apostrophes
+ukAddress.error.townOrCity.length = Town or city must be 250 characters or less
+ukAddress.error.townOrCity.invalid = Town or city must only include letters a to z, hyphens, spaces and apostrophes
+ukAddress.error.county.length = County must be 250 characters or less
+ukAddress.error.county.invalid = County must only include letters a to z, hyphens, spaces and apostrophes
+ukAddress.error.postCode.length = Postcode must be 9 characters or less
 ukAddress.error.postCode.invalid = Enter a valid postcode
 ukAddress.change.hidden = the principal place of business address
 
@@ -209,7 +213,7 @@ applicationComplete.feedback.30seconds = (takes 30 seconds)
 
 deleteTradingName.title = Are you sure you want to remove {0}?
 deleteTradingName.heading = Are you sure you want to remove {0}?
-deleteTradingName.error.required = Select yes if you want to remove this trading name
+deleteTradingName.error.required = Select yes if you need to remove this trading name
 
 addTradingName.title.singular = You have added one UK trading name
 addTradingName.heading.singular = You have added one UK trading name
@@ -371,7 +375,7 @@ fixedEstablishmentAddress.error.line2.length = Address line 2 must be 100 charac
 fixedEstablishmentAddress.error.townOrCity.length = Town or city must be 100 characters or less
 fixedEstablishmentAddress.error.county.length = State or region must be 100 characters or less
 fixedEstablishmentAddress.error.postCode.length = Postcode must be 100 characters or less
-fixedEstablishmentAddress.error.postCode.invalid = Enter a valid postcode
+fixedEstablishmentAddress.error.postCode.invalid = Postcode must only include letters a to z, numbers and spaces
 fixedEstablishmentAddress.change.hidden = the fixed establishment address
 
 fixedEstablishmentTradingName.title = What is your trading name in {0}?
@@ -379,9 +383,9 @@ fixedEstablishmentTradingName.heading = What is your trading name in {0}?
 fixedEstablishmentTradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
 fixedEstablishmentTradingName.checkYourAnswersLabel = Trading name
 fixedEstablishmentTradingName.error.required = Enter your trading name in {0}
-fixedEstablishmentTradingName.error.length = Trading name must be 100 characters or less
+fixedEstablishmentTradingName.error.length = Trading name must be 160 characters or less
 fixedEstablishmentTradingName.change.hidden = your trading name
-fixedEstablishmentTradingName.error.invalid = Enter a valid trading name
+fixedEstablishmentTradingName.error.invalid = Trading name must only include letters a to z, numbers, hyphens, spaces and apostrophes
 
 hasFixedEstablishment.title = Do you have a fixed establishment in {0}?
 hasFixedEstablishment.heading = Do you have a fixed establishment in {0}?
@@ -503,7 +507,7 @@ sellsGoodsFromNi.change.hidden = if your business will sell goods online from No
 taxRegisteredInEu.title = Is your business registered for tax in EU countries?
 taxRegisteredInEu.heading = Is your business registered for tax in EU countries?
 taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
-taxRegisteredInEu.error.required = Select yes if your business is registered for tax in EU countries
+taxRegisteredInEu.error.required = Select yes if your business is registered for tax in the EU
 taxRegisteredInEu.change.hidden = if your business is registered for tax in EU countries
 
 updateVatDetails.title = You cannot use this service

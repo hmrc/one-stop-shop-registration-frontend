@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.postCodePattern
+import forms.Validation.Validation.{commonNamePattern, postCodePattern}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -29,13 +29,21 @@ class UkAddressFormProvider @Inject() extends Mappings {
    def apply(): Form[UkAddress] = Form(
      mapping(
       "line1" -> text("ukAddress.error.line1.required")
-        .verifying(maxLength(250, "ukAddress.error.line1.length")),
+        .verifying(firstError(
+          maxLength(250, "ukAddress.error.line1.length"),
+          regexp(commonNamePattern, "ukAddress.error.line1.invalid"))),
       "line2" -> optional(text("ukAddress.error.line2.required")
-        .verifying(maxLength(250, "ukAddress.error.line2.length"))),
+        .verifying(firstError(
+          maxLength(250, "ukAddress.error.line2.length"),
+          regexp(commonNamePattern, "ukAddress.error.line2.invalid")))),
        "townOrCity" -> text("ukAddress.error.townOrCity.required")
-         .verifying(maxLength(250, "ukAddress.error.townOrCity.length")),
+       .verifying(firstError(
+         maxLength(250, "ukAddress.error.townOrCity.length"),
+         regexp(commonNamePattern, "ukAddress.error.townOrCity.invalid"))),
        "county" -> optional(text("ukAddress.error.county.required")
-         .verifying(maxLength(250, "ukAddress.error.county.length"))),
+         .verifying(firstError(
+           maxLength(250, "ukAddress.error.county.length"),
+           regexp(commonNamePattern, "ukAddress.error.county.invalid")))),
        "postCode" -> text("ukAddress.error.postCode.required")
          .verifying(firstError(
            maxLength(250, "ukAddress.error.postCode.length"),
