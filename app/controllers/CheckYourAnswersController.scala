@@ -22,11 +22,12 @@ import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.NormalMode
+import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.RegistrationService
+import services.{AuditService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -42,6 +43,7 @@ class CheckYourAnswersController @Inject()(
   cc: AuthenticatedControllerComponents,
   registrationConnector: RegistrationConnector,
   registrationService: RegistrationService,
+  auditService: AuditService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
@@ -87,13 +89,16 @@ class CheckYourAnswersController @Inject()(
         case Valid(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
+              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
               successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
 
             case Left(ConflictFound) =>
+              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
               successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
+              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
               successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
 

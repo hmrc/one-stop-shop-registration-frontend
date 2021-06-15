@@ -10,4 +10,6 @@
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
+
+    <logger name="application.controllers.actions.AuthenticatedIdentifierAction" level="${logger.controllers.actions.AuthenticatedIdentifierAction:-INFO}"/>
 </configuration>

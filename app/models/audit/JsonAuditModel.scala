@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package models.requests
+package models.audit
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.domain.Vrn
+import play.api.libs.json.JsValue
 
-case class IdentifierRequest[A] (
-                                  request: Request[A],
-                                  credentials: Credentials,
-                                  vrn: Vrn
-                                ) extends WrappedRequest[A](request) {
-
-  val userId: String = credentials.providerId
+trait JsonAuditModel {
+  val auditType: String
+  val transactionName: String
+  val detail: JsValue
 }
