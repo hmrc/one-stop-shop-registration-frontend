@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package config
+package models.emails
 
-object Constants {
+import play.api.libs.json.{Json, Reads, Writes}
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
+case class EmailToSendRequest(
+   to: List[String],
+   templateId: String,
+   parameters: EmailParameters,
+   force: Boolean = false
+)
 
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
+object EmailToSendRequest {
+  implicit val reads: Reads[EmailToSendRequest] = Json.reads[EmailToSendRequest]
+  implicit val writes: Writes[EmailToSendRequest] = Json.writes[EmailToSendRequest]
 }

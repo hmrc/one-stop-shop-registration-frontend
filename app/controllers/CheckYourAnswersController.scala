@@ -27,7 +27,7 @@ import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{AuditService, RegistrationService}
+import services.{AuditService, EmailService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -44,7 +44,8 @@ class CheckYourAnswersController @Inject()(
   registrationConnector: RegistrationConnector,
   registrationService: RegistrationService,
   auditService: AuditService,
-  view: CheckYourAnswersView
+  view: CheckYourAnswersView,
+  emailService: EmailService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -90,8 +91,14 @@ class CheckYourAnswersController @Inject()(
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
-              successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
-
+              emailService.sendConfirmationEmail(
+                registration.contactDetails.fullName,
+                registration.registeredCompanyName,
+                request.vrn.toString(),
+                registration.contactDetails.emailAddress
+              ) flatMap {
+                _ => successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
+              }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
               successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))

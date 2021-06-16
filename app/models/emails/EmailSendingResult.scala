@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package models.emails
 
-object Constants {
+sealed trait EmailSendingResult
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
-
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
+object EmailSendingResult {
+  case object EMAIL_ACCEPTED extends  EmailSendingResult
+  case object EMAIL_NOT_SENT extends  EmailSendingResult
+  case object EMAIL_UNSENDABLE extends  EmailSendingResult
 }
