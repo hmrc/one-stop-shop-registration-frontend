@@ -22,6 +22,7 @@ import models.{NormalMode, UserAnswers, responses}
 import pages.FirstAuthedPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.FeatureFlagService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import java.time.{Clock, Instant}
@@ -33,6 +34,7 @@ class IndexController @Inject()(
                                  cc: AuthenticatedControllerComponents,
                                  connector: RegistrationConnector,
                                  clock: Clock,
+                                 features: FeatureFlagService
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -61,7 +63,15 @@ class IndexController @Inject()(
               }
 
             case Left(_) =>
-              Future.successful(InternalServerError)
+              if (features.proceedWhenVatApiCallFails) {
+                val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
+                cc.sessionRepository.set(answers).map {
+                  _ =>
+                    Redirect(FirstAuthedPage.navigate(NormalMode, answers))
+                }
+              } else {
+                Future.successful(InternalServerError)
+              }
           }
       }
   }
