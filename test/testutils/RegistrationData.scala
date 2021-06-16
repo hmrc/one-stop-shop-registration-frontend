@@ -45,6 +45,9 @@ object RegistrationData {
           Country("DE", "Germany"),
           EuTaxIdentifier(EuTaxIdentifierType.Other, "DE123456789"),
           FixedEstablishment("German trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany")))
+        ),
+        RegistrationWithoutFixedEstablishment(
+          Country("IE", "Ireland")
         )
       ),
       contactDetails = createBusinessContactDetails(),
