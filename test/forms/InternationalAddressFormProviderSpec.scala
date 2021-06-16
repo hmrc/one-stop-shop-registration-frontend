@@ -19,6 +19,7 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
@@ -147,7 +148,7 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      arbitrary[Country].map(_.code)
+     Gen.oneOf(Country.internationalCountries).map(_.code)
     )
 
     behave like mandatoryField(
@@ -158,7 +159,7 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
     "must not bind any values other than valid country codes" in {
 
-      val invalidAnswers = arbitrary[String] suchThat (x => !Country.euCountries.map(_.code).contains(x))
+      val invalidAnswers = arbitrary[String] suchThat (x => !Country.internationalCountries.map(_.code).contains(x))
 
       forAll(invalidAnswers) {
         answer =>
