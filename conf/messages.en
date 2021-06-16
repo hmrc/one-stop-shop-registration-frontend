@@ -111,8 +111,8 @@ euVatNumber.title = What is your VAT registration number for {0}?
 euVatNumber.heading = What is your VAT registration number for {0}?
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
-euVatNumber.error.length = VAT registration number must be 100 characters or less
-euVatNumber.error.invalid = EU VAT registration number must only include letters A to Z and numbers
+euVatNumber.error.length = EU VAT registration number must be 12 characters or less
+euVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, *, + and numbers
 euVatNumber.change.hidden = your VAT registration number
 
 euCountry.title = Enter an EU country where your business is registered for tax
@@ -140,7 +140,7 @@ addEuDetails.addAnother.hint = You must tell us your tax details for all EU coun
 
 deleteEuVatDetails.title = Are you sure you want to remove the tax details for {0}?
 deleteEuVatDetails.heading = Are you sure you want to remove the tax details for {0}?
-deleteEuVatDetails.error.required = Select yes if you are sure you want to remove the tax details
+deleteEuVatDetails.error.required = Select yes if you need to remove VAT details for this country
 
 ukAddress.title = Principal place of business address
 ukAddress.heading = Principal place of business address
@@ -410,13 +410,13 @@ currentCountryOfRegistration.heading = Which EU country is your business registe
 currentCountryOfRegistration.option1 = Option 1
 currentCountryOfRegistration.option2 = Option 2
 currentCountryOfRegistration.checkYourAnswersLabel = EU Country your business is registered in
-currentCountryOfRegistration.error.required = Select which EU country your business is registered in
+currentCountryOfRegistration.error.required = Select where your business is already registered for the One Stop Shop
 currentCountryOfRegistration.change.hidden = which EU country your business is registered in
 
 currentlyRegisteredInEu.title = Are you registered for the One Stop Shop scheme in another EU country now?
 currentlyRegisteredInEu.heading = Are you registered for the One Stop Shop scheme in another EU country now?
 currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
-currentlyRegisteredInEu.error.required = Select yes if you are registered in another EU country now
+currentlyRegisteredInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country
 currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
 
 addPreviousRegistration.title.singular = You added one deregistration from the One Stop Shop
@@ -424,7 +424,7 @@ addPreviousRegistration.heading.singular = You added one deregistration from the
 addPreviousRegistration.title = You added {0} deregistrations from the One Stop Shop
 addPreviousRegistration.heading = You added {0} deregistrations from the One Stop Shop
 addPreviousRegistration.maximumReached = You have added details for every EU country
-addPreviousRegistration.error.required = Select yes if you need to add another dregistration
+addPreviousRegistration.error.required = Select yes if you need to add a deregistration for another EU country
 addPreviousRegistration.change.hidden = old registration in {0}
 addPreviousRegistration.remove.hidden = old registration for {0}
 addPreviousRegistration.addAnother = Add another deregistration?
@@ -432,13 +432,14 @@ addPreviousRegistration.addAnother.hint = You must tell us about all deregistrat
 
 previousEuCountry.title = Enter an EU country where you are no longer registered for the One Stop Shop
 previousEuCountry.heading = Enter an EU country where you are no longer registered for the One Stop Shop
-previousEuCountry.error.required = Enter an EU country
+previousEuCountry.error.required = Select an EU country
+previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
 previousEuVatNumber.title = What was your VAT registration number for {0}?
 previousEuVatNumber.heading = What was your VAT registration number for {0}?
-previousEuVatNumber.error.required = Enter the VAT registration number
+previousEuVatNumber.error.required = Enter your VAT registration number for this country
 previousEuVatNumber.error.length = VAT registration number must be 100 characters or less
-previousEuVatNumber.error.invalid = Enter a valid EU VAT registration number
+previousEuVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, *, + and numbers
 
 previouslyRegistered.title = Has your business deregistered from the One Stop Shop in an EU country?
 previouslyRegistered.heading = Has your business deregistered from the One Stop Shop in an EU country?
@@ -482,7 +483,7 @@ currentlyRegisteredInCountry.change.hidden = if your business is already registe
 euTaxReference.title = What is your tax reference number for {0}?
 euTaxReference.heading = What is your tax reference number for {0}?
 euTaxReference.checkYourAnswersLabel = Tax reference number
-euTaxReference.error.required = Enter your tax reference number for {0}
+euTaxReference.error.required = Enter your business tax reference number in {0}
 euTaxReference.error.length = EuTaxReference must be 100 characters or less
 euTaxReference.change.hidden = EuTaxReference
 
