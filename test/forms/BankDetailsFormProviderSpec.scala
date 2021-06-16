@@ -68,18 +68,12 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       validData
     )
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
-
-    behave like fieldWithMinLength(
+    behave like fieldWithLengthRange(
       form,
       fieldName,
       minLength = minLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(minLength))
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, Seq(invalidKey, lengthKey), Seq(bicPattern))
     )
 
     "not bind any strings containing characters other than digits or alpha characters" in {

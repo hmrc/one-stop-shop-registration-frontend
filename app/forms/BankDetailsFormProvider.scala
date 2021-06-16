@@ -35,8 +35,7 @@ class BankDetailsFormProvider @Inject() extends Mappings {
        )),
      "bic" -> optional(text("bankDetails.error.bic.required")
        .verifying(firstError(
-         minLength(8, "bankDetails.error.bic.length"),
-         maxLength(11, "bankDetails.error.bic.length"),
+         stringLengthRange(8, 11, "bankDetails.error.bic.length"),
          regexp(bicPattern, "bankDetails.error.bic.invalid")
        ))),
       "iban" -> text("bankDetails.error.iban.required")

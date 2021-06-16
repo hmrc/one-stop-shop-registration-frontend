@@ -49,4 +49,20 @@ trait StringFieldBehaviours extends FieldBehaviours {
       }
     }
   }
+
+  def fieldWithLengthRange(form: Form[_],
+                       fieldName: String,
+                       minLength: Int,
+                       maxLength: Int,
+                       lengthError: FormError): Unit = {
+    s"not bind strings outside range of $minLength and $maxLength characters in length" in {
+
+      forAll(stringsWithLength(minLength, maxLength) -> "stringsWithLength") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors must contain only Seq(lengthError)
+      }
+    }
+  }
+
 }
