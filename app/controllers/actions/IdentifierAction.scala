@@ -18,13 +18,13 @@ package controllers.actions
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import controllers.routes
 import controllers.auth.{routes => authRoutes}
+import controllers.routes
 import logging.Logging
 import models.requests.IdentifierRequest
 import play.api.mvc.Results._
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -55,26 +55,26 @@ class AuthenticatedIdentifierAction @Inject()(
         (AffinityGroup.Individual or AffinityGroup.Organisation) and
         CredentialStrength(CredentialStrength.strong)
     ).retrieve(
-      Retrievals.internalId and
+      Retrievals.credentials and
         Retrievals.allEnrolments and
         Retrievals.affinityGroup and
         Retrievals.confidenceLevel and
         Retrievals.credentialRole) {
 
-      case Some(internalId) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
+      case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
         findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) => block(IdentifierRequest(request, internalId, vrn))
+          case Some(vrn) => block(IdentifierRequest(request, credentials, vrn))
           case None      => throw InsufficientEnrolments()
         }
 
       case _ ~ _ ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == Assistant =>
         throw UnsupportedCredentialRole()
 
-      case Some(internalId) ~ enrolments ~ Some(Individual) ~ confidence ~ _ =>
+      case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence ~ _ =>
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) =>
             if (confidence >= ConfidenceLevel.L250) {
-              block(IdentifierRequest(request, internalId, vrn))
+              block(IdentifierRequest(request, credentials, vrn))
             } else {
               throw InsufficientConfidenceLevel()
             }

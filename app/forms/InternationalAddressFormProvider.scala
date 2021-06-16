@@ -37,8 +37,8 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
       "postCode" -> optional(text("internationalAddress.error.postCode.required")
         .verifying(maxLength(100, "internationalAddress.error.postCode.length"))),
       "country" -> text("internationalAddress.error.country.required")
-        .verifying("internationalAddress.error.country.required", value => Country.euCountries.exists(_.code == value))
-        .transform[Country](value => Country.euCountries.find(_.code == value).get, _.code)
+        .verifying("internationalAddress.error.country.required", value => Country.internationalCountries.exists(_.code == value))
+        .transform[Country](value => Country.internationalCountries.find(_.code == value).get, _.code)
     )(InternationalAddress.apply)(InternationalAddress.unapply)
   )
 }

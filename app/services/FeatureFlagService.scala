@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import viewmodels.InputWidth._
+package services
 
-@this(
-    layout: templates.Layout
-)
+import play.api.Configuration
 
-@()(implicit request: Request[_], messages: Messages)
+import javax.inject.Inject
 
-@layout(pageTitle = titleNoForm(messages("cannotRegisterForService.title"))) {
+class FeatureFlagService @Inject()(configuration: Configuration) {
 
-    <h1 class="govuk-heading-xl">@messages("cannotRegisterForService.title")</h1>
-
-    <p class="govuk-body">@messages("cannotRegisterForService.can-register-in-eu-country")</p>
-
+  val proceedWhenVatApiCallFails: Boolean = configuration.get[Boolean]("features.proceed-when-vat-api-call-fails")
 }

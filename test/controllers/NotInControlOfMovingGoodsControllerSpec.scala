@@ -20,13 +20,13 @@ import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.CannotRegisterForServiceView
+import views.html.NotInControlOfMovingGoodsView
 
-class CannotRegisterForServiceControllerSpec extends SpecBase with MockitoSugar {
+class NotInControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
 
-  private lazy val cannotRegisterForServiceRoute = routes.CannotRegisterForServiceController.onPageLoad().url
+  private lazy val cannotRegisterForServiceRoute = routes.NotInControlOfMovingGoodsController.onPageLoad().url
 
-  "CannotRegisterForService Controller" - {
+  "NotInControlOfMovingGoods Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -37,7 +37,7 @@ class CannotRegisterForServiceControllerSpec extends SpecBase with MockitoSugar 
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CannotRegisterForServiceView]
+        val view = application.injector.instanceOf[NotInControlOfMovingGoodsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString

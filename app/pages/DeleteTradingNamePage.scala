@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.mvc.Call
 import queries.DeriveNumberOfTradingNames
 
@@ -27,5 +27,11 @@ case class DeleteTradingNamePage(index: Index) extends Page {
     answers.get(DeriveNumberOfTradingNames) match {
       case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(NormalMode)
       case _                => routes.HasTradingNameController.onPageLoad(NormalMode)
+    }
+
+  override protected def navigateInCheckMode (answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfTradingNames) match {
+      case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(CheckMode)
+      case _                => routes.HasTradingNameController.onPageLoad(CheckMode)
     }
 }

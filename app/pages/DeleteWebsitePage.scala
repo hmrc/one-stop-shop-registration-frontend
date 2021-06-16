@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.mvc.Call
 import queries.DeriveNumberOfWebsites
 
@@ -27,5 +27,11 @@ case class DeleteWebsitePage(index: Index) extends Page {
     answers.get(DeriveNumberOfWebsites) match {
       case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(NormalMode)
       case _                => routes.HasWebsiteController.onPageLoad(NormalMode)
+    }
+
+  override protected def navigateInCheckMode (answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfWebsites) match {
+      case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(CheckMode)
+      case _                => routes.HasWebsiteController.onPageLoad(CheckMode)
     }
 }

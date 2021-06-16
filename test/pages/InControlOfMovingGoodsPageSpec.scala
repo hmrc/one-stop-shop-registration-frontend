@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
@@ -37,21 +37,38 @@ class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswersWithVatInfo.set(InControlOfMovingGoodsPage, true).success.value
         InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.CheckVatDetailsController.onPageLoad(NormalMode))
+          .mustEqual(routes.CheckVatDetailsController.onPageLoad())
       }
 
       "to Check Vat Number when the answer is yes and we do not have the user's VAT info" in {
 
         val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
         InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.CheckVatNumberController.onPageLoad(NormalMode))
+          .mustEqual(routes.CheckVatNumberController.onPageLoad())
       }
 
-      "to Cannot Register when the answer is no" in {
+      "to Not in Control of Moving Goods when the answer is no" in {
 
         val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
         InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.CannotRegisterForServiceController.onPageLoad())
+          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
+        InControlOfMovingGoodsPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Not in Control of Moving Goods for Service when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
+        InControlOfMovingGoodsPage.navigate(CheckMode, answers)
+          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
       }
     }
   }

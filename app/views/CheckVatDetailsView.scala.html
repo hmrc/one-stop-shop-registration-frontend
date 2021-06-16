@@ -1,4 +1,5 @@
 @import viewmodels.CheckVatDetailsViewModel
+@import viewmodels.LegendSize
 
 @this(
     layout: templates.Layout,
@@ -8,11 +9,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewModel: CheckVatDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("checkVatDetails.title"))) {
 
-    @formHelper(action = routes.CheckVatDetailsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.CheckVatDetailsController.onSubmit(), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -20,12 +21,36 @@
 
         <h1 class="govuk-heading-xl">@messages("checkVatDetails.heading")</h1>
 
-        <p class="govuk-body">@viewModel.vrn.value</p>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            @viewModel.organisationName.map { name =>
+              <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.organisationName")</dt>
+                  <dt class="govuk-summary-list__value govuk-!-width-one-half">@name</dt>
+              </div>
+            }
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.vrn")</dt>
+                <dt class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.vrn</dt>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.address")</dt>
+                <dt class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.formattedAddress</dt>
+            </div>
+
+            @viewModel.partOfVatGroup.map { answer =>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.partOfVatGroup")</dt>
+                    <dt class="govuk-summary-list__value govuk-!-width-one-half">@answer</dt>
+                </div>
+            }
+        </dl>
 
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("checkVatDetails.question")),
+                legend = LegendViewModel(messages("checkVatDetails.question")).withSize(LegendSize.Medium),
                 items  = CheckVatDetails.options
             )
         )

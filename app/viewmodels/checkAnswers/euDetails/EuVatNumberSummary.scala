@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, Index, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,7 +27,14 @@ import viewmodels.implicits._
 
 object EuVatNumberSummary {
 
-  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
+
+    val changeLinkMode = currentMode match {
+      case NormalMode    => CheckLoopMode
+      case CheckMode     => CheckMode
+      case CheckLoopMode => CheckLoopMode
+    }
+
     answers.get(euDetails.EuVatNumberPage(index)).map {
       answer =>
 
@@ -35,9 +42,10 @@ object EuVatNumberSummary {
           key = "euVatNumber.checkYourAnswersLabel",
           value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.EuVatNumberController.onPageLoad(CheckMode, index).url)
+            ActionItemViewModel("site.change", routes.EuVatNumberController.onPageLoad(changeLinkMode, index).url)
               .withVisuallyHiddenText(messages("euVatNumber.change.hidden"))
           )
         )
     }
+  }
 }

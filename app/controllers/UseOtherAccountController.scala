@@ -34,6 +34,6 @@ class UseOtherAccountController @Inject()(
 
   def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Ok(view())
+      Ok(view(request.vrn))
   }
 }

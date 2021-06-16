@@ -16,10 +16,10 @@
 
 package generators
 
+import models.CurrentlyRegisteredInCountry.{No, Yes}
 import models.StartDateOption.EarlierDate
 import models._
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
-import models.euDetails.FixedEstablishmentAddress
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Vrn
@@ -27,6 +27,11 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryCurrentlyRegisteredInCountry: Arbitrary[CurrentlyRegisteredInCountry] =
+    Arbitrary {
+      Gen.oneOf(Gen.const(No), arbitrary[Country].map(Yes))
+    }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
@@ -68,22 +73,11 @@ trait ModelGenerators {
       } yield BankDetails(accountName, bic, iban.mkString)
     }
 
-  implicit lazy val arbitraryFixedEstablishmentAddress: Arbitrary[FixedEstablishmentAddress] =
-    Arbitrary {
-      for {
-        line1      <- arbitrary[String]
-        line2      <- Gen.option(arbitrary[String])
-        townOrCity <- arbitrary[String]
-        county     <- Gen.option(arbitrary[String])
-        postCode   <- Gen.option(arbitrary[String])
-      } yield FixedEstablishmentAddress(line1, line2, townOrCity, county, postCode)
-    }
-
   implicit lazy val arbitraryFixedEstablishment: Arbitrary[FixedEstablishment] =
     Arbitrary {
       for {
         tradingName <- arbitrary[String]
-        address     <- arbitrary[FixedEstablishmentAddress]
+        address     <- arbitrary[InternationalAddress]
       } yield FixedEstablishment(tradingName, address)
     }
 

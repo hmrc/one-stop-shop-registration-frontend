@@ -47,7 +47,7 @@ class AddWebsiteController @Inject()(
       getNumberOfWebsites {
         number =>
           val canAddWebsites = number < Constants.maxWebsites
-          Future.successful(Ok(view(form, mode, WebsiteSummary.addToListRows(request.userAnswers), canAddWebsites)))
+          Future.successful(Ok(view(form, mode, WebsiteSummary.addToListRows(request.userAnswers, mode), canAddWebsites)))
       }
   }
 
@@ -60,7 +60,7 @@ class AddWebsiteController @Inject()(
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(
-                BadRequest(view(formWithErrors, mode, WebsiteSummary.addToListRows(request.userAnswers), canAddWebsites))
+                BadRequest(view(formWithErrors, mode, WebsiteSummary.addToListRows(request.userAnswers, mode), canAddWebsites))
               ),
 
             value =>

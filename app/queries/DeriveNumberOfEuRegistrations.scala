@@ -20,5 +20,5 @@ import play.api.libs.json.{JsObject, JsPath}
 
 case object DeriveNumberOfEuRegistrations extends Derivable[List[JsObject], Int] {
   override val derive: List[JsObject] => Int = _.size
-  override def path: JsPath = JsPath \ "euVatDetails"
+  override def path: JsPath = JsPath \ "euDetails"
 }

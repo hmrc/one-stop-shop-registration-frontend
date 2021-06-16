@@ -58,7 +58,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(baseAnswers)
+        val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -76,7 +76,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(baseAnswers)
+        val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -123,7 +123,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[AddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(baseAnswers)
+        val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 

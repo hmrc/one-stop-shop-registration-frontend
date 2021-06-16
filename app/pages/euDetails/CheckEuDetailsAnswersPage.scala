@@ -17,12 +17,18 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import play.api.mvc.Call
 
 case object CheckEuDetailsAnswersPage extends Page {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    euRoutes.AddEuDetailsController.onPageLoad(CheckMode)
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
     euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
 }

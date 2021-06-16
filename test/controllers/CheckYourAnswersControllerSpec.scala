@@ -17,21 +17,24 @@
 package controllers
 
 import base.SpecBase
+import cats.data.NonEmptyChain
+import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
-import models.{BusinessContactDetails, NormalMode}
+import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.responses.ConflictFound
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
-import org.mockito.{Mockito}
-import org.mockito.Mockito.{times, verify, when}
+import models.requests.DataRequest
+import models.responses.{ConflictFound, UnexpectedResponseStatus}
+import models.{BusinessContactDetails, DataMissingError, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito
+import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BusinessContactDetailsPage, CheckYourAnswersPage}
+import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasTradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
-import services.{EmailService, RegistrationService}
+import services.{AuditService, EmailService, RegistrationService}
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
@@ -45,11 +48,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
   private val registrationService = mock[RegistrationService]
   private val registrationConnector = mock[RegistrationConnector]
   private val emailService = mock[EmailService]
+  private val auditService = mock[AuditService]
 
   override def beforeEach(): Unit = {
-    Mockito.reset(registrationConnector)
-    Mockito.reset(registrationService)
-    Mockito.reset(emailService)
+    Mockito.reset(
+      registrationConnector,
+      registrationService,
+      auditService,
+      emailService
+    )
   }
 
   "Check Your Answers Controller" - {
@@ -73,10 +80,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-        "user should be redirected to the next page and successfully send email confirmation" in {
+        "must audit the event and redirect to the next page and successfully send email confirmation" in {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
-          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right())
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right(()))
+          doNothing().when(auditService).audit(any())(any(), any())
           when(emailService.sendConfirmationEmail(
             eqTo(registration.contactDetails.fullName),
             eqTo(registration.registeredCompanyName),
@@ -91,18 +99,22 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[EmailService].toInstance(emailService)
+              bind[EmailService].toInstance(emailService),
+              bind[AuditService].toInstance(auditService)
             ).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
             val result = route(application, request).value
+            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, emptyUserAnswers).url
 
             verify(emailService, times(1))
               .sendConfirmationEmail(any(), any(), any(), any())(any())
+            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
           }
         }
       }
@@ -111,7 +123,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "the user is redirected to Journey Recovery Page" in {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn None
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(bind[RegistrationService].toInstance(registrationService)).build()
@@ -130,22 +142,55 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "the user is redirected to Already Registered Page" in {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn Some(registration)
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
+          doNothing().when(auditService).audit(any())(any(), any())
 
           val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
             .overrides(
-              bind[RegistrationService]
-              .toInstance(registrationService),bind[RegistrationConnector]
-              .toInstance(registrationConnector)
+              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationConnector].toInstance(registrationConnector),
+              bind[AuditService].toInstance(auditService)
             ).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
             val result = route(application, request).value
+            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.AlreadyRegisteredController.onPageLoad().url
+            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+          }
+        }
+      }
+
+      "when the submission fails because of a technical issue" - {
+
+        "the user is redirected to Already Registered Page" in {
+
+          val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
+          doNothing().when(auditService).audit(any())(any(), any())
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationConnector].toInstance(registrationConnector),
+              bind[AuditService].toInstance(auditService)
+            ).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
           }
         }
       }

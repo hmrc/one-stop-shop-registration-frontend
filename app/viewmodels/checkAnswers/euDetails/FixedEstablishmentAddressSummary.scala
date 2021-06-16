@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, Index, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,14 @@ import viewmodels.implicits._
 
 object FixedEstablishmentAddressSummary {
 
-  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
+
+    val changeLinkMode = currentMode match {
+      case NormalMode    => CheckLoopMode
+      case CheckMode     => CheckMode
+      case CheckLoopMode => CheckLoopMode
+    }
+
     answers.get(euDetails.FixedEstablishmentAddressPage(index)).map {
       answer =>
 
@@ -36,7 +43,7 @@ object FixedEstablishmentAddressSummary {
           Some(HtmlFormat.escape(answer.line1).toString),
           answer.line2.map(HtmlFormat.escape),
           Some(HtmlFormat.escape(answer.townOrCity).toString),
-          answer.county.map(HtmlFormat.escape),
+          answer.stateOrRegion.map(HtmlFormat.escape),
           answer.postCode.map(HtmlFormat.escape)
         ).flatten.mkString("<br/>")
 
@@ -44,9 +51,10 @@ object FixedEstablishmentAddressSummary {
           key = "fixedEstablishmentAddress.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.FixedEstablishmentAddressController.onPageLoad(CheckMode, index).url)
+            ActionItemViewModel("site.change", routes.FixedEstablishmentAddressController.onPageLoad(changeLinkMode, index).url)
               .withVisuallyHiddenText(messages("fixedEstablishmentAddress.change.hidden"))
           )
         )
     }
+  }
 }

@@ -101,7 +101,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
 
     for {
       length <- Gen.choose(1, maxLength - 1)
-      chars  <- listOfN(length, arbitrary[Char])
+      chars  <- listOfN(length, arbitrary[Char] suchThat (_ != ' '))
     } yield chars.mkString
   }
 

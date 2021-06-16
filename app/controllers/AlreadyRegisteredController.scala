@@ -46,13 +46,11 @@ class AlreadyRegisteredController @Inject()(
           Ok(view(
             HtmlFormat.escape(registration.registeredCompanyName).toString,
             request.vrn,
-            HtmlFormat.escape(registration.contactDetails.emailAddress).toString,
             config.feedbackUrl)
           )
 
         case None =>
           Redirect(routes.IndexController.onPageLoad())
       }
-
   }
 }

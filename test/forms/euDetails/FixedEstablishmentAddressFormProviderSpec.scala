@@ -16,14 +16,17 @@
 
 package forms.euDetails
 
+import org.scalacheck.Arbitrary.arbitrary
 import forms.Validation.Validation.postcodePattern
 import forms.behaviours.StringFieldBehaviours
+import models.Country
 import play.api.data.FormError
 
 class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val formProvider = new FixedEstablishmentAddressFormProvider()
-  val form = formProvider()
+  private val country = arbitrary[Country].sample.value
+  private val formProvider = new FixedEstablishmentAddressFormProvider()
+  private val form = formProvider(country)
 
   ".line1" - {
 
@@ -99,10 +102,10 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
     )
   }
   
-  ".county" - {
+  ".stateOrRegion" - {
 
-    val fieldName = "county"
-    val lengthKey = "fixedEstablishmentAddress.error.county.length"
+    val fieldName = "stateOrRegion"
+    val lengthKey = "fixedEstablishmentAddress.error.stateOrRegion.length"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(

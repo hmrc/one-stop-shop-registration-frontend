@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package models.euDetails
+package queries
 
-import play.api.libs.json._
+import play.api.libs.json.{JsArray, JsPath}
 
-case class FixedEstablishmentAddress (
-                                       line1: String,
-                                       line2: Option[String],
-                                       townOrCity: String,
-                                       county: Option[String],
-                                       postCode: Option[String]
-                                     )
+case object AllEuDetailsRawQuery extends Gettable[JsArray] with Settable[JsArray] {
 
-object FixedEstablishmentAddress {
-  implicit val format: OFormat[FixedEstablishmentAddress] = Json.format[FixedEstablishmentAddress]
+  override def path: JsPath = JsPath \ "euDetails"
 }

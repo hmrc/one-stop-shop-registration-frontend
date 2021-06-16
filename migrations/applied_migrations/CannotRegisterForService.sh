@@ -14,12 +14,12 @@ echo "POST       /changeCannotRegisterForService                  controllers.Ca
 
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en
-echo "cannotRegisterForService.title = cannotRegisterForService" >> ../conf/messages.en
-echo "cannotRegisterForService.heading = cannotRegisterForService" >> ../conf/messages.en
-echo "cannotRegisterForService.checkYourAnswersLabel = cannotRegisterForService" >> ../conf/messages.en
-echo "cannotRegisterForService.error.required = Enter cannotRegisterForService" >> ../conf/messages.en
-echo "cannotRegisterForService.error.length = CannotRegisterForService must be 100 characters or less" >> ../conf/messages.en
-echo "cannotRegisterForService.change.hidden = CannotRegisterForService" >> ../conf/messages.en
+echo "notInControlOfMovingGoods.title = cannotRegisterForService" >> ../conf/messages.en
+echo "notInControlOfMovingGoods.heading = cannotRegisterForService" >> ../conf/messages.en
+echo "notInControlOfMovingGoods.checkYourAnswersLabel = cannotRegisterForService" >> ../conf/messages.en
+echo "notInControlOfMovingGoods.error.required = Enter cannotRegisterForService" >> ../conf/messages.en
+echo "notInControlOfMovingGoods.error.length = CannotRegisterForService must be 100 characters or less" >> ../conf/messages.en
+echo "notInControlOfMovingGoods.change.hidden = CannotRegisterForService" >> ../conf/messages.en
 
 echo "Adding to UserAnswersEntryGenerators"
 awk '/trait UserAnswersEntryGenerators/ {\

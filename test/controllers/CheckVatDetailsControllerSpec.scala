@@ -37,8 +37,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new CheckVatDetailsFormProvider()
   private val form = formProvider()
 
-  private val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
-  private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad(NormalMode).url
+  private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad().url
 
   "CheckVatDetails Controller" - {
 
@@ -52,9 +51,11 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CheckVatDetailsView]
+        implicit val msgs = messages(application)
+        val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, viewModel)(request, implicitly).toString
       }
     }
 
@@ -68,12 +69,14 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(GET, checkVatDetailsRoute)
 
         val view = application.injector.instanceOf[CheckVatDetailsView]
+        implicit val msgs = messages(application)
+        val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(CheckVatDetails.Yes), NormalMode, viewModel)(request, messages(application)).toString
+          view(form.fill(CheckVatDetails.Yes), viewModel)(request, implicitly).toString
       }
     }
 
@@ -116,11 +119,13 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
         val view = application.injector.instanceOf[CheckVatDetailsView]
+        implicit val msgs = messages(application)
+        val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, viewModel)(request, implicitly).toString
       }
     }
 

@@ -31,4 +31,7 @@ case object PartOfVatGroupPage extends QuestionPage[Boolean] {
     case Some(vatInfo) if vatInfo.registrationDate.isDefined => UkVatEffectiveDatePage.navigate(NormalMode, answers)
     case _                                                   => routes.UkVatEffectiveDateController.onPageLoad(NormalMode)
   }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    routes.CheckYourAnswersController.onPageLoad()
 }

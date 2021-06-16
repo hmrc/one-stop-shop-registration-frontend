@@ -18,7 +18,7 @@ package forms.euDetails
 
 import forms.Validation.Validation.postcodePattern
 import forms.mappings.Mappings
-import models.euDetails.FixedEstablishmentAddress
+import models.{Country, InternationalAddress}
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
 
-   def apply(): Form[FixedEstablishmentAddress] = Form(
+   def apply(country: Country): Form[InternationalAddress] = Form(
      mapping(
        "line1" -> text("fixedEstablishmentAddress.error.line1.required")
          .verifying(maxLength(100, "fixedEstablishmentAddress.error.line1.length")),
@@ -34,12 +34,12 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
          .verifying(maxLength(100, "fixedEstablishmentAddress.error.line2.length"))),
        "townOrCity" -> text("fixedEstablishmentAddress.error.townOrCity.required")
          .verifying(maxLength(100, "fixedEstablishmentAddress.error.townOrCity.length")),
-       "county" -> optional(text("fixedEstablishmentAddress.error.county.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.county.length"))),
+       "stateOrRegion" -> optional(text("fixedEstablishmentAddress.error.stateOrRegion.required")
+         .verifying(maxLength(100, "fixedEstablishmentAddress.error.stateOrRegion.length"))),
        "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
          .verifying(firstError(
            maxLength(100, "fixedEstablishmentAddress.error.postCode.length"),
            regexp(postcodePattern, "fixedEstablishmentAddress.error.postCode.invalid"))))
-     )(FixedEstablishmentAddress.apply)(FixedEstablishmentAddress.unapply)
+     )(InternationalAddress(_, _, _, _, _, country))(x => Some((x.line1, x.line2, x.townOrCity, x.stateOrRegion, x.postCode)))
    )
  }

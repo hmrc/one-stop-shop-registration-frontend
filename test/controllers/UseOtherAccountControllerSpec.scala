@@ -37,7 +37,7 @@ class UseOtherAccountControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[UseOtherAccountView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(vrn)(request, messages(application)).toString
       }
     }
   }

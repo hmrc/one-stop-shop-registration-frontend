@@ -18,7 +18,8 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -40,6 +41,54 @@ class FixedEstablishmentTradingNamePageSpec extends SpecBase with PageBehaviours
 
         FixedEstablishmentTradingNamePage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when Fixed Establishment Address has not been answered" - {
+
+        "to Fixed Establishment Address" in {
+
+          FixedEstablishmentTradingNamePage(index).navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(CheckMode, index))
+        }
+      }
+
+      "when Fixed Establishment Address has already been answered" - {
+
+        "to wherever Fixed Establishment Address would navigate to" in {
+
+          val address = arbitrary[InternationalAddress].sample.value
+          val answers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
+
+          FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers)
+            .mustEqual(FixedEstablishmentAddressPage(index).navigate(CheckMode, answers))
+        }
+      }
+    }
+
+    "must navigate in Check Loop mode" - {
+
+      "when Fixed Establishment Address has not been answered" - {
+
+        "to Fixed Establishment Address" in {
+
+          FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(CheckLoopMode, index))
+        }
+      }
+
+      "when Fixed Establishment Address has already been answered" - {
+
+        "to wherever Fixed Establishment Address would navigate to" in {
+
+          val address = arbitrary[InternationalAddress].sample.value
+          val answers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
+
+          FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)
+            .mustEqual(FixedEstablishmentAddressPage(index).navigate(CheckLoopMode, answers))
+        }
       }
     }
   }

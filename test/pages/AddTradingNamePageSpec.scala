@@ -19,7 +19,7 @@ package pages
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{Index, NormalMode}
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
@@ -57,6 +57,35 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
 
           AddTradingNamePage.navigate(NormalMode, answers)
             .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "to Trading Name with index equal to the number of names already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo").success.value
+              .set(TradingNamePage(Index(1)), "bar").success.value
+              .set(AddTradingNamePage, true).success.value
+
+          AddTradingNamePage.navigate(CheckMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(CheckMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
+
+          AddTradingNamePage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }
     }

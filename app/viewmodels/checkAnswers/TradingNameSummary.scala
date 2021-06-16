@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllTradingNames
@@ -29,13 +29,13 @@ import viewmodels.implicits._
 
 object TradingNameSummary  {
 
-  def addToListRows(answers: UserAnswers)(implicit messages: Messages): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Seq[ListItem] =
     answers.get(AllTradingNames).getOrElse(List.empty).zipWithIndex.map {
       case (name, index) =>
         ListItem(
           name      = HtmlFormat.escape(name).toString,
-          changeUrl = routes.TradingNameController.onPageLoad(NormalMode, Index(index)).url,
-          removeUrl = routes.DeleteTradingNameController.onPageLoad(NormalMode, Index(index)).url
+          changeUrl = routes.TradingNameController.onPageLoad(mode, Index(index)).url,
+          removeUrl = routes.DeleteTradingNameController.onPageLoad(mode, Index(index)).url
         )
     }
 

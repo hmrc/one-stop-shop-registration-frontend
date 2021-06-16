@@ -18,7 +18,7 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Country, Index, NormalMode}
+import models.{CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
@@ -39,6 +39,22 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
 
         PreviousEuCountryPage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Previous EU VAT number for the same index where the VAT number hasn't already been answered" in {
+
+        PreviousEuCountryPage(index).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index))
+      }
+
+      "to Add Previous Registration when the VAT number for this index has been answered" in {
+
+        val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
+        PreviousEuCountryPage(index).navigate(CheckMode, answers)
+          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
       }
     }
   }

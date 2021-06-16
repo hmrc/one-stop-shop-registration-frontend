@@ -16,16 +16,18 @@
 
 package controllers
 
+import cats.data.Validated.{Invalid, Valid}
 import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.NormalMode
+import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{EmailService, RegistrationService}
+import services.{AuditService, EmailService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -41,6 +43,7 @@ class CheckYourAnswersController @Inject()(
   cc: AuthenticatedControllerComponents,
   registrationConnector: RegistrationConnector,
   registrationService: RegistrationService,
+  auditService: AuditService,
   view: CheckYourAnswersView,
   emailService: EmailService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
@@ -51,21 +54,28 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(
+          SellsGoodsFromNiSummary.row(request.userAnswers),
+          InControlOfMovingGoodsSummary.row(request.userAnswers),
           RegisteredCompanyNameSummary.row(request.userAnswers),
-          HasTradingNameSummary.row(request.userAnswers),
-          TradingNameSummary.checkAnswersRow(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
+          BusinessAddressInUkSummary.row(request.userAnswers),
+          UkAddressSummary.row(request.userAnswers),
+          InternationalAddressSummary.row(request.userAnswers),
+          HasTradingNameSummary.row(request.userAnswers),
+          TradingNameSummary.checkAnswersRow(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
           CurrentlyRegisteredInEuSummary.row(request.userAnswers),
           CurrentCountryOfRegistrationSummary.row(request.userAnswers),
+          CurrentlyRegisteredInCountrySummary.row(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
           StartDateSummary.row(request.userAnswers),
-          UkAddressSummary.row(request.userAnswers),
+          HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
-          BusinessContactDetailsSummary.row(request.userAnswers)
+          BusinessContactDetailsSummary.row(request.userAnswers),
+          BankDetailsSummary.row(request.userAnswers)
         ).flatten
       )
 
@@ -77,9 +87,10 @@ class CheckYourAnswersController @Inject()(
       val registration = registrationService.fromUserAnswers(request.userAnswers, request.vrn)
 
       registration match {
-        case Some(registration) =>
+        case Valid(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
+              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
               emailService.sendConfirmationEmail(
                 registration.contactDetails.fullName,
                 registration.registeredCompanyName,
@@ -89,14 +100,18 @@ class CheckYourAnswersController @Inject()(
                 _ => successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
               }
             case Left(ConflictFound) =>
+              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
               successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
+              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
               successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           }
-        case None =>
-          logger.error("Unable to create a registration request from user answers")
+
+        case Invalid(errors) =>
+          val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
+          logger.error(s"Unable to create a registration request from user answers: $errorMessages")
           successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }

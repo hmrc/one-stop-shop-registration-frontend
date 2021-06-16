@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{NormalMode, StartDate}
+import models.{CheckMode, NormalMode, StartDate}
 import pages.behaviours.PageBehaviours
 
 class StartDatePageSpec extends SpecBase with PageBehaviours {
@@ -37,6 +37,15 @@ class StartDatePageSpec extends SpecBase with PageBehaviours {
 
         StartDatePage.navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        StartDatePage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
   }

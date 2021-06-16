@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.NormalMode
+import models.{CheckLoopMode, CheckMode, NormalMode}
 
 class CheckEuDetailsAnswersPageSpec extends SpecBase {
 
@@ -26,8 +26,24 @@ class CheckEuDetailsAnswersPageSpec extends SpecBase {
 
     "must navigate in Normal mode" - {
 
-      "to Add EU Details" in {
+      "to Add EU Details in Normal mode" in {
         CheckEuDetailsAnswersPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Add EU Details in Check mode" - {
+        CheckEuDetailsAnswersPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(CheckMode))
+      }
+    }
+
+    "must navigate in Check Loop mode" - {
+
+      "to Add EU Details in Normal mode (because the user has now finished checking this country)" in {
+        CheckEuDetailsAnswersPage.navigate(CheckLoopMode, emptyUserAnswers)
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
       }
     }

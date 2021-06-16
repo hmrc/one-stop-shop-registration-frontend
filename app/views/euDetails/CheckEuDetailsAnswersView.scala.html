@@ -22,11 +22,11 @@
         govukButton: GovukButton
 )
 
-@(list: SummaryList, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkEuVatDetailsAnswers.title", country.name))) {
 
-    @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(index)) {
+    @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index)) {
 
         <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
 

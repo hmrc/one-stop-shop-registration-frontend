@@ -17,9 +17,12 @@
 package pages
 
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import queries.AllWebsites
+
+import scala.util.Try
 
 case object HasWebsitePage extends QuestionPage[Boolean] {
 
@@ -32,4 +35,18 @@ case object HasWebsitePage extends QuestionPage[Boolean] {
     case Some(false) => routes.BusinessContactDetailsController.onPageLoad(NormalMode)
     case None        => routes.JourneyRecoveryController.onPageLoad()
   }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(HasWebsitePage), answers.get(AllWebsites)) match {
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(true), _)                                           => routes.WebsiteController.onPageLoad(CheckMode, Index(0))
+      case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()
+      case _                                                         => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(false) => userAnswers.remove(AllWebsites)
+      case _           => super.cleanup(value, userAnswers)
+    }
 }

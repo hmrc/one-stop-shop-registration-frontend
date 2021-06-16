@@ -19,9 +19,11 @@ package pages.euDetails
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{Country, Index, NormalMode, UserAnswers}
+import controllers.routes
+import models.CurrentlyRegisteredInCountry.No
+import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
+import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage}
 import pages.behaviours.PageBehaviours
-import pages.euDetails
 
 class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
@@ -58,39 +60,92 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
       }
     }
 
-    // TODO: Include other data
-    "must remove all EU VAT details when the answer is false" in {
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "and country details have already been given" - {
+
+          "to Check Your Answers" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(TaxRegisteredInEuPage, true).success.value
+                .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+                .set(VatRegisteredPage(Index(0)), false).success.value
+                .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+
+            TaxRegisteredInEuPage.navigate(CheckMode, answers)
+              .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+          }
+        }
+
+        "and no country details have already been given" - {
+
+          "to EU Country (index 0)" in {
+
+            val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+            TaxRegisteredInEuPage.navigate(CheckMode, answers)
+              .mustEqual(euRoutes.EuCountryController.onPageLoad(CheckMode, Index(0)))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
+
+          TaxRegisteredInEuPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+    }
+
+    "must remove all EU VAT details and current registration details when the answer is false" in {
 
       val answers =
         UserAnswers("id")
           .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
+          .set(VatRegisteredPage(Index(0)), true).success.value
           .set(EuVatNumberPage(Index(0)), "reg 1").success.value
-          .set(euDetails.EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
-          .set(euDetails.EuVatNumberPage(Index(1)), "reg 2").success.value
+          .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+          .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
+          .set(EuVatNumberPage(Index(1)), "reg 2").success.value
+          .set(CurrentlyRegisteredInEuPage, true).success.value
+          .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
+          .set(CurrentlyRegisteredInCountryPage, No).success.value
 
       val result = answers.set(TaxRegisteredInEuPage, false).success.value
 
-      result.get(euDetails.EuCountryPage(Index(0))) must not be defined
-      result.get(euDetails.EuVatNumberPage(Index(0))) must not be defined
-      result.get(euDetails.EuCountryPage(Index(1))) must not be defined
-      result.get(euDetails.EuVatNumberPage(Index(1))) must not be defined
+      result.get(EuCountryPage(Index(0))) must not be defined
+      result.get(VatRegisteredPage(Index(0))) must not be defined
+      result.get(EuVatNumberPage(Index(0))) must not be defined
+      result.get(HasFixedEstablishmentPage(Index(0))) must not be defined
+      result.get(EuCountryPage(Index(1))) must not be defined
+      result.get(EuVatNumberPage(Index(1))) must not be defined
+      result.get(CurrentlyRegisteredInEuPage) must not be defined
+      result.get(CurrentlyRegisteredInCountryPage) must not be defined
+      result.get(CurrentCountryOfRegistrationPage) must not be defined
     }
 
     "must not remove any EU VAT details when the answer is true" in {
 
       val answers =
         UserAnswers("id")
-          .set(euDetails.EuCountryPage(Index(0)), Country.euCountries.head).success.value
-          .set(euDetails.EuVatNumberPage(Index(0)), "reg 1").success.value
-          .set(euDetails.EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
-          .set(euDetails.EuVatNumberPage(Index(1)), "reg 2").success.value
+          .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
+          .set(EuVatNumberPage(Index(0)), "reg 1").success.value
+          .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
+          .set(EuVatNumberPage(Index(1)), "reg 2").success.value
 
       val result = answers.set(TaxRegisteredInEuPage, true).success.value
 
-      result.get(euDetails.EuCountryPage(Index(0))).value mustEqual Country.euCountries.head
-      result.get(euDetails.EuVatNumberPage(Index(0))).value mustEqual "reg 1"
-      result.get(euDetails.EuCountryPage(Index(1))).value mustEqual Country.euCountries.tail.head
-      result.get(euDetails.EuVatNumberPage(Index(1))).value mustEqual "reg 2"
+      result.get(EuCountryPage(Index(0))).value mustEqual Country.euCountries.head
+      result.get(EuVatNumberPage(Index(0))).value mustEqual "reg 1"
+      result.get(EuCountryPage(Index(1))).value mustEqual Country.euCountries.tail.head
+      result.get(EuVatNumberPage(Index(1))).value mustEqual "reg 2"
     }
   }
 }
