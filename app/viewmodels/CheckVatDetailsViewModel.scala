@@ -17,13 +17,11 @@
 package viewmodels
 
 import formats.Format.dateFormatter
-import models.{Country, DesAddress}
+import models.Country
 import models.domain.VatCustomerInfo
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.domain.Vrn
-
-import java.time.LocalDate
 
 
 case class CheckVatDetailsViewModel(vrn: Vrn, vatCustomerInfo: VatCustomerInfo)(implicit messages: Messages) {
@@ -46,7 +44,7 @@ case class CheckVatDetailsViewModel(vrn: Vrn, vatCustomerInfo: VatCustomerInfo)(
     ).flatten.mkString("<br/>")
   )
 
-  val partOfVatGroup: Option[String] = (vatCustomerInfo).partOfVatGroup.map {
+  val partOfVatGroup: Option[String] = vatCustomerInfo.partOfVatGroup.map {
     case true  => messages("site.yes")
     case false => messages("site.no")
   }
