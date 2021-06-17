@@ -21,6 +21,7 @@ import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
 import repositories.SessionRepository
+import services.FeatureFlagService
 
 import javax.inject.Inject
 
@@ -32,10 +33,13 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def getData: DataRetrievalAction
   def requireData: DataRequiredAction
   def checkRegistration: CheckRegistrationFilter
+  def checkVrnAllowList: VrnAllowListFilter
   def limitIndex: MaximumIndexFilterProvider
+  def features: FeatureFlagService
 
   def authAndGetData(): ActionBuilder[DataRequest, AnyContent] =
     identify andThen
+      checkVrnAllowList andThen
       checkRegistration andThen
       getData andThen
       requireData
@@ -51,9 +55,10 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                executionContext: scala.concurrent.ExecutionContext,
                                                                sessionRepository: SessionRepository,
                                                                identify: IdentifierAction,
+                                                               checkVrnAllowList: VrnAllowListFilter,
                                                                checkRegistration: CheckRegistrationFilter,
                                                                getData: DataRetrievalAction,
                                                                requireData: DataRequiredAction,
-                                                               limitIndex: MaximumIndexFilterProvider
+                                                               limitIndex: MaximumIndexFilterProvider,
+                                                               features: FeatureFlagService
                                                              ) extends AuthenticatedControllerComponents
-

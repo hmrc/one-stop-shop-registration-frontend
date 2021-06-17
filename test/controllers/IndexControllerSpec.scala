@@ -111,6 +111,58 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
           }
         }
       }
+
+      "and the call to get their VAT details fails" - {
+
+        val failureResponse = responses.UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+
+        "and the feature to allow users to proceed is enabled" - {
+
+          "must create user answers with no VAT details, then redirect to the next page" in {
+
+            val application =
+              appBuilder(None)
+                .configure("features.proceed-when-vat-api-call-fails" -> true)
+                .build()
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
+              verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
+            }
+          }
+        }
+
+        "and the feature to allow users to proceed is disabled" - {
+
+          "must return an internal server error" in {
+
+            val application =
+              appBuilder(None)
+                .configure("features.proceed-when-vat-api-call-fails" -> false)
+                .build()
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+              val result = route(application, request).value
+
+              status(result) mustEqual INTERNAL_SERVER_ERROR
+              verify(mockRepository, times(0)).set(any())
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package config
+package queries
 
-object Constants {
+import play.api.libs.json.{JsArray, JsPath}
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
+case object AllPreviousRegistrationsRawQuery extends Gettable[JsArray] with Settable[JsArray] {
 
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
+  override def path: JsPath = JsPath \ "previousRegistrations"
 }

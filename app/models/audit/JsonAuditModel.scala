@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package models.audit
 
-object Constants {
+import play.api.libs.json.JsValue
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
-
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
+trait JsonAuditModel {
+  val auditType: String
+  val transactionName: String
+  val detail: JsValue
 }

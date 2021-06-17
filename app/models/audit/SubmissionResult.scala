@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package config
+package models.audit
 
-object Constants {
+import models.{Enumerable, WithName}
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
+sealed trait SubmissionResult
 
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
+object SubmissionResult extends Enumerable.Implicits {
+
+  case object Success extends WithName("success") with SubmissionResult
+  case object Failure extends WithName("failure") with SubmissionResult
+  case object Duplicate extends WithName("failure-duplicate-submission") with SubmissionResult
+
+  val values = Seq(Success, Failure, Duplicate)
+
+  implicit val enumerable: Enumerable[SubmissionResult] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

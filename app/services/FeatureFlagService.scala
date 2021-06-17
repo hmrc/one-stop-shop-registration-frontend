@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package services
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import play.api.Configuration
 import uk.gov.hmrc.domain.Vrn
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
 
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vrn) extends DataRetrievalAction {
+class FeatureFlagService @Inject()(configuration: Configuration) {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request.request, request.credentials, vrn, dataToReturn))
+  val proceedWhenVatApiCallFails: Boolean = configuration.get[Boolean]("features.proceed-when-vat-api-call-fails")
 
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+  val restrictAccessUsingVrnAllowList: Boolean = configuration.get[Boolean]("features.restrict-access-using-vrn-allow-list")
+  val vrnAllowList: Seq[Vrn]                   = configuration.get[Seq[String]]("features.vrn-allow-list").map(Vrn(_))
+  val vrnBlockedRedirectUrl: String            = configuration.get[String]("features.vrn-blocked-redirect-url")
 }

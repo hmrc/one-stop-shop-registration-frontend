@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-object Constants {
+import queries.Gettable
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
+trait ValidationError {
 
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
+  val errorMessage: String
+}
+
+case class DataMissingError(page: Gettable[_]) extends ValidationError {
+
+  override val errorMessage: String = s"Data missing at ${page.path.toString}"
 }

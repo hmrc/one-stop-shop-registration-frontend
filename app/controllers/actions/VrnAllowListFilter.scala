@@ -16,22 +16,23 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import models.requests.IdentifierRequest
-import play.api.mvc._
-import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.domain.Vrn
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Result}
+import services.FeatureFlagService
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class VrnAllowListFilterImpl @Inject()(features: FeatureFlagService)
+                                      (implicit val executionContext: ExecutionContext) extends VrnAllowListFilter {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, Credentials("12345-credId", "GGW"), Vrn("123456789")))
-
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
-
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+  override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] =
+    if (features.restrictAccessUsingVrnAllowList && !features.vrnAllowList.contains(request.vrn)) {
+      Future.successful(Some(Redirect(features.vrnBlockedRedirectUrl)))
+    } else {
+      Future.successful(None)
+    }
 }
+
+trait VrnAllowListFilter extends ActionFilter[IdentifierRequest]
