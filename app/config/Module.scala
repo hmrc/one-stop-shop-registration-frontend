@@ -28,6 +28,7 @@ class Module extends AbstractModule {
     bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
     bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
     bind(classOf[CheckRegistrationFilter]).to(classOf[CheckRegistrationFilterImpl]).asEagerSingleton()
+    bind(classOf[VrnAllowListFilter]).to(classOf[VrnAllowListFilterImpl]).asEagerSingleton()
 
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
 

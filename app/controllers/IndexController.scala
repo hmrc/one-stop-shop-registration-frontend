@@ -33,8 +33,7 @@ class IndexController @Inject()(
                                  override val messagesApi: MessagesApi,
                                  cc: AuthenticatedControllerComponents,
                                  connector: RegistrationConnector,
-                                 clock: Clock,
-                                 features: FeatureFlagService
+                                 clock: Clock
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -63,7 +62,7 @@ class IndexController @Inject()(
               }
 
             case Left(_) =>
-              if (features.proceedWhenVatApiCallFails) {
+              if (cc.features.proceedWhenVatApiCallFails) {
                 val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
                 cc.sessionRepository.set(answers).map {
                   _ =>
