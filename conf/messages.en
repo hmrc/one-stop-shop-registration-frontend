@@ -1,4 +1,4 @@
-service.name = Register to pay VAT on sales of goods from Northern Ireland to the EU
+service.name = Register to pay VAT on online sales of goods from Northern Ireland to the EU
 
 site.back = Back
 site.remove = Remove
@@ -124,7 +124,7 @@ euCountry.error.duplicate = You selected this country already. Select a differen
 vatRegistered.title = Are you registered for VAT in {0}?
 vatRegistered.heading = Are you registered for VAT in {0}?
 vatRegistered.checkYourAnswersLabel = Registered for VAT
-vatRegistered.error.required = Select yes if you are registered for VAT in this country
+vatRegistered.error.required = Select yes if you are registered for VAT in {0}
 vatRegistered.change.hidden = if you are registered for VAT
 
 addEuDetails.title.singular = You added tax details for one EU country
@@ -441,7 +441,7 @@ previousEuCountry.error.duplicate = You selected this EU country already. Select
 
 previousEuVatNumber.title = What was your VAT registration number for {0}?
 previousEuVatNumber.heading = What was your VAT registration number for {0}?
-previousEuVatNumber.error.required = Enter your VAT registration number for this country
+previousEuVatNumber.error.required = Enter your VAT registration number for {0}
 previousEuVatNumber.error.length = VAT registration number must be 100 characters or less
 previousEuVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, asterisk, plus symbol and numbers
 
@@ -489,6 +489,7 @@ euTaxReference.heading = What is your tax reference number for {0}?
 euTaxReference.checkYourAnswersLabel = Tax reference number
 euTaxReference.error.required = Enter your business tax reference number in {0}
 euTaxReference.error.length = Business tax reference number must be 100 characters or less
+euTaxReference.error.format = Business tax reference number must only include letters, numbers and spaces
 euTaxReference.change.hidden = EuTaxReference
 
 hasWebsite.title = Do you want to give us website addresses that you use to sell your goods?
@@ -517,7 +518,7 @@ taxRegisteredInEu.change.hidden = if your business is registered for tax in EU c
 
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
-updateVatDetails.guidance = You will need to update the details of your VAT registration before registering for the One Stop Shop scheme.
+updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a> to update your UK VAT details before registering for this scheme.
 
 businessAddressInUk.title = Is your principal place of business in the UK?
 businessAddressInUk.heading = Is your principal place of business in the UK?
