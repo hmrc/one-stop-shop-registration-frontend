@@ -123,6 +123,28 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
     }
   }
 
+  "stringLengthRange" - {
+
+    val minLength = 50
+    val maxLength = 9999
+
+    "must return valid for a string length within range" in {
+      forAll(stringsInsideOfLengthRange(minLength, maxLength)) {
+        validValue =>
+          val result =  stringLengthRange(minLength, maxLength, "error.length")(validValue)
+          result mustEqual Valid
+      }
+    }
+
+    "must return invalid for a string length outside range" in {
+      forAll(stringsOutsideOfLengthRange(minLength, maxLength)) {
+        invalidValue =>
+          val result =  stringLengthRange(minLength, maxLength, "error.length")(invalidValue)
+          result mustEqual Invalid("error.length", minLength, maxLength)
+      }
+    }
+  }
+
   "maxDate" - {
 
     "must return Valid for a date before or equal to the maximum" in {

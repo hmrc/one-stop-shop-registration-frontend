@@ -71,6 +71,17 @@ trait Constraints {
         }
     }
 
+  protected def stringLengthRange(minimum: Int, maximum: Int, errorKey: String): Constraint[String] =
+    Constraint {
+      input =>
+
+        if (input.length >= minimum && input.length <= maximum) {
+          Valid
+        } else {
+          Invalid(errorKey, minimum, maximum)
+        }
+    }
+
   protected def regexp(regex: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if str.matches(regex) =>

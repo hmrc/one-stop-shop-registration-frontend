@@ -13,8 +13,8 @@ GET         /refresh-session                                controllers.KeepAliv
 
 GET         /there-is-a-problem                             controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                             controllers.CheckYourAnswersController.onPageLoad
-POST        /check-your-answers                             controllers.CheckYourAnswersController.onSubmit
+GET         /check-answers                                  controllers.CheckYourAnswersController.onPageLoad
+POST        /check-answers                                  controllers.CheckYourAnswersController.onSubmit
 
 GET         /unauthorised                                   controllers.UnauthorisedController.onPageLoad
 
@@ -79,14 +79,14 @@ POST        /uk-business-address                            controllers.UkAddres
 GET         /check-uk-business-address                      controllers.UkAddressController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-uk-business-address                      controllers.UkAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET         /businessContactDetails                         controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /businessContactDetails                         controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeBusinessContactDetails                   controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /business-contact-details                       controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /business-contact-details                       controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /check-business-contact-details                 controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-business-contact-details                 controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /do-not-move-goods                              controllers.NotInControlOfMovingGoodsController.onPageLoad()
 
-GET        /applicationComplete                             controllers.ApplicationCompleteController.onPageLoad()
+GET        /successful                                      controllers.ApplicationCompleteController.onPageLoad()
 
 GET        /remove-uk-trading-name/:index                        controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST       /remove-uk-trading-name/:index                        controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -98,20 +98,20 @@ POST        /add-uk-trading-name                                 controllers.Add
 GET         /check-add-uk-trading-name                           controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-uk-trading-name                           controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /website/:index                                  controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /website/:index                                  controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /changeWebsite/:index                            controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /changeWebsite/:index                            controllers.WebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET        /website-address/:index                          controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /website-address/:index                          controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /check-website-address/:index                    controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /check-website-address/:index                    controllers.WebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /addWebsite                                 controllers.AddWebsiteController.onPageLoad(mode: Mode = NormalMode)
-POST        /addWebsite                                 controllers.AddWebsiteController.onSubmit(mode: Mode = NormalMode)
-GET         /changeAddWebsite                           controllers.AddWebsiteController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeAddWebsite                           controllers.AddWebsiteController.onSubmit(mode: Mode = CheckMode)
+GET         /add-website-address                            controllers.AddWebsiteController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-website-address                            controllers.AddWebsiteController.onSubmit(mode: Mode = NormalMode)
+GET         /check-add-website-address                      controllers.AddWebsiteController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-add-website-address                      controllers.AddWebsiteController.onSubmit(mode: Mode = CheckMode)
 
-GET        /deleteWebsite/:index                        controllers.DeleteWebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /deleteWebsite/:index                        controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /changeDeleteWebsite/:index                  controllers.DeleteWebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /changeDeleteWebsite/:index                  controllers.DeleteWebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET        /remove-website-address/:index                   controllers.DeleteWebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /remove-website-address/:index                   controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /check-remove-website-address/:index             controllers.DeleteWebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /check-remove-website-address/:index             controllers.DeleteWebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET        /start-date                        controllers.StartDateController.onPageLoad(mode: Mode = NormalMode)
 POST       /start-date                        controllers.StartDateController.onSubmit(mode: Mode = NormalMode)
@@ -171,12 +171,12 @@ POST       /check-eu-fixed-establishment/:index/                 controllers.euD
 GET        /first-check-eu-fixed-establishment/:index            controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST       /first-check-eu-fixed-establishment/:index            controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
-GET         /check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /changeCheckEuVatDetails/:index/checking-answers                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /changeCheckEuVatDetails/:index/checking-answers                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET        /check-tax-details/:index                            controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /check-tax-details/:index                            controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeCheckEuVatDetails/:index/checking-answers     controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeCheckEuVatDetails/:index/checking-answers     controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET        /first-check-tax-details/:index                      controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST       /first-check-tax-details/:index                      controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
 GET        /already-registered                           controllers.AlreadyRegisteredController.onPageLoad()
 
@@ -216,10 +216,10 @@ POST        /deletePreviousRegistration/:index                      controllers.
 GET         /changeDeletePreviousRegistration/:index                controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /changeDeletePreviousRegistration/:index                controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET        /bankDetails                        controllers.BankDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /bankDetails                        controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeBankDetails                  controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeBankDetails                  controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /bank-details                        controllers.BankDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /bank-details                        controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /check-bank-details                  controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /check-bank-details                  controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /already-registered-country                       controllers.CurrentlyRegisteredInCountryController.onPageLoad(mode: Mode = NormalMode)
 POST       /already-registered-country                       controllers.CurrentlyRegisteredInCountryController.onSubmit(mode: Mode = NormalMode)
@@ -233,10 +233,10 @@ POST       /check-eu-tax-number/:index                          controllers.euDe
 GET        /first-check-eu-tax-number/:index                    controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST       /first-check-eu-tax-number/:index                    controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
-GET        /hasWebsite                        controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasWebsite                        controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasWebsite                  controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasWebsite                  controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
+GET        /give-website-address                        controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
+POST       /give-website-address                        controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
+GET        /check-give-website-address                  controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
+POST       /check-give-website-address                  controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
 
 GET        /move-goods                                    controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = NormalMode)
 POST       /move-goods                                    controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = NormalMode)

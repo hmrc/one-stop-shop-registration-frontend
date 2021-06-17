@@ -75,6 +75,12 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def intsOutsideRange(min: Int, max: Int): Gen[Int] =
     arbitrary[Int] suchThat(x => x < min || x > max)
 
+  def stringsOutsideOfLengthRange(minLength: Int, maxLength: Int): Gen[String] =
+    arbitrary[String] suchThat(x => (x.length < minLength || x.length > maxLength) && x.nonEmpty)
+
+  def stringsInsideOfLengthRange(minLength: Int, maxLength: Int): Gen[String] =
+    arbitrary[String] suchThat(x => x.length >= minLength && x.length <= maxLength)
+
   def nonBooleans: Gen[String] =
     arbitrary[String]
       .suchThat (_.nonEmpty)
@@ -172,6 +178,12 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
     length <- choose(1, maxLength)
     chars  <- listOfN(length, commonFieldSafeInputs)
   } yield chars.mkString).suchThat(_.trim.nonEmpty)
+
+  def alphaNumStringWithLength(minLength: Int, maxLength: Int): Gen[String] = (
+    for {
+      length <- choose(minLength, maxLength)
+      chars  <- listOfN(length, Gen.alphaNumChar)
+    } yield chars.mkString).suchThat(_.trim.nonEmpty)
 
   private def commonFieldSafeInputs: Gen[Char] = Gen.oneOf(
     Gen.alphaNumChar,
