@@ -17,7 +17,7 @@
 package models.audit
 import models.domain.Registration
 import models.requests.DataRequest
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 case class RegistrationAuditModel(
                                    credId: String,
@@ -29,11 +29,49 @@ case class RegistrationAuditModel(
   override val auditType: String       = "RegistrationSubmitted"
   override val transactionName: String = "registration-submitted"
 
+  private def currentCountryDetail: JsObject =
+    registration.currentCountryOfRegistration.map {
+      country =>
+        Json.obj("currentCountryOfRegistration" -> Json.obj(
+          "countryCode" -> country.code,
+          "name"        -> country.name
+        ))
+    }.getOrElse(Json.obj())
+
+  private def previousRegistrationDetail: JsObject =
+    if (registration.previousRegistrations.nonEmpty) {
+      Json.obj("previousRegistrations" -> Json.toJson(registration.previousRegistrations))
+    } else {
+      Json.obj()
+    }
+
+  private def websiteDetail: JsObject =
+    if(registration.websites.nonEmpty) Json.obj("websites" -> registration.websites) else Json.obj()
+
+  private def euRegistrationDetail: JsObject =
+    if (registration.euRegistrations.nonEmpty) Json.obj("euRegistrations" -> Json.toJson(registration.euRegistrations)) else Json.obj()
+
+  private val tradingNameDetail: JsObject =
+    if (registration.tradingNames.nonEmpty) Json.obj("tradingNames" -> registration.tradingNames) else Json.obj()
+
+  private val registrationDetail: JsValue = Json.obj(
+    "vatRegistrationNumber" -> registration.vrn,
+    "registeredCompanyName" -> registration.registeredCompanyName,
+    "vatDetails"            -> Json.toJson(registration.vatDetails),
+    "contactDetails"        -> Json.toJson(registration.contactDetails),
+    "startDate"             -> Json.toJson(registration.startDate),
+    "bankDetails"           -> Json.toJson(registration.bankDetails)
+  ) ++ tradingNameDetail ++
+    euRegistrationDetail ++
+    websiteDetail ++
+    currentCountryDetail ++
+    previousRegistrationDetail
+
   override val detail: JsValue = Json.obj(
     "credId"              -> credId,
-    "userAgent"           -> userAgent,
+    "browserUserAgent"    -> userAgent,
     "submissionResult"    -> Json.toJson(result),
-    "registrationDetails" -> Json.toJson(registration)
+    "registrationDetails" -> registrationDetail
   )
 }
 
