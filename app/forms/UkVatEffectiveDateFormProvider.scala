@@ -16,9 +16,11 @@
 
 package forms
 
-import java.time.LocalDate
+import formats.Format.dateFormatter
 
+import java.time.LocalDate
 import forms.mappings.Mappings
+
 import javax.inject.Inject
 import play.api.data.Form
 
@@ -32,5 +34,6 @@ class UkVatEffectiveDateFormProvider @Inject() extends Mappings {
         twoRequiredKey = "ukVatEffectiveDate.error.required.two",
         requiredKey    = "ukVatEffectiveDate.error.required"
       )
+      .verifying(maxDate(LocalDate.now(), "ukVatEffectiveDate.error.future-date", LocalDate.now().format(dateFormatter)))
     )
 }

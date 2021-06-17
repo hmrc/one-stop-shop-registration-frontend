@@ -16,9 +16,10 @@
 
 package forms.behaviours
 
+import formats.Format.dateFormatter
+
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
@@ -86,6 +87,24 @@ trait DateBehaviours extends FieldBehaviours {
 
           result.errors must contain only formError
       }
+    }
+  }
+
+  def dateFieldWithFutureDate(form: Form[_], key: String, error: String): Unit = {
+
+    "fail to bind date in the future" - {
+
+      val futureDate = LocalDate.now().plusDays(1)
+
+      val data = Map(
+        s"$key.day"   -> futureDate.getDayOfMonth.toString,
+        s"$key.month" -> futureDate.getMonthValue.toString,
+        s"$key.year"  -> futureDate.getYear.toString
+      )
+
+      val result = form.bind(data)
+
+      result.errors must contain only FormError(key, error, Seq(LocalDate.now.format(dateFormatter)))
     }
   }
 

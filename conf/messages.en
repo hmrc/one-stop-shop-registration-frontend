@@ -96,6 +96,7 @@ ukVatEffectiveDate.error.required.all = Enter your UK VAT registration date
 ukVatEffectiveDate.error.required.two = Your UK VAT registration date must include {0} and {1}
 ukVatEffectiveDate.error.required = Your UK VAT registration date must include {0}
 ukVatEffectiveDate.error.invalid = Enter a real date
+ukVatEffectiveDate.error.future-date = Cannot enter date in the future
 ukVatEffectiveDate.change.hidden = your UK VAT registration date
 
 ukVatRegisteredPostcode.title = What is the postcode where your business is registered for UK VAT?

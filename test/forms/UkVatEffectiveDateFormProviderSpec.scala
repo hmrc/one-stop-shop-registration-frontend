@@ -35,4 +35,10 @@ class UkVatEffectiveDateFormProviderSpec extends DateBehaviours {
 
     behave like mandatoryDateField(form, "value", "ukVatEffectiveDate.error.required.all")
   }
+
+  "must not set date in the future" - {
+
+    behave like dateFieldWithFutureDate(form, "value","ukVatEffectiveDate.error.future-date")
+
+  }
 }
