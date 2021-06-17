@@ -17,7 +17,7 @@
 package forms.euDetails
 
 import org.scalacheck.Arbitrary.arbitrary
-import forms.Validation.Validation.postcodePattern
+import forms.Validation.Validation.{commonTextPattern, postcodePattern}
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import play.api.data.FormError
@@ -33,19 +33,13 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line1"
     val requiredKey = "fixedEstablishmentAddress.error.line1.required"
     val lengthKey = "fixedEstablishmentAddress.error.line1.length"
+    val formatKey = "fixedEstablishmentAddress.error.line1.format"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
       stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
     behave like mandatoryField(
@@ -53,12 +47,21 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    behave like commonTextField(
+      form,
+      fieldName,
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
+    )
   }
 
   ".line2" - {
 
     val fieldName = "line2"
     val lengthKey = "fixedEstablishmentAddress.error.line2.length"
+    val formatKey = "fixedEstablishmentAddress.error.line2.format"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
@@ -67,11 +70,12 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
       stringsWithMaxLength(maxLength)
     )
 
-    behave like fieldWithMaxLength(
+    behave like commonTextField(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
     )
   }
 
@@ -80,19 +84,13 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "townOrCity"
     val requiredKey = "fixedEstablishmentAddress.error.townOrCity.required"
     val lengthKey = "fixedEstablishmentAddress.error.townOrCity.length"
+    val formatKey = "fixedEstablishmentAddress.error.townOrCity.format"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
       stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
     behave like mandatoryField(
@@ -100,12 +98,21 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    behave like commonTextField(
+      form,
+      fieldName,
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
+    )
   }
   
   ".stateOrRegion" - {
 
     val fieldName = "stateOrRegion"
     val lengthKey = "fixedEstablishmentAddress.error.stateOrRegion.length"
+    val formatKey = "fixedEstablishmentAddress.error.stateOrRegion.format"
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
@@ -114,11 +121,12 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
       stringsWithMaxLength(maxLength)
     )
 
-    behave like fieldWithMaxLength(
+    behave like commonTextField(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
     )
   }
 

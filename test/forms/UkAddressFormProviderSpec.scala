@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{commonNamePattern, postCodePattern}
+import forms.Validation.Validation.{commonTextPattern, postCodePattern}
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -55,7 +55,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Line 1" in {
       val invalidLine1 = "^Invalid~ !@=£"
       val result = form.bind(Map(fieldName -> invalidLine1)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
     }
   }
 
@@ -82,7 +82,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Line 2" in {
       val invalidLine2 = "^Invalid~ !@=£"
       val result = form.bind(Map(fieldName -> invalidLine2)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
     }
   }
 
@@ -116,7 +116,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid Town or City" in {
       val invalidTownOrCity = "^Invalid~ !@=£"
       val result = form.bind(Map(fieldName -> invalidTownOrCity)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
     }
   }
 
@@ -143,7 +143,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid County" in {
       val invalidCounty = "^Invalid~ !@=£"
       val result = form.bind(Map(fieldName -> invalidCounty)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
     }
   }
 
