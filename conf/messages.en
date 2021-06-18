@@ -557,3 +557,21 @@ internationalAddress.change.hidden = your principal place of business address
 notSellingGoodsFromNi.title = You do not need to register
 notSellingGoodsFromNi.heading = You do not need to register
 notSellingGoodsFromNi.p = This service is only for businesses that sell goods online from Northern Ireland to consumers in the EU.
+
+alreadyMadeSales.title = alreadyMadeSales
+alreadyMadeSales.heading = alreadyMadeSales
+alreadyMadeSales.checkYourAnswersLabel = alreadyMadeSales
+alreadyMadeSales.error.required = Select yes if alreadyMadeSales
+alreadyMadeSales.change.hidden = AlreadyMadeSales
+
+commencementDate.title = commencementDate
+commencementDate.heading = commencementDate
+
+intendToSellGoodsThisQuarter.title = intendToSellGoodsThisQuarter
+intendToSellGoodsThisQuarter.heading = intendToSellGoodsThisQuarter
+intendToSellGoodsThisQuarter.checkYourAnswersLabel = intendToSellGoodsThisQuarter
+intendToSellGoodsThisQuarter.error.required = Select yes if intendToSellGoodsThisQuarter
+intendToSellGoodsThisQuarter.change.hidden = IntendToSellGoodsThisQuarter
+
+registerLater.title = registerLater
+registerLater.heading = registerLater
