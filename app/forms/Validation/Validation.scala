@@ -20,11 +20,12 @@ object Validation {
 
   val euVatNumberPattern = """^[A-Z\d\*\+]{1,12}$"""
   val postcodePattern = """^[A-Za-z0-9 ]{0,100}$"""
-  val commonNamePattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
+  val commonTextPattern = """^[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-]+$"""
   val postCodePattern = """^[ ]*[A-Za-z][ ]*[A-Za-z]{0,1}[ ]*[0-9][ ]*[0-9A-Za-z]{0,1}[ ]*[0-9][ ]*[A-Za-z][ ]*[A-Za-z][ ]*$"""
   val emailPattern = """^(.+)\b@\b(.+)\b\.\b(.+)$"""
   val telephonePattern = """^\+[0-9 ]{1,18}$|^[0-9 ]{1,19}$|^(?=.{2,22}$)\+[0-9 ]*\(0\)[0-9 ]*$|^(?=.{1,22}$)[0-9 ]*\(0\)[0-9 ]*$"""
   val websitePattern = """^(((HTTP|http)(S|s)?\:\/\/((WWW|www)\.)?)|(( |WWW|www)\.))?[a-zA-Z0-9\[_~\:\/?\-#\]@!&'()*+, |;=% ]+\.[a-zA-Z]{2,5}(\.[a-zA-Z]{2,5})?(\:[0-9] |{1,5})?(\/[a-zA-Z0-9_-]+(\/)?)*$"""
-  val bicPattern = """[A-Za-z0-9]{1,11}"""
+  val bicPattern = """[A-Za-z0-9]{8,11}"""
   val ibanPattern = "[A-Za-z0-9]{5,34}"
+  val alphaNumbericWithSpace = """^[a-zA-Z0-9 ]+$"""
 }

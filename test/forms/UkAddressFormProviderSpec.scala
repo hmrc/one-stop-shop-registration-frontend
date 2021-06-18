@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.postCodePattern
+import forms.Validation.Validation.{commonTextPattern, postCodePattern}
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -30,6 +30,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line1"
     val requiredKey = "ukAddress.error.line1.required"
     val lengthKey = "ukAddress.error.line1.length"
+    val invalidKey = "ukAddress.error.line1.invalid"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -50,12 +51,19 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind invalid Line 1" in {
+      val invalidLine1 = "^Invalid~ !@=£"
+      val result = form.bind(Map(fieldName -> invalidLine1)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
+    }
   }
 
   ".line2" - {
 
     val fieldName = "line2"
     val lengthKey = "ukAddress.error.line2.length"
+    val invalidKey = "ukAddress.error.line2.invalid"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -70,6 +78,12 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
+
+    "must not bind invalid Line 2" in {
+      val invalidLine2 = "^Invalid~ !@=£"
+      val result = form.bind(Map(fieldName -> invalidLine2)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
+    }
   }
 
   ".townOrCity" - {
@@ -77,6 +91,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "townOrCity"
     val requiredKey = "ukAddress.error.townOrCity.required"
     val lengthKey = "ukAddress.error.townOrCity.length"
+    val invalidKey = "ukAddress.error.townOrCity.invalid"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -97,12 +112,19 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind invalid Town or City" in {
+      val invalidTownOrCity = "^Invalid~ !@=£"
+      val result = form.bind(Map(fieldName -> invalidTownOrCity)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
+    }
   }
 
   ".county" - {
 
     val fieldName = "county"
     val lengthKey = "ukAddress.error.county.length"
+    val invalidKey = "ukAddress.error.county.invalid"
     val maxLength = 250
 
     behave like fieldThatBindsValidData(
@@ -117,6 +139,12 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
+
+    "must not bind invalid County" in {
+      val invalidCounty = "^Invalid~ !@=£"
+      val result = form.bind(Map(fieldName -> invalidCounty)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
+    }
   }
 
   ".postCode" - {

@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.commonNamePattern
+import forms.Validation.Validation.commonTextPattern
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -31,6 +31,6 @@ class TradingNameFormProvider @Inject() extends Mappings {
         .verifying(firstError(
           maxLength(160, "tradingName.error.length"),
           notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
-          regexp(commonNamePattern, "tradingName.error.invalid")))
+          regexp(commonTextPattern, "tradingName.error.invalid")))
     )
 }

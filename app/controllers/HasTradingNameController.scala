@@ -43,7 +43,7 @@ class HasTradingNameController @Inject()(
       getCompanyName {
         companyName =>
 
-          val form = formProvider(companyName)
+          val form = formProvider()
 
           val preparedForm = request.userAnswers.get(HasTradingNamePage) match {
             case None => form
@@ -59,7 +59,7 @@ class HasTradingNameController @Inject()(
       getCompanyName {
         companyName =>
 
-          val form = formProvider(companyName)
+          val form = formProvider()
 
           form.bindFromRequest().fold(
             formWithErrors =>

@@ -75,6 +75,12 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def intsOutsideRange(min: Int, max: Int): Gen[Int] =
     arbitrary[Int] suchThat(x => x < min || x > max)
 
+  def stringsOutsideOfLengthRange(minLength: Int, maxLength: Int): Gen[String] =
+    arbitrary[String] suchThat(x => (x.length < minLength || x.length > maxLength) && x.nonEmpty)
+
+  def stringsInsideOfLengthRange(minLength: Int, maxLength: Int): Gen[String] =
+    arbitrary[String] suchThat(x => x.length >= minLength && x.length <= maxLength)
+
   def nonBooleans: Gen[String] =
     arbitrary[String]
       .suchThat (_.nonEmpty)
@@ -160,7 +166,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def unsafeInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
     length      <- choose(2, maxLength)
     invalidChar <- unsafeInputs
-    validChars  <- listOfN(length - 1, safeInputs)
+    validChars  <- listOfN(length - 1, unsafeInputs)
   } yield (validChars :+ invalidChar).mkString).suchThat(_.trim.nonEmpty)
 
   def safeInputsShorterThan(length: Int): Gen[String] = (for {
@@ -183,4 +189,30 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
       suffix  <- Gen.oneOf(Seq(".com", ".co.uk", ".gov.uk"))
     } yield s"${user.mkString}@${domain.mkString}${suffix.mkString}"
   }
+
+  def commonFieldString(maxLength: Int): Gen[String] = (for {
+    length <- choose(1, maxLength)
+    chars  <- listOfN(length, commonFieldSafeInputs)
+  } yield chars.mkString).suchThat(_.trim.nonEmpty)
+
+  def alphaNumStringWithLength(minLength: Int, maxLength: Int): Gen[String] = (
+    for {
+      length <- choose(minLength, maxLength)
+      chars  <- listOfN(length, Gen.alphaNumChar)
+    } yield chars.mkString).suchThat(_.trim.nonEmpty)
+
+  private def commonFieldSafeInputs: Gen[Char] = Gen.oneOf(
+    Gen.alphaNumChar,
+    Gen.oneOf('À' to 'ÿ'),
+    Gen.const('.'),
+    Gen.const(','),
+    Gen.const('/'),
+    Gen.const('’'),
+    Gen.const('''),
+    Gen.const('"'),
+    Gen.const('_'),
+    Gen.const('&'),
+    Gen.const(' '),
+    Gen.const('\'')
+  )
 }
