@@ -16,13 +16,18 @@
 
 package testutils
 
+import generators.Generators
 import models.domain._
-import models.{BankDetails, BusinessContactDetails, Country, InternationalAddress, UkAddress}
+import models.{BankDetails, BusinessContactDetails, Country, Iban, InternationalAddress, UkAddress}
+import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
-object RegistrationData {
+object RegistrationData extends Generators with EitherValues {
+
+  val iban: Iban = Iban("GB33BUKB20201555555555").right.value
+
   val registration: Registration =
     Registration(
       vrn = Vrn("123456789"),
@@ -57,7 +62,7 @@ object RegistrationData {
       previousRegistrations = Seq(
         PreviousRegistration(Country("DE", "Germany"), "DE123")
       ),
-      bankDetails = BankDetails("Account name", Some("12345678"), "GB12345678")
+      bankDetails = BankDetails("Account name", Some("12345678"), iban)
     )
 
   private def createUkAddress(): UkAddress =

@@ -16,8 +16,10 @@
 
 package forms
 
+import org.scalacheck.Arbitrary.arbitrary
 import forms.Validation.Validation.bicPattern
 import forms.behaviours.StringFieldBehaviours
+import models.Iban
 import org.scalacheck.Gen
 import play.api.data.FormError
 
@@ -77,15 +79,10 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "iban"
     val requiredKey = "bankDetails.error.iban.required"
-    val maxKey = "bankDetails.error.iban.max"
-    val minKey = "bankDetails.error.iban.min"
-    val maxLength = 34
-    val minLength = 5
+    val invalidKey = "bankDetails.error.iban.invalid"
+    val checksumKey = "bankDetails.error.iban.checksum"
 
-    val validData = for {
-      ibanChars <- Gen.choose(minLength, maxLength)
-      iban <- Gen.listOfN(ibanChars, Gen.oneOf(Gen.alphaChar, Gen.numChar))
-    } yield iban.mkString
+    val validData = arbitrary[Iban].map(_.toString)
 
     behave like fieldThatBindsValidData(
       form,
@@ -93,24 +90,32 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       validData
     )
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, maxKey, Seq(maxLength))
-    )
-
-    behave like fieldWithMinLength(
-      form,
-      fieldName,
-      minLength = minLength,
-      lengthError = FormError(fieldName, minKey, Seq(minLength))
-    )
-
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind values in the wrong format" in {
+
+      forAll(arbitrary[String] suchThat (_.trim.nonEmpty)) {
+        value =>
+
+          whenever(Iban(value).isLeft) {
+            val result = form.bind(Map(fieldName -> value)).apply(fieldName)
+            result.errors mustEqual Seq(FormError(fieldName, invalidKey))
+          }
+      }
+    }
+
+    "must not bind values with an invalid checksum" in {
+
+      forAll(arbitrary[Iban]) {
+        iban =>
+          val value = iban.toString.take(2) + "00" + iban.toString.substring(4)
+          val result = form.bind(Map(fieldName -> value)).apply(fieldName)
+          result.errors mustEqual Seq(FormError(fieldName, checksumKey))
+      }
+    }
   }
 }

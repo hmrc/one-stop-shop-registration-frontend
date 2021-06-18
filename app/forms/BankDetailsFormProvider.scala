@@ -37,12 +37,7 @@ class BankDetailsFormProvider @Inject() extends Mappings {
        .verifying(firstError(maxLength(11, "bankDetails.error.bic.length"),
          regexp(bicPattern, "bankDetails.error.bic.invalid")
        ))),
-      "iban" -> text("bankDetails.error.iban.required")
-        .verifying(firstError(
-          minLength(5, "bankDetails.error.iban.min"),
-          maxLength(34, "bankDetails.error.iban.max"),
-          regexp(ibanPattern, "bankDetails.error.iban.invalid"))
-        )
+      "iban" -> iban("bankDetails.error.iban.required", "bankDetails.error.iban.invalid", "bankDetails.error.iban.checksum")
    )(BankDetails.apply)(BankDetails.unapply)
   )
 }

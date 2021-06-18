@@ -18,9 +18,10 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
-import models.{BankDetails, NormalMode}
+import models.{BankDetails, Iban, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BankDetailsPage
 import play.api.inject.bind
@@ -38,7 +39,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val bankDetailsRoute = routes.BankDetailsController.onPageLoad(NormalMode).url
 
-  private val bankDetails = BankDetails("account name", Some("12345678"), "GB123456789")
+  private val iban        = arbitrary[Iban].sample.value
+  private val bankDetails = BankDetails("account name", Some("12345678"), iban)
   private val userAnswers = emptyUserAnswers.set(BankDetailsPage, bankDetails).success.value
 
   "BankDetails Controller" - {
@@ -91,7 +93,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", "12345678"), ("iban", "GB123456789"))
+            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", "12345678"), ("iban", iban.toString))
 
         val result = route(application, request).value
         val expectedAnswers = emptyUserAnswers.set(BankDetailsPage, bankDetails).success.value
@@ -143,7 +145,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", "12345678"), ("iban", "GB123456789"))
+            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", "12345678"), ("iban", iban.toString))
 
         val result = route(application, request).value
 
