@@ -1,5 +1,5 @@
 # Add all the application routes to the app.routes file
 ->         /pay-vat-on-goods-sold-online-to-eu/northern-ireland-register   app.Routes
-->         /                                                                health.Routes
+->         /                                                               health.Routes
 
 GET        /admin/metrics             @com.kenshoo.play.metrics.MetricsController.metrics
