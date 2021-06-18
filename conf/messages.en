@@ -65,7 +65,7 @@ hasTradingName.change.hidden = if your business trades using a name that is diff
 partOfVatGroup.title = Is your business part of a UK VAT group?
 partOfVatGroup.heading = Is your business part of a UK VAT group?
 partOfVatGroup.guidance = VAT groups are when 2 or more companies or limited liability partnerships register as one ‘taxable’ person for VAT.
-partOfVatGroup.checkYourAnswersLabel = Part of a VAT UK group
+partOfVatGroup.checkYourAnswersLabel = Part of a UK VAT group
 partOfVatGroup.error.required = Select yes if your business is part of a UK VAT group
 partOfVatGroup.change.hidden = if the business is part of a UK VAT group
 
@@ -141,7 +141,7 @@ addEuDetails.addAnother.hint = You must tell us your tax details for all EU coun
 
 deleteEuVatDetails.title = Are you sure you need to remove the tax details for {0}?
 deleteEuVatDetails.heading = Are you sure you need to remove the tax details for {0}?
-deleteEuVatDetails.error.required = Select yes if you need to remove VAT details for this country
+deleteEuVatDetails.error.required = Select yes if you need to remove the tax details for {0}
 
 ukAddress.title = Principal place of business address
 ukAddress.heading = Principal place of business address
@@ -468,7 +468,7 @@ bankDetails.iban = IBAN
 bankDetails.iban.hint = Must be between 5 and 34 characters long. You can ask your bank or check your bank statement
 bankDetails.checkYourAnswersLabel = Bank account details
 bankDetails.error.accountName.required = Enter your account name
-bankDetails.error.bic.required = Enter the BIC number
+bankDetails.error.bic.required = Enter your BIC
 bankDetails.error.iban.required = Enter your IBAN
 bankDetails.error.accountName.length = Account name must be 100 characters or less
 bankDetails.error.accountName.invalid = Account name must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
@@ -523,7 +523,7 @@ updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/
 
 businessAddressInUk.title = Is your principal place of business in the UK?
 businessAddressInUk.heading = Is your principal place of business in the UK?
-businessAddressInUk.checkYourAnswersLabel = Principal place of business address
+businessAddressInUk.checkYourAnswersLabel = Principal place of business in UK
 businessAddressInUk.error.required = Select yes if your principal place of business is in the UK
 businessAddressInUk.change.hidden = if your principal place of business is in the UK
 
