@@ -17,6 +17,7 @@
 package pages
 
 import controllers.routes
+import models.AlreadyMadeSales.{No, Yes}
 import models.{AlreadyMadeSales, CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -31,21 +32,21 @@ case object AlreadyMadeSalesPage extends QuestionPage[AlreadyMadeSales] {
   override def toString: String = "alreadyMadeSales"
 
   override def navigateInNormalMode(answers: UserAnswers): Call = answers.get(AlreadyMadeSalesPage) match {
-    case Some(x) if x.answer => routes.CommencementDateController.onPageLoad(NormalMode)
-    case Some(_)             => routes.IntendToSellGoodsThisQuarterController.onPageLoad(NormalMode)
-    case None                => routes.JourneyRecoveryController.onPageLoad()
+    case Some(Yes(_)) => routes.CommencementDateController.onPageLoad(NormalMode)
+    case Some(No)     => routes.IntendToSellGoodsThisQuarterController.onPageLoad(NormalMode)
+    case None         => routes.JourneyRecoveryController.onPageLoad()
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(AlreadyMadeSalesPage), answers.get(IntendToSellGoodsThisQuarterPage)) match {
-      case (Some(x), _) if x.answer        => routes.CommencementDateController.onPageLoad(CheckMode)
-      case (Some(x), None) if !x.answer    => routes.IntendToSellGoodsThisQuarterController.onPageLoad(CheckMode)
-      case (Some(x), Some(_)) if !x.answer => routes.CheckYourAnswersController.onPageLoad()
-      case _                               => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(Yes(_)), _)   => routes.CommencementDateController.onPageLoad(CheckMode)
+      case (Some(No), None)    => routes.IntendToSellGoodsThisQuarterController.onPageLoad(CheckMode)
+      case (Some(No), Some(_)) => routes.CheckYourAnswersController.onPageLoad()
+      case _                   => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[AlreadyMadeSales], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(x) if !x.answer => super.cleanup(value, userAnswers)
-    case _                    => userAnswers.remove(IntendToSellGoodsThisQuarterPage)
+    case Some(No) => super.cleanup(value, userAnswers)
+    case _        => userAnswers.remove(IntendToSellGoodsThisQuarterPage)
   }
 }

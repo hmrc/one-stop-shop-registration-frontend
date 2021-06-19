@@ -30,7 +30,7 @@ trait ModelGenerators {
 
   implicit lazy val arbitraryAlreadyMadeSales: Arbitrary[AlreadyMadeSales] =
     Arbitrary {
-        Gen.const(AlreadyMadeSales(answer = false, None))
+        Gen.const(AlreadyMadeSales.No)
     }
 
   implicit lazy val arbitraryCurrentlyRegisteredInCountry: Arbitrary[CurrentlyRegisteredInCountry] =

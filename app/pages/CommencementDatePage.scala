@@ -18,9 +18,17 @@ package pages
 
 import controllers.routes
 import models.UserAnswers
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import queries.{Gettable, Settable}
 
-case object CommencementDatePage extends Page {
+import java.time.LocalDate
+
+case object CommencementDatePage extends Page with Gettable[LocalDate] with Settable[LocalDate] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "commencementDate"
 
   override def navigateInNormalMode(answers: UserAnswers): Call = answers.vatInfo match {
     case Some(_) => routes.CheckVatDetailsController.onPageLoad()

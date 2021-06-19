@@ -17,6 +17,8 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
+import formats.Format.dateFormatter
+import models.AlreadyMadeSales.{No, Yes}
 import models.{CheckMode, UserAnswers}
 import pages.AlreadyMadeSalesPage
 import play.api.i18n.Messages
@@ -26,19 +28,44 @@ import viewmodels.implicits._
 
 object AlreadyMadeSalesSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def answerRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AlreadyMadeSalesPage).map {
       alreadyMadeSales =>
 
-        val value = if (alreadyMadeSales.answer) "site.yes" else "site.no"
+        val value = alreadyMadeSales match {
+          case Yes(_) => "site.yes"
+          case No     => "site.no"
+        }
 
         SummaryListRowViewModel(
-          key     = "alreadyMadeSales.checkYourAnswersLabel",
+          key     = "alreadyMadeSales.answer.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AlreadyMadeSalesController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("alreadyMadeSales.change.hidden"))
           )
         )
+    }
+
+  def dateOfFirstSaleRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AlreadyMadeSalesPage).flatMap {
+      alreadyMadeSales =>
+
+        alreadyMadeSales match {
+          case Yes(date) =>
+            Some(
+              SummaryListRowViewModel(
+                key     = "alreadyMadeSales.firstSale.checkYourAnswersLabel",
+                value   = ValueViewModel(date.format(dateFormatter)),
+                actions = Seq(
+                  ActionItemViewModel("site.change", routes.AlreadyMadeSalesController.onPageLoad(CheckMode).url)
+                    .withVisuallyHiddenText(messages("alreadyMadeSales.change.hidden"))
+                )
+              )
+            )
+
+          case No =>
+            None
+        }
     }
 }

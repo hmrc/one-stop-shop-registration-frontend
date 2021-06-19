@@ -18,15 +18,17 @@ package controllers
 
 import base.SpecBase
 import forms.AlreadyMadeSalesFormProvider
-import models.{AlreadyMadeSales, NormalMode, UserAnswers}
+import models.AlreadyMadeSales.{No, Yes}
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AlreadyMadeSalesPage
+import pages.{AlreadyMadeSalesPage, CommencementDatePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import services.StartDateService
 import views.html.AlreadyMadeSalesView
 
 import scala.concurrent.Future
@@ -38,7 +40,7 @@ class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val alreadyMadeSalesRoute = routes.AlreadyMadeSalesController.onPageLoad(NormalMode).url
 
-  private val validAnswer = AlreadyMadeSales(answer = false, None)
+  private val validAnswer = No
 
   "AlreadyMadeSales Controller" - {
 
@@ -76,28 +78,69 @@ class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "when the answer is No" - {
 
-      val mockSessionRepository = mock[SessionRepository]
+      "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        val mockSessionRepository = mock[SessionRepository]
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, alreadyMadeSalesRoute)
-            .withFormUrlEncodedBody(("answer", "false"))
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
 
-        val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(AlreadyMadeSalesPage, validAnswer).success.value
+        running(application) {
+          val request =
+            FakeRequest(POST, alreadyMadeSalesRoute)
+              .withFormUrlEncodedBody(("answer", "false"))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AlreadyMadeSalesPage.navigate(NormalMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+          val result = route(application, request).value
+          val expectedAnswers = emptyUserAnswers.set(AlreadyMadeSalesPage, validAnswer).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual AlreadyMadeSalesPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
+      }
+    }
+
+    "when the answer is Yes" - {
+
+      "must save the answer and the commencement date and redirect to the next page when valid data is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, alreadyMadeSalesRoute)
+              .withFormUrlEncodedBody(
+                ("answer", "true"),
+                ("firstSale.day", arbitraryDate.getDayOfMonth.toString),
+                ("firstSale.month", arbitraryDate.getMonthValue.toString),
+                ("firstSale.year", arbitraryDate.getYear.toString)
+              )
+
+          val startDateService = application.injector.instanceOf[StartDateService]
+
+          val result = route(application, request).value
+          val expectedAnswers =
+            emptyUserAnswers
+              .set(AlreadyMadeSalesPage, Yes(arbitraryDate)).success.value
+              .set(CommencementDatePage, startDateService.startDateBasedOnFirstSale(arbitraryDate)).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual AlreadyMadeSalesPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
       }
     }
 

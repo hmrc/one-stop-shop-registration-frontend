@@ -18,21 +18,25 @@ package controllers
 
 import controllers.actions._
 import forms.AlreadyMadeSalesFormProvider
-import javax.inject.Inject
-import models.Mode
-import pages.AlreadyMadeSalesPage
+import models.AlreadyMadeSales.{No, Yes}
+import models.{AlreadyMadeSales, Mode, UserAnswers}
+import pages.{AlreadyMadeSalesPage, CommencementDatePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyMadeSalesView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class AlreadyMadeSalesController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: AlreadyMadeSalesFormProvider,
-                                         view: AlreadyMadeSalesView
+                                         view: AlreadyMadeSalesView,
+                                         startDateService: StartDateService
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -58,9 +62,20 @@ class AlreadyMadeSalesController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AlreadyMadeSalesPage, value))
+            updatedAnswers <- Future.fromTry(updateUserAnswers(value, request.userAnswers))
             _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(AlreadyMadeSalesPage.navigate(mode, updatedAnswers))
       )
   }
+
+  private def updateUserAnswers(alreadyMadeSales: AlreadyMadeSales, answers: UserAnswers): Try[UserAnswers] =
+    alreadyMadeSales match {
+      case Yes(dateOfFirstSale) =>
+        answers
+          .set(AlreadyMadeSalesPage, alreadyMadeSales)
+          .flatMap(_.set(CommencementDatePage, startDateService.startDateBasedOnFirstSale(dateOfFirstSale)))
+
+      case No =>
+        answers.set(AlreadyMadeSalesPage, alreadyMadeSales)
+    }
 }

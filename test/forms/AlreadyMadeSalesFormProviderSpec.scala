@@ -37,7 +37,7 @@ class AlreadyMadeSalesFormProviderSpec extends BooleanFieldBehaviours with Scala
       "must bind" in {
 
         val result = form.bind(Map("answer" -> "false"))
-        result.value.value mustEqual AlreadyMadeSales(answer = false, None)
+        result.value.value mustEqual AlreadyMadeSales.No
       }
     }
 
@@ -56,7 +56,7 @@ class AlreadyMadeSalesFormProviderSpec extends BooleanFieldBehaviours with Scala
 
             val result = form.bind(data)
 
-            result.value.value mustEqual AlreadyMadeSales(answer = true, Some(date))
+            result.value.value mustEqual AlreadyMadeSales.Yes(date)
             result.errors mustBe empty
         }
       }

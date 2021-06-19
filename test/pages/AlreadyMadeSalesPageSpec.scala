@@ -18,6 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
+import models.AlreadyMadeSales.{No, Yes}
 import models.{AlreadyMadeSales, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -39,7 +40,7 @@ class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
         "to Commencement Date" in {
 
-          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(true, Some(LocalDate.now))).success.value
+          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, Yes(LocalDate.now)).success.value
           AlreadyMadeSalesPage.navigate(NormalMode, answers)
             .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
         }
@@ -49,7 +50,7 @@ class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
         "to Intend to Sell Goods This Quarter" in {
 
-          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(false, None)).success.value
+          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, No).success.value
           AlreadyMadeSalesPage.navigate(NormalMode, answers)
             .mustEqual(routes.IntendToSellGoodsThisQuarterController.onPageLoad(NormalMode))
         }
@@ -62,7 +63,7 @@ class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
         "to Commencement Date" in {
 
-          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(true, Some(LocalDate.now))).success.value
+          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, Yes(LocalDate.now)).success.value
           AlreadyMadeSalesPage.navigate(CheckMode, answers)
             .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
         }
@@ -77,7 +78,7 @@ class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
             val answers =
               emptyUserAnswers
                 .set(IntendToSellGoodsThisQuarterPage, true).success.value
-                .set(AlreadyMadeSalesPage, AlreadyMadeSales(false, None)).success.value
+                .set(AlreadyMadeSalesPage, No).success.value
 
             AlreadyMadeSalesPage.navigate(CheckMode, answers)
               .mustEqual(routes.CheckYourAnswersController.onPageLoad())
@@ -88,7 +89,7 @@ class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
           "to Intend to Sell Goods This Quarter" in {
 
-            val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(false, None)).success.value
+            val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, No).success.value
             AlreadyMadeSalesPage.navigate(CheckMode, answers)
               .mustEqual(routes.IntendToSellGoodsThisQuarterController.onPageLoad(CheckMode))
           }
@@ -100,7 +101,7 @@ class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
       val answers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, true).success.value
 
-      val result = answers.set(AlreadyMadeSalesPage, AlreadyMadeSales(true, Some(LocalDate.now))).success.value
+      val result = answers.set(AlreadyMadeSalesPage, Yes(LocalDate.now)).success.value
 
       result.get(IntendToSellGoodsThisQuarterPage) must not be defined
     }

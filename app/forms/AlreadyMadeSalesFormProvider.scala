@@ -38,6 +38,18 @@ class AlreadyMadeSalesFormProvider @Inject()(clock: Clock) extends Mappings {
           requiredKey    = "alreadyMadeSales.firstSale.error.required"
         )
         .verifying(maxDate(LocalDate.now(clock), "alreadyMadeSales.firstSale.error.maxDate"))
-      ))(AlreadyMadeSales.apply)(AlreadyMadeSales.unapply)
+      ))(a)(u)
     )
+
+  private def a(answer: Boolean, firstSale: Option[LocalDate]): AlreadyMadeSales =
+    if (answer) {
+      firstSale.map(date => AlreadyMadeSales.Yes(date)).getOrElse(throw new IllegalArgumentException("Cannot create AlreadyMadeSales as Yes without a date"))
+    } else {
+      AlreadyMadeSales.No
+    }
+
+  private def u(a: AlreadyMadeSales): Option[(Boolean, Option[LocalDate])] = a match {
+    case AlreadyMadeSales.Yes(date) => Some((true, Some(date)))
+    case AlreadyMadeSales.No        => Some((false, None))
+  }
 }
