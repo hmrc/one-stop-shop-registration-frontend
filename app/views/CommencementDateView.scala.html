@@ -4,11 +4,11 @@
         govukButton: GovukButton
 )
 
-@(mode: Mode)(implicit request: Request[_], messages: Messages)
+@(mode: Mode, formattedDate: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
+@layout(pageTitle = titleNoForm(messages("commencementDate.title", formattedDate))) {
 
-    <h1 class="govuk-heading-xl">@messages("commencementDate.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("commencementDate.heading", formattedDate)</h1>
 
     @formHelper(action = routes.CommencementDateController.onSubmit(mode), 'autoComplete -> "off") {
 

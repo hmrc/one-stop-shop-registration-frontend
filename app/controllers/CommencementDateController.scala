@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import formats.Format.dateFormatter
 import models.Mode
 import pages.CommencementDatePage
 
@@ -36,7 +37,10 @@ class CommencementDateController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Ok(view(mode))
+      request.userAnswers.get(CommencementDatePage).map {
+        date =>
+          Ok(view(mode, date.format(dateFormatter)))
+      }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {

@@ -571,8 +571,8 @@ alreadyMadeSales.firstSale.error.allRequired = Enter the date of your first sale
 alreadyMadeSales.firstSale.error.maxDate = The date must be today or in the past
 alreadyMadeSales.change.hidden = if you have already made sales
 
-commencementDate.title = Commencement date
-commencementDate.heading = Commencement date
+commencementDate.title = You can use this scheme from {0}
+commencementDate.heading = You can use this scheme from {0}
 
 intendToSellGoodsThisQuarter.title = Do you intend to sell goods in this quarter?
 intendToSellGoodsThisQuarter.heading = Do you intend to sell goods in this quarter?

@@ -24,6 +24,7 @@ import models.{Mode, UserAnswers}
 import pages.{CommencementDatePage, IntendToSellGoodsThisQuarterPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntendToSellGoodsThisQuarterView
 
@@ -36,7 +37,8 @@ class IntendToSellGoodsThisQuarterController @Inject()(
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: IntendToSellGoodsThisQuarterFormProvider,
                                          view: IntendToSellGoodsThisQuarterView,
-                                         clock: Clock
+                                         clock: Clock,
+                                         startDateService: StartDateService
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -72,7 +74,7 @@ class IntendToSellGoodsThisQuarterController @Inject()(
     if (answer) {
       answers
         .set(IntendToSellGoodsThisQuarterPage, answer)
-        .flatMap(_.set(CommencementDatePage, LocalDate.now(clock)))
+        .flatMap(_.set(CommencementDatePage, startDateService.startDateBasedOnIntentionToSellGoods()))
     } else {
       answers.set(IntendToSellGoodsThisQuarterPage, answer)
     }
