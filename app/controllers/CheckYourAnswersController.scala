@@ -56,6 +56,9 @@ class CheckYourAnswersController @Inject()(
         rows = Seq(
           SellsGoodsFromNiSummary.row(request.userAnswers),
           InControlOfMovingGoodsSummary.row(request.userAnswers),
+          AlreadyMadeSalesSummary.answerRow(request.userAnswers),
+          AlreadyMadeSalesSummary.dateOfFirstSaleRow(request.userAnswers),
+          IntendToSellGoodsThisQuarterSummary.row(request.userAnswers),
           RegisteredCompanyNameSummary.row(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
