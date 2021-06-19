@@ -542,5 +542,12 @@ intendToSellGoodsThisQuarter.checkYourAnswersLabel = Intend to sell goods this q
 intendToSellGoodsThisQuarter.error.required = Select yes if you intend to sell goods this quarter
 intendToSellGoodsThisQuarter.change.hidden = if you intend to sell goods this quarter
 
-registerLater.title = Register later
-registerLater.heading = Register later
+registerLater.title = You need to register later
+registerLater.heading = You need to register later
+
+cannotRegisterAlreadyRegistered.title = You cannot use this service
+cannotRegisterAlreadyRegistered.heading = You cannot use this service
+
+registeredForOssInEu.title = Is your business already registered for the One Stop Shop in an EU country?
+registeredForOssInEu.heading = Is your business already registered for the One Stop Shop in an EU country?
+registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country

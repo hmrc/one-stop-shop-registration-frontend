@@ -19,22 +19,25 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import views.html.CannotRegisterAlreadyRegisteredView
 
-class IndexControllerSpec extends SpecBase {
+class CannotRegisterAlreadyRegisteredControllerSpec extends SpecBase {
 
+  "CannotRegisterAlreadyRegistered Controller" - {
 
-  "Index Controller" - {
+    "must return OK and the correct view for a GET" in {
 
-    "must redirect to Registered for OSS in EU" in {
-
-      val application = applicationBuilder(None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(routes.IndexController.onPageLoad())
+        val request = FakeRequest(GET, routes.CannotRegisterAlreadyRegisteredController.onPageLoad().url)
+
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
+        val view = application.injector.instanceOf[CannotRegisterAlreadyRegisteredView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
   }

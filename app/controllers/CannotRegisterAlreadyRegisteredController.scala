@@ -16,22 +16,23 @@
 
 package controllers
 
-import controllers.actions.AuthenticatedControllerComponents
+import controllers.actions._
+import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.CannotRegisterAlreadyRegisteredView
 
-import javax.inject.Inject
-
-class IndexController @Inject()(
-                                 override val messagesApi: MessagesApi,
-                                 cc: AuthenticatedControllerComponents,
-                               ) extends FrontendBaseController with I18nSupport {
+class CannotRegisterAlreadyRegisteredController @Inject()(
+                                       override val messagesApi: MessagesApi,
+                                       cc: AuthenticatedControllerComponents,
+                                       view: CannotRegisterAlreadyRegisteredView
+                                     ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad: Action[AnyContent] = Action {
-    _ =>
-      Redirect(routes.RegisteredForOssInEuController.onPageLoad())
+    implicit request =>
+      Ok(view())
   }
 }

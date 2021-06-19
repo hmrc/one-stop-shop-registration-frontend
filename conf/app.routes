@@ -137,6 +137,8 @@ GET         /account/provider-unsupported                                   cont
 GET         /account/credential-unsupported                                 controllers.auth.AuthController.insufficientEnrolments()
 GET         /account/role-unsupported                                       controllers.auth.AuthController.unsupportedCredentialRole
 
+GET         /on-sign-in                                                     controllers.auth.AuthController.onSignIn
+
 GET        /confirm-vat-details                    controllers.CheckVatDetailsController.onPageLoad
 POST       /confirm-vat-details                    controllers.CheckVatDetailsController.onSubmit
 
@@ -263,3 +265,8 @@ GET        /changeIntendToSellGoodsThisQuarter                  controllers.Inte
 POST       /changeIntendToSellGoodsThisQuarter                  controllers.IntendToSellGoodsThisQuarterController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registerLater                       controllers.RegisterLaterController.onPageLoad()
+
+GET        /already-eu-registered                   controllers.RegisteredForOssInEuController.onPageLoad()
+POST       /already-eu-registered                   controllers.RegisteredForOssInEuController.onSubmit()
+
+GET        /cannotRegisterAlreadyRegistered                       controllers.CannotRegisterAlreadyRegisteredController.onPageLoad()

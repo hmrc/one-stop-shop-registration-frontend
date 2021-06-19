@@ -14,28 +14,32 @@
  * limitations under the License.
  */
 
-package controllers
+package forms
 
-import base.SpecBase
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-class IndexControllerSpec extends SpecBase {
+class RegisteredForOssInEuFormProviderSpec extends BooleanFieldBehaviours {
 
+  val requiredKey = "registeredForOssInEu.error.required"
+  val invalidKey = "error.boolean"
 
-  "Index Controller" - {
+  val form = new RegisteredForOssInEuFormProvider()()
 
-    "must redirect to Registered for OSS in EU" in {
+  ".value" - {
 
-      val application = applicationBuilder(None).build()
+    val fieldName = "value"
 
-      running(application) {
-        val request = FakeRequest(routes.IndexController.onPageLoad())
-        val result = route(application, request).value
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
-      }
-    }
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
   }
 }

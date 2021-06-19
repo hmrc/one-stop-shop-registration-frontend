@@ -14,28 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package forms
 
-import base.SpecBase
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import javax.inject.Inject
 
-class IndexControllerSpec extends SpecBase {
+import forms.mappings.Mappings
+import play.api.data.Form
 
+class RegisteredForOssInEuFormProvider @Inject() extends Mappings {
 
-  "Index Controller" - {
-
-    "must redirect to Registered for OSS in EU" in {
-
-      val application = applicationBuilder(None).build()
-
-      running(application) {
-        val request = FakeRequest(routes.IndexController.onPageLoad())
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
-      }
-    }
-  }
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("registeredForOssInEu.error.required")
+    )
 }
