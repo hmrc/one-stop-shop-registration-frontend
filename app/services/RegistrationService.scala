@@ -145,9 +145,9 @@ class RegistrationService {
     ).mapN(VatDetails.apply)
 
   private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] =
-    answers.get(StartDatePage) match {
-      case Some(startDate) => startDate.date.validNec
-      case None            => DataMissingError(StartDatePage).invalidNec
+    answers.get(CommencementDatePage) match {
+      case Some(startDate) => startDate.validNec
+      case None            => DataMissingError(CommencementDatePage).invalidNec
     }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =

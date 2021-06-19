@@ -60,9 +60,7 @@ class RegistrationServiceSpec extends SpecBase {
       .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
-      .set(StartDatePage,
-        StartDate(StartDateOption.NextPeriod, LocalDate.now())
-      ).success.value
+      .set(CommencementDatePage, LocalDate.now()).success.value
       .set(
         UkAddressPage,
         UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
@@ -257,12 +255,12 @@ class RegistrationServiceSpec extends SpecBase {
         result mustEqual Invalid(NonEmptyChain(DataMissingError(PartOfVatGroupPage)))
       }
 
-      "when Start Date is missing" in {
+      "when Commencement Date is missing" in {
 
-        val userAnswers = answers.remove(StartDatePage).success.value
+        val userAnswers = answers.remove(CommencementDatePage).success.value
         val result = registrationService.fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(StartDatePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(CommencementDatePage)))
       }
 
       "when Contact Details are missing" in {
