@@ -17,6 +17,8 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class IntendToSellGoodsThisQuarterPageSpec extends SpecBase with PageBehaviours {
@@ -28,5 +30,43 @@ class IntendToSellGoodsThisQuarterPageSpec extends SpecBase with PageBehaviours 
     beSettable[Boolean](IntendToSellGoodsThisQuarterPage)
 
     beRemovable[Boolean](IntendToSellGoodsThisQuarterPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Commencement Date when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, true).success.value
+
+        IntendToSellGoodsThisQuarterPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+      }
+
+      "to Register Later when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, false).success.value
+
+        IntendToSellGoodsThisQuarterPage.navigate(NormalMode, answers)
+          .mustEqual(routes.RegisterLaterController.onPageLoad())
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Commencement Date when the answer is yes" in {
+
+        val answers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, true).success.value
+
+        IntendToSellGoodsThisQuarterPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+      }
+    }
+
+    "to Register Later when the answer is no" in {
+
+      val answers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, false).success.value
+
+      IntendToSellGoodsThisQuarterPage.navigate(CheckMode, answers)
+        .mustEqual(routes.RegisterLaterController.onPageLoad())
+    }
   }
 }

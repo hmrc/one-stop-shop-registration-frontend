@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.AlreadyMadeSalesFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AlreadyMadeSales, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,10 +33,12 @@ import scala.concurrent.Future
 
 class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new AlreadyMadeSalesFormProvider()
+  private val formProvider = new AlreadyMadeSalesFormProvider(stubClockAtArbitraryDate)
   private val form = formProvider()
 
   private lazy val alreadyMadeSalesRoute = routes.AlreadyMadeSalesController.onPageLoad(NormalMode).url
+
+  private val validAnswer = AlreadyMadeSales(answer = false, None)
 
   "AlreadyMadeSales Controller" - {
 
@@ -58,7 +60,7 @@ class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(AlreadyMadeSalesPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(AlreadyMadeSalesPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -70,7 +72,7 @@ class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -88,10 +90,10 @@ class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, alreadyMadeSalesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("answer", "false"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(AlreadyMadeSalesPage, true).success.value
+        val expectedAnswers = emptyUserAnswers.set(AlreadyMadeSalesPage, validAnswer).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual AlreadyMadeSalesPage.navigate(NormalMode, expectedAnswers).url
@@ -140,7 +142,7 @@ class AlreadyMadeSalesControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, alreadyMadeSalesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("answer", "false"))
 
         val result = route(application, request).value
 

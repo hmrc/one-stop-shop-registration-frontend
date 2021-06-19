@@ -17,6 +17,9 @@
 package controllers
 
 import controllers.actions._
+import models.Mode
+import pages.CommencementDatePage
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,8 +34,13 @@ class CommencementDateController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Ok(view())
+      Ok(view(mode))
+  }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+    implicit request =>
+      Redirect(CommencementDatePage.navigate(mode, request.userAnswers))
   }
 }

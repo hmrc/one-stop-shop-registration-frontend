@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.CommencementDateView
@@ -30,14 +31,14 @@ class CommencementDateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CommencementDateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(NormalMode)(request, messages(application)).toString
       }
     }
   }

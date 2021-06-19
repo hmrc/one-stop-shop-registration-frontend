@@ -16,15 +16,28 @@
 
 package forms
 
+import forms.mappings.Mappings
+import models.AlreadyMadeSales
+import play.api.data.Form
+import play.api.data.Forms.mapping
+import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfEqual
+
+import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 
-import forms.mappings.Mappings
-import play.api.data.Form
+class AlreadyMadeSalesFormProvider @Inject()(clock: Clock) extends Mappings {
 
-class AlreadyMadeSalesFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
+  def apply(): Form[AlreadyMadeSales] =
     Form(
-      "value" -> boolean("alreadyMadeSales.error.required")
+      mapping(
+        "answer"    -> boolean("alreadyMadeSales.answer.error.required"),
+        "firstSale" -> mandatoryIfEqual("answer", true.toString, localDate(
+          invalidKey     = "alreadyMadeSales.firstSale.error.invalid",
+          allRequiredKey = "alreadyMadeSales.firstSale.error.allRequired",
+          twoRequiredKey = "alreadyMadeSales.firstSale.error.twoRequired",
+          requiredKey    = "alreadyMadeSales.firstSale.error.required"
+        )
+        .verifying(maxDate(LocalDate.now(clock), "alreadyMadeSales.firstSale.error.maxDate"))
+      ))(AlreadyMadeSales.apply)(AlreadyMadeSales.unapply)
     )
 }

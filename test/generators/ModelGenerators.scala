@@ -28,6 +28,11 @@ import java.time.LocalDate
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryAlreadyMadeSales: Arbitrary[AlreadyMadeSales] =
+    Arbitrary {
+        Gen.const(AlreadyMadeSales(answer = false, None))
+    }
+
   implicit lazy val arbitraryCurrentlyRegisteredInCountry: Arbitrary[CurrentlyRegisteredInCountry] =
     Arbitrary {
       Gen.oneOf(Gen.const(No), arbitrary[Country].map(Yes))

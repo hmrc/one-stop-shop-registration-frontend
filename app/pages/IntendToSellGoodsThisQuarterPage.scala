@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -27,5 +27,15 @@ case object IntendToSellGoodsThisQuarterPage extends QuestionPage[Boolean] {
 
   override def toString: String = "intendToSellGoodsThisQuarter"
 
-  override def navigateInNormalMode(answers: UserAnswers): Call = routes.IndexController.onPageLoad()
+  override def navigateInNormalMode(answers: UserAnswers): Call = answers.get(IntendToSellGoodsThisQuarterPage) match {
+    case Some(true)  => routes.CommencementDateController.onPageLoad(NormalMode)
+    case Some(false) => routes.RegisterLaterController.onPageLoad()
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  override def navigateInCheckMode(answers: UserAnswers): Call = answers.get(IntendToSellGoodsThisQuarterPage) match {
+    case Some(true)  => routes.CommencementDateController.onPageLoad(CheckMode)
+    case Some(false) => routes.RegisterLaterController.onPageLoad()
+    case None        => routes.JourneyRecoveryController.onPageLoad()
+  }
 }

@@ -272,7 +272,10 @@ POST       /alreadyMadeSales                        controllers.AlreadyMadeSales
 GET        /changeAlreadyMadeSales                  controllers.AlreadyMadeSalesController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeAlreadyMadeSales                  controllers.AlreadyMadeSalesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /commencementDate                       controllers.CommencementDateController.onPageLoad()
+GET        /commencementDate                       controllers.CommencementDateController.onPageLoad(mode: Mode = NormalMode)
+POST       /commencementDate                       controllers.CommencementDateController.onSubmit(mode: Mode = NormalMode)
+GET        /checkCommencementDate                       controllers.CommencementDateController.onPageLoad(mode: Mode = CheckMode)
+POST       /checkCommencementDate                       controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
 
 GET        /intendToSellGoodsThisQuarter                        controllers.IntendToSellGoodsThisQuarterController.onPageLoad(mode: Mode = NormalMode)
 POST       /intendToSellGoodsThisQuarter                        controllers.IntendToSellGoodsThisQuarterController.onSubmit(mode: Mode = NormalMode)

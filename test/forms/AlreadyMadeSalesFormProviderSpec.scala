@@ -17,29 +17,198 @@
 package forms
 
 import forms.behaviours.BooleanFieldBehaviours
+import generators.Generators
+import models.AlreadyMadeSales
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.FormError
 
-class AlreadyMadeSalesFormProviderSpec extends BooleanFieldBehaviours {
+import java.time.{Clock, LocalDate, ZoneId}
 
-  val requiredKey = "alreadyMadeSales.error.required"
-  val invalidKey = "error.boolean"
+class AlreadyMadeSalesFormProviderSpec extends BooleanFieldBehaviours with ScalaCheckPropertyChecks with Generators {
 
-  val form = new AlreadyMadeSalesFormProvider()()
+  private val stubClock = Clock.fixed(LocalDate.now.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
 
-  ".value" - {
+  private val form = new AlreadyMadeSalesFormProvider(stubClock)()
 
-    val fieldName = "value"
+  "form" - {
 
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
-    )
+    "when the answer is false" - {
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+      "must bind" in {
+
+        val result = form.bind(Map("answer" -> "false"))
+        result.value.value mustEqual AlreadyMadeSales(answer = false, None)
+      }
+    }
+
+    "when the answer is true" - {
+
+      "must bind if firstSale is in the past or today" in {
+
+        forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+          date =>
+            val data = Map(
+              "answer"          -> "true",
+              "firstSale.day"   -> date.getDayOfMonth.toString,
+              "firstSale.month" -> date.getMonthValue.toString,
+              "firstSale.year"  -> date.getYear.toString
+            )
+
+            val result = form.bind(data)
+
+            result.value.value mustEqual AlreadyMadeSales(answer = true, Some(date))
+            result.errors mustBe empty
+        }
+      }
+
+      "must fail to bind" - {
+
+        "when firstSale is not present" in {
+
+          val result = form.bind(Map("answer" -> "true"))
+          result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.allRequired")
+        }
+
+        "when firstSale is in the future" in {
+
+          forAll(datesBetween(LocalDate.now, LocalDate.now.plusYears(1))) {
+            date =>
+              val data = Map(
+                "answer"          -> "true",
+                "firstSale.day"   -> date.getDayOfMonth.toString,
+                "firstSale.month" -> date.getMonthValue.toString,
+                "firstSale.year"  -> date.getYear.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.maxDate")
+          }
+        }
+
+        "when firstSale.day is missing" in {
+
+          forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+            date =>
+              val data = Map(
+                "answer"          -> "true",
+                "firstSale.month" -> date.getMonthValue.toString,
+                "firstSale.year"  -> date.getYear.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.required", Seq("day"))
+          }
+        }
+
+        "when firstSale.month is missing" in {
+
+          forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+            date =>
+              val data = Map(
+                "answer"          -> "true",
+                "firstSale.day"   -> date.getDayOfMonth.toString,
+                "firstSale.year"  -> date.getYear.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.required", Seq("month"))
+          }
+        }
+
+        "when firstSale.year is missing" in {
+
+          forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+            date =>
+              val data = Map(
+                "answer"          -> "true",
+                "firstSale.day"   -> date.getDayOfMonth.toString,
+                "firstSale.month" -> date.getMonthValue.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.required", Seq("year"))
+          }
+        }
+
+        "when firstSale.day and firstSale.month are missing" in {
+
+          forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+            date =>
+              val data = Map(
+                "answer"          -> "true",
+                "firstSale.year"  -> date.getYear.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.twoRequired", Seq("day", "month"))
+          }
+        }
+
+        "when firstSale.day and firstSale.year are missing" in {
+
+          forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+            date =>
+              val data = Map(
+                "answer"          -> "true",
+                "firstSale.month" -> date.getMonthValue.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.twoRequired", Seq("day", "year"))
+          }
+        }
+
+        "when firstSale.month and firstSale.year are missing" in {
+
+          forAll(datesBetween(LocalDate.now.minusYears(1), LocalDate.now)) {
+            date =>
+              val data = Map(
+                "answer"        -> "true",
+                "firstSale.day" -> date.getDayOfMonth.toString
+              )
+
+              val result = form.bind(data)
+
+              result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.twoRequired", Seq("month", "year"))
+          }
+        }
+
+        "when firstSale is not a valid date" in {
+
+          val data = Map(
+            "answer"          -> "true",
+            "firstSale.day"   -> "32",
+            "firstSale.month" -> LocalDate.now.getMonthValue.toString,
+            "firstSale.year"  -> LocalDate.now.getYear.toString
+          )
+
+          val result = form.bind(data)
+
+          result.errors must contain only FormError("firstSale", "alreadyMadeSales.firstSale.error.invalid")
+        }
+      }
+    }
+
+    "must fail to bind when answer is not present" in {
+
+      forAll(datesBetween(LocalDate.now.minusMonths(1), LocalDate.now)) {
+        date =>
+          val data = Map(
+            "firstSale.day"   -> date.getDayOfMonth.toString,
+            "firstSale.month" -> date.getMonthValue.toString,
+            "firstSale.year"  -> date.getYear.toString
+          )
+
+          val result = form.bind(data)
+
+          result.errors must contain only FormError("answer", "alreadyMadeSales.answer.error.required")
+      }
+    }
   }
 }

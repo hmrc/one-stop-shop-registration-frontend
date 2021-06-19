@@ -28,9 +28,9 @@ object AlreadyMadeSalesSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AlreadyMadeSalesPage).map {
-      answer =>
+      alreadyMadeSales =>
 
-        val value = if (answer) "site.yes" else "site.no"
+        val value = if (alreadyMadeSales.answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
           key     = "alreadyMadeSales.checkYourAnswersLabel",

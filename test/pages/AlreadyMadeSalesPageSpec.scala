@@ -17,16 +17,92 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.{AlreadyMadeSales, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
+
+import java.time.LocalDate
 
 class AlreadyMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
   "AlreadyMadeSalesPage" - {
 
-    beRetrievable[Boolean](AlreadyMadeSalesPage)
+    beRetrievable[AlreadyMadeSales](AlreadyMadeSalesPage)
 
-    beSettable[Boolean](AlreadyMadeSalesPage)
+    beSettable[AlreadyMadeSales](AlreadyMadeSalesPage)
 
-    beRemovable[Boolean](AlreadyMadeSalesPage)
+    beRemovable[AlreadyMadeSales](AlreadyMadeSalesPage)
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "to Commencement Date" in {
+
+          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(true, Some(LocalDate.now))).success.value
+          AlreadyMadeSalesPage.navigate(NormalMode, answers)
+            .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Intend to Sell Goods This Quarter" in {
+
+          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(false, None)).success.value
+          AlreadyMadeSalesPage.navigate(NormalMode, answers)
+            .mustEqual(routes.IntendToSellGoodsThisQuarterController.onPageLoad(NormalMode))
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "to Commencement Date" in {
+
+          val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(true, Some(LocalDate.now))).success.value
+          AlreadyMadeSalesPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "and Intend to Sell Goods has been answered" - {
+
+          "to Check Your Answers" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(IntendToSellGoodsThisQuarterPage, true).success.value
+                .set(AlreadyMadeSalesPage, AlreadyMadeSales(false, None)).success.value
+
+            AlreadyMadeSalesPage.navigate(CheckMode, answers)
+              .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+          }
+        }
+
+        "and Intend to Sell Goods has not been answered" - {
+
+          "to Intend to Sell Goods This Quarter" in {
+
+            val answers = emptyUserAnswers.set(AlreadyMadeSalesPage, AlreadyMadeSales(false, None)).success.value
+            AlreadyMadeSalesPage.navigate(CheckMode, answers)
+              .mustEqual(routes.IntendToSellGoodsThisQuarterController.onPageLoad(CheckMode))
+          }
+        }
+      }
+    }
+
+    "must remove Intend to Sell Goods when the answer is yes" in {
+
+      val answers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, true).success.value
+
+      val result = answers.set(AlreadyMadeSalesPage, AlreadyMadeSales(true, Some(LocalDate.now))).success.value
+
+      result.get(IntendToSellGoodsThisQuarterPage) must not be defined
+    }
   }
 }

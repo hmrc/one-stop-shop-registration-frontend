@@ -17,16 +17,35 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{AlreadyMadeSales, CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
+import scala.util.Try
 
-case object AlreadyMadeSalesPage extends QuestionPage[Boolean] {
+
+case object AlreadyMadeSalesPage extends QuestionPage[AlreadyMadeSales] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "alreadyMadeSales"
 
-  override def navigateInNormalMode(answers: UserAnswers): Call = routes.IndexController.onPageLoad()
+  override def navigateInNormalMode(answers: UserAnswers): Call = answers.get(AlreadyMadeSalesPage) match {
+    case Some(x) if x.answer => routes.CommencementDateController.onPageLoad(NormalMode)
+    case Some(_)             => routes.IntendToSellGoodsThisQuarterController.onPageLoad(NormalMode)
+    case None                => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(AlreadyMadeSalesPage), answers.get(IntendToSellGoodsThisQuarterPage)) match {
+      case (Some(x), _) if x.answer        => routes.CommencementDateController.onPageLoad(CheckMode)
+      case (Some(x), None) if !x.answer    => routes.IntendToSellGoodsThisQuarterController.onPageLoad(CheckMode)
+      case (Some(x), Some(_)) if !x.answer => routes.CheckYourAnswersController.onPageLoad()
+      case _                               => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override def cleanup(value: Option[AlreadyMadeSales], userAnswers: UserAnswers): Try[UserAnswers] = value match {
+    case Some(x) if !x.answer => super.cleanup(value, userAnswers)
+    case _                    => userAnswers.remove(IntendToSellGoodsThisQuarterPage)
+  }
 }
