@@ -30,6 +30,15 @@ class StartDateService @Inject()(clock: Clock) {
     lastDayOfCurrentPeriod.plusDays(1)
   }
 
+  def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
+    val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
+    if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {
+      startOfNextPeriod
+    } else {
+      dateOfFirstSale
+    }
+  }
+
   def canRegisterLastMonth: Boolean =
     LocalDate.now(clock).getDayOfMonth < 11
 
