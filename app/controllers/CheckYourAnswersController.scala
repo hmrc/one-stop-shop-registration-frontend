@@ -71,7 +71,6 @@ class CheckYourAnswersController @Inject()(
           CurrentlyRegisteredInCountrySummary.row(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
-          StartDateSummary.row(request.userAnswers),
           HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers),

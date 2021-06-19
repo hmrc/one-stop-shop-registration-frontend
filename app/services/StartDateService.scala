@@ -43,20 +43,4 @@ class StartDateService @Inject()(clock: Clock) {
 
   def startDateBasedOnIntentionToSellGoods(): LocalDate =
     if(LocalDate.now(clock).isBefore(startOfScheme)) startOfScheme else LocalDate.now(clock)
-
-  def canRegisterLastMonth: Boolean =
-    LocalDate.now(clock).getDayOfMonth < 11
-
-  def earliestAlternativeDate: LocalDate = {
-    if (canRegisterLastMonth) {
-      LocalDate.now(clock).minusMonths(1).withDayOfMonth(1)
-    } else {
-      LocalDate.now(clock).withDayOfMonth(1)
-    }
-  }
-
-  def latestAlternativeDate: LocalDate = {
-    val today = LocalDate.now(clock)
-    today.withDayOfMonth(today.lengthOfMonth)
-  }
 }

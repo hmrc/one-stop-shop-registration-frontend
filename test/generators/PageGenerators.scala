@@ -90,9 +90,6 @@ trait PageGenerators {
   implicit lazy val arbitraryCheckVatNumberPage: Arbitrary[CheckVatNumberPage.type] =
     Arbitrary(CheckVatNumberPage)
 
-  implicit lazy val arbitraryStartDatePage: Arbitrary[StartDatePage.type] =
-    Arbitrary(StartDatePage)
-
   implicit lazy val arbitraryWebsitePage: Arbitrary[WebsitePage] =
     Arbitrary(WebsitePage(Index(0)))
 
