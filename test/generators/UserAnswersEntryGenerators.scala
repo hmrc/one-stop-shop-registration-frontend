@@ -98,14 +98,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryCurrentlyRegisteredInCountryUserAnswersEntry: Arbitrary[(CurrentlyRegisteredInCountryPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[CurrentlyRegisteredInCountryPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryBankDetailsUserAnswersEntry: Arbitrary[(BankDetailsPage.type, JsValue)] =
     Arbitrary {
       for {
@@ -143,22 +135,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       for {
         page  <- arbitrary[AddPreviousRegistrationPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryCurrentlyRegisteredInEuUserAnswersEntry: Arbitrary[(CurrentlyRegisteredInEuPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[CurrentlyRegisteredInEuPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryCurrentCountryOfRegistrationUserAnswersEntry: Arbitrary[(CurrentCountryOfRegistrationPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[CurrentCountryOfRegistrationPage.type]
-        value <- arbitrary[Country].map(Json.toJson(_))
       } yield (page, value)
     }
 

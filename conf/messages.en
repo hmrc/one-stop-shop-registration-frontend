@@ -393,20 +393,6 @@ alreadyRegistered.p1 = We will send you details about how to submit returns and 
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 
-currentCountryOfRegistration.title = Where is your business already registered for the One Stop Shop?
-currentCountryOfRegistration.heading = Where is your business already registered for the One Stop Shop?
-currentCountryOfRegistration.option1 = Option 1
-currentCountryOfRegistration.option2 = Option 2
-currentCountryOfRegistration.checkYourAnswersLabel = EU Country your business is registered in
-currentCountryOfRegistration.error.required = Select where your business is already registered for the One Stop Shop
-currentCountryOfRegistration.change.hidden = which EU country your business is registered in
-
-currentlyRegisteredInEu.title = Is your business already registered for the One Stop Shop in an EU country?
-currentlyRegisteredInEu.heading = Is your business already registered for the One Stop Shop in an EU country?
-currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
-currentlyRegisteredInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country
-currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
-
 addPreviousRegistration.title.singular = You added one deregistration from the One Stop Shop
 addPreviousRegistration.heading.singular = You added one deregistration from the One Stop Shop
 addPreviousRegistration.title = You added {0} deregistrations from the One Stop Shop
@@ -461,12 +447,6 @@ bankDetails.error.iban.length = IBAN must be between 5 and 34 characters
 bankDetails.error.iban.invalid = IBAN must only include letters and numbers
 bankDetails.accountName.change.hidden = account name
 bankDetails.bic.change.hidden = BIC number
-
-currentlyRegisteredInCountry.title = Is your business already registered for the One Stop Shop in {0}?
-currentlyRegisteredInCountry.heading = Is your business already registered for the One Stop Shop in {0}?
-currentlyRegisteredInCountry.checkYourAnswersLabel = Registered for One Stop Shop in EU country
-currentlyRegisteredInCountry.error.required = Select yes if your business is already registered for the One Stop Shop in {0}
-currentlyRegisteredInCountry.change.hidden = if your business is already registered for the One Stop Shop
 
 euTaxReference.title = What is your tax reference number for {0}?
 euTaxReference.heading = What is your tax reference number for {0}?

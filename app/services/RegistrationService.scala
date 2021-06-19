@@ -17,7 +17,6 @@
 package services
 
 import cats.implicits._
-import models.CurrentlyRegisteredInCountry.{No, Yes}
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
@@ -37,26 +36,24 @@ class RegistrationService {
       getTradingNames(answers),
       getVatDetails(answers),
       getEuTaxRegistrations(answers),
-      getStartDate(answers),
+      getCommencementDate(answers),
       getContactDetails(answers),
       getWebsites(answers),
       getPreviousRegistrations(answers),
-      getBankDetails(answers),
-      getCurrentCountry(answers)
+      getBankDetails(answers)
     ).mapN(
-      (name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails, currentCountry) =>
+      (name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
         Registration(
-          vrn                          = vrn,
-          registeredCompanyName        = name,
-          tradingNames                 = tradingNames,
-          vatDetails                   = vatDetails,
-          euRegistrations              = euRegistrations,
-          contactDetails               = contactDetails,
-          websites                     = websites,
-          startDate                    = startDate,
-          currentCountryOfRegistration = currentCountry,
-          previousRegistrations        = previousRegistrations,
-          bankDetails                  = bankDetails
+          vrn                   = vrn,
+          registeredCompanyName = name,
+          tradingNames          = tradingNames,
+          vatDetails            = vatDetails,
+          euRegistrations       = euRegistrations,
+          contactDetails        = contactDetails,
+          websites              = websites,
+          commencementDate      = startDate,
+          previousRegistrations = previousRegistrations,
+          bankDetails           = bankDetails
         )
     )
 
@@ -144,7 +141,7 @@ class RegistrationService {
       getVatDetailSource(answers)
     ).mapN(VatDetails.apply)
 
-  private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] =
+  private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
     answers.get(CommencementDatePage) match {
       case Some(startDate) => startDate.validNec
       case None            => DataMissingError(CommencementDatePage).invalidNec
@@ -312,43 +309,5 @@ class RegistrationService {
 
       case None =>
         DataMissingError(HasWebsitePage).invalidNec
-    }
-
-  private def getCurrentCountry(answers: UserAnswers): ValidationResult[Option[Country]] =
-    answers.get(AllEuDetailsRawQuery) match {
-      case None =>
-        None.validNec
-
-      case Some(details) =>
-        details.value.zipWithIndex.foldLeft(0) { (a, i) =>
-          answers.get(VatRegisteredPage(Index(i._2))) match {
-            case Some(true) => a + 1
-            case _          => a
-          }
-        } match {
-          case 0 => None.validNec
-          case 1 => getCountrySingle(answers)
-          case _ => getCountryMultiple(answers)
-        }
-    }
-
-  private def getCountrySingle(answers: UserAnswers): ValidationResult[Option[Country]] =
-    answers.get(CurrentlyRegisteredInCountryPage) match {
-      case Some(Yes(country)) => Some(country).validNec
-      case Some(No)           => None.validNec
-      case None               => DataMissingError(CurrentlyRegisteredInCountryPage).invalidNec
-    }
-
-  private def getCountryMultiple(answers: UserAnswers): ValidationResult[Option[Country]] =
-    answers.get(CurrentlyRegisteredInEuPage) match {
-      case Some(true) =>
-        answers.get(CurrentCountryOfRegistrationPage) match {
-          case Some(country) => Some(country).validNec
-          case None          => DataMissingError(CurrentCountryOfRegistrationPage).invalidNec
-        }
-      case Some(false) =>
-        None.validNec
-      case None =>
-        DataMissingError(CurrentlyRegisteredInEuPage).invalidNec
     }
 }

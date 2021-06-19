@@ -17,23 +17,22 @@
 package controllers.euDetails
 
 import base.SpecBase
-import models.CurrentlyRegisteredInCountry.No
 import models.{Country, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CurrentlyRegisteredInCountryPage, euDetails}
-import pages.euDetails.{CheckEuDetailsAnswersPage, EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails
+import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import viewmodels.checkAnswers.euDetails.EuCountrySummary
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
-import play.api.inject.bind
 
 import scala.concurrent.Future
 
@@ -87,41 +86,6 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
           redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, emptyUserAnswers).url
         }
       }
-
     }
-      "when there are two or more VAT registered countries in the user's answers" - {
-
-        "must remove the answer to Currently Registered in Country" in {
-
-          val answers =
-            emptyUserAnswers
-              .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(VatRegisteredPage(Index(0)), true).success.value
-              .set(EuVatNumberPage(Index(0)), "123").success.value
-              .set(HasFixedEstablishmentPage(Index(0)), false).success.value
-              .set(EuCountryPage(Index(1)), Country("ES", "Spain")).success.value
-              .set(VatRegisteredPage(Index(1)), true).success.value
-              .set(EuVatNumberPage(Index(1)), "123").success.value
-              .set(HasFixedEstablishmentPage(Index(1)), false).success.value
-              .set(CurrentlyRegisteredInCountryPage, No).success.value
-
-          val application =
-            applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-              .build()
-
-          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-          running(application) {
-            val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index).url)
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-            val expectedAnswers = answers.remove(CurrentlyRegisteredInCountryPage).success.value
-
-            verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-          }
-        }
-      }
   }
 }

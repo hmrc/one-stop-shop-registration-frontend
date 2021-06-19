@@ -175,16 +175,6 @@ POST       /first-check-tax-details/:index                      controllers.euDe
 
 GET        /already-registered                           controllers.AlreadyRegisteredController.onPageLoad()
 
-GET        /already-registered-which-country            controllers.CurrentCountryOfRegistrationController.onPageLoad(mode: Mode = NormalMode)
-POST       /already-registered-which-country            controllers.CurrentCountryOfRegistrationController.onSubmit(mode: Mode = NormalMode)
-GET        /check-already-registered-which-country      controllers.CurrentCountryOfRegistrationController.onPageLoad(mode: Mode = CheckMode)
-POST       /check-already-registered-which-country      controllers.CurrentCountryOfRegistrationController.onSubmit(mode: Mode = CheckMode)
-
-GET        /already-eu-registered                             controllers.CurrentlyRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
-POST       /already-eu-registered                             controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
-GET        /check-already-eu-registered                       controllers.CurrentlyRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
-POST       /check-already-eu-registered                       controllers.CurrentlyRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
-
 GET        /add-deregistration                                controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
 POST       /add-deregistration                                controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode)
 GET        /check-add-deregistration                          controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
@@ -215,11 +205,6 @@ GET        /bank-details                        controllers.BankDetailsControlle
 POST       /bank-details                        controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /check-bank-details                  controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /check-bank-details                  controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
-
-GET        /already-registered-country                       controllers.CurrentlyRegisteredInCountryController.onPageLoad(mode: Mode = NormalMode)
-POST       /already-registered-country                       controllers.CurrentlyRegisteredInCountryController.onSubmit(mode: Mode = NormalMode)
-GET        /heck-already-registered-country                  controllers.CurrentlyRegisteredInCountryController.onPageLoad(mode: Mode = CheckMode)
-POST       /heck-already-registered-country                  controllers.CurrentlyRegisteredInCountryController.onSubmit(mode: Mode = CheckMode)
 
 GET        /eu-tax-number/:index                                controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST       /eu-tax-number/:index                                controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode, index: Index)

@@ -16,7 +16,6 @@
 
 package generators
 
-import models.CurrentlyRegisteredInCountry.{No, Yes}
 import models._
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
 import org.scalacheck.Arbitrary.arbitrary
@@ -28,11 +27,6 @@ trait ModelGenerators {
   implicit lazy val arbitraryAlreadyMadeSales: Arbitrary[AlreadyMadeSales] =
     Arbitrary {
         Gen.const(AlreadyMadeSales.No)
-    }
-
-  implicit lazy val arbitraryCurrentlyRegisteredInCountry: Arbitrary[CurrentlyRegisteredInCountry] =
-    Arbitrary {
-      Gen.oneOf(Gen.const(No), arbitrary[Country].map(Yes))
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
