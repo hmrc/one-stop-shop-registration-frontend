@@ -18,21 +18,25 @@ package controllers
 
 import controllers.actions._
 import forms.IntendToSellGoodsThisQuarterFormProvider
+
 import javax.inject.Inject
-import models.Mode
-import pages.IntendToSellGoodsThisQuarterPage
+import models.{Mode, UserAnswers}
+import pages.{CommencementDatePage, IntendToSellGoodsThisQuarterPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntendToSellGoodsThisQuarterView
 
+import java.time.{Clock, LocalDate}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class IntendToSellGoodsThisQuarterController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: IntendToSellGoodsThisQuarterFormProvider,
-                                         view: IntendToSellGoodsThisQuarterView
+                                         view: IntendToSellGoodsThisQuarterView,
+                                         clock: Clock
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -58,9 +62,18 @@ class IntendToSellGoodsThisQuarterController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IntendToSellGoodsThisQuarterPage, value))
+            updatedAnswers <- Future.fromTry(updateUserAnswers(value, request.userAnswers))
             _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(IntendToSellGoodsThisQuarterPage.navigate(mode, updatedAnswers))
       )
   }
+
+  private def updateUserAnswers(answer: Boolean, answers: UserAnswers): Try[UserAnswers] =
+    if (answer) {
+      answers
+        .set(IntendToSellGoodsThisQuarterPage, answer)
+        .flatMap(_.set(CommencementDatePage, LocalDate.now(clock)))
+    } else {
+      answers.set(IntendToSellGoodsThisQuarterPage, answer)
+    }
 }

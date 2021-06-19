@@ -22,13 +22,14 @@ import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IntendToSellGoodsThisQuarterPage
+import pages.{CommencementDatePage, IntendToSellGoodsThisQuarterPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import views.html.IntendToSellGoodsThisQuarterView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class IntendToSellGoodsThisQuarterControllerSpec extends SpecBase with MockitoSugar {
@@ -74,28 +75,62 @@ class IntendToSellGoodsThisQuarterControllerSpec extends SpecBase with MockitoSu
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "when the answer is yes" - {
 
-      val mockSessionRepository = mock[SessionRepository]
+      "must save the answer and the commencement date and redirect to the next page when valid data is submitted" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        val mockSessionRepository = mock[SessionRepository]
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, intendToSellGoodsThisQuarterRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
 
-        val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, true).success.value
+        running(application) {
+          val request =
+            FakeRequest(POST, intendToSellGoodsThisQuarterRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IntendToSellGoodsThisQuarterPage.navigate(NormalMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+          val result = route(application, request).value
+          val expectedAnswers =
+            emptyUserAnswers
+              .set(IntendToSellGoodsThisQuarterPage, true).success.value
+              .set(CommencementDatePage, LocalDate.now(stubClockAtArbitraryDate)).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual IntendToSellGoodsThisQuarterPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
+      }
+    }
+
+    "when the answer is no" - {
+
+      "must save the answer and redirect to the next page when valid data is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, intendToSellGoodsThisQuarterRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+          val expectedAnswers = emptyUserAnswers.set(IntendToSellGoodsThisQuarterPage, false).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual IntendToSellGoodsThisQuarterPage.navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
       }
     }
 
