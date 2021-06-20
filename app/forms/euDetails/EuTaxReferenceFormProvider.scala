@@ -16,7 +16,7 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.alphaNumbericWithSpace
+import forms.Validation.Validation.alphaNumericWithSpace
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -30,7 +30,7 @@ class EuTaxReferenceFormProvider @Inject() extends Mappings {
       "value" -> text("euTaxReference.error.required", Seq(country.name))
         .verifying(firstError(
           maxLength(100, "euTaxReference.error.length")),
-          regexp(alphaNumbericWithSpace, "euTaxReference.error.format")
+          regexp(alphaNumericWithSpace, "euTaxReference.error.format")
         )
     )
 }

@@ -16,11 +16,9 @@
 
 package forms
 
-import org.scalacheck.Arbitrary.arbitrary
-import forms.Validation.Validation.bicPattern
 import forms.behaviours.StringFieldBehaviours
-import models.Iban
-import org.scalacheck.Gen
+import models.{Bic, Iban}
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class BankDetailsFormProviderSpec extends StringFieldBehaviours {
@@ -58,40 +56,30 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "bic"
     val invalidKey = "bankDetails.error.bic.invalid"
-    val lengthKey = "bankDetails.error.bic.length"
-    val minLength = 8
-    val maxLength = 11
 
-    val validData = Gen.listOfN(maxLength, Gen.oneOf(Gen.numChar, Gen.alphaUpperChar)).map(_.mkString)
+    s"bind strings that match the BIC regular expression" in {
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      validData
-    )
-
-    s"not bind strings outside range of $minLength and $maxLength characters in length" in {
-      forAll(stringsOutsideOfLengthRange(minLength, maxLength)) {
-        invalidInput =>
-          val result = form.bind(Map(fieldName -> invalidInput)).apply(fieldName)
-
-          result.errors must contain(FormError(fieldName, lengthKey, Seq(minLength, maxLength)))
-      }
-    }
-
-    s"bind strings inside range of $minLength and $maxLength characters in length" in {
-
-      forAll(alphaNumStringWithLength(minLength, maxLength)) {
+      forAll(arbitrary[Bic]) {
         validInput =>
-          val result = form.bind(Map(fieldName -> validInput)).apply(fieldName)
+          val result = form.bind(Map(fieldName -> validInput.toString)).apply(fieldName)
           result.errors mustBe empty
       }
     }
 
-    "not bind any strings containing characters other than digits or alpha characters" in {
+    "not bind any strings that don't match the BIC regular expression" in {
 
-      val result = form.bind(Map(fieldName -> "invalid.")).apply(fieldName)
-      result.errors must contain only FormError(fieldName, invalidKey, Seq(bicPattern))
+      val invalidCodes = Seq(
+        "ABCDEF1A",
+        "ABCDEF2O",
+        "ABCDEF2AB",
+        "ABCDEF2123",
+        "ABCDE12A"
+      )
+
+      for (invalidCode <- invalidCodes) {
+        val result = form.bind(Map(fieldName -> invalidCode)).apply(fieldName)
+        result.errors must contain only FormError(fieldName, invalidKey)
+      }
     }
   }
 
@@ -115,6 +103,18 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must allow spaces in the input, but strip them when creating the resulting IBAN" in {
+
+      val ibansWithSpaces = genIntersperseString(arbitrary[Iban].map(_.toString), " ")
+
+      forAll(ibansWithSpaces) {
+        input =>
+          val result = form.bind(Map(fieldName -> input)).apply(fieldName)
+          result.value mustBe defined
+          result.errors mustBe empty
+      }
+    }
 
     "must not bind values in the wrong format" in {
 

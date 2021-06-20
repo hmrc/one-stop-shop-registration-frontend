@@ -16,7 +16,7 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.{alphaNumbericWithSpace, commonTextPattern}
+import forms.Validation.Validation.{alphaNumericWithSpace, commonTextPattern}
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -63,7 +63,7 @@ class EuTaxReferenceFormProviderSpec extends StringFieldBehaviours {
       forAll(unsafeInputsWithMaxLength(maxLength)) {
         invalidInput: String =>
           val result = form.bind(Map(fieldName -> invalidInput)).apply(fieldName)
-          result.errors must contain(FormError(fieldName, formatKey, Seq(alphaNumbericWithSpace)))
+          result.errors must contain(FormError(fieldName, formatKey, Seq(alphaNumericWithSpace)))
       }
     }
 

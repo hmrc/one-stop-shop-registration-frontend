@@ -19,7 +19,7 @@ package forms.mappings
 import models.IbanError.{InvalidChecksum, InvalidFormat}
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import models.{Enumerable, Iban}
+import models.{Bic, Enumerable, Iban}
 
 import scala.util.control.Exception.nonFatalCatch
 
@@ -116,5 +116,25 @@ trait Formatters {
           }
 
       def unbind(key: String, value: Iban) = Map(key -> value.toString)
+    }
+
+  private[mappings] def bicFormatter(requiredKey: String, invalidKey: String, args: Seq[String] = Seq.empty): Formatter[Bic] =
+    new Formatter[Bic] {
+
+      private val baseFormatter = stringFormatter(requiredKey, args)
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Bic] =
+        baseFormatter
+          .bind(key, data)
+          .right
+          .flatMap {
+            value =>
+              Bic(value) match {
+                case Some(bic) => Right(bic)
+                case None      => Left(Seq(FormError(key, invalidKey, args)))
+              }
+          }
+
+      override def unbind(key: String, value: Bic): Map[String, String] = Map(key -> value.toString)
     }
 }

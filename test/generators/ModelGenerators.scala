@@ -24,6 +24,16 @@ import uk.gov.hmrc.domain.Vrn
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryBic: Arbitrary[Bic] =
+    Arbitrary{
+      for {
+        firstChars <- Gen.listOfN(6, Gen.alphaUpperChar).map(_.mkString)
+        char7      <- Gen.oneOf(Gen.alphaUpperChar, Gen.choose(2, 9))
+        char8      <- Gen.oneOf(Gen.alphaUpperChar, Gen.numChar).suchThat(_ != 'O')
+        lastChars  <- Gen.option(Gen.listOfN(3, Gen.oneOf(Gen.alphaUpperChar, Gen.numChar)).map(_.mkString))
+      } yield Bic(s"$firstChars$char7$char8${lastChars.getOrElse("")}").get
+    }
+
   implicit lazy val arbitraryIban: Arbitrary[Iban] =
     Arbitrary {
       Gen.oneOf(
@@ -86,8 +96,8 @@ trait ModelGenerators {
     Arbitrary {
       for {
         accountName <- arbitrary[String]
-        bic <- Gen.option(Gen.listOfN(11, Gen.alphaNumChar).map(_.mkString))
-        iban <- arbitrary[Iban]
+        bic         <- Gen.option(arbitrary[Bic])
+        iban        <- arbitrary[Iban]
       } yield BankDetails(accountName, bic, iban)
     }
 

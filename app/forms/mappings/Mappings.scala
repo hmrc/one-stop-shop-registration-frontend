@@ -19,7 +19,7 @@ package forms.mappings
 import java.time.LocalDate
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
-import models.{Enumerable, Iban}
+import models.{Bic, Enumerable, Iban}
 
 trait Mappings extends Formatters with Constraints {
 
@@ -53,4 +53,7 @@ trait Mappings extends Formatters with Constraints {
 
   protected def iban(requiredKey: String, invalidKey: String, checksumKey: String, args: Seq[String] = Seq.empty): FieldMapping[Iban] =
     of(ibanFormatter(requiredKey, invalidKey, checksumKey, args))
+
+  protected def bic(requiredKey: String, invalidKey: String, args: Seq[String] = Seq.empty): FieldMapping[Bic] =
+    of(bicFormatter(requiredKey, invalidKey, args))
 }

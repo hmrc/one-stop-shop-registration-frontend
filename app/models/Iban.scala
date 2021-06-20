@@ -36,7 +36,7 @@ object Iban {
   private val ibanFormat       = """([A-Z]{2})(\d{2})([A-Za-z0-9]{10,30})""".r.anchored
   private val invalidChecksums = Set("00", "01", "98", "99")
 
-  def apply(input: String): Either[IbanError, Iban] = input match {
+  def apply(input: String): Either[IbanError, Iban] = input.trim.replace(" ", "") match {
     case ibanFormat(countryCode, checkSum, remainder) =>
 
       val stringToCheck = s"${remainder.toUpperCase}$countryCode$checkSum"
