@@ -35,13 +35,13 @@ import scala.concurrent.Future
 
 class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new DeleteEuDetailsFormProvider()
-  private val form = formProvider()
-
   private val index = Index(0)
   private val country = Country.euCountries.head
   private val euVatDetails = EuDetails(country, true, Some("12345678"), false, None, None, None)
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, index).url
+
+  private val formProvider = new DeleteEuDetailsFormProvider()
+  private val form = formProvider(euVatDetails)
 
   private val baseUserAnswers =
     emptyUserAnswers

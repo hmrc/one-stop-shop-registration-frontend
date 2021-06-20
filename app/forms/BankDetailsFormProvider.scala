@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{bicPattern, commonNamePattern, ibanPattern}
+import forms.Validation.Validation.{bicPattern, commonTextPattern, ibanPattern}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -30,11 +30,12 @@ class BankDetailsFormProvider @Inject() extends Mappings {
     mapping(
      "accountName" -> text("bankDetails.error.accountName.required")
        .verifying(firstError(
-         maxLength(100, "bankDetails.error.accountName.length"),
-         regexp(commonNamePattern, "bankDetails.error.accountName.invalid")
+         maxLength(70, "bankDetails.error.accountName.length"),
+         regexp(commonTextPattern, "bankDetails.error.accountName.invalid")
        )),
      "bic" -> optional(text("bankDetails.error.bic.required")
-       .verifying(firstError(maxLength(11, "bankDetails.error.bic.length"),
+       .verifying(firstError(
+         stringLengthRange(8, 11, "bankDetails.error.bic.length"),
          regexp(bicPattern, "bankDetails.error.bic.invalid")
        ))),
       "iban" -> iban("bankDetails.error.iban.required", "bankDetails.error.iban.invalid", "bankDetails.error.iban.checksum")

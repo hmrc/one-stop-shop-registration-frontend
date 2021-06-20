@@ -25,7 +25,7 @@ class HasTradingNameFormProviderSpec extends BooleanFieldBehaviours {
   val invalidKey = "error.boolean"
   val registeredCompanyName = "foo"
 
-  val form = new HasTradingNameFormProvider()(registeredCompanyName)
+  val form = new HasTradingNameFormProvider()()
 
   ".value" - {
 
@@ -34,13 +34,13 @@ class HasTradingNameFormProviderSpec extends BooleanFieldBehaviours {
     behave like booleanField(
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey, Seq(registeredCompanyName))
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey, Seq(registeredCompanyName))
+      requiredError = FormError(fieldName, requiredKey)
     )
   }
 }

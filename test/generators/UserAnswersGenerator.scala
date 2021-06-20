@@ -29,6 +29,8 @@ trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[_], JsValue)]] =
+    arbitrary[(IntendToSellGoodsThisQuarterPage.type, JsValue)] ::
+    arbitrary[(AlreadyMadeSalesPage.type, JsValue)] ::
     arbitrary[(InternationalAddressPage.type, JsValue)] ::
     arbitrary[(BusinessAddressInUkPage.type, JsValue)] ::
     arbitrary[(TaxRegisteredInEuPage.type, JsValue)] ::
@@ -36,20 +38,16 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] ::
     arbitrary[(HasWebsitePage.type, JsValue)] ::
     arbitrary[(EuTaxReferencePage, JsValue)] ::
-    arbitrary[(CurrentlyRegisteredInCountryPage.type, JsValue)] ::
     arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::
     arbitrary[(PreviousEuVatNumberPage, JsValue)] ::
     arbitrary[(PreviousEuCountryPage, JsValue)] ::
     arbitrary[(AddPreviousRegistrationPage.type, JsValue)] ::
-    arbitrary[(CurrentlyRegisteredInEuPage.type, JsValue)] ::
-    arbitrary[(CurrentCountryOfRegistrationPage.type, JsValue)] ::
     arbitrary[(HasFixedEstablishmentPage, JsValue)] ::
     arbitrary[(FixedEstablishmentTradingNamePage, JsValue)] ::
     arbitrary[(FixedEstablishmentAddressPage, JsValue)] ::
     arbitrary[(CheckVatDetailsPage.type, JsValue)] ::
     arbitrary[(CheckVatNumberPage.type, JsValue)] ::
-    arbitrary[(StartDatePage.type, JsValue)] ::
     arbitrary[(WebsitePage, JsValue)] ::
     arbitrary[(BusinessContactDetailsPage.type, JsValue)] ::
     arbitrary[(UkAddressPage.type, JsValue)] ::

@@ -23,8 +23,8 @@ import play.api.data.Form
 
 class HasTradingNameFormProvider @Inject() extends Mappings {
 
-  def apply(registeredCompanyName: String): Form[Boolean] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("hasTradingName.error.required", args = Seq(registeredCompanyName))
+      "value" -> boolean("hasTradingName.error.required")
     )
 }

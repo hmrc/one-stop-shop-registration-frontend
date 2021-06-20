@@ -57,8 +57,7 @@ object RegistrationData extends Generators with EitherValues {
       ),
       contactDetails = createBusinessContactDetails(),
       websites = Seq("website1", "website2"),
-      startDate = LocalDate.now(),
-      currentCountryOfRegistration = Some(Country("FR", "France")),
+      commencementDate = LocalDate.now(),
       previousRegistrations = Seq(
         PreviousRegistration(Country("DE", "Germany"), "DE123")
       ),

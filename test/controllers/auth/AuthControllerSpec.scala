@@ -18,9 +18,14 @@ package controllers.auth
 
 import base.SpecBase
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
+import models.{NormalMode, UserAnswers, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito
+import org.mockito.Mockito.{never, times, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
+import pages.FirstAuthedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -30,21 +35,149 @@ import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView
 import java.net.URLEncoder
 import scala.concurrent.Future
 
-class AuthControllerSpec extends SpecBase with MockitoSugar {
+class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val continueUrl = "continueUrl"
 
+
+  private val mockConnector  = mock[RegistrationConnector]
+  private val mockRepository = mock[SessionRepository]
+
+  private def appBuilder(answers: Option[UserAnswers]) =
+    applicationBuilder(answers)
+      .overrides(
+        bind[RegistrationConnector].toInstance(mockConnector),
+        bind[SessionRepository].toInstance(mockRepository)
+      )
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockConnector, mockRepository)
+  }
+
+
+  "onSignIn" - {
+
+    "when we already have some user answers" - {
+
+      "must redirect to the next page without makings calls to get data or updating the user answers" in {
+
+        val application = appBuilder(Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
+          verify(mockConnector, never()).getVatCustomerInfo()(any())
+          verify(mockRepository, never()).set(any())
+        }
+      }
+    }
+
+    "when we don't already have user answers" - {
+
+      "and we can find their VAT details" - {
+
+        "must create user answers with their VAT details, then redirect to the next page" in {
+
+          val application = appBuilder(None).build()
+
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
+          when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+          running(application) {
+
+            val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo).url
+            verify(mockRepository, times(1)).set(eqTo(emptyUserAnswersWithVatInfo))
+          }
+        }
+      }
+
+      "and we cannot find their VAT details" - {
+
+        "must create user answers with no VAT details, then redirect to the next page" in {
+
+          val application = appBuilder(None).build()
+
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(responses.NotFound))
+          when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+          running(application) {
+
+            val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
+            verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
+          }
+        }
+      }
+
+      "and the call to get their VAT details fails" - {
+
+        val failureResponse = responses.UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+
+        "and the feature to allow users to proceed is enabled" - {
+
+          "must create user answers with no VAT details, then redirect to the next page" in {
+
+            val application =
+              appBuilder(None)
+                .configure("features.proceed-when-vat-api-call-fails" -> true)
+                .build()
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
+              verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
+            }
+          }
+        }
+
+        "and the feature to allow users to proceed is disabled" - {
+
+          "must return an internal server error" in {
+
+            val application =
+              appBuilder(None)
+                .configure("features.proceed-when-vat-api-call-fails" -> false)
+                .build()
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
+
+              status(result) mustEqual INTERNAL_SERVER_ERROR
+              verify(mockRepository, times(0)).set(any())
+            }
+          }
+        }
+      }
+    }
+  }
+
   "signOut" - {
 
-    "must clear user answers and redirect to sign out, specifying the exit survey as the continue URL" in {
+    "must redirect to sign out, specifying the exit survey as the continue URL" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(None)
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+      val application = applicationBuilder(None).build()
 
       running(application) {
 
@@ -58,22 +191,15 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl
-        verify(mockSessionRepository, times(1)).clear(eqTo(userAnswersId))
       }
     }
   }
 
   "signOutNoSurvey" - {
 
-    "must clear users answers and redirect to sign out, specifying SignedOut as the continue URL" in {
+    "must redirect to sign out, specifying SignedOut as the continue URL" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(None)
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+      val application = applicationBuilder(None).build()
 
       running(application) {
 
@@ -87,7 +213,6 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl
-        verify(mockSessionRepository, times(1)).clear(eqTo(userAnswersId))
       }
     }
   }

@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{commonNamePattern, emailPattern, telephonePattern}
+import forms.Validation.Validation.{commonTextPattern, emailPattern, telephonePattern}
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -56,7 +56,7 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid full name" in {
       val invalidFullName = "*@tom [smith]"
       val result = form.bind(Map(fieldName -> invalidFullName)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonNamePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
     }
   }
 

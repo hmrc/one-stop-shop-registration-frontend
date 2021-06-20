@@ -75,72 +75,101 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
     }
   }
 
-  ".canRegisterLastMonth" - {
+  ".startDateBasedOnFirstSale" - {
 
-    "must be true for any date before the 11th of the month" in {
+    "must be the date of the first sale" - {
 
-      val dates: Gen[LocalDate] = for {
-        dayOfMonth <- Gen.choose(1, 10)
-        date       <- datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 31))
-      } yield date.withDayOfMonth(dayOfMonth)
+      "when today is in the same month as the date of the first sale" in {
 
-      forAll(dates) {
-        date =>
-          val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+        val dates: Gen[(LocalDate, LocalDate)] = for {
+          dayOfMonthOfFirstSale <- Gen.choose(1, 26)
+          firstSale             <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          dayOfToday            <- Gen.choose(dayOfMonthOfFirstSale, firstSale.lengthOfMonth())
+        } yield (firstSale.withDayOfMonth(dayOfMonthOfFirstSale), firstSale.withDayOfMonth(dayOfToday))
 
-          service.canRegisterLastMonth mustEqual true
+        forAll(dates) {
+          case (firstSale, today) =>
+            val stubClock = getStubClock(today)
+            val service = new StartDateService(stubClock)
+
+            service.startDateBasedOnFirstSale(firstSale) mustEqual firstSale
+        }
+      }
+
+      "when today is the 1st to the 10th of the month after the date of first sale" in {
+
+        val dates: Gen[(LocalDate, LocalDate)] = for {
+          firstSale  <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          dayOfToday <- Gen.choose(1, 10)
+        } yield (firstSale, firstSale.plusMonths(1).withDayOfMonth(dayOfToday))
+
+        forAll(dates) {
+          case (firstSale, today) =>
+            val stubClock = getStubClock(today)
+            val service = new StartDateService(stubClock)
+
+            service.startDateBasedOnFirstSale(firstSale) mustEqual firstSale
+        }
       }
     }
 
-    "must be false for any date after the 10th of the month" in {
+    "must be the start of the next quarter" - {
 
-      val dates: Gen[LocalDate] = for {
-        date       <- datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 31))
-        dayOfMonth <- Gen.choose(11, date.lengthOfMonth)
-      } yield date.withDayOfMonth(dayOfMonth)
+      "when today is the 11th onwards of the month after the first sale" in {
 
-      forAll(dates) {
-        date =>
-          val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+        val dates: Gen[(LocalDate, LocalDate)] = for {
+          firstSale  <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          dayOfToday <- Gen.choose(11, firstSale.plusMonths(1).lengthOfMonth())
+        } yield (firstSale, firstSale.plusMonths(1).withDayOfMonth(dayOfToday))
 
-          service.canRegisterLastMonth mustEqual false
+        forAll(dates) {
+          case (firstSale, today) =>
+            val stubClock = getStubClock(today)
+            val service = new StartDateService(stubClock)
+
+            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextPeriod
+        }
+      }
+
+      "when today is two or more months after the first sale" in {
+
+        val dates: Gen[(LocalDate, LocalDate)] = for {
+          firstSale  <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          extraMonths <- Gen.choose(2, 12)
+        } yield (firstSale, firstSale.plusMonths(extraMonths))
+
+        forAll(dates) {
+          case (firstSale, today) =>
+            val stubClock = getStubClock(today)
+            val service = new StartDateService(stubClock)
+
+            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextPeriod
+        }
       }
     }
   }
 
-  ".earliestAlternativeDate" - {
+  ".startDateBasedOnIntentionToSellGoods" - {
 
-    "must be the first of the previous month on the 1st to the 10th of any month" in {
+    "must be 1 July 2021 if today is before that date" in {
 
-      val dates: Gen[LocalDate] = for {
-        dayOfMonth <- Gen.choose(1, 10)
-        date       <- datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 31))
-      } yield date.withDayOfMonth(dayOfMonth)
-
-      forAll(dates) {
+      forAll(datesBetween(LocalDate.of(2020, 1, 1), LocalDate.of(2021, 6, 30))) {
         date =>
           val stubClock = getStubClock(date)
           val service   = new StartDateService(stubClock)
 
-          service.earliestAlternativeDate mustEqual date.minusMonths(1).withDayOfMonth(1)
+          service.startDateBasedOnIntentionToSellGoods() mustEqual LocalDate.of(2021, 7, 1)
       }
     }
 
-    "must be the first of this month on any day after the 10th of the month" in {
+    "must be `today` on 1 July 2021 and all future dates" in {
 
-      val dates: Gen[LocalDate] = for {
-        date       <- datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 31))
-        dayOfMonth <- Gen.choose(11, date.lengthOfMonth)
-      } yield date.withDayOfMonth(dayOfMonth)
-
-      forAll(dates) {
+      forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2030, 12, 31))) {
         date =>
           val stubClock = getStubClock(date)
           val service   = new StartDateService(stubClock)
 
-          service.earliestAlternativeDate mustEqual date.withDayOfMonth(1)
+          service.startDateBasedOnIntentionToSellGoods() mustEqual date
       }
     }
   }

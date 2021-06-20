@@ -24,6 +24,12 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryIntendToSellGoodsThisQuarterPage: Arbitrary[IntendToSellGoodsThisQuarterPage.type] =
+    Arbitrary(IntendToSellGoodsThisQuarterPage)
+
+  implicit lazy val arbitraryAlreadyMadeSalesPage: Arbitrary[AlreadyMadeSalesPage.type] =
+    Arbitrary(AlreadyMadeSalesPage)
+
   implicit lazy val arbitraryInternationalAddressPage: Arbitrary[InternationalAddressPage.type] =
     Arbitrary(InternationalAddressPage)
 
@@ -45,9 +51,6 @@ trait PageGenerators {
   implicit lazy val arbitraryEuTaxReferencePage: Arbitrary[EuTaxReferencePage] =
     Arbitrary(EuTaxReferencePage(Index(0)))
 
-  implicit lazy val arbitraryCurrentlyRegisteredInCountryPage: Arbitrary[CurrentlyRegisteredInCountryPage.type] =
-    Arbitrary(CurrentlyRegisteredInCountryPage)
-
   implicit lazy val arbitraryBankDetailsPage: Arbitrary[BankDetailsPage.type] =
     Arbitrary(BankDetailsPage)
 
@@ -63,12 +66,6 @@ trait PageGenerators {
   implicit lazy val arbitraryAddPreviousRegistrationPage: Arbitrary[AddPreviousRegistrationPage.type] =
     Arbitrary(AddPreviousRegistrationPage)
 
-  implicit lazy val arbitraryCurrentlyRegisteredInEuPage: Arbitrary[CurrentlyRegisteredInEuPage.type] =
-    Arbitrary(CurrentlyRegisteredInEuPage)
-
-  implicit lazy val arbitraryCurrentCountryOfRegistrationPage: Arbitrary[CurrentCountryOfRegistrationPage.type] =
-    Arbitrary(CurrentCountryOfRegistrationPage)
-
   implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
     Arbitrary(euDetails.HasFixedEstablishmentPage(Index(0)))
 
@@ -83,9 +80,6 @@ trait PageGenerators {
 
   implicit lazy val arbitraryCheckVatNumberPage: Arbitrary[CheckVatNumberPage.type] =
     Arbitrary(CheckVatNumberPage)
-
-  implicit lazy val arbitraryStartDatePage: Arbitrary[StartDatePage.type] =
-    Arbitrary(StartDatePage)
 
   implicit lazy val arbitraryWebsitePage: Arbitrary[WebsitePage] =
     Arbitrary(WebsitePage(Index(0)))

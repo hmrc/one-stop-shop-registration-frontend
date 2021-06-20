@@ -17,27 +17,69 @@
 package controllers.auth
 
 import config.FrontendAppConfig
-import controllers.actions.IdentifierAction
+import connectors.RegistrationConnector
+import controllers.actions.AuthenticatedControllerComponents
+import models.{NormalMode, UserAnswers, responses}
+import pages.FirstAuthedPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.auth._
 
+import java.time.{Clock, Instant}
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class AuthController @Inject()(
-                                val controllerComponents: MessagesControllerComponents,
+                                cc: AuthenticatedControllerComponents,
                                 config: FrontendAppConfig,
-                                sessionRepository: SessionRepository,
-                                identify: IdentifierAction,
+                                connector: RegistrationConnector,
+                                clock: Clock,
                                 insufficientEnrolmentsView: InsufficientEnrolmentsView,
                                 unsupportedAffinityGroupView: UnsupportedAffinityGroupView,
                                 unsupportedAuthProviderView: UnsupportedAuthProviderView,
                                 unsupportedCredentialRoleView: UnsupportedCredentialRoleView
                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  protected val controllerComponents: MessagesControllerComponents = cc
+
+  def onSignIn: Action[AnyContent] = (cc.identify andThen cc.checkRegistration andThen cc.getData).async {
+    implicit request =>
+
+      request.userAnswers match {
+        case Some(answers) =>
+          Future.successful(Redirect(FirstAuthedPage.navigate(NormalMode, answers)))
+
+        case None =>
+          connector.getVatCustomerInfo().flatMap {
+            case Right(vatInfo) =>
+              val answers = UserAnswers(request.userId, vatInfo = Some(vatInfo), lastUpdated = Instant.now(clock))
+              cc.sessionRepository.set(answers).map {
+                _ =>
+                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
+              }
+
+            case Left(responses.NotFound) =>
+              val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
+              cc.sessionRepository.set(answers).map {
+                _ =>
+                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
+              }
+
+            case Left(_) =>
+              if (cc.features.proceedWhenVatApiCallFails) {
+                val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
+                cc.sessionRepository.set(answers).map {
+                  _ =>
+                    Redirect(FirstAuthedPage.navigate(NormalMode, answers))
+                }
+              } else {
+                Future.successful(InternalServerError)
+              }
+          }
+      }
+  }
 
   def redirectToRegister(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
@@ -60,24 +102,14 @@ class AuthController @Inject()(
         )
   }
 
-  def signOut(): Action[AnyContent] = identify.async {
-    implicit request =>
-      sessionRepository
-        .clear(request.userId)
-        .map {
-          _ =>
-            Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
-      }
+  def signOut(): Action[AnyContent] = Action {
+    _ =>
+      Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
   }
 
-  def signOutNoSurvey(): Action[AnyContent] = identify.async {
-    implicit request =>
-    sessionRepository
-      .clear(request.userId)
-      .map {
-        _ =>
-        Redirect(config.signOutUrl, Map("continue" -> Seq(routes.SignedOutController.onPageLoad().url)))
-      }
+  def signOutNoSurvey(): Action[AnyContent] = Action {
+    _ =>
+      Redirect(config.signOutUrl, Map("continue" -> Seq(routes.SignedOutController.onPageLoad().url)))
   }
 
   def unsupportedAffinityGroup(): Action[AnyContent] = Action {

@@ -35,7 +35,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private val registeredCompanyName = "Company name"
   private val formProvider = new HasTradingNameFormProvider()
-  private val form = formProvider(registeredCompanyName)
+  private val form = formProvider()
 
   private lazy val hasTradingNameRoute = routes.HasTradingNameController.onPageLoad(NormalMode).url
 

@@ -16,6 +16,7 @@
 
 package forms.euDetails
 
+import forms.Validation.Validation.alphaNumbericWithSpace
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -27,6 +28,9 @@ class EuTaxReferenceFormProvider @Inject() extends Mappings {
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("euTaxReference.error.required", Seq(country.name))
-        .verifying(maxLength(100, "euTaxReference.error.length"))
+        .verifying(firstError(
+          maxLength(100, "euTaxReference.error.length")),
+          regexp(alphaNumbericWithSpace, "euTaxReference.error.format")
+        )
     )
 }

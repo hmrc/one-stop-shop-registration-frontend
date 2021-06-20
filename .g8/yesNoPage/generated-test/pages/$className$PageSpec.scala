@@ -3,7 +3,7 @@ package pages
 import base.SpecBase
 import pages.behaviours.PageBehaviours
 
-class $className$PageSpec SpecBase with extends PageBehaviours {
+class $className$PageSpec extends SpecBase with PageBehaviours {
 
   "$className$Page" - {
 

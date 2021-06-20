@@ -32,7 +32,7 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "accountName"
     val requiredKey = "bankDetails.error.accountName.required"
     val lengthKey = "bankDetails.error.accountName.length"
-    val maxLength = 100
+    val maxLength = 70
 
     behave like fieldThatBindsValidData(
       form,
@@ -58,6 +58,8 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "bic"
     val invalidKey = "bankDetails.error.bic.invalid"
+    val lengthKey = "bankDetails.error.bic.length"
+    val minLength = 8
     val maxLength = 11
 
     val validData = Gen.listOfN(maxLength, Gen.oneOf(Gen.numChar, Gen.alphaUpperChar)).map(_.mkString)
@@ -67,6 +69,24 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       validData
     )
+
+    s"not bind strings outside range of $minLength and $maxLength characters in length" in {
+      forAll(stringsOutsideOfLengthRange(minLength, maxLength)) {
+        invalidInput =>
+          val result = form.bind(Map(fieldName -> invalidInput)).apply(fieldName)
+
+          result.errors must contain(FormError(fieldName, lengthKey, Seq(minLength, maxLength)))
+      }
+    }
+
+    s"bind strings inside range of $minLength and $maxLength characters in length" in {
+
+      forAll(alphaNumStringWithLength(minLength, maxLength)) {
+        validInput =>
+          val result = form.bind(Map(fieldName -> validInput)).apply(fieldName)
+          result.errors mustBe empty
+      }
+    }
 
     "not bind any strings containing characters other than digits or alpha characters" in {
 
