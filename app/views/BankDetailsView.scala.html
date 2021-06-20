@@ -33,7 +33,6 @@
                 field = form("bic"),
                 label = LabelViewModel(messages("bankDetails.bic"))
             )
-            .asNumeric()
             .withWidth(Fixed10)
             .withHint(HintViewModel(messages("bankDetails.bic.hint")))
         )

@@ -32,6 +32,9 @@ import java.time.LocalDate
 
 class RegistrationServiceSpec extends SpecBase {
 
+  private val iban = RegistrationData.iban
+  private val bic = RegistrationData.bic
+
   private val answers =
     UserAnswers("id")
       .set(SellsGoodsFromNiPage, true).success.value
@@ -75,7 +78,7 @@ class RegistrationServiceSpec extends SpecBase {
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
-      .set(BankDetailsPage, BankDetails("Account name", Some("12345678"), "GB12345678")).success.value
+      .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
 
   private val registrationService = new RegistrationService()
 
