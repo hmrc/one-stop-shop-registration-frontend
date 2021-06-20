@@ -16,21 +16,17 @@
 
 package generators
 
-import models.CurrentlyRegisteredInCountry.{No, Yes}
-import models.StartDateOption.EarlierDate
 import models._
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Vrn
 
-import java.time.LocalDate
-
 trait ModelGenerators {
 
-  implicit lazy val arbitraryCurrentlyRegisteredInCountry: Arbitrary[CurrentlyRegisteredInCountry] =
+  implicit lazy val arbitraryAlreadyMadeSales: Arbitrary[AlreadyMadeSales] =
     Arbitrary {
-      Gen.oneOf(Gen.const(No), arbitrary[Country].map(Yes))
+        Gen.const(AlreadyMadeSales.No)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
@@ -85,12 +81,6 @@ trait ModelGenerators {
     Arbitrary {
       Gen.oneOf(Country.euCountries)
     }
-
-  implicit lazy val arbitraryStartDate: Arbitrary[StartDate] = {
-    Arbitrary {
-      Gen.const(StartDate(EarlierDate, LocalDate.now))
-    }
-  }
 
   implicit lazy val arbitraryBusinessContactDetails: Arbitrary[BusinessContactDetails] =
     Arbitrary {

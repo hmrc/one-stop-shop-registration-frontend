@@ -21,6 +21,8 @@ import javax.inject.Inject
 
 class StartDateService @Inject()(clock: Clock) {
 
+  private val startOfScheme: LocalDate = LocalDate.of(2021, 7, 1)
+
   def startOfNextPeriod: LocalDate = {
     val today                   = LocalDate.now(clock)
     val lastMonthOfPeriod       = (((today.getMonthValue - 1) / 3) + 1) * 3
@@ -30,19 +32,15 @@ class StartDateService @Inject()(clock: Clock) {
     lastDayOfCurrentPeriod.plusDays(1)
   }
 
-  def canRegisterLastMonth: Boolean =
-    LocalDate.now(clock).getDayOfMonth < 11
-
-  def earliestAlternativeDate: LocalDate = {
-    if (canRegisterLastMonth) {
-      LocalDate.now(clock).minusMonths(1).withDayOfMonth(1)
+  def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
+    val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
+    if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {
+      startOfNextPeriod
     } else {
-      LocalDate.now(clock).withDayOfMonth(1)
+      dateOfFirstSale
     }
   }
 
-  def latestAlternativeDate: LocalDate = {
-    val today = LocalDate.now(clock)
-    today.withDayOfMonth(today.lengthOfMonth)
-  }
+  def startDateBasedOnIntentionToSellGoods(): LocalDate =
+    if(LocalDate.now(clock).isBefore(startOfScheme)) startOfScheme else LocalDate.now(clock)
 }

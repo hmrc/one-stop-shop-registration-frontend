@@ -1,0 +1,19 @@
+@this(
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton
+)
+
+@(mode: Mode, formattedDate: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("commencementDate.title", formattedDate))) {
+
+    <h1 class="govuk-heading-xl">@messages("commencementDate.heading", formattedDate)</h1>
+
+    @formHelper(action = routes.CommencementDateController.onSubmit(mode), 'autoComplete -> "off") {
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

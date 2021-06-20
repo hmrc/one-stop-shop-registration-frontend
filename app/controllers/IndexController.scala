@@ -16,62 +16,22 @@
 
 package controllers
 
-import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import models.{NormalMode, UserAnswers, responses}
-import pages.FirstAuthedPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.FeatureFlagService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import java.time.{Clock, Instant}
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class IndexController @Inject()(
                                  override val messagesApi: MessagesApi,
                                  cc: AuthenticatedControllerComponents,
-                                 connector: RegistrationConnector,
-                                 clock: Clock
-                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                               ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.identify andThen cc.checkRegistration andThen cc.getData).async {
-    implicit request =>
-
-      request.userAnswers match {
-        case Some(answers) =>
-          Future.successful(Redirect(FirstAuthedPage.navigate(NormalMode, answers)))
-
-        case None =>
-          connector.getVatCustomerInfo().flatMap {
-            case Right(vatInfo) =>
-              val answers = UserAnswers(request.userId, vatInfo = Some(vatInfo), lastUpdated = Instant.now(clock))
-              cc.sessionRepository.set(answers).map {
-                _ =>
-                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
-              }
-
-            case Left(responses.NotFound) =>
-              val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
-              cc.sessionRepository.set(answers).map {
-                _ =>
-                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
-              }
-
-            case Left(_) =>
-              if (cc.features.proceedWhenVatApiCallFails) {
-                val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
-                cc.sessionRepository.set(answers).map {
-                  _ =>
-                    Redirect(FirstAuthedPage.navigate(NormalMode, answers))
-                }
-              } else {
-                Future.successful(InternalServerError)
-              }
-          }
-      }
+  def onPageLoad: Action[AnyContent] = Action {
+    _ =>
+      Redirect(routes.RegisteredForOssInEuController.onPageLoad())
   }
 }

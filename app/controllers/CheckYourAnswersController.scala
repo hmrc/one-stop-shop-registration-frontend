@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.NormalMode
+import models.{NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
@@ -56,6 +56,9 @@ class CheckYourAnswersController @Inject()(
         rows = Seq(
           SellsGoodsFromNiSummary.row(request.userAnswers),
           InControlOfMovingGoodsSummary.row(request.userAnswers),
+          AlreadyMadeSalesSummary.answerRow(request.userAnswers),
+          AlreadyMadeSalesSummary.dateOfFirstSaleRow(request.userAnswers),
+          IntendToSellGoodsThisQuarterSummary.row(request.userAnswers),
           RegisteredCompanyNameSummary.row(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
@@ -66,12 +69,8 @@ class CheckYourAnswersController @Inject()(
           TradingNameSummary.checkAnswersRow(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
-          CurrentlyRegisteredInEuSummary.row(request.userAnswers),
-          CurrentCountryOfRegistrationSummary.row(request.userAnswers),
-          CurrentlyRegisteredInCountrySummary.row(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
-          StartDateSummary.row(request.userAnswers),
           HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers),
@@ -112,7 +111,14 @@ class CheckYourAnswersController @Inject()(
         case Invalid(errors) =>
           val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-          successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+
+          if (errors.toChain.toList.contains(NotSellingGoodsFromNiError)) {
+            successful(Redirect(routes.NotSellingGoodsFromNiController.onPageLoad()))
+          } else if (errors.toChain.toList.contains(NotInControlOfMovingGoodsError)) {
+            successful(Redirect(routes.NotInControlOfMovingGoodsController.onPageLoad()))
+          } else {
+            successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          }
       }
   }
 }

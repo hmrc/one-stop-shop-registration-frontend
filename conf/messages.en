@@ -252,24 +252,6 @@ addWebsite.addAnother = Add another website address?
 addWebsite.error.required = Select yes if you need to add a website address
 addWebsite.addAnother.hint = You can add up to 10 websites that you use to sell your goods.
 
-startDate.title = When do you want this registration to start?
-startDate.heading = When do you want this registration to start?
-startDate.guidance = This is when the business needs to start accounting for VAT on sales to the EU using this scheme.
-startDate.nextPeriod = {0}, the start of the next calendar quarter
-startDate.earlierDate = An earlier date
-startDate.earlierDate.guidance.canRegisterLastMonth.true = This must be any day this month or last month
-startDate.earlierDate.guidance.canRegisterLastMonth.false = This must be any day this month
-startDate.earlierDate.hint = For example, 27 3 2007
-startDate.checkYourAnswersLabel = Date your sales start to be included in this scheme
-startDate.choice.error.required = Select when you want your registration to start
-startDate.change.hidden = when your registration starts
-startDate.earlierDate.error.invalid = Enter a real date
-startDate.earlierDate.error.allRequired = Enter the date you want your registration to start
-startDate.earlierDate.error.twoRequired = The date must include {0} and {1}
-startDate.earlierDate.error.required = The date must include {0}
-startDate.earlierDate.error.minDate = The date must be on or after {0}
-startDate.earlierDate.error.maxDate = The date must be on or before {0}
-
 unsupportedAffinityGroup.title = You cannot use this service
 unsupportedAffinityGroup.heading = You cannot use this service
 unsupportedAffinityGroup.p1 = You signed in to Government Gateway with an agent services account.
@@ -411,20 +393,6 @@ alreadyRegistered.p1 = We will send you details about how to submit returns and 
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 
-currentCountryOfRegistration.title = Where is your business already registered for the One Stop Shop?
-currentCountryOfRegistration.heading = Where is your business already registered for the One Stop Shop?
-currentCountryOfRegistration.option1 = Option 1
-currentCountryOfRegistration.option2 = Option 2
-currentCountryOfRegistration.checkYourAnswersLabel = EU Country your business is registered in
-currentCountryOfRegistration.error.required = Select where your business is already registered for the One Stop Shop
-currentCountryOfRegistration.change.hidden = which EU country your business is registered in
-
-currentlyRegisteredInEu.title = Is your business already registered for the One Stop Shop in an EU country?
-currentlyRegisteredInEu.heading = Is your business already registered for the One Stop Shop in an EU country?
-currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
-currentlyRegisteredInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country
-currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
-
 addPreviousRegistration.title.singular = You added one deregistration from the One Stop Shop
 addPreviousRegistration.heading.singular = You added one deregistration from the One Stop Shop
 addPreviousRegistration.title = You added {0} deregistrations from the One Stop Shop
@@ -479,12 +447,6 @@ bankDetails.error.iban.length = IBAN must be between 5 and 34 characters
 bankDetails.error.iban.invalid = IBAN must only include letters and numbers
 bankDetails.accountName.change.hidden = account name
 bankDetails.bic.change.hidden = BIC number
-
-currentlyRegisteredInCountry.title = Is your business already registered for the One Stop Shop in {0}?
-currentlyRegisteredInCountry.heading = Is your business already registered for the One Stop Shop in {0}?
-currentlyRegisteredInCountry.checkYourAnswersLabel = Registered for One Stop Shop in EU country
-currentlyRegisteredInCountry.error.required = Select yes if your business is already registered for the One Stop Shop in {0}
-currentlyRegisteredInCountry.change.hidden = if your business is already registered for the One Stop Shop
 
 euTaxReference.title = What is your tax reference number for {0}?
 euTaxReference.heading = What is your tax reference number for {0}?
@@ -557,3 +519,35 @@ internationalAddress.change.hidden = your principal place of business address
 notSellingGoodsFromNi.title = You do not need to register
 notSellingGoodsFromNi.heading = You do not need to register
 notSellingGoodsFromNi.p = This service is only for businesses that sell goods online from Northern Ireland to consumers in the EU.
+
+alreadyMadeSales.title = Have you already made sales?
+alreadyMadeSales.heading = Have you already made sales?
+alreadyMadeSales.checkYourAnswersLabel = Already made sales
+alreadyMadeSales.firstSale.guidance = Enter the date of your first sale
+alreadyMadeSales.firstSale.hint = For example, 1 7 2021
+alreadyMadeSales.answer.error.required = Select yes if you have already made sales
+alreadyMadeSales.firstSale.error.invalid = Enter a real date
+alreadyMadeSales.firstSale.error.required = Date must include a {0}
+alreadyMadeSales.firstSale.error.twoRequired = Date must include a {0} and a {0}
+alreadyMadeSales.firstSale.error.allRequired = Enter the date of your first sale
+alreadyMadeSales.firstSale.error.maxDate = The date must be today or in the past
+alreadyMadeSales.change.hidden = if you have already made sales
+
+commencementDate.title = You can use this scheme from {0}
+commencementDate.heading = You can use this scheme from {0}
+
+intendToSellGoodsThisQuarter.title = Do you intend to sell goods in this quarter?
+intendToSellGoodsThisQuarter.heading = Do you intend to sell goods in this quarter?
+intendToSellGoodsThisQuarter.checkYourAnswersLabel = Intend to sell goods this quarter
+intendToSellGoodsThisQuarter.error.required = Select yes if you intend to sell goods this quarter
+intendToSellGoodsThisQuarter.change.hidden = if you intend to sell goods this quarter
+
+registerLater.title = You need to register later
+registerLater.heading = You need to register later
+
+cannotRegisterAlreadyRegistered.title = You cannot use this service
+cannotRegisterAlreadyRegistered.heading = You cannot use this service
+
+registeredForOssInEu.title = Is your business already registered for the One Stop Shop in an EU country?
+registeredForOssInEu.heading = Is your business already registered for the One Stop Shop in an EU country?
+registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country

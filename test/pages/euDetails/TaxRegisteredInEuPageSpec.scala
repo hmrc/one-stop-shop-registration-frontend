@@ -20,9 +20,7 @@ import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.CurrentlyRegisteredInCountry.No
 import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
-import pages.{CurrentCountryOfRegistrationPage, CurrentlyRegisteredInCountryPage, CurrentlyRegisteredInEuPage}
 import pages.behaviours.PageBehaviours
 
 class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
@@ -104,7 +102,7 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
       }
     }
 
-    "must remove all EU VAT details and current registration details when the answer is false" in {
+    "must remove all EU VAT details when the answer is false" in {
 
       val answers =
         UserAnswers("id")
@@ -114,9 +112,6 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
           .set(HasFixedEstablishmentPage(Index(0)), false).success.value
           .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
           .set(EuVatNumberPage(Index(1)), "reg 2").success.value
-          .set(CurrentlyRegisteredInEuPage, true).success.value
-          .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
-          .set(CurrentlyRegisteredInCountryPage, No).success.value
 
       val result = answers.set(TaxRegisteredInEuPage, false).success.value
 
@@ -126,9 +121,6 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
       result.get(HasFixedEstablishmentPage(Index(0))) must not be defined
       result.get(EuCountryPage(Index(1))) must not be defined
       result.get(EuVatNumberPage(Index(1))) must not be defined
-      result.get(CurrentlyRegisteredInEuPage) must not be defined
-      result.get(CurrentlyRegisteredInCountryPage) must not be defined
-      result.get(CurrentCountryOfRegistrationPage) must not be defined
     }
 
     "must not remove any EU VAT details when the answer is true" in {

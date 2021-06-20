@@ -18,12 +18,11 @@ package controllers.euDetails
 
 import controllers.actions.AuthenticatedControllerComponents
 import models.requests.DataRequest
-import models.{Country, Index, Mode, UserAnswers}
-import pages.{CurrentlyRegisteredInCountryPage, euDetails}
+import models.{Country, Index, Mode}
+import pages.euDetails
 import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.AllEuDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.euDetails._
 import viewmodels.govuk.summarylist._
@@ -33,10 +32,10 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckEuDetailsAnswersController @Inject()(
-                                                    override val messagesApi: MessagesApi,
-                                                    cc: AuthenticatedControllerComponents,
-                                                    view: CheckEuDetailsAnswersView
-                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                 override val messagesApi: MessagesApi,
+                                                 cc: AuthenticatedControllerComponents,
+                                                 view: CheckEuDetailsAnswersView
+                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -61,12 +60,9 @@ class CheckEuDetailsAnswersController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      updateCurrentRegistration(request.userAnswers).map {
-        _ =>
-          Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
-      }
+      Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
   }
 
   private def getCountry(index: Index)
@@ -76,16 +72,4 @@ class CheckEuDetailsAnswersController @Inject()(
       country =>
         block(country)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-  private def updateCurrentRegistration(answers: UserAnswers)(implicit ec: ExecutionContext): Future[Boolean] =
-    answers.get(AllEuDetailsQuery).map(_.filter(_.vatRegistered)) match {
-      case Some(details) if details.size >= 2 =>
-        Future.fromTry(answers.remove(CurrentlyRegisteredInCountryPage)).flatMap {
-          updatedAnswers =>
-            cc.sessionRepository.set(updatedAnswers)
-        }
-
-      case _ =>
-        Future.successful(true)
-    }
 }

@@ -29,15 +29,6 @@ case class RegistrationAuditModel(
   override val auditType: String       = "RegistrationSubmitted"
   override val transactionName: String = "registration-submitted"
 
-  private def currentCountryDetail: JsObject =
-    registration.currentCountryOfRegistration.map {
-      country =>
-        Json.obj("currentCountryOfRegistration" -> Json.obj(
-          "countryCode" -> country.code,
-          "name"        -> country.name
-        ))
-    }.getOrElse(Json.obj())
-
   private def previousRegistrationDetail: JsObject =
     if (registration.previousRegistrations.nonEmpty) {
       Json.obj("previousRegistrations" -> Json.toJson(registration.previousRegistrations))
@@ -59,12 +50,11 @@ case class RegistrationAuditModel(
     "registeredCompanyName" -> registration.registeredCompanyName,
     "vatDetails"            -> Json.toJson(registration.vatDetails),
     "contactDetails"        -> Json.toJson(registration.contactDetails),
-    "startDate"             -> Json.toJson(registration.startDate),
+    "commencementDate"      -> Json.toJson(registration.commencementDate),
     "bankDetails"           -> Json.toJson(registration.bankDetails)
   ) ++ tradingNameDetail ++
     euRegistrationDetail ++
     websiteDetail ++
-    currentCountryDetail ++
     previousRegistrationDetail
 
   override val detail: JsValue = Json.obj(

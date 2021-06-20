@@ -24,7 +24,7 @@ import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.DataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BusinessContactDetails, DataMissingError, NormalMode}
+import models.{BusinessContactDetails, DataMissingError, NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
@@ -138,6 +138,44 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
       }
 
+      "when the registration returns a Not Selling Goods from NI error" - {
+
+        "the user is redirected to Not Selling Goods From NI" in {
+
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(NotSellingGoodsFromNiError))
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.NotSellingGoodsFromNiController.onPageLoad().url
+          }
+        }
+      }
+
+      "when the registration returns a Not in Control of Moving Goods error" - {
+
+        "the user is redirected to Not Selling Goods From NI" in {
+
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(NotInControlOfMovingGoodsError))
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.NotInControlOfMovingGoodsController.onPageLoad().url
+          }
+        }
+      }
+
       "when the submission fails because the user has already registered" - {
 
         "the user is redirected to Already Registered Page" in {
@@ -168,7 +206,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "when the submission fails because of a technical issue" - {
 
-        "the user is redirected to Already Registered Page" in {
+        "the user is redirected to the Journey Recovery page" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
