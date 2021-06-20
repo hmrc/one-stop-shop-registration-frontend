@@ -34,6 +34,8 @@ class RegistrationServiceSpec extends SpecBase {
 
   private val answers =
     UserAnswers("id")
+      .set(SellsGoodsFromNiPage, true).success.value
+      .set(InControlOfMovingGoodsPage, true).success.value
       .set(RegisteredCompanyNamePage, "foo").success.value
       .set(HasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
@@ -161,6 +163,38 @@ class RegistrationServiceSpec extends SpecBase {
     }
 
     "must return Invalid" - {
+
+      "when Sells Goods From NI is false" in {
+
+        val userAnswers = answers.set(SellsGoodsFromNiPage, false).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(NotSellingGoodsFromNiError))
+      }
+
+      "when Sells Goods From NI is missing" in {
+
+        val userAnswers = answers.remove(SellsGoodsFromNiPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(SellsGoodsFromNiPage)))
+      }
+
+      "when In Control of Moving Goods is false" in {
+
+        val userAnswers = answers.set(InControlOfMovingGoodsPage, false).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(NotInControlOfMovingGoodsError))
+      }
+
+      "when In Control of Moving Goods is missing" in {
+
+        val userAnswers = answers.remove(InControlOfMovingGoodsPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(InControlOfMovingGoodsPage)))
+      }
 
       "when Registered Company Name is missing" in {
 

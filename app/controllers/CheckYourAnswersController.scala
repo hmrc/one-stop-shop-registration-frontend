@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.NormalMode
+import models.{NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
@@ -111,7 +111,14 @@ class CheckYourAnswersController @Inject()(
         case Invalid(errors) =>
           val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-          successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+
+          if (errors.toChain.toList.contains(NotSellingGoodsFromNiError)) {
+            successful(Redirect(routes.NotSellingGoodsFromNiController.onPageLoad()))
+          } else if (errors.toChain.toList.contains(NotInControlOfMovingGoodsError)) {
+            successful(Redirect(routes.NotInControlOfMovingGoodsController.onPageLoad()))
+          } else {
+            successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          }
       }
   }
 }

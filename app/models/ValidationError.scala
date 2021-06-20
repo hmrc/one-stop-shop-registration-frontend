@@ -27,3 +27,13 @@ case class DataMissingError(page: Gettable[_]) extends ValidationError {
 
   override val errorMessage: String = s"Data missing at ${page.path.toString}"
 }
+
+case object NotSellingGoodsFromNiError extends ValidationError {
+
+  override val errorMessage: String = "Not selling goods from NI to the EU"
+}
+
+case object NotInControlOfMovingGoodsError extends ValidationError {
+
+  override val errorMessage: String = "Not in control of moving goods"
+}
