@@ -1,4 +1,4 @@
-service.name = Register to pay VAT on sales of goods from Northern Ireland to the EU
+service.name = Register to pay VAT on online sales of goods from Northern Ireland to the EU
 
 site.back = Back
 site.remove = Remove
@@ -12,7 +12,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
-site.submit = Submit application
+site.submit = Register
 
 date.day = Day
 date.month = Month
@@ -40,6 +40,7 @@ error.summary.title = There is a problem
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
+checkYourAnswers.info = By registering for this scheme, you confirm that the information you are providing is correct and complete.
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -57,14 +58,14 @@ unauthorised.heading = You can’t access this service with this account
 
 hasTradingName.title = Does your business trade using a different name in the UK?
 hasTradingName.heading = Does your business trade using a name that is different from {0} in the UK?
-hasTradingName.checkYourAnswersLabel = Does your business have a different trading name
+hasTradingName.checkYourAnswersLabel = Have a different trading name
 hasTradingName.error.required = Select yes if you use a different trading name in the UK
 hasTradingName.change.hidden = if your business trades using a name that is different from {0} in the UK
 
 partOfVatGroup.title = Is your business part of a UK VAT group?
 partOfVatGroup.heading = Is your business part of a UK VAT group?
 partOfVatGroup.guidance = VAT groups are when 2 or more companies or limited liability partnerships register as one ‘taxable’ person for VAT.
-partOfVatGroup.checkYourAnswersLabel = Is the business part of a UK VAT group?
+partOfVatGroup.checkYourAnswersLabel = Part of a UK VAT group
 partOfVatGroup.error.required = Select yes if your business is part of a UK VAT group
 partOfVatGroup.change.hidden = if the business is part of a UK VAT group
 
@@ -72,10 +73,10 @@ registeredCompanyName.title = What is your business name?
 registeredCompanyName.heading = What is your business name?
 registeredCompanyName.hint = Make sure it matches the name on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
 registeredCompanyName.hint.link.text = business tax account
-registeredCompanyName.checkYourAnswersLabel = Registered business name
+registeredCompanyName.checkYourAnswersLabel = Business name
 registeredCompanyName.error.required = Enter your business name
 registeredCompanyName.error.length = Business name must be 105 characters or less
-registeredCompanyName.error.invalid = Business name must only include letters a to z, numbers, hyphens, spaces and apostrophes
+registeredCompanyName.error.invalid = Business name must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 registeredCompanyName.change.hidden = the registered business name
 
 tradingName.title = What is your UK trading name?
@@ -83,19 +84,20 @@ tradingName.heading = What is your UK trading name?
 tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
 tradingName.error.required = Enter your UK trading name
 tradingName.error.length = Trading name must be 160 characters or less
-tradingName.error.duplicate = You entered this trading name already. Enter a different one.
-tradingName.error.invalid = Trading name must only include letters a to z, numbers, hyphens, spaces and apostrophes
+tradingName.error.duplicate = You have entered this trading name already. Enter a different one.
+tradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 tradingName.change.hidden = your UK trading name
 
 ukVatEffectiveDate.title = What is your UK VAT registration date?
 ukVatEffectiveDate.heading = What is your UK VAT registration date?
-ukVatEffectiveDate.guidance = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
+ukVatEffectiveDate.guidance = You can find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a> or ask your accountant.
 ukVatEffectiveDate.hint = For example, 12 11 2007
 ukVatEffectiveDate.checkYourAnswersLabel = UK VAT registration date
 ukVatEffectiveDate.error.required.all = Enter your UK VAT registration date
-ukVatEffectiveDate.error.required.two = Your UK VAT registration date must include {0} and {1}
-ukVatEffectiveDate.error.required = Your UK VAT registration date must include {0}
+ukVatEffectiveDate.error.required.two = Your UK VAT registration date must include a {0} and a {1}
+ukVatEffectiveDate.error.required = Your UK VAT registration date must include a {0}
 ukVatEffectiveDate.error.invalid = Enter a real date
+ukVatEffectiveDate.error.future-date = UK VAT registration date must be today or in the past
 ukVatEffectiveDate.change.hidden = your UK VAT registration date
 
 ukVatRegisteredPostcode.title = What is the postcode where your business is registered for UK VAT?
@@ -112,19 +114,19 @@ euVatNumber.heading = What is your VAT registration number for {0}?
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.length = EU VAT registration number must be 12 characters or less
-euVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, *, + and numbers
+euVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, asterisk, plus symbol and numbers
 euVatNumber.change.hidden = your VAT registration number
 
 euCountry.title = Enter an EU country where your business is registered for tax
 euCountry.heading = Enter an EU country where your business is registered for tax
-euCountry.checkYourAnswersLabel = Country of registration
+euCountry.checkYourAnswersLabel = Country of tax registration
 euCountry.error.required = Select an EU country where your business is registered for tax
 euCountry.error.duplicate = You selected this country already. Select a different one.
 
 vatRegistered.title = Are you registered for VAT in {0}?
 vatRegistered.heading = Are you registered for VAT in {0}?
-vatRegistered.checkYourAnswersLabel = Registered for VAT
-vatRegistered.error.required = Select yes if you are registered for VAT in this country
+vatRegistered.checkYourAnswersLabel = VAT registered
+vatRegistered.error.required = Select yes if you are registered for VAT in {0}
 vatRegistered.change.hidden = if you are registered for VAT
 
 addEuDetails.title.singular = You added tax details for one EU country
@@ -138,9 +140,9 @@ addEuDetails.remove.hidden = VAT details for {0}
 addEuDetails.addAnother = Add tax details for another EU country?
 addEuDetails.addAnother.hint = You must tell us your tax details for all EU countries.
 
-deleteEuVatDetails.title = Are you sure you want to remove the tax details for {0}?
-deleteEuVatDetails.heading = Are you sure you want to remove the tax details for {0}?
-deleteEuVatDetails.error.required = Select yes if you need to remove VAT details for this country
+deleteEuVatDetails.title = Are you sure you need to remove the tax details for {0}?
+deleteEuVatDetails.heading = Are you sure you need to remove the tax details for {0}?
+deleteEuVatDetails.error.required = Select yes if you need to remove the tax details for {0}
 
 ukAddress.title = Principal place of business address
 ukAddress.heading = Principal place of business address
@@ -150,28 +152,28 @@ ukAddress.guidance.2 = or ask your accountant.
 ukAddress.line1 = Building and street
 ukAddress.line2 =
 ukAddress.townOrCity = Town or city
-ukAddress.county = County
+ukAddress.county = County (optional)
 ukAddress.postCode = Postcode
 ukAddress.checkYourAnswersLabel = UK business address
 ukAddress.error.line1.required = Enter the building and street
 ukAddress.error.townOrCity.required = Enter the town or city
 ukAddress.error.postCode.required = Enter the postcode
 ukAddress.error.line1.length = Building and street must be 250 characters or less
-ukAddress.error.line1.invalid = Building and street must only include letters a to z, numbers, hyphens, spaces and apostrophes
+ukAddress.error.line1.invalid = Building and street must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 ukAddress.error.line2.length = Building and street must be 250 characters or less
-ukAddress.error.line2.invalid = Building and street must only include letters a to z, numbers, hyphens, spaces and apostrophes
+ukAddress.error.line2.invalid = Building and street must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 ukAddress.error.townOrCity.length = Town or city must be 250 characters or less
-ukAddress.error.townOrCity.invalid = Town or city must only include letters a to z, hyphens, spaces and apostrophes
+ukAddress.error.townOrCity.invalid = Town or city must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 ukAddress.error.county.length = County must be 250 characters or less
-ukAddress.error.county.invalid = County must only include letters a to z, hyphens, spaces and apostrophes
+ukAddress.error.county.invalid = County must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 ukAddress.error.postCode.length = Postcode must be 9 characters or less
-ukAddress.error.postCode.invalid = Enter a valid postcode
+ukAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
 ukAddress.change.hidden = the principal place of business address
 
 businessContactDetails.title = Enter your business contact details
 businessContactDetails.heading = Enter your business contact details
 businessContactDetails.caption = We’ll only use this to send you information about your VAT returns for this scheme.
-businessContactDetails.fullName = Full name
+businessContactDetails.fullName = Full name or business department
 businessContactDetails.telephoneNumber = Telephone number
 businessContactDetails.emailAddress = Email address
 businessContactDetails.checkYourAnswersLabel = Your contact details
@@ -179,17 +181,17 @@ businessContactDetails.error.fullName.required = Enter your full name or busines
 businessContactDetails.error.telephoneNumber.required = Enter your business telephone number
 businessContactDetails.error.emailAddress.required = Enter your business email address
 businessContactDetails.error.fullName.length = Full name or business department must be 105 characters or less
-businessContactDetails.error.fullName.invalid = Full name or business department must only include letters a to z, numbers, hyphens, spaces and apostrophes
+1 = Full name or business department must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 businessContactDetails.error.telephoneNumber.length = Telephone number must be 20 characters or less
-businessContactDetails.error.telephoneNumber.invalid = Enter a telephone number in the right format, like 01642 123 456, 07777777777 or +33 1 23 45 67 88
+businessContactDetails.error.telephoneNumber.invalid = Enter a telephone number in the correct format, like 01642 123 456, 07777777777 or +33 1 23 45 67 88
 businessContactDetails.error.emailAddress.length = Email address must be 50 characters or less
-businessContactDetails.error.emailAddress.invalid = Enter a real email address
+businessContactDetails.error.emailAddress.invalid = Enter an email address in the correct format. For example, yourname@example.com
 businessContactDetails.fullName.change.hidden = Full name
 businessContactDetails.telephoneNumber.change.hidden = Telephone number
 businessContactDetails.emailAddress.change.hidden = Email address
 
-euVatDetails.checkYourAnswersLabel = EU VAT registration details
-euVatDetails.change.hidden = your EU VAT registration details
+euVatDetails.checkYourAnswersLabel = EU tax details
+euVatDetails.change.hidden = your EU tax details
 
 websites.checkYourAnswersLabel = Website addresses
 websites.change.hidden = your websites
@@ -202,12 +204,12 @@ notInControlOfMovingGoods.heading = You do not need to register
 notInControlOfMovingGoods.p1 = If your business sells goods on online marketplaces, but is not in control of moving goods, your business is not responsible for paying VAT to EU countries.
 notInControlOfMovingGoods.p2 = The online marketplaces in control of moving the goods will be responsible for paying the VAT and registering for this scheme.
 
-applicationComplete.title = Application complete
-applicationComplete.heading = Application complete
-applicationComplete.reference = Your reference number
+applicationComplete.title = Registration successful
+applicationComplete.heading = Registration successful
+applicationComplete.reference = Your UK VAT registration number
 applicationComplete.next = What happens next
 applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-applicationComplete.caption = We will send you details about how to submit returns and make payments before your first VAT return is due.
+applicationComplete.caption = We will send you details about how to submit returns and make payments before your first VAT return for this scheme is due.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
@@ -220,7 +222,7 @@ addTradingName.heading.singular = You have added one UK trading name
 addTradingName.title = You have added {0} UK trading names
 addTradingName.heading = You have added {0} UK trading names
 addTradingName.maximumReached = You have added the maximum number of trading names.
-addTradingName.error.required = Select yes if you need to add another trading name
+addTradingName.error.required = Select yes if you need to add another UK trading name
 addTradingName.change.hidden = Change {0}
 addTradingName.remove.hidden = Remove {0}
 addTradingName.addAnother = Add another trading name?
@@ -232,11 +234,11 @@ website.checkYourAnswersLabel = Website address
 website.error.required = Enter a website address
 website.error.length = Website address must be 250 characters or less
 website.error.duplicate = You entered this website address already. Enter a different one.
-website.error.invalid = Website address must only include letters a to z, numbers, hyphens and spaces
+website.error.invalid = Enter a website address in the correct format. For example, www.gov.uk
 website.change.hidden = website address
 
-deleteWebsite.title = Are you sure you want to remove {0}?
-deleteWebsite.heading = Are you sure you want to remove {0}?
+deleteWebsite.title = Are you sure you need to remove {0}?
+deleteWebsite.heading = Are you sure you need to remove {0}?
 deleteWebsite.error.required = Select yes if you need to remove this website address
 
 addWebsite.name.singular = website address
@@ -249,24 +251,6 @@ addWebsite.maximumReached = You have added the maximum number of website address
 addWebsite.addAnother = Add another website address?
 addWebsite.error.required = Select yes if you need to add a website address
 addWebsite.addAnother.hint = You can add up to 10 websites that you use to sell your goods.
-
-startDate.title = When do you want this registration to start?
-startDate.heading = When do you want this registration to start?
-startDate.guidance = This is when the business needs to start accounting for VAT on sales to the EU using this scheme.
-startDate.nextPeriod = {0}, the start of the next calendar quarter
-startDate.earlierDate = An earlier date
-startDate.earlierDate.guidance.canRegisterLastMonth.true = This must be any day this month or last month
-startDate.earlierDate.guidance.canRegisterLastMonth.false = This must be any day this month
-startDate.earlierDate.hint = For example, 27 3 2007
-startDate.checkYourAnswersLabel = Registration start date
-startDate.choice.error.required = Select when you want your registration to start
-startDate.change.hidden = when your registration starts
-startDate.earlierDate.error.invalid = Enter a real date
-startDate.earlierDate.error.allRequired = Enter the date you want your registration to start
-startDate.earlierDate.error.twoRequired = The date must include {0} and {1}
-startDate.earlierDate.error.required = The date must include {0}
-startDate.earlierDate.error.minDate = The date must be on or after {0}
-startDate.earlierDate.error.maxDate = The date must be on or before {0}
 
 unsupportedAffinityGroup.title = You cannot use this service
 unsupportedAffinityGroup.heading = You cannot use this service
@@ -349,15 +333,15 @@ checkVatDetails.wrongAccount = No, I want to register a different business
 
 checkVatNumber.title = Confirm VAT details for your business
 checkVatNumber.heading = Confirm VAT details for your business
-checkVatNumber.question = Do you want to register this business for the scheme?
+checkVatNumber.question = Do you want to register this business for the VAT One Stop Shop?
 checkVatNumber.error.required = Select yes if you want to register this business for the VAT One Stop Shop
 checkVatNumber.vrn.title = UK VAT registration number
 
-useOtherAccount.title = Sign in with a different Government Gateway
-useOtherAccount.heading = Sign in with a different Government Gateway
-useOtherAccount.p1 = You signed in with a Government Gateway that is linked to VAT registration number {0}.
+useOtherAccount.title = Sign in with a different Government Gateway user ID
+useOtherAccount.heading = Sign in with a different Government Gateway user ID
+useOtherAccount.p1 = You signed in with a Government Gateway user ID that is linked to VAT registration number {0}.
 useOtherAccount.p2.1 = You need to
-useOtherAccount.p2.link.text = sign in with a different Government Gateway
+useOtherAccount.p2.link.text = sign in with a different Government Gateway user ID
 useOtherAccount.p2.2 = if you want to register for a business with a different VAT registration number.
 
 fixedEstablishmentAddress.title = Enter your fixed establishment address in {0}
@@ -371,13 +355,13 @@ fixedEstablishmentAddress.checkYourAnswersLabel = Fixed establishment address
 fixedEstablishmentAddress.error.line1.required = Enter address line 1
 fixedEstablishmentAddress.error.townOrCity.required = Enter the town or city
 fixedEstablishmentAddress.error.line1.length = Address line 1 must be 100 characters or less
-fixedEstablishmentAddress.error.line1.format = Address line 1 must only include letters a to z, numbers, hyphens, spaces and apostrophes
+fixedEstablishmentAddress.error.line1.format = Address line 1 must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 fixedEstablishmentAddress.error.line2.length = Address line 2 must be 100 characters or less
-fixedEstablishmentAddress.error.line2.format = Address line 2 must only include letters a to z, numbers, hyphens, spaces and apostrophes
+fixedEstablishmentAddress.error.line2.format = Address line 2 must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 fixedEstablishmentAddress.error.townOrCity.length = Town or city must be 100 characters or less
-fixedEstablishmentAddress.error.townOrCity.format = Town or city must only include letters a to z, numbers, hyphens, spaces and apostrophes
+fixedEstablishmentAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 fixedEstablishmentAddress.error.stateOrRegion.length = State or region must be 100 characters or less
-fixedEstablishmentAddress.error.stateOrRegion.format = State or region must only include letters a to z, numbers, hyphens, spaces and apostrophes
+fixedEstablishmentAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 fixedEstablishmentAddress.error.county.length = State or region must be 100 characters or less
 fixedEstablishmentAddress.error.postCode.length = Postcode must be 100 characters or less
 fixedEstablishmentAddress.error.postCode.invalid = Postcode must only include letters a to z, numbers and spaces
@@ -385,16 +369,15 @@ fixedEstablishmentAddress.change.hidden = the fixed establishment address
 
 fixedEstablishmentTradingName.title = What is your trading name in {0}?
 fixedEstablishmentTradingName.heading = What is your trading name in {0}?
-fixedEstablishmentTradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
 fixedEstablishmentTradingName.checkYourAnswersLabel = Trading name
 fixedEstablishmentTradingName.error.required = Enter your trading name in {0}
 fixedEstablishmentTradingName.error.length = Trading name must be 160 characters or less
 fixedEstablishmentTradingName.change.hidden = your trading name
-fixedEstablishmentTradingName.error.invalid = Trading name must only include letters a to z, numbers, hyphens, spaces and apostrophes
+fixedEstablishmentTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 
 hasFixedEstablishment.title = Do you have a fixed establishment in {0}?
 hasFixedEstablishment.heading = Do you have a fixed establishment in {0}?
-hasFixedEstablishment.checkYourAnswersLabel = Fixed establishment in this country
+hasFixedEstablishment.checkYourAnswersLabel = Fixed establishment
 hasFixedEstablishment.error.required = Select yes if you have a fixed establishment in {0}
 hasFixedEstablishment.change.hidden = if you have a fixed establishment
 
@@ -410,20 +393,6 @@ alreadyRegistered.p1 = We will send you details about how to submit returns and 
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 
-currentCountryOfRegistration.title = Which EU country is your business registered for the One Stop Shop in?
-currentCountryOfRegistration.heading = Which EU country is your business registered for the One Stop Shop in?
-currentCountryOfRegistration.option1 = Option 1
-currentCountryOfRegistration.option2 = Option 2
-currentCountryOfRegistration.checkYourAnswersLabel = EU Country your business is registered in
-currentCountryOfRegistration.error.required = Select where your business is already registered for the One Stop Shop
-currentCountryOfRegistration.change.hidden = which EU country your business is registered in
-
-currentlyRegisteredInEu.title = Are you registered for the One Stop Shop scheme in another EU country now?
-currentlyRegisteredInEu.heading = Are you registered for the One Stop Shop scheme in another EU country now?
-currentlyRegisteredInEu.checkYourAnswersLabel = Registered in another EU Country
-currentlyRegisteredInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country
-currentlyRegisteredInEu.change.hidden = if you are registered in another EU country
-
 addPreviousRegistration.title.singular = You added one deregistration from the One Stop Shop
 addPreviousRegistration.heading.singular = You added one deregistration from the One Stop Shop
 addPreviousRegistration.title = You added {0} deregistrations from the One Stop Shop
@@ -435,78 +404,72 @@ addPreviousRegistration.remove.hidden = old registration for {0}
 addPreviousRegistration.addAnother = Add another deregistration?
 addPreviousRegistration.addAnother.hint = You must tell us about all deregistrations from the One Stop Shop in EU countries.
 
-previousEuCountry.title = Enter an EU country where you are no longer registered for the One Stop Shop
-previousEuCountry.heading = Enter an EU country where you are no longer registered for the One Stop Shop
+previousEuCountry.title = Select an EU country where you are no longer registered for the One Stop Shop
+previousEuCountry.heading = Select an EU country where you are no longer registered for the One Stop Shop
 previousEuCountry.error.required = Select an EU country
 previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
 previousEuVatNumber.title = What was your VAT registration number for {0}?
 previousEuVatNumber.heading = What was your VAT registration number for {0}?
-previousEuVatNumber.error.required = Enter your VAT registration number for this country
+previousEuVatNumber.error.required = Enter your VAT registration number for {0}
 previousEuVatNumber.error.length = VAT registration number must be 100 characters or less
-previousEuVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, *, + and numbers
+previousEuVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, asterisk, plus symbol and numbers
 
 previouslyRegistered.title = Has your business deregistered from the One Stop Shop in an EU country?
 previouslyRegistered.heading = Has your business deregistered from the One Stop Shop in an EU country?
-previouslyRegistered.checkYourAnswersLabel = Deregistered
+previouslyRegistered.checkYourAnswersLabel = Deregistered from One Stop Shop in EU countries
 previouslyRegistered.error.required = Select yes if your business has deregistered from the One Stop Shop in an EU country
 previouslyRegistered.change.hidden = if your business deregistered from the One Stop Shop in an EU country
 
-deletePreviousRegistration.title = Are you sure you want to remove the deregistration for {0}?
-deletePreviousRegistration.heading = Are you sure you want to remove the deregistration for {0}?
-deletePreviousRegistration.error.required = Select yes if you are sure you want to remove the deregistration
+deletePreviousRegistration.title = Are you sure you need to remove the deregistration for {0}?
+deletePreviousRegistration.heading = Are you sure you need to remove the deregistration for {0}?
+deletePreviousRegistration.error.required = Select yes if you are sure you need to remove the deregistration
 
-previousRegistrations.checkYourAnswersLabel = Old registrations
-previousRegistrations.change.hidden = your old registrations
+previousRegistrations.checkYourAnswersLabel = One Stop Shop deregistration details
+previousRegistrations.change.hidden = your One Stop Shop deregistration details
 
 bankDetails.title = Enter your bank or building society account details
 bankDetails.heading = Enter your bank or building society account details
 bankDetails.accountName = Account name
-bankDetails.bic = BIC
+bankDetails.bic = BIC or SWIFT code
 bankDetails.bic.hint = Must be between 8 and 11 characters long. You can ask your bank or check your bank statement
-bankDetails.iban = IBAN number
-bankDetails.iban.hint = Can be up to 34 characters long. You can ask your bank or check your bank statement
+bankDetails.iban = IBAN
+bankDetails.iban.hint = Must be between 5 and 34 characters long. You can ask your bank or check your bank statement
 bankDetails.checkYourAnswersLabel = Bank account details
 bankDetails.error.accountName.required = Enter your account name
-bankDetails.error.bic.required = Enter the BIC number
-bankDetails.error.iban.required = Enter your IBAN number
-bankDetails.error.accountName.length = Account name must be 100 characters or less
-bankDetails.error.accountName.invalid = Account name must only include letters a to z, numbers, hyphens, spaces and apostrophes
-bankDetails.error.bic.length = BIC or SWIFT code must be between {0} and {1} characters
-bankDetails.error.bic.invalid = BIC or SWIFT code must only include letters a to z and numbers
-bankDetails.error.iban.length = IBAN number must be between 8 and 34 characters
-bankDetails.error.iban.invalid = IBAN can only be letters or numbers
-bankDetails.accountName.change.hidden = account name
-bankDetails.bic.change.hidden = BIC number
-
-currentlyRegisteredInCountry.title = Is your business already registered for the One Stop Shop in {0}?
-currentlyRegisteredInCountry.heading = Is your business already registered for the One Stop Shop in {0}?
-currentlyRegisteredInCountry.checkYourAnswersLabel = Already registered for the One Stop Shop
-currentlyRegisteredInCountry.error.required = Select yes if your business is already registered for the One Stop Shop in {0}
-currentlyRegisteredInCountry.change.hidden = if your business is already registered for the One Stop Shop
+bankDetails.error.bic.required = Enter your BIC or SWIFT code
+bankDetails.error.iban.required = Enter your IBAN
+bankDetails.error.accountName.length = Account name must be 70 characters or less
+bankDetails.error.iban.invalid = Enter a real IBAN
+bankDetails.error.iban.checksum = Enter a real IBAN
+bankDetails.error.accountName.invalid = Account name must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
+bankDetails.error.bic.length = BIC or SWIFT codemust be between {0} and {1} characters
+bankDetails.error.bic.invalid = BIC or SWIFT code must only include letters and numbers
+bankDetails.change.hidden = your bank details
 
 euTaxReference.title = What is your tax reference number for {0}?
 euTaxReference.heading = What is your tax reference number for {0}?
 euTaxReference.checkYourAnswersLabel = Tax reference number
 euTaxReference.error.required = Enter your business tax reference number in {0}
-euTaxReference.error.length = EuTaxReference must be 100 characters or less
+euTaxReference.error.length = Business tax reference number must be 100 characters or less
+euTaxReference.error.format = Business tax reference number must only include letters, numbers and spaces
 euTaxReference.change.hidden = EuTaxReference
 
 hasWebsite.title = Do you want to give us website addresses that you use to sell your goods?
 hasWebsite.heading = Do you want to give us website addresses that you use to sell your goods?
-hasWebsite.checkYourAnswersLabel = Do you want to give us website addresses that you use to sell your goods?
+hasWebsite.checkYourAnswersLabel = Want to give us website addresses
 hasWebsite.error.required = Select yes if you want to give us website addresses that you use to sell your goods
 hasWebsite.change.hidden = if you want to give us website addresses that you use to sell your goods
 
 inControlOfMovingGoods.title = Will your business be in control of moving goods from Northern Ireland to consumers in the EU?
 inControlOfMovingGoods.heading = Will your business be in control of moving goods from Northern Ireland to consumers in the EU?
-inControlOfMovingGoods.checkYourAnswersLabel = Will your business be in control of moving goods from Northern Ireland to consumers in the EU?
+inControlOfMovingGoods.checkYourAnswersLabel = In control of moving goods from Northern Ireland
 inControlOfMovingGoods.error.required = Select yes if the business is in control of moving goods from Northern Ireland to consumers in the EU
 inControlOfMovingGoods.change.hidden = if your business will be in control of moving goods
 
 sellsGoodsFromNi.title = Will your business sell goods online from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.heading = Will your business sell goods online from Northern Ireland to consumers in the EU?
-sellsGoodsFromNi.checkYourAnswersLabel = Will your business sell goods online from Northern Ireland to consumers in the EU?
+sellsGoodsFromNi.checkYourAnswersLabel = Selling goods from Northern Ireland
 sellsGoodsFromNi.error.required = Select yes if the business sells goods online from Northern Ireland to consumers in the EU
 sellsGoodsFromNi.change.hidden = if your business will sell goods online from Northern Ireland to consumers in the EU
 
@@ -518,7 +481,7 @@ taxRegisteredInEu.change.hidden = if your business is registered for tax in EU c
 
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
-updateVatDetails.guidance = You will need to update the details of your VAT registration before registering for the One Stop Shop scheme.
+updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a> to update your UK VAT details before registering for this scheme.
 
 businessAddressInUk.title = Is your principal place of business in the UK?
 businessAddressInUk.heading = Is your principal place of business in the UK?
@@ -542,16 +505,48 @@ internationalAddress.error.line1.required = Enter address line 1
 internationalAddress.error.townOrCity.required = Enter the town or city
 internationalAddress.error.country.required = Enter the country
 internationalAddress.error.line1.length = Address line 1 must be 100 characters or less
-internationalAddress.error.line1.format = Address line 1 must only include letters a to z, numbers, hyphens, spaces and apostrophes
+internationalAddress.error.line1.format = Address line 1 must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 internationalAddress.error.line2.length = Address line 2 must be 100 characters or less
-internationalAddress.error.line2.format = Address line 2 must only include letters a to z, numbers, hyphens, spaces and apostrophes
+internationalAddress.error.line2.format = Address line 2 must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 internationalAddress.error.townOrCity.length = Town or city must be 100 characters or less
-internationalAddress.error.townOrCity.format = Town or city must only include letters a to z, numbers, hyphens, spaces and apostrophes
+internationalAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 internationalAddress.error.stateOrRegion.length = State or region must be 100 characters or less
-internationalAddress.error.stateOrRegion.format = State or region must only include letters a to z, numbers, hyphens, spaces and apostrophes
+internationalAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces, apostrophes, exclamation marks, commas, quotation marks, ampersand, underscore, full stop, round brackets and forward slash
 internationalAddress.error.postCode.length = Postcode must be 100 characters or less
 internationalAddress.change.hidden = your principal place of business address
 
 notSellingGoodsFromNi.title = You do not need to register
 notSellingGoodsFromNi.heading = You do not need to register
 notSellingGoodsFromNi.p = This service is only for businesses that sell goods online from Northern Ireland to consumers in the EU.
+
+alreadyMadeSales.title = Have you already made sales?
+alreadyMadeSales.heading = Have you already made sales?
+alreadyMadeSales.checkYourAnswersLabel = Already made sales
+alreadyMadeSales.firstSale.guidance = Enter the date of your first sale
+alreadyMadeSales.firstSale.hint = For example, 1 7 2021
+alreadyMadeSales.answer.error.required = Select yes if you have already made sales
+alreadyMadeSales.firstSale.error.invalid = Enter a real date
+alreadyMadeSales.firstSale.error.required = Date must include a {0}
+alreadyMadeSales.firstSale.error.twoRequired = Date must include a {0} and a {0}
+alreadyMadeSales.firstSale.error.allRequired = Enter the date of your first sale
+alreadyMadeSales.firstSale.error.maxDate = The date must be today or in the past
+alreadyMadeSales.change.hidden = if you have already made sales
+
+commencementDate.title = You can use this scheme from {0}
+commencementDate.heading = You can use this scheme from {0}
+
+intendToSellGoodsThisQuarter.title = Do you intend to sell goods in this quarter?
+intendToSellGoodsThisQuarter.heading = Do you intend to sell goods in this quarter?
+intendToSellGoodsThisQuarter.checkYourAnswersLabel = Intend to sell goods this quarter
+intendToSellGoodsThisQuarter.error.required = Select yes if you intend to sell goods this quarter
+intendToSellGoodsThisQuarter.change.hidden = if you intend to sell goods this quarter
+
+registerLater.title = You need to register later
+registerLater.heading = You need to register later
+
+cannotRegisterAlreadyRegistered.title = You cannot use this service
+cannotRegisterAlreadyRegistered.heading = You cannot use this service
+
+registeredForOssInEu.title = Is your business already registered for the One Stop Shop in an EU country?
+registeredForOssInEu.heading = Is your business already registered for the One Stop Shop in an EU country?
+registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country

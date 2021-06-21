@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.CheckVatDetailsFormProvider
-import models.{CheckVatDetails, NormalMode, StartDateOption}
+import models.{CheckVatDetails, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -164,7 +164,6 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, checkVatDetailsRoute)
-            .withFormUrlEncodedBody(("value", StartDateOption.NextPeriod.toString))
 
         val result = route(application, request).value
 
@@ -181,7 +180,6 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, checkVatDetailsRoute)
-            .withFormUrlEncodedBody(("value", StartDateOption.NextPeriod.toString))
 
         val result = route(application, request).value
 

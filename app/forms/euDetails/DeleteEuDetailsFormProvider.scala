@@ -17,14 +17,17 @@
 package forms.euDetails
 
 import forms.mappings.Mappings
+import models.euDetails.EuDetails
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class DeleteEuDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(euDetails: EuDetails): Form[Boolean] = {
+    println(euDetails)
     Form(
-      "value" -> boolean("deleteEuVatDetails.error.required")
+      "value" -> boolean("deleteEuVatDetails.error.required", args = Seq(euDetails.euCountry.name))
     )
+  }
 }

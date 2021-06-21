@@ -56,7 +56,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = IdentifierRequest(FakeRequest(), "id", vrn)
+        val request = IdentifierRequest(FakeRequest(), testCredentials, vrn)
         val controller = new Harness(mockConnector)
 
         val result = controller.callFilter(request).futureValue
@@ -72,7 +72,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = IdentifierRequest(FakeRequest(), "id", vrn)
+        val request = IdentifierRequest(FakeRequest(), testCredentials, vrn)
         val controller = new Harness(mockConnector)
 
         val result = controller.callFilter(request).futureValue

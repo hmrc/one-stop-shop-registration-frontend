@@ -38,13 +38,16 @@ class DeleteEuDetailsController @Inject()(
                                            view: DeleteEuDetailsView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
+
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getEuVatDetails(index) {
         details =>
+
+          val form = formProvider(details)
+
           Future.successful(Ok(view(form, mode, index, details)))
       }
   }
@@ -53,6 +56,8 @@ class DeleteEuDetailsController @Inject()(
     implicit request =>
       getEuVatDetails(index) {
         details =>
+
+          val form = formProvider(details)
 
           form.bindFromRequest().fold(
             formWithErrors =>

@@ -16,6 +16,7 @@
 
 package forms.euDetails
 
+import forms.Validation.Validation.{alphaNumericWithSpace, commonTextPattern}
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -25,7 +26,9 @@ class EuTaxReferenceFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "euTaxReference.error.required"
   val lengthKey = "euTaxReference.error.length"
+  val formatKey = "euTaxReference.error.format"
   val maxLength = 100
+  val minLength = 1
 
   val country: Country = arbitrary[Country].sample.value
 
@@ -41,17 +44,35 @@ class EuTaxReferenceFormProviderSpec extends StringFieldBehaviours {
       stringsWithMaxLength(maxLength)
     )
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
-
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
+
+    s"not bind strings longer than $maxLength characters" in {
+
+      forAll(stringsLongerThan(maxLength) -> "longString") {
+        string =>
+          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+          result.errors must contain(FormError(fieldName, lengthKey, Seq(maxLength)))
+      }
+    }
+
+    "not bind incorrect values" in {
+      forAll(unsafeInputsWithMaxLength(maxLength)) {
+        invalidInput: String =>
+          val result = form.bind(Map(fieldName -> invalidInput)).apply(fieldName)
+          result.errors must contain(FormError(fieldName, formatKey, Seq(alphaNumericWithSpace)))
+      }
+    }
+
+    "bind correct values" in {
+      forAll(alphaNumStringWithLength(minLength, maxLength - 1)) {
+        validInput: String =>
+          val result = form.bind(Map(fieldName -> validInput)).apply(fieldName + " ")
+          result.errors mustBe empty
+      }
+    }
   }
 }

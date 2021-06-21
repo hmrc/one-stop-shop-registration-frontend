@@ -16,148 +16,316 @@
 
 package services
 
-import models.CurrentlyRegisteredInCountry.Yes
-import models.domain.VatDetailSource.{Etmp, Mixed, UserEntered}
+import cats.implicits._
+import models._
+import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
-import models.euDetails.EuDetails
-import models.{Address, Country, UserAnswers}
 import pages._
-import queries.{AllEuDetailsQuery, AllPreviousRegistrationsQuery, AllTradingNames, AllWebsites}
+import pages.euDetails._
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import queries._
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
 
 class RegistrationService {
 
-  def fromUserAnswers(userAnswers: UserAnswers, vrn: Vrn): Option[Registration] =
-    for {
-      registeredCompanyName        <- getName(userAnswers)
-      tradingNames                 = getTradingNames(userAnswers)
-      vatDetails                   <- buildVatDetails(userAnswers)
-      euRegistrations              = buildEuRegistrations(userAnswers)
-      startDate                    <- userAnswers.get(StartDatePage)
-      businessContactDetails       <- userAnswers.get(BusinessContactDetailsPage)
-      websites                     = getWebsites(userAnswers)
-      currentCountryOfRegistration = getCurrentCountry(userAnswers)
-      previousRegistrations        = buildPreviousRegistrations(userAnswers)
-      bankDetails                  <- userAnswers.get(BankDetailsPage)
-    } yield Registration(
-      vrn,
-      registeredCompanyName,
-      tradingNames,
-      vatDetails,
-      euRegistrations,
-      businessContactDetails,
-      websites,
-      startDate.date,
-      currentCountryOfRegistration,
-      previousRegistrations,
-      bankDetails
+  def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
+    (
+      checkSellingGoods(answers),
+      checkInControlOfMovingGoods(answers),
+      getCompanyName(answers),
+      getTradingNames(answers),
+      getVatDetails(answers),
+      getEuTaxRegistrations(answers),
+      getCommencementDate(answers),
+      getContactDetails(answers),
+      getWebsites(answers),
+      getPreviousRegistrations(answers),
+      getBankDetails(answers)
+    ).mapN(
+      (_, _, name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
+        Registration(
+          vrn                   = vrn,
+          registeredCompanyName = name,
+          tradingNames          = tradingNames,
+          vatDetails            = vatDetails,
+          euRegistrations       = euRegistrations,
+          contactDetails        = contactDetails,
+          websites              = websites,
+          commencementDate      = startDate,
+          previousRegistrations = previousRegistrations,
+          bankDetails           = bankDetails
+        )
     )
 
-  private def getTradingNames(userAnswers: UserAnswers): List[String] =
-    userAnswers.get(AllTradingNames).getOrElse(List.empty)
-
-  private def getWebsites(userAnswers: UserAnswers): List[String] =
-    userAnswers.get(AllWebsites).getOrElse(List.empty)
-
-  private def buildEuRegistrations(answers: UserAnswers): List[EuTaxRegistration] =
-    answers
-      .get(AllEuDetailsQuery).getOrElse(List.empty)
-      .flatMap {
-        detail =>
-          buildRegistrationWithFixedEstablishment(detail) orElse buildEuVatRegistration(detail)
+  private def checkSellingGoods(answers: UserAnswers): ValidationResult[Boolean] = {
+    answers.get(SellsGoodsFromNiPage) match {
+      case Some(true)  => true.validNec
+      case Some(false) => NotSellingGoodsFromNiError.invalidNec
+      case None        => DataMissingError(SellsGoodsFromNiPage).invalidNec
     }
-
-  private def buildRegistrationWithFixedEstablishment(euDetails: EuDetails): Option[RegistrationWithFixedEstablishment] =
-    for {
-      tradingName <- euDetails.fixedEstablishmentTradingName
-      address     <- euDetails.fixedEstablishmentAddress
-      country     = euDetails.euCountry
-      identifier  <- buildEuTaxIdentifier(euDetails)
-    } yield RegistrationWithFixedEstablishment(country, identifier, FixedEstablishment(tradingName, address))
-
-  private def buildEuTaxIdentifier(euDetails: EuDetails): Option[EuTaxIdentifier] = {
-    import EuTaxIdentifierType._
-
-    euDetails.euVatNumber.map(EuTaxIdentifier(Vat, _)) orElse euDetails.euTaxReference.map(EuTaxIdentifier(Other, _))
   }
 
-  private def buildEuVatRegistration(euDetails: EuDetails): Option[EuVatRegistration] =
-    for {
-      vatNumber <- euDetails.euVatNumber
-      country   = euDetails.euCountry
-    } yield EuVatRegistration(country, vatNumber)
-
-  private def buildPreviousRegistrations(answers: UserAnswers): List[PreviousRegistration] =
-    answers
-      .get(AllPreviousRegistrationsQuery)
-      .getOrElse(List.empty)
-      .map {
-        detail =>
-          PreviousRegistration(detail.previousEuCountry, detail.previousEuVatNumber)
-      }
-
-  private def buildVatDetails(answers: UserAnswers): Option[VatDetails] =
-    for {
-      address          <- getAddress(answers)
-      registrationDate <- getRegistrationDate(answers)
-      partOfVatGroup   <- getPartOfVatGroup(answers)
-      source           = getVatDetailSource(answers)
-    } yield VatDetails(registrationDate, address, partOfVatGroup, source)
-
-  private def getPartOfVatGroup(answers: UserAnswers): Option[Boolean] =
-    answers.vatInfo match {
-      case Some(vatInfo) =>
-        vatInfo.partOfVatGroup orElse answers.get(PartOfVatGroupPage)
-      case None =>
-        answers.get(PartOfVatGroupPage)
+  private def checkInControlOfMovingGoods(answers: UserAnswers): ValidationResult[Boolean] = {
+    answers.get(InControlOfMovingGoodsPage) match {
+      case Some(true)  => true.validNec
+      case Some(false) => NotInControlOfMovingGoodsError.invalidNec
+      case None        => DataMissingError(InControlOfMovingGoodsPage).invalidNec
     }
+  }
 
-  private def getRegistrationDate(answers: UserAnswers): Option[LocalDate] =
+  private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
     answers.vatInfo match {
-      case Some(vatInfo) =>
-        vatInfo.registrationDate orElse answers.get(UkVatEffectiveDatePage)
-      case None =>
-        answers.get(UkVatEffectiveDatePage)
-    }
-
-  private def getAddress(answers: UserAnswers): Option[Address] =
-    answers.vatInfo match {
-      case Some(vatInfo) =>
-        Some(vatInfo.address)
-      case None =>
-        answers.get(BusinessAddressInUkPage) match {
-          case Some(true)  => answers.get(UkAddressPage)
-          case Some(false) => answers.get(InternationalAddressPage)
-          case None        => None
+      case Some(VatCustomerInfo(_, _, _, Some(organisationName))) =>
+        organisationName.validNec
+      case _ =>
+        answers.get(RegisteredCompanyNamePage) match {
+          case Some(name) => name.validNec
+          case None       => DataMissingError(RegisteredCompanyNamePage).invalidNec
         }
     }
 
-  private def getName(answers: UserAnswers): Option[String] =
-    answers.vatInfo match {
-      case Some(vatInfo) =>
-        vatInfo.organisationName orElse answers.get(RegisteredCompanyNamePage)
-      case None =>
-        answers.get(RegisteredCompanyNamePage)
-    }
+  private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
+    answers.get(HasTradingNamePage) match {
+      case Some(true) =>
+        answers.get(AllTradingNames) match {
+          case Some(Nil) | None => DataMissingError(AllTradingNames).invalidNec
+          case Some(list)       => list.validNec
+        }
 
-  private def getVatDetailSource(answers: UserAnswers): VatDetailSource =
-    answers.vatInfo match {
-      case Some(vatInfo) if vatInfo.registrationDate.isDefined & vatInfo.partOfVatGroup.isDefined & vatInfo.organisationName.isDefined =>
-        Etmp
-      case Some(_) =>
-        Mixed
-      case None =>
-        UserEntered
-    }
+      case Some(false) =>
+        List.empty.validNec
 
-  private def getCurrentCountry(answers: UserAnswers): Option[Country] = {
-    answers.get(CurrentCountryOfRegistrationPage).orElse(
-      answers.get(CurrentlyRegisteredInCountryPage) match {
-        case Some(Yes(country)) => Some(country)
-        case _ => None
-      }
-    )
+      case None =>
+        DataMissingError(HasTradingNamePage).invalidNec
+    }
   }
+
+  private def getAddress(answers: UserAnswers): ValidationResult[Address] =
+    answers.vatInfo match {
+      case Some(VatCustomerInfo(address, _, _, _)) => address.validNec
+      case None =>
+        answers.get(BusinessAddressInUkPage) match {
+          case Some(true) =>
+            answers.get(UkAddressPage) match {
+              case Some(address) => address.validNec
+              case None          => DataMissingError(UkAddressPage).invalidNec
+            }
+          case Some(false) =>
+            answers.get(InternationalAddressPage) match {
+              case Some(address) => address.validNec
+              case None          => DataMissingError(InternationalAddressPage).invalidNec
+            }
+          case None =>
+            DataMissingError(BusinessAddressInUkPage).invalidNec
+        }
+    }
+
+  private def getRegistrationDate(answers: UserAnswers): ValidationResult[LocalDate] =
+    answers.vatInfo match {
+      case Some(VatCustomerInfo(_, Some(registrationDate), _, _)) =>
+        registrationDate.validNec
+      case _ =>
+        answers.get(UkVatEffectiveDatePage) match {
+          case Some(date) => date.validNec
+          case None       => DataMissingError(UkVatEffectiveDatePage).invalidNec
+        }
+    }
+
+  private def getPartOfVatGroup(answers: UserAnswers): ValidationResult[Boolean] =
+    answers.vatInfo match {
+      case Some(VatCustomerInfo(_, _, Some(partOfVatGroup), _)) =>
+        partOfVatGroup.validNec
+      case _ =>
+        answers.get(PartOfVatGroupPage) match {
+          case Some(answer) => answer.validNec
+          case None         => DataMissingError(PartOfVatGroupPage).invalidNec
+        }
+    }
+
+  private def getVatDetailSource(answers: UserAnswers): ValidationResult[VatDetailSource] =
+    answers.vatInfo match {
+      case Some(VatCustomerInfo(_, Some(_), Some(_), Some(_))) => VatDetailSource.Etmp.validNec
+      case Some(_)                                             => VatDetailSource.Mixed.validNec
+      case None                                                => VatDetailSource.UserEntered.validNec
+    }
+
+  private def getVatDetails(answers: UserAnswers): ValidationResult[VatDetails] =
+    (
+      getRegistrationDate(answers),
+      getAddress(answers),
+      getPartOfVatGroup(answers),
+      getVatDetailSource(answers)
+    ).mapN(VatDetails.apply)
+
+  private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
+    answers.get(CommencementDatePage) match {
+      case Some(startDate) => startDate.validNec
+      case None            => DataMissingError(CommencementDatePage).invalidNec
+    }
+
+  private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
+    answers.get(BusinessContactDetailsPage) match {
+      case Some(details) => details.validNec
+      case None          => DataMissingError(BusinessContactDetailsPage).invalidNec
+    }
+
+  private def getBankDetails(answers: UserAnswers): ValidationResult[BankDetails] =
+    answers.get(BankDetailsPage) match {
+      case Some(bankDetails) => bankDetails.validNec
+      case None              => DataMissingError(BankDetailsPage).invalidNec
+    }
+
+  private def getPreviousRegistrations(answers: UserAnswers): ValidationResult[List[PreviousRegistration]] = {
+    answers.get(PreviouslyRegisteredPage) match {
+      case Some(true) =>
+        answers.get(AllPreviousRegistrationsRawQuery) match {
+          case None =>
+            DataMissingError(AllPreviousRegistrationsRawQuery).invalidNec
+          case Some(details) =>
+            details.value.zipWithIndex.map {
+              case(_, index) =>
+                processPreviousRegistration(answers, Index(index))
+            }.toList.sequence
+        }
+
+      case Some(false) =>
+        List.empty.validNec
+
+      case None =>
+        DataMissingError(PreviouslyRegisteredPage).invalidNec
+    }
+  }
+
+  private def processPreviousRegistration(answers: UserAnswers, index: Index): ValidationResult[PreviousRegistration] =
+    answers.get(PreviousEuCountryPage(index)) match {
+      case Some(country) =>
+        answers.get(PreviousEuVatNumberPage(index)) match {
+          case Some(vatNumber) =>
+            PreviousRegistration(country, vatNumber).validNec
+          case None =>
+            DataMissingError(PreviousEuVatNumberPage(index)).invalidNec
+        }
+      case None =>
+        DataMissingError(PreviousEuCountryPage(index)).invalidNec
+    }
+
+  private def getEuTaxRegistrations(answers: UserAnswers): ValidationResult[List[EuTaxRegistration]] = {
+    answers.get(TaxRegisteredInEuPage) match {
+      case Some(true) =>
+        answers.get(AllEuDetailsRawQuery) match {
+          case None =>
+            DataMissingError(AllEuDetailsRawQuery).invalidNec
+          case Some(euDetails) =>
+            euDetails.value.zipWithIndex.map {
+              case (_, index) =>
+                processEuDetail(answers, Index(index))
+            }.toList.sequence
+        }
+
+      case Some(false) =>
+        List.empty.validNec
+
+      case None =>
+        DataMissingError(TaxRegisteredInEuPage).invalidNec
+    }
+  }
+
+  private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[EuTaxRegistration] = {
+    answers.get(EuCountryPage(index)) match {
+      case Some(country) =>
+        answers.get(HasFixedEstablishmentPage(index)) match {
+          case Some(true) =>
+            getRegistrationWithFixedEstablishment(answers, country, index)
+
+          case Some(false) =>
+            answers.get(VatRegisteredPage(index)) match {
+              case Some(true) =>
+                getEuVatRegistration(answers, country, index)
+
+              case Some(false) =>
+                RegistrationWithoutFixedEstablishment(country).validNec
+
+              case None =>
+                DataMissingError(VatRegisteredPage(index)).invalidNec
+            }
+
+          case None =>
+            DataMissingError(HasFixedEstablishmentPage(index)).invalidNec
+        }
+
+      case None =>
+        DataMissingError(EuCountryPage(index)).invalidNec
+    }
+  }
+
+    private def getRegistrationWithFixedEstablishment(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] =
+    (
+      getEuTaxIdentifier(answers, index),
+      getFixedEstablishment(answers, index)
+    ).mapN(
+      (taxIdentifier, fixedEstablishment) =>
+        RegistrationWithFixedEstablishment(country, taxIdentifier, fixedEstablishment)
+    )
+
+  private def getEuTaxIdentifier(answers: UserAnswers, index: Index): ValidationResult[EuTaxIdentifier] =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        getEuVatNumber(answers, index).map(EuTaxIdentifier(Vat, _))
+
+      case Some(false) =>
+        answers.get(EuTaxReferencePage(index)) match {
+          case Some(value) => EuTaxIdentifier(Other, value).validNec
+          case None        => DataMissingError(EuTaxReferencePage(index)).invalidNec
+        }
+
+      case None =>
+        DataMissingError(VatRegisteredPage(index)).invalidNec
+    }
+
+  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] =
+    getEuVatNumber(answers, index).map {
+      vatNumber =>
+        EuVatRegistration(country, vatNumber)
+    }
+
+  private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] =
+    answers.get(EuVatNumberPage(index)) match {
+      case Some(vatNumber) => vatNumber.validNec
+      case None            => DataMissingError(EuVatNumberPage(index)).invalidNec
+    }
+
+  private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =
+    (
+      getFixedEstablishmentTradingName(answers, index),
+      getFixedEstablishmentAddress(answers, index)
+    ).mapN(FixedEstablishment.apply)
+
+  private def getFixedEstablishmentTradingName(answers: UserAnswers, index: Index): ValidationResult[String] =
+    answers.get(FixedEstablishmentTradingNamePage(index)) match {
+      case Some(name) => name.validNec
+      case None       => DataMissingError(FixedEstablishmentTradingNamePage(index)).invalidNec
+    }
+
+  private def getFixedEstablishmentAddress(answers: UserAnswers, index: Index): ValidationResult[InternationalAddress] =
+    answers.get(FixedEstablishmentAddressPage(index)) match {
+      case Some(address) => address.validNec
+      case None          => DataMissingError(FixedEstablishmentAddressPage(index)).invalidNec
+    }
+
+  private def getWebsites(answers: UserAnswers): ValidationResult[List[String]] =
+    answers.get(HasWebsitePage) match {
+      case Some(true) =>
+        answers.get(AllWebsites) match {
+          case Some(Nil) | None => DataMissingError(AllWebsites).invalidNec
+          case Some(list)       => list.validNec
+        }
+
+      case Some(false) =>
+        List.empty.validNec
+
+      case None =>
+        DataMissingError(HasWebsitePage).invalidNec
+    }
 }

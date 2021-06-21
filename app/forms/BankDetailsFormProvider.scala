@@ -16,29 +16,25 @@
 
 package forms
 
-import forms.Validation.Validation.{bicPattern, commonTextPattern, ibanPattern}
-
-import javax.inject.Inject
+import forms.Validation.Validation.commonTextPattern
 import forms.mappings.Mappings
+import models.BankDetails
 import play.api.data.Form
 import play.api.data.Forms._
-import models.BankDetails
+
+import javax.inject.Inject
 
 class BankDetailsFormProvider @Inject() extends Mappings {
 
   def apply(): Form[BankDetails] = Form(
     mapping(
-     "accountName" -> text("bankDetails.error.accountName.required")
-       .verifying(firstError(
-         maxLength(100, "bankDetails.error.accountName.length"),
-         regexp(commonTextPattern, "bankDetails.error.accountName.invalid")
-       )),
-     "bic" -> optional(text("bankDetails.error.bic.required")
-       .verifying(stringLengthRange(8, 11, "bankDetails.error.bic.length"))
-       .verifying(regexp(bicPattern, "bankDetails.error.bic.invalid"))),
-      "iban" -> text("bankDetails.error.iban.required")
-        .verifying(stringLengthRange(5, 34, "bankDetails.error.iban.length"))
-        .verifying(regexp(ibanPattern, "bankDetails.error.iban.invalid"))
-   )(BankDetails.apply)(BankDetails.unapply)
+      "accountName" -> text("bankDetails.error.accountName.required")
+        .verifying(firstError(
+          maxLength(70, "bankDetails.error.accountName.length"),
+          regexp(commonTextPattern, "bankDetails.error.accountName.invalid")
+        )),
+      "bic"  -> optional(bic("bankDetails.error.bic.required", "bankDetails.error.bic.invalid")),
+      "iban" -> iban("bankDetails.error.iban.required", "bankDetails.error.iban.invalid", "bankDetails.error.iban.checksum")
+    )(BankDetails.apply)(BankDetails.unapply)
   )
 }

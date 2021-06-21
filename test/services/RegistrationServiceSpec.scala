@@ -17,22 +17,28 @@
 package services
 
 import base.SpecBase
-import models.CurrentlyRegisteredInCountry.Yes
+import cats.data.NonEmptyChain
+import cats.data.Validated.{Invalid, Valid}
 import models._
 import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
-import queries.{AllEuDetailsQuery, AllTradingNames, AllWebsites}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import queries.{AllEuDetailsRawQuery, AllPreviousRegistrationsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
 import java.time.LocalDate
 
 class RegistrationServiceSpec extends SpecBase {
 
+  private val iban = RegistrationData.iban
+  private val bic = RegistrationData.bic
+
   private val answers =
     UserAnswers("id")
+      .set(SellsGoodsFromNiPage, true).success.value
+      .set(InControlOfMovingGoodsPage, true).success.value
       .set(RegisteredCompanyNamePage, "foo").success.value
       .set(HasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
@@ -59,21 +65,20 @@ class RegistrationServiceSpec extends SpecBase {
       .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
-      .set(StartDatePage,
-        StartDate(StartDateOption.NextPeriod, LocalDate.now())
-      ).success.value
+      .set(CommencementDatePage, LocalDate.now()).success.value
       .set(
         UkAddressPage,
-        UkAddress("123 Street",Some("Street"),"City",Some("county"),"AA12 1AB")
+        UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
       ).success.value
       .set(
         BusinessContactDetailsPage,
-        BusinessContactDetails("Joe Bloggs","01112223344","email@email.com")).success.value
+        BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
+      .set(HasWebsitePage, true).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
-      .set(CurrentlyRegisteredInCountryPage, Yes(Country("FR", "France"))).success.value
+      .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
-      .set(BankDetailsPage, BankDetails("Account name", Some("12345678"), "GB12345678")).success.value
+      .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
 
   private val registrationService = new RegistrationService()
 
@@ -83,9 +88,9 @@ class RegistrationServiceSpec extends SpecBase {
 
       val registration = registrationService.fromUserAnswers(answers, vrn)
 
-      val expectedRegistration = RegistrationData.registration copy (vatDetails = RegistrationData.registration.vatDetails.copy (source = UserEntered))
+      val expectedRegistration = RegistrationData.registration copy (vatDetails = RegistrationData.registration.vatDetails.copy(source = UserEntered))
 
-      registration.value mustBe expectedRegistration
+      registration mustEqual Valid(expectedRegistration)
     }
 
     "must return a Registration when user answers are provided and we have full VAT information on the user" in {
@@ -94,8 +99,8 @@ class RegistrationServiceSpec extends SpecBase {
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
       val vatInfo = VatCustomerInfo(
         registrationDate = Some(regDate),
-        address          = address,
-        partOfVatGroup   = Some(true),
+        address = address,
+        partOfVatGroup = Some(true),
         organisationName = Some("bar")
       )
 
@@ -113,7 +118,7 @@ class RegistrationServiceSpec extends SpecBase {
           registeredCompanyName = "bar"
         )
 
-      registration.value mustEqual expectedRegistration
+      registration mustEqual Valid(expectedRegistration)
     }
 
     "must return a Registration when no trading names, EU countries or websites were provided" in {
@@ -123,21 +128,20 @@ class RegistrationServiceSpec extends SpecBase {
           .set(HasTradingNamePage, false).success.value
           .remove(AllTradingNames).success.value
           .set(TaxRegisteredInEuPage, false).success.value
-          .remove(AllEuDetailsQuery).success.value
+          .remove(AllEuDetailsRawQuery).success.value
           .set(HasWebsitePage, false).success.value
           .remove(AllWebsites).success.value
 
       val expectedRegistration =
-        RegistrationData.registration copy (
-          tradingNames                 = Seq.empty,
-          euRegistrations              = Seq.empty,
-          vatDetails                   = RegistrationData.registration.vatDetails copy (source = UserEntered),
-          websites                     = Seq.empty,
-          currentCountryOfRegistration = None
+        RegistrationData.registration copy(
+          tradingNames = Seq.empty,
+          euRegistrations = Seq.empty,
+          vatDetails = RegistrationData.registration.vatDetails copy (source = UserEntered),
+          websites = Seq.empty
         )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)
-      registration.value mustEqual expectedRegistration
+      registration mustEqual Valid(expectedRegistration)
     }
 
     "must return a registration when an International address is given" in {
@@ -151,40 +155,312 @@ class RegistrationServiceSpec extends SpecBase {
 
       val expectedRegistration =
         RegistrationData.registration copy (
-          vatDetails = RegistrationData.registration.vatDetails copy (
+          vatDetails = RegistrationData.registration.vatDetails copy(
             address = address,
-            source  = UserEntered
+            source = UserEntered
           )
-        )
+          )
 
       val registration = registrationService.fromUserAnswers(userAnswers, vrn)
-      registration.value mustEqual expectedRegistration
+      registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return a registration when Currently Registered in EU was answered" in {
+    "must return Invalid" - {
 
-      val userAnswers =
-        answers
-          .remove(CurrentlyRegisteredInCountryPage).success.value
-          .set(CurrentlyRegisteredInEuPage, true).success.value
-          .set(CurrentCountryOfRegistrationPage, Country("FR", "France")).success.value
+      "when Sells Goods From NI is false" in {
 
-      val expectedRegistration =
-        RegistrationData.registration copy (
-          vatDetails = RegistrationData.registration.vatDetails copy (
-            source  = UserEntered
-          ))
+        val userAnswers = answers.set(SellsGoodsFromNiPage, false).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
 
-      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
-      registration.value mustEqual expectedRegistration
-    }
+        result mustEqual Invalid(NonEmptyChain(NotSellingGoodsFromNiError))
+      }
 
-    "must return None when mandatory data is missing" in {
+      "when Sells Goods From NI is missing" in {
 
-      val userAnswers = answers.remove(RegisteredCompanyNamePage).success.value
-      val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val userAnswers = answers.remove(SellsGoodsFromNiPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
 
-      result mustBe empty
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(SellsGoodsFromNiPage)))
+      }
+
+      "when In Control of Moving Goods is false" in {
+
+        val userAnswers = answers.set(InControlOfMovingGoodsPage, false).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(NotInControlOfMovingGoodsError))
+      }
+
+      "when In Control of Moving Goods is missing" in {
+
+        val userAnswers = answers.remove(InControlOfMovingGoodsPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(InControlOfMovingGoodsPage)))
+      }
+
+      "when Registered Company Name is missing" in {
+
+        val userAnswers = answers.remove(RegisteredCompanyNamePage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(RegisteredCompanyNamePage)))
+      }
+
+      "when Has Trading Name is missing" in {
+
+        val userAnswers = answers.remove(HasTradingNamePage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
+      }
+
+      "when Has Trading Name is true, but there are no trading names" in {
+
+        val userAnswers = answers.remove(AllTradingNames).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(AllTradingNames)))
+      }
+
+      "when UK VAT Effective Date is missing" in {
+
+        val userAnswers = answers.remove(UkVatEffectiveDatePage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(UkVatEffectiveDatePage)))
+      }
+
+      "when Business Address in UK is missing" in {
+
+        val userAnswers = answers.remove(BusinessAddressInUkPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessAddressInUkPage)))
+      }
+
+      "when Business Address in UK is true, but UK Address is missing" in {
+
+        val userAnswers =
+          answers
+            .set(BusinessAddressInUkPage, true).success.value
+            .remove(UkAddressPage).success.value
+
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(UkAddressPage)))
+      }
+
+      "when Business Address in UK is false, but International Address is missing" in {
+
+        val userAnswers =
+          answers
+            .set(BusinessAddressInUkPage, false).success.value
+            .remove(InternationalAddressPage).success.value
+
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(InternationalAddressPage)))
+      }
+
+      "when Part of VAT Group is missing" in {
+
+        val userAnswers = answers.remove(PartOfVatGroupPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(PartOfVatGroupPage)))
+      }
+
+      "when Commencement Date is missing" in {
+
+        val userAnswers = answers.remove(CommencementDatePage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(CommencementDatePage)))
+      }
+
+      "when Contact Details are missing" in {
+
+        val userAnswers = answers.remove(BusinessContactDetailsPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessContactDetailsPage)))
+      }
+
+      "when Bank Details are missing" in {
+
+        val userAnswers = answers.remove(BankDetailsPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(BankDetailsPage)))
+      }
+
+      "when Has Website is missing" in {
+
+        val userAnswers = answers.remove(HasWebsitePage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
+      }
+
+      "when Has Website is true, but there are no websites" in {
+
+        val userAnswers =
+          answers
+            .set(HasWebsitePage, true).success.value
+            .remove(AllWebsites).success.value
+
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(AllWebsites)))
+      }
+
+      "when Previously Registered has not been answered" in {
+
+        val userAnswers = answers.remove(PreviouslyRegisteredPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviouslyRegisteredPage)))
+      }
+
+      "when Previously Registered is true" - {
+
+        "but there are no previous registrations" in {
+          val userAnswers =
+            answers
+              .set(PreviouslyRegisteredPage, true).success.value
+              .remove(AllPreviousRegistrationsRawQuery).success.value
+
+          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+          result mustEqual Invalid(NonEmptyChain(DataMissingError(AllPreviousRegistrationsRawQuery)))
+        }
+
+        "but there is a previous registration without a country" in {
+          val userAnswers = answers.remove(PreviousEuCountryPage(Index(0))).success.value
+          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+          result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousEuCountryPage(Index(0)))))
+        }
+
+        "but there is a previous registration without a VAT number" in {
+          val userAnswers = answers.remove(PreviousEuVatNumberPage(Index(0))).success.value
+          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+          result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousEuVatNumberPage(Index(0)))))
+        }
+      }
+
+      "when Tax Registered in EU is missing" - {
+
+        val userAnswers = answers.remove(TaxRegisteredInEuPage).success.value
+        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(TaxRegisteredInEuPage)))
+      }
+
+      "when Tax Registered in EU is true" - {
+
+        "and there are no EU country details" in {
+
+          val userAnswers =
+            answers
+              .set(TaxRegisteredInEuPage, true).success.value
+              .remove(AllEuDetailsRawQuery).success.value
+
+          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+          result mustEqual Invalid(NonEmptyChain(DataMissingError(AllEuDetailsRawQuery)))
+        }
+
+        "and there is a record with no country" in {
+          val userAnswers = answers.remove(EuCountryPage(Index(0))).success.value
+          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+          result mustEqual Invalid(NonEmptyChain(DataMissingError(EuCountryPage(Index(0)))))
+        }
+
+        "and there is a record with a country" - {
+
+          "where Vat Registered is missing" in {
+            val userAnswers = answers.remove(VatRegisteredPage(Index(2))).success.value
+            val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+            result mustEqual Invalid(NonEmptyChain(DataMissingError(VatRegisteredPage(Index(2)))))
+          }
+
+          "without a VAT registration" - {
+
+            "which does not have an answer for Has Fixed Establishment" in {
+              val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(2))).success.value
+              val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+              result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentPage(Index(2)))))
+            }
+
+            "and Has Fixed Establishment is true" - {
+
+              "and it does not have an EU Tax identifier" in {
+                val userAnswers = answers.remove(EuTaxReferencePage(Index(2))).success.value
+                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(2)))))
+              }
+
+              "and it does not have a fixed establishment trading name" in {
+                val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(2))).success.value
+                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(2)))))
+              }
+
+              "and it does not have a fixed establishment address" in {
+                val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(2))).success.value
+                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(2)))))
+              }
+            }
+          }
+
+          "with a VAT registration" - {
+
+            "with the VAT number missing" in {
+              val userAnswers = answers.remove(EuVatNumberPage(Index(0))).success.value
+              val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+              result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(0)))))
+            }
+
+            "with a VAT number" - {
+
+              "which does not have an answer for Has Fixed Establishment" in {
+                val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(0))).success.value
+                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentPage(Index(0)))))
+              }
+
+              "and Has Fixed Establishment is true" - {
+
+                "and it does not have a fixed establishment trading name" in {
+                  val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(1))).success.value
+                  val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(1)))))
+                }
+
+                "and it does not have a fixed establishment address" in {
+                  val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(1))).success.value
+                  val result = registrationService.fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(1)))))
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

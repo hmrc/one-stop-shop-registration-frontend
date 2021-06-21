@@ -25,6 +25,5 @@ object Validation {
   val emailPattern = """^(.+)\b@\b(.+)\b\.\b(.+)$"""
   val telephonePattern = """^\+[0-9 ]{1,18}$|^[0-9 ]{1,19}$|^(?=.{2,22}$)\+[0-9 ]*\(0\)[0-9 ]*$|^(?=.{1,22}$)[0-9 ]*\(0\)[0-9 ]*$"""
   val websitePattern = """^(((HTTP|http)(S|s)?\:\/\/((WWW|www)\.)?)|(( |WWW|www)\.))?[a-zA-Z0-9\[_~\:\/?\-#\]@!&'()*+, |;=% ]+\.[a-zA-Z]{2,5}(\.[a-zA-Z]{2,5})?(\:[0-9] |{1,5})?(\/[a-zA-Z0-9_-]+(\/)?)*$"""
-  val bicPattern = """[A-Za-z0-9]{8,11}"""
-  val ibanPattern = "[A-Za-z0-9]{5,34}"
+  val alphaNumericWithSpace = """^[a-zA-Z0-9 ]+$"""
 }

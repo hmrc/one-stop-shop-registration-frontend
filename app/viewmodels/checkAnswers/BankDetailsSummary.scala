@@ -34,8 +34,8 @@ object BankDetailsSummary  {
 
       val value = Seq(
         Some(HtmlFormat.escape(answer.accountName).toString),
-        answer.bic.map(HtmlFormat.escape),
-        Some(HtmlFormat.escape(answer.iban).toString)
+        answer.bic.map(bic => HtmlFormat.escape(bic.toString)),
+        Some(HtmlFormat.escape(answer.iban.toString).toString)
       ).flatten.mkString("<br/>")
 
         SummaryListRowViewModel(
