@@ -26,10 +26,16 @@ class CheckYourAnswersPageSpec extends SpecBase {
 
     "must navigate in Normal mode" - {
 
-      "to Application Complete" in {
+      "to Application Complete with email confirmation" in {
 
-        CheckYourAnswersPage.navigate(NormalMode, emptyUserAnswers)
-          .mustBe(routes.ApplicationCompleteController.onPageLoad())
+        CheckYourAnswersPage.navigateWithEmailConfirmation(true)
+          .mustBe(routes.ApplicationCompleteController.onPageLoad(true))
+      }
+
+      "to Application Complete without email confirmation" in {
+
+        CheckYourAnswersPage.navigateWithEmailConfirmation(false)
+          .mustBe(routes.ApplicationCompleteController.onPageLoad(false))
       }
     }
   }

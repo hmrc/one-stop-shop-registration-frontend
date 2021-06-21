@@ -36,13 +36,14 @@ class ApplicationCompleteController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
+  def onPageLoad(showEmailConfirmation: Boolean): Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
     implicit request =>
       val businessContactDetailsPage = request.userAnswers.get(BusinessContactDetailsPage)
         Ok(view(
           HtmlFormat.escape(businessContactDetailsPage.get.emailAddress).toString,
           request.vrn,
-          frontendAppConfig.feedbackUrl)
-        )
+          frontendAppConfig.feedbackUrl,
+          showEmailConfirmation
+        ))
   }
 }

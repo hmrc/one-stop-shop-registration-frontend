@@ -21,6 +21,6 @@ import play.api.mvc.Call
 
 case object CheckYourAnswersPage extends Page {
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.ApplicationCompleteController.onPageLoad()
+  def navigateWithEmailConfirmation(showEmailConfirmation: Boolean) =
+    routes.ApplicationCompleteController.onPageLoad(showEmailConfirmation)
 }
