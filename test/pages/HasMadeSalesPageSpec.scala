@@ -23,10 +23,14 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
   "HasMadeSalesPage" - {
 
-    beRetrievable[Boolean](HasMadeSalesPage)
+    "must navigate to auth.onSignIn when the answer is yes" in {
 
-    beSettable[Boolean](HasMadeSalesPage)
+      HasMadeSalesPage.navigate(true) mustEqual controllers.auth.routes.AuthController.onSignIn()
+    }
 
-    beRemovable[Boolean](HasMadeSalesPage)
+    "must navigate to Register Later when the answer is no" in {
+
+      HasMadeSalesPage.navigate(false) mustEqual controllers.routes.RegisterLaterController.onPageLoad()
+    }
   }
 }

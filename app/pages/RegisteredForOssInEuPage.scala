@@ -16,24 +16,15 @@
 
 package pages
 
-import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import play.api.mvc.Call
 
-class FirstAuthedPageSpec extends SpecBase {
+case object RegisteredForOssInEuPage extends Page {
 
-  "must navigate in Normal Mode" - {
-
-    "to Check VAT Details when we have VAT details for the user" in {
-
-      FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
-        .mustEqual(routes.CheckVatDetailsController.onPageLoad())
+  def navigate(answer: Boolean): Call =
+    if (answer) {
+      routes.SellsGoodsFromNiController.onPageLoad()
+    } else {
+      routes.CannotRegisterAlreadyRegisteredController.onPageLoad()
     }
-
-    "to Check VAT Number when we have VAT details for the user" in {
-
-      FirstAuthedPage.navigate(NormalMode, emptyUserAnswers)
-        .mustEqual(routes.CheckVatNumberController.onPageLoad())
-    }
-  }
 }

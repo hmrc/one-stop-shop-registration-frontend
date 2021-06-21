@@ -17,25 +17,14 @@
 package pages
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object SellsGoodsFromNiPage extends QuestionPage[Boolean] {
+case object SellsGoodsFromNiPage extends Page {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "sellsGoodsFromNi"
-
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(SellsGoodsFromNiPage) match {
-    case Some(true)  => routes.InControlOfMovingGoodsController.onPageLoad(NormalMode)
-    case Some(false) => routes.NotSellingGoodsFromNiController.onPageLoad()
-    case None        => routes.JourneyRecoveryController.onPageLoad()
-  }
-
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(SellsGoodsFromNiPage) match {
-    case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
-    case Some(false) => routes.NotSellingGoodsFromNiController.onPageLoad()
-    case None        => routes.JourneyRecoveryController.onPageLoad()
-  }
+  def navigate(answer: Boolean): Call =
+    if (answer) {
+      routes.InControlOfMovingGoodsController.onPageLoad()
+    } else {
+      routes.NotSellingGoodsFromNiController.onPageLoad()
+    }
 }

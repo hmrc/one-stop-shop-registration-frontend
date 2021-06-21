@@ -220,15 +220,11 @@ POST       /give-website-address                       controllers.HasWebsiteCon
 GET        /check-give-website-address                 controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST       /check-give-website-address                 controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
 
-GET        /move-goods                                 controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = NormalMode)
-POST       /move-goods                                 controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = NormalMode)
-GET        /check-move-goods                           controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = CheckMode)
-POST       /check-move-goods                           controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = CheckMode)
+GET        /move-goods                                 controllers.InControlOfMovingGoodsController.onPageLoad
+POST       /move-goods                                 controllers.InControlOfMovingGoodsController.onSubmit
 
-GET        /sell-online                                controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = NormalMode)
-POST       /sell-online                                controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = NormalMode)
-GET        /check-sell-online                          controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = CheckMode)
-POST       /check-sell-online                          controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = CheckMode)
+GET        /sell-online                                controllers.SellsGoodsFromNiController.onPageLoad
+POST       /sell-online                                controllers.SellsGoodsFromNiController.onSubmit
 
 GET        /tax-in-eu                                  controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
 POST       /tax-in-eu                                  controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
@@ -276,10 +272,8 @@ POST       /dateOfFirstSale                  controllers.DateOfFirstSaleControll
 GET        /changeDateOfFirstSale                        controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeDateOfFirstSale                        controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
 
-GET        /hasMadeSales                        controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasMadeSales                        controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasMadeSales                  controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasMadeSales                  controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
+GET        /hasMadeSales                        controllers.HasMadeSalesController.onPageLoad
+POST       /hasMadeSales                        controllers.HasMadeSalesController.onSubmit
 
 GET        /isOnlineMarketplace                        controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
 POST       /isOnlineMarketplace                        controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)

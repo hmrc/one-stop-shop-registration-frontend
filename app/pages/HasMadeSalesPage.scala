@@ -16,11 +16,15 @@
 
 package pages
 
-import play.api.libs.json.JsPath
+import controllers.routes
+import play.api.mvc.Call
 
-case object HasMadeSalesPage extends QuestionPage[Boolean] {
+case object HasMadeSalesPage extends Page {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "hasMadeSales"
+  def navigate(answer: Boolean): Call =
+    if (answer) {
+      controllers.auth.routes.AuthController.onSignIn()
+    } else {
+      routes.RegisterLaterController.onPageLoad()
+    }
 }

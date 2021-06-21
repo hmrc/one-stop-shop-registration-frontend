@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions.AuthenticatedControllerComponents
 import forms.RegisteredForOssInEuFormProvider
+import pages.RegisteredForOssInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -46,11 +47,7 @@ class RegisteredForOssInEuController @Inject()(override val messagesApi: Message
           BadRequest(view(formWithErrors)),
 
         value =>
-          if (value) {
-            Redirect(routes.CannotRegisterAlreadyRegisteredController.onPageLoad())
-          } else {
-            Redirect(controllers.auth.routes.AuthController.onSignIn())
-          }
+          Redirect(RegisteredForOssInEuPage.navigate(value))
       )
   }
 }

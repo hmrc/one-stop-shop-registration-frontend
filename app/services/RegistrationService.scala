@@ -32,8 +32,6 @@ class RegistrationService {
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
     (
-      checkSellingGoods(answers),
-      checkInControlOfMovingGoods(answers),
       getCompanyName(answers),
       getTradingNames(answers),
       getVatDetails(answers),
@@ -44,7 +42,7 @@ class RegistrationService {
       getPreviousRegistrations(answers),
       getBankDetails(answers)
     ).mapN(
-      (_, _, name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
+      (name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
         Registration(
           vrn                   = vrn,
           registeredCompanyName = name,
@@ -58,22 +56,6 @@ class RegistrationService {
           bankDetails           = bankDetails
         )
     )
-
-  private def checkSellingGoods(answers: UserAnswers): ValidationResult[Boolean] = {
-    answers.get(SellsGoodsFromNiPage) match {
-      case Some(true)  => true.validNec
-      case Some(false) => NotSellingGoodsFromNiError.invalidNec
-      case None        => DataMissingError(SellsGoodsFromNiPage).invalidNec
-    }
-  }
-
-  private def checkInControlOfMovingGoods(answers: UserAnswers): ValidationResult[Boolean] = {
-    answers.get(InControlOfMovingGoodsPage) match {
-      case Some(true)  => true.validNec
-      case Some(false) => NotInControlOfMovingGoodsError.invalidNec
-      case None        => DataMissingError(InControlOfMovingGoodsPage).invalidNec
-    }
-  }
 
   private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
     answers.vatInfo match {

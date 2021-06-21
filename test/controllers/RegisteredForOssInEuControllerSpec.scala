@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.RegisteredForOssInEuFormProvider
+import pages.RegisteredForOssInEuPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.RegisteredForOssInEuView
@@ -47,7 +48,7 @@ class RegisteredForOssInEuControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Cannot Register Already Registered if the answer is yes" in {
+    "must redirect to the next page when valid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -57,21 +58,7 @@ class RegisteredForOssInEuControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CannotRegisterAlreadyRegisteredController.onPageLoad().url
-      }
-    }
-
-    "must redirect to auth.onSignIn on POST if the answer is no" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(POST, controllerRoute).withFormUrlEncodedBody(("value", "false"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.auth.routes.AuthController.onSignIn().url
+        redirectLocation(result).value mustEqual RegisteredForOssInEuPage.navigate(true).url
       }
     }
 

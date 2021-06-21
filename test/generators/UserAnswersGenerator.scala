@@ -30,18 +30,15 @@ trait UserAnswersGenerator extends TryValues {
 
   val generators: Seq[Gen[(QuestionPage[_], JsValue)]] =
     arbitrary[(IsOnlineMarketplacePage.type, JsValue)] ::
-    arbitrary[(HasMadeSalesPage.type, JsValue)] ::
     arbitrary[(DateOfFirstSalePage.type, JsValue)] ::
     arbitrary[(IntendToSellGoodsThisQuarterPage.type, JsValue)] ::
     arbitrary[(AlreadyMadeSalesPage.type, JsValue)] ::
     arbitrary[(InternationalAddressPage.type, JsValue)] ::
     arbitrary[(BusinessAddressInUkPage.type, JsValue)] ::
     arbitrary[(TaxRegisteredInEuPage.type, JsValue)] ::
-    arbitrary[(SellsGoodsFromNiPage.type, JsValue)] ::
-    arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] ::
     arbitrary[(HasWebsitePage.type, JsValue)] ::
     arbitrary[(EuTaxReferencePage, JsValue)] ::
-   // arbitrary[(BankDetailsPage.type, JsValue)] ::
+    arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::
     arbitrary[(PreviousEuVatNumberPage, JsValue)] ::
     arbitrary[(PreviousEuCountryPage, JsValue)] ::

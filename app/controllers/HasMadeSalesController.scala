@@ -18,49 +18,39 @@ package controllers
 
 import controllers.actions._
 import forms.HasMadeSalesFormProvider
-import javax.inject.Inject
-import models.Mode
 import pages.HasMadeSalesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HasMadeSalesView
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
 
 class HasMadeSalesController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: HasMadeSalesFormProvider,
                                          view: HasMadeSalesView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                 ) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+      Ok(view(form))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit: Action[AnyContent] = Action {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          BadRequest(view(formWithErrors)),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers))
+          Redirect(HasMadeSalesPage.navigate(value))
       )
   }
 }

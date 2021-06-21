@@ -18,51 +18,20 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
 
   "InControlOfMovingGoodsPage" - {
 
-    beRetrievable[Boolean](InControlOfMovingGoodsPage)
+    "must navigate to Has Made Sales when the answer is yes" in {
 
-    beSettable[Boolean](InControlOfMovingGoodsPage)
-
-    beRemovable[Boolean](InControlOfMovingGoodsPage)
-
-    "must navigate in Normal Mode" - {
-
-      "to Already Made Sales when the answer is yes" in {
-
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
-        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.AlreadyMadeSalesController.onPageLoad(NormalMode))
-      }
-
-      "to Not in Control of Moving Goods when the answer is no" in {
-
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
-        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
-      }
+      InControlOfMovingGoodsPage.navigate(true) mustEqual routes.HasMadeSalesController.onPageLoad()
     }
 
-    "must navigate in Check mode" - {
+    "must navigate to Not In Control of Moving Goods when the answer is no" in {
 
-      "to Check Your Answers when the answer is yes" in {
-
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
-        InControlOfMovingGoodsPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Not in Control of Moving Goods for Service when the answer is no" in {
-
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
-        InControlOfMovingGoodsPage.navigate(CheckMode, answers)
-          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
-      }
+      InControlOfMovingGoodsPage.navigate(false) mustEqual routes.NotInControlOfMovingGoodsController.onPageLoad()
     }
   }
 }

@@ -21,11 +21,9 @@ import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.{NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.responses.ConflictFound
-import pages.CheckYourAnswersPage
 import pages.CheckYourAnswersPage.navigateWithEmailConfirmation
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -56,8 +54,6 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(
-          SellsGoodsFromNiSummary.row(request.userAnswers),
-          InControlOfMovingGoodsSummary.row(request.userAnswers),
           AlreadyMadeSalesSummary.answerRow(request.userAnswers),
           AlreadyMadeSalesSummary.dateOfFirstSaleRow(request.userAnswers),
           IntendToSellGoodsThisQuarterSummary.row(request.userAnswers),
@@ -115,13 +111,7 @@ class CheckYourAnswersController @Inject()(
           val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
 
-          if (errors.toChain.toList.contains(NotSellingGoodsFromNiError)) {
-            successful(Redirect(routes.NotSellingGoodsFromNiController.onPageLoad()))
-          } else if (errors.toChain.toList.contains(NotInControlOfMovingGoodsError)) {
-            successful(Redirect(routes.NotInControlOfMovingGoodsController.onPageLoad()))
-          } else {
-            successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          }
+          successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 }

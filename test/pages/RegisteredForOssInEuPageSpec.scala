@@ -18,22 +18,20 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import pages.behaviours.PageBehaviours
 
-class FirstAuthedPageSpec extends SpecBase {
+class RegisteredForOssInEuPageSpec extends SpecBase with PageBehaviours {
 
-  "must navigate in Normal Mode" - {
+  "RegisteredForOssInEuPage" - {
 
-    "to Check VAT Details when we have VAT details for the user" in {
+    "must navigate to Sells Goods From NI when the answer is yes" in {
 
-      FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
-        .mustEqual(routes.CheckVatDetailsController.onPageLoad())
+      RegisteredForOssInEuPage.navigate(true) mustEqual routes.SellsGoodsFromNiController.onPageLoad()
     }
 
-    "to Check VAT Number when we have VAT details for the user" in {
+    "must navigate to Cannot Register Already Registered when the answer is no" in {
 
-      FirstAuthedPage.navigate(NormalMode, emptyUserAnswers)
-        .mustEqual(routes.CheckVatNumberController.onPageLoad())
+      RegisteredForOssInEuPage.navigate(false) mustEqual routes.CannotRegisterAlreadyRegisteredController.onPageLoad()
     }
   }
 }
