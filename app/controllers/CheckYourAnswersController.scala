@@ -23,8 +23,10 @@ import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.{NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
+import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
+import pages.CheckYourAnswersPage.navigateWithEmailConfirmation
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuditService, EmailService, RegistrationService}
@@ -96,7 +98,8 @@ class CheckYourAnswersController @Inject()(
                 request.vrn.toString(),
                 registration.contactDetails.emailAddress
               ) flatMap {
-                _ => successful(Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)))
+                case EMAIL_ACCEPTED => successful(Redirect(navigateWithEmailConfirmation(true)))
+                case _ => successful(Redirect(navigateWithEmailConfirmation(false)))
               }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))

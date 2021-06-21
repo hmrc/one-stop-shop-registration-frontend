@@ -41,21 +41,33 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
   "ApplicationComplete Controller" - {
 
-    "must return OK and the correct view for a GET" in {
-
-      val emailAddress: String = "test@test.com"
-
+    "must return OK and the correct view for a GET with email confirmation" in {
+      val emailAddress = "test@test.com"
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad(true).url)
         val config = application.injector.instanceOf[FrontendAppConfig]
+        val result = route(application, request).value
+        val view = application.injector.instanceOf[ApplicationCompleteView]
 
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(emailAddress, vrn, config.feedbackUrl(request), true)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET without email confirmation" in {
+      val emailAddress = "test@test.com"
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad(false).url)
+        val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ApplicationCompleteView]
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(emailAddress, vrn, config.feedbackUrl(request))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(emailAddress, vrn, config.feedbackUrl(request), false)(request, messages(application)).toString
       }
     }
   }
