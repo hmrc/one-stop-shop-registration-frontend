@@ -163,7 +163,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
           val result = controller.onPageLoad()(fakeRequest)
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe "http://localhost:9948/mdtp/uplift?origin=OSS&confidenceLevel=250&completionURL=http%3A%2F%2Flocalhost%3A10200&failureURL=http%3A%2F%2Flocalhost%3A10200%2Fone-stop-shop-registration%2Fidentity-complete%3FcontinueURL%3Dhttp%253A%252F%252Flocalhost%253A10200"
+          redirectLocation(result).value mustBe "http://localhost:9948/mdtp/uplift?origin=OSS&confidenceLevel=250&completionURL=http%3A%2F%2Flocalhost%3A10200&failureURL=http%3A%2F%2Flocalhost%3A10200%2Fpay-vat-on-goods-sold-to-eu%2Fnorthern-ireland-register%2Fidentity-complete%3FcontinueURL%3Dhttp%253A%252F%252Flocalhost%253A10200"
         }
       }
     }
