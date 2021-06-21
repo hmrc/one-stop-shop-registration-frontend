@@ -51,12 +51,12 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Tax Registered in EU" in {
+        "to Date of First Sale" in {
 
           val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
 
           AddTradingNamePage.navigate(NormalMode, answers)
-            .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
+            .mustEqual(routes.DateOfFirstSaleController.onPageLoad(NormalMode))
         }
       }
     }

@@ -16,7 +16,6 @@
 
 package pages
 
-import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
@@ -32,7 +31,7 @@ case object AddTradingNamePage extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _)         => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
+      case (Some(false), _)         => routes.DateOfFirstSaleController.onPageLoad(NormalMode)
       case _                        => routes.JourneyRecoveryController.onPageLoad()
     }
 

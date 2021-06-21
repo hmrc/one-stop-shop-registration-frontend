@@ -17,8 +17,10 @@
 package pages
 
 import base.SpecBase
-import java.time.LocalDate
+import controllers.routes
+import models.{CheckMode, NormalMode}
 
+import java.time.LocalDate
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
 
@@ -35,5 +37,23 @@ class DateOfFirstSalePageSpec extends SpecBase with PageBehaviours {
     beSettable[LocalDate](DateOfFirstSalePage)
 
     beRemovable[LocalDate](DateOfFirstSalePage)
+  }
+
+  "must navigate in Normal Mode" - {
+
+    "to Commencement Date" in {
+
+      DateOfFirstSalePage.navigate(NormalMode, emptyUserAnswers)
+        .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+    }
+  }
+
+  "must navigate in Check Mode" - {
+
+    "to Commencement Date" in {
+
+      DateOfFirstSalePage.navigate(CheckMode, emptyUserAnswers)
+        .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+    }
   }
 }

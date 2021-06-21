@@ -35,7 +35,7 @@ case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(PreviouslyRegisteredPage) match {
       case Some(true)  => prevRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(0))
-      case Some(false) => routes.HasWebsiteController.onPageLoad(NormalMode)
+      case Some(false) => routes.IsOnlineMarketplaceController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 

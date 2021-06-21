@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.{Gettable, Settable}
@@ -30,10 +30,8 @@ case object CommencementDatePage extends Page with Gettable[LocalDate] with Sett
 
   override def toString: String = "commencementDate"
 
-  override def navigateInNormalMode(answers: UserAnswers): Call = answers.vatInfo match {
-    case Some(_) => routes.CheckVatDetailsController.onPageLoad()
-    case None    => routes.CheckVatNumberController.onPageLoad()
-  }
+  override def navigateInNormalMode(answers: UserAnswers): Call =
+    routes.HasTradingNameController.onPageLoad(NormalMode)
 
   override def navigateInCheckMode(answers: UserAnswers): Call =
     routes.CheckYourAnswersController.onPageLoad()

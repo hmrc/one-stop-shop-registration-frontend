@@ -24,28 +24,16 @@ class CommencementDatePageSpec extends SpecBase {
 
   "CommencementDatePage" - {
 
-    "must navigate in Normal mode" - {
+    "must navigate in Normal mode to Has Trading Name" in {
 
-      "to Check VAT Details when we have VAT details for the user" in {
-
-        CommencementDatePage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
-          .mustEqual(routes.CheckVatDetailsController.onPageLoad())
-      }
-
-      "to Check VAT Number when we do not have VAT details for the user" in {
-
-        CommencementDatePage.navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(routes.CheckVatNumberController.onPageLoad())
-      }
+      CommencementDatePage.navigate(NormalMode, emptyUserAnswers)
+        .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
     }
 
-    "must navigate in Check mode" - {
+    "must navigate in Check mode to Check Your Answers" in {
 
-      "to Check Your Answers" in {
-
-        CommencementDatePage.navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
+      CommencementDatePage.navigate(CheckMode, emptyUserAnswers)
+        .mustEqual(routes.CheckYourAnswersController.onPageLoad())
     }
   }
 }

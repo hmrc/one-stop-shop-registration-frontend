@@ -17,6 +17,8 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
@@ -28,5 +30,23 @@ class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
     beSettable[Boolean](IsOnlineMarketplacePage)
 
     beRemovable[Boolean](IsOnlineMarketplacePage)
+
+    "must navigate in Normal mode" - {
+
+      "to Has Website" in {
+
+        IsOnlineMarketplacePage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        IsOnlineMarketplacePage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+    }
   }
 }
