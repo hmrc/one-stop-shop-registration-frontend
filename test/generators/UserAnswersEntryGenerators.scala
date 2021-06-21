@@ -26,6 +26,30 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
+  implicit lazy val arbitraryIsOnlineMarketplaceUserAnswersEntry: Arbitrary[(IsOnlineMarketplacePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[IsOnlineMarketplacePage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryHasMadeSalesUserAnswersEntry: Arbitrary[(HasMadeSalesPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[HasMadeSalesPage.type]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryDateOfFirstSaleUserAnswersEntry: Arbitrary[(DateOfFirstSalePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[DateOfFirstSalePage.type]
+        value <- arbitrary[Int].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
   implicit lazy val arbitraryIntendToSellGoodsThisQuarterUserAnswersEntry: Arbitrary[(IntendToSellGoodsThisQuarterPage.type, JsValue)] =
     Arbitrary {
       for {

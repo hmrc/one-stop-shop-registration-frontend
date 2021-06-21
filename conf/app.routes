@@ -270,3 +270,18 @@ GET        /already-eu-registered                   controllers.RegisteredForOss
 POST       /already-eu-registered                   controllers.RegisteredForOssInEuController.onSubmit()
 
 GET        /cannotRegisterAlreadyRegistered                       controllers.CannotRegisterAlreadyRegisteredController.onPageLoad()
+
+GET        /dateOfFirstSale                  controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = NormalMode)
+POST       /dateOfFirstSale                  controllers.DateOfFirstSaleController.onSubmit(mode: Mode = NormalMode)
+GET        /changeDateOfFirstSale                        controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeDateOfFirstSale                        controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
+
+GET        /hasMadeSales                        controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
+POST       /hasMadeSales                        controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
+GET        /changeHasMadeSales                  controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeHasMadeSales                  controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /isOnlineMarketplace                        controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
+POST       /isOnlineMarketplace                        controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
+GET        /changeIsOnlineMarketplace                  controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeIsOnlineMarketplace                  controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
