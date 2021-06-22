@@ -519,27 +519,8 @@ notSellingGoodsFromNi.title = You do not need to register
 notSellingGoodsFromNi.heading = You do not need to register
 notSellingGoodsFromNi.p = This service is only for businesses that sell goods online from Northern Ireland to consumers in the EU.
 
-alreadyMadeSales.title = Have you already made sales?
-alreadyMadeSales.heading = Have you already made sales?
-alreadyMadeSales.checkYourAnswersLabel = Already made sales
-alreadyMadeSales.firstSale.guidance = Enter the date of your first sale
-alreadyMadeSales.firstSale.hint = For example, 1 7 2021
-alreadyMadeSales.answer.error.required = Select yes if you have already made sales
-alreadyMadeSales.firstSale.error.invalid = Enter a real date
-alreadyMadeSales.firstSale.error.required = Date must include a {0}
-alreadyMadeSales.firstSale.error.twoRequired = Date must include a {0} and a {0}
-alreadyMadeSales.firstSale.error.allRequired = Enter the date of your first sale
-alreadyMadeSales.firstSale.error.maxDate = The date must be today or in the past
-alreadyMadeSales.change.hidden = if you have already made sales
-
 commencementDate.title = You can use this scheme from {0}
 commencementDate.heading = You can use this scheme from {0}
-
-intendToSellGoodsThisQuarter.title = Do you intend to sell goods in this quarter?
-intendToSellGoodsThisQuarter.heading = Do you intend to sell goods in this quarter?
-intendToSellGoodsThisQuarter.checkYourAnswersLabel = Intend to sell goods this quarter
-intendToSellGoodsThisQuarter.error.required = Select yes if you intend to sell goods this quarter
-intendToSellGoodsThisQuarter.change.hidden = if you intend to sell goods this quarter
 
 registerLater.title = You need to register later
 registerLater.heading = You need to register later

@@ -33,12 +33,6 @@ trait PageGenerators {
   implicit lazy val arbitraryDateOfFirstSalePage: Arbitrary[DateOfFirstSalePage.type] =
     Arbitrary(DateOfFirstSalePage)
 
-  implicit lazy val arbitraryIntendToSellGoodsThisQuarterPage: Arbitrary[IntendToSellGoodsThisQuarterPage.type] =
-    Arbitrary(IntendToSellGoodsThisQuarterPage)
-
-  implicit lazy val arbitraryAlreadyMadeSalesPage: Arbitrary[AlreadyMadeSalesPage.type] =
-    Arbitrary(AlreadyMadeSalesPage)
-
   implicit lazy val arbitraryInternationalAddressPage: Arbitrary[InternationalAddressPage.type] =
     Arbitrary(InternationalAddressPage)
 

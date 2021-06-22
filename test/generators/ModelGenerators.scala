@@ -67,11 +67,6 @@ trait ModelGenerators {
       ).map(v => Iban(v).right.get)
     }
 
-  implicit lazy val arbitraryAlreadyMadeSales: Arbitrary[AlreadyMadeSales] =
-    Arbitrary {
-        Gen.const(AlreadyMadeSales.No)
-    }
-
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {

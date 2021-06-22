@@ -42,22 +42,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryIntendToSellGoodsThisQuarterUserAnswersEntry: Arbitrary[(IntendToSellGoodsThisQuarterPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[IntendToSellGoodsThisQuarterPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryAlreadyMadeSalesUserAnswersEntry: Arbitrary[(AlreadyMadeSalesPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[AlreadyMadeSalesPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryInternationalAddressUserAnswersEntry: Arbitrary[(InternationalAddressPage.type, JsValue)] =
     Arbitrary {
       for {
