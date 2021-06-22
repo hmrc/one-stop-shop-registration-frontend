@@ -16,7 +16,7 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.{alphaNumericWithSpace, commonTextPattern}
+import forms.Validation.Validation.alphaNumericWithSpace
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary

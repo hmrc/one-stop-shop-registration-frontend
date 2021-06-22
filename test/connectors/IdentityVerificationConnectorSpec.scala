@@ -31,8 +31,6 @@ import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, running}
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class IdentityVerificationConnectorSpec
   extends AnyFreeSpec
     with WireMockHelper

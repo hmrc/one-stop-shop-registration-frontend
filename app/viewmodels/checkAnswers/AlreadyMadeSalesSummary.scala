@@ -38,7 +38,7 @@ object AlreadyMadeSalesSummary  {
         }
 
         SummaryListRowViewModel(
-          key     = "alreadyMadeSales.answer.checkYourAnswersLabel",
+          key     = "alreadyMadeSales.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AlreadyMadeSalesController.onPageLoad(CheckMode).url)

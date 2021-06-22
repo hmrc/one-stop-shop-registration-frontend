@@ -28,7 +28,6 @@ import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntendToSellGoodsThisQuarterView
 
-import java.time.{Clock, LocalDate}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -37,7 +36,6 @@ class IntendToSellGoodsThisQuarterController @Inject()(
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: IntendToSellGoodsThisQuarterFormProvider,
                                          view: IntendToSellGoodsThisQuarterView,
-                                         clock: Clock,
                                          startDateService: StartDateService
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
