@@ -18,6 +18,7 @@ package controllers
 
 import java.time.{Clock, Instant, LocalDate, ZoneId, ZoneOffset}
 import base.SpecBase
+import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -37,8 +38,10 @@ import scala.concurrent.Future
 
 class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  private val date: LocalDate  = LocalDate.now(stubClockAtArbitraryDate)
-  private val dateService      = new DateService(stubClockAtArbitraryDate)
+  private val date: LocalDate   = LocalDate.now(stubClockAtArbitraryDate)
+  private val dateService       = new DateService(stubClockAtArbitraryDate)
+  private val dateFormatted     = dateService.earliestSaleAllowed.format(dateFormatter)
+  private val dateHintFormatted = dateService.earliestSaleAllowed.format(dateHintFormatter)
 
   private val formProvider = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)
   private val form = formProvider()
@@ -68,7 +71,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
         val view = application.injector.instanceOf[DateOfFirstSaleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
       }
     }
 
@@ -84,7 +87,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
         val result = route(application, getRequest).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(date), NormalMode)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(date), NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
       }
     }
 
@@ -130,7 +133,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, dateFormatted, dateHintFormatted)(request, messages(application)).toString
       }
     }
 

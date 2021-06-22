@@ -33,7 +33,8 @@ class HasTradingNameController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: HasTradingNameFormProvider,
-                                         view: HasTradingNameView
+                                         view: HasTradingNameView,
+                                         page: HasTradingNamePage
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -45,7 +46,7 @@ class HasTradingNameController @Inject()(
 
           val form = formProvider()
 
-          val preparedForm = request.userAnswers.get(HasTradingNamePage) match {
+          val preparedForm = request.userAnswers.get(page) match {
             case None => form
             case Some(value) => form.fill(value)
           }
@@ -67,9 +68,9 @@ class HasTradingNameController @Inject()(
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(HasTradingNamePage, value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(HasTradingNamePage.navigate(mode, updatedAnswers))
+              } yield Redirect(page.navigate(mode, updatedAnswers))
         )
       }
   }

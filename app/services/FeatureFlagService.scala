@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 class FeatureFlagService @Inject()(configuration: Configuration, clock: Clock) {
 
-  def schemeHasStarted: Boolean = LocalDate.now(clock) isBefore Constants.schemeStartDate
+  def schemeHasStarted: Boolean = LocalDate.now(clock) isAfter Constants.schemeStartDate.minusDays(1)
 
   val proceedWhenVatApiCallFails: Boolean = configuration.get[Boolean]("features.proceed-when-vat-api-call-fails")
 

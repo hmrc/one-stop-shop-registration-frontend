@@ -17,26 +17,32 @@
 package controllers
 
 import controllers.actions._
+import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import pages.DateOfFirstSalePage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DateOfFirstSaleView
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class DateOfFirstSaleController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: DateOfFirstSaleFormProvider,
-                                        view: DateOfFirstSaleView
+                                        view: DateOfFirstSaleView,
+                                        dateService: DateService
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private def form = formProvider()
+  private def form: Form[LocalDate] = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
@@ -47,15 +53,23 @@ class DateOfFirstSaleController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      val earliestDateFormatted     = dateService.earliestSaleAllowed.format(dateFormatter)
+      val earliestDateHintFormatted = dateService.earliestSaleAllowed.format(dateHintFormatter)
+
+      Ok(view(preparedForm, mode, earliestDateFormatted, earliestDateHintFormatted))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+        formWithErrors => {
+
+          val earliestDateFormatted     = dateService.earliestSaleAllowed.format(dateFormatter)
+          val earliestDateHintFormatted = dateService.earliestSaleAllowed.format(dateHintFormatter)
+
+          Future.successful(BadRequest(view(formWithErrors, mode, earliestDateFormatted, earliestDateHintFormatted)))
+        },
 
         value =>
           for {

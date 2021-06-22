@@ -113,7 +113,4 @@ trait PageGenerators {
 
   implicit lazy val arbitraryPartOfVatGroupPage: Arbitrary[PartOfVatGroupPage.type] =
     Arbitrary(PartOfVatGroupPage)
-
-  implicit lazy val arbitraryHasTradingNamePage: Arbitrary[HasTradingNamePage.type] =
-    Arbitrary(HasTradingNamePage)
 }

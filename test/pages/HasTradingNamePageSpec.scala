@@ -17,37 +17,62 @@
 package pages
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
+import services.FeatureFlagService
 
-class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
+class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSugar with BeforeAndAfterEach {
+
+  private val features = mock[FeatureFlagService]
+
+  private val page = new HasTradingNamePage(features)
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(features)
+  }
 
   "HasTradingNamePage" - {
 
-    beRetrievable[Boolean](HasTradingNamePage)
+    beRetrievable[Boolean](page)
 
-    beSettable[Boolean](HasTradingNamePage)
+    beSettable[Boolean](page)
 
-    beRemovable[Boolean](HasTradingNamePage)
+    beRemovable[Boolean](page)
 
     "must navigate in Normal mode" - {
 
       "to Trading Name (index 0) when the answer is yes" in {
 
-        val answers = emptyUserAnswers.set(HasTradingNamePage, true).success.value
+        val answers = emptyUserAnswers.set(page, true).success.value
 
-        HasTradingNamePage.navigate(NormalMode, answers)
+        page.navigate(NormalMode, answers)
           .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(0)))
       }
 
-      "to Tax Registered in EU when the answer is no" in {
+      "when the answer is no" - {
 
-        val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+        "to Date of First Sale when the scheme has started" in {
 
-        HasTradingNamePage.navigate(NormalMode, answers)
-          .mustBe(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
+          when(features.schemeHasStarted) thenReturn true
+          val answers = emptyUserAnswers.set(page, false).success.value
+
+          page.navigate(NormalMode, answers)
+            .mustBe(routes.DateOfFirstSaleController.onPageLoad(NormalMode))
+        }
+
+        "to Commencement Date when the scheme has not started" in {
+
+          when(features.schemeHasStarted) thenReturn false
+          val answers = emptyUserAnswers.set(page, false).success.value
+
+          page.navigate(NormalMode, answers)
+            .mustBe(routes.CommencementDateController.onPageLoad(NormalMode))
+        }
       }
     }
 
@@ -57,9 +82,9 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
 
         "to Trading name (index 0) when there are no trading names in the user's answers" in {
 
-          val answers = emptyUserAnswers.set(HasTradingNamePage ,true).success.value
+          val answers = emptyUserAnswers.set(page ,true).success.value
 
-          HasTradingNamePage.navigate(CheckMode, answers)
+          page.navigate(CheckMode, answers)
             .mustEqual(routes.TradingNameController.onPageLoad(CheckMode, Index(0)))
         }
 
@@ -68,9 +93,9 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
           val answers =
             emptyUserAnswers
               .set(TradingNamePage(Index(0)), "foo").success.value
-              .set(HasTradingNamePage ,true).success.value
+              .set(page ,true).success.value
 
-          HasTradingNamePage.navigate(CheckMode, answers)
+          page.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }
@@ -79,9 +104,9 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
 
         "to Check Your Answers" in {
 
-          val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+          val answers = emptyUserAnswers.set(page, false).success.value
 
-          HasTradingNamePage.navigate(CheckMode, answers)
+          page.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }
@@ -94,7 +119,7 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
           .set(TradingNamePage(Index(0)), "name 1").success.value
           .set(TradingNamePage(Index(1)), "name 2").success.value
 
-      val result = answers.set(HasTradingNamePage, false).success.value
+      val result = answers.set(page, false).success.value
 
       result.get(TradingNamePage(Index(0))) must not be defined
       result.get(TradingNamePage(Index(1))) must not be defined
@@ -107,7 +132,7 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours {
           .set(TradingNamePage(Index(0)), "name 1").success.value
           .set(TradingNamePage(Index(1)), "name 2").success.value
 
-      val result = answers.set(HasTradingNamePage, true).success.value
+      val result = answers.set(page, true).success.value
 
       result.get(TradingNamePage(Index(0))).value mustEqual "name 1"
       result.get(TradingNamePage(Index(1))).value mustEqual "name 2"

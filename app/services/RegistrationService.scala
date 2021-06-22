@@ -17,6 +17,7 @@
 package services
 
 import cats.implicits._
+import config.Constants
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
@@ -29,7 +30,7 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 import javax.inject.Inject
 
-class RegistrationService @Inject()(dateService: DateService) {
+class RegistrationService @Inject()(dateService: DateService, features: FeatureFlagService) {
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
     (
@@ -37,13 +38,13 @@ class RegistrationService @Inject()(dateService: DateService) {
       getTradingNames(answers),
       getVatDetails(answers),
       getEuTaxRegistrations(answers),
-      getDateOfFirstSale(answers),
+      getStartDate(answers),
       getContactDetails(answers),
       getWebsites(answers),
       getPreviousRegistrations(answers),
       getBankDetails(answers)
     ).mapN(
-      (name, tradingNames, vatDetails, euRegistrations, dateOfFirstSale, contactDetails, websites, previousRegistrations, bankDetails) =>
+      (name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
         Registration(
           vrn                   = vrn,
           registeredCompanyName = name,
@@ -52,7 +53,7 @@ class RegistrationService @Inject()(dateService: DateService) {
           euRegistrations       = euRegistrations,
           contactDetails        = contactDetails,
           websites              = websites,
-          commencementDate      = dateService.startDateBasedOnFirstSale(dateOfFirstSale),
+          commencementDate      = startDate,
           previousRegistrations = previousRegistrations,
           bankDetails           = bankDetails
         )
@@ -70,7 +71,7 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
-    answers.get(HasTradingNamePage) match {
+    answers.get(new HasTradingNamePage(features)) match {
       case Some(true) =>
         answers.get(AllTradingNames) match {
           case Some(Nil) | None => DataMissingError(AllTradingNames).invalidNec
@@ -81,7 +82,7 @@ class RegistrationService @Inject()(dateService: DateService) {
         List.empty.validNec
 
       case None =>
-        DataMissingError(HasTradingNamePage).invalidNec
+        DataMissingError(new HasTradingNamePage(features)).invalidNec
     }
   }
 
@@ -142,11 +143,16 @@ class RegistrationService @Inject()(dateService: DateService) {
       getVatDetailSource(answers)
     ).mapN(VatDetails.apply)
 
-  private def getDateOfFirstSale(answers: UserAnswers): ValidationResult[LocalDate] =
-    answers.get(DateOfFirstSalePage) match {
-      case Some(startDate) => startDate.validNec
-      case None            => DataMissingError(DateOfFirstSalePage).invalidNec
+  private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] = {
+    if (features.schemeHasStarted) {
+      answers.get(DateOfFirstSalePage) match {
+        case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
+        case None            => DataMissingError(DateOfFirstSalePage).invalidNec
+      }
+    } else {
+      Constants.schemeStartDate.validNec
     }
+  }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
     answers.get(BusinessContactDetailsPage) match {

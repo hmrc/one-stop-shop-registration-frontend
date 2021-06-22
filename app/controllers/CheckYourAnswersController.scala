@@ -27,7 +27,7 @@ import models.responses.ConflictFound
 import pages.CheckYourAnswersPage.navigateWithEmailConfirmation
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{AuditService, EmailService, RegistrationService, DateService}
+import services.{AuditService, DateService, EmailService, FeatureFlagService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -46,7 +46,8 @@ class CheckYourAnswersController @Inject()(
   auditService: AuditService,
   view: CheckYourAnswersView,
   emailService: EmailService,
-  dateService: DateService
+  dateService: DateService,
+  features: FeatureFlagService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -61,7 +62,7 @@ class CheckYourAnswersController @Inject()(
           BusinessAddressInUkSummary.row(request.userAnswers),
           UkAddressSummary.row(request.userAnswers),
           InternationalAddressSummary.row(request.userAnswers),
-          HasTradingNameSummary.row(request.userAnswers),
+          new HasTradingNameSummary(features).row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
           DateOfFirstSaleSummary.row(request.userAnswers),
           new CommencementDateSummary(dateService).row(request.userAnswers),

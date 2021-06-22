@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, NormalMode}
 
@@ -24,10 +25,10 @@ class CommencementDatePageSpec extends SpecBase {
 
   "CommencementDatePage" - {
 
-    "must navigate in Normal mode to Has Trading Name" in {
+    "must navigate in Normal mode to Tax Registered in EU" in {
 
       CommencementDatePage.navigate(NormalMode, emptyUserAnswers)
-        .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+        .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
     }
 
     "must navigate in Check mode to Check Your Answers" in {

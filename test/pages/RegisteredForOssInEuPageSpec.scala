@@ -24,14 +24,14 @@ class RegisteredForOssInEuPageSpec extends SpecBase with PageBehaviours {
 
   "RegisteredForOssInEuPage" - {
 
-    "must navigate to Sells Goods From NI when the answer is yes" in {
+    "must navigate to Sells Goods From NI when the answer is no" in {
 
-      RegisteredForOssInEuPage.navigate(true) mustEqual routes.SellsGoodsFromNiController.onPageLoad()
+      RegisteredForOssInEuPage.navigate(false) mustEqual routes.SellsGoodsFromNiController.onPageLoad()
     }
 
-    "must navigate to Cannot Register Already Registered when the answer is no" in {
+    "must navigate to Cannot Register Already Registered when the answer is yes" in {
 
-      RegisteredForOssInEuPage.navigate(false) mustEqual routes.CannotRegisterAlreadyRegisteredController.onPageLoad()
+      RegisteredForOssInEuPage.navigate(true) mustEqual routes.CannotRegisterAlreadyRegisteredController.onPageLoad()
     }
   }
 }

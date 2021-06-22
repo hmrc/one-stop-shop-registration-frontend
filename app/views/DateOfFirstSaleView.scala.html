@@ -6,9 +6,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, dateFormatted: String, dateHintFormatted: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("dateOfFirstSale.title"))) {
+@layout(pageTitle = title(form, messages("dateOfFirstSale.title", dateFormatted))) {
 
     @formHelper(action = routes.DateOfFirstSaleController.onSubmit(mode), 'autoComplete -> "off") {
 
@@ -19,9 +19,9 @@
         @govukDateInput(
             DateViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("dateOfFirstSale.heading")).asPageHeading()
+                legend = LegendViewModel(messages("dateOfFirstSale.heading", dateFormatted)).asPageHeading()
             )
-            .withHint(HintViewModel(messages("dateOfFirstSale.hint")))
+            .withHint(HintViewModel(messages("dateOfFirstSale.hint", dateHintFormatted)))
         )
 
         @govukButton(

@@ -19,30 +19,51 @@ package services
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
+import config.Constants
 import models._
 import models.domain.VatDetailSource.UserEntered
 import models.domain.{VatCustomerInfo, VatDetailSource, VatDetails}
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import queries.{AllEuDetailsRawQuery, AllPreviousRegistrationsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
-import java.time.{Clock, Instant, LocalDate, ZoneId}
+import java.time.{Clock, LocalDate, ZoneId}
 
-class RegistrationServiceSpec extends SpecBase {
+class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  private val iban = RegistrationData.iban
-  private val bic = RegistrationData.bic
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockFeatures)
+  }
+
+  private val iban  = RegistrationData.iban
+  private val bic   = RegistrationData.bic
+
+  private def getStubClock(date: LocalDate) =
+    Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
+
+  private def getDateService(date: LocalDate) = new DateService(getStubClock(date))
+
+  private val mockFeatures = mock[FeatureFlagService]
+  
+  private def getRegistrationService(today: LocalDate) =
+    new RegistrationService(getDateService(today), mockFeatures)
+
+  private val hasTradingNamePage = new HasTradingNamePage(mockFeatures)
 
   private val answers =
     UserAnswers("id")
-      .set(DateOfFirstSalePage, LocalDate.now).success.value
+      .set(DateOfFirstSalePage, arbitraryDate).success.value
       .set(RegisteredCompanyNamePage, "foo").success.value
-      .set(HasTradingNamePage, true).success.value
+      .set(hasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
       .set(PartOfVatGroupPage, true).success.value
-      .set(UkVatEffectiveDatePage, LocalDate.now()).success.value
+      .set(UkVatEffectiveDatePage, LocalDate.now).success.value
       .set(BusinessAddressInUkPage, true).success.value
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
@@ -78,24 +99,24 @@ class RegistrationServiceSpec extends SpecBase {
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
 
-  private val today: Instant   = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
-  private val stubClock: Clock = Clock.fixed(today, ZoneId.systemDefault)
-
-  private val dateService = new DateService(stubClock)
-  private val registrationService = new RegistrationService(dateService)
-
   "fromUserAnswers" - {
 
     "must return a Registration when user answers are provided and the user manually entered all their VAT details" in {
 
-      val registration = registrationService.fromUserAnswers(answers, vrn)
+      when(mockFeatures.schemeHasStarted) thenReturn true
+      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(answers, vrn)
 
-      val expectedRegistration = RegistrationData.registration copy (vatDetails = RegistrationData.registration.vatDetails.copy(source = UserEntered))
+      val expectedRegistration = RegistrationData.registration.copy(
+        vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+        commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+      )
 
       registration mustEqual Valid(expectedRegistration)
     }
 
     "must return a Registration when user answers are provided and we have full VAT information on the user" in {
+
+      when(mockFeatures.schemeHasStarted) thenReturn true
 
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
@@ -112,12 +133,13 @@ class RegistrationServiceSpec extends SpecBase {
           .remove(UkAddressPage).success.value
           .remove(PartOfVatGroupPage).success.value
 
-      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
       val expectedRegistration =
         RegistrationData.registration.copy(
-          vatDetails = VatDetails(regDate, address, true, VatDetailSource.Etmp),
-          registeredCompanyName = "bar"
+          vatDetails            = VatDetails(regDate, address, true, VatDetailSource.Etmp),
+          registeredCompanyName = "bar",
+          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
         )
 
       registration mustEqual Valid(expectedRegistration)
@@ -125,9 +147,11 @@ class RegistrationServiceSpec extends SpecBase {
 
     "must return a Registration when no trading names, EU countries or websites were provided" in {
 
+      when(mockFeatures.schemeHasStarted) thenReturn true
+
       val userAnswers =
         answers
-          .set(HasTradingNamePage, false).success.value
+          .set(hasTradingNamePage, false).success.value
           .remove(AllTradingNames).success.value
           .set(TaxRegisteredInEuPage, false).success.value
           .remove(AllEuDetailsRawQuery).success.value
@@ -136,17 +160,20 @@ class RegistrationServiceSpec extends SpecBase {
 
       val expectedRegistration =
         RegistrationData.registration copy(
-          tradingNames = Seq.empty,
-          euRegistrations = Seq.empty,
-          vatDetails = RegistrationData.registration.vatDetails copy (source = UserEntered),
-          websites = Seq.empty
+          tradingNames     = Seq.empty,
+          euRegistrations  = Seq.empty,
+          vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered),
+          websites         = Seq.empty,
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
         )
 
-      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
       registration mustEqual Valid(expectedRegistration)
     }
 
     "must return a registration when an International address is given" in {
+
+      when(mockFeatures.schemeHasStarted) thenReturn true
 
       val address = InternationalAddress("line 1", None, "town", None, None, Country("FR", "France"))
       val userAnswers =
@@ -160,10 +187,28 @@ class RegistrationServiceSpec extends SpecBase {
           vatDetails = RegistrationData.registration.vatDetails copy(
             address = address,
             source = UserEntered
-          )
+          ),
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 
-      val registration = registrationService.fromUserAnswers(userAnswers, vrn)
+      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+      registration mustEqual Valid(expectedRegistration)
+    }
+
+    "must return a registration when the scheme has not started and Date of First Sale is absent" in {
+
+      when(mockFeatures.schemeHasStarted) thenReturn false
+
+      val userAnswers = answers.remove(DateOfFirstSalePage).success.value
+      val today = LocalDate.of(2021, 6, 30)
+
+      val expectedRegistration =
+        RegistrationData.registration copy (
+          vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+          commencementDate = Constants.schemeStartDate
+        )
+
+      val registration = getRegistrationService(today).fromUserAnswers(userAnswers, vrn)
       registration mustEqual Valid(expectedRegistration)
     }
 
@@ -171,124 +216,152 @@ class RegistrationServiceSpec extends SpecBase {
 
       "when Registered Company Name is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(RegisteredCompanyNamePage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(RegisteredCompanyNamePage)))
       }
 
       "when Has Trading Name is missing" in {
 
-        val userAnswers = answers.remove(HasTradingNamePage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        when(mockFeatures.schemeHasStarted) thenReturn true
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
+        val userAnswers = answers.remove(hasTradingNamePage).success.value
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result.isInvalid mustBe true
       }
 
       "when Has Trading Name is true, but there are no trading names" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(AllTradingNames).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllTradingNames)))
       }
 
       "when UK VAT Effective Date is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(UkVatEffectiveDatePage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(UkVatEffectiveDatePage)))
       }
 
       "when Business Address in UK is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(BusinessAddressInUkPage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessAddressInUkPage)))
       }
 
       "when Business Address in UK is true, but UK Address is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers =
           answers
             .set(BusinessAddressInUkPage, true).success.value
             .remove(UkAddressPage).success.value
 
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(UkAddressPage)))
       }
 
       "when Business Address in UK is false, but International Address is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers =
           answers
             .set(BusinessAddressInUkPage, false).success.value
             .remove(InternationalAddressPage).success.value
 
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(InternationalAddressPage)))
       }
 
       "when Part of VAT Group is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(PartOfVatGroupPage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(PartOfVatGroupPage)))
       }
 
-      "when Date of First Sale is missing" in {
+      "when Date of First Sale is missing and the scheme has started" in {
+
+        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(DateOfFirstSalePage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(DateOfFirstSalePage)))
       }
 
       "when Contact Details are missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(BusinessContactDetailsPage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessContactDetailsPage)))
       }
 
       "when Bank Details are missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(BankDetailsPage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BankDetailsPage)))
       }
 
       "when Has Website is missing" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(HasWebsitePage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
       }
 
       "when Has Website is true, but there are no websites" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers =
           answers
             .set(HasWebsitePage, true).success.value
             .remove(AllWebsites).success.value
 
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllWebsites)))
       }
 
       "when Previously Registered has not been answered" in {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(PreviouslyRegisteredPage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviouslyRegisteredPage)))
       }
@@ -296,26 +369,35 @@ class RegistrationServiceSpec extends SpecBase {
       "when Previously Registered is true" - {
 
         "but there are no previous registrations" in {
+
+          when(mockFeatures.schemeHasStarted) thenReturn true
+
           val userAnswers =
             answers
               .set(PreviouslyRegisteredPage, true).success.value
               .remove(AllPreviousRegistrationsRawQuery).success.value
 
-          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+          val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(AllPreviousRegistrationsRawQuery)))
         }
 
         "but there is a previous registration without a country" in {
+
+          when(mockFeatures.schemeHasStarted) thenReturn true
+
           val userAnswers = answers.remove(PreviousEuCountryPage(Index(0))).success.value
-          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+          val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousEuCountryPage(Index(0)))))
         }
 
         "but there is a previous registration without a VAT number" in {
+
+          when(mockFeatures.schemeHasStarted) thenReturn true
+
           val userAnswers = answers.remove(PreviousEuVatNumberPage(Index(0))).success.value
-          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+          val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousEuVatNumberPage(Index(0)))))
         }
@@ -323,8 +405,10 @@ class RegistrationServiceSpec extends SpecBase {
 
       "when Tax Registered in EU is missing" - {
 
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
         val userAnswers = answers.remove(TaxRegisteredInEuPage).success.value
-        val result = registrationService.fromUserAnswers(userAnswers, vrn)
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(TaxRegisteredInEuPage)))
       }
@@ -333,19 +417,24 @@ class RegistrationServiceSpec extends SpecBase {
 
         "and there are no EU country details" in {
 
+          when(mockFeatures.schemeHasStarted) thenReturn true
+
           val userAnswers =
             answers
               .set(TaxRegisteredInEuPage, true).success.value
               .remove(AllEuDetailsRawQuery).success.value
 
-          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+          val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(AllEuDetailsRawQuery)))
         }
 
         "and there is a record with no country" in {
+
+          when(mockFeatures.schemeHasStarted) thenReturn true
+
           val userAnswers = answers.remove(EuCountryPage(Index(0))).success.value
-          val result = registrationService.fromUserAnswers(userAnswers, vrn)
+          val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(EuCountryPage(Index(0)))))
         }
@@ -353,8 +442,11 @@ class RegistrationServiceSpec extends SpecBase {
         "and there is a record with a country" - {
 
           "where Vat Registered is missing" in {
+
+            when(mockFeatures.schemeHasStarted) thenReturn true
+
             val userAnswers = answers.remove(VatRegisteredPage(Index(2))).success.value
-            val result = registrationService.fromUserAnswers(userAnswers, vrn)
+            val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
             result mustEqual Invalid(NonEmptyChain(DataMissingError(VatRegisteredPage(Index(2)))))
           }
@@ -362,8 +454,11 @@ class RegistrationServiceSpec extends SpecBase {
           "without a VAT registration" - {
 
             "which does not have an answer for Has Fixed Establishment" in {
+
+              when(mockFeatures.schemeHasStarted) thenReturn true
+
               val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(2))).success.value
-              val result = registrationService.fromUserAnswers(userAnswers, vrn)
+              val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
               result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentPage(Index(2)))))
             }
@@ -371,22 +466,31 @@ class RegistrationServiceSpec extends SpecBase {
             "and Has Fixed Establishment is true" - {
 
               "and it does not have an EU Tax identifier" in {
+
+                when(mockFeatures.schemeHasStarted) thenReturn true
+
                 val userAnswers = answers.remove(EuTaxReferencePage(Index(2))).success.value
-                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                 result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(2)))))
               }
 
               "and it does not have a fixed establishment trading name" in {
+
+                when(mockFeatures.schemeHasStarted) thenReturn true
+
                 val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(2))).success.value
-                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                 result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(2)))))
               }
 
               "and it does not have a fixed establishment address" in {
+
+                when(mockFeatures.schemeHasStarted) thenReturn true
+
                 val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(2))).success.value
-                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                 result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(2)))))
               }
@@ -396,8 +500,11 @@ class RegistrationServiceSpec extends SpecBase {
           "with a VAT registration" - {
 
             "with the VAT number missing" in {
+
+              when(mockFeatures.schemeHasStarted) thenReturn true
+
               val userAnswers = answers.remove(EuVatNumberPage(Index(0))).success.value
-              val result = registrationService.fromUserAnswers(userAnswers, vrn)
+              val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
               result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(0)))))
             }
@@ -405,8 +512,11 @@ class RegistrationServiceSpec extends SpecBase {
             "with a VAT number" - {
 
               "which does not have an answer for Has Fixed Establishment" in {
+
+                when(mockFeatures.schemeHasStarted) thenReturn true
+
                 val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(0))).success.value
-                val result = registrationService.fromUserAnswers(userAnswers, vrn)
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                 result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentPage(Index(0)))))
               }
@@ -414,15 +524,21 @@ class RegistrationServiceSpec extends SpecBase {
               "and Has Fixed Establishment is true" - {
 
                 "and it does not have a fixed establishment trading name" in {
+
+                  when(mockFeatures.schemeHasStarted) thenReturn true
+
                   val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(1))).success.value
-                  val result = registrationService.fromUserAnswers(userAnswers, vrn)
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                   result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(1)))))
                 }
 
                 "and it does not have a fixed establishment address" in {
+
+                  when(mockFeatures.schemeHasStarted) thenReturn true
+
                   val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(1))).success.value
-                  val result = registrationService.fromUserAnswers(userAnswers, vrn)
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                   result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(1)))))
                 }

@@ -532,15 +532,15 @@ registeredForOssInEu.title = Is your business already registered for the One Sto
 registeredForOssInEu.heading = Is your business already registered for the One Stop Shop in an EU country?
 registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop in an EU country
 
-dateOfFirstSale.title = What was the date of your first sale to be included in this scheme?
-dateOfFirstSale.heading = What was the date of your first sale to be included in this scheme?
-dateOfFirstSale.hint = For example, 12 11 2007
+dateOfFirstSale.title = Date of your first sale since {0}
+dateOfFirstSale.heading = Date of your first sale since {0}
+dateOfFirstSale.hint = For example, {0}
 dateOfFirstSale.checkYourAnswersLabel = First sale
-dateOfFirstSale.error.required.all = Enter the date of your first sale to be included in this scheme
+dateOfFirstSale.error.required.all = Enter the date of your first sale
 dateOfFirstSale.error.required.two = The date must include a {0} and a {1}
 dateOfFirstSale.error.required = The date must include a {0}
 dateOfFirstSale.error.invalid = Enter a real date
-dateOfFirstSale.change.hidden = the date of your first sale to be included in this scheme
+dateOfFirstSale.change.hidden = the date of your first sale since {0}
 
 hasMadeSales.title = Have you already made sales to include in this scheme?
 hasMadeSales.heading = Have you already made sales to include in this scheme?

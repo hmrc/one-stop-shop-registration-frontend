@@ -23,8 +23,8 @@ case object RegisteredForOssInEuPage extends Page {
 
   def navigate(answer: Boolean): Call =
     if (answer) {
-      routes.SellsGoodsFromNiController.onPageLoad()
-    } else {
       routes.CannotRegisterAlreadyRegisteredController.onPageLoad()
+    } else {
+      routes.SellsGoodsFromNiController.onPageLoad()
     }
 }

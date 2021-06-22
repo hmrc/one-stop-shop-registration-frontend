@@ -20,5 +20,6 @@ import java.time.format.DateTimeFormatter
 
 object Format {
 
-  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  val dateFormatter: DateTimeFormatter     = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  val dateHintFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MM yyyy")
 }
