@@ -32,8 +32,5 @@ case class PreviousEuCountryPage(index: Index) extends QuestionPage[Country] {
     prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    answers.get(PreviousEuVatNumberPage(index)) match {
-      case Some(_) => prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode)
-      case None    => prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index)
-    }
+    prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index)
 }
