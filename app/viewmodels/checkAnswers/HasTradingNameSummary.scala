@@ -29,17 +29,16 @@ object HasTradingNameSummary  {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     for {
       hasTradingName        <- answers.get(HasTradingNamePage)
-      registeredCompanyName <- answers.get(RegisteredCompanyNamePage)
     } yield {
 
       val value = if (hasTradingName) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key     = messages("hasTradingName.checkYourAnswersLabel", registeredCompanyName),
+        key     = messages("hasTradingName.checkYourAnswersLabel"),
         value   = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("hasTradingName.change.hidden", registeredCompanyName))
+            .withVisuallyHiddenText(messages("hasTradingName.change.hidden"))
         )
       )
     }
