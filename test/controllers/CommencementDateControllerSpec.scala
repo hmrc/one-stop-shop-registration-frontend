@@ -26,7 +26,7 @@ import pages.DateOfFirstSalePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.StartDateService
+import services.DateService
 import views.html.CommencementDateView
 
 class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
@@ -36,13 +36,13 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
 
       val answers = emptyUserAnswers.set(DateOfFirstSalePage, arbitraryDate).success.value
-      val startDateService = mock[StartDateService]
+      val dateService = mock[DateService]
 
-      when(startDateService.startDateBasedOnFirstSale(any())) thenReturn arbitraryDate
+      when(dateService.startDateBasedOnFirstSale(any())) thenReturn arbitraryDate
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
-          .overrides(bind[StartDateService].toInstance(startDateService))
+          .overrides(bind[DateService].toInstance(dateService))
           .build()
 
       running(application) {

@@ -81,8 +81,8 @@ class RegistrationServiceSpec extends SpecBase {
   private val today: Instant   = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
   private val stubClock: Clock = Clock.fixed(today, ZoneId.systemDefault)
 
-  private val startDateService = new StartDateService(stubClock)
-  private val registrationService = new RegistrationService(startDateService)
+  private val dateService = new DateService(stubClock)
+  private val registrationService = new RegistrationService(dateService)
 
   "fromUserAnswers" - {
 

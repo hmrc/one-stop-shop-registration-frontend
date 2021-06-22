@@ -16,23 +16,40 @@
 
 package forms
 
-import java.time.{LocalDate, ZoneOffset}
-
+import base.SpecBase
+import formats.Format.dateFormatter
 import forms.behaviours.DateBehaviours
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.FormError
+import services.DateService
 
-class DateOfFirstSaleFormProviderSpec extends DateBehaviours {
+import java.time.{Clock, LocalDate, ZoneId}
 
-  val form = new DateOfFirstSaleFormProvider()()
+class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with MockitoSugar {
+
+  private val dateService = new DateService(stubClockAtArbitraryDate)
+
+  val form = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)()
 
   ".value" - {
 
     val validData = datesBetween(
-      min = LocalDate.of(2000, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
+      min = dateService.earliestSaleAllowed,
+      max = dateService.earliestSaleAllowed.plusDays(10)
     )
 
     behave like dateField(form, "value", validData)
 
     behave like mandatoryDateField(form, "value", "dateOfFirstSale.error.required.all")
+
+    behave like dateFieldWithMax(
+      form,
+      "value",
+      LocalDate.now(stubClockAtArbitraryDate),
+      FormError(
+        "value",
+        "dateOfFirstSale.error.max",
+        Seq(LocalDate.now(stubClockAtArbitraryDate).format(dateFormatter)))
+    )
   }
 }

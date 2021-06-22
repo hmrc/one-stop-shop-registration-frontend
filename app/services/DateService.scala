@@ -16,10 +16,14 @@
 
 package services
 
+import config.Constants
+import config.Constants.schemeStartDate
+
 import java.time.{Clock, LocalDate}
+import java.time.Month._
 import javax.inject.Inject
 
-class StartDateService @Inject()(clock: Clock) {
+class DateService @Inject()(clock: Clock) {
 
   def startOfNextPeriod: LocalDate = {
     val today                   = LocalDate.now(clock)
@@ -36,6 +40,19 @@ class StartDateService @Inject()(clock: Clock) {
       startOfNextPeriod
     } else {
       dateOfFirstSale
+    }
+  }
+
+  def earliestSaleAllowed: LocalDate = {
+    val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
+    val today = LocalDate.now(clock)
+
+    if (today.isBefore(schemeStartDate.plusMonths(1))) {
+      schemeStartDate
+    } else if (quarterStartMonths.contains(today.getMonth) && today.getDayOfMonth < 11) {
+      today.minusMonths(1).withDayOfMonth(1)
+    } else {
+      startOfNextPeriod.minusMonths(3)
     }
   }
 }

@@ -29,7 +29,7 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 import javax.inject.Inject
 
-class RegistrationService @Inject()(startDateService: StartDateService) {
+class RegistrationService @Inject()(dateService: DateService) {
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
     (
@@ -52,7 +52,7 @@ class RegistrationService @Inject()(startDateService: StartDateService) {
           euRegistrations       = euRegistrations,
           contactDetails        = contactDetails,
           websites              = websites,
-          commencementDate      = startDateService.startDateBasedOnFirstSale(dateOfFirstSale),
+          commencementDate      = dateService.startDateBasedOnFirstSale(dateOfFirstSale),
           previousRegistrations = previousRegistrations,
           bankDetails           = bankDetails
         )

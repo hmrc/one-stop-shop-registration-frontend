@@ -16,13 +16,13 @@
 
 package controllers
 
-import java.time.{LocalDate, ZoneOffset}
-
+import java.time.{Clock, Instant, LocalDate, ZoneId, ZoneOffset}
 import base.SpecBase
 import forms.DateOfFirstSaleFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DateOfFirstSalePage
 import play.api.inject.bind
@@ -30,16 +30,18 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import services.DateService
 import views.html.DateOfFirstSaleView
 
 import scala.concurrent.Future
 
-class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
+class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  private val formProvider = new DateOfFirstSaleFormProvider()
+  private val date: LocalDate  = LocalDate.now(stubClockAtArbitraryDate)
+  private val dateService      = new DateService(stubClockAtArbitraryDate)
+
+  private val formProvider = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)
   private val form = formProvider()
-
-  private val validAnswer = LocalDate.now(ZoneOffset.UTC)
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
 
@@ -49,9 +51,9 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
   private def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, dateOfFirstSaleRoute)
       .withFormUrlEncodedBody(
-        "value.day"   -> validAnswer.getDayOfMonth.toString,
-        "value.month" -> validAnswer.getMonthValue.toString,
-        "value.year"  -> validAnswer.getYear.toString
+        "value.day"   -> date.getDayOfMonth.toString,
+        "value.month" -> date.getMonthValue.toString,
+        "value.year"  -> date.getYear.toString
       )
 
   "DateOfFirstSale Controller" - {
@@ -72,7 +74,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(DateOfFirstSalePage, validAnswer).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(DateOfFirstSalePage, date).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -82,7 +84,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, getRequest).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(date), NormalMode)(getRequest, messages(application)).toString
       }
     }
 
@@ -94,13 +96,18 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[DateService].toInstance(dateService)
+          )
           .build()
 
       running(application) {
         val result = route(application, postRequest).value
-        val expectedAnswers = emptyUserAnswers.set(DateOfFirstSalePage, validAnswer).success.value
+        val expectedAnswers = emptyUserAnswers.set(DateOfFirstSalePage, date).success.value
 
+        println(date)
+        println(dateService.earliestSaleAllowed)
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual DateOfFirstSalePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))

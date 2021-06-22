@@ -16,21 +16,33 @@
 
 package forms
 
-import java.time.LocalDate
+import formats.Format.dateFormatter
 
+import java.time.{Clock, LocalDate}
 import forms.mappings.Mappings
+
 import javax.inject.Inject
 import play.api.data.Form
+import services.DateService
 
-class DateOfFirstSaleFormProvider @Inject() extends Mappings {
+class DateOfFirstSaleFormProvider @Inject()(
+                                             dateService: DateService,
+                                             clock: Clock
+                                           ) extends Mappings {
 
-  def apply(): Form[LocalDate] =
+  def apply(): Form[LocalDate] = {
+
+    val minimumDate = dateService.earliestSaleAllowed
+    val today       = LocalDate.now(clock)
+
     Form(
       "value" -> localDate(
-        invalidKey     = "dateOfFirstSale.error.invalid",
+        invalidKey = "dateOfFirstSale.error.invalid",
         allRequiredKey = "dateOfFirstSale.error.required.all",
         twoRequiredKey = "dateOfFirstSale.error.required.two",
-        requiredKey    = "dateOfFirstSale.error.required"
-      )
+        requiredKey = "dateOfFirstSale.error.required"
+      ).verifying(minDate(minimumDate, "dateOfFirstSale.error.min", minimumDate.format(dateFormatter)))
+        .verifying(maxDate(today, "dateOfFirstSale.error.max", today.format(dateFormatter)))
     )
+  }
 }
