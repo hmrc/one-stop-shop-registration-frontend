@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package pages
-import controllers.routes
-import models.UserAnswers
-import play.api.mvc.Call
+package queries
 
-case object CheckYourAnswersPage extends Page {
+import play.api.libs.json.JsPath
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.ApplicationCompleteController.onPageLoad()
+case object EmailConfirmationQuery extends Gettable[Boolean] with Settable[Boolean] {
+
+  override def path: JsPath = JsPath \ "emailConfirmation"
 }
