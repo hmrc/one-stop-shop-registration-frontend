@@ -45,7 +45,7 @@ object PreviousRegistrationSummary {
 
         val value = previousRegistrations.map {
           details =>
-            HtmlFormat.escape(details.previousEuCountry.name)
+            HtmlFormat.escape(details.previousEuCountry.name) + " - " + HtmlFormat.escape(details.previousEuVatNumber)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(

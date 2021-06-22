@@ -44,9 +44,10 @@ class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Check mode" - {
 
-      "to Add Previous Registration" in {
+      "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        PreviousEuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers)
+        val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
+        PreviousEuVatNumberPage(index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
       }
     }

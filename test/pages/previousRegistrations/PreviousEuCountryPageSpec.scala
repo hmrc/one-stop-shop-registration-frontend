@@ -54,7 +54,7 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
         PreviousEuCountryPage(index).navigate(CheckMode, answers)
-          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
+          .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index))
       }
     }
   }
