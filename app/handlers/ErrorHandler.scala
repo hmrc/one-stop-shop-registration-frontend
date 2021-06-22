@@ -16,8 +16,6 @@
 
 package handlers
 
-import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, UNAUTHORIZED}
-
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Request

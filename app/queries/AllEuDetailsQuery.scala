@@ -17,7 +17,7 @@
 package queries
 
 import models.euDetails.EuDetails
-import play.api.libs.json.{JsObject, JsPath}
+import play.api.libs.json.JsPath
 
 case object AllEuDetailsQuery extends Gettable[List[EuDetails]] with Settable[List[EuDetails]] {
 

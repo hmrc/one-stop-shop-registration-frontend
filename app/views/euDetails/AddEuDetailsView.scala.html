@@ -39,7 +39,7 @@
 
             <h1 class="govuk-heading-xl">@messages("addEuDetails.heading" + messageSuffix, list.size)</h1>
 
-            @addToList(list, Long)
+            @addToList(list, Long, "addEuDetails.change.hidden", "addEuDetails.remove.hidden")
 
             @if(canAddCountries) {
                 @govukRadios(

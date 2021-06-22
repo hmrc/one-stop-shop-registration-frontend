@@ -39,7 +39,7 @@
 
             <h1 class="govuk-heading-xl">@messages("addTradingName.heading" + messageSuffix, list.size)</h1>
 
-            @addToList(list, itemSize = Long)
+            @addToList(list, itemSize = Long, "addTradingName.change.hidden", "addTradingName.remove.hidden")
 
             @if(canAddTradingNames) {
                 @govukRadios(

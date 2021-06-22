@@ -18,7 +18,6 @@ package services
 
 import config.FrontendAppConfig
 import models.audit.JsonAuditModel
-import play.api.libs.json.Json
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions

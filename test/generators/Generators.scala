@@ -208,7 +208,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
     Gen.const(','),
     Gen.const('/'),
     Gen.const('’'),
-    Gen.const('''),
+    Gen.const('\''),
     Gen.const('"'),
     Gen.const('_'),
     Gen.const('&'),
