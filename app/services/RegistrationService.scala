@@ -27,8 +27,9 @@ import queries._
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
+import javax.inject.Inject
 
-class RegistrationService {
+class RegistrationService @Inject()(startDateService: StartDateService) {
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
     (
@@ -36,13 +37,13 @@ class RegistrationService {
       getTradingNames(answers),
       getVatDetails(answers),
       getEuTaxRegistrations(answers),
-      getCommencementDate(answers),
+      getDateOfFirstSale(answers),
       getContactDetails(answers),
       getWebsites(answers),
       getPreviousRegistrations(answers),
       getBankDetails(answers)
     ).mapN(
-      (name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
+      (name, tradingNames, vatDetails, euRegistrations, dateOfFirstSale, contactDetails, websites, previousRegistrations, bankDetails) =>
         Registration(
           vrn                   = vrn,
           registeredCompanyName = name,
@@ -51,7 +52,7 @@ class RegistrationService {
           euRegistrations       = euRegistrations,
           contactDetails        = contactDetails,
           websites              = websites,
-          commencementDate      = startDate,
+          commencementDate      = startDateService.startDateBasedOnFirstSale(dateOfFirstSale),
           previousRegistrations = previousRegistrations,
           bankDetails           = bankDetails
         )
@@ -141,10 +142,10 @@ class RegistrationService {
       getVatDetailSource(answers)
     ).mapN(VatDetails.apply)
 
-  private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
-    answers.get(CommencementDatePage) match {
+  private def getDateOfFirstSale(answers: UserAnswers): ValidationResult[LocalDate] =
+    answers.get(DateOfFirstSalePage) match {
       case Some(startDate) => startDate.validNec
-      case None            => DataMissingError(CommencementDatePage).invalidNec
+      case None            => DataMissingError(DateOfFirstSalePage).invalidNec
     }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =

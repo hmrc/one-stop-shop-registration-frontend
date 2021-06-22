@@ -16,6 +16,8 @@
 
 package services
 
+import config.Constants
+
 import java.time.LocalDate
 import play.api.Configuration
 import uk.gov.hmrc.domain.Vrn
@@ -25,9 +27,7 @@ import javax.inject.Inject
 
 class FeatureFlagService @Inject()(configuration: Configuration, clock: Clock) {
 
-  val schemeStartDate = LocalDate.of(2021, 7, 1)
-
-  def schemeHasStarted: Boolean = LocalDate.now(clock) isBefore schemeStartDate
+  def schemeHasStarted: Boolean = LocalDate.now(clock) isBefore Constants.schemeStartDate
 
   val proceedWhenVatApiCallFails: Boolean = configuration.get[Boolean]("features.proceed-when-vat-api-call-fails")
 

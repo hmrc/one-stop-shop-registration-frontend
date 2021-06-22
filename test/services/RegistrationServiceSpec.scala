@@ -28,7 +28,7 @@ import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPa
 import queries.{AllEuDetailsRawQuery, AllPreviousRegistrationsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
-import java.time.LocalDate
+import java.time.{Clock, Instant, LocalDate, ZoneId}
 
 class RegistrationServiceSpec extends SpecBase {
 
@@ -37,6 +37,7 @@ class RegistrationServiceSpec extends SpecBase {
 
   private val answers =
     UserAnswers("id")
+      .set(DateOfFirstSalePage, LocalDate.now).success.value
       .set(RegisteredCompanyNamePage, "foo").success.value
       .set(HasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
@@ -63,7 +64,6 @@ class RegistrationServiceSpec extends SpecBase {
       .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
-      .set(CommencementDatePage, LocalDate.now()).success.value
       .set(
         UkAddressPage,
         UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
@@ -78,7 +78,11 @@ class RegistrationServiceSpec extends SpecBase {
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
 
-  private val registrationService = new RegistrationService()
+  private val today: Instant   = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
+  private val stubClock: Clock = Clock.fixed(today, ZoneId.systemDefault)
+
+  private val startDateService = new StartDateService(stubClock)
+  private val registrationService = new RegistrationService(startDateService)
 
   "fromUserAnswers" - {
 
@@ -237,12 +241,12 @@ class RegistrationServiceSpec extends SpecBase {
         result mustEqual Invalid(NonEmptyChain(DataMissingError(PartOfVatGroupPage)))
       }
 
-      "when Commencement Date is missing" in {
+      "when Date of First Sale is missing" in {
 
-        val userAnswers = answers.remove(CommencementDatePage).success.value
+        val userAnswers = answers.remove(DateOfFirstSalePage).success.value
         val result = registrationService.fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(CommencementDatePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(DateOfFirstSalePage)))
       }
 
       "when Contact Details are missing" in {

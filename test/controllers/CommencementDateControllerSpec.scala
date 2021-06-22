@@ -19,19 +19,31 @@ package controllers
 import base.SpecBase
 import formats.Format.dateFormatter
 import models.NormalMode
-import pages.CommencementDatePage
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.when
+import org.scalatestplus.mockito.MockitoSugar
+import pages.DateOfFirstSalePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.StartDateService
 import views.html.CommencementDateView
 
-class CommencementDateControllerSpec extends SpecBase {
+class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
 
   "CommencementDate Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val answers = emptyUserAnswers.set(CommencementDatePage, arbitraryDate).success.value
-      val application = applicationBuilder(userAnswers = Some(answers)).build()
+      val answers = emptyUserAnswers.set(DateOfFirstSalePage, arbitraryDate).success.value
+      val startDateService = mock[StartDateService]
+
+      when(startDateService.startDateBasedOnFirstSale(any())) thenReturn arbitraryDate
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[StartDateService].toInstance(startDateService))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)

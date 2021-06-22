@@ -24,11 +24,7 @@ import queries.{Gettable, Settable}
 
 import java.time.LocalDate
 
-case object CommencementDatePage extends Page with Gettable[LocalDate] with Settable[LocalDate] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "commencementDate"
+case object CommencementDatePage extends Page {
 
   override def navigateInNormalMode(answers: UserAnswers): Call =
     routes.HasTradingNameController.onPageLoad(NormalMode)

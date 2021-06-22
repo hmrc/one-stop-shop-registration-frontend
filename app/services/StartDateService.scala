@@ -21,8 +21,6 @@ import javax.inject.Inject
 
 class StartDateService @Inject()(clock: Clock) {
 
-  private val startOfScheme: LocalDate = LocalDate.of(2021, 7, 1)
-
   def startOfNextPeriod: LocalDate = {
     val today                   = LocalDate.now(clock)
     val lastMonthOfPeriod       = (((today.getMonthValue - 1) / 3) + 1) * 3
@@ -40,7 +38,4 @@ class StartDateService @Inject()(clock: Clock) {
       dateOfFirstSale
     }
   }
-
-  def startDateBasedOnIntentionToSellGoods(): LocalDate =
-    if(LocalDate.now(clock).isBefore(startOfScheme)) startOfScheme else LocalDate.now(clock)
 }

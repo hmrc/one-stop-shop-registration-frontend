@@ -19,27 +19,31 @@ package controllers
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.Mode
-import pages.CommencementDatePage
+import pages.{CommencementDatePage, DateOfFirstSalePage}
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
 class CommencementDateController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: CommencementDateView
+                                       view: CommencementDateView,
+                                       startDateService: StartDateService
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      request.userAnswers.get(CommencementDatePage).map {
+      request.userAnswers.get(DateOfFirstSalePage).map {
         date =>
-          Ok(view(mode, date.format(dateFormatter)))
+
+          val startDate = startDateService.startDateBasedOnFirstSale(date)
+          Ok(view(mode, startDate.format(dateFormatter)))
       }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
 

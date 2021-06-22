@@ -148,29 +148,4 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
       }
     }
   }
-
-  ".startDateBasedOnIntentionToSellGoods" - {
-
-    "must be 1 July 2021 if today is before that date" in {
-
-      forAll(datesBetween(LocalDate.of(2020, 1, 1), LocalDate.of(2021, 6, 30))) {
-        date =>
-          val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
-
-          service.startDateBasedOnIntentionToSellGoods() mustEqual LocalDate.of(2021, 7, 1)
-      }
-    }
-
-    "must be `today` on 1 July 2021 and all future dates" in {
-
-      forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2030, 12, 31))) {
-        date =>
-          val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
-
-          service.startDateBasedOnIntentionToSellGoods() mustEqual date
-      }
-    }
-  }
 }
