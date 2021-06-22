@@ -21,17 +21,16 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, SubmissionResult}
-import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT}
+import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.DataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BankDetails, Bic, BusinessContactDetails, DataMissingError, Iban, NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
+import models.{BusinessContactDetails, DataMissingError, NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BankDetailsPage, BusinessContactDetailsPage, CheckYourAnswersPage, HasTradingNamePage}
+import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasTradingNamePage}
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest
