@@ -27,7 +27,7 @@ import models.responses.ConflictFound
 import pages.CheckYourAnswersPage.navigateWithEmailConfirmation
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{AuditService, EmailService, RegistrationService}
+import services.{AuditService, EmailService, RegistrationService, StartDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -45,7 +45,8 @@ class CheckYourAnswersController @Inject()(
   registrationService: RegistrationService,
   auditService: AuditService,
   view: CheckYourAnswersView,
-  emailService: EmailService
+  emailService: EmailService,
+  startDateService: StartDateService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -62,10 +63,13 @@ class CheckYourAnswersController @Inject()(
           InternationalAddressSummary.row(request.userAnswers),
           HasTradingNameSummary.row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
+          DateOfFirstSaleSummary.row(request.userAnswers),
+          new CommencementDateSummary(startDateService).row(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+          IsOnlineMarketplaceSummary.row(request.userAnswers),
           HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers),
