@@ -22,6 +22,7 @@ import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
+import queries.EmailConfirmationQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationCompleteView
 
@@ -36,14 +37,16 @@ class ApplicationCompleteController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(showEmailConfirmation: Boolean): Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
+  def onPageLoad(): Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
     implicit request =>
       val businessContactDetailsPage = request.userAnswers.get(BusinessContactDetailsPage)
-        Ok(view(
-          HtmlFormat.escape(businessContactDetailsPage.get.emailAddress).toString,
-          request.vrn,
-          frontendAppConfig.feedbackUrl,
-          showEmailConfirmation
-        ))
+      val showEmailConfirmation = request.userAnswers.get(EmailConfirmationQuery)
+
+      Ok(view(
+        HtmlFormat.escape(businessContactDetailsPage.get.emailAddress).toString,
+        request.vrn,
+        frontendAppConfig.feedbackUrl,
+        showEmailConfirmation.getOrElse(false)
+      ))
   }
 }

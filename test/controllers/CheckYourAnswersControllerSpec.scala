@@ -21,7 +21,7 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, SubmissionResult}
-import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT}
+import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.DataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, DataMissingError, NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
@@ -32,8 +32,11 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasTradingNamePage}
 import play.api.inject.bind
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
+import queries.EmailConfirmationQuery
+import repositories.SessionRepository
 import services.{AuditService, EmailService, RegistrationService}
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
@@ -81,7 +84,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
         "must audit the event and redirect to the next page and successfully send email confirmation" in {
+          val mockSessionRepository = mock[SessionRepository]
 
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right(()))
           doNothing().when(auditService).audit(any())(any(), any())
@@ -100,59 +105,24 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[EmailService].toInstance(emailService),
-              bind[AuditService].toInstance(auditService)
+              bind[AuditService].toInstance(auditService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = DataRequest(request, testCredentials, vrn, userAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
+            val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigateWithEmailConfirmation(true).url
+            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
               .sendConfirmationEmail(any(), any(), any(), any())(any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-          }
-        }
-
-        "must audit the event and redirect to the next page and not send email confirmation" in {
-
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
-          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right(()))
-          doNothing().when(auditService).audit(any())(any(), any())
-          when(emailService.sendConfirmationEmail(
-            eqTo(registration.contactDetails.fullName),
-            eqTo(registration.registeredCompanyName),
-            eqTo(vrn.toString()),
-            eqTo(registration.contactDetails.emailAddress)
-          )(any())) thenReturn Future.successful(EMAIL_NOT_SENT)
-
-          val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-          val userAnswers = emptyUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
-
-          val application = applicationBuilder(userAnswers = Some(userAnswers))
-            .overrides(
-              bind[RegistrationService].toInstance(registrationService),
-              bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[EmailService].toInstance(emailService),
-              bind[AuditService].toInstance(auditService)
-            ).build()
-
-          running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-            val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigateWithEmailConfirmation(false).url
-
-            verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any())(any())
-            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+            verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
         }
       }

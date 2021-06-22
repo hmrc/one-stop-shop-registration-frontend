@@ -26,9 +26,9 @@ import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
-import pages.CheckYourAnswersPage.navigateWithEmailConfirmation
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.EmailConfirmationQuery
 import services.{AuditService, EmailService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
@@ -37,7 +37,7 @@ import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummar
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
 
 class CheckYourAnswersController @Inject()(
@@ -98,8 +98,12 @@ class CheckYourAnswersController @Inject()(
                 request.vrn.toString(),
                 registration.contactDetails.emailAddress
               ) flatMap {
-                case EMAIL_ACCEPTED => successful(Redirect(navigateWithEmailConfirmation(true)))
-                case _ => successful(Redirect(navigateWithEmailConfirmation(false)))
+                  emailConfirmationResult =>
+                    val emailSent = EMAIL_ACCEPTED == emailConfirmationResult
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
+                      _              <- cc.sessionRepository.set(updatedAnswers)
+                    } yield Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
               }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))

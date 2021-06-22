@@ -23,6 +23,7 @@ import pages.BusinessContactDetailsPage
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.EmailConfirmationQuery
 import views.html.ApplicationCompleteView
 
 class ApplicationCompleteControllerSpec extends SpecBase {
@@ -43,10 +44,11 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET with email confirmation" in {
       val emailAddress = "test@test.com"
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val userAnswersWithEmail = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad(true).url)
+        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
         val view = application.injector.instanceOf[ApplicationCompleteView]
@@ -58,10 +60,11 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET without email confirmation" in {
       val emailAddress = "test@test.com"
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val userAnswersWithoutEmail = userAnswers.copy().set(EmailConfirmationQuery, false).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad(false).url)
+        val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
 

@@ -86,7 +86,7 @@ POST        /check-business-contact-details                 controllers.Business
 
 GET         /do-not-move-goods                              controllers.NotInControlOfMovingGoodsController.onPageLoad()
 
-GET        /successful                                      controllers.ApplicationCompleteController.onPageLoad(showEmailConfirmation: Boolean)
+GET        /successful                                      controllers.ApplicationCompleteController.onPageLoad()
 
 GET        /remove-uk-trading-name/:index                        controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST       /remove-uk-trading-name/:index                        controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
