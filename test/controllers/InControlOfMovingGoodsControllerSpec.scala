@@ -60,8 +60,10 @@ class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        val page = application.injector.instanceOf[InControlOfMovingGoodsPage]
+
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual InControlOfMovingGoodsPage.navigate(true).url
+        redirectLocation(result).value mustEqual page.navigate(true).url
       }
     }
 

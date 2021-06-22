@@ -30,7 +30,8 @@ class InControlOfMovingGoodsController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: InControlOfMovingGoodsFormProvider,
-                                         view: InControlOfMovingGoodsView
+                                         view: InControlOfMovingGoodsView,
+                                         page: InControlOfMovingGoodsPage
                                  ) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -50,7 +51,7 @@ class InControlOfMovingGoodsController @Inject()(
           BadRequest(view(formWithErrors)),
 
         value =>
-          Redirect(InControlOfMovingGoodsPage.navigate(value))
+          Redirect(page.navigate(value))
       )
   }
 }

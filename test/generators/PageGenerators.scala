@@ -51,9 +51,6 @@ trait PageGenerators {
   implicit lazy val arbitrarySellsGoodsFromNiPage: Arbitrary[SellsGoodsFromNiPage.type] =
     Arbitrary(SellsGoodsFromNiPage)
 
-  implicit lazy val arbitraryInControlOfMovingGoodsPage: Arbitrary[InControlOfMovingGoodsPage.type] =
-    Arbitrary(InControlOfMovingGoodsPage)
-
   implicit lazy val arbitraryHasWebsitePage: Arbitrary[HasWebsitePage.type] =
     Arbitrary(HasWebsitePage)
 

@@ -18,12 +18,19 @@ package pages
 
 import controllers.routes
 import play.api.mvc.Call
+import services.FeatureFlagService
 
-case object InControlOfMovingGoodsPage extends Page {
+import javax.inject.Inject
+
+class InControlOfMovingGoodsPage @Inject()(features: FeatureFlagService) extends Page {
 
   def navigate(answer: Boolean): Call =
     if (answer) {
-      routes.HasMadeSalesController.onPageLoad()
+      if (features.schemeHasStarted) {
+        routes.HasMadeSalesController.onPageLoad()
+      } else {
+        controllers.auth.routes.AuthController.onSignIn()
+      }
     } else {
       routes.NotInControlOfMovingGoodsController.onPageLoad()
     }
