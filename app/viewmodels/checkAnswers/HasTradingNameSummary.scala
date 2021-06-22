@@ -30,20 +30,17 @@ import javax.inject.Inject
 class HasTradingNameSummary @Inject()(features: FeatureFlagService) {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    for {
-      hasTradingName        <- answers.get(new HasTradingNamePage(features))
-      registeredCompanyName <- answers.get(RegisteredCompanyNamePage)
-    } yield {
+    answers.get(new HasTradingNamePage(features)).map {
+      hasTradingName =>
+        val value = if (hasTradingName) "site.yes" else "site.no"
 
-      val value = if (hasTradingName) "site.yes" else "site.no"
-
-      SummaryListRowViewModel(
-        key     = messages("hasTradingName.checkYourAnswersLabel", registeredCompanyName),
-        value   = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("hasTradingName.change.hidden", registeredCompanyName))
+        SummaryListRowViewModel(
+          key     = messages("hasTradingName.checkYourAnswersLabel"),
+          value   = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("hasTradingName.change.hidden"))
+          )
         )
-      )
     }
 }
