@@ -16,11 +16,20 @@
 
 package pages
 
+import controllers.routes
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object AllSalesViaMarketplacePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "allSalesViaMarketplace"
+
+  def navigate(answer: Boolean): Call =
+    if (answer) {
+      routes.NotLiableForVatController.onPageLoad()
+    } else {
+      routes.LiableForVatOnDirectSalesController.onPageLoad()
+    }
 }

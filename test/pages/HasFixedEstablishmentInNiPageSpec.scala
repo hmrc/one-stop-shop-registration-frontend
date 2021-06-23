@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
 import pages.behaviours.PageBehaviours
 
 class HasFixedEstablishmentInNiPageSpec extends SpecBase with PageBehaviours {
@@ -28,5 +29,18 @@ class HasFixedEstablishmentInNiPageSpec extends SpecBase with PageBehaviours {
     beSettable[Boolean](HasFixedEstablishmentInNiPage)
 
     beRemovable[Boolean](HasFixedEstablishmentInNiPage)
+
+    "must navigate" - {
+
+      "to Liable For VAT on All Sales when the answer is yes" in {
+
+        HasFixedEstablishmentInNiPage.navigate(true) mustEqual routes.LiableForVatOnAllSalesController.onPageLoad()
+      }
+
+      "to All Sales Via Marketplace when the answer is no" in {
+
+        HasFixedEstablishmentInNiPage.navigate(false) mustEqual routes.AllSalesViaMarketplaceController.onPageLoad()
+      }
+    }
   }
 }

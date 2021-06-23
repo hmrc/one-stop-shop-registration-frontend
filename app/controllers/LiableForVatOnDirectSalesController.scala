@@ -31,7 +31,7 @@ class LiableForVatOnDirectSalesController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
       Ok(view())
   }

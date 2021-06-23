@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
 import pages.behaviours.PageBehaviours
 
 class AllSalesViaMarketplacePageSpec extends SpecBase with PageBehaviours {
@@ -28,5 +29,18 @@ class AllSalesViaMarketplacePageSpec extends SpecBase with PageBehaviours {
     beSettable[Boolean](AllSalesViaMarketplacePage)
 
     beRemovable[Boolean](AllSalesViaMarketplacePage)
+
+    "must navigate" - {
+
+      "to Not Liable For VAT when the answer is yes" in {
+
+        AllSalesViaMarketplacePage.navigate(true) mustEqual routes.NotLiableForVatController.onPageLoad()
+      }
+
+      "to Liable for VAT on Direct Sales when the answer is no" in {
+
+        AllSalesViaMarketplacePage.navigate(false) mustEqual routes.LiableForVatOnDirectSalesController.onPageLoad()
+      }
+    }
   }
 }

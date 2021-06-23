@@ -18,25 +18,18 @@ package controllers
 
 import base.SpecBase
 import forms.HasFixedEstablishmentInNiFormProvider
-import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.HasFixedEstablishmentInNiPage
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import views.html.HasFixedEstablishmentInNiView
-
-import scala.concurrent.Future
 
 class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new HasFixedEstablishmentInNiFormProvider()
   private val form = formProvider()
 
-  private lazy val hasFixedEstablishmentInNiRoute = routes.HasFixedEstablishmentInNiController.onPageLoad(NormalMode).url
+  private lazy val hasFixedEstablishmentInNiRoute = routes.HasFixedEstablishmentInNiController.onPageLoad().url
 
   "HasFixedEstablishmentInNi Controller" - {
 
@@ -52,38 +45,13 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
         val view = application.injector.instanceOf[HasFixedEstablishmentInNiView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must redirect to the next page when valid data is submitted" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(HasFixedEstablishmentInNiPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, hasFixedEstablishmentInNiRoute)
-
-        val view = application.injector.instanceOf[HasFixedEstablishmentInNiView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must save the answer and redirect to the next page when valid data is submitted" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -91,11 +59,9 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(HasFixedEstablishmentInNiPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual HasFixedEstablishmentInNiPage.navigate(NormalMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        redirectLocation(result).value mustEqual HasFixedEstablishmentInNiPage.navigate(true).url
       }
     }
 
@@ -115,37 +81,7 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, hasFixedEstablishmentInNiRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, hasFixedEstablishmentInNiRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
   }

@@ -274,23 +274,17 @@ POST        /online-marketplace                                                 
 GET         /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
 
-GET        /allSalesViaMarketplace                        controllers.AllSalesViaMarketplaceController.onPageLoad(mode: Mode = NormalMode)
-POST       /allSalesViaMarketplace                        controllers.AllSalesViaMarketplaceController.onSubmit(mode: Mode = NormalMode)
-GET        /changeAllSalesViaMarketplace                  controllers.AllSalesViaMarketplaceController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeAllSalesViaMarketplace                  controllers.AllSalesViaMarketplaceController.onSubmit(mode: Mode = CheckMode)
+GET         /allSalesViaMarketplace                        controllers.AllSalesViaMarketplaceController.onPageLoad
+POST        /allSalesViaMarketplace                        controllers.AllSalesViaMarketplaceController.onSubmit
 
-GET        /businessBasedInNi                        controllers.BusinessBasedInNiController.onPageLoad(mode: Mode = NormalMode)
-POST       /businessBasedInNi                        controllers.BusinessBasedInNiController.onSubmit(mode: Mode = NormalMode)
-GET        /changeBusinessBasedInNi                  controllers.BusinessBasedInNiController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeBusinessBasedInNi                  controllers.BusinessBasedInNiController.onSubmit(mode: Mode = CheckMode)
+GET         /businessBasedInNi                        controllers.BusinessBasedInNiController.onPageLoad
+POST        /businessBasedInNi                        controllers.BusinessBasedInNiController.onSubmit
 
-GET        /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasFixedEstablishmentInNi                  controllers.HasFixedEstablishmentInNiController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasFixedEstablishmentInNi                  controllers.HasFixedEstablishmentInNiController.onSubmit(mode: Mode = CheckMode)
+GET         /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onPageLoad
+POST        /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onSubmit
 
-GET        /liableForVatOnAllSales                       controllers.LiableForVatOnAllSalesController.onPageLoad()
+GET         /liableForVatOnAllSales                       controllers.LiableForVatOnAllSalesController.onPageLoad()
 
-GET        /liableForVatOnDirectSales                       controllers.LiableForVatOnDirectSalesController.onPageLoad()
+GET         /liableForVatOnDirectSales                       controllers.LiableForVatOnDirectSalesController.onPageLoad()
 
-GET        /notLiableForVat                       controllers.NotLiableForVatController.onPageLoad()
+GET         /notLiableForVat                       controllers.NotLiableForVatController.onPageLoad()

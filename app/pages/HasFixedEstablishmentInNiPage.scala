@@ -16,11 +16,20 @@
 
 package pages
 
+import controllers.routes
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object HasFixedEstablishmentInNiPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "hasFixedEstablishmentInNi"
+
+  def navigate(answer: Boolean): Call =
+    if (answer) {
+      routes.LiableForVatOnAllSalesController.onPageLoad()
+    } else {
+      routes.AllSalesViaMarketplaceController.onPageLoad()
+    }
 }

@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
 import pages.behaviours.PageBehaviours
 
 class BusinessBasedInNiPageSpec extends SpecBase with PageBehaviours {
@@ -28,5 +29,18 @@ class BusinessBasedInNiPageSpec extends SpecBase with PageBehaviours {
     beSettable[Boolean](BusinessBasedInNiPage)
 
     beRemovable[Boolean](BusinessBasedInNiPage)
+
+    "must navigate" - {
+
+      "to Liable for VAT on All Sales when the answer is yes" in {
+
+        BusinessBasedInNiPage.navigate(true) mustEqual routes.LiableForVatOnAllSalesController.onPageLoad()
+      }
+
+      "to Has Fixed Establishment in NI when the answer is no" in {
+
+        BusinessBasedInNiPage.navigate(false) mustEqual routes.HasFixedEstablishmentInNiController.onPageLoad()
+      }
+    }
   }
 }
