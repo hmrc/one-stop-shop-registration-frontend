@@ -32,7 +32,7 @@ class EmailService@Inject()(emailConnector: EmailConnector)(implicit executionCo
     val emailToSendRequest = EmailToSendRequest(
       List(emailAddress),
       registrationConfirmationTemplateId,
-      RegistrationConfirmationEmailParameters(recipientName_line1, businessName, reference)
+      RegistrationConfirmationEmailParameters(recipientName_line1, businessName, "12 June 2021", reference)
     )
 
     emailConnector.send(emailToSendRequest)

@@ -49,7 +49,8 @@ class EmailServiceSpec extends SpecBase {
         safeInputsWithMaxLength(maxLengthContactName)
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String) =>
-            val emailParams = RegistrationConfirmationEmailParameters(contactName, businessName, vatNum)
+            val startDate = "12 June 2021"
+            val emailParams = RegistrationConfirmationEmailParameters(contactName, businessName, startDate, vatNum)
             val emailToSendRequest = EmailToSendRequest(List(email), "oss_registration_confirmation", emailParams)
 
             when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
