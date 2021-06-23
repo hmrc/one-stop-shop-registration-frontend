@@ -21,20 +21,28 @@ import connectors.EmailConnector
 import models.emails.{EmailSendingResult, EmailToSendRequest, RegistrationConfirmationEmailParameters}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EmailService@Inject()(emailConnector: EmailConnector)(implicit executionContext: ExecutionContext) {
 
-  def sendConfirmationEmail(recipientName_line1: String, businessName: String, reference: String, emailAddress: String)
-                           (implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
-    val emailToSendRequest = EmailToSendRequest(
-      List(emailAddress),
-      registrationConfirmationTemplateId,
-      RegistrationConfirmationEmailParameters(recipientName_line1, businessName, "12 June 2021", reference)
-    )
+  def sendConfirmationEmail(
+    recipientName_line1: String,
+    businessName: String,
+    reference: String,
+    startDate: LocalDate,
+    emailAddress: String
+  )(implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
+    val formattedStartDate = s"${startDate.getDayOfMonth} ${startDate.getMonth} ${startDate.getYear}"
 
-    emailConnector.send(emailToSendRequest)
+    emailConnector.send(
+      EmailToSendRequest(
+        List(emailAddress),
+        registrationConfirmationTemplateId,
+        RegistrationConfirmationEmailParameters(recipientName_line1, businessName, formattedStartDate, reference)
+      )
+    )
   }
 }

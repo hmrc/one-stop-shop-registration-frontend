@@ -26,6 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -41,25 +42,31 @@ class EmailServiceSpec extends SpecBase {
 
       val maxLengthBusiness = 160
       val maxLengthContactName = 105
+      val validStartDate = LocalDate.of(2010, 1, 1)
+      val validEndDate = LocalDate.now()
 
       forAll(
         validVRNs,
         validEmails,
         safeInputsWithMaxLength(maxLengthBusiness),
-        safeInputsWithMaxLength(maxLengthContactName)
+        safeInputsWithMaxLength(maxLengthContactName),
+        datesBetween(validStartDate, validEndDate)
       ) {
-        (vatNum: String, email: String, businessName: String, contactName: String) =>
-            val startDate = "12 June 2021"
-            val emailParams = RegistrationConfirmationEmailParameters(contactName, businessName, startDate, vatNum)
-            val emailToSendRequest = EmailToSendRequest(List(email), "oss_registration_confirmation", emailParams)
+        (vatNum: String, email: String, businessName: String, contactName: String, startDate: LocalDate) =>
+          val expectedDate = s"${startDate.getDayOfMonth} ${startDate.getMonth} ${startDate.getYear}"
+          val expectedEmailToSendRequest = EmailToSendRequest(
+            List(email),
+            "oss_registration_confirmation",
+            RegistrationConfirmationEmailParameters(contactName, businessName, expectedDate, vatNum)
+          )
 
-            when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
+          when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
 
-            emailService.sendConfirmationEmail(
-              contactName, businessName, vatNum, email
-            ).futureValue mustBe EMAIL_ACCEPTED
+          emailService.sendConfirmationEmail(
+            contactName, businessName, vatNum, startDate, email
+          ).futureValue mustBe EMAIL_ACCEPTED
 
-            verify(connector, times(1)).send(refEq(emailToSendRequest))(any(), any())
+          verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
       }
     }
   }

@@ -42,6 +42,7 @@ import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -94,6 +95,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             eqTo(registration.contactDetails.fullName),
             eqTo(registration.registeredCompanyName),
             eqTo(vrn.toString()),
+            eqTo(registration.commencementDate),
             eqTo(registration.contactDetails.emailAddress)
           )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
@@ -120,7 +122,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any())(any())
+              .sendConfirmationEmail(any(), any(), any(), any(), any())(any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
