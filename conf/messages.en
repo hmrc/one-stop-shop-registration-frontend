@@ -565,23 +565,19 @@ allSalesViaMarketplace.checkYourAnswersLabel = allSalesViaMarketplace
 allSalesViaMarketplace.error.required = Select yes if allSalesViaMarketplace
 allSalesViaMarketplace.change.hidden = AllSalesViaMarketplace
 
-businessBasedInNi.title = businessBasedInNi
-businessBasedInNi.heading = businessBasedInNi
-businessBasedInNi.checkYourAnswersLabel = businessBasedInNi
-businessBasedInNi.error.required = Select yes if businessBasedInNi
-businessBasedInNi.change.hidden = BusinessBasedInNi
+businessBasedInNi.title = Is your principle place of business in Northern Ireland?
+businessBasedInNi.heading = Is your principle place of business in Northern Ireland?
+businessBasedInNi.error.required = Select yes if your principle place of business is in Northern Ireland
 
-hasFixedEstablishmentInNi.title = hasFixedEstablishmentInNi
-hasFixedEstablishmentInNi.heading = hasFixedEstablishmentInNi
-hasFixedEstablishmentInNi.checkYourAnswersLabel = hasFixedEstablishmentInNi
-hasFixedEstablishmentInNi.error.required = Select yes if hasFixedEstablishmentInNi
-hasFixedEstablishmentInNi.change.hidden = HasFixedEstablishmentInNi
+hasFixedEstablishmentInNi.title = Do you have a fixed establishment in Northern Ireland?
+hasFixedEstablishmentInNi.heading = Do you have a fixed establishment in Northern Ireland?
+hasFixedEstablishmentInNi.error.required = Select yes if you have a fixed establishment in Northern Ireland
 
-liableForVatOnAllSales.title = liableForVatOnAllSales
-liableForVatOnAllSales.heading = liableForVatOnAllSales
+liableForVatOnAllSales.title = You need to account for VAT on all sales to EU countries
+liableForVatOnAllSales.heading = You need to account for VAT on all sales to EU countries
 
-liableForVatOnDirectSales.title = liableForVatOnDirectSales
-liableForVatOnDirectSales.heading = liableForVatOnDirectSales
+liableForVatOnDirectSales.title = You need to account for VAT on all sales not via an online marketplace to EU countries
+liableForVatOnDirectSales.heading = You need to account for VAT on all sales not via an online marketplace to EU countries
 
-notLiableForVat.title = notLiableForVat
-notLiableForVat.heading = notLiableForVat
+notLiableForVat.title = You do not need to register
+notLiableForVat.heading = You do not need to register
