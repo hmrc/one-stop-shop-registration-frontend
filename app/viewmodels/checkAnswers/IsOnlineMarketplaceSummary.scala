@@ -18,26 +18,26 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.SellsGoodsFromNiPage
+import pages.IsOnlineMarketplacePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object SellsGoodsFromNiSummary  {
+object IsOnlineMarketplaceSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SellsGoodsFromNiPage).map {
+    answers.get(IsOnlineMarketplacePage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = "sellsGoodsFromNi.checkYourAnswersLabel",
+          key     = "isOnlineMarketplace.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.SellsGoodsFromNiController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("sellsGoodsFromNi.change.hidden"))
+            ActionItemViewModel("site.change", routes.IsOnlineMarketplaceController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("isOnlineMarketplace.change.hidden"))
           )
         )
     }

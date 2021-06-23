@@ -5,7 +5,7 @@
         govukButton: GovukButton
 )
 
-@(companyName: String, vrn: Vrn, feedbackLink: String)(implicit request: Request[_], messages: Messages)
+@(companyName: String, vrn: Vrn, feedbackLink: String, startDate: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("alreadyRegistered.title")), showBackLink = false) {
 
@@ -20,11 +20,12 @@
         </div>
 
         <div class="govuk-body">
-        @Html(messages("alreadyRegistered.confirmation"))
+            @Html(messages("alreadyRegistered.confirmation"))
         </div>
 
         <h2 class="govuk-heading-m">@messages("alreadyRegistered.next")</h2>
-        <p class="govuk-body">@messages("alreadyRegistered.p1")</p>
+        <p class="govuk-body">@messages("alreadyRegistered.p1", startDate)</p>
+        <p class="govuk-body">@messages("alreadyRegistered.p2")</p>
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("alreadyRegistered.feedback.link.text")</a>
             @messages("alreadyRegistered.feedback.30seconds")

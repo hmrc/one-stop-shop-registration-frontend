@@ -6,20 +6,32 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("inControlOfMovingGoods.title"))) {
 
-    @formHelper(action = routes.InControlOfMovingGoodsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.InControlOfMovingGoodsController.onSubmit(), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
         @govukRadios(
-            RadiosViewModel.yesNo(
+            RadiosViewModel(
                 field = form("value"),
-                legend = LegendViewModel(messages("inControlOfMovingGoods.heading")).asPageHeading()
+                legend = LegendViewModel(messages("inControlOfMovingGoods.heading")).asPageHeading(),
+                items = Seq(
+                    RadioItem(
+                        content = Text(messages("inControlOfMovingGoods.yes")),
+                        value   = Some(true.toString),
+                        id      = Some("value")
+                    ),
+                    RadioItem(
+                        content = Text(messages("inControlOfMovingGoods.no")),
+                        value   = Some(false.toString),
+                        id      = Some("value-no")
+                    )
+                )
             )
         )
 

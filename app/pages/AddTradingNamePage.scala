@@ -16,28 +16,37 @@
 
 package pages
 
-import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.DeriveNumberOfTradingNames
+import services.FeatureFlagService
 
-case object AddTradingNamePage extends QuestionPage[Boolean] {
+import javax.inject.Inject
+
+class AddTradingNamePage @Inject()(features: FeatureFlagService) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "addTradingName"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
-      case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _)         => euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
-      case _                        => routes.JourneyRecoveryController.onPageLoad()
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    def noRoute: Call = if(features.schemeHasStarted) {
+      routes.DateOfFirstSaleController.onPageLoad(NormalMode)
+    } else {
+      routes.CommencementDateController.onPageLoad(NormalMode)
     }
 
+    (answers.get(new AddTradingNamePage(features)), answers.get(DeriveNumberOfTradingNames)) match {
+      case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _)         => noRoute
+      case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
+    (answers.get(new AddTradingNamePage(features)), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(CheckMode, Index(size))
       case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
       case _                        => routes.JourneyRecoveryController.onPageLoad()

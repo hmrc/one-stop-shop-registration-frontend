@@ -38,10 +38,10 @@ POST        /uk-trading-name/:index                                             
 GET         /check-uk-trading-name/:index                                        controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-uk-trading-name/:index                                        controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /vat-effective-date                                                  controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
-POST        /vat-effective-date                                                  controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
-GET         /check-vat-effective-date                                            controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-vat-effective-date                                            controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
+GET         /uk-vat-registration-date                                            controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
+POST        /uk-vat-registration-date                                            controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
+GET         /checkuk-vat-registration-date                                       controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
+POST        /checkuk-vat-registration-date                                       controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
 
 GET         /eu-vat-number/:index                                                controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-vat-number/:index                                                controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -220,15 +220,15 @@ POST        /give-website-address                                               
 GET         /check-give-website-address                                          controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-give-website-address                                          controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
 
-GET         /move-goods                                                          controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = NormalMode)
-POST        /move-goods                                                          controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = NormalMode)
-GET         /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onSubmit(mode: Mode = CheckMode)
+GET         /move-goods                                                          controllers.InControlOfMovingGoodsController.onPageLoad
+POST        /move-goods                                                          controllers.InControlOfMovingGoodsController.onSubmit
+GET         /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onPageLoad
+POST        /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onSubmit
 
-GET         /sell-online                                                         controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = NormalMode)
-POST        /sell-online                                                         controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = NormalMode)
-GET         /check-sell-online                                                   controllers.SellsGoodsFromNiController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-sell-online                                                   controllers.SellsGoodsFromNiController.onSubmit(mode: Mode = CheckMode)
+GET         /sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onPageLoad
+POST        /sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onSubmit
+GET         /check-sell-from-northern-ireland                                    controllers.SellsGoodsFromNiController.onPageLoad
+POST        /check-sell-from-northern-ireland                                    controllers.SellsGoodsFromNiController.onSubmit
 
 GET         /tax-in-eu                                                           controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
 POST        /tax-in-eu                                                           controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
@@ -247,26 +247,29 @@ POST        /non-uk-business-address                                            
 GET         /check-non-uk-business-address                                       controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-non-uk-business-address                                       controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET         /do-not-sell-online                                                  controllers.NotSellingGoodsFromNiController.onPageLoad()
+GET         /do-not-sell-from-northern-ireland                                   controllers.NotSellingGoodsFromNiController.onPageLoad()
 
-GET         /alreadyMadeSales                                                    controllers.AlreadyMadeSalesController.onPageLoad(mode: Mode = NormalMode)
-POST        /alreadyMadeSales                                                    controllers.AlreadyMadeSalesController.onSubmit(mode: Mode = NormalMode)
-GET         /changeAlreadyMadeSales                                              controllers.AlreadyMadeSalesController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeAlreadyMadeSales                                              controllers.AlreadyMadeSalesController.onSubmit(mode: Mode = CheckMode)
+GET         /start-date                                                          controllers.CommencementDateController.onPageLoad(mode: Mode = NormalMode)
+POST        /start-date                                                          controllers.CommencementDateController.onSubmit(mode: Mode = NormalMode)
+GET         /check-start-date                                                    controllers.CommencementDateController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-start-date                                                    controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
 
-GET         /commencementDate                                                    controllers.CommencementDateController.onPageLoad(mode: Mode = NormalMode)
-POST        /commencementDate                                                    controllers.CommencementDateController.onSubmit(mode: Mode = NormalMode)
-GET         /checkCommencementDate                                               controllers.CommencementDateController.onPageLoad(mode: Mode = CheckMode)
-POST        /checkCommencementDate                                               controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
-
-GET         /intendToSellGoodsThisQuarter                                        controllers.IntendToSellGoodsThisQuarterController.onPageLoad(mode: Mode = NormalMode)
-POST        /intendToSellGoodsThisQuarter                                        controllers.IntendToSellGoodsThisQuarterController.onSubmit(mode: Mode = NormalMode)
-GET         /changeIntendToSellGoodsThisQuarter                                  controllers.IntendToSellGoodsThisQuarterController.onPageLoad(mode: Mode = CheckMode)
-POST        /changeIntendToSellGoodsThisQuarter                                  controllers.IntendToSellGoodsThisQuarterController.onSubmit(mode: Mode = CheckMode)
-
-GET         /registerLater                                                       controllers.RegisterLaterController.onPageLoad()
+GET         /register-later                                                      controllers.RegisterLaterController.onPageLoad()
 
 GET         /already-eu-registered                                               controllers.RegisteredForOssInEuController.onPageLoad()
 POST        /already-eu-registered                                               controllers.RegisteredForOssInEuController.onSubmit()
 
-GET         /cannotRegisterAlreadyRegistered                                     controllers.CannotRegisterAlreadyRegisteredController.onPageLoad()
+GET         /return-later-already-eu-registered                                  controllers.CannotRegisterAlreadyRegisteredController.onPageLoad()
+
+GET         /date-of-first-sale                                                  controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = NormalMode)
+POST        /date-of-first-sale                                                  controllers.DateOfFirstSaleController.onSubmit(mode: Mode = NormalMode)
+GET         /check-date-of-first-sale                                            controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-date-of-first-sale                                            controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
+
+GET         /already-made-sales                                                  controllers.HasMadeSalesController.onPageLoad
+POST        /already-made-sales                                                  controllers.HasMadeSalesController.onSubmit
+
+GET         /online-marketplace                                                  controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
+POST        /online-marketplace                                                  controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
+GET         /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)

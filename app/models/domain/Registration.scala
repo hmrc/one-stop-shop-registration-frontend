@@ -32,7 +32,8 @@ final case class Registration(
                                websites: Seq[String],
                                commencementDate: LocalDate,
                                previousRegistrations: Seq[PreviousRegistration],
-                               bankDetails: BankDetails
+                               bankDetails: BankDetails,
+                               isOnlineMarketplace: Boolean
                              )
 
 object Registration {

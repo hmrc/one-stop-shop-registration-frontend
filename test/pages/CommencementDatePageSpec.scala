@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, NormalMode}
 
@@ -24,28 +25,16 @@ class CommencementDatePageSpec extends SpecBase {
 
   "CommencementDatePage" - {
 
-    "must navigate in Normal mode" - {
+    "must navigate in Normal mode to Tax Registered in EU" in {
 
-      "to Check VAT Details when we have VAT details for the user" in {
-
-        CommencementDatePage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
-          .mustEqual(routes.CheckVatDetailsController.onPageLoad())
-      }
-
-      "to Check VAT Number when we do not have VAT details for the user" in {
-
-        CommencementDatePage.navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(routes.CheckVatNumberController.onPageLoad())
-      }
+      CommencementDatePage.navigate(NormalMode, emptyUserAnswers)
+        .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
     }
 
-    "must navigate in Check mode" - {
+    "must navigate in Check mode to Check Your Answers" in {
 
-      "to Check Your Answers" in {
-
-        CommencementDatePage.navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
+      CommencementDatePage.navigate(CheckMode, emptyUserAnswers)
+        .mustEqual(routes.CheckYourAnswersController.onPageLoad())
     }
   }
 }

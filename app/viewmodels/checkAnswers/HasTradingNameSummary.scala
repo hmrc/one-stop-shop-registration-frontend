@@ -20,26 +20,27 @@ import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.i18n.Messages
+import services.FeatureFlagService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object HasTradingNameSummary  {
+import javax.inject.Inject
+
+class HasTradingNameSummary @Inject()(features: FeatureFlagService) {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    for {
-      hasTradingName        <- answers.get(HasTradingNamePage)
-    } yield {
+    answers.get(new HasTradingNamePage(features)).map {
+      hasTradingName =>
+        val value = if (hasTradingName) "site.yes" else "site.no"
 
-      val value = if (hasTradingName) "site.yes" else "site.no"
-
-      SummaryListRowViewModel(
-        key     = messages("hasTradingName.checkYourAnswersLabel"),
-        value   = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("hasTradingName.change.hidden"))
+        SummaryListRowViewModel(
+          key     = messages("hasTradingName.checkYourAnswersLabel"),
+          value   = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("hasTradingName.change.hidden"))
+          )
         )
-      )
     }
 }

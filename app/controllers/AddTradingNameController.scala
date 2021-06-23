@@ -36,7 +36,8 @@ class AddTradingNameController @Inject()(
   override val messagesApi: MessagesApi,
   cc: AuthenticatedControllerComponents,
   formProvider: AddTradingNameFormProvider,
-  view: AddTradingNameView
+  view: AddTradingNameView,
+  page: AddTradingNamePage
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -65,9 +66,9 @@ class AddTradingNameController @Inject()(
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddTradingNamePage, value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(AddTradingNamePage.navigate(mode, updatedAnswers))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(page.navigate(mode, updatedAnswers))
           )
       }
   }

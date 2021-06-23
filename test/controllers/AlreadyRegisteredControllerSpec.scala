@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
+import formats.Format.dateFormatter
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -67,7 +68,8 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
             view(
               registration.registeredCompanyName,
               vrn,
-              config.feedbackUrl(request)
+              config.feedbackUrl(request),
+              registration.commencementDate.format(dateFormatter)
             )(request, messages(application)).toString
 
           contentAsString(result) mustEqual expectedContent

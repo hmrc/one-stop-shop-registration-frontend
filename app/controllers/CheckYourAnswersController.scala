@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.{NormalMode, NotInControlOfMovingGoodsError, NotSellingGoodsFromNiError}
+import models.NormalMode
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.responses.ConflictFound
@@ -29,7 +29,7 @@ import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.EmailConfirmationQuery
-import services.{AuditService, EmailService, RegistrationService}
+import services._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -37,8 +37,8 @@ import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummar
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
@@ -47,7 +47,9 @@ class CheckYourAnswersController @Inject()(
   registrationService: RegistrationService,
   auditService: AuditService,
   view: CheckYourAnswersView,
-  emailService: EmailService
+  emailService: EmailService,
+  dateService: DateService,
+  features: FeatureFlagService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -56,23 +58,21 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(
-          SellsGoodsFromNiSummary.row(request.userAnswers),
-          InControlOfMovingGoodsSummary.row(request.userAnswers),
-          AlreadyMadeSalesSummary.answerRow(request.userAnswers),
-          AlreadyMadeSalesSummary.dateOfFirstSaleRow(request.userAnswers),
-          IntendToSellGoodsThisQuarterSummary.row(request.userAnswers),
           RegisteredCompanyNameSummary.row(request.userAnswers),
           PartOfVatGroupSummary.row(request.userAnswers),
           UkVatEffectiveDateSummary.row(request.userAnswers),
           BusinessAddressInUkSummary.row(request.userAnswers),
           UkAddressSummary.row(request.userAnswers),
           InternationalAddressSummary.row(request.userAnswers),
-          HasTradingNameSummary.row(request.userAnswers),
+          new HasTradingNameSummary(features).row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
+          DateOfFirstSaleSummary.row(request.userAnswers),
+          new CommencementDateSummary(dateService).row(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),
           PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+          IsOnlineMarketplaceSummary.row(request.userAnswers),
           HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers),
@@ -119,13 +119,7 @@ class CheckYourAnswersController @Inject()(
           val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
 
-          if (errors.toChain.toList.contains(NotSellingGoodsFromNiError)) {
-            successful(Redirect(routes.NotSellingGoodsFromNiController.onPageLoad()))
-          } else if (errors.toChain.toList.contains(NotInControlOfMovingGoodsError)) {
-            successful(Redirect(routes.NotInControlOfMovingGoodsController.onPageLoad()))
-          } else {
-            successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          }
+          successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 }

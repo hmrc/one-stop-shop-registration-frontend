@@ -19,12 +19,12 @@ package forms
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class IntendToSellGoodsThisQuarterFormProviderSpec extends BooleanFieldBehaviours {
+class IsOnlineMarketplaceFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "intendToSellGoodsThisQuarter.error.required"
+  val requiredKey = "isOnlineMarketplace.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new IntendToSellGoodsThisQuarterFormProvider()()
+  val form = new IsOnlineMarketplaceFormProvider()()
 
   ".value" - {
 

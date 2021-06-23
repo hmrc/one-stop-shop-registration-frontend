@@ -52,12 +52,12 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Has Website" in {
+        "to Is Online Markterplace" in {
 
           val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
 
           PreviouslyRegisteredPage.navigate(NormalMode, answers)
-            .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+            .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
         }
       }
     }

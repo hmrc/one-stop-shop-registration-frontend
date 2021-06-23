@@ -18,50 +18,22 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
 
   "SellsGoodsFromNiPage" - {
 
-    beRetrievable[Boolean](SellsGoodsFromNiPage)
-
-    beSettable[Boolean](SellsGoodsFromNiPage)
-
-    beRemovable[Boolean](SellsGoodsFromNiPage)
-
-    "must navigate in Normal Mode" - {
+    "must navigate" - {
 
       "to In Control of Moving Goods when the answer is yes" in {
 
-        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, true).success.value
-        SellsGoodsFromNiPage.navigate(NormalMode, answers)
-          .mustEqual(routes.InControlOfMovingGoodsController.onPageLoad(NormalMode))
+        SellsGoodsFromNiPage.navigate(true) mustEqual routes.InControlOfMovingGoodsController.onPageLoad()
       }
 
-      "to Do Not Need To Register when the answer is no" in {
+      "to Not Selling Goods From NI when the answer is no" in {
 
-        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
-        SellsGoodsFromNiPage.navigate(NormalMode, answers)
-          .mustEqual(routes.NotSellingGoodsFromNiController.onPageLoad())
-      }
-    }
-
-    "must navigate in Check mode" - {
-
-      "to Check Your Answers when the answer is yes" in {
-
-        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, true).success.value
-        SellsGoodsFromNiPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Do Not Need To Register for Service when the answer is no" in {
-
-        val answers = emptyUserAnswers.set(SellsGoodsFromNiPage, false).success.value
-        SellsGoodsFromNiPage.navigate(CheckMode, answers)
-          .mustEqual(routes.NotSellingGoodsFromNiController.onPageLoad())
+        SellsGoodsFromNiPage.navigate(false) mustEqual routes.NotSellingGoodsFromNiController.onPageLoad()
       }
     }
   }

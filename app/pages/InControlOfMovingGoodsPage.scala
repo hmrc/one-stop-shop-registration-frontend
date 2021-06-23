@@ -17,25 +17,21 @@
 package pages
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import services.FeatureFlagService
 
-case object InControlOfMovingGoodsPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class InControlOfMovingGoodsPage @Inject()(features: FeatureFlagService) extends Page {
 
-  override def toString: String = "inControlOfMovingGoods"
-
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(InControlOfMovingGoodsPage) match {
-    case Some(true)  => routes.AlreadyMadeSalesController.onPageLoad(NormalMode)
-    case Some(false) => routes.NotInControlOfMovingGoodsController.onPageLoad()
-    case _           => routes.JourneyRecoveryController.onPageLoad()
-  }
-
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(InControlOfMovingGoodsPage) match {
-    case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
-    case Some(false) => routes.NotInControlOfMovingGoodsController.onPageLoad()
-    case _           => routes.JourneyRecoveryController.onPageLoad()
-  }
+  def navigate(answer: Boolean): Call =
+    if (answer) {
+      if (features.schemeHasStarted) {
+        routes.HasMadeSalesController.onPageLoad()
+      } else {
+        controllers.auth.routes.AuthController.onSignIn()
+      }
+    } else {
+      routes.NotInControlOfMovingGoodsController.onPageLoad()
+    }
 }

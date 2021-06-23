@@ -16,24 +16,15 @@
 
 package pages
 
+import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import models.{NormalMode, UserAnswers}
 import play.api.mvc.Call
-import queries.{Gettable, Settable}
 
-import java.time.LocalDate
+case object CommencementDatePage extends Page {
 
-case object CommencementDatePage extends Page with Gettable[LocalDate] with Settable[LocalDate] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "commencementDate"
-
-  override def navigateInNormalMode(answers: UserAnswers): Call = answers.vatInfo match {
-    case Some(_) => routes.CheckVatDetailsController.onPageLoad()
-    case None    => routes.CheckVatNumberController.onPageLoad()
-  }
+  override def navigateInNormalMode(answers: UserAnswers): Call =
+    euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
 
   override def navigateInCheckMode(answers: UserAnswers): Call =
     routes.CheckYourAnswersController.onPageLoad()

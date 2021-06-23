@@ -20,17 +20,30 @@ import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode}
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
+import services.FeatureFlagService
 
-class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
+class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSugar with BeforeAndAfterEach {
+
+  private val features = mock[FeatureFlagService]
+
+  private val page = new AddTradingNamePage(features)
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(features)
+  }
 
   "AddTradingNamePage" - {
 
-    beRetrievable[Boolean](AddTradingNamePage)
+    beRetrievable[Boolean](page)
 
-    beSettable[Boolean](AddTradingNamePage)
+    beSettable[Boolean](page)
 
-    beRemovable[Boolean](AddTradingNamePage)
+    beRemovable[Boolean](page)
 
     "must navigate in Normal mode" - {
 
@@ -42,21 +55,37 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
             emptyUserAnswers
               .set(TradingNamePage(Index(0)), "foo").success.value
               .set(TradingNamePage(Index(1)), "bar").success.value
-              .set(AddTradingNamePage, true).success.value
+              .set(page, true).success.value
 
-          AddTradingNamePage.navigate(NormalMode, answers)
+          page.navigate(NormalMode, answers)
             .mustEqual(routes.TradingNameController.onPageLoad(NormalMode, Index(2)))
         }
       }
 
       "when the answer is no" - {
 
-        "to Tax Registered in EU" in {
+        "and the scheme has started" - {
 
-          val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
+          "to Date of First Sale" in {
 
-          AddTradingNamePage.navigate(NormalMode, answers)
-            .mustEqual(euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode))
+            when(features.schemeHasStarted) thenReturn true
+            val answers = emptyUserAnswers.set(page, false).success.value
+
+            page.navigate(NormalMode, answers)
+              .mustEqual(routes.DateOfFirstSaleController.onPageLoad(NormalMode))
+          }
+        }
+
+        "and the scheme has not started yet" - {
+
+          "to Commencement Date" in {
+
+            when(features.schemeHasStarted) thenReturn false
+            val answers = emptyUserAnswers.set(page, false).success.value
+
+            page.navigate(NormalMode, answers)
+              .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+          }
         }
       }
     }
@@ -71,9 +100,9 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
             emptyUserAnswers
               .set(TradingNamePage(Index(0)), "foo").success.value
               .set(TradingNamePage(Index(1)), "bar").success.value
-              .set(AddTradingNamePage, true).success.value
+              .set(page, true).success.value
 
-          AddTradingNamePage.navigate(CheckMode, answers)
+          page.navigate(CheckMode, answers)
             .mustEqual(routes.TradingNameController.onPageLoad(CheckMode, Index(2)))
         }
       }
@@ -82,9 +111,9 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours {
 
         "to Check Your Answers" in {
 
-          val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
+          val answers = emptyUserAnswers.set(page, false).success.value
 
-          AddTradingNamePage.navigate(CheckMode, answers)
+          page.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }

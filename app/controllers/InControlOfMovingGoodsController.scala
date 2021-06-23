@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions._
 import forms.InControlOfMovingGoodsFormProvider
-import models.Mode
 import pages.InControlOfMovingGoodsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,41 +25,33 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InControlOfMovingGoodsView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class InControlOfMovingGoodsController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: InControlOfMovingGoodsFormProvider,
-                                         view: InControlOfMovingGoodsView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                         view: InControlOfMovingGoodsView,
+                                         page: InControlOfMovingGoodsPage
+                                 ) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(InControlOfMovingGoodsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+      Ok(view(form))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit: Action[AnyContent] = Action {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          BadRequest(view(formWithErrors)),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(InControlOfMovingGoodsPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(InControlOfMovingGoodsPage.navigate(mode, updatedAnswers))
+          Redirect(page.navigate(value))
       )
   }
 }

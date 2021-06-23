@@ -67,15 +67,19 @@ trait SpecBase
 
   val vrn: Vrn = Vrn("123456789")
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None): GuiceApplicationBuilder = {
+
+    val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
+
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
-        bind[Clock].toInstance(stubClockAtArbitraryDate)
+        bind[Clock].toInstance(clockToBind)
       )
+  }
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]

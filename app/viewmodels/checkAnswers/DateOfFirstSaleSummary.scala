@@ -16,28 +16,30 @@
 
 package viewmodels.checkAnswers
 
+import java.time.format.DateTimeFormatter
+
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.IntendToSellGoodsThisQuarterPage
+import pages.DateOfFirstSalePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object IntendToSellGoodsThisQuarterSummary  {
+object DateOfFirstSaleSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IntendToSellGoodsThisQuarterPage).map {
+    answers.get(DateOfFirstSalePage).map {
       answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+        val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
         SummaryListRowViewModel(
-          key     = "intendToSellGoodsThisQuarter.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
+          key     = "dateOfFirstSale.checkYourAnswersLabel",
+          value   = ValueViewModel(answer.format(dateFormatter)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IntendToSellGoodsThisQuarterController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("intendToSellGoodsThisQuarter.change.hidden"))
+            ActionItemViewModel("site.change", routes.DateOfFirstSaleController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("dateOfFirstSale.change.hidden"))
           )
         )
     }

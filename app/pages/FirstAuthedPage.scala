@@ -15,12 +15,18 @@
  */
 
 package pages
+
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import play.api.mvc.Call
 
 case object FirstAuthedPage extends Page {
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.SellsGoodsFromNiController.onPageLoad(NormalMode)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    if (answers.vatInfo.isDefined) {
+      routes.CheckVatDetailsController.onPageLoad()
+    } else {
+      routes.CheckVatNumberController.onPageLoad()
+    }
+  }
 }

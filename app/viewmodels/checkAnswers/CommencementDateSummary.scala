@@ -16,29 +16,29 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
-import pages.InControlOfMovingGoodsPage
+import formats.Format.dateFormatter
+import models.UserAnswers
+import pages.DateOfFirstSalePage
 import play.api.i18n.Messages
+import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object InControlOfMovingGoodsSummary  {
+import javax.inject.Inject
+
+class CommencementDateSummary @Inject()(dateService: DateService) {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(InControlOfMovingGoodsPage).map {
+    answers.get(DateOfFirstSalePage).map {
       answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+        val startDate = dateService.startDateBasedOnFirstSale(answer)
 
         SummaryListRowViewModel(
-          key     = "inControlOfMovingGoods.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.InControlOfMovingGoodsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("inControlOfMovingGoods.change.hidden"))
-          )
+          key     = "commencementDate.checkYourAnswersLabel",
+          value   = ValueViewModel(startDate.format(dateFormatter)),
+          actions = Seq.empty
         )
     }
 }

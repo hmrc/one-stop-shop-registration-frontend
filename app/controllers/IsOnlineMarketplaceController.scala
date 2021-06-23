@@ -17,26 +17,22 @@
 package controllers
 
 import controllers.actions._
-import forms.IntendToSellGoodsThisQuarterFormProvider
-
+import forms.IsOnlineMarketplaceFormProvider
 import javax.inject.Inject
-import models.{Mode, UserAnswers}
-import pages.{CommencementDatePage, IntendToSellGoodsThisQuarterPage}
+import models.Mode
+import pages.IsOnlineMarketplacePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.StartDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IntendToSellGoodsThisQuarterView
+import views.html.IsOnlineMarketplaceView
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
-class IntendToSellGoodsThisQuarterController @Inject()(
+class IsOnlineMarketplaceController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         formProvider: IntendToSellGoodsThisQuarterFormProvider,
-                                         view: IntendToSellGoodsThisQuarterView,
-                                         startDateService: StartDateService
+                                         formProvider: IsOnlineMarketplaceFormProvider,
+                                         view: IsOnlineMarketplaceView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -45,7 +41,7 @@ class IntendToSellGoodsThisQuarterController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(IntendToSellGoodsThisQuarterPage) match {
+      val preparedForm = request.userAnswers.get(IsOnlineMarketplacePage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -62,18 +58,9 @@ class IntendToSellGoodsThisQuarterController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(updateUserAnswers(value, request.userAnswers))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(IsOnlineMarketplacePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(IntendToSellGoodsThisQuarterPage.navigate(mode, updatedAnswers))
+          } yield Redirect(IsOnlineMarketplacePage.navigate(mode, updatedAnswers))
       )
   }
-
-  private def updateUserAnswers(answer: Boolean, answers: UserAnswers): Try[UserAnswers] =
-    if (answer) {
-      answers
-        .set(IntendToSellGoodsThisQuarterPage, answer)
-        .flatMap(_.set(CommencementDatePage, startDateService.startDateBasedOnIntentionToSellGoods()))
-    } else {
-      answers.set(IntendToSellGoodsThisQuarterPage, answer)
-    }
 }

@@ -16,37 +16,55 @@
 
 package controllers
 
-import config.FrontendAppConfig
+import config.{Constants, FrontendAppConfig}
 import controllers.actions._
-import pages.BusinessContactDetailsPage
+import formats.Format.dateFormatter
+import models.UserAnswers
+import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
 import queries.EmailConfirmationQuery
+import services.{DateService, FeatureFlagService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationCompleteView
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class ApplicationCompleteController @Inject()(
   override val messagesApi: MessagesApi,
   cc: AuthenticatedControllerComponents,
   view: ApplicationCompleteView,
-  frontendAppConfig: FrontendAppConfig
+  frontendAppConfig: FrontendAppConfig,
+  dateService: DateService,
+  features: FeatureFlagService
 ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(): Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
-    implicit request =>
-      val businessContactDetailsPage = request.userAnswers.get(BusinessContactDetailsPage)
-      val showEmailConfirmation = request.userAnswers.get(EmailConfirmationQuery)
-
-      Ok(view(
-        HtmlFormat.escape(businessContactDetailsPage.get.emailAddress).toString,
-        request.vrn,
-        frontendAppConfig.feedbackUrl,
-        showEmailConfirmation.getOrElse(false)
-      ))
+    implicit request => {
+      for {
+        contactDetails        <- request.userAnswers.get(BusinessContactDetailsPage)
+        showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
+        startDate             <- getStartDate(request.userAnswers)
+      } yield {
+        Ok(view(
+          HtmlFormat.escape(contactDetails.emailAddress).toString,
+          request.vrn,
+          frontendAppConfig.feedbackUrl,
+          showEmailConfirmation,
+          startDate.format(dateFormatter)
+        ))
+      }
+    }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
+
+  private def getStartDate(answers: UserAnswers): Option[LocalDate] =
+    if (features.schemeHasStarted) {
+      answers.get(DateOfFirstSalePage).map(dateService.startDateBasedOnFirstSale)
+    } else {
+      Some(Constants.schemeStartDate)
+    }
 }

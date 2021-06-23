@@ -24,15 +24,25 @@ import uk.gov.hmrc.domain.Vrn
 
 trait ModelGenerators {
 
-  implicit lazy val arbitraryBic: Arbitrary[Bic] =
-    Arbitrary{
+  implicit lazy val arbitraryBic: Arbitrary[Bic] = {
+    val asciiCodeForA = 65
+    val asciiCodeForN = 78
+    val asciiCodeForP = 80
+    val asciiCodeForZ = 90
+
+    Arbitrary {
       for {
         firstChars <- Gen.listOfN(6, Gen.alphaUpperChar).map(_.mkString)
-        char7      <- Gen.oneOf(Gen.alphaUpperChar, Gen.choose(2, 9))
-        char8      <- Gen.oneOf(Gen.alphaUpperChar, Gen.numChar).suchThat(_ != 'O')
-        lastChars  <- Gen.option(Gen.listOfN(3, Gen.oneOf(Gen.alphaUpperChar, Gen.numChar)).map(_.mkString))
+        char7 <- Gen.oneOf(
+                   Gen.choose(asciiCodeForA, asciiCodeForN).map(_.toChar),
+                   Gen.choose(asciiCodeForP, asciiCodeForZ).map(_.toChar),
+                   Gen.choose(2, 9)
+                 )
+        char8 <- Gen.oneOf(Gen.alphaUpperChar, Gen.numChar).suchThat(_ != 'O')
+        lastChars <- Gen.option(Gen.listOfN(3, Gen.oneOf(Gen.alphaUpperChar, Gen.numChar)).map(_.mkString))
       } yield Bic(s"$firstChars$char7$char8${lastChars.getOrElse("")}").get
     }
+  }
 
   implicit lazy val arbitraryIban: Arbitrary[Iban] =
     Arbitrary {
@@ -55,11 +65,6 @@ trait ModelGenerators {
         "GB21SCBL60910417068859",
         "GB42CPBK08005470328725"
       ).map(v => Iban(v).right.get)
-    }
-
-  implicit lazy val arbitraryAlreadyMadeSales: Arbitrary[AlreadyMadeSales] =
-    Arbitrary {
-        Gen.const(AlreadyMadeSales.No)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =

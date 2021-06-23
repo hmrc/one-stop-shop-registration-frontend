@@ -21,9 +21,10 @@ import generators.Generators
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-import java.time.{Clock, LocalDate, ZoneId}
+import java.time.Month._
+import java.time.{Clock, LocalDate, Year, ZoneId}
 
-class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
+class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
   private def getStubClock(date: LocalDate): Clock =
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
@@ -35,7 +36,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
       forAll(datesBetween(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 12, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+          val service   = new DateService(stubClock)
 
           service.startOfNextPeriod mustEqual LocalDate.of(2022, 1, 1)
       }
@@ -46,7 +47,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
       forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+          val service   = new DateService(stubClock)
 
           service.startOfNextPeriod mustEqual LocalDate.of(2022, 4, 1)
       }
@@ -57,7 +58,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
       forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+          val service   = new DateService(stubClock)
 
           service.startOfNextPeriod mustEqual LocalDate.of(2022, 7, 1)
       }
@@ -68,7 +69,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
       forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+          val service   = new DateService(stubClock)
 
           service.startOfNextPeriod mustEqual LocalDate.of(2022, 10, 1)
       }
@@ -90,7 +91,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
         forAll(dates) {
           case (firstSale, today) =>
             val stubClock = getStubClock(today)
-            val service = new StartDateService(stubClock)
+            val service = new DateService(stubClock)
 
             service.startDateBasedOnFirstSale(firstSale) mustEqual firstSale
         }
@@ -106,7 +107,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
         forAll(dates) {
           case (firstSale, today) =>
             val stubClock = getStubClock(today)
-            val service = new StartDateService(stubClock)
+            val service = new DateService(stubClock)
 
             service.startDateBasedOnFirstSale(firstSale) mustEqual firstSale
         }
@@ -125,7 +126,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
         forAll(dates) {
           case (firstSale, today) =>
             val stubClock = getStubClock(today)
-            val service = new StartDateService(stubClock)
+            val service = new DateService(stubClock)
 
             service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextPeriod
         }
@@ -141,7 +142,7 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
         forAll(dates) {
           case (firstSale, today) =>
             val stubClock = getStubClock(today)
-            val service = new StartDateService(stubClock)
+            val service = new DateService(stubClock)
 
             service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextPeriod
         }
@@ -149,27 +150,95 @@ class StartDateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with G
     }
   }
 
-  ".startDateBasedOnIntentionToSellGoods" - {
+  ".earliestSaleAllowed" - {
 
-    "must be 1 July 2021 if today is before that date" in {
+    "between 1st July 2021 and 30th September 2021" - {
 
-      forAll(datesBetween(LocalDate.of(2020, 1, 1), LocalDate.of(2021, 6, 30))) {
-        date =>
-          val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+      "must be 1st July 2021" in {
 
-          service.startDateBasedOnIntentionToSellGoods() mustEqual LocalDate.of(2021, 7, 1)
+        forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2021, 9, 30))) {
+          date =>
+            val stubClock = getStubClock(date)
+            val service   = new DateService(stubClock)
+
+            service.earliestSaleAllowed mustEqual LocalDate.of(2021, 7, 1)
+        }
       }
     }
 
-    "must be `today` on 1 July 2021 and all future dates" in {
+    "after 30th September 2021" - {
 
-      forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2030, 12, 31))) {
-        date =>
-          val stubClock = getStubClock(date)
-          val service   = new StartDateService(stubClock)
+      "in the 1st to the 10th day of any quarter" - {
 
-          service.startDateBasedOnIntentionToSellGoods() mustEqual date
+        "must be the 1st of the previous month" in {
+
+          val dates = for {
+            day   <- Gen.choose(1, 10)
+            month <- Gen.oneOf(JANUARY, APRIL, JULY, OCTOBER).map(_.getValue)
+            year  <- Gen.choose(2022, 2030)
+          } yield LocalDate.of(year, month, day)
+
+          forAll(dates) {
+            date: LocalDate =>
+              val stubClock = getStubClock(date)
+              val service   = new DateService(stubClock)
+
+              service.earliestSaleAllowed mustEqual date.minusMonths(1).withDayOfMonth(1)
+          }
+        }
+      }
+
+      "in the 11th day onwards of the first month of any quarter" - {
+
+        "must be the first day of the quarter" in {
+
+          val datesIn31DayMonths = for {
+            day   <- Gen.choose(11, 31)
+            month <- Gen.oneOf(JANUARY, JULY, OCTOBER).map(_.getValue)
+            year  <- Gen.choose(2022, 2030)
+          } yield LocalDate.of(year, month, day)
+
+          val datesInApril = for {
+            day  <- Gen.choose(11, 30)
+            year <- Gen.choose(2022, 2030)
+          } yield LocalDate.of(year, APRIL.getValue, day)
+
+          val dates = Gen.oneOf(datesInApril, datesIn31DayMonths)
+
+          forAll(dates) {
+            date =>
+              val stubClock = getStubClock(date)
+              val service   = new DateService(stubClock)
+
+              service.earliestSaleAllowed mustEqual date.withDayOfMonth(1)
+          }
+        }
+      }
+
+      "on any day after the first month of any quarter" - {
+
+        "must be the first day of the quarter" in {
+
+          val dates = for {
+            year  <- Gen.choose(2022, 2030)
+            month <- Gen.oneOf(FEBRUARY, MARCH, MAY, JUNE, AUGUST, SEPTEMBER, NOVEMBER, DECEMBER)
+            day   <- Gen.choose(1, month.length(Year.of(year).isLeap))
+            quarterStart = month match {
+              case FEBRUARY | MARCH     => JANUARY
+              case MAY      | JUNE      => APRIL
+              case AUGUST   | SEPTEMBER => JULY
+              case NOVEMBER | DECEMBER  => OCTOBER
+            }
+          } yield (LocalDate.of(year, month, day), LocalDate.of(year, quarterStart, 1))
+
+          forAll(dates) {
+            case (today, startOfQuarter) =>
+              val stubClock = getStubClock(today)
+              val service   = new DateService(stubClock)
+
+              service.earliestSaleAllowed mustEqual startOfQuarter
+          }
+        }
       }
     }
   }

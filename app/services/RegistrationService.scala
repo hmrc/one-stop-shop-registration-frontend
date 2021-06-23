@@ -17,6 +17,7 @@
 package services
 
 import cats.implicits._
+import config.Constants
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
@@ -27,24 +28,35 @@ import queries._
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
+import javax.inject.Inject
 
-class RegistrationService {
+class RegistrationService @Inject()(dateService: DateService, features: FeatureFlagService) {
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
     (
-      checkSellingGoods(answers),
-      checkInControlOfMovingGoods(answers),
       getCompanyName(answers),
       getTradingNames(answers),
       getVatDetails(answers),
       getEuTaxRegistrations(answers),
-      getCommencementDate(answers),
+      getStartDate(answers),
       getContactDetails(answers),
       getWebsites(answers),
       getPreviousRegistrations(answers),
-      getBankDetails(answers)
+      getBankDetails(answers),
+      getOnlineMarketplace(answers)
     ).mapN(
-      (_, _, name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
+      (
+        name,
+        tradingNames,
+        vatDetails,
+        euRegistrations,
+        startDate,
+        contactDetails,
+        websites,
+        previousRegistrations,
+        bankDetails,
+        isOnlineMarketplace
+      ) =>
         Registration(
           vrn                   = vrn,
           registeredCompanyName = name,
@@ -55,25 +67,10 @@ class RegistrationService {
           websites              = websites,
           commencementDate      = startDate,
           previousRegistrations = previousRegistrations,
-          bankDetails           = bankDetails
+          bankDetails           = bankDetails,
+          isOnlineMarketplace   = isOnlineMarketplace
         )
     )
-
-  private def checkSellingGoods(answers: UserAnswers): ValidationResult[Boolean] = {
-    answers.get(SellsGoodsFromNiPage) match {
-      case Some(true)  => true.validNec
-      case Some(false) => NotSellingGoodsFromNiError.invalidNec
-      case None        => DataMissingError(SellsGoodsFromNiPage).invalidNec
-    }
-  }
-
-  private def checkInControlOfMovingGoods(answers: UserAnswers): ValidationResult[Boolean] = {
-    answers.get(InControlOfMovingGoodsPage) match {
-      case Some(true)  => true.validNec
-      case Some(false) => NotInControlOfMovingGoodsError.invalidNec
-      case None        => DataMissingError(InControlOfMovingGoodsPage).invalidNec
-    }
-  }
 
   private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
     answers.vatInfo match {
@@ -87,7 +84,7 @@ class RegistrationService {
     }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
-    answers.get(HasTradingNamePage) match {
+    answers.get(new HasTradingNamePage(features)) match {
       case Some(true) =>
         answers.get(AllTradingNames) match {
           case Some(Nil) | None => DataMissingError(AllTradingNames).invalidNec
@@ -98,7 +95,7 @@ class RegistrationService {
         List.empty.validNec
 
       case None =>
-        DataMissingError(HasTradingNamePage).invalidNec
+        DataMissingError(new HasTradingNamePage(features)).invalidNec
     }
   }
 
@@ -159,11 +156,16 @@ class RegistrationService {
       getVatDetailSource(answers)
     ).mapN(VatDetails.apply)
 
-  private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
-    answers.get(CommencementDatePage) match {
-      case Some(startDate) => startDate.validNec
-      case None            => DataMissingError(CommencementDatePage).invalidNec
+  private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] = {
+    if (features.schemeHasStarted) {
+      answers.get(DateOfFirstSalePage) match {
+        case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
+        case None            => DataMissingError(DateOfFirstSalePage).invalidNec
+      }
+    } else {
+      Constants.schemeStartDate.validNec
     }
+  }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
     answers.get(BusinessContactDetailsPage) match {
@@ -327,5 +329,11 @@ class RegistrationService {
 
       case None =>
         DataMissingError(HasWebsitePage).invalidNec
+    }
+
+  private def getOnlineMarketplace(answers: UserAnswers): ValidationResult[Boolean] =
+    answers.get(IsOnlineMarketplacePage) match {
+      case Some(answer) => answer.validNec
+      case None         => DataMissingError(IsOnlineMarketplacePage).invalidNec
     }
 }

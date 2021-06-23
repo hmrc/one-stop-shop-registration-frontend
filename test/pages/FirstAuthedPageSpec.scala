@@ -24,10 +24,16 @@ class FirstAuthedPageSpec extends SpecBase {
 
   "must navigate in Normal Mode" - {
 
-    "to Sells Goods in NI" in {
+    "to Check VAT Details when we have VAT details for the user" in {
+
+      FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+        .mustEqual(routes.CheckVatDetailsController.onPageLoad())
+    }
+
+    "to Check VAT Number when we have VAT details for the user" in {
 
       FirstAuthedPage.navigate(NormalMode, emptyUserAnswers)
-        .mustEqual(routes.SellsGoodsFromNiController.onPageLoad(NormalMode))
+        .mustEqual(routes.CheckVatNumberController.onPageLoad())
     }
   }
 }

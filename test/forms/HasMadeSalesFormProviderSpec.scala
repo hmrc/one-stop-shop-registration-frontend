@@ -16,15 +16,30 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-import forms.mappings.Mappings
-import play.api.data.Form
+class HasMadeSalesFormProviderSpec extends BooleanFieldBehaviours {
 
-class IntendToSellGoodsThisQuarterFormProvider @Inject() extends Mappings {
+  val requiredKey = "hasMadeSales.error.required"
+  val invalidKey = "error.boolean"
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("intendToSellGoodsThisQuarter.error.required")
+  val form = new HasMadeSalesFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
     )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

@@ -26,19 +26,19 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
-  implicit lazy val arbitraryIntendToSellGoodsThisQuarterUserAnswersEntry: Arbitrary[(IntendToSellGoodsThisQuarterPage.type, JsValue)] =
+  implicit lazy val arbitraryIsOnlineMarketplaceUserAnswersEntry: Arbitrary[(IsOnlineMarketplacePage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[IntendToSellGoodsThisQuarterPage.type]
+        page  <- arbitrary[IsOnlineMarketplacePage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryAlreadyMadeSalesUserAnswersEntry: Arbitrary[(AlreadyMadeSalesPage.type, JsValue)] =
+  implicit lazy val arbitraryDateOfFirstSaleUserAnswersEntry: Arbitrary[(DateOfFirstSalePage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[AlreadyMadeSalesPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
+        page  <- arbitrary[DateOfFirstSalePage.type]
+        value <- arbitrary[Int].map(Json.toJson(_))
       } yield (page, value)
     }
 
@@ -62,22 +62,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[TaxRegisteredInEuPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitrarySellsGoodsFromNiUserAnswersEntry: Arbitrary[(SellsGoodsFromNiPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[SellsGoodsFromNiPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryInControlOfMovingGoodsUserAnswersEntry: Arbitrary[(InControlOfMovingGoodsPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[InControlOfMovingGoodsPage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
@@ -262,14 +246,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[PartOfVatGroupPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryHasTradingNameUserAnswersEntry: Arbitrary[(HasTradingNamePage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[HasTradingNamePage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }

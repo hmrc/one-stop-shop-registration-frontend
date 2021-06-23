@@ -18,50 +18,53 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
+import services.FeatureFlagService
 
-class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours {
+class InControlOfMovingGoodsPageSpec extends SpecBase with PageBehaviours with MockitoSugar with BeforeAndAfterEach {
+
+  private val features = mock[FeatureFlagService]
+
+  private val page = new InControlOfMovingGoodsPage(features)
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(features)
+  }
 
   "InControlOfMovingGoodsPage" - {
 
-    beRetrievable[Boolean](InControlOfMovingGoodsPage)
+    "when the answer is yes" - {
 
-    beSettable[Boolean](InControlOfMovingGoodsPage)
+      "and the scheme has started" - {
 
-    beRemovable[Boolean](InControlOfMovingGoodsPage)
+        "must navigate to HasMadeSales" in {
 
-    "must navigate in Normal Mode" - {
+          when(features.schemeHasStarted) thenReturn true
 
-      "to Already Made Sales when the answer is yes" in {
-
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
-        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.AlreadyMadeSalesController.onPageLoad(NormalMode))
+          page.navigate(true) mustEqual routes.HasMadeSalesController.onPageLoad()
+        }
       }
 
-      "to Not in Control of Moving Goods when the answer is no" in {
+      "and the scheme has not started yet" - {
 
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
-        InControlOfMovingGoodsPage.navigate(NormalMode, answers)
-          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
+        "must navigate to auth.onSignIn" in {
+
+          when(features.schemeHasStarted) thenReturn false
+
+          page.navigate(true) mustEqual controllers.auth.routes.AuthController.onSignIn()
+        }
       }
     }
 
-    "must navigate in Check mode" - {
+    "when the answer is no" - {
 
-      "to Check Your Answers when the answer is yes" in {
+      "must navigate to Not In Control of Moving Goods" in {
 
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, true).success.value
-        InControlOfMovingGoodsPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Not in Control of Moving Goods for Service when the answer is no" in {
-
-        val answers = emptyUserAnswers.set(InControlOfMovingGoodsPage, false).success.value
-        InControlOfMovingGoodsPage.navigate(CheckMode, answers)
-          .mustEqual(routes.NotInControlOfMovingGoodsController.onPageLoad())
+        page.navigate(false) mustEqual routes.NotInControlOfMovingGoodsController.onPageLoad()
       }
     }
   }

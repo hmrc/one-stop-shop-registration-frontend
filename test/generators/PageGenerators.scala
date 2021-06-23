@@ -24,11 +24,14 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
-  implicit lazy val arbitraryIntendToSellGoodsThisQuarterPage: Arbitrary[IntendToSellGoodsThisQuarterPage.type] =
-    Arbitrary(IntendToSellGoodsThisQuarterPage)
+  implicit lazy val arbitraryIsOnlineMarketplacePage: Arbitrary[IsOnlineMarketplacePage.type] =
+    Arbitrary(IsOnlineMarketplacePage)
 
-  implicit lazy val arbitraryAlreadyMadeSalesPage: Arbitrary[AlreadyMadeSalesPage.type] =
-    Arbitrary(AlreadyMadeSalesPage)
+  implicit lazy val arbitraryHasMadeSalesPage: Arbitrary[HasMadeSalesPage.type] =
+    Arbitrary(HasMadeSalesPage)
+
+  implicit lazy val arbitraryDateOfFirstSalePage: Arbitrary[DateOfFirstSalePage.type] =
+    Arbitrary(DateOfFirstSalePage)
 
   implicit lazy val arbitraryInternationalAddressPage: Arbitrary[InternationalAddressPage.type] =
     Arbitrary(InternationalAddressPage)
@@ -41,9 +44,6 @@ trait PageGenerators {
 
   implicit lazy val arbitrarySellsGoodsFromNiPage: Arbitrary[SellsGoodsFromNiPage.type] =
     Arbitrary(SellsGoodsFromNiPage)
-
-  implicit lazy val arbitraryInControlOfMovingGoodsPage: Arbitrary[InControlOfMovingGoodsPage.type] =
-    Arbitrary(InControlOfMovingGoodsPage)
 
   implicit lazy val arbitraryHasWebsitePage: Arbitrary[HasWebsitePage.type] =
     Arbitrary(HasWebsitePage)
@@ -113,7 +113,4 @@ trait PageGenerators {
 
   implicit lazy val arbitraryPartOfVatGroupPage: Arbitrary[PartOfVatGroupPage.type] =
     Arbitrary(PartOfVatGroupPage)
-
-  implicit lazy val arbitraryHasTradingNamePage: Arbitrary[HasTradingNamePage.type] =
-    Arbitrary(HasTradingNamePage)
 }

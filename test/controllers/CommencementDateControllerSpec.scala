@@ -17,31 +17,71 @@
 package controllers
 
 import base.SpecBase
+import config.Constants
 import formats.Format.dateFormatter
 import models.NormalMode
-import pages.CommencementDatePage
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.when
+import org.scalatestplus.mockito.MockitoSugar
+import pages.DateOfFirstSalePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.DateService
 import views.html.CommencementDateView
 
-class CommencementDateControllerSpec extends SpecBase {
+import java.time.{Clock, LocalDate, ZoneId}
+
+class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
 
   "CommencementDate Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "when the scheme has started" - {
 
-      val answers = emptyUserAnswers.set(CommencementDatePage, arbitraryDate).success.value
-      val application = applicationBuilder(userAnswers = Some(answers)).build()
+      "must return OK and the correct view for a GET" in {
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+        val answers = emptyUserAnswers.set(DateOfFirstSalePage, arbitraryDate).success.value
+        val dateService = mock[DateService]
 
-        val result = route(application, request).value
+        when(dateService.startDateBasedOnFirstSale(any())) thenReturn arbitraryDate
 
-        val view = application.injector.instanceOf[CommencementDateView]
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(NormalMode, arbitraryDate.format(dateFormatter))(request, messages(application)).toString
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CommencementDateView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(NormalMode, arbitraryDate.format(dateFormatter))(request, messages(application)).toString
+        }
+      }
+    }
+
+    "when the scheme has not started" - {
+
+      "must return OK and the correct view for a GET" in {
+
+        val instantBeforeSchemeStarts = LocalDate.of(2021, 6, 30).atStartOfDay(ZoneId.systemDefault).toInstant
+        val clock = Clock.fixed(instantBeforeSchemeStarts, ZoneId.systemDefault)
+
+        val application = applicationBuilder(Some(emptyUserAnswers), Some(clock)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CommencementDateView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(NormalMode, Constants.schemeStartDate.format(dateFormatter))(request, messages(application)).toString
+        }
       }
     }
   }
