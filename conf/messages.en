@@ -558,3 +558,30 @@ isOnlineMarketplace.heading = Is your business an online marketplace?
 isOnlineMarketplace.checkYourAnswersLabel = Is business an online marketplace
 isOnlineMarketplace.error.required = Select yes if your business is an online marketplace
 isOnlineMarketplace.change.hidden = if your business is an online marketplace
+
+allSalesViaMarketplace.title = allSalesViaMarketplace
+allSalesViaMarketplace.heading = allSalesViaMarketplace
+allSalesViaMarketplace.checkYourAnswersLabel = allSalesViaMarketplace
+allSalesViaMarketplace.error.required = Select yes if allSalesViaMarketplace
+allSalesViaMarketplace.change.hidden = AllSalesViaMarketplace
+
+businessBasedInNi.title = businessBasedInNi
+businessBasedInNi.heading = businessBasedInNi
+businessBasedInNi.checkYourAnswersLabel = businessBasedInNi
+businessBasedInNi.error.required = Select yes if businessBasedInNi
+businessBasedInNi.change.hidden = BusinessBasedInNi
+
+hasFixedEstablishmentInNi.title = hasFixedEstablishmentInNi
+hasFixedEstablishmentInNi.heading = hasFixedEstablishmentInNi
+hasFixedEstablishmentInNi.checkYourAnswersLabel = hasFixedEstablishmentInNi
+hasFixedEstablishmentInNi.error.required = Select yes if hasFixedEstablishmentInNi
+hasFixedEstablishmentInNi.change.hidden = HasFixedEstablishmentInNi
+
+liableForVatOnAllSales.title = liableForVatOnAllSales
+liableForVatOnAllSales.heading = liableForVatOnAllSales
+
+liableForVatOnDirectSales.title = liableForVatOnDirectSales
+liableForVatOnDirectSales.heading = liableForVatOnDirectSales
+
+notLiableForVat.title = notLiableForVat
+notLiableForVat.heading = notLiableForVat
