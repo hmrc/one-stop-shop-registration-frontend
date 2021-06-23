@@ -19,11 +19,13 @@ package controllers
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
+import formats.Format.dateFormatter
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
+import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyRegisteredView
 
@@ -46,7 +48,8 @@ class AlreadyRegisteredController @Inject()(
           Ok(view(
             HtmlFormat.escape(registration.registeredCompanyName).toString,
             request.vrn,
-            config.feedbackUrl)
+            config.feedbackUrl,
+            registration.commencementDate.format(dateFormatter))
           )
 
         case None =>

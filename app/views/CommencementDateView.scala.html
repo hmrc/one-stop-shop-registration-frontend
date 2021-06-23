@@ -6,9 +6,11 @@
 
 @(mode: Mode, formattedDate: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("commencementDate.title", formattedDate))) {
+@layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("commencementDate.heading", formattedDate)</h1>
+    <h1 class="govuk-heading-xl">@messages("commencementDate.heading")</h1>
+
+    <p class="govuk-body">@messages("commencementDate.p1", formattedDate)</p>
 
     @formHelper(action = routes.CommencementDateController.onSubmit(mode), 'autoComplete -> "off") {
 

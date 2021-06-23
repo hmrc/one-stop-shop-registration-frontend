@@ -17,9 +17,21 @@
         }
 
         @govukRadios(
-            RadiosViewModel.yesNo(
+            RadiosViewModel(
                 field = form("value"),
-                legend = LegendViewModel(messages("inControlOfMovingGoods.heading")).asPageHeading()
+                legend = LegendViewModel(messages("inControlOfMovingGoods.heading")).asPageHeading(),
+                items = Seq(
+                    RadioItem(
+                        content = Text(messages("inControlOfMovingGoods.yes")),
+                        value   = Some(true.toString),
+                        id      = Some("value_0")
+                    ),
+                    RadioItem(
+                        content = Text(messages("inControlOfMovingGoods.no")),
+                        value   = Some(false.toString),
+                        id      = Some("value_1")
+                    )
+                )
             )
         )
 

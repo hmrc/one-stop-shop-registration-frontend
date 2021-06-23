@@ -21,7 +21,7 @@
         govukButton: GovukButton
 )
 
-@(email: String, vrn: Vrn, feedbackLink: String, showEmailConfirmation: Boolean)(implicit request: Request[_], messages: Messages)
+@(email: String, vrn: Vrn, feedbackLink: String, showEmailConfirmation: Boolean, startDate: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title"))) {
     <div class="grid-row column-two-thirds" id="application_complete_id">
@@ -40,9 +40,10 @@
             </div>
         }
 
-
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
-        <p class="govuk-body">@messages("applicationComplete.caption")</p>
+
+        <p class="govuk-body">@messages("applicationComplete.p1", startDate)</p>
+        <p class="govuk-body">@messages("applicationComplete.p2")</p>
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
             @messages("applicationComplete.feedback.30seconds")

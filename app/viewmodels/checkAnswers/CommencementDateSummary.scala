@@ -36,7 +36,7 @@ class CommencementDateSummary @Inject()(dateService: DateService) {
         val startDate = dateService.startDateBasedOnFirstSale(answer)
 
         SummaryListRowViewModel(
-          key     = "ukVatEffectiveDate.checkYourAnswersLabel",
+          key     = "commencementDate.checkYourAnswersLabel",
           value   = ValueViewModel(startDate.format(dateFormatter)),
           actions = Seq.empty
         )
