@@ -17,11 +17,13 @@
 package controllers
 
 import controllers.actions._
-import javax.inject.Inject
+import pages.LiableForVatOnAllSalesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.LiableForVatOnAllSalesView
+
+import javax.inject.Inject
 
 class LiableForVatOnAllSalesController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -34,5 +36,10 @@ class LiableForVatOnAllSalesController @Inject()(
   def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
       Ok(view())
+  }
+
+  def onSubmit: Action[AnyContent] = Action{
+    _ =>
+      Redirect(LiableForVatOnAllSalesPage.navigate)
   }
 }

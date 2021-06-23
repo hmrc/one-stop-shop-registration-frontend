@@ -284,7 +284,9 @@ GET         /hasFixedEstablishmentInNi                        controllers.HasFix
 POST        /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onSubmit
 
 GET         /liableForVatOnAllSales                       controllers.LiableForVatOnAllSalesController.onPageLoad()
+POST        /liableForVatOnAllSales                       controllers.LiableForVatOnAllSalesController.onSubmit()
 
 GET         /liableForVatOnDirectSales                       controllers.LiableForVatOnDirectSalesController.onPageLoad()
+POST        /liableForVatOnDirectSales                       controllers.LiableForVatOnDirectSalesController.onSubmit()
 
 GET         /notLiableForVat                       controllers.NotLiableForVatController.onPageLoad()

@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import pages.LiableForVatOnAllSalesPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.LiableForVatOnAllSalesView
@@ -38,6 +39,20 @@ class LiableForVatOnAllSalesControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page for a POST" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.LiableForVatOnAllSalesController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual LiableForVatOnAllSalesPage.navigate.url
       }
     }
   }
