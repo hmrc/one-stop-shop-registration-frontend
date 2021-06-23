@@ -22,6 +22,7 @@ import models.emails.{EmailSendingResult, EmailToSendRequest, RegistrationConfir
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +36,9 @@ class EmailService@Inject()(emailConnector: EmailConnector)(implicit executionCo
     startDate: LocalDate,
     emailAddress: String
   )(implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
-    val formattedStartDate = s"${startDate.getDayOfMonth} ${startDate.getMonth} ${startDate.getYear}"
+
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+    val formattedStartDate = startDate.format(formatter)
 
     emailConnector.send(
       EmailToSendRequest(

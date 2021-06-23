@@ -27,6 +27,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -53,7 +54,9 @@ class EmailServiceSpec extends SpecBase {
         datesBetween(validStartDate, validEndDate)
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String, startDate: LocalDate) =>
-          val expectedDate = s"${startDate.getDayOfMonth} ${startDate.getMonth} ${startDate.getYear}"
+          val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+          val expectedDate = startDate.format(formatter)
+
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
             "oss_registration_confirmation",

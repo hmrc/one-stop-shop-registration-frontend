@@ -42,7 +42,6 @@ import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
