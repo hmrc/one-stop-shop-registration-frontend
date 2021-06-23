@@ -67,7 +67,7 @@ class AddTradingNameController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
+                _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(page.navigate(mode, updatedAnswers))
           )
       }

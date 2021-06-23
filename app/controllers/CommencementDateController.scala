@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.Constants
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.Mode
@@ -24,7 +25,7 @@ import pages.{CommencementDatePage, DateOfFirstSalePage}
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.DateService
+import services.{DateService, FeatureFlagService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
@@ -32,19 +33,24 @@ class CommencementDateController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
                                        view: CommencementDateView,
-                                       dateService: DateService
+                                       dateService: DateService,
+                                       features: FeatureFlagService
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      request.userAnswers.get(DateOfFirstSalePage).map {
-        date =>
+      if (features.schemeHasStarted) {
+        request.userAnswers.get(DateOfFirstSalePage).map {
+          date =>
 
-          val startDate = dateService.startDateBasedOnFirstSale(date)
-          Ok(view(mode, startDate.format(dateFormatter)))
-      }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+            val startDate = dateService.startDateBasedOnFirstSale(date)
+            Ok(view(mode, startDate.format(dateFormatter)))
+        }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        Ok(view(mode, Constants.schemeStartDate.format(dateFormatter)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
