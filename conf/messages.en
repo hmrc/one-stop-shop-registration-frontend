@@ -235,7 +235,7 @@ website.checkYourAnswersLabel = Website address
 website.error.required = Enter a website address
 website.error.length = Website address must be 250 characters or less
 website.error.duplicate = You entered this website address already. Enter a different one.
-website.error.invalid = Enter a website address in the correct format. For example, www.gov.uk
+website.error.invalid = Enter a website address in the correct format, like www.gov.uk
 website.change.hidden = website address
 
 deleteWebsite.title = Are you sure you need to remove {0}?
