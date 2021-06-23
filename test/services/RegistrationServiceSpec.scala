@@ -98,6 +98,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
+      .set(IsOnlineMarketplacePage, false).success.value
 
   "fromUserAnswers" - {
 
@@ -354,6 +355,16 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllWebsites)))
+      }
+
+      "when Is Online Marketplace is missing" in {
+
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
+        val userAnswers = answers.remove(IsOnlineMarketplacePage).success.value
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(IsOnlineMarketplacePage)))
       }
 
       "when Previously Registered has not been answered" in {

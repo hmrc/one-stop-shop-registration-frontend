@@ -42,9 +42,21 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
       getContactDetails(answers),
       getWebsites(answers),
       getPreviousRegistrations(answers),
-      getBankDetails(answers)
+      getBankDetails(answers),
+      getOnlineMarketplace(answers)
     ).mapN(
-      (name, tradingNames, vatDetails, euRegistrations, startDate, contactDetails, websites, previousRegistrations, bankDetails) =>
+      (
+        name,
+        tradingNames,
+        vatDetails,
+        euRegistrations,
+        startDate,
+        contactDetails,
+        websites,
+        previousRegistrations,
+        bankDetails,
+        isOnlineMarketplace
+      ) =>
         Registration(
           vrn                   = vrn,
           registeredCompanyName = name,
@@ -55,7 +67,8 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
           websites              = websites,
           commencementDate      = startDate,
           previousRegistrations = previousRegistrations,
-          bankDetails           = bankDetails
+          bankDetails           = bankDetails,
+          isOnlineMarketplace   = isOnlineMarketplace
         )
     )
 
@@ -316,5 +329,11 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
 
       case None =>
         DataMissingError(HasWebsitePage).invalidNec
+    }
+
+  private def getOnlineMarketplace(answers: UserAnswers): ValidationResult[Boolean] =
+    answers.get(IsOnlineMarketplacePage) match {
+      case Some(answer) => answer.validNec
+      case None         => DataMissingError(IsOnlineMarketplacePage).invalidNec
     }
 }

@@ -62,7 +62,8 @@ object RegistrationData extends Generators with EitherValues {
       previousRegistrations = Seq(
         PreviousRegistration(Country("DE", "Germany"), "DE123")
       ),
-      bankDetails = BankDetails("Account name", Some(bic), iban)
+      bankDetails = BankDetails("Account name", Some(bic), iban),
+      isOnlineMarketplace = false
     )
 
   private def createUkAddress(): UkAddress =
