@@ -23,7 +23,7 @@ case object SellsGoodsFromNiPage extends Page {
 
   def navigate(answer: Boolean): Call =
     if (answer) {
-      routes.InControlOfMovingGoodsController.onPageLoad()
+      routes.BusinessBasedInNiController.onPageLoad()
     } else {
       routes.NotSellingGoodsFromNiController.onPageLoad()
     }

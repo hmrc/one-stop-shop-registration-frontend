@@ -84,8 +84,6 @@ POST        /business-contact-details                                           
 GET         /check-business-contact-details                                      controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-business-contact-details                                      controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /do-not-move-goods                                                   controllers.NotInControlOfMovingGoodsController.onPageLoad()
-
 GET        /successful                                                           controllers.ApplicationCompleteController.onPageLoad()
 
 GET         /remove-uk-trading-name/:index                                       controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
@@ -219,11 +217,6 @@ GET         /give-website-address                                               
 POST        /give-website-address                                                controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
 GET         /check-give-website-address                                          controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-give-website-address                                          controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
-
-GET         /move-goods                                                          controllers.InControlOfMovingGoodsController.onPageLoad
-POST        /move-goods                                                          controllers.InControlOfMovingGoodsController.onSubmit
-GET         /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onPageLoad
-POST        /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onSubmit
 
 GET         /sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onPageLoad
 POST        /sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onSubmit

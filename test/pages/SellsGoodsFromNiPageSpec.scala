@@ -26,9 +26,9 @@ class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate" - {
 
-      "to In Control of Moving Goods when the answer is yes" in {
+      "to Business Based in NI when the answer is yes" in {
 
-        SellsGoodsFromNiPage.navigate(true) mustEqual routes.InControlOfMovingGoodsController.onPageLoad()
+        SellsGoodsFromNiPage.navigate(true) mustEqual routes.BusinessBasedInNiController.onPageLoad()
       }
 
       "to Not Selling Goods From NI when the answer is no" in {
