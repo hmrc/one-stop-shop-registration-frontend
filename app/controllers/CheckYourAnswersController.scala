@@ -96,6 +96,7 @@ class CheckYourAnswersController @Inject()(
                 registration.contactDetails.fullName,
                 registration.registeredCompanyName,
                 request.vrn.toString(),
+                registration.commencementDate,
                 registration.contactDetails.emailAddress
               ) flatMap {
                   emailConfirmationResult =>

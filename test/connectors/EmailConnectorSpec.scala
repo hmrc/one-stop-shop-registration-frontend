@@ -35,7 +35,7 @@ class EmailConnectorSpec extends SpecBase with WireMockHelper {
     to = List("name@example.com"),
     templateId = "oss_registration_confirmation",
     parameters = RegistrationConfirmationEmailParameters(
-      "Joe Bloggs", "Test Business", "123456789"
+      "Joe Bloggs", "Test Business", "1 March 2021", "123456789"
     ))
 
   private def application: Application =
