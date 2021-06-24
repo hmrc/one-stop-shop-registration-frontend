@@ -28,7 +28,8 @@ import views.html.LiableForVatOnDirectSalesView
 class LiableForVatOnDirectSalesController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: LiableForVatOnDirectSalesView
+                                       view: LiableForVatOnDirectSalesView,
+                                       page: LiableForVatOnDirectSalesPage
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -40,6 +41,6 @@ class LiableForVatOnDirectSalesController @Inject()(
 
   def onSubmit: Action[AnyContent] = Action{
     _ =>
-      Redirect(LiableForVatOnDirectSalesPage.navigate)
+      Redirect(page.navigate)
   }
 }

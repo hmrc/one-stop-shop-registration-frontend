@@ -51,8 +51,11 @@ class LiableForVatOnDirectSalesControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
+        val page = application.injector.instanceOf[LiableForVatOnDirectSalesPage]
+
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual LiableForVatOnDirectSalesPage.navigate.url
+        redirectLocation(result).value mustEqual page.navigate.url
+
       }
     }
   }

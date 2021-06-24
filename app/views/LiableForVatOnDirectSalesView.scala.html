@@ -1,5 +1,6 @@
 @this(
         layout: templates.Layout,
+        formHelper: FormWithCSRF,
         govukButton: GovukButton
 )
 
@@ -8,4 +9,11 @@
 @layout(pageTitle = titleNoForm(messages("liableForVatOnDirectSales.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("liableForVatOnDirectSales.heading")</h1>
+
+    @formHelper(action = routes.LiableForVatOnDirectSalesController.onSubmit(), 'autoComplete -> "off") {
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
 }

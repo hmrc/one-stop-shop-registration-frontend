@@ -559,11 +559,9 @@ isOnlineMarketplace.checkYourAnswersLabel = Is business an online marketplace
 isOnlineMarketplace.error.required = Select yes if your business is an online marketplace
 isOnlineMarketplace.change.hidden = if your business is an online marketplace
 
-allSalesViaMarketplace.title = allSalesViaMarketplace
-allSalesViaMarketplace.heading = allSalesViaMarketplace
-allSalesViaMarketplace.checkYourAnswersLabel = allSalesViaMarketplace
-allSalesViaMarketplace.error.required = Select yes if allSalesViaMarketplace
-allSalesViaMarketplace.change.hidden = AllSalesViaMarketplace
+allSalesViaMarketplace.title = Do you make all your sales via an online marketplace?
+allSalesViaMarketplace.heading = Do you make all your sales via an online marketplace?
+allSalesViaMarketplace.error.required = Select yes if you make all your sales via an online marketplace
 
 businessBasedInNi.title = Is your principle place of business in Northern Ireland?
 businessBasedInNi.heading = Is your principle place of business in Northern Ireland?

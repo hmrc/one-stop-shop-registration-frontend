@@ -17,16 +17,40 @@
 package pages
 
 import controllers.routes
+import org.mockito.Mockito.when
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
+import services.FeatureFlagService
 
-class LiableForVatOnAllSalesPageSpec extends AnyFreeSpec with Matchers {
+class LiableForVatOnAllSalesPageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
   "LiableForVatOnAllSales page" - {
 
-    "must navigate to Has Made Sales" in {
+    "when the scheme has started" - {
 
-      LiableForVatOnAllSalesPage.navigate mustEqual routes.HasMadeSalesController.onPageLoad()
+      "must navigate to Has Made Sales" in {
+
+        val features = mock[FeatureFlagService]
+        val page = new LiableForVatOnAllSalesPage(features)
+
+        when(features.schemeHasStarted) thenReturn true
+
+        page.navigate mustEqual routes.HasMadeSalesController.onPageLoad()
+      }
+    }
+
+    "when the scheme has not started yet" - {
+
+      "must navigate to auth.onSignIn" in {
+
+        val features = mock[FeatureFlagService]
+        val page = new LiableForVatOnAllSalesPage(features)
+
+        when(features.schemeHasStarted) thenReturn false
+
+        page.navigate mustEqual controllers.auth.routes.AuthController.onSignIn()
+      }
     }
   }
 }
