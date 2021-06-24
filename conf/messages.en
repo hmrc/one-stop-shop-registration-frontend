@@ -558,3 +558,34 @@ isOnlineMarketplace.heading = Is your business an online marketplace?
 isOnlineMarketplace.checkYourAnswersLabel = Is business an online marketplace
 isOnlineMarketplace.error.required = Select yes if your business is an online marketplace
 isOnlineMarketplace.change.hidden = if your business is an online marketplace
+
+businessBasedInNi.title = Is your principle place of business in Northern Ireland?
+businessBasedInNi.heading = Is your principle place of business in Northern Ireland?
+businessBasedInNi.error.required = Select yes if your principle place of business is in Northern Ireland
+
+hasFixedEstablishmentInNi.title = Do you have a fixed establishment in Northern Ireland?
+hasFixedEstablishmentInNi.heading = Do you have a fixed establishment in Northern Ireland?
+hasFixedEstablishmentInNi.error.required = Select yes if you have a fixed establishment in Northern Ireland
+
+liableForVatOnAllSales.title = Report and pay VAT on sales
+liableForVatOnAllSales.heading = Report and pay VAT on sales
+liableForVatOnAllSales.p1 = Your business is responsible for reporting and paying VAT for all sales to consumers in EU countries.
+liableForVatOnAllSales.p2 = This includes sales made on online marketplaces.
+
+liableForVatOnDirectSales.title = Do not report and pay VAT on sales made on online marketplaces
+liableForVatOnDirectSales.heading = Do not report and pay VAT on sales made on online marketplaces
+liableForVatOnDirectSales.p1 = The online marketplaces will be responsible for the VAT on those sales.
+liableForVatOnDirectSales.p2 = Your business is responsible for VAT on sales made to EU countries via other channels.
+liableForVatOnDirectSales.p3 = Only sales made via other channels count towards the £8,818 (10,000 euros) threshold for your business.
+
+notLiableForVat.title = You cannot register
+notLiableForVat.heading = You cannot register
+notLiableForVat.p1 = Your business is not responsible for reporting and paying VAT to EU countries.
+notLiableForVat.p2 = The online marketplaces you use to sell goods will be responsible for registering for this scheme and reporting and paying the VAT.
+
+salesChannels.title = How will you sell goods to consumers in EU counties?
+salesChannels.heading = How will you sell goods to consumers in EU counties?
+salesChannels.onlineMarketplaces = Only via online marketplaces
+salesChannels.mixed = Via online marketplaces and other sales channels
+salesChannels.notOnlineMarketplaces = Not via online marketplaces
+salesChannels.error.required = Select how you will sell goods to consumers in EU countries

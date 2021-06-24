@@ -1,0 +1,25 @@
+@this(
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("liableForVatOnDirectSales.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("liableForVatOnDirectSales.heading")</h1>
+
+    <p class="govuk-body">@messages("liableForVatOnDirectSales.p1")</p>
+
+    <p class="govuk-body">@messages("liableForVatOnDirectSales.p2")</p>
+
+    <p class="govuk-body">@messages("liableForVatOnDirectSales.p3")</p>
+
+    @formHelper(action = routes.LiableForVatOnDirectSalesController.onSubmit(), 'autoComplete -> "off") {
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

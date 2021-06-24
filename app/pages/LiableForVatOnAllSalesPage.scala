@@ -18,13 +18,15 @@ package pages
 
 import controllers.routes
 import play.api.mvc.Call
+import services.FeatureFlagService
 
-case object SellsGoodsFromNiPage extends Page {
+import javax.inject.Inject
 
-  def navigate(answer: Boolean): Call =
-    if (answer) {
-      routes.BusinessBasedInNiController.onPageLoad()
-    } else {
-      routes.NotSellingGoodsFromNiController.onPageLoad()
-    }
+class LiableForVatOnAllSalesPage @Inject()(features: FeatureFlagService) extends Page {
+
+  def navigate: Call = if (features.schemeHasStarted) {
+    routes.HasMadeSalesController.onPageLoad()
+  } else {
+    controllers.auth.routes.AuthController.onSignIn()
+  }
 }

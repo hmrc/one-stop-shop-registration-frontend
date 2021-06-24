@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package pages
-
-import controllers.routes
-import play.api.mvc.Call
-import services.FeatureFlagService
+package forms
 
 import javax.inject.Inject
 
-class InControlOfMovingGoodsPage @Inject()(features: FeatureFlagService) extends Page {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  def navigate(answer: Boolean): Call =
-    if (answer) {
-      if (features.schemeHasStarted) {
-        routes.HasMadeSalesController.onPageLoad()
-      } else {
-        controllers.auth.routes.AuthController.onSignIn()
-      }
-    } else {
-      routes.NotInControlOfMovingGoodsController.onPageLoad()
-    }
+class BusinessBasedInNiFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("businessBasedInNi.error.required")
+    )
 }

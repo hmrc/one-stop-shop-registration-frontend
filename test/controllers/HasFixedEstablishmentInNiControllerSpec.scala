@@ -17,32 +17,32 @@
 package controllers
 
 import base.SpecBase
-import forms.InControlOfMovingGoodsFormProvider
+import forms.HasFixedEstablishmentInNiFormProvider
 import org.scalatestplus.mockito.MockitoSugar
-import pages.InControlOfMovingGoodsPage
+import pages.HasFixedEstablishmentInNiPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.InControlOfMovingGoodsView
+import views.html.HasFixedEstablishmentInNiView
 
-class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
+class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new InControlOfMovingGoodsFormProvider()
+  private val formProvider = new HasFixedEstablishmentInNiFormProvider()
   private val form = formProvider()
 
-  private lazy val inControlOfMovingGoodsRoute = routes.InControlOfMovingGoodsController.onPageLoad().url
+  private lazy val hasFixedEstablishmentInNiRoute = routes.HasFixedEstablishmentInNiController.onPageLoad().url
 
-  "InControlOfMovingGoods Controller" - {
+  "HasFixedEstablishmentInNi Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, inControlOfMovingGoodsRoute)
+        val request = FakeRequest(GET, hasFixedEstablishmentInNiRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[InControlOfMovingGoodsView]
+        val view = application.injector.instanceOf[HasFixedEstablishmentInNiView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form)(request, messages(application)).toString
@@ -55,15 +55,13 @@ class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, inControlOfMovingGoodsRoute)
+          FakeRequest(POST, hasFixedEstablishmentInNiRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
-        val page = application.injector.instanceOf[InControlOfMovingGoodsPage]
-
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual page.navigate(true).url
+        redirectLocation(result).value mustEqual HasFixedEstablishmentInNiPage.navigate(true).url
       }
     }
 
@@ -73,12 +71,12 @@ class InControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, inControlOfMovingGoodsRoute)
+          FakeRequest(POST, hasFixedEstablishmentInNiRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[InControlOfMovingGoodsView]
+        val view = application.injector.instanceOf[HasFixedEstablishmentInNiView]
 
         val result = route(application, request).value
 

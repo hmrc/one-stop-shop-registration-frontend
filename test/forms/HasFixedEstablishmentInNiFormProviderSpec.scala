@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import base.SpecBase
-import controllers.routes
-import pages.behaviours.PageBehaviours
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
+class HasFixedEstablishmentInNiFormProviderSpec extends BooleanFieldBehaviours {
 
-  "SellsGoodsFromNiPage" - {
+  val requiredKey = "hasFixedEstablishmentInNi.error.required"
+  val invalidKey = "error.boolean"
 
-    "must navigate" - {
+  val form = new HasFixedEstablishmentInNiFormProvider()()
 
-      "to Business Based in NI when the answer is yes" in {
+  ".value" - {
 
-        SellsGoodsFromNiPage.navigate(true) mustEqual routes.BusinessBasedInNiController.onPageLoad()
-      }
+    val fieldName = "value"
 
-      "to Not Selling Goods From NI when the answer is no" in {
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
 
-        SellsGoodsFromNiPage.navigate(false) mustEqual routes.NotSellingGoodsFromNiController.onPageLoad()
-      }
-    }
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
   }
 }

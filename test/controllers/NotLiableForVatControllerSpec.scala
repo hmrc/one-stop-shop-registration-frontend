@@ -17,27 +17,24 @@
 package controllers
 
 import base.SpecBase
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.NotInControlOfMovingGoodsView
+import views.html.NotLiableForVatView
 
-class NotInControlOfMovingGoodsControllerSpec extends SpecBase with MockitoSugar {
+class NotLiableForVatControllerSpec extends SpecBase {
 
-  private lazy val cannotRegisterForServiceRoute = routes.NotInControlOfMovingGoodsController.onPageLoad().url
-
-  "NotInControlOfMovingGoods Controller" - {
+  "NotLiableForVat Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, cannotRegisterForServiceRoute)
+        val request = FakeRequest(GET, routes.NotLiableForVatController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NotInControlOfMovingGoodsView]
+        val view = application.injector.instanceOf[NotLiableForVatView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString

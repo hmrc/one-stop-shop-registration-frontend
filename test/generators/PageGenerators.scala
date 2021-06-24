@@ -24,6 +24,15 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
+  implicit lazy val arbitrarySalesChannelsPage: Arbitrary[SalesChannelsPage.type] =
+    Arbitrary(SalesChannelsPage)
+
+  implicit lazy val arbitraryHasFixedEstablishmentInNiPage: Arbitrary[HasFixedEstablishmentInNiPage.type] =
+    Arbitrary(HasFixedEstablishmentInNiPage)
+
+  implicit lazy val arbitraryBusinessBasedInNiPage: Arbitrary[BusinessBasedInNiPage.type] =
+    Arbitrary(BusinessBasedInNiPage)
+
   implicit lazy val arbitraryIsOnlineMarketplacePage: Arbitrary[IsOnlineMarketplacePage.type] =
     Arbitrary(IsOnlineMarketplacePage)
 

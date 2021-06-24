@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import javax.inject.Inject
+import controllers.routes
+import models.SalesChannels
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
-import forms.mappings.Mappings
-import play.api.data.Form
+case object SalesChannelsPage extends QuestionPage[SalesChannels] {
 
-class InControlOfMovingGoodsFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("inControlOfMovingGoods.error.required")
-    )
+  override def toString: String = "salesChannels"
+
+  def navigate(answer: SalesChannels): Call =
+    if (answer == SalesChannels.OnlineMarketplaces) {
+      routes.NotLiableForVatController.onPageLoad()
+    } else {
+      routes.LiableForVatOnDirectSalesController.onPageLoad()
+    }
 }

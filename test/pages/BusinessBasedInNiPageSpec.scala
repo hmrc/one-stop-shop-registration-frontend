@@ -20,20 +20,26 @@ import base.SpecBase
 import controllers.routes
 import pages.behaviours.PageBehaviours
 
-class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
+class BusinessBasedInNiPageSpec extends SpecBase with PageBehaviours {
 
-  "SellsGoodsFromNiPage" - {
+  "BusinessBasedInNiPage" - {
+
+    beRetrievable[Boolean](BusinessBasedInNiPage)
+
+    beSettable[Boolean](BusinessBasedInNiPage)
+
+    beRemovable[Boolean](BusinessBasedInNiPage)
 
     "must navigate" - {
 
-      "to Business Based in NI when the answer is yes" in {
+      "to Liable for VAT on All Sales when the answer is yes" in {
 
-        SellsGoodsFromNiPage.navigate(true) mustEqual routes.BusinessBasedInNiController.onPageLoad()
+        BusinessBasedInNiPage.navigate(true) mustEqual routes.LiableForVatOnAllSalesController.onPageLoad()
       }
 
-      "to Not Selling Goods From NI when the answer is no" in {
+      "to Has Fixed Establishment in NI when the answer is no" in {
 
-        SellsGoodsFromNiPage.navigate(false) mustEqual routes.NotSellingGoodsFromNiController.onPageLoad()
+        BusinessBasedInNiPage.navigate(false) mustEqual routes.HasFixedEstablishmentInNiController.onPageLoad()
       }
     }
   }

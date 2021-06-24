@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package controllers
-
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.NotInControlOfMovingGoodsView
+package forms
 
 import javax.inject.Inject
 
-class NotInControlOfMovingGoodsController @Inject()(
-    override val messagesApi: MessagesApi,
-    val controllerComponents: MessagesControllerComponents,
-    view: NotInControlOfMovingGoodsView
-) extends FrontendBaseController with I18nSupport {
+import forms.mappings.Mappings
+import play.api.data.Form
+import models.SalesChannels
 
-  def onPageLoad(): Action[AnyContent] = Action {
-    implicit request =>
-      Ok(view())
-  }
+class SalesChannelsFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[SalesChannels] =
+    Form(
+      "value" -> enumerable[SalesChannels]("salesChannels.error.required")
+    )
 }

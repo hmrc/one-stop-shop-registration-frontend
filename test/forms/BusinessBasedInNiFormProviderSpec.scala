@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import controllers.routes
-import play.api.mvc.Call
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-case object SellsGoodsFromNiPage extends Page {
+class BusinessBasedInNiFormProviderSpec extends BooleanFieldBehaviours {
 
-  def navigate(answer: Boolean): Call =
-    if (answer) {
-      routes.BusinessBasedInNiController.onPageLoad()
-    } else {
-      routes.NotSellingGoodsFromNiController.onPageLoad()
-    }
+  val requiredKey = "businessBasedInNi.error.required"
+  val invalidKey = "error.boolean"
+
+  val form = new BusinessBasedInNiFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

@@ -20,20 +20,26 @@ import base.SpecBase
 import controllers.routes
 import pages.behaviours.PageBehaviours
 
-class SellsGoodsFromNiPageSpec extends SpecBase with PageBehaviours {
+class HasFixedEstablishmentInNiPageSpec extends SpecBase with PageBehaviours {
 
-  "SellsGoodsFromNiPage" - {
+  "HasFixedEstablishmentInNiPage" - {
+
+    beRetrievable[Boolean](HasFixedEstablishmentInNiPage)
+
+    beSettable[Boolean](HasFixedEstablishmentInNiPage)
+
+    beRemovable[Boolean](HasFixedEstablishmentInNiPage)
 
     "must navigate" - {
 
-      "to Business Based in NI when the answer is yes" in {
+      "to Liable For VAT on All Sales when the answer is yes" in {
 
-        SellsGoodsFromNiPage.navigate(true) mustEqual routes.BusinessBasedInNiController.onPageLoad()
+        HasFixedEstablishmentInNiPage.navigate(true) mustEqual routes.LiableForVatOnAllSalesController.onPageLoad()
       }
 
-      "to Not Selling Goods From NI when the answer is no" in {
+      "to All Sales Via Marketplace when the answer is no" in {
 
-        SellsGoodsFromNiPage.navigate(false) mustEqual routes.NotSellingGoodsFromNiController.onPageLoad()
+        HasFixedEstablishmentInNiPage.navigate(false) mustEqual routes.SalesChannelsController.onPageLoad()
       }
     }
   }

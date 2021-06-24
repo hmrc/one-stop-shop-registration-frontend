@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import controllers.routes
-import play.api.mvc.Call
+import javax.inject.Inject
 
-case object SellsGoodsFromNiPage extends Page {
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  def navigate(answer: Boolean): Call =
-    if (answer) {
-      routes.BusinessBasedInNiController.onPageLoad()
-    } else {
-      routes.NotSellingGoodsFromNiController.onPageLoad()
-    }
+class HasFixedEstablishmentInNiFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("hasFixedEstablishmentInNi.error.required")
+    )
 }

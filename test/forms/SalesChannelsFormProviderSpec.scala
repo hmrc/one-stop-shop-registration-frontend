@@ -16,24 +16,24 @@
 
 package forms
 
-import forms.behaviours.BooleanFieldBehaviours
+import forms.behaviours.OptionFieldBehaviours
+import models.SalesChannels
 import play.api.data.FormError
 
-class InControlOfMovingGoodsFormProviderSpec extends BooleanFieldBehaviours {
+class SalesChannelsFormProviderSpec extends OptionFieldBehaviours {
 
-  val requiredKey = "inControlOfMovingGoods.error.required"
-  val invalidKey = "error.boolean"
-
-  val form = new InControlOfMovingGoodsFormProvider()()
+  val form = new SalesChannelsFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
+    val requiredKey = "salesChannels.error.required"
 
-    behave like booleanField(
+    behave like optionsField[SalesChannels](
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      validValues  = SalesChannels.values,
+      invalidError = FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(

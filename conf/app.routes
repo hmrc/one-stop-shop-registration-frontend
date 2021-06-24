@@ -84,8 +84,6 @@ POST        /business-contact-details                                           
 GET         /check-business-contact-details                                      controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-business-contact-details                                      controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /do-not-move-goods                                                   controllers.NotInControlOfMovingGoodsController.onPageLoad()
-
 GET        /successful                                                           controllers.ApplicationCompleteController.onPageLoad()
 
 GET         /remove-uk-trading-name/:index                                       controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
@@ -220,11 +218,6 @@ POST        /give-website-address                                               
 GET         /check-give-website-address                                          controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-give-website-address                                          controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
 
-GET         /move-goods                                                          controllers.InControlOfMovingGoodsController.onPageLoad
-POST        /move-goods                                                          controllers.InControlOfMovingGoodsController.onSubmit
-GET         /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onPageLoad
-POST        /check-move-goods                                                    controllers.InControlOfMovingGoodsController.onSubmit
-
 GET         /sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onPageLoad
 POST        /sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onSubmit
 GET         /check-sell-from-northern-ireland                                    controllers.SellsGoodsFromNiController.onPageLoad
@@ -273,3 +266,20 @@ GET         /online-marketplace                                                 
 POST        /online-marketplace                                                  controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
 GET         /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
+
+GET         /ni-business                                                         controllers.BusinessBasedInNiController.onPageLoad
+POST        /ni-business                                                         controllers.BusinessBasedInNiController.onSubmit
+
+GET         /ni-fixed-establishment                                              controllers.HasFixedEstablishmentInNiController.onPageLoad
+POST        /ni-fixed-establishment                                              controllers.HasFixedEstablishmentInNiController.onSubmit
+
+GET         /business-pay                                                        controllers.LiableForVatOnAllSalesController.onPageLoad()
+POST        /business-pay                                                        controllers.LiableForVatOnAllSalesController.onSubmit()
+
+GET         /do-not-pay-sales-on-marketplace                                     controllers.LiableForVatOnDirectSalesController.onPageLoad()
+POST        /do-not-pay-sales-on-marketplace                                     controllers.LiableForVatOnDirectSalesController.onSubmit()
+
+GET         /cannot-use-no-vat                                                   controllers.NotLiableForVatController.onPageLoad()
+
+GET        /how-do-you-sell                                                      controllers.SalesChannelsController.onPageLoad
+POST       /how-do-you-sell                                                      controllers.SalesChannelsController.onSubmit

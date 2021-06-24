@@ -17,21 +17,20 @@
 package controllers
 
 import controllers.actions._
-import forms.InControlOfMovingGoodsFormProvider
-import pages.InControlOfMovingGoodsPage
+import forms.HasFixedEstablishmentInNiFormProvider
+import pages.HasFixedEstablishmentInNiPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.InControlOfMovingGoodsView
+import views.html.HasFixedEstablishmentInNiView
 
 import javax.inject.Inject
 
-class InControlOfMovingGoodsController @Inject()(
+class HasFixedEstablishmentInNiController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         formProvider: InControlOfMovingGoodsFormProvider,
-                                         view: InControlOfMovingGoodsView,
-                                         page: InControlOfMovingGoodsPage
+                                         formProvider: HasFixedEstablishmentInNiFormProvider,
+                                         view: HasFixedEstablishmentInNiView
                                  ) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -39,7 +38,6 @@ class InControlOfMovingGoodsController @Inject()(
 
   def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
-
       Ok(view(form))
   }
 
@@ -51,7 +49,7 @@ class InControlOfMovingGoodsController @Inject()(
           BadRequest(view(formWithErrors)),
 
         value =>
-          Redirect(page.navigate(value))
+          Redirect(HasFixedEstablishmentInNiPage.navigate(value))
       )
   }
 }
