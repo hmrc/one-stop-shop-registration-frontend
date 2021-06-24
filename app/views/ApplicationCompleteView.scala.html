@@ -23,7 +23,7 @@
 
 @(email: String, vrn: Vrn, feedbackLink: String, showEmailConfirmation: Boolean, startDate: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("applicationComplete.title"))) {
+@layout(pageTitle = titleNoForm(messages("applicationComplete.title")),  showBackLink = false) {
     <div class="grid-row column-two-thirds" id="application_complete_id">
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
