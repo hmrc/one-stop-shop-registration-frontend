@@ -17,32 +17,33 @@
 package controllers
 
 import base.SpecBase
-import forms.AllSalesViaMarketplaceFormProvider
+import forms.SalesChannelsFormProvider
+import models.SalesChannels
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AllSalesViaMarketplacePage
+import pages.SalesChannelsPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.AllSalesViaMarketplaceView
+import views.html.SalesChannelsView
 
-class AllSalesViaMarketplaceControllerSpec extends SpecBase with MockitoSugar {
+class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new AllSalesViaMarketplaceFormProvider()
+  private lazy val salesChannelsRoute = routes.SalesChannelsController.onPageLoad().url
+
+  private val formProvider = new SalesChannelsFormProvider()
   private val form = formProvider()
 
-  private lazy val allSalesViaMarketplaceRoute = routes.AllSalesViaMarketplaceController.onPageLoad().url
-
-  "AllSalesViaMarketplace Controller" - {
+  "SalesChannels Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, allSalesViaMarketplaceRoute)
+        val request = FakeRequest(GET, salesChannelsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AllSalesViaMarketplaceView]
+        val view = application.injector.instanceOf[SalesChannelsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form)(request, messages(application)).toString
@@ -55,13 +56,14 @@ class AllSalesViaMarketplaceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, allSalesViaMarketplaceRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, salesChannelsRoute)
+            .withFormUrlEncodedBody(("value", SalesChannels.values.head.toString))
 
         val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(SalesChannelsPage, SalesChannels.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AllSalesViaMarketplacePage.navigate(true).url
+        redirectLocation(result).value mustEqual SalesChannelsPage.navigate(SalesChannels.values.head).url
       }
     }
 
@@ -71,12 +73,12 @@ class AllSalesViaMarketplaceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, allSalesViaMarketplaceRoute)
-            .withFormUrlEncodedBody(("value", ""))
+          FakeRequest(POST, salesChannelsRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[AllSalesViaMarketplaceView]
+        val view = application.injector.instanceOf[SalesChannelsView]
 
         val result = route(application, request).value
 

@@ -267,19 +267,19 @@ POST        /online-marketplace                                                 
 GET         /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-online-marketplace                                            controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
 
-GET         /allSalesViaMarketplace                        controllers.AllSalesViaMarketplaceController.onPageLoad
-POST        /allSalesViaMarketplace                        controllers.AllSalesViaMarketplaceController.onSubmit
+GET         /ni-business                                                         controllers.BusinessBasedInNiController.onPageLoad
+POST        /ni-business                                                         controllers.BusinessBasedInNiController.onSubmit
 
-GET         /businessBasedInNi                        controllers.BusinessBasedInNiController.onPageLoad
-POST        /businessBasedInNi                        controllers.BusinessBasedInNiController.onSubmit
+GET         /ni-fixed-establishment                                              controllers.HasFixedEstablishmentInNiController.onPageLoad
+POST        /ni-fixed-establishment                                              controllers.HasFixedEstablishmentInNiController.onSubmit
 
-GET         /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onPageLoad
-POST        /hasFixedEstablishmentInNi                        controllers.HasFixedEstablishmentInNiController.onSubmit
+GET         /business-pay                                                        controllers.LiableForVatOnAllSalesController.onPageLoad()
+POST        /business-pay                                                        controllers.LiableForVatOnAllSalesController.onSubmit()
 
-GET         /liableForVatOnAllSales                       controllers.LiableForVatOnAllSalesController.onPageLoad()
-POST        /liableForVatOnAllSales                       controllers.LiableForVatOnAllSalesController.onSubmit()
+GET         /do-not-pay-sales-on-marketplace                                     controllers.LiableForVatOnDirectSalesController.onPageLoad()
+POST        /do-not-pay-sales-on-marketplace                                     controllers.LiableForVatOnDirectSalesController.onSubmit()
 
-GET         /liableForVatOnDirectSales                       controllers.LiableForVatOnDirectSalesController.onPageLoad()
-POST        /liableForVatOnDirectSales                       controllers.LiableForVatOnDirectSalesController.onSubmit()
+GET         /cannot-use-no-vat                                                   controllers.NotLiableForVatController.onPageLoad()
 
-GET         /notLiableForVat                       controllers.NotLiableForVatController.onPageLoad()
+GET        /how-do-you-sell                                                      controllers.SalesChannelsController.onPageLoad
+POST       /how-do-you-sell                                                      controllers.SalesChannelsController.onSubmit

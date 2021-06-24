@@ -24,6 +24,11 @@ import uk.gov.hmrc.domain.Vrn
 
 trait ModelGenerators {
 
+  implicit lazy val arbitrarySalesChannels: Arbitrary[SalesChannels] =
+    Arbitrary {
+      Gen.oneOf(SalesChannels.values.toSeq)
+    }
+
   implicit lazy val arbitraryBic: Arbitrary[Bic] = {
     val asciiCodeForA = 65
     val asciiCodeForN = 78

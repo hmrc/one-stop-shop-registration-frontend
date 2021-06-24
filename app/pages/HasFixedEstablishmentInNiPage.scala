@@ -30,6 +30,6 @@ case object HasFixedEstablishmentInNiPage extends QuestionPage[Boolean] {
     if (answer) {
       routes.LiableForVatOnAllSalesController.onPageLoad()
     } else {
-      routes.AllSalesViaMarketplaceController.onPageLoad()
+      routes.SalesChannelsController.onPageLoad()
     }
 }

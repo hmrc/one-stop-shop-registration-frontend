@@ -17,27 +17,28 @@
 package controllers
 
 import controllers.actions._
-import forms.AllSalesViaMarketplaceFormProvider
-import pages.AllSalesViaMarketplacePage
+import forms.SalesChannelsFormProvider
+import pages.SalesChannelsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.AllSalesViaMarketplaceView
+import views.html.SalesChannelsView
 
 import javax.inject.Inject
 
-class AllSalesViaMarketplaceController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: AllSalesViaMarketplaceFormProvider,
-                                         view: AllSalesViaMarketplaceView
-                                 ) extends FrontendBaseController with I18nSupport {
+class SalesChannelsController @Inject()(
+                                       override val messagesApi: MessagesApi,
+                                       cc: AuthenticatedControllerComponents,
+                                       formProvider: SalesChannelsFormProvider,
+                                       view: SalesChannelsView
+                                     ) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
+
       Ok(view(form))
   }
 
@@ -49,7 +50,7 @@ class AllSalesViaMarketplaceController @Inject()(
           BadRequest(view(formWithErrors)),
 
         value =>
-          Redirect(AllSalesViaMarketplacePage.navigate(value))
+          Redirect(SalesChannelsPage.navigate(value))
       )
   }
 }

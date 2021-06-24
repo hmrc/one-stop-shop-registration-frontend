@@ -39,7 +39,7 @@ class HasFixedEstablishmentInNiPageSpec extends SpecBase with PageBehaviours {
 
       "to All Sales Via Marketplace when the answer is no" in {
 
-        HasFixedEstablishmentInNiPage.navigate(false) mustEqual routes.AllSalesViaMarketplaceController.onPageLoad()
+        HasFixedEstablishmentInNiPage.navigate(false) mustEqual routes.SalesChannelsController.onPageLoad()
       }
     }
   }

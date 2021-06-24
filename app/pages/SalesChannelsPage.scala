@@ -17,17 +17,18 @@
 package pages
 
 import controllers.routes
+import models.SalesChannels
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object AllSalesViaMarketplacePage extends QuestionPage[Boolean] {
+case object SalesChannelsPage extends QuestionPage[SalesChannels] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "allSalesViaMarketplace"
+  override def toString: String = "salesChannels"
 
-  def navigate(answer: Boolean): Call =
-    if (answer) {
+  def navigate(answer: SalesChannels): Call =
+    if (answer == SalesChannels.OnlineMarketplaces) {
       routes.NotLiableForVatController.onPageLoad()
     } else {
       routes.LiableForVatOnDirectSalesController.onPageLoad()

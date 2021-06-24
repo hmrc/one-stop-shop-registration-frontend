@@ -20,11 +20,12 @@ import javax.inject.Inject
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import models.SalesChannels
 
-class AllSalesViaMarketplaceFormProvider @Inject() extends Mappings {
+class SalesChannelsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(): Form[SalesChannels] =
     Form(
-      "value" -> boolean("allSalesViaMarketplace.error.required")
+      "value" -> enumerable[SalesChannels]("salesChannels.error.required")
     )
 }

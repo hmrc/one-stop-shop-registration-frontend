@@ -10,6 +10,10 @@
 
     <h1 class="govuk-heading-xl">@messages("liableForVatOnAllSales.heading")</h1>
 
+    <p class="govuk-body">@messages("liableForVatOnAllSales.p1")</p>
+
+    <p class="govuk-body">@messages("liableForVatOnAllSales.p2")</p>
+
     @formHelper(action = routes.LiableForVatOnAllSalesController.onSubmit(), 'autoComplete -> "off") {
 
         @govukButton(
