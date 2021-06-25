@@ -67,7 +67,7 @@ class CheckYourAnswersController @Inject()(
           new HasTradingNameSummary(features).row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
           DateOfFirstSaleSummary.row(request.userAnswers),
-          new CommencementDateSummary(dateService).row(request.userAnswers),
+          new CommencementDateSummary(dateService, features).row(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
           PreviouslyRegisteredSummary.row(request.userAnswers),

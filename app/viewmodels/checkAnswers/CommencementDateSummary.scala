@@ -16,29 +16,41 @@
 
 package viewmodels.checkAnswers
 
+import config.Constants
 import formats.Format.dateFormatter
 import models.UserAnswers
 import pages.DateOfFirstSalePage
 import play.api.i18n.Messages
-import services.DateService
+import services.{DateService, FeatureFlagService}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 import javax.inject.Inject
 
-class CommencementDateSummary @Inject()(dateService: DateService) {
+class CommencementDateSummary @Inject()(
+                                         dateService: DateService,
+                                         features: FeatureFlagService
+                                       ) {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(DateOfFirstSalePage).map {
-      answer =>
+    if(features.schemeHasStarted) {
+      answers.get(DateOfFirstSalePage).map {
+        answer =>
 
-        val startDate = dateService.startDateBasedOnFirstSale(answer)
+          val startDate = dateService.startDateBasedOnFirstSale(answer)
 
-        SummaryListRowViewModel(
-          key     = "commencementDate.checkYourAnswersLabel",
-          value   = ValueViewModel(startDate.format(dateFormatter)),
-          actions = Seq.empty
-        )
+          SummaryListRowViewModel(
+            key = "commencementDate.checkYourAnswersLabel",
+            value = ValueViewModel(startDate.format(dateFormatter)),
+            actions = Seq.empty
+          )
+      }
+    } else {
+      Some(SummaryListRowViewModel(
+        key = "commencementDate.checkYourAnswersLabel",
+        value = ValueViewModel(Constants.schemeStartDate.format(dateFormatter)),
+        actions = Seq.empty
+      ))
     }
 }
