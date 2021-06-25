@@ -15,9 +15,8 @@
 
     <p class="govuk-body">
         @messages("useOtherAccount.p2.1")
-        <a href="@controllers.auth.routes.AuthController.redirectToLogin(routes.IndexController.onPageLoad().url).url" class="govuk-link">
-        @messages("useOtherAccount.p2.link.text")
-        </a>
+        <a href="@controllers.auth.routes.AuthController.redirectToLogin(routes.IndexController.onPageLoad().url).url"
+           class="govuk-link">@messages("useOtherAccount.p2.link.text")</a>
         @messages("useOtherAccount.p2.2")
     </p>
 }
