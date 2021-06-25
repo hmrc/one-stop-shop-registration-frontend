@@ -68,7 +68,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
     "when no continue Url is supplied" - {
 
-      "must return OK and the start again view" in {
+      "must return OK and the start again view with link to vatNumber when No VAT info" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -79,8 +79,28 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
+          val expectedRedirectURl = routes.CheckVatNumberController.onPageLoad().url
+
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) mustEqual startAgainView(expectedRedirectURl)(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the start again view with link to vatNumber when user VAT info exists" in {
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
+
+          val expectedRedirectURl = routes.CheckVatDetailsController.onPageLoad().url
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual startAgainView(expectedRedirectURl)(request, messages(application)).toString
         }
       }
     }

@@ -49,6 +49,12 @@ class JourneyRecoveryController @Inject()(
           }
       }
 
+//      if (request.userAnswers.vatInfo.isDefined) {
+//        routes.CheckVatDetailsController.onPageLoad()
+//      } else {
+//        routes.CheckVatNumberController.onPageLoad()
+//      }
+
       safeUrl
         .map(url => Ok(continueView(url)))
         .getOrElse(Ok(startAgainView()))
