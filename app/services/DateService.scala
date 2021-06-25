@@ -16,7 +16,6 @@
 
 package services
 
-import config.Constants
 import config.Constants.schemeStartDate
 
 import java.time.{Clock, LocalDate}

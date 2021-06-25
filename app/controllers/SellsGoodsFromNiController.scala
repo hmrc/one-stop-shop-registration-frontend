@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions._
 import forms.SellsGoodsFromNiFormProvider
-import models.Mode
 import pages.SellsGoodsFromNiPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
