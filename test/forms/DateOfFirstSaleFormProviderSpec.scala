@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.FormError
 import services.DateService
 
-import java.time.{Clock, LocalDate, ZoneId}
+import java.time.LocalDate
 
 class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with MockitoSugar {
 

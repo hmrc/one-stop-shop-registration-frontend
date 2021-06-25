@@ -30,7 +30,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasTradingNamePage, HasWebsitePage}
+import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasWebsitePage}
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest

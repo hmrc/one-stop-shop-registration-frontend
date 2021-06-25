@@ -17,7 +17,6 @@
 package pages
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode}
 import org.mockito.Mockito

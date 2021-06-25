@@ -49,10 +49,11 @@
 
         @govukInput(
             InputViewModel(
-                field = form("county"),
+                field = form("stateOrRegion"),
                 label = LabelViewModel(messages("fixedEstablishmentAddress.stateOrRegion"))
             )
             .withWidth(TwoThirds)
+            .withAutocomplete("state-or-region")
         )
 
         @govukInput(
