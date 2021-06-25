@@ -48,7 +48,8 @@ journeyRecovery.continue.heading = Sorry, there is a problem with the service
 journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
 journeyRecovery.startAgain.title = Sorry, there is a problem with the service
 journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.startAgain.guidance = [Add content to explain why the user needs to start again.]
+journeyRecovery.startAgain.guidance.heading = You did not answer all the questions
+journeyRecovery.startAgain.guidance = You need to fill in all the missing information before we can register you
 
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
