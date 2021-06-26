@@ -75,6 +75,7 @@ trait SpecBase
       .overrides(
         bind[AuthenticatedIdentifierAction].to[FakeAuthenticatedIdentifierAction],
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
+        bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[Clock].toInstance(clockToBind)
       )

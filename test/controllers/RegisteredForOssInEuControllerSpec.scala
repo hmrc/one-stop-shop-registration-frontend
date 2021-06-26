@@ -18,12 +18,19 @@ package controllers
 
 import base.SpecBase
 import forms.RegisteredForOssInEuFormProvider
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import pages.RegisteredForOssInEuPage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.UnauthenticatedSessionRepository
 import views.html.RegisteredForOssInEuView
 
-class RegisteredForOssInEuControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val formProvider = new RegisteredForOssInEuFormProvider()
   private lazy val form = formProvider()
@@ -48,9 +55,32 @@ class RegisteredForOssInEuControllerSpec extends SpecBase {
       }
     }
 
+    "must populate the view and return OK and the correct view for a GET when the question has been answered" in {
+
+      val answers = emptyUserAnswers.set(RegisteredForOssInEuPage, true).success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllerRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[RegisteredForOssInEuView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(true))(request, messages(application)).toString
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      when(sessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .build()
 
       running(application) {
         val request = FakeRequest(POST, controllerRoute).withFormUrlEncodedBody(("value", "true"))

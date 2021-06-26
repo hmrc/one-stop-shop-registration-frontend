@@ -16,8 +16,9 @@
 
 package controllers
 
-import controllers.actions.AuthenticatedControllerComponents
+import controllers.actions.UnauthenticatedControllerComponents
 import forms.RegisteredForOssInEuFormProvider
+import models.UserAnswers
 import pages.RegisteredForOssInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -25,29 +26,39 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.RegisteredForOssInEuView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class RegisteredForOssInEuController @Inject()(override val messagesApi: MessagesApi,
-                                               cc: AuthenticatedControllerComponents,
+                                               cc: UnauthenticatedControllerComponents,
                                                formProvider: RegisteredForOssInEuFormProvider,
                                                view: RegisteredForOssInEuView
-                                              ) extends FrontendBaseController with I18nSupport {
+                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
   private val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = Action {
+  def onPageLoad(): Action[AnyContent] = cc.identifyAndGetOptionalData {
     implicit request =>
-      Ok(view(form))
+
+      val preparedForm = request.userAnswers.getOrElse(UserAnswers(request.userId)).get(RegisteredForOssInEuPage) match {
+        case Some(answer) => form.fill(answer)
+        case None         => form
+      }
+
+      Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = Action {
+  def onSubmit(): Action[AnyContent] = cc.identifyAndGetOptionalData.async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          BadRequest(view(formWithErrors)),
+          Future.successful(BadRequest(view(formWithErrors))),
 
         value =>
-          Redirect(RegisteredForOssInEuPage.navigate(value))
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId)).set(RegisteredForOssInEuPage, value))
+            _              <- cc.sessionRepository.set(updatedAnswers)
+          } yield Redirect(RegisteredForOssInEuPage.navigate(value))
       )
   }
 }

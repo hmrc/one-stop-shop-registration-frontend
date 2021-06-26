@@ -17,9 +17,14 @@
 package pages
 
 import controllers.routes
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object RegisteredForOssInEuPage extends Page {
+case object RegisteredForOssInEuPage extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override val toString: String = "registeredForOssInEu"
 
   def navigate(answer: Boolean): Call =
     if (answer) {
