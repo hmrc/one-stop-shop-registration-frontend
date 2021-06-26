@@ -9,7 +9,8 @@ GET         /assets/*file                                                       
 
 GET         /language/:lang                                                      controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                                                     controllers.KeepAliveController.keepAlive
+GET         /refresh-session                                                     controllers.KeepAliveController.keepAliveAuthenticated
+GET         /refresh-session-unauthenticated                                     controllers.KeepAliveController.keepAliveUnauthenticated
 
 GET         /there-is-a-problem                                                  controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
@@ -281,5 +282,7 @@ POST        /do-not-pay-sales-on-marketplace                                    
 
 GET         /cannot-use-no-vat                                                   controllers.NotLiableForVatController.onPageLoad()
 
-GET        /how-do-you-sell                                                      controllers.SalesChannelsController.onPageLoad
-POST       /how-do-you-sell                                                      controllers.SalesChannelsController.onSubmit
+GET         /how-do-you-sell                                                     controllers.SalesChannelsController.onPageLoad
+POST        /how-do-you-sell                                                     controllers.SalesChannelsController.onSubmit
+
+GET         /answers-deleted                                                     controllers.AnswersDeletedController.onPageLoad

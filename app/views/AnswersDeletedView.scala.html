@@ -1,0 +1,22 @@
+@this(
+        layout: templates.UnauthenticatedLayout,
+        govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle    = titleNoForm(messages("answersDeleted.title")),
+    showBackLink = false,
+    timeout      = false
+) {
+
+    <h1 class="govuk-heading-xl">@messages("answersDeleted.heading")</h1>
+
+    <p class="govuk-body">
+        @govukButton(
+            ButtonViewModel(messages("site.startAgain"))
+                    .asLink(routes.IndexController.onPageLoad().url)
+        )
+    </p>
+}

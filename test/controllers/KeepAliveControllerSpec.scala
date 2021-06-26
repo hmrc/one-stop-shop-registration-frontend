@@ -23,13 +23,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedSessionRepository
+import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
 
 import scala.concurrent.Future
 
 class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
-  "keepAlive" - {
+  "keepAliveAuthenticated" - {
 
     "when the user has answered some questions" - {
 
@@ -45,7 +45,7 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          val request = FakeRequest(GET, routes.KeepAliveController.keepAlive().url)
+          val request = FakeRequest(GET, routes.KeepAliveController.keepAliveAuthenticated().url)
 
           val result = route(application, request).value
 
@@ -69,7 +69,58 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          val request = FakeRequest(GET, routes.KeepAliveController.keepAlive().url)
+          val request = FakeRequest(GET, routes.KeepAliveController.keepAliveAuthenticated().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          verify(mockSessionRepository, never()).keepAlive(any())
+        }
+      }
+    }
+  }
+
+  "keepAliveUnAuthenticated" - {
+
+    "when the user has answered some questions" - {
+
+      "must keep the answers alive and return OK" in {
+
+        val mockSessionRepository = mock[UnauthenticatedSessionRepository]
+        when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(Some(emptyUserAnswers))
+            .overrides(bind[UnauthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, routes.KeepAliveController.keepAliveUnauthenticated().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          verify(mockSessionRepository, times(1)).keepAlive(emptyUserAnswers.id)
+        }
+      }
+    }
+
+    "when the user has not answered any questions" - {
+
+      "must return OK" in {
+
+        val mockSessionRepository = mock[UnauthenticatedSessionRepository]
+        when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(None)
+            .overrides(bind[UnauthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, routes.KeepAliveController.keepAliveUnauthenticated().url)
 
           val result = route(application, request).value
 

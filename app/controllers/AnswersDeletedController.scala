@@ -17,22 +17,27 @@
 package controllers
 
 import controllers.actions._
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.NotLiableForVatView
+import views.html.AnswersDeletedView
 
-class NotLiableForVatController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: UnauthenticatedControllerComponents,
-                                       view: NotLiableForVatView
-                                     ) extends FrontendBaseController with I18nSupport {
+import scala.concurrent.ExecutionContext
+
+class AnswersDeletedController @Inject()(
+                                           override val messagesApi: MessagesApi,
+                                           cc: UnauthenticatedControllerComponents,
+                                           view: AnswersDeletedView
+                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      Ok(view())
+      cc.sessionRepository
+        .clear(request.userId)
+        .map(_ => Ok(view()))
   }
 }
