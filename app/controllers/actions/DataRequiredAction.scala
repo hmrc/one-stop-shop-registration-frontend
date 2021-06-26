@@ -45,7 +45,7 @@ class UnauthenticatedDataRequiredAction @Inject()(implicit val executionContext:
 
     request.userAnswers match {
       case None =>
-        Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+        Future.successful(Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad())))
       case Some(data) =>
         Future.successful(Right(UnauthenticatedDataRequest(request.request, request.userId, data)))
     }
