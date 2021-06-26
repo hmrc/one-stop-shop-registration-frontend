@@ -29,7 +29,7 @@ class KeepAliveController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def keepAlive: Action[AnyContent] = (cc.identify andThen cc.getData).async {
+  def keepAlive: Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData).async {
     implicit request =>
       request.userAnswers
         .map {

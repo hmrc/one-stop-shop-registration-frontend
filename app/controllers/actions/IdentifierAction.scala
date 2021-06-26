@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import controllers.auth.{routes => authRoutes}
 import controllers.routes
 import logging.Logging
-import models.requests.IdentifierRequest
+import models.requests.{AuthenticatedIdentifierRequest, SessionRequest}
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
@@ -34,17 +34,20 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
-
 class AuthenticatedIdentifierAction @Inject()(
                                                override val authConnector: AuthConnector,
                                                config: FrontendAppConfig,
                                                val parser: BodyParsers.Default
                                              )
-                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions with Logging {
+                                             (implicit val executionContext: ExecutionContext)
+  extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
+    with AuthorisedFunctions
+    with Logging {
+
+  private type IdentifierActionResult[A] = Future[Either[Result, AuthenticatedIdentifierRequest[A]]]
 
   //noinspection ScalaStyle
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
+  override def refine[A](request: Request[A]): IdentifierActionResult[A] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
@@ -63,7 +66,7 @@ class AuthenticatedIdentifierAction @Inject()(
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
         findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) => block(IdentifierRequest(request, credentials, vrn))
+          case Some(vrn) => Future.successful(Right(AuthenticatedIdentifierRequest(request, credentials, vrn)))
           case None      => throw InsufficientEnrolments()
         }
 
@@ -74,7 +77,7 @@ class AuthenticatedIdentifierAction @Inject()(
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) =>
             if (confidence >= ConfidenceLevel.L250) {
-              block(IdentifierRequest(request, credentials, vrn))
+              Future.successful(Right(AuthenticatedIdentifierRequest(request, credentials, vrn)))
             } else {
               throw InsufficientConfidenceLevel()
             }
@@ -86,26 +89,26 @@ class AuthenticatedIdentifierAction @Inject()(
       case _ =>
         throw new UnauthorizedException("Unable to retrieve authorisation data")
 
-    } recover {
+    } recoverWith {
       case _: NoActiveSession =>
         logger.info("No active session")
-        Redirect(config.loginUrl, Map("continue" -> Seq(continueUrl)))
+        Future.successful(Left(Redirect(config.loginUrl, Map("continue" -> Seq(continueUrl)))))
 
       case _: UnsupportedAffinityGroup =>
         logger.info("Unsupported affinity grouop")
-        Redirect(authRoutes.AuthController.unsupportedAffinityGroup())
+        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAffinityGroup())))
 
       case _: UnsupportedAuthProvider =>
         logger.info("Unsupported auth provider")
-        Redirect(authRoutes.AuthController.unsupportedAuthProvider(continueUrl = continueUrl))
+        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAuthProvider(continueUrl = continueUrl))))
 
       case _: UnsupportedCredentialRole =>
         logger.info("Unsupported credential role")
-        Redirect(authRoutes.AuthController.unsupportedCredentialRole().url)
+        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedCredentialRole().url)))
 
       case _: InsufficientEnrolments =>
         logger.info("Insufficient enrolments")
-        Redirect(authRoutes.AuthController.insufficientEnrolments())
+        Future.successful(Left(Redirect(authRoutes.AuthController.insufficientEnrolments())))
 
       case _: IncorrectCredentialStrength =>
         logger.info("Incorrect credential strength")
@@ -117,11 +120,11 @@ class AuthenticatedIdentifierAction @Inject()(
 
       case e: AuthorisationException =>
         logger.info("Authorisation Exception", e.getMessage)
-        Redirect(routes.UnauthorisedController.onPageLoad())
+        Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad())))
 
       case e: UnauthorizedException =>
         logger.info("Unauthorised exception", e.message)
-        Redirect(routes.UnauthorisedController.onPageLoad())
+        Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad())))
     }
   }
 
@@ -136,17 +139,17 @@ class AuthenticatedIdentifierAction @Inject()(
           enrolment.identifiers.find(_.key == "VATRegNo").map(e => Vrn(e.value))
       }
 
-  private def upliftCredentialStrength(request: Request[_]): Result =
-    Redirect(
+  private def upliftCredentialStrength[A](request: Request[A]): IdentifierActionResult[A] =
+    Future.successful(Left(Redirect(
       config.mfaUpliftUrl,
       Map(
         "origin"      -> Seq(config.origin),
         "continueUrl" -> Seq(config.loginContinueUrl + request.path)
       )
-    )
+    )))
 
-  private def upliftConfidenceLevel[A](request: Request[A]): Result =
-    Redirect(
+  private def upliftConfidenceLevel[A](request: Request[A]): IdentifierActionResult[A] =
+    Future.successful(Left(Redirect(
       config.ivUpliftUrl,
       Map(
         "origin"          -> Seq(config.origin),
@@ -155,5 +158,18 @@ class AuthenticatedIdentifierAction @Inject()(
         "failureURL"      ->
           Seq(config.loginContinueUrl + authRoutes.IdentityVerificationController.handleIvFailure(config.loginContinueUrl + request.path, None).url)
       )
-    )
+    )))
+}
+
+class SessionIdentifierAction @Inject()()(implicit val executionContext: ExecutionContext)
+  extends ActionRefiner[Request, SessionRequest] with ActionFunction[Request, SessionRequest] {
+
+  override def refine[A](request: Request[A]): Future[Either[Result, SessionRequest[A]]] = {
+
+    val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+    hc.sessionId
+      .map(session => Future.successful(Right(SessionRequest(request, session.value))))
+      .getOrElse(Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))))
+  }
 }

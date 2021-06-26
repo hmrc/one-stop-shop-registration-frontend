@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.requests.DataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
@@ -29,20 +29,28 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def actionBuilder: DefaultActionBuilder
   def sessionRepository: AuthenticatedSessionRepository
-  def identify: IdentifierAction
-  def getData: DataRetrievalAction
-  def requireData: DataRequiredAction
+  def identify: AuthenticatedIdentifierAction
+  def getData: AuthenticatedDataRetrievalAction
+  def requireData: AuthenticatedDataRequiredAction
   def checkRegistration: CheckRegistrationFilter
   def checkVrnAllowList: VrnAllowListFilter
   def limitIndex: MaximumIndexFilterProvider
   def features: FeatureFlagService
 
-  def authAndGetData(): ActionBuilder[DataRequest, AnyContent] =
-    identify andThen
+  def authAndGetData(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+    actionBuilder andThen
+      identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
       getData andThen
       requireData
+
+  def authAndGetOptionalData: ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
+    actionBuilder andThen
+      identify andThen
+      checkVrnAllowList andThen
+      checkRegistration andThen
+      getData
 }
 
 case class DefaultAuthenticatedControllerComponents @Inject()(
@@ -54,11 +62,11 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                fileMimeTypes: FileMimeTypes,
                                                                executionContext: scala.concurrent.ExecutionContext,
                                                                sessionRepository: AuthenticatedSessionRepository,
-                                                               identify: IdentifierAction,
+                                                               identify: AuthenticatedIdentifierAction,
                                                                checkVrnAllowList: VrnAllowListFilter,
                                                                checkRegistration: CheckRegistrationFilter,
-                                                               getData: DataRetrievalAction,
-                                                               requireData: DataRequiredAction,
+                                                               getData: AuthenticatedDataRetrievalAction,
+                                                               requireData: AuthenticatedDataRequiredAction,
                                                                limitIndex: MaximumIndexFilterProvider,
                                                                features: FeatureFlagService
                                                              ) extends AuthenticatedControllerComponents

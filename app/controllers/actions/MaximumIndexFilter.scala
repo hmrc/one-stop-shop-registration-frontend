@@ -17,7 +17,7 @@
 package controllers.actions
 
 import models.Index
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Results.NotFound
 import play.api.mvc.{ActionFilter, Result}
 
@@ -25,9 +25,9 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class MaximumIndexFilter (index: Index, maxAllowed: Int)
-                         (implicit val executionContext: ExecutionContext) extends ActionFilter[DataRequest] {
+                         (implicit val executionContext: ExecutionContext) extends ActionFilter[AuthenticatedDataRequest] {
 
-  override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] =
     if (index.position >= maxAllowed) {
       Future.successful(Some(NotFound))
     } else {

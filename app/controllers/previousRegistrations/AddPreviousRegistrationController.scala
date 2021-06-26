@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Country, Mode}
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -75,7 +75,7 @@ class AddPreviousRegistrationController @Inject()(
   }
 
   private def getNumberOfPreviousRegistrations(block: Int => Future[Result])
-                                              (implicit request: DataRequest[AnyContent]): Future[Result] =
+                                              (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfPreviousRegistrations).map {
       number =>
         block(number)

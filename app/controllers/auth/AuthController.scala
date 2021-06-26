@@ -44,7 +44,7 @@ class AuthController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onSignIn: Action[AnyContent] = (cc.identify andThen cc.checkRegistration andThen cc.getData).async {
+  def onSignIn: Action[AnyContent] = cc.authAndGetOptionalData.async {
     implicit request =>
 
       request.userAnswers match {

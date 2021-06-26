@@ -73,9 +73,8 @@ trait SpecBase
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[DataRequiredAction].to[DataRequiredActionImpl],
-        bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers, vrn)),
+        bind[AuthenticatedIdentifierAction].to[FakeAuthenticatedIdentifierAction],
+        bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[Clock].toInstance(clockToBind)
       )

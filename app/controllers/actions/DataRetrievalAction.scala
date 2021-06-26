@@ -17,22 +17,32 @@
 package controllers.actions
 
 import javax.inject.Inject
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest, SessionRequest, UnauthenticatedOptionalDataRequest}
 import play.api.mvc.ActionTransformer
-import repositories.AuthenticatedSessionRepository
+import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRetrievalActionImpl @Inject()(
-                                         val sessionRepository: AuthenticatedSessionRepository
-                                       )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
+class AuthenticatedDataRetrievalAction @Inject()(val sessionRepository: AuthenticatedSessionRepository)
+                                                (implicit val executionContext: ExecutionContext)
+  extends ActionTransformer[AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest] {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+  override protected def transform[A](request: AuthenticatedIdentifierRequest[A]): Future[AuthenticatedOptionalDataRequest[A]] = {
 
     sessionRepository.get(request.userId).map {
-      OptionalDataRequest(request.request, request.credentials, request.vrn, _)
+      AuthenticatedOptionalDataRequest(request.request, request.credentials, request.vrn, _)
     }
   }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]
+class UnauthenticatedDataRetrievalAction @Inject()(val sessionRepository: UnauthenticatedSessionRepository)
+                                                (implicit val executionContext: ExecutionContext)
+  extends ActionTransformer[SessionRequest, UnauthenticatedOptionalDataRequest] {
+
+  override protected def transform[A](request: SessionRequest[A]): Future[UnauthenticatedOptionalDataRequest[A]] = {
+
+    sessionRepository.get(request.userId).map {
+      UnauthenticatedOptionalDataRequest(request.request, request.userId, _)
+    }
+  }
+}

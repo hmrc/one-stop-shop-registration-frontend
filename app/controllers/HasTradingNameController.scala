@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import forms.HasTradingNameFormProvider
 import models.Mode
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -76,7 +76,7 @@ class HasTradingNameController @Inject()(
   }
 
   private def getCompanyName(block: String => Future[Result])
-                            (implicit request: DataRequest[AnyContent]): Future[Result] = {
+                            (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.vatInfo match {
       case Some(vatInfo) =>
         val name = vatInfo.organisationName orElse request.userAnswers.get(RegisteredCompanyNamePage)

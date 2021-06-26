@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousEuVatNumberFormProvider
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -77,7 +77,7 @@ class PreviousEuVatNumberController @Inject()(
 
   private def getCountry(index: Index)
                         (block: Country => Future[Result])
-                        (implicit request: DataRequest[AnyContent]): Future[Result] =
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousEuCountryPage(index)).map {
       country =>
         block(country)

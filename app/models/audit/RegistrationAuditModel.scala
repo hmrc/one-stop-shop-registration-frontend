@@ -16,7 +16,7 @@
 
 package models.audit
 import models.domain.Registration
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 case class RegistrationAuditModel(
@@ -70,7 +70,7 @@ object RegistrationAuditModel {
   def build(
              registration: Registration,
              result: SubmissionResult,
-             request: DataRequest[_]
+             request: AuthenticatedDataRequest[_]
            ): RegistrationAuditModel =
     RegistrationAuditModel(
       credId = request.credentials.providerId,

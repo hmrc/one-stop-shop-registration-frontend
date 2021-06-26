@@ -19,7 +19,7 @@ package controllers.euDetails
 import controllers.actions._
 import forms.euDetails.DeleteEuDetailsFormProvider
 import models.euDetails.EuDetails
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.euDetails.DeleteEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -79,7 +79,7 @@ class DeleteEuDetailsController @Inject()(
 
   private def getEuVatDetails(index: Index)
                              (block: EuDetails => Future[Result])
-                             (implicit request: DataRequest[AnyContent]): Future[Result] =
+                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(EuDetailsQuery(index)).map {
       details =>
         block(details)

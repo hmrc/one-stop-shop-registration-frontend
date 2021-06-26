@@ -19,7 +19,7 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
 import models.previousRegistrations.PreviousRegistrationDetails
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.previousRegistrations.DeletePreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -74,7 +74,7 @@ class DeletePreviousRegistrationController @Inject()(
 
   private def getPreviousRegistration(index: Index)
                              (block: PreviousRegistrationDetails => Future[Result])
-                             (implicit request: DataRequest[AnyContent]): Future[Result] =
+                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousRegistrationQuery(index)).map {
       details =>
         block(details)

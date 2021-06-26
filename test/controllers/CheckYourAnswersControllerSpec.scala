@@ -22,7 +22,7 @@ import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, DataMissingError, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -113,7 +113,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, userAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
             val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
 
@@ -165,7 +165,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -194,7 +194,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER

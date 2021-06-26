@@ -18,7 +18,7 @@ package controllers.actions
 
 import connectors.RegistrationConnector
 import controllers.routes
-import models.requests.IdentifierRequest
+import models.requests.AuthenticatedIdentifierRequest
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,7 +31,7 @@ class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector)
                                            (implicit val executionContext: ExecutionContext)
   extends CheckRegistrationFilter {
 
-  override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
@@ -42,4 +42,4 @@ class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector)
   }
 }
 
-trait CheckRegistrationFilter extends ActionFilter[IdentifierRequest]
+trait CheckRegistrationFilter extends ActionFilter[AuthenticatedIdentifierRequest]
