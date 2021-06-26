@@ -26,4 +26,6 @@ object Constants {
   val registrationConfirmationTemplateId = "oss_registration_confirmation"
 
   val schemeStartDate: LocalDate = LocalDate.of(2021, 7, 1)
+
+  val tradingNameReservedWords = Set("limited", "ltd", "llp", "plc")
 }

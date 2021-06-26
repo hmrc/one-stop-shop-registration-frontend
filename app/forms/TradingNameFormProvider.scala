@@ -16,6 +16,7 @@
 
 package forms
 
+import config.Constants.tradingNameReservedWords
 import forms.Validation.Validation.commonTextPattern
 
 import javax.inject.Inject
@@ -31,6 +32,8 @@ class TradingNameFormProvider @Inject() extends Mappings {
         .verifying(firstError(
           maxLength(160, "tradingName.error.length"),
           notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
-          regexp(commonTextPattern, "tradingName.error.invalid")))
+          regexp(commonTextPattern, "tradingName.error.invalid"),
+          notContainStrings(tradingNameReservedWords, "tradingName.error.invalid")
+        )),
     )
 }
