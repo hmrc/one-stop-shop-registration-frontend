@@ -24,6 +24,7 @@ import logging.Logging
 import models.requests.{AuthenticatedIdentifierRequest, SessionRequest}
 import play.api.mvc.Results._
 import play.api.mvc._
+import services.UrlBuilderService
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
@@ -37,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthenticatedIdentifierAction @Inject()(
                                                override val authConnector: AuthConnector,
                                                config: FrontendAppConfig,
-                                               val parser: BodyParsers.Default
+                                               urlBuilder: UrlBuilderService
                                              )
                                              (implicit val executionContext: ExecutionContext)
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
@@ -50,8 +51,6 @@ class AuthenticatedIdentifierAction @Inject()(
   override def refine[A](request: Request[A]): IdentifierActionResult[A] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    val continueUrl = config.loginContinueUrl + request.path
 
     authorised(
       AuthProviders(AuthProvider.GovernmentGateway) and
@@ -92,15 +91,15 @@ class AuthenticatedIdentifierAction @Inject()(
     } recoverWith {
       case _: NoActiveSession =>
         logger.info("No active session")
-        Future.successful(Left(Redirect(config.loginUrl, Map("continue" -> Seq(continueUrl)))))
+        Future.successful(Left(Redirect(config.loginUrl, Map("continue" -> Seq(urlBuilder.loginContinueUrl(request))))))
 
       case _: UnsupportedAffinityGroup =>
-        logger.info("Unsupported affinity grouop")
+        logger.info("Unsupported affinity group")
         Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAffinityGroup())))
 
       case _: UnsupportedAuthProvider =>
         logger.info("Unsupported auth provider")
-        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAuthProvider(continueUrl = continueUrl))))
+        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(request)))))
 
       case _: UnsupportedCredentialRole =>
         logger.info("Unsupported credential role")
@@ -144,7 +143,7 @@ class AuthenticatedIdentifierAction @Inject()(
       config.mfaUpliftUrl,
       Map(
         "origin"      -> Seq(config.origin),
-        "continueUrl" -> Seq(config.loginContinueUrl + request.path)
+        "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request))
       )
     )))
 
@@ -154,9 +153,8 @@ class AuthenticatedIdentifierAction @Inject()(
       Map(
         "origin"          -> Seq(config.origin),
         "confidenceLevel" -> Seq(ConfidenceLevel.L250.toString),
-        "completionURL"   -> Seq(config.loginContinueUrl + request.path),
-        "failureURL"      ->
-          Seq(config.loginContinueUrl + authRoutes.IdentityVerificationController.handleIvFailure(config.loginContinueUrl + request.path, None).url)
+        "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request)),
+        "failureURL"      -> Seq(urlBuilder.ivFailureUrl(request))
       )
     )))
 }
