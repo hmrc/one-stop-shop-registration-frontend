@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 import viewmodels.checkAnswers.euDetails.EuCountrySummary
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
@@ -41,7 +41,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
   private val index                 = Index(0)
   private val country               = Country.euCountries.head
   private val baseUserAnswers       = emptyUserAnswers.set(euDetails.EuCountryPage(index), country).success.value
-  private val mockSessionRepository = mock[SessionRepository]
+  private val mockSessionRepository = mock[AuthenticatedSessionRepository]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
@@ -73,7 +73,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
         val application =
           applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
             .build()
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

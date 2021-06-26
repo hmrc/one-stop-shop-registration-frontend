@@ -20,7 +20,7 @@ import models.requests.DataRequest
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 import services.FeatureFlagService
 
 import javax.inject.Inject
@@ -28,7 +28,7 @@ import javax.inject.Inject
 trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def actionBuilder: DefaultActionBuilder
-  def sessionRepository: SessionRepository
+  def sessionRepository: AuthenticatedSessionRepository
   def identify: IdentifierAction
   def getData: DataRetrievalAction
   def requireData: DataRequiredAction
@@ -53,7 +53,7 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                langs: Langs,
                                                                fileMimeTypes: FileMimeTypes,
                                                                executionContext: scala.concurrent.ExecutionContext,
-                                                               sessionRepository: SessionRepository,
+                                                               sessionRepository: AuthenticatedSessionRepository,
                                                                identify: IdentifierAction,
                                                                checkVrnAllowList: VrnAllowListFilter,
                                                                checkRegistration: CheckRegistrationFilter,

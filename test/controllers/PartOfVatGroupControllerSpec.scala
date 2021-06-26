@@ -26,7 +26,7 @@ import pages.PartOfVatGroupPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 import views.html.PartOfVatGroupView
 
 import scala.concurrent.Future
@@ -76,13 +76,13 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository = mock[AuthenticatedSessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {

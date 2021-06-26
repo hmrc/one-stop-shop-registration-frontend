@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 
 import scala.concurrent.Future
 
@@ -35,12 +35,12 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
       "must keep the answers alive and return OK" in {
 
-        val mockSessionRepository = mock[SessionRepository]
+        val mockSessionRepository = mock[AuthenticatedSessionRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(Some(emptyUserAnswers))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
             .build()
 
         running(application) {
@@ -59,12 +59,12 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK" in {
 
-        val mockSessionRepository = mock[SessionRepository]
+        val mockSessionRepository = mock[AuthenticatedSessionRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(None)
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
             .build()
 
         running(application) {

@@ -22,14 +22,14 @@ import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
-  class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
+  class Harness(sessionRepository: AuthenticatedSessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
     def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
   }
 
@@ -39,7 +39,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
       "must set userAnswers to 'None' in the request" in {
 
-        val sessionRepository = mock[SessionRepository]
+        val sessionRepository = mock[AuthenticatedSessionRepository]
         when(sessionRepository.get("12345-credId")) thenReturn Future(None)
         val action = new Harness(sessionRepository)
 
@@ -53,7 +53,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
       "must build a userAnswers object and add it to the request" in {
 
-        val sessionRepository = mock[SessionRepository]
+        val sessionRepository = mock[AuthenticatedSessionRepository]
         when(sessionRepository.get("12345-credId")) thenReturn Future(Some(UserAnswers("12345-credId")))
         val action = new Harness(sessionRepository)
 
