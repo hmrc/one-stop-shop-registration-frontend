@@ -61,7 +61,7 @@ trait SpecBase
       organisationName = Some("Company name")
     )
 
-  val testCredentials: Credentials             = Credentials("12345-credId", "GGW")
+  val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
 
