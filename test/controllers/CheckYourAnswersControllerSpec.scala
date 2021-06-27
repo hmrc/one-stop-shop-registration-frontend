@@ -24,13 +24,13 @@ import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BusinessContactDetails, DataMissingError, FilterQuestionMissingError, NormalMode}
+import models.{BusinessContactDetails, DataMissingError, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BusinessBasedInNiPage, BusinessContactDetailsPage, CheckYourAnswersPage, HasWebsitePage}
+import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasWebsitePage}
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest
@@ -39,7 +39,6 @@ import queries.EmailConfirmationQuery
 import repositories.AuthenticatedSessionRepository
 import services.{AuditService, EmailService, RegistrationService}
 import testutils.RegistrationData
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
@@ -144,52 +143,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-          }
-        }
-      }
-
-      "when the user has not answered a filter question" - {
-
-        "must redirect to Journey Recovery with `/` as the continue URL" - {
-
-          "when this was the only validation error" in {
-
-            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(FilterQuestionMissingError(BusinessBasedInNiPage)))
-
-            val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
-
-            running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
-              val result = route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-              val expectedLocation = routes.JourneyRecoveryController.onPageLoad(Some(RedirectUrl(routes.IndexController.onPageLoad().url))).url
-              redirectLocation(result).value mustEqual expectedLocation
-            }
-          }
-
-          "when there are other validation errors" in {
-            
-            when(registrationService.fromUserAnswers(any(), any()))
-              .thenReturn(
-                Invalid(NonEmptyChain(
-                  FilterQuestionMissingError(BusinessBasedInNiPage),
-                  DataMissingError(HasWebsitePage)
-                ))
-              )
-
-            val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
-
-            running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
-              val result = route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-              val expectedLocation = routes.JourneyRecoveryController.onPageLoad(Some(RedirectUrl(routes.IndexController.onPageLoad().url))).url
-              redirectLocation(result).value mustEqual expectedLocation
-            }
           }
         }
       }

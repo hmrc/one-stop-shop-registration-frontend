@@ -34,7 +34,7 @@ final case class Registration(
                                previousRegistrations: Seq[PreviousRegistration],
                                bankDetails: BankDetails,
                                isOnlineMarketplace: Boolean,
-                               niPresence: NiPresence
+                               niPresence: Option[NiPresence]
                              )
 
 object Registration {

@@ -100,6 +100,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
+      .set(BusinessBasedInNiPage, true).success.value
 
   "fromUserAnswers" - {
 
@@ -214,16 +215,24 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return Invalid" - {
+    "must return a registration" - {
 
       "when Business Based in NI is missing" in {
 
         when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(BusinessBasedInNiPage).success.value
+
+        val expectedRegistration =
+          RegistrationData.registration copy (
+            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            niPresence       = None,
+            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          )
+
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessBasedInNiPage)))
+        result mustEqual Valid(expectedRegistration)
       }
 
       "when Business Based in NI is false and Has Fixed Establishment in NI is missing" in {
@@ -235,9 +244,16 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             .set(BusinessBasedInNiPage, false).success.value
             .remove(HasFixedEstablishmentInNiPage).success.value
 
+        val expectedRegistration =
+          RegistrationData.registration copy (
+            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            niPresence       = None,
+            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          )
+
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentInNiPage)))
+        result mustEqual Valid(expectedRegistration)
       }
 
       "when Has Fixed Establishment in NI is false and Sales Channels is missing" in {
@@ -250,10 +266,20 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             .set(HasFixedEstablishmentInNiPage, false).success.value
             .remove(SalesChannelsPage).success.value
 
+        val expectedRegistration =
+          RegistrationData.registration copy (
+            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            niPresence       = None,
+            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          )
+
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(SalesChannelsPage)))
+        result mustEqual Valid(expectedRegistration)
       }
+    }
+
+    "must return Invalid" - {
 
       "when Registered Company Name is missing" in {
 

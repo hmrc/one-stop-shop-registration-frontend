@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.{FilterQuestionMissingError, NormalMode}
+import models.NormalMode
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.responses.ConflictFound
@@ -30,7 +30,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.EmailConfirmationQuery
 import services._
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax._
 import viewmodels.checkAnswers._
@@ -122,11 +121,7 @@ class CheckYourAnswersController @Inject()(
           val errorMessages = errorList.map(_.errorMessage).mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
 
-          val continueUrl = errorList.find(_.isInstanceOf[FilterQuestionMissingError]).map{
-            _ => RedirectUrl(routes.IndexController.onPageLoad().url)
-          }
-
-          Redirect(routes.JourneyRecoveryController.onPageLoad(continueUrl)).toFuture
+          Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
       }
   }
 }

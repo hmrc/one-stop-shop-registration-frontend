@@ -340,27 +340,27 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
       case None         => DataMissingError(IsOnlineMarketplacePage).invalidNec
     }
 
-  private def getNiPresence(answers: UserAnswers): ValidationResult[NiPresence] =
+  private def getNiPresence(answers: UserAnswers): ValidationResult[Option[NiPresence]] =
     answers.get(BusinessBasedInNiPage) match {
       case Some(true) =>
-        PrincipalPlaceOfBusinessInNi.validNec
+        Some(PrincipalPlaceOfBusinessInNi).validNec
 
       case Some(false) =>
         answers.get(HasFixedEstablishmentInNiPage) match {
           case Some(true) =>
-            FixedEstablishmentInNi.validNec
+            Some(FixedEstablishmentInNi).validNec
 
           case Some(false) =>
             answers.get(SalesChannelsPage) match {
-              case Some(answer) => NoPresence(answer).validNec
-              case None         => FilterQuestionMissingError(SalesChannelsPage).invalidNec
+              case Some(answer) => Some(NoPresence(answer)).validNec
+              case None         => None.validNec
             }
 
           case None =>
-            FilterQuestionMissingError(HasFixedEstablishmentInNiPage).invalidNec
+            None.validNec
         }
 
       case None =>
-        FilterQuestionMissingError(BusinessBasedInNiPage).invalidNec
+        None.validNec
     }
 }
