@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.NormalMode
+import models.{FilterQuestionMissingError, NormalMode}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.responses.ConflictFound
@@ -30,14 +30,15 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.EmailConfirmationQuery
 import services._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax._
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
-import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
@@ -108,19 +109,24 @@ class CheckYourAnswersController @Inject()(
               }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
-              successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
+              Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
-              successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+              Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
           }
 
         case Invalid(errors) =>
-          val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
+          val errorList = errors.toChain.toList
+          val errorMessages = errorList.map(_.errorMessage).mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
 
-          successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          val continueUrl = errorList.find(_.isInstanceOf[FilterQuestionMissingError]).map{
+            _ => RedirectUrl(routes.IndexController.onPageLoad().url)
+          }
+
+          Redirect(routes.JourneyRecoveryController.onPageLoad(continueUrl)).toFuture
       }
   }
 }

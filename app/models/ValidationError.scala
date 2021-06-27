@@ -18,12 +18,17 @@ package models
 
 import queries.Gettable
 
-trait ValidationError {
+sealed trait ValidationError {
 
   val errorMessage: String
 }
 
 case class DataMissingError(page: Gettable[_]) extends ValidationError {
+
+  override val errorMessage: String = s"Data missing at ${page.path.toString}"
+}
+
+case class FilterQuestionMissingError(page: Gettable[_]) extends ValidationError {
 
   override val errorMessage: String = s"Data missing at ${page.path.toString}"
 }

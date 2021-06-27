@@ -353,14 +353,14 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
           case Some(false) =>
             answers.get(SalesChannelsPage) match {
               case Some(answer) => NoPresence(answer).validNec
-              case None         => DataMissingError(SalesChannelsPage).invalidNec
+              case None         => FilterQuestionMissingError(SalesChannelsPage).invalidNec
             }
 
           case None =>
-            DataMissingError(HasFixedEstablishmentInNiPage).invalidNec
+            FilterQuestionMissingError(HasFixedEstablishmentInNiPage).invalidNec
         }
 
       case None =>
-        DataMissingError(BusinessBasedInNiPage).invalidNec
+        FilterQuestionMissingError(BusinessBasedInNiPage).invalidNec
     }
 }
