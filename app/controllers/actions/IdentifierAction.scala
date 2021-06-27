@@ -32,6 +32,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.FutureSyntax._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -65,7 +66,7 @@ class AuthenticatedIdentifierAction @Inject()(
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
         findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) => Future.successful(Right(AuthenticatedIdentifierRequest(request, credentials, vrn)))
+          case Some(vrn) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
           case None      => throw InsufficientEnrolments()
         }
 
@@ -76,7 +77,7 @@ class AuthenticatedIdentifierAction @Inject()(
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) =>
             if (confidence >= ConfidenceLevel.L250) {
-              Future.successful(Right(AuthenticatedIdentifierRequest(request, credentials, vrn)))
+              Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
             } else {
               throw InsufficientConfidenceLevel()
             }
@@ -91,23 +92,23 @@ class AuthenticatedIdentifierAction @Inject()(
     } recoverWith {
       case _: NoActiveSession =>
         logger.info("No active session")
-        Future.successful(Left(Redirect(config.loginUrl, Map("continue" -> Seq(urlBuilder.loginContinueUrl(request))))))
+        Left(Redirect(config.loginUrl, Map("continue" -> Seq(urlBuilder.loginContinueUrl(request))))).toFuture
 
       case _: UnsupportedAffinityGroup =>
         logger.info("Unsupported affinity group")
-        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAffinityGroup())))
+        Left(Redirect(authRoutes.AuthController.unsupportedAffinityGroup())).toFuture
 
       case _: UnsupportedAuthProvider =>
         logger.info("Unsupported auth provider")
-        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(request)))))
+        Left(Redirect(authRoutes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(request)))).toFuture
 
       case _: UnsupportedCredentialRole =>
         logger.info("Unsupported credential role")
-        Future.successful(Left(Redirect(authRoutes.AuthController.unsupportedCredentialRole().url)))
+        Left(Redirect(authRoutes.AuthController.unsupportedCredentialRole().url)).toFuture
 
       case _: InsufficientEnrolments =>
         logger.info("Insufficient enrolments")
-        Future.successful(Left(Redirect(authRoutes.AuthController.insufficientEnrolments())))
+        Left(Redirect(authRoutes.AuthController.insufficientEnrolments())).toFuture
 
       case _: IncorrectCredentialStrength =>
         logger.info("Incorrect credential strength")
@@ -119,11 +120,11 @@ class AuthenticatedIdentifierAction @Inject()(
 
       case e: AuthorisationException =>
         logger.info("Authorisation Exception", e.getMessage)
-        Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad())))
+        Left(Redirect(routes.UnauthorisedController.onPageLoad())).toFuture
 
       case e: UnauthorizedException =>
         logger.info("Unauthorised exception", e.message)
-        Future.successful(Left(Redirect(routes.UnauthorisedController.onPageLoad())))
+        Left(Redirect(routes.UnauthorisedController.onPageLoad())).toFuture
     }
   }
 
@@ -139,16 +140,16 @@ class AuthenticatedIdentifierAction @Inject()(
       }
 
   private def upliftCredentialStrength[A](request: Request[A]): IdentifierActionResult[A] =
-    Future.successful(Left(Redirect(
+    Left(Redirect(
       config.mfaUpliftUrl,
       Map(
         "origin"      -> Seq(config.origin),
         "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request))
       )
-    )))
+    )).toFuture
 
   private def upliftConfidenceLevel[A](request: Request[A]): IdentifierActionResult[A] =
-    Future.successful(Left(Redirect(
+    Left(Redirect(
       config.ivUpliftUrl,
       Map(
         "origin"          -> Seq(config.origin),
@@ -156,7 +157,7 @@ class AuthenticatedIdentifierAction @Inject()(
         "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request)),
         "failureURL"      -> Seq(urlBuilder.ivFailureUrl(request))
       )
-    )))
+    )).toFuture
 }
 
 class SessionIdentifierAction @Inject()()(implicit val executionContext: ExecutionContext)
@@ -167,7 +168,7 @@ class SessionIdentifierAction @Inject()()(implicit val executionContext: Executi
     val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     hc.sessionId
-      .map(session => Future.successful(Right(SessionRequest(request, session.value))))
-      .getOrElse(Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))))
+      .map(session => Right(SessionRequest(request, session.value)).toFuture)
+      .getOrElse(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())).toFuture)
   }
 }

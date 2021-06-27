@@ -16,12 +16,13 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import controllers.routes
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
+import utils.FutureSyntax._
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedDataRequiredAction @Inject()(implicit val executionContext: ExecutionContext)
@@ -31,9 +32,9 @@ class AuthenticatedDataRequiredAction @Inject()(implicit val executionContext: E
 
     request.userAnswers match {
       case None =>
-        Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+        Left(Redirect(routes.JourneyRecoveryController.onPageLoad())).toFuture
       case Some(data) =>
-        Future.successful(Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, data)))
+        Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, data)).toFuture
     }
   }
 }
@@ -45,9 +46,9 @@ class UnauthenticatedDataRequiredAction @Inject()(implicit val executionContext:
 
     request.userAnswers match {
       case None =>
-        Future.successful(Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad())))
+        Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad())).toFuture
       case Some(data) =>
-        Future.successful(Right(UnauthenticatedDataRequest(request.request, request.userId, data)))
+        Right(UnauthenticatedDataRequest(request.request, request.userId, data)).toFuture
     }
   }
 }

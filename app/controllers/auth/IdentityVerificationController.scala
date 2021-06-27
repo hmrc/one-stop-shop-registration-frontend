@@ -28,6 +28,7 @@ import views.html.iv.IdentityProblemView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import utils.FutureSyntax._
 
 class IdentityVerificationController @Inject()(
                                                 override val messagesApi: MessagesApi,
@@ -59,21 +60,21 @@ class IdentityVerificationController @Inject()(
             case Some(result: IdentityVerificationResult) =>
               result match {
                 case InsufficientEvidence       => handleInsufficientEvidence
-                case Success                    => Future.successful(Redirect(continueUrl))
-                case Incomplete                 => Future.successful(Redirect(routes.IvReturnController.incomplete().url))
-                case FailedMatching             => Future.successful(Redirect(routes.IvReturnController.failedMatching(continueUrl).url))
-                case FailedIdentityVerification => Future.successful(Redirect(routes.IvReturnController.failed(continueUrl).url))
-                case UserAborted                => Future.successful(Redirect(routes.IvReturnController.userAborted(continueUrl).url))
-                case LockedOut                  => Future.successful(Redirect(routes.IvReturnController.lockedOut().url))
-                case PrecondFailed              => Future.successful(Redirect(routes.IvReturnController.preconditionFailed().url))
-                case TechnicalIssue             => Future.successful(Redirect(routes.IvReturnController.technicalIssue().url))
-                case Timeout                    => Future.successful(Redirect(routes.IvReturnController.timeout().url))
+                case Success                    => Redirect(continueUrl).toFuture
+                case Incomplete                 => Redirect(routes.IvReturnController.incomplete().url).toFuture
+                case FailedMatching             => Redirect(routes.IvReturnController.failedMatching(continueUrl).url).toFuture
+                case FailedIdentityVerification => Redirect(routes.IvReturnController.failed(continueUrl).url).toFuture
+                case UserAborted                => Redirect(routes.IvReturnController.userAborted(continueUrl).url).toFuture
+                case LockedOut                  => Redirect(routes.IvReturnController.lockedOut().url).toFuture
+                case PrecondFailed              => Redirect(routes.IvReturnController.preconditionFailed().url).toFuture
+                case TechnicalIssue             => Redirect(routes.IvReturnController.technicalIssue().url).toFuture
+                case Timeout                    => Redirect(routes.IvReturnController.timeout().url).toFuture
               }
             case _ =>
-              Future.successful(Redirect(routes.IvReturnController.error().url))
+              Redirect(routes.IvReturnController.error().url).toFuture
           }
       }.getOrElse {
-        Future.successful(Redirect(routes.IdentityVerificationController.identityError(continueUrl).url))
+        Redirect(routes.IdentityVerificationController.identityError(continueUrl).url).toFuture
       }
   }
 

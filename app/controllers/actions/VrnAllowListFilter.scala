@@ -20,6 +20,7 @@ import models.requests.AuthenticatedIdentifierRequest
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.FeatureFlagService
+import utils.FutureSyntax._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,9 +30,9 @@ class VrnAllowListFilterImpl @Inject()(features: FeatureFlagService)
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] =
     if (features.restrictAccessUsingVrnAllowList && !features.vrnAllowList.contains(request.vrn)) {
-      Future.successful(Some(Redirect(features.vrnBlockedRedirectUrl)))
+      Some(Redirect(features.vrnBlockedRedirectUrl)).toFuture
     } else {
-      Future.successful(None)
+      None.toFuture
     }
 }
 
