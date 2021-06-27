@@ -201,6 +201,13 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
       chars  <- listOfN(length, Gen.alphaNumChar)
     } yield chars.mkString).suchThat(_.trim.nonEmpty)
 
+  def tradingNameReservedWords: Gen[String] = Gen.oneOf(
+    Gen.const("limited"),
+    Gen.const("ltd"),
+    Gen.const("llp"),
+    Gen.const("plc")
+  )
+
   private def commonFieldSafeInputs: Gen[Char] = Gen.oneOf(
     Gen.alphaNumChar,
     Gen.oneOf('À' to 'ÿ'),

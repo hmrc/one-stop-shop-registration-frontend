@@ -243,4 +243,38 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
       result mustEqual Invalid("error.duplicate", "foo")
     }
   }
+
+  "notContainStrings" - {
+    "must return Valid when excludedStrings is empty" in {
+      val answer = "name"
+      val excludedStrings: Set[String] = Set()
+
+      val result = notContainStrings(excludedStrings, "error.key")(answer)
+      result mustEqual Valid
+    }
+
+    "must return Valid when answer does not include any excludedStrings" in {
+      val answer = "name"
+      val excludedStrings: Set[String] = Set("limited", "plc")
+
+      val result = notContainStrings(excludedStrings, "error.key")(answer)
+      result mustEqual Valid
+    }
+
+    "must return Valid when answer has excludedStrings as substring" in {
+      val answer = "delimited"
+      val excludedStrings: Set[String] = Set("limited", "plc")
+
+      val result = notContainStrings(excludedStrings, "error.key")(answer)
+      result mustEqual Valid
+    }
+
+    "must return Invalid when answer has excludedStrings as stand alone word" in {
+      val answer = "name limited"
+      val excludedStrings: Set[String] = Set("limited", "plc")
+
+      val result = notContainStrings(excludedStrings, "error.key")(answer)
+      result mustEqual Invalid("error.key")
+    }
+  }
 }

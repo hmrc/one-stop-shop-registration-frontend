@@ -142,4 +142,16 @@ trait Constraints {
         Valid
     }
   }
+
+  def notContainStrings(excludedStrings: Set[String], errorKey: String): Constraint[String] = {
+    Constraint { answer =>
+        val answerSet = answer.toLowerCase.split(" ").toSet
+
+        if (excludedStrings.intersect(answerSet).nonEmpty) {
+          Invalid(errorKey)
+        } else {
+          Valid
+        }
+    }
+  }
 }
