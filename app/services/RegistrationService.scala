@@ -43,7 +43,8 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
       getWebsites(answers),
       getPreviousRegistrations(answers),
       getBankDetails(answers),
-      getOnlineMarketplace(answers)
+      getOnlineMarketplace(answers),
+      getNiPresence(answers)
     ).mapN(
       (
         name,
@@ -55,7 +56,8 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
         websites,
         previousRegistrations,
         bankDetails,
-        isOnlineMarketplace
+        isOnlineMarketplace,
+        niPresence
       ) =>
         Registration(
           vrn                   = vrn,
@@ -68,7 +70,8 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
           commencementDate      = startDate,
           previousRegistrations = previousRegistrations,
           bankDetails           = bankDetails,
-          isOnlineMarketplace   = isOnlineMarketplace
+          isOnlineMarketplace   = isOnlineMarketplace,
+          niPresence            = niPresence
         )
     )
 
@@ -335,5 +338,29 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
     answers.get(IsOnlineMarketplacePage) match {
       case Some(answer) => answer.validNec
       case None         => DataMissingError(IsOnlineMarketplacePage).invalidNec
+    }
+
+  private def getNiPresence(answers: UserAnswers): ValidationResult[NiPresence] =
+    answers.get(BusinessBasedInNiPage) match {
+      case Some(true) =>
+        PrincipalPlaceOfBusinessInNi.validNec
+
+      case Some(false) =>
+        answers.get(HasFixedEstablishmentInNiPage) match {
+          case Some(true) =>
+            FixedEstablishmentInNi.validNec
+
+          case Some(false) =>
+            answers.get(SalesChannelsPage) match {
+              case Some(answer) => NoPresence(answer).validNec
+              case None         => DataMissingError(SalesChannelsPage).invalidNec
+            }
+
+          case None =>
+            DataMissingError(HasFixedEstablishmentInNiPage).invalidNec
+        }
+
+      case None =>
+        DataMissingError(BusinessBasedInNiPage).invalidNec
     }
 }

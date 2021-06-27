@@ -63,7 +63,8 @@ object RegistrationData extends Generators with EitherValues {
         PreviousRegistration(Country("DE", "Germany"), "DE123")
       ),
       bankDetails = BankDetails("Account name", Some(bic), iban),
-      isOnlineMarketplace = false
+      isOnlineMarketplace = false,
+      niPresence = PrincipalPlaceOfBusinessInNi
     )
 
   private def createUkAddress(): UkAddress =

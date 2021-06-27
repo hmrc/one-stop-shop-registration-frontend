@@ -58,6 +58,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
   private val answers =
     UserAnswers("id")
+      .set(BusinessBasedInNiPage, true).success.value
       .set(DateOfFirstSalePage, arbitraryDate).success.value
       .set(RegisteredCompanyNamePage, "foo").success.value
       .set(hasTradingNamePage, true).success.value
@@ -214,6 +215,45 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
     }
 
     "must return Invalid" - {
+
+      "when Business Based in NI is missing" in {
+
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
+        val userAnswers = answers.remove(BusinessBasedInNiPage).success.value
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessBasedInNiPage)))
+      }
+
+      "when Business Based in NI is false and Has Fixed Establishment in NI is missing" in {
+
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
+        val userAnswers =
+          answers
+            .set(BusinessBasedInNiPage, false).success.value
+            .remove(HasFixedEstablishmentInNiPage).success.value
+
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentInNiPage)))
+      }
+
+      "when Has Fixed Establishment in NI is false and Sales Channels is missing" in {
+
+        when(mockFeatures.schemeHasStarted) thenReturn true
+
+        val userAnswers =
+          answers
+            .set(BusinessBasedInNiPage, false).success.value
+            .set(HasFixedEstablishmentInNiPage, false).success.value
+            .remove(SalesChannelsPage).success.value
+
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(SalesChannelsPage)))
+      }
 
       "when Registered Company Name is missing" in {
 
