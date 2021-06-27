@@ -68,9 +68,9 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
     "when no continue Url is supplied" - {
 
-      "must return OK and the start again view" in {
+      "must return OK and the start again view with link to auth on sign in" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
 
         running(application) {
           val request = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad().url)
@@ -79,8 +79,10 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
 
+          val expectedRedirectURl = controllers.auth.routes.AuthController.onSignIn().url
+
           status(result) mustEqual OK
-          contentAsString(result) mustEqual startAgainView()(request, messages(application)).toString
+          contentAsString(result) mustEqual startAgainView(expectedRedirectURl)(request, messages(application)).toString
         }
       }
     }
