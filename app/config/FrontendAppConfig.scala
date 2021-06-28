@@ -52,8 +52,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def ivJourneyResultUrl(journeyId: String): String = new URI(s"$ivJourneyServiceUrl$journeyId").toString
 
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/one-stop-shop-registration-frontend"
+  private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host") + configuration.get[String]("feedback-frontend.url")
+  lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/${origin.toLowerCase}"
 
   val userResearchUrl : String = configuration.get[String]("urls.userResearchUrl")
 
