@@ -22,7 +22,7 @@ import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, DataMissingError, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -36,7 +36,7 @@ import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import queries.EmailConfirmationQuery
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 import services.{AuditService, EmailService, RegistrationService}
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
@@ -84,7 +84,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
         "must audit the event and redirect to the next page and successfully send email confirmation" in {
-          val mockSessionRepository = mock[SessionRepository]
+          val mockSessionRepository = mock[AuthenticatedSessionRepository]
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
@@ -107,13 +107,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[EmailService].toInstance(emailService),
               bind[AuditService].toInstance(auditService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
+              bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
             ).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, userAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
             val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
 
@@ -165,7 +165,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -194,7 +194,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onPageLoad().url)
             val result = route(application, request).value
-            val dataRequest = DataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER

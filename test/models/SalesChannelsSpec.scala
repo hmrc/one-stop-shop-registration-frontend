@@ -30,7 +30,7 @@ class SalesChannelsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropert
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(SalesChannels.values.toSeq)
+      val gen = Gen.oneOf(SalesChannels.values)
 
       forAll(gen) {
         salesChannels =>
@@ -52,7 +52,7 @@ class SalesChannelsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropert
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(SalesChannels.values.toSeq)
+      val gen = Gen.oneOf(SalesChannels.values)
 
       forAll(gen) {
         salesChannels =>

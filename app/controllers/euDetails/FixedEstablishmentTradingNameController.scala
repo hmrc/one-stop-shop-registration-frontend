@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.FixedEstablishmentTradingNameFormProvider
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
 import pages.euDetails.{EuCountryPage, FixedEstablishmentTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -75,7 +75,7 @@ class FixedEstablishmentTradingNameController @Inject()(
 
   private def getCountry(index: Index)
                         (block: Country => Future[Result])
-                        (implicit request: DataRequest[AnyContent]): Future[Result] =
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(EuCountryPage(index)).map {
       country =>
         block(country)

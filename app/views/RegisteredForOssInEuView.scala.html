@@ -1,5 +1,5 @@
 @this(
-        layout: templates.Layout,
+        layout: templates.UnauthenticatedLayout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukRadios: GovukRadios,
@@ -8,7 +8,10 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("registeredForOssInEu.title"))) {
+@layout(
+    pageTitle    = title(form, messages("registeredForOssInEu.title")),
+    showBackLink = false
+) {
 
     @formHelper(action = routes.RegisteredForOssInEuController.onSubmit(), 'autoComplete -> "off") {
 

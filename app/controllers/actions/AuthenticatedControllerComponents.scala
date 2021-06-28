@@ -16,11 +16,11 @@
 
 package controllers.actions
 
-import models.requests.DataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 import services.FeatureFlagService
 
 import javax.inject.Inject
@@ -28,21 +28,29 @@ import javax.inject.Inject
 trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def actionBuilder: DefaultActionBuilder
-  def sessionRepository: SessionRepository
-  def identify: IdentifierAction
-  def getData: DataRetrievalAction
-  def requireData: DataRequiredAction
+  def sessionRepository: AuthenticatedSessionRepository
+  def identify: AuthenticatedIdentifierAction
+  def getData: AuthenticatedDataRetrievalAction
+  def requireData: AuthenticatedDataRequiredAction
   def checkRegistration: CheckRegistrationFilter
   def checkVrnAllowList: VrnAllowListFilter
   def limitIndex: MaximumIndexFilterProvider
   def features: FeatureFlagService
 
-  def authAndGetData(): ActionBuilder[DataRequest, AnyContent] =
-    identify andThen
+  def authAndGetData(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+    actionBuilder andThen
+      identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
       getData andThen
       requireData
+
+  def authAndGetOptionalData: ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
+    actionBuilder andThen
+      identify andThen
+      checkVrnAllowList andThen
+      checkRegistration andThen
+      getData
 }
 
 case class DefaultAuthenticatedControllerComponents @Inject()(
@@ -53,12 +61,12 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                langs: Langs,
                                                                fileMimeTypes: FileMimeTypes,
                                                                executionContext: scala.concurrent.ExecutionContext,
-                                                               sessionRepository: SessionRepository,
-                                                               identify: IdentifierAction,
+                                                               sessionRepository: AuthenticatedSessionRepository,
+                                                               identify: AuthenticatedIdentifierAction,
                                                                checkVrnAllowList: VrnAllowListFilter,
                                                                checkRegistration: CheckRegistrationFilter,
-                                                               getData: DataRetrievalAction,
-                                                               requireData: DataRequiredAction,
+                                                               getData: AuthenticatedDataRetrievalAction,
+                                                               requireData: AuthenticatedDataRequiredAction,
                                                                limitIndex: MaximumIndexFilterProvider,
                                                                features: FeatureFlagService
                                                              ) extends AuthenticatedControllerComponents

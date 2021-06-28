@@ -19,7 +19,7 @@ package controllers.auth
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import models.{NormalMode, UserAnswers, responses}
+import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
@@ -29,7 +29,8 @@ import pages.FirstAuthedPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import queries.VatApiCallResultQuery
+import repositories.AuthenticatedSessionRepository
 import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView, UnsupportedAuthProviderView, UnsupportedCredentialRoleView}
 
 import java.net.URLEncoder
@@ -41,13 +42,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
 
   private val mockConnector  = mock[RegistrationConnector]
-  private val mockRepository = mock[SessionRepository]
+  private val mockRepository = mock[AuthenticatedSessionRepository]
 
   private def appBuilder(answers: Option[UserAnswers]) =
     applicationBuilder(answers)
       .overrides(
         bind[RegistrationConnector].toInstance(mockConnector),
-        bind[SessionRepository].toInstance(mockRepository)
+        bind[AuthenticatedSessionRepository].toInstance(mockRepository)
       )
 
   override def beforeEach(): Unit = {
@@ -59,18 +60,125 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
     "when we already have some user answers" - {
 
-      "must redirect to the next page without makings calls to get data or updating the user answers" in {
+      "and we have made a call to get VAT info" - {
 
-        val application = appBuilder(Some(emptyUserAnswers)).build()
+        "must redirect to the next page without makings calls to get data or updating the user answers" in {
 
-        running(application) {
-          val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
-          val result = route(application, request).value
+          val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+          val application = appBuilder(Some(answers)).build()
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
-          verify(mockConnector, never()).getVatCustomerInfo()(any())
-          verify(mockRepository, never()).set(any())
+          running(application) {
+            val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, answers).url
+            verify(mockConnector, never()).getVatCustomerInfo()(any())
+            verify(mockRepository, never()).set(any())
+          }
+        }
+      }
+
+      "and we have not yet made a call to get VAT info" - {
+
+        "and we can find their VAT details" - {
+
+          "must create user answers with their VAT details, then redirect to the next page" in {
+
+            val application = appBuilder(Some(emptyUserAnswers)).build()
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
+
+              val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
+        }
+
+        "and we cannot find their VAT details" - {
+
+          "must create user answers with no VAT details, then redirect to the next page" in {
+
+            val application = appBuilder(Some(emptyUserAnswers)).build()
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(responses.NotFound))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
+
+              val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.NotFound).success.value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
+        }
+
+        "and the call to get their VAT details fails" - {
+
+          val failureResponse = responses.UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+
+          "and the feature to allow users to proceed is enabled" - {
+
+            "must create user answers with no VAT details, then redirect to the next page" in {
+
+              val application =
+                appBuilder(None)
+                  .configure("features.proceed-when-vat-api-call-fails" -> true)
+                  .build()
+
+              when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+              when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+              running(application) {
+
+                val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+                val result = route(application, request).value
+
+                val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Error).success.value
+
+                status(result) mustEqual SEE_OTHER
+                redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+                verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+              }
+            }
+          }
+
+          "and the feature to allow users to proceed is disabled" - {
+
+            "must return an internal server error" in {
+
+              val application =
+                appBuilder(None)
+                  .configure("features.proceed-when-vat-api-call-fails" -> false)
+                  .build()
+
+              when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+              when(mockRepository.set(any())) thenReturn Future.successful(true)
+
+              running(application) {
+
+                val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+                val result = route(application, request).value
+
+                status(result) mustEqual INTERNAL_SERVER_ERROR
+                verify(mockRepository, times(0)).set(any())
+              }
+            }
+          }
         }
       }
     }
@@ -91,9 +199,11 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
             val result = route(application, request).value
 
+            val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo).url
-            verify(mockRepository, times(1)).set(eqTo(emptyUserAnswersWithVatInfo))
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+            verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
           }
         }
       }
@@ -112,9 +222,11 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
             val result = route(application, request).value
 
+            val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.NotFound).success.value
+
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
-            verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
+            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+            verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
           }
         }
       }
@@ -140,9 +252,11 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
               val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
               val result = route(application, request).value
 
+              val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Error).success.value
+
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, emptyUserAnswers).url
-              verify(mockRepository, times(1)).set(eqTo(emptyUserAnswers))
+              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
             }
           }
         }

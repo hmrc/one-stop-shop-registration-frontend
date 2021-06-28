@@ -26,7 +26,7 @@ import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import repositories.AuthenticatedSessionRepository
 import services.FeatureFlagService
 import views.html.HasTradingNameView
 
@@ -97,14 +97,14 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository = mock[AuthenticatedSessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 

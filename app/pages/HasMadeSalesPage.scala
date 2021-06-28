@@ -17,9 +17,14 @@
 package pages
 
 import controllers.routes
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object HasMadeSalesPage extends Page {
+case object HasMadeSalesPage extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "hasMadeSales"
 
   def navigate(answer: Boolean): Call =
     if (answer) {

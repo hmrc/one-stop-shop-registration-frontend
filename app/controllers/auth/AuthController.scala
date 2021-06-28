@@ -19,17 +19,18 @@ package controllers.auth
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import models.{NormalMode, UserAnswers, responses}
+import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
 import pages.FirstAuthedPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.VatApiCallResultQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.auth._
 
 import java.time.{Clock, Instant}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-
+import utils.FutureSyntax._
 
 class AuthController @Inject()(
                                 cc: AuthenticatedControllerComponents,
@@ -44,38 +45,37 @@ class AuthController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onSignIn: Action[AnyContent] = (cc.identify andThen cc.checkRegistration andThen cc.getData).async {
+  def onSignIn: Action[AnyContent] = cc.authAndGetOptionalData.async {
     implicit request =>
 
-      request.userAnswers match {
-        case Some(answers) =>
-          Future.successful(Redirect(FirstAuthedPage.navigate(NormalMode, answers)))
+      val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
+
+      answers.get(VatApiCallResultQuery) match {
+        case Some(_) =>
+          Redirect(FirstAuthedPage.navigate(NormalMode, answers)).toFuture
 
         case None =>
           connector.getVatCustomerInfo().flatMap {
             case Right(vatInfo) =>
-              val answers = UserAnswers(request.userId, vatInfo = Some(vatInfo), lastUpdated = Instant.now(clock))
-              cc.sessionRepository.set(answers).map {
-                _ =>
-                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
-              }
+              for {
+                updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
+                _              <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
 
             case Left(responses.NotFound) =>
-              val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
-              cc.sessionRepository.set(answers).map {
-                _ =>
-                  Redirect(FirstAuthedPage.navigate(NormalMode, answers))
-              }
+              for {
+                updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.NotFound))
+                _              <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
 
-            case Left(_) =>
+            case _ =>
               if (cc.features.proceedWhenVatApiCallFails) {
-                val answers = UserAnswers(request.userId, vatInfo = None, lastUpdated = Instant.now(clock))
-                cc.sessionRepository.set(answers).map {
-                  _ =>
-                    Redirect(FirstAuthedPage.navigate(NormalMode, answers))
-                }
+                for {
+                  updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.Error))
+                  _              <- cc.sessionRepository.set(updatedAnswers)
+                } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
               } else {
-                Future.successful(InternalServerError)
+                InternalServerError.toFuture
               }
           }
       }

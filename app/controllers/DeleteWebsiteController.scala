@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteWebsiteFormProvider
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.{DeleteWebsitePage, WebsitePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -71,7 +71,7 @@ class DeleteWebsiteController @Inject()(
 
   private def getWebsite(index: Index)
                         (block: String => Future[Result])
-                        (implicit request: DataRequest[AnyContent]): Future[Result] =
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(WebsitePage(index)).map {
       name =>
         block(name)

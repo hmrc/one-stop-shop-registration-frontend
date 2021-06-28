@@ -35,7 +35,7 @@ class JourneyRecoveryController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = cc.identify {
+  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
 
       val safeUrl: Option[String] = continueUrl.flatMap {

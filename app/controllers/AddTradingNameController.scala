@@ -20,7 +20,7 @@ import config.Constants
 import controllers.actions._
 import forms.AddTradingNameFormProvider
 import models.Mode
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import pages.AddTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -74,7 +74,7 @@ class AddTradingNameController @Inject()(
   }
 
   private def getNumberOfTradingNames(block: Int => Future[Result])
-                                     (implicit request: DataRequest[AnyContent]): Future[Result] =
+                                     (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfTradingNames).map {
       number =>
         block(number)

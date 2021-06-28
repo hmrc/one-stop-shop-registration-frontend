@@ -25,7 +25,7 @@ import views.html.NotLiableForVatView
 
 class NotLiableForVatController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
+                                       cc: UnauthenticatedControllerComponents,
                                        view: NotLiableForVatView
                                      ) extends FrontendBaseController with I18nSupport {
 

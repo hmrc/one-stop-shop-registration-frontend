@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.requests.IdentifierRequest
+import models.requests.AuthenticatedIdentifierRequest
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   class Harness(features: FeatureFlagService) extends VrnAllowListFilterImpl(features) {
-    def callFilter(request: IdentifierRequest[_]): Future[Option[Result]] = filter(request)
+    def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   ".filter" - {
@@ -53,7 +53,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request    = IdentifierRequest(FakeRequest(), testCredentials, vrn)
+            val request    = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
             val features   = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
@@ -78,7 +78,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request    = IdentifierRequest(FakeRequest(), testCredentials, vrn)
+            val request    = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
             val features   = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
@@ -106,7 +106,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request = IdentifierRequest(FakeRequest(), testCredentials, vrn)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
             val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 

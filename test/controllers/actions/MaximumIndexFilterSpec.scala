@@ -18,7 +18,7 @@ package controllers.actions
 
 import base.SpecBase
 import models.Index
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class MaximumIndexFilterSpec extends SpecBase with ScalaCheckPropertyChecks {
 
   class Harness(index: Index, max: Int) extends MaximumIndexFilter(index, max) {
-    def callFilter(request: DataRequest[_]): Future[Option[Result]] = filter(request)
+    def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   ".filter" - {
@@ -46,7 +46,7 @@ class MaximumIndexFilterSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       forAll(invalidCombinations) {
         case (index, max) =>
-          val request = DataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
           val harness = new Harness(index, max)
 
           val result = harness.callFilter(request).futureValue
@@ -64,7 +64,7 @@ class MaximumIndexFilterSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       forAll(validCombinations) {
         case (index, max) =>
-          val request = DataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
           val harness = new Harness(index, max)
 
           val result = harness.callFilter(request).futureValue

@@ -18,7 +18,7 @@ package models
 
 import queries.Gettable
 
-trait ValidationError {
+sealed trait ValidationError {
 
   val errorMessage: String
 }

@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.AuthenticatedControllerComponents
+import controllers.actions.{AuthenticatedControllerComponents, UnauthenticatedControllerComponents}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -24,18 +24,27 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class KeepAliveController @Inject()(
-                                     cc: AuthenticatedControllerComponents,
+                                     authCc: AuthenticatedControllerComponents,
+                                     unauthCc: UnauthenticatedControllerComponents
                                    )(implicit ec: ExecutionContext) extends FrontendBaseController {
 
-  protected val controllerComponents: MessagesControllerComponents = cc
+  protected val controllerComponents: MessagesControllerComponents = authCc
 
-  def keepAlive: Action[AnyContent] = (cc.identify andThen cc.getData).async {
+  def keepAliveAuthenticated: Action[AnyContent] = (authCc.actionBuilder andThen authCc.identify andThen authCc.getData).async {
     implicit request =>
       request.userAnswers
         .map {
           answers =>
-            cc.sessionRepository.keepAlive(answers.id).map(_ => Ok)
-        }
-        .getOrElse(Future.successful(Ok))
+            authCc.sessionRepository.keepAlive(answers.id).map(_ => Ok)
+        }.getOrElse(Future.successful(Ok))
+  }
+
+  def keepAliveUnauthenticated: Action[AnyContent] = unauthCc.identifyAndGetOptionalData.async {
+    implicit request =>
+      request.userAnswers
+        .map {
+          answers =>
+            unauthCc.sessionRepository.keepAlive(answers.id).map(_ => Ok)
+        }.getOrElse(Future.successful(Ok))
   }
 }

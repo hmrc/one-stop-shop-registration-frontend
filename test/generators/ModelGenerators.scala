@@ -26,7 +26,7 @@ trait ModelGenerators {
 
   implicit lazy val arbitrarySalesChannels: Arbitrary[SalesChannels] =
     Arbitrary {
-      Gen.oneOf(SalesChannels.values.toSeq)
+      Gen.oneOf(SalesChannels.values)
     }
 
   implicit lazy val arbitraryBic: Arbitrary[Bic] = {

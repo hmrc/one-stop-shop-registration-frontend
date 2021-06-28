@@ -31,13 +31,13 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.EmailConfirmationQuery
 import services._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax._
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
-import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
@@ -108,19 +108,20 @@ class CheckYourAnswersController @Inject()(
               }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
-              successful(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
+              Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
-              successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+              Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
           }
 
         case Invalid(errors) =>
-          val errorMessages = errors.map(_.errorMessage).toChain.toList.mkString("\n")
+          val errorList = errors.toChain.toList
+          val errorMessages = errorList.map(_.errorMessage).mkString("\n")
           logger.error(s"Unable to create a registration request from user answers: $errorMessages")
 
-          successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
       }
   }
 }

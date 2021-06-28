@@ -9,7 +9,8 @@ GET         /assets/*file                                             controller
 
 GET         /language/:lang                                           controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                                          controllers.KeepAliveController.keepAlive
+GET         /refresh-session                                          controllers.KeepAliveController.keepAliveAuthenticated
+GET         /refresh-session-unauthenticated                          controllers.KeepAliveController.keepAliveUnauthenticated
 
 GET         /there-is-a-problem                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
@@ -283,3 +284,5 @@ GET         /cannot-use-no-vat                                        controller
 
 GET         /sales-on-marketplaces                                    controllers.SalesChannelsController.onPageLoad
 POST        /sales-on-marketplaces                                    controllers.SalesChannelsController.onSubmit
+
+GET         /answers-deleted                                          controllers.AnswersDeletedController.onPageLoad

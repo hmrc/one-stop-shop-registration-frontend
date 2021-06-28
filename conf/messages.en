@@ -20,9 +20,12 @@ date.month = Month
 date.year = Year
 
 timeout.title = You’re about to be signed out
-timeout.message = For security reasons, you will be signed out of this service in
+timeout.message = For security reasons, we will sign you out in
 timeout.keepAlive = Stay signed in
 timeout.signOut = Sign out
+timeout.unauthenticated.keepAlive = Continue registering
+timeout.unauthenticated.message = For your security, we will delete your answers in
+timeout.unauthenticated.signOut = Delete your answers
 
 error.browser.title.prefix = Error:
 error.boolean = Please give an answer
@@ -590,3 +593,6 @@ salesChannels.onlineMarketplaces = All
 salesChannels.mixed = Some
 salesChannels.notOnlineMarketplaces = None
 salesChannels.error.required = Select how much of your sales will be made on online marketplaces?
+
+answersDeleted.title = For your security, we deleted your answers
+answersDeleted.heading = For your security, we deleted your answers

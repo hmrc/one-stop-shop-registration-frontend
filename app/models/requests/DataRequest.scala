@@ -21,17 +21,23 @@ import models.UserAnswers
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
-case class OptionalDataRequest[A] (
-                                    request: Request[A],
-                                    credentials: Credentials,
-                                    vrn: Vrn,
-                                    userAnswers: Option[UserAnswers]
-                                  ) extends WrappedRequest[A](request) {
+case class AuthenticatedOptionalDataRequest[A](
+                                                request: Request[A],
+                                                credentials: Credentials,
+                                                vrn: Vrn,
+                                                userAnswers: Option[UserAnswers]
+                                              ) extends WrappedRequest[A](request) {
 
   val userId: String = credentials.providerId
 }
 
-case class DataRequest[A] (
+case class UnauthenticatedOptionalDataRequest[A](
+                                                  request: Request[A],
+                                                  userId: String,
+                                                  userAnswers: Option[UserAnswers]
+                                                ) extends WrappedRequest[A](request)
+
+case class AuthenticatedDataRequest[A](
                             request: Request[A],
                             credentials: Credentials,
                             vrn: Vrn,
@@ -40,3 +46,9 @@ case class DataRequest[A] (
 
   val userId: String = credentials.providerId
 }
+
+case class UnauthenticatedDataRequest[A](
+                                          request: Request[A],
+                                          userId: String,
+                                          userAnswers: UserAnswers
+                                        ) extends WrappedRequest[A](request)

@@ -16,22 +16,27 @@
 
 package controllers.actions
 
-import javax.inject.Inject
-import models.requests.IdentifierRequest
+import config.FrontendAppConfig
+import models.requests.AuthenticatedIdentifierRequest
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc._
+import services.UrlBuilderService
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeAuthenticatedIdentifierAction extends AuthenticatedIdentifierAction(
+  mock[AuthConnector],
+  mock[FrontendAppConfig],
+  mock[UrlBuilderService]
+)(ExecutionContext.Implicits.global) {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, Credentials("12345-credId", "GGW"), Vrn("123456789")))
-
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
-
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+  override def refine[A](request: Request[A]): Future[Either[Result, AuthenticatedIdentifierRequest[A]]] =
+    Future.successful(Right(AuthenticatedIdentifierRequest(
+      request,
+      Credentials("12345-credId", "GGW"),
+      Vrn("123456789")
+    )))
 }

@@ -25,32 +25,42 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HasMadeSalesView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class HasMadeSalesController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
+                                         cc: UnauthenticatedControllerComponents,
                                          formProvider: HasMadeSalesFormProvider,
                                          view: HasMadeSalesView
-                                 ) extends FrontendBaseController with I18nSupport {
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = cc.identifyAndGetData {
     implicit request =>
 
-      Ok(view(form))
+
+      val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
+        case Some(answer) => form.fill(answer)
+        case None         => form
+      }
+
+      Ok(view(preparedForm))
   }
 
-  def onSubmit: Action[AnyContent] = Action {
+  def onSubmit: Action[AnyContent] = cc.identifyAndGetData.async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          BadRequest(view(formWithErrors)),
+          Future.successful(BadRequest(view(formWithErrors))),
 
         value =>
-          Redirect(HasMadeSalesPage.navigate(value))
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
+            _              <- cc.sessionRepository.set(updatedAnswers)
+          } yield Redirect(HasMadeSalesPage.navigate(value))
       )
   }
 }

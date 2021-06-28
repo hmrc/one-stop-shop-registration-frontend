@@ -18,11 +18,17 @@ package controllers
 
 import base.SpecBase
 import forms.HasMadeSalesFormProvider
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.HasMadeSalesPage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.UnauthenticatedSessionRepository
 import views.html.HasMadeSalesView
+
+import scala.concurrent.Future
 
 class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
@@ -49,9 +55,32 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must populate the view and return OK and the correct view for a GET when the question has already been answered" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val answers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasMadeSalesRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HasMadeSalesView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(true))(request, messages(application)).toString
+      }
+    }
+
+    "must save the answer and redirect to the next page when valid data is submitted" in {
+
+      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      when(sessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .build()
 
       running(application) {
         val request =
@@ -60,8 +89,11 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        val expectedAnswers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual HasMadeSalesPage.navigate(true).url
+        verify(sessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -82,6 +114,36 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Registered for OSS in EU for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasMadeSalesRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Registered for OSS in EU for a POST if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, hasMadeSalesRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
       }
     }
   }

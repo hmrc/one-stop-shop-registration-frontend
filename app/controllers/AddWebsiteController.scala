@@ -20,7 +20,7 @@ import config.Constants
 import controllers.actions._
 import forms.AddWebsiteFormProvider
 import models.Mode
-import models.requests.DataRequest
+import models.requests.AuthenticatedDataRequest
 import pages.AddWebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -73,7 +73,7 @@ class AddWebsiteController @Inject()(
   }
 
   private def getNumberOfWebsites(block: Int => Future[Result])
-                                 (implicit request: DataRequest[AnyContent]): Future[Result] =
+                                 (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfWebsites).map {
       number =>
         block(number)

@@ -19,7 +19,7 @@ package controllers.actions
 import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.routes
-import models.requests.IdentifierRequest
+import models.requests.AuthenticatedIdentifierRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   class Harness(connector: RegistrationConnector) extends CheckRegistrationFilterImpl(connector) {
-    def callFilter(request: IdentifierRequest[_]): Future[Option[Result]] = filter(request)
+    def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   private val mockConnector = mock[RegistrationConnector]
@@ -56,7 +56,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = IdentifierRequest(FakeRequest(), testCredentials, vrn)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
         val controller = new Harness(mockConnector)
 
         val result = controller.callFilter(request).futureValue
@@ -72,7 +72,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = IdentifierRequest(FakeRequest(), testCredentials, vrn)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
         val controller = new Harness(mockConnector)
 
         val result = controller.callFilter(request).futureValue

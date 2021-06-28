@@ -16,25 +16,39 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import controllers.routes
-import models.requests.{DataRequest, OptionalDataRequest}
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
+import utils.FutureSyntax._
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionContext) extends DataRequiredAction {
+class AuthenticatedDataRequiredAction @Inject()(implicit val executionContext: ExecutionContext)
+  extends ActionRefiner[AuthenticatedOptionalDataRequest, AuthenticatedDataRequest] {
 
-  override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
+  override protected def refine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedDataRequest[A]]] = {
 
     request.userAnswers match {
       case None =>
-        Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+        Left(Redirect(routes.JourneyRecoveryController.onPageLoad())).toFuture
       case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, request.credentials, request.vrn, data)))
+        Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, data)).toFuture
     }
   }
 }
 
-trait DataRequiredAction extends ActionRefiner[OptionalDataRequest, DataRequest]
+class UnauthenticatedDataRequiredAction @Inject()(implicit val executionContext: ExecutionContext)
+  extends ActionRefiner[UnauthenticatedOptionalDataRequest, UnauthenticatedDataRequest] {
+
+  override protected def refine[A](request: UnauthenticatedOptionalDataRequest[A]): Future[Either[Result, UnauthenticatedDataRequest[A]]] = {
+
+    request.userAnswers match {
+      case None =>
+        Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad())).toFuture
+      case Some(data) =>
+        Right(UnauthenticatedDataRequest(request.request, request.userId, data)).toFuture
+    }
+  }
+}

@@ -43,7 +43,7 @@ class ApplicationCompleteController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = (cc.identify andThen cc.getData andThen cc.requireData) {
+  def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData) {
     implicit request => {
       for {
         contactDetails        <- request.userAnswers.get(BusinessContactDetailsPage)
