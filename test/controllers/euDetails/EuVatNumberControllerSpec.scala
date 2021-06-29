@@ -104,6 +104,31 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must capitalise and save the answer and redirect to the next page when valid lower case data is submitted" in {
+
+      val mockSessionRepository = mock[AuthenticatedSessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, euVatNumberRoute)
+            .withFormUrlEncodedBody(("value", "fr1234567"))
+
+        val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), "FR1234567").success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()

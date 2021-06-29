@@ -63,5 +63,12 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
       val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
       result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(euVatNumberPattern)))
     }
+
+    "bind lowercase letters" in {
+      val dataItem = "aa123456789"
+      val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+      result.value.value mustBe dataItem
+      result.errors mustBe empty
+    }
   }
 }

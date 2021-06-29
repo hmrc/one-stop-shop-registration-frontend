@@ -65,11 +65,13 @@ class EuVatNumberController @Inject()(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
 
-            value =>
+            value => {
+              val formattedValue = value.toUpperCase
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), formattedValue))
                 _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
+            }
           )
       }
   }
