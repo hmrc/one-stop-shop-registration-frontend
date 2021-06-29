@@ -30,6 +30,7 @@ class PreviousEuVatNumberFormProvider @Inject() extends Mappings {
       "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
         .verifying(firstError(
           maxLength(12, "previousEuVatNumber.error.length"),
-            regexp(euVatNumberPattern, "previousEuVatNumber.error.invalid"))).transform[String](_.toUpperCase, x => x)
+            regexp(euVatNumberPattern, "previousEuVatNumber.error.invalid")))
+        .transform[String](_.toUpperCase, value => value)
     )
 }
