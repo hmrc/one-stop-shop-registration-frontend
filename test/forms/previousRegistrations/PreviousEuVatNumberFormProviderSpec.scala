@@ -46,12 +46,6 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
       validData
     )
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      validLowerCaseData
-    )
-
     behave like fieldWithMaxLength(
       form,
       fieldName,
@@ -69,6 +63,12 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
       val invalidEuVatNumber = "-. @abc"
       val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
       result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(euVatNumberPattern)))
+    }
+
+    "must bind when EU VAT number is lowercase" in {
+      val result = form.bind(Map(fieldName -> validLowerCaseData)).apply(fieldName)
+      result.value.value mustBe validLowerCaseData
+      result.errors mustBe empty
     }
   }
 }
