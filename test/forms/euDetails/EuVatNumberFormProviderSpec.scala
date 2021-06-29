@@ -68,7 +68,12 @@ class EuVatNumberFormProviderSpec extends StringFieldBehaviours {
     "must bind when EU VAT number is lowercase" in {
       val result = form.bind(Map(fieldName -> validLowerCaseData)).apply(fieldName)
       result.value.value mustBe validLowerCaseData
-      form.bindFromRequest(Map(fieldName -> Seq(validLowerCaseData))).value mustBe Some(validData)
+      result.errors mustBe empty
+    }
+
+    "must bind when EU VAT number is transformed from lowercase to uppercase" in {
+      val result = form.bindFromRequest(Map(fieldName -> Seq(validLowerCaseData)))
+      result.value.value mustBe validData
       result.errors mustBe empty
     }
   }
