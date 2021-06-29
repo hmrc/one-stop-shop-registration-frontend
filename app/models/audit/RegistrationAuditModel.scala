@@ -29,21 +29,24 @@ case class RegistrationAuditModel(
   override val auditType: String       = "RegistrationSubmitted"
   override val transactionName: String = "registration-submitted"
 
-  private def previousRegistrationDetail: JsObject =
+  private val previousRegistrationDetail: JsObject =
     if (registration.previousRegistrations.nonEmpty) {
       Json.obj("previousRegistrations" -> Json.toJson(registration.previousRegistrations))
     } else {
       Json.obj()
     }
 
-  private def websiteDetail: JsObject =
+  private val websiteDetail: JsObject =
     if(registration.websites.nonEmpty) Json.obj("websites" -> registration.websites) else Json.obj()
 
-  private def euRegistrationDetail: JsObject =
+  private val euRegistrationDetail: JsObject =
     if (registration.euRegistrations.nonEmpty) Json.obj("euRegistrations" -> Json.toJson(registration.euRegistrations)) else Json.obj()
 
   private val tradingNameDetail: JsObject =
     if (registration.tradingNames.nonEmpty) Json.obj("tradingNames" -> registration.tradingNames) else Json.obj()
+
+  private val niPresence: JsObject =
+    if (registration.niPresence.nonEmpty) Json.obj("niPresence" -> registration.niPresence) else Json.obj()
 
   private val registrationDetail: JsValue = Json.obj(
     "vatRegistrationNumber" -> registration.vrn,
@@ -51,11 +54,13 @@ case class RegistrationAuditModel(
     "vatDetails"            -> Json.toJson(registration.vatDetails),
     "contactDetails"        -> Json.toJson(registration.contactDetails),
     "commencementDate"      -> Json.toJson(registration.commencementDate),
-    "bankDetails"           -> Json.toJson(registration.bankDetails)
+    "bankDetails"           -> Json.toJson(registration.bankDetails),
+    "isOnlineMarketplace"   -> registration.isOnlineMarketplace
   ) ++ tradingNameDetail ++
     euRegistrationDetail ++
     websiteDetail ++
-    previousRegistrationDetail
+    previousRegistrationDetail ++
+    niPresence
 
   override val detail: JsValue = Json.obj(
     "credId"              -> credId,
