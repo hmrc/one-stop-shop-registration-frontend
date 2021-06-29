@@ -28,6 +28,7 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "previousEuVatNumber.error.length"
   val invalidKey = "previousEuVatNumber.error.invalid"
   val validData = "DE+854123"
+  val validLowerCaseData = "de+854123"
   val maxLength = 12
 
   val country: Country = arbitrary[Country].sample.value
@@ -62,6 +63,12 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
       val invalidEuVatNumber = "-. @abc"
       val result = form.bind(Map(fieldName -> invalidEuVatNumber)).apply(fieldName)
       result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(euVatNumberPattern)))
+    }
+
+    "must bind when EU VAT number is lowercase" in {
+      val result = form.bind(Map(fieldName -> validLowerCaseData)).apply(fieldName)
+      result.value.value mustBe validLowerCaseData
+      result.errors mustBe empty
     }
   }
 }
