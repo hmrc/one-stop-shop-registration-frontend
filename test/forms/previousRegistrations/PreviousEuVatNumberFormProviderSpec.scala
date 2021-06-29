@@ -28,6 +28,7 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "previousEuVatNumber.error.length"
   val invalidKey = "previousEuVatNumber.error.invalid"
   val validData = "DE+854123"
+  val validLowerCaseData = "de+854123"
   val maxLength = 12
 
   val country: Country = arbitrary[Country].sample.value
@@ -43,6 +44,12 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       validData
+    )
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      validLowerCaseData
     )
 
     behave like fieldWithMaxLength(
