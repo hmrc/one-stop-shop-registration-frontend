@@ -16,7 +16,10 @@
     @formHelper(action = routes.CheckVatDetailsController.onSubmit(), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(
+                form = form,
+                errorLinkOverrides = Map("value" -> "value_0")
+            ))
         }
 
         <h1 class="govuk-heading-xl">@messages("checkVatDetails.heading")</h1>
@@ -25,24 +28,24 @@
             @viewModel.organisationName.map { name =>
               <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.organisationName")</dt>
-                  <dt class="govuk-summary-list__value govuk-!-width-one-half">@name</dt>
+                  <dd class="govuk-summary-list__value govuk-!-width-one-half">@name</dd>
               </div>
             }
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.vrn")</dt>
-                <dt class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.vrn</dt>
+                <dd class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.vrn</dd>
             </div>
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.address")</dt>
-                <dt class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.formattedAddress</dt>
+                <dd class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.formattedAddress</dd>
             </div>
 
             @viewModel.partOfVatGroup.map { answer =>
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.partOfVatGroup")</dt>
-                    <dt class="govuk-summary-list__value govuk-!-width-one-half">@answer</dt>
+                    <dd class="govuk-summary-list__value govuk-!-width-one-half">@answer</dd>
                 </div>
             }
         </dl>

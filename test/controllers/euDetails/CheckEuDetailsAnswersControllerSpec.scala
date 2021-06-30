@@ -30,7 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
-import viewmodels.checkAnswers.euDetails.EuCountrySummary
+import viewmodels.checkAnswers.euDetails.VatRegisteredSummary
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
 
@@ -40,8 +40,12 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
   private val index                 = Index(0)
   private val country               = Country.euCountries.head
-  private val baseUserAnswers       = emptyUserAnswers.set(euDetails.EuCountryPage(index), country).success.value
   private val mockSessionRepository = mock[AuthenticatedSessionRepository]
+
+  private val baseUserAnswers =
+    emptyUserAnswers
+      .set(euDetails.EuCountryPage(index), Country.euCountries.head).success.value
+      .set(euDetails.VatRegisteredPage(index), true).success.value
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
@@ -59,7 +63,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
         val list = SummaryListViewModel(
-          Seq(EuCountrySummary.row(baseUserAnswers, index)).flatten
+          Seq(VatRegisteredSummary.row(baseUserAnswers, index, NormalMode)).flatten
         )
 
         status(result) mustEqual OK

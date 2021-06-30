@@ -388,8 +388,8 @@ hasFixedEstablishment.checkYourAnswersLabel = Fixed establishment
 hasFixedEstablishment.error.required = Select yes if you have a fixed establishment in {0}
 hasFixedEstablishment.change.hidden = fixed establishment
 
-checkEuVatDetailsAnswers.title = Check your answers
-checkEuVatDetailsAnswers.heading = Check your answers
+checkEuVatDetailsAnswers.title = Check your answers for {0}
+checkEuVatDetailsAnswers.heading = Check your answers for {0}
 
 alreadyRegistered.title = Already registered
 alreadyRegistered.heading = {0} is already registered
