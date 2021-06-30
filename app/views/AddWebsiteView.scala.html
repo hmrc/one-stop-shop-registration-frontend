@@ -46,7 +46,9 @@
                 @govukRadios(
                     RadiosViewModel.yesNo(
                         field = form("value"),
-                        legend = LegendViewModel(messages("addWebsite.addAnother")).withSize(LegendSize.Medium)
+                        legend = LegendViewModel(
+                            HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("addWebsite.addAnother") + "</h2>"))
+                        ).withSize(LegendSize.Medium)
                     ).withHint(HintViewModel(messages("addWebsite.addAnother.hint")))
                 )
             } else {
