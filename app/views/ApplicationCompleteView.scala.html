@@ -27,11 +27,6 @@
     <div class="grid-row column-two-thirds" id="application_complete_id">
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
-            <div class="govuk-panel__body">
-            @messages("applicationComplete.reference")
-                <br />
-                <strong>@vrn.vrn</strong>
-            </div>
         </div>
 
         @if(showEmailConfirmation) {
@@ -40,9 +35,20 @@
             </div>
         }
 
+        <div class="govuk-body">@messages("applicationComplete.reference", vrn.vrn)</div>
+
+        <p class="govuk-body">@messages("applicationComplete.startDate", startDate)</p>
+
+        <p class="govuk-body">@messages("applicationComplete.list")
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("applicationComplete.list.p1")</li>
+                <li>@messages("applicationComplete.list.p2")</li>
+                <li>@messages("applicationComplete.list.p3")</li>
+            </ul>
+        </p>
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
 
-        <p class="govuk-body">@messages("applicationComplete.p1", startDate)</p>
+        <p class="govuk-body">@messages("applicationComplete.p1")</p>
         <p class="govuk-body">@messages("applicationComplete.p2")</p>
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
