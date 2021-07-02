@@ -41,8 +41,8 @@ class DateOfFirstSaleFormProvider @Inject()(
         allRequiredKey = "dateOfFirstSale.error.required.all",
         twoRequiredKey = "dateOfFirstSale.error.required.two",
         requiredKey = "dateOfFirstSale.error.required"
-      ).verifying(minDate(minimumDate, "dateOfFirstSale.error.min", minimumDate.format(dateFormatter)))
-        .verifying(maxDate(today, "dateOfFirstSale.error.max", today.format(dateFormatter)))
+      ).verifying(minDate(minimumDate, "dateOfFirstSale.error.minMax", minimumDate.format(dateFormatter)))
+        .verifying(maxDate(today, "dateOfFirstSale.error.minMax", minimumDate.format(dateFormatter)))
     )
   }
 }

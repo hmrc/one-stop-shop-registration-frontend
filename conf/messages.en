@@ -556,8 +556,7 @@ dateOfFirstSale.error.required.all = Enter the date of your first sale
 dateOfFirstSale.error.required.two = The date must include a {0} and a {1}
 dateOfFirstSale.error.required = The date must include a {0}
 dateOfFirstSale.error.invalid = Enter a real date
-dateOfFirstSale.error.min = Enter a real date
-dateOfFirstSale.error.max = Enter a real date
+dateOfFirstSale.error.minMax = Date of first sale must be between {0} and today
 dateOfFirstSale.change.hidden = date your sales start to be included in this scheme
 
 hasMadeSales.title = Have you already made sales to include in this scheme?
