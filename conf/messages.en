@@ -281,12 +281,20 @@ unsupportedCredentialRole.heading = You cannot use this service
 unsupportedCredentialRole.p1 = You signed in to Government Gateway as a standard user. To register for this scheme you must be an administrator user.
 unsupportedCredentialRole.p2 = Contact the person who set up your Government Gateway.
 
-insufficientEnrolments.title = Sign in with a different Government Gateway
+insufficientEnrolments.title = You cannot use this service
 insufficientEnrolments.heading = Sign in with a different Government Gateway
-insufficientEnrolments.p1 = Your Government Gateway is not linked to a VAT registration number.
-insufficientEnrolments.p2.1 = You need to
-insufficientEnrolments.p2.link.text = sign in with a Government Gateway
-insufficientEnrolments.p2.2 = that is linked to a VAT registration number.
+insufficientEnrolments.p1 = Your Government Gateway user ID is not linked to a VAT registration number.
+insufficientEnrolments.haveABusinessTaxAccount = If you know you have a Business tax account where you can see your VAT details
+insufficientEnrolments.enteredWrongGGUserID = You have entered the wrong Government Gateway user ID.
+insufficientEnrolments.signInWithYourGGUserID.link.text = Sign in with your Government Gateway user ID
+insufficientEnrolments.usedToSeeVATReturns = used to see VAT returns.
+insufficientEnrolments.cannotSeeVATDetailsInBTA = If you cannot see VAT details in the Business tax account for the business you want to register
+insufficientEnrolments.linkYourGGUserID = Link your Government Gateway user ID to your VAT registration number in your
+insufficientEnrolments.businessTaxAccount.link.text  = Business tax account
+insufficientEnrolments.opensInNewTab = (opens in new tab)
+insufficientEnrolments.goToManageAccount = Go to ''Manage account'', then ''Get online access to a tax, duty or scheme''.
+insufficientEnrolments.yourBusinessIsNotRegistered = If your business is not registered for UK VAT
+insufficientEnrolments.registerForUkVat = Register for UK VAT
 
 ivError.title = Sorry, there is a problem with the service
 ivError.heading = Sorry, there is a problem with the service

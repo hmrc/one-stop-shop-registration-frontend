@@ -26,11 +26,32 @@
 
     <p class="govuk-body">@messages("insufficientEnrolments.p1")</p>
 
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">@messages("insufficientEnrolments.haveABusinessTaxAccount")</h2>
+
+    <p class="govuk-body">@messages("insufficientEnrolments.enteredWrongGGUserID")</p>
+
     <p class="govuk-body">
-        @messages("insufficientEnrolments.p2.1")
         <a href="@controllers.auth.routes.AuthController.redirectToLogin(routes.IndexController.onPageLoad().url).url" class="govuk-link">
-            @messages("insufficientEnrolments.p2.link.text")
-        </a>
-        @messages("insufficientEnrolments.p2.2")
+            @messages("insufficientEnrolments.signInWithYourGGUserID.link.text")</a>
+        @messages("insufficientEnrolments.usedToSeeVATReturns")
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">@messages("insufficientEnrolments.cannotSeeVATDetailsInBTA")</h2>
+
+    <p class="govuk-body">
+        @messages("insufficientEnrolments.linkYourGGUserID")
+        <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" target="_blank">
+            @messages("insufficientEnrolments.businessTaxAccount.link.text")</a>
+        @messages("insufficientEnrolments.opensInNewTab")
+    </p>
+
+    <p class="govuk-body">@messages("insufficientEnrolments.goToManageAccount")</p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">@messages("insufficientEnrolments.yourBusinessIsNotRegistered")</h2>
+
+    <p class="govuk-body">
+        <a href="https://www.gov.uk/vat-registration/how-to-register" class="govuk-link" target="_blank">
+            @messages("insufficientEnrolments.registerForUkVat")</a>
+        @messages("insufficientEnrolments.opensInNewTab")
     </p>
 }
