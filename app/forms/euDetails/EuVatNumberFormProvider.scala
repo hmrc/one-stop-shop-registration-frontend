@@ -28,9 +28,11 @@ class EuVatNumberFormProvider @Inject() extends Mappings {
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("euVatNumber.error.required", Seq(country.name))
-        .verifying(firstError(
-          maxLength(12, "euVatNumber.error.length"),
-          regexp(euVatNumberPattern, "euVatNumber.error.invalid")))
-        .transform[String](_.toUpperCase, value => value)
+        .verifying(
+          firstError(
+            maxLength(12, "euVatNumber.error.length"),
+            regexp(euVatNumberPattern, "euVatNumber.error.invalid")
+          )
+        ).transform[String](_.toUpperCase, value => value)
     )
 }
