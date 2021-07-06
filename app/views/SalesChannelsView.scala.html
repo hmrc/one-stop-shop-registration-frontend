@@ -16,13 +16,13 @@
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel(
-                field  = form("value"),
+    @govukRadios(
+        RadiosViewModel(
+                field = form("value"),
                 legend = LegendViewModel(messages("salesChannels.heading")).asPageHeading(),
                 items  = SalesChannels.options
-            )
-        )
+        ).withHint(HintViewModel(messages("salesChannels.caption")))
+    )
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

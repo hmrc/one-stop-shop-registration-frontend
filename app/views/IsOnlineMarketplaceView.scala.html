@@ -19,8 +19,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("isOnlineMarketplace.heading")).asPageHeading()
-            )
+                legend = LegendViewModel(messages("isOnlineMarketplace.heading")).asPageHeading(),
+            ).withHint(HintViewModel(messages("isOnlineMarketplace.caption")))
         )
 
         @govukButton(

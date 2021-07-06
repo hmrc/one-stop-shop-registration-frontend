@@ -291,7 +291,8 @@ insufficientEnrolments.usedToSeeVATReturns = used to see VAT returns.
 insufficientEnrolments.cannotSeeVATDetailsInBTA = If you cannot see VAT details in the Business tax account for the business you want to register
 insufficientEnrolments.linkYourGGUserID = Link your Government Gateway user ID to your VAT registration number in your
 insufficientEnrolments.businessTaxAccount.link.text  = Business tax account
-insufficientEnrolments.opensInNewTab = (opens in new tab)
+insufficientEnrolments.opensInNewTab = (opens in new tab).
+insufficientEnrolments.opensInNewTabNoFullStop = (opens in new tab)
 insufficientEnrolments.goToManageAccount = Go to ''Manage account'', then ''Get online access to a tax, duty or scheme''.
 insufficientEnrolments.yourBusinessIsNotRegistered = If your business is not registered for UK VAT
 insufficientEnrolments.registerForUkVat = Register for UK VAT
@@ -574,6 +575,7 @@ hasMadeSales.error.required = Select yes if you have already made sales to inclu
 isOnlineMarketplace.title = Is your business an online marketplace?
 isOnlineMarketplace.heading = Is your business an online marketplace?
 isOnlineMarketplace.checkYourAnswersLabel = An online marketplace
+isOnlineMarketplace.caption = This means customers can buy goods from different sellers on your website or mobile app.
 isOnlineMarketplace.error.required = Select yes if your business is an online marketplace
 isOnlineMarketplace.change.hidden = if your business is an online marketplace
 
@@ -607,6 +609,7 @@ salesChannels.onlineMarketplaces = All
 salesChannels.mixed = Some
 salesChannels.notOnlineMarketplaces = None
 salesChannels.error.required = Select how much of your sales will be made on online marketplaces?
+salesChannels.caption = Online marketplaces are websites or mobile apps where customers can buy goods from different sellers.
 
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
