@@ -76,7 +76,7 @@ partOfVatGroup.change.hidden = if part of a UK VAT group
 
 registeredCompanyName.title = What is your business name?
 registeredCompanyName.heading = What is your business name?
-registeredCompanyName.hint = Make sure it matches the name on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
+registeredCompanyName.hint = Make sure it matches the name on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a>.
 registeredCompanyName.hint.link.text = business tax account
 registeredCompanyName.checkYourAnswersLabel = Business name
 registeredCompanyName.error.required = Enter your business name
@@ -95,7 +95,7 @@ tradingName.change.hidden = your UK trading name
 
 ukVatEffectiveDate.title = What is your UK VAT registration date?
 ukVatEffectiveDate.heading = What is your UK VAT registration date?
-ukVatEffectiveDate.guidance = You can find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a> or ask your accountant.
+ukVatEffectiveDate.guidance = You can find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a> or ask your accountant.
 ukVatEffectiveDate.hint = For example, 12 11 2007
 ukVatEffectiveDate.checkYourAnswersLabel = UK VAT registration date
 ukVatEffectiveDate.error.required.all = Enter your UK VAT registration date
@@ -107,7 +107,7 @@ ukVatEffectiveDate.change.hidden = UK VAT registration date
 
 ukVatRegisteredPostcode.title = What is the postcode where your business is registered for UK VAT?
 ukVatRegisteredPostcode.heading = What is the postcode where your business is registered for UK VAT?
-ukVatRegisteredPostcode.hint = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a>.
+ukVatRegisteredPostcode.hint = You can ask your accountant or find it on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a>.
 ukVatRegisteredPostcode.checkYourAnswersLabel = UK VAT registration postcode
 ukVatRegisteredPostcode.error.required = Enter the postcode where your business is registered for UK VAT
 ukVatRegisteredPostcode.error.invalid = Enter a valid postcode
@@ -152,7 +152,7 @@ deleteEuVatDetails.error.required = Select yes if you need to remove the tax det
 ukAddress.title = Principal place of business address
 ukAddress.heading = Principal place of business address
 ukAddress.guidance.1 = Make sure it matches the address on your VAT certificate in your
-ukAddress.guidance.link.text = business tax account (opens in a new tab)
+ukAddress.guidance.link.text = business tax account (opens in new tab)
 ukAddress.guidance.2 = or ask your accountant.
 ukAddress.line1 = Building and street
 ukAddress.line2 =
@@ -289,13 +289,10 @@ insufficientEnrolments.enteredWrongGGUserID = You have entered the wrong Governm
 insufficientEnrolments.signInWithYourGGUserID.link.text = Sign in with your Government Gateway user ID
 insufficientEnrolments.usedToSeeVATReturns = used to see VAT returns.
 insufficientEnrolments.cannotSeeVATDetailsInBTA = If you cannot see VAT details in the Business tax account for the business you want to register
-insufficientEnrolments.linkYourGGUserID = Link your Government Gateway user ID to your VAT registration number in your
-insufficientEnrolments.businessTaxAccount.link.text  = Business tax account
-insufficientEnrolments.opensInNewTab = (opens in new tab).
-insufficientEnrolments.opensInNewTabNoFullStop = (opens in new tab)
+insufficientEnrolments.businessTaxAccount.link.text = Link your Government Gateway user ID to your VAT registration number in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a>.
 insufficientEnrolments.goToManageAccount = Go to ''Manage account'', then ''Get online access to a tax, duty or scheme''.
 insufficientEnrolments.yourBusinessIsNotRegistered = If your business is not registered for UK VAT
-insufficientEnrolments.registerForUkVat = Register for UK VAT
+insufficientEnrolments.registerForUkVat = Register for UK VAT (opens in new tab)
 
 ivError.title = Sorry, there is a problem with the service
 ivError.heading = Sorry, there is a problem with the service
@@ -500,7 +497,7 @@ taxRegisteredInEu.change.hidden = if registered for tax in EU countries
 
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
-updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in a new tab)</a> to update your UK VAT details before registering for this scheme.
+updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a> to update your UK VAT details before registering for this scheme.
 
 businessAddressInUk.title = Is your principal place of business in the UK?
 businessAddressInUk.heading = Is your principal place of business in the UK?
@@ -511,7 +508,7 @@ businessAddressInUk.change.hidden = principal place of business address
 internationalAddress.title = Principal place of business address
 internationalAddress.heading = Principal place of business address
 internationalAddress.guidance.1 = Make sure it matches the address on your VAT certificate in your
-internationalAddress.guidance.link.text = business tax account (opens in a new tab)
+internationalAddress.guidance.link.text = business tax account (opens in new tab)
 internationalAddress.guidance.2 = or ask your accountant.
 internationalAddress.line1 = Address line 1
 internationalAddress.line2 = Address line 2 (optional)

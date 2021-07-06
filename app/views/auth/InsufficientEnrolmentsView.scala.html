@@ -38,12 +38,7 @@
 
     <h2 class="govuk-heading-m govuk-!-margin-top-6">@messages("insufficientEnrolments.cannotSeeVATDetailsInBTA")</h2>
 
-    <p class="govuk-body">
-        @messages("insufficientEnrolments.linkYourGGUserID")
-        <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" target="_blank">
-            @messages("insufficientEnrolments.businessTaxAccount.link.text")</a>
-        @messages("insufficientEnrolments.opensInNewTab")
-    </p>
+    <p class="govuk-body">@Html(messages("insufficientEnrolments.businessTaxAccount.link.text"))</p>
 
     <p class="govuk-body">@messages("insufficientEnrolments.goToManageAccount")</p>
 
@@ -52,6 +47,5 @@
     <p class="govuk-body">
         <a href="https://www.gov.uk/vat-registration/how-to-register" class="govuk-link" target="_blank">
             @messages("insufficientEnrolments.registerForUkVat")</a>
-        @messages("insufficientEnrolments.opensInNewTabNoFullStop")
     </p>
 }
