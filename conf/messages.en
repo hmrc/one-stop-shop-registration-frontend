@@ -289,7 +289,7 @@ insufficientEnrolments.enteredWrongGGUserID = You have entered the wrong Governm
 insufficientEnrolments.signInWithYourGGUserID.link.text = Sign in with your Government Gateway user ID
 insufficientEnrolments.usedToSeeVATReturns = used to see VAT returns.
 insufficientEnrolments.cannotSeeVATDetailsInBTA = If you cannot see VAT details in the Business tax account for the business you want to register
-insufficientEnrolments.businessTaxAccount.link.text = Link your Government Gateway user ID to your VAT registration number in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a>.
+insufficientEnrolments.businessTaxAccount.link.text = Link your Government Gateway user ID to your VAT registration number in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">Business tax account (opens in new tab)</a>.
 insufficientEnrolments.goToManageAccount = Go to ''Manage account'', then ''Get online access to a tax, duty or scheme''.
 insufficientEnrolments.yourBusinessIsNotRegistered = If your business is not registered for UK VAT
 insufficientEnrolments.registerForUkVat = Register for UK VAT (opens in new tab)

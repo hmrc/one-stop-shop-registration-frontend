@@ -51,15 +51,5 @@ class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with 
         "dateOfFirstSale.error.minMax",
         Seq(dateService.earliestSaleAllowed.format(dateFormatter)))
     )
-
-    behave like dateFieldWithMin(
-      form,
-      "value",
-      LocalDate.now(stubClockAtArbitraryDate),
-      FormError(
-        "value",
-        "dateOfFirstSale.error.minMax",
-        Seq(dateService.earliestSaleAllowed.format(dateFormatter)))
-    )
   }
 }
