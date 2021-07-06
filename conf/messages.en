@@ -499,10 +499,10 @@ updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
 updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a> to update your UK VAT details before registering for this scheme.
 
-businessAddressInUk.title = Is your principal place of business in the UK?
-businessAddressInUk.heading = Is your principal place of business in the UK?
+businessAddressInUk.title = Is your principal place of business in Northern Ireland or Great Britain?
+businessAddressInUk.heading = Is your principal place of business in Northern Ireland or Great Britain?
 businessAddressInUk.checkYourAnswersLabel = Principal place of business in UK
-businessAddressInUk.error.required = Select yes if your principal place of business is in the UK
+businessAddressInUk.error.required = Select yes if your principal place of business is in Northern Ireland or Great Britain
 businessAddressInUk.change.hidden = principal place of business address
 
 internationalAddress.title = Principal place of business address
@@ -537,7 +537,7 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
-commencementDate.p1 = Your sales starting from {0} will be included in this scheme.
+commencementDate.p1 = Your eligible sales starting from {0} will be included in this scheme.
 commencementDate.checkYourAnswersLabel = Date your sales start to be included in this scheme
 
 registerLater.title = Come back later
@@ -554,19 +554,20 @@ registeredForOssInEu.title = Is your business already registered for the One Sto
 registeredForOssInEu.heading = Is your business already registered for the One Stop Shop Union scheme in an EU country?
 registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop Union scheme in an EU country
 
-dateOfFirstSale.title = Date of your first sale since {0}
-dateOfFirstSale.heading = Date of your first sale since {0}
+dateOfFirstSale.title = Date of your first eligible sale since {0}
+dateOfFirstSale.heading = Date of your first eligible sale since {0}
 dateOfFirstSale.hint = For example, {0}
 dateOfFirstSale.checkYourAnswersLabel = Date your sales start to be included in this scheme
-dateOfFirstSale.error.required.all = Enter the date of your first sale
+dateOfFirstSale.error.required.all = Enter the date of your first eligible sale
 dateOfFirstSale.error.required.two = The date must include a {0} and a {1}
 dateOfFirstSale.error.required = The date must include a {0}
 dateOfFirstSale.error.invalid = Enter a real date
-dateOfFirstSale.error.minMax = Date of first sale must be between {0} and today
+dateOfFirstSale.error.minMax = Date of first eligible sale must be between {0} and today
 dateOfFirstSale.change.hidden = date your sales start to be included in this scheme
 
 hasMadeSales.title = Have you already made sales to include in this scheme?
 hasMadeSales.heading = Have you already made sales to include in this scheme?
+hasMadeSales.caption = Only sales of goods to consumers in the EU are eligible.
 hasMadeSales.error.required = Select yes if you have already made sales to include in this scheme
 
 isOnlineMarketplace.title = Is your business an online marketplace?
