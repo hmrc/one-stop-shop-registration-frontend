@@ -29,19 +29,19 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
   def apply(): Form[InternationalAddress] = Form(
     mapping(
       "line1" -> text("internationalAddress.error.line1.required")
-        .verifying(maxLength(100, "internationalAddress.error.line1.length"))
+        .verifying(maxLength(35, "internationalAddress.error.line1.length"))
         .verifying(regexp(commonTextPattern, "internationalAddress.error.line1.format")),
       "line2" -> optional(text("internationalAddress.error.line2.required")
-        .verifying(maxLength(100, "internationalAddress.error.line2.length"))
+        .verifying(maxLength(35, "internationalAddress.error.line2.length"))
         .verifying(regexp(commonTextPattern, "internationalAddress.error.line2.format"))),
       "townOrCity" -> text("internationalAddress.error.townOrCity.required")
-        .verifying(maxLength(100, "internationalAddress.error.townOrCity.length"))
+        .verifying(maxLength(35, "internationalAddress.error.townOrCity.length"))
         .verifying(regexp(commonTextPattern, "internationalAddress.error.townOrCity.format")),
       "stateOrRegion" -> optional(text("internationalAddress.error.stateOrRegion.required")
-        .verifying(maxLength(100, "internationalAddress.error.stateOrRegion.length"))
+        .verifying(maxLength(35, "internationalAddress.error.stateOrRegion.length"))
         .verifying(regexp(commonTextPattern, "internationalAddress.error.stateOrRegion.format"))),
       "postCode" -> optional(text("internationalAddress.error.postCode.required")
-        .verifying(maxLength(100, "internationalAddress.error.postCode.length"))),
+        .verifying(maxLength(50, "internationalAddress.error.postCode.length"))),
       "country" -> text("internationalAddress.error.country.required")
         .verifying("internationalAddress.error.country.required", value => Country.internationalCountries.exists(_.code == value))
         .transform[Country](value => Country.internationalCountries.find(_.code == value).get, _.code)

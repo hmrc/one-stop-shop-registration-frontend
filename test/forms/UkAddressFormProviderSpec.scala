@@ -31,7 +31,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "ukAddress.error.line1.required"
     val lengthKey = "ukAddress.error.line1.length"
     val invalidKey = "ukAddress.error.line1.invalid"
-    val maxLength = 250
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -64,7 +64,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line2"
     val lengthKey = "ukAddress.error.line2.length"
     val invalidKey = "ukAddress.error.line2.invalid"
-    val maxLength = 250
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -92,7 +92,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "ukAddress.error.townOrCity.required"
     val lengthKey = "ukAddress.error.townOrCity.length"
     val invalidKey = "ukAddress.error.townOrCity.invalid"
-    val maxLength = 250
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -125,7 +125,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "county"
     val lengthKey = "ukAddress.error.county.length"
     val invalidKey = "ukAddress.error.county.invalid"
-    val maxLength = 250
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -154,7 +154,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val lengthKey = "ukAddress.error.postCode.length"
     val invalidKey = "ukAddress.error.postCode.invalid"
     val validData = "AA11 1AA"
-    val maxLength = 250
+    val maxLength = 10
 
     behave like fieldThatBindsValidData(
       form,

@@ -29,20 +29,20 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
    def apply(country: Country): Form[InternationalAddress] = Form(
      mapping(
        "line1" -> text("fixedEstablishmentAddress.error.line1.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.line1.length"))
+         .verifying(maxLength(35, "fixedEstablishmentAddress.error.line1.length"))
          .verifying(regexp(commonTextPattern, "fixedEstablishmentAddress.error.line1.format")),
        "line2" -> optional(text("fixedEstablishmentAddress.error.line2.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.line2.length"))
+         .verifying(maxLength(35, "fixedEstablishmentAddress.error.line2.length"))
          .verifying(regexp(commonTextPattern, "fixedEstablishmentAddress.error.line2.format"))),
        "townOrCity" -> text("fixedEstablishmentAddress.error.townOrCity.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.townOrCity.length"))
+         .verifying(maxLength(35, "fixedEstablishmentAddress.error.townOrCity.length"))
          .verifying(regexp(commonTextPattern, "fixedEstablishmentAddress.error.townOrCity.format")),
        "stateOrRegion" -> optional(text("fixedEstablishmentAddress.error.stateOrRegion.required")
-         .verifying(maxLength(100, "fixedEstablishmentAddress.error.stateOrRegion.length"))
+         .verifying(maxLength(35, "fixedEstablishmentAddress.error.stateOrRegion.length"))
          .verifying(regexp(commonTextPattern, "fixedEstablishmentAddress.error.stateOrRegion.format"))),
        "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
          .verifying(firstError(
-           maxLength(100, "fixedEstablishmentAddress.error.postCode.length"),
+           maxLength(50, "fixedEstablishmentAddress.error.postCode.length"),
            regexp(postcodePattern, "fixedEstablishmentAddress.error.postCode.invalid"))))
      )(InternationalAddress(_, _, _, _, _, country))(x => Some((x.line1, x.line2, x.townOrCity, x.stateOrRegion, x.postCode)))
    )
