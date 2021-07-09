@@ -80,7 +80,7 @@ registeredCompanyName.hint = Make sure it matches the name on your VAT certifica
 registeredCompanyName.hint.link.text = business tax account
 registeredCompanyName.checkYourAnswersLabel = Business name
 registeredCompanyName.error.required = Enter your business name
-registeredCompanyName.error.length = Business name must be 105 characters or less
+registeredCompanyName.error.length = Business name must be 100 characters or less
 registeredCompanyName.error.invalid = Business name must only include letters, numbers, hyphens, spaces and apostrophes
 registeredCompanyName.change.hidden = business name
 

@@ -28,7 +28,7 @@ class RegisteredCompanyNameFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("registeredCompanyName.error.required")
         .verifying(firstError(
-          maxLength(105, "registeredCompanyName.error.length"),
+          maxLength(100, "registeredCompanyName.error.length"),
           regexp(commonTextPattern, "registeredCompanyName.error.invalid")))
     )
 }
