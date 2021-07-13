@@ -213,13 +213,13 @@ applicationComplete.heading = You are registered for the One Stop Shop Union sch
 applicationComplete.reference = Your reference number is your UK VAT registration number, {0}.
 applicationComplete.next = What happens next
 applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-applicationComplete.list = You need to:
-applicationComplete.list.p1 = charge VAT at the rate of the EU country where the goods are sent to
-applicationComplete.list.p2 = complete a single quarterly return using this scheme for eligible sales of goods to consumers in the EU
-applicationComplete.list.p3 = make a quarterly payment to HMRC of the total VAT due on eligible sales of goods to consumers in the EU
-applicationComplete.startDate = Your eligible sales starting from {0} will be included in this scheme.
+applicationComplete.vatRate = You need to charge VAT at the rate of the EU country where the goods are sent to.
+applicationComplete.list = For each calendar quarter, you need to use the new One Stop Shop service to:
+applicationComplete.list.p1 = complete a single return for eligible sales of goods to consumers in the EU
+applicationComplete.list.p2 = make a payment to HMRC of the total VAT due on eligible sales of goods to consumers in the EU
+applicationComplete.startDate = Your first return will be for eligible sales starting from {0} to {1}.
 applicationComplete.p1 = We will contact you if we need to check any information.
-applicationComplete.p2 = We will send you details about how to submit returns and make payments before your first VAT return for this scheme is due.
+applicationComplete.p2 = We will contact you about how to use the new service to submit your first return by {0} and make payment.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
