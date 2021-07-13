@@ -32,7 +32,9 @@ case class RegistrationConfirmationEmailParameters(
   recipientName_line1: String,
   businessName:String,
   startDate: String,
-  reference: String
+  reference: String,
+  lastDayOfCalendarQuarter: String,
+  lastDayOfMonthAfterCalendarQuarter: String
 ) extends EmailParameters
 
 object RegistrationConfirmationEmailParameters {

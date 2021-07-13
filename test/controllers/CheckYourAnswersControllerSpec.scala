@@ -25,7 +25,7 @@ import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, DataMissingError, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, anyInt, anyLong, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
@@ -37,11 +37,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import queries.EmailConfirmationQuery
 import repositories.AuthenticatedSessionRepository
-import services.{AuditService, EmailService, RegistrationService}
+import services.{AuditService, DateService, EmailService, RegistrationService}
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -52,13 +53,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
   private val registrationConnector = mock[RegistrationConnector]
   private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
+  private val dateService = mock[DateService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
       registrationConnector,
       registrationService,
       auditService,
-      emailService
+      emailService,
+      dateService
     )
   }
 
@@ -89,13 +92,21 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right(()))
+//          when(dateService.startOfNextPeriod) thenReturn LocalDate.of(30,9,2021)
+//          when(dateService.startOfNextPeriod) thenReturn LocalDate.of(31,10,2021)
+//          when(dateService.startOfNextPeriod) thenReturn LocalDate.of(31,10,2021)
+          when(dateService.startOfNextPeriod.minusDays(anyLong())) thenReturn LocalDate.of(2021,9,30)
+          when(dateService.startOfNextPeriod.withDayOfMonth(anyInt())) thenReturn LocalDate.of(2021,10,31)
+//          when(dateService.startOfNextPeriod.lengthOfMonth) thenReturn Valid(9)
           doNothing().when(auditService).audit(any())(any(), any())
           when(emailService.sendConfirmationEmail(
             eqTo(registration.contactDetails.fullName),
             eqTo(registration.registeredCompanyName),
             eqTo(vrn.toString()),
             eqTo(registration.commencementDate),
-            eqTo(registration.contactDetails.emailAddress)
+            eqTo(registration.contactDetails.emailAddress),
+            eqTo(septDate),
+            eqTo(octDate)
           )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
@@ -107,6 +118,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[EmailService].toInstance(emailService),
               bind[AuditService].toInstance(auditService),
+              bind[DateService].toInstance(dateService),
               bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
             ).build()
 
@@ -121,8 +133,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any(), any())(any())
+              .sendConfirmationEmail(any(), any(), any(), any(), any(), any(), any())(any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+            verify(dateService, times(3)).startOfNextPeriod
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
         }

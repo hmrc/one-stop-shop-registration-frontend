@@ -66,6 +66,8 @@ trait SpecBase
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
 
   val vrn: Vrn = Vrn("123456789")
+  val septDate = LocalDate.of(2021,9,30)
+  val octDate = LocalDate.of(2021,10,31)
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None): GuiceApplicationBuilder = {
 
