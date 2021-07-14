@@ -28,6 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.DateService
 import testutils.RegistrationData.registration
 import views.html.AlreadyRegisteredView
 
@@ -61,6 +62,9 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
           val view = application.injector.instanceOf[AlreadyRegisteredView]
           val config = application.injector.instanceOf[FrontendAppConfig]
+          val dateService = application.injector.instanceOf[DateService]
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
           status(result) mustEqual OK
 
@@ -69,7 +73,9 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
               registration.registeredCompanyName,
               vrn,
               config.feedbackUrl(request),
-              registration.commencementDate.format(dateFormatter)
+              registration.commencementDate.format(dateFormatter),
+              lastDayOfCalendarQuarter.format(dateFormatter),
+              lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
             )(request, messages(application)).toString
 
           contentAsString(result) mustEqual expectedContent
