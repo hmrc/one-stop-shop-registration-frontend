@@ -53,6 +53,7 @@ class DateService @Inject()(clock: Clock) {
   def earliestSaleAllowed: LocalDate = {
     val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
     val today = LocalDate.now(clock)
+    println("Today: " + today) // 2022-02-06   2021-07-14
 
     if (today.isBefore(schemeStartDate.plusMonths(1))) {
       schemeStartDate
