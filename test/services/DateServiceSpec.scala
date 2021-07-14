@@ -76,6 +76,34 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
   }
 
+  ".lastDayOfCalendarQuarter" - {
+
+    "must be 30th September for any date in July, August or September" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfCalendarQuarter mustEqual LocalDate.of(2022, 9, 30)
+      }
+    }
+  }
+
+  ".lastDayOfMonthAfterCalendarQuarter" - {
+
+    "must be 31st October for any date in July, August or September" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfMonthAfterCalendarQuarter mustEqual LocalDate.of(2022, 10, 31)
+      }
+    }
+  }
+
   ".startDateBasedOnFirstSale" - {
 
     "must be the date of the first sale" - {

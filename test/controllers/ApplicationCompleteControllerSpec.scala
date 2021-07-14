@@ -61,8 +61,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[ApplicationCompleteView]
           val dateService = application.injector.instanceOf[DateService]
           val startDate = dateService.startDateBasedOnFirstSale(arbitraryDate)
-          val lastDayOfCalendarQuarter = dateService.startOfNextPeriod.minusDays(1)
-          val lastDayOfMonthAfterCalendarQuarter = dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth)
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
@@ -88,8 +88,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val result = route(application, request).value
           val dateService = application.injector.instanceOf[DateService]
           val startDate = dateService.startDateBasedOnFirstSale(arbitraryDate)
-          val lastDayOfCalendarQuarter = dateService.startOfNextPeriod.minusDays(1)
-          val lastDayOfMonthAfterCalendarQuarter = dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth)
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
           val view = application.injector.instanceOf[ApplicationCompleteView]
           status(result) mustEqual OK
@@ -123,8 +123,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
           val dateService = application.injector.instanceOf[DateService]
-          val lastDayOfCalendarQuarter = dateService.startOfNextPeriod.minusDays(1)
-          val lastDayOfMonthAfterCalendarQuarter = dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth)
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
@@ -149,8 +149,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val dateService = application.injector.instanceOf[DateService]
-          val lastDayOfCalendarQuarter = dateService.startOfNextPeriod.minusDays(1)
-          val lastDayOfMonthAfterCalendarQuarter = dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth)
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
           val view = application.injector.instanceOf[ApplicationCompleteView]
           status(result) mustEqual OK

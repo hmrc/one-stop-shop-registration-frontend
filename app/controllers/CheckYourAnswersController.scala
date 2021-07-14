@@ -98,8 +98,8 @@ class CheckYourAnswersController @Inject()(
                 request.vrn.toString(),
                 registration.commencementDate,
                 registration.contactDetails.emailAddress,
-                dateService.startOfNextPeriod.minusDays(1),
-                dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth)
+                dateService.lastDayOfCalendarQuarter,
+                dateService.lastDayOfMonthAfterCalendarQuarter
               ) flatMap {
                   emailConfirmationResult =>
                     val emailSent = EMAIL_ACCEPTED == emailConfirmationResult

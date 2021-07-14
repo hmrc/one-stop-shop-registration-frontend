@@ -46,8 +46,8 @@ class EmailServiceSpec extends SpecBase {
       val maxLengthContactName = 105
       val validStartDate = LocalDate.of(2010, 1, 1)
       val validEndDate = LocalDate.now()
-      val lastDayOfCalendarQuarter = dateService.startOfNextPeriod.minusDays(1)
-      val lastDayOfMonthAfterCalendarQuarter = dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth)
+      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
       forAll(
         validVRNs,

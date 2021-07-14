@@ -42,6 +42,14 @@ class DateService @Inject()(clock: Clock) {
     }
   }
 
+  def lastDayOfCalendarQuarter: LocalDate = {
+    startOfNextPeriod.minusDays(1)
+  }
+
+  def lastDayOfMonthAfterCalendarQuarter: LocalDate = {
+    startOfNextPeriod.withDayOfMonth(startOfNextPeriod.lengthOfMonth)
+  }
+
   def earliestSaleAllowed: LocalDate = {
     val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
     val today = LocalDate.now(clock)

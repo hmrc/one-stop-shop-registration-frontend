@@ -56,8 +56,8 @@ class ApplicationCompleteController @Inject()(
           frontendAppConfig.feedbackUrl,
           showEmailConfirmation,
           startDate.format(dateFormatter),
-          dateService.startOfNextPeriod.minusDays(1).format(dateFormatter),
-          dateService.startOfNextPeriod.withDayOfMonth(dateService.startOfNextPeriod.lengthOfMonth).format(dateFormatter)
+          dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+          dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
         ))
       }
     }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
