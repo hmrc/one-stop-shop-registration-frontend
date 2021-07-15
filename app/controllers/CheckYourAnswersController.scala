@@ -97,7 +97,9 @@ class CheckYourAnswersController @Inject()(
                 registration.registeredCompanyName,
                 request.vrn.toString(),
                 registration.commencementDate,
-                registration.contactDetails.emailAddress
+                registration.contactDetails.emailAddress,
+                dateService.lastDayOfCalendarQuarter,
+                dateService.lastDayOfMonthAfterCalendarQuarter
               ) flatMap {
                   emailConfirmationResult =>
                     val emailSent = EMAIL_ACCEPTED == emailConfirmationResult

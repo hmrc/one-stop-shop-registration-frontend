@@ -35,6 +35,7 @@ class EmailServiceSpec extends SpecBase {
 
   private val connector = mock[EmailConnector]
   private val emailService = new EmailService(connector)
+  private val dateService = new DateService(stubClockAtArbitraryDate)
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "EmailService.sendConfirmationEmail" - {
@@ -45,28 +46,38 @@ class EmailServiceSpec extends SpecBase {
       val maxLengthContactName = 105
       val validStartDate = LocalDate.of(2010, 1, 1)
       val validEndDate = LocalDate.now()
+      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
       forAll(
         validVRNs,
         validEmails,
         safeInputsWithMaxLength(maxLengthBusiness),
         safeInputsWithMaxLength(maxLengthContactName),
-        datesBetween(validStartDate, validEndDate)
+        datesBetween(validStartDate, validEndDate),
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String, startDate: LocalDate) =>
           val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
           val expectedDate = startDate.format(formatter)
+          val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
+          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
 
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
             "oss_registration_confirmation",
-            RegistrationConfirmationEmailParameters(contactName, businessName, expectedDate, vatNum)
+            RegistrationConfirmationEmailParameters(
+              contactName,
+              businessName,
+              expectedDate,
+              vatNum,
+              formattedLastDateOfCalendarQuarter,
+              formattedLastDayOfMonthAfterCalendarQuarter)
           )
 
           when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
 
           emailService.sendConfirmationEmail(
-            contactName, businessName, vatNum, startDate, email
+            contactName, businessName, vatNum, startDate, email, lastDayOfCalendarQuarter, lastDayOfMonthAfterCalendarQuarter
           ).futureValue mustBe EMAIL_ACCEPTED
 
           verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())

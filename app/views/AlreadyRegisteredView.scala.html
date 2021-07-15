@@ -5,23 +5,37 @@
         govukButton: GovukButton
 )
 
-@(companyName: String, vrn: Vrn, feedbackLink: String, startDate: String)(implicit request: Request[_], messages: Messages)
+@(companyName: String, vrn: Vrn, feedbackLink: String, startDate: String, lastDayOfCalendarQuarter: String, lastDayOfMonthAfterCalendarQuarter: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("alreadyRegistered.title")), showBackLink = false) {
 
     <div class="grid-row column-two-thirds">
+
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("alreadyRegistered.heading", companyName)</h1>
-            <div class="govuk-panel__body">
-            @messages("alreadyRegistered.reference")
-                <br />
-                <strong>@vrn.vrn</strong>
-            </div>
         </div>
 
+        <p class="govuk-body">@messages("alreadyRegistered.confirmation")</p>
+
+        <p class="govuk-body">@messages("alreadyRegistered.reference", vrn)</p>
+
+        <p class="govuk-body">@messages("alreadyRegistered.chargeVATRateOfEUCountry")</p>
+
+        <p class="govuk-body">@messages("alreadyRegistered.list")
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("alreadyRegistered.list.p1")</li>
+                <li>@messages("alreadyRegistered.list.p2")</li>
+            </ul>
+        </p>
+
+        <p class="govuk-body">@messages("alreadyRegistered.startDate", startDate, lastDayOfCalendarQuarter)</p>
+
         <h2 class="govuk-heading-m">@messages("alreadyRegistered.next")</h2>
-        <p class="govuk-body">@messages("alreadyRegistered.p1", startDate)</p>
-        <p class="govuk-body">@messages("alreadyRegistered.p2")</p>
+
+        <p class="govuk-body">@messages("alreadyRegistered.p1")</p>
+
+        <p class="govuk-body">@messages("alreadyRegistered.p2", lastDayOfMonthAfterCalendarQuarter)</p>
+
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("alreadyRegistered.feedback.link.text")</a>
             @messages("alreadyRegistered.feedback.30seconds")

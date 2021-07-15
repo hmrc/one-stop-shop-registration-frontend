@@ -37,7 +37,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import queries.EmailConfirmationQuery
 import repositories.AuthenticatedSessionRepository
-import services.{AuditService, EmailService, RegistrationService}
+import services.{AuditService, DateService, EmailService, RegistrationService}
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
@@ -90,13 +90,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right(()))
           doNothing().when(auditService).audit(any())(any(), any())
-          when(emailService.sendConfirmationEmail(
-            eqTo(registration.contactDetails.fullName),
-            eqTo(registration.registeredCompanyName),
-            eqTo(vrn.toString()),
-            eqTo(registration.commencementDate),
-            eqTo(registration.contactDetails.emailAddress)
-          )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
           val userAnswers = emptyUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
@@ -111,6 +104,17 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             ).build()
 
           running(application) {
+            val dateService = application.injector.instanceOf[DateService]
+            when(emailService.sendConfirmationEmail(
+              eqTo(registration.contactDetails.fullName),
+              eqTo(registration.registeredCompanyName),
+              eqTo(vrn.toString()),
+              eqTo(registration.commencementDate),
+              eqTo(registration.contactDetails.emailAddress),
+              eqTo(dateService.lastDayOfCalendarQuarter),
+              eqTo(dateService.lastDayOfMonthAfterCalendarQuarter)
+            )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
+
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
@@ -121,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any(), any())(any())
+              .sendConfirmationEmail(any(), any(), any(), any(), any(), any(), any())(any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }

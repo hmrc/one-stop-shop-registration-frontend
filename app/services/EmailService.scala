@@ -34,17 +34,28 @@ class EmailService@Inject()(emailConnector: EmailConnector)(implicit executionCo
     businessName: String,
     reference: String,
     startDate: LocalDate,
-    emailAddress: String
+    emailAddress: String,
+    lastDayOfCalendarQuarter: LocalDate,
+    lastDayOfMonthAfterCalendarQuarter: LocalDate
   )(implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
 
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
     val formattedStartDate = startDate.format(formatter)
+    val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
+    val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
 
     emailConnector.send(
       EmailToSendRequest(
         List(emailAddress),
         registrationConfirmationTemplateId,
-        RegistrationConfirmationEmailParameters(recipientName_line1, businessName, formattedStartDate, reference)
+        RegistrationConfirmationEmailParameters(
+          recipientName_line1,
+          businessName,
+          formattedStartDate,
+          reference,
+          formattedLastDateOfCalendarQuarter,
+          formattedLastDayOfMonthAfterCalendarQuarter
+        )
       )
     )
   }

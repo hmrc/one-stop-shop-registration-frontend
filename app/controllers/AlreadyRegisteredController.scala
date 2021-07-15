@@ -25,6 +25,7 @@ import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
+import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyRegisteredView
 
@@ -35,6 +36,7 @@ class AlreadyRegisteredController @Inject()(
                                        cc: AuthenticatedControllerComponents,
                                        view: AlreadyRegisteredView,
                                        connector: RegistrationConnector,
+                                       dateService: DateService,
                                        config: FrontendAppConfig
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -48,7 +50,9 @@ class AlreadyRegisteredController @Inject()(
             HtmlFormat.escape(registration.registeredCompanyName).toString,
             request.vrn,
             config.feedbackUrl,
-            registration.commencementDate.format(dateFormatter))
+            registration.commencementDate.format(dateFormatter),
+            dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter))
           )
 
         case None =>
