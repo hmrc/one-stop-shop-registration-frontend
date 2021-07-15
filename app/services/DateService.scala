@@ -24,43 +24,42 @@ import javax.inject.Inject
 
 class DateService @Inject()(clock: Clock) {
 
-  def startOfNextPeriod: LocalDate = {
-    val today                   = LocalDate.now(clock)
-    val lastMonthOfPeriod       = (((today.getMonthValue - 1) / 3) + 1) * 3
-    val dateInLastMonthOfPeriod = today.withMonth(lastMonthOfPeriod)
-    val lastDayOfCurrentPeriod  = dateInLastMonthOfPeriod.withDayOfMonth(dateInLastMonthOfPeriod.lengthOfMonth)
+  def startOfNextQuarter: LocalDate = {
+    val today                    = LocalDate.now(clock)
+    val lastMonthOfQuarter       = (((today.getMonthValue - 1) / 3) + 1) * 3
+    val dateInLastMonthOfQuarter = today.withMonth(lastMonthOfQuarter)
+    val lastDayOfCurrentQuarter  = dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
 
-    lastDayOfCurrentPeriod.plusDays(1)
+    lastDayOfCurrentQuarter.plusDays(1)
   }
 
   def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
     val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
     if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {
-      startOfNextPeriod
+      startOfNextQuarter
     } else {
       dateOfFirstSale
     }
   }
 
   def lastDayOfCalendarQuarter: LocalDate = {
-    startOfNextPeriod.minusDays(1)
+    startOfNextQuarter.minusDays(1)
   }
 
   def lastDayOfMonthAfterCalendarQuarter: LocalDate = {
-    startOfNextPeriod.withDayOfMonth(startOfNextPeriod.lengthOfMonth)
+    startOfNextQuarter.withDayOfMonth(startOfNextQuarter.lengthOfMonth)
   }
 
   def earliestSaleAllowed: LocalDate = {
     val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
     val today = LocalDate.now(clock)
-    println("Today: " + today) // 2022-02-06   2021-07-14
 
     if (today.isBefore(schemeStartDate.plusMonths(1))) {
       schemeStartDate
     } else if (quarterStartMonths.contains(today.getMonth) && today.getDayOfMonth < 11) {
       today.minusMonths(1).withDayOfMonth(1)
     } else {
-      startOfNextPeriod.minusMonths(3)
+      startOfNextQuarter.minusMonths(3)
     }
   }
 }
