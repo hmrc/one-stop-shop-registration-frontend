@@ -30,10 +30,11 @@ case object UkVatEffectiveDatePage extends QuestionPage[LocalDate] {
   override def toString: String = "ukVatEffectiveDate"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    if(answers.vatInfo.isDefined) {
-      routes.HasTradingNameController.onPageLoad(NormalMode)
-    } else {
-      routes.BusinessAddressInUkController.onPageLoad(NormalMode)
+    (answers.get(BusinessBasedInNiPage), answers.vatInfo.isDefined) match {
+      case (_, true)             => routes.HasTradingNameController.onPageLoad(NormalMode)
+      case (Some(true), false)   => routes.UkAddressController.onPageLoad(NormalMode)
+      case (Some(false), false)  => routes.BusinessAddressInUkController.onPageLoad(NormalMode)
+      case _                     => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =

@@ -502,10 +502,10 @@ updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
 updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a> to update your UK VAT details before registering for this scheme.
 
-businessAddressInUk.title = Is your principal place of business in Northern Ireland or Great Britain?
-businessAddressInUk.heading = Is your principal place of business in Northern Ireland or Great Britain?
-businessAddressInUk.checkYourAnswersLabel = Principal place of business in UK
-businessAddressInUk.error.required = Select yes if your principal place of business is in Northern Ireland or Great Britain
+businessAddressInUk.title = Is your principal place of business in Great Britain?
+businessAddressInUk.heading = Is your principal place of business in Great Britain?
+businessAddressInUk.checkYourAnswersLabel = Principal place of business in Great Britain
+businessAddressInUk.error.required = Select yes if your principal place of business is in Great Britain
 businessAddressInUk.change.hidden = principal place of business address
 
 internationalAddress.title = Principal place of business address
