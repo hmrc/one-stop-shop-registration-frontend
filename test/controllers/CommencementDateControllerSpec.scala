@@ -62,27 +62,5 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
         }
       }
     }
-
-    "when the scheme has not started" - {
-
-      "must return OK and the correct view for a GET" in {
-
-        val instantBeforeSchemeStarts = LocalDate.of(2021, 6, 30).atStartOfDay(ZoneId.systemDefault).toInstant
-        val clock = Clock.fixed(instantBeforeSchemeStarts, ZoneId.systemDefault)
-
-        val application = applicationBuilder(Some(emptyUserAnswers), Some(clock)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
-
-          val result = route(application, request).value
-
-          val view = application.injector.instanceOf[CommencementDateView]
-
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(NormalMode, Constants.schemeStartDate.format(dateFormatter))(request, messages(application)).toString
-        }
-      }
-    }
   }
 }

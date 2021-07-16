@@ -17,7 +17,6 @@
 package controllers
 
 import controllers.actions._
-import pages.LiableForVatOnDirectSalesPage
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -28,8 +27,7 @@ import views.html.LiableForVatOnDirectSalesView
 class LiableForVatOnDirectSalesController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: LiableForVatOnDirectSalesView,
-                                       page: LiableForVatOnDirectSalesPage
+                                       view: LiableForVatOnDirectSalesView
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -41,6 +39,6 @@ class LiableForVatOnDirectSalesController @Inject()(
 
   def onSubmit: Action[AnyContent] = Action{
     _ =>
-      Redirect(page.navigate)
+      Redirect(routes.HasMadeSalesController.onPageLoad())
   }
 }

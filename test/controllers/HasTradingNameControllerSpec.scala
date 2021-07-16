@@ -79,7 +79,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val features    = mock[FeatureFlagService]
-      val userAnswers = baseUserAnswers.set(new HasTradingNamePage(features), true).success.value
+      val userAnswers = baseUserAnswers.set(HasTradingNamePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -113,12 +113,11 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, hasTradingNameRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
-        val page = application.injector.instanceOf[HasTradingNamePage]
         val result = route(application, request).value
-        val expectedAnswers = baseUserAnswers.set(page, true).success.value
+        val expectedAnswers = baseUserAnswers.set(HasTradingNamePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual page.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual HasTradingNamePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }

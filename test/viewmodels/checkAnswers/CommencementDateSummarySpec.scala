@@ -65,29 +65,5 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
         }
       }
     }
-
-    "when the scheme has not started" - {
-
-      "must return a viewmodel with 1st July as the start date" in {
-
-        val instant: Instant = LocalDate.of(2021, 6, 30).atStartOfDay(ZoneId.systemDefault).toInstant
-        val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
-
-        val app = applicationBuilder(Some(emptyUserAnswers), Some(stubClock)).build()
-
-        running(app) {
-
-          val viewmodel = app.injector.instanceOf[CommencementDateSummary]
-          val msgs      = messages(app)
-
-          val row = viewmodel.row(emptyUserAnswers)(msgs).value
-          row mustEqual SummaryListRowViewModel(
-            key     = KeyViewModel(Text(msgs("commencementDate.checkYourAnswersLabel"))),
-            value   = ValueViewModel(Text(Constants.schemeStartDate.format(dateFormatter))),
-            actions = Seq.empty
-          )
-        }
-      }
-    }
   }
 }

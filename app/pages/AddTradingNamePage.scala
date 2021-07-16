@@ -25,28 +25,21 @@ import services.FeatureFlagService
 
 import javax.inject.Inject
 
-class AddTradingNamePage @Inject()(features: FeatureFlagService) extends QuestionPage[Boolean] {
+case object AddTradingNamePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "addTradingName"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
-    def noRoute: Call = if(features.schemeHasStarted) {
-      routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    } else {
-      routes.CommencementDateController.onPageLoad(NormalMode)
-    }
-
-    (answers.get(new AddTradingNamePage(features)), answers.get(DeriveNumberOfTradingNames)) match {
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _)         => noRoute
+      case (Some(false), _)         => routes.DateOfFirstSaleController.onPageLoad(NormalMode)
       case _                        => routes.JourneyRecoveryController.onPageLoad()
-    }
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    (answers.get(new AddTradingNamePage(features)), answers.get(DeriveNumberOfTradingNames)) match {
+    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(CheckMode, Index(size))
       case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
       case _                        => routes.JourneyRecoveryController.onPageLoad()

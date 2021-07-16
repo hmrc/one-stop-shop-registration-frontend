@@ -21,34 +21,23 @@ import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllTradingNames
-import services.FeatureFlagService
 
-import javax.inject.Inject
 import scala.util.Try
 
-class HasTradingNamePage @Inject()(features: FeatureFlagService) extends QuestionPage[Boolean] {
+case object HasTradingNamePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "hasTradingName"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
-
-    def noRoute: Call = if(features.schemeHasStarted) {
-      routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    } else {
-      routes.CommencementDateController.onPageLoad(NormalMode)
-    }
-
-    answers.get(new HasTradingNamePage(features)) match {
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
       case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))
-      case Some(false) => noRoute
+      case Some(false) => routes.DateOfFirstSaleController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
-  }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    (answers.get(new HasTradingNamePage(features)), answers.get(AllTradingNames)) match {
+    (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
       case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
       case (Some(true), _)                                           => routes.TradingNameController.onPageLoad(CheckMode, Index(0))
       case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()

@@ -28,44 +28,44 @@ import java.time.{Clock, LocalDate, ZoneId}
 
 class FeatureFlagServiceSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators {
 
-  ".schemeHasStarted" - {
-
-    "must be false before 1st July 2021" in {
-
-      forAll(datesBetween(LocalDate.of(2021, 4, 1), LocalDate.of(2021, 6, 30))) {
-        date =>
-          val stubClock = Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
-
-          val application =
-            new GuiceApplicationBuilder()
-              .overrides(bind[Clock].toInstance(stubClock))
-              .build()
-
-          running(application) {
-
-            val service = application.injector.instanceOf[FeatureFlagService]
-            service.schemeHasStarted mustEqual false
-          }
-      }
-    }
-
-    "must be true on or after 1st July 2021" in {
-
-      forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2030, 1, 1))) {
-        date =>
-          val stubClock = Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
-
-          val application =
-            new GuiceApplicationBuilder()
-              .overrides(bind[Clock].toInstance(stubClock))
-              .build()
-
-          running(application) {
-
-            val service = application.injector.instanceOf[FeatureFlagService]
-            service.schemeHasStarted mustEqual true
-          }
-      }
-    }
-  }
+//  ".schemeHasStarted" - {
+//
+//    "must be false before 1st July 2021" in {
+//
+//      forAll(datesBetween(LocalDate.of(2021, 4, 1), LocalDate.of(2021, 6, 30))) {
+//        date =>
+//          val stubClock = Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
+//
+//          val application =
+//            new GuiceApplicationBuilder()
+//              .overrides(bind[Clock].toInstance(stubClock))
+//              .build()
+//
+//          running(application) {
+//
+//            val service = application.injector.instanceOf[FeatureFlagService]
+//            service.schemeHasStarted mustEqual false
+//          }
+//      }
+//    }
+//
+//    "must be true on or after 1st July 2021" in {
+//
+//      forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2030, 1, 1))) {
+//        date =>
+//          val stubClock = Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
+//
+//          val application =
+//            new GuiceApplicationBuilder()
+//              .overrides(bind[Clock].toInstance(stubClock))
+//              .build()
+//
+//          running(application) {
+//
+//            val service = application.injector.instanceOf[FeatureFlagService]
+//            service.schemeHasStarted mustEqual true
+//          }
+//      }
+//    }
+//  }
 }

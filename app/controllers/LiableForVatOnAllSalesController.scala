@@ -17,7 +17,6 @@
 package controllers
 
 import controllers.actions._
-import pages.LiableForVatOnAllSalesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,8 +27,7 @@ import javax.inject.Inject
 class LiableForVatOnAllSalesController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: LiableForVatOnAllSalesView,
-                                       page: LiableForVatOnAllSalesPage
+                                       view: LiableForVatOnAllSalesView
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -41,6 +39,6 @@ class LiableForVatOnAllSalesController @Inject()(
 
   def onSubmit: Action[AnyContent] = Action{
     _ =>
-      Redirect(page.navigate)
+      Redirect(routes.HasMadeSalesController.onPageLoad())
   }
 }

@@ -17,7 +17,6 @@
 package services
 
 import cats.implicits._
-import config.Constants
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
@@ -30,7 +29,7 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.LocalDate
 import javax.inject.Inject
 
-class RegistrationService @Inject()(dateService: DateService, features: FeatureFlagService) {
+class RegistrationService @Inject()(dateService: DateService) {
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
     (
@@ -87,7 +86,7 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
     }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
-    answers.get(new HasTradingNamePage(features)) match {
+    answers.get(HasTradingNamePage) match {
       case Some(true) =>
         answers.get(AllTradingNames) match {
           case Some(Nil) | None => DataMissingError(AllTradingNames).invalidNec
@@ -98,7 +97,7 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
         List.empty.validNec
 
       case None =>
-        DataMissingError(new HasTradingNamePage(features)).invalidNec
+        DataMissingError(HasTradingNamePage).invalidNec
     }
   }
 
@@ -159,16 +158,12 @@ class RegistrationService @Inject()(dateService: DateService, features: FeatureF
       getVatDetailSource(answers)
     ).mapN(VatDetails.apply)
 
-  private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] = {
-    if (features.schemeHasStarted) {
-      answers.get(DateOfFirstSalePage) match {
+  private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] =
+    answers.get(DateOfFirstSalePage) match {
         case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
         case None            => DataMissingError(DateOfFirstSalePage).invalidNec
-      }
-    } else {
-      Constants.schemeStartDate.validNec
     }
-  }
+
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
     answers.get(BusinessContactDetailsPage) match {
