@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import config.{Constants, FrontendAppConfig}
+import config.FrontendAppConfig
 import formats.Format.dateFormatter
 import models.UserAnswers
 import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
@@ -28,7 +28,6 @@ import queries.EmailConfirmationQuery
 import services.DateService
 import views.html.ApplicationCompleteView
 
-import java.time.{Clock, Instant, LocalDate, ZoneId}
 
 class ApplicationCompleteControllerSpec extends SpecBase {
 

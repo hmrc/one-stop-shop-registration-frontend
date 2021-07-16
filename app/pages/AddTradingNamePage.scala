@@ -21,9 +21,6 @@ import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.DeriveNumberOfTradingNames
-import services.FeatureFlagService
-
-import javax.inject.Inject
 
 case object AddTradingNamePage extends QuestionPage[Boolean] {
 
