@@ -61,6 +61,12 @@ class UkVatEffectiveDatePageSpec extends SpecBase with PageBehaviours {
         UkVatEffectiveDatePage.navigate(NormalMode, answers)
           .mustEqual(routes.BusinessAddressInUkController.onPageLoad(NormalMode))
       }
+
+      "to Has Trading Name if user has partial VAT info including address" in {
+
+        UkVatEffectiveDatePage.navigate(NormalMode, partialUserAnswersWithVatInfo)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+      }
     }
 
     "must navigate in Check mode" - {
