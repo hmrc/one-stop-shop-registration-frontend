@@ -61,9 +61,18 @@ trait SpecBase
       organisationName = Some("Company name")
     )
 
+  val partialVatCustomerInfo: VatCustomerInfo =
+    VatCustomerInfo(
+      registrationDate = None,
+      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup   = None,
+      organisationName = None
+    )
+
   val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
+  val partialUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(partialVatCustomerInfo))
 
   val vrn: Vrn = Vrn("123456789")
 

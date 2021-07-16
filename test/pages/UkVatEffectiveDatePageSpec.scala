@@ -46,10 +46,26 @@ class UkVatEffectiveDatePageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
 
-      "to Business Address in UK if we don't have the user's VAT info" in {
+      "to UK Business Address if user answers yes to Business Based in Northern Ireland with no VAT info" in {
 
-        UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswers)
+        val answers = emptyUserAnswers.set(BusinessBasedInNiPage, true).success.value
+
+        UkVatEffectiveDatePage.navigate(NormalMode, answers)
+          .mustEqual(routes.UkAddressController.onPageLoad(NormalMode))
+      }
+
+      "to Is Your Principal Place of Business in Great Britain if user answers no to Business Based in Northern Ireland with no VAT info" in {
+
+        val answers = emptyUserAnswers.set(BusinessBasedInNiPage, false).success.value
+
+        UkVatEffectiveDatePage.navigate(NormalMode, answers)
           .mustEqual(routes.BusinessAddressInUkController.onPageLoad(NormalMode))
+      }
+
+      "to Has Trading Name if user has partial VAT info including address" in {
+
+        UkVatEffectiveDatePage.navigate(NormalMode, partialUserAnswersWithVatInfo)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
     }
 
