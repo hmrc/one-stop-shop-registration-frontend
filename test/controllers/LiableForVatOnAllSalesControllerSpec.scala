@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import pages.LiableForVatOnAllSalesPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.LiableForVatOnAllSalesView
@@ -51,10 +50,8 @@ class LiableForVatOnAllSalesControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val page = application.injector.instanceOf[LiableForVatOnAllSalesPage]
-
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual page.navigate.url
+        redirectLocation(result).value mustEqual routes.HasMadeSalesController.onPageLoad().url
       }
     }
   }

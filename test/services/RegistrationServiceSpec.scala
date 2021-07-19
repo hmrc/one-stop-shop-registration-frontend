@@ -37,10 +37,6 @@ import java.time.{Clock, LocalDate, ZoneId}
 
 class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  override def beforeEach(): Unit = {
-    Mockito.reset(mockFeatures)
-  }
-
   private val iban  = RegistrationData.iban
   private val bic   = RegistrationData.bic
 
@@ -48,13 +44,11 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
 
   private def getDateService(date: LocalDate) = new DateService(getStubClock(date))
-
-  private val mockFeatures = mock[FeatureFlagService]
   
   private def getRegistrationService(today: LocalDate) =
-    new RegistrationService(getDateService(today), mockFeatures)
+    new RegistrationService(getDateService(today))
 
-  private val hasTradingNamePage = new HasTradingNamePage(mockFeatures)
+  private val hasTradingNamePage = HasTradingNamePage
 
   private val answers =
     UserAnswers("id")
@@ -106,7 +100,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
     "must return a Registration when user answers are provided and the user manually entered all their VAT details" in {
 
-      when(mockFeatures.schemeHasStarted) thenReturn true
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(answers, vrn)
 
       val expectedRegistration = RegistrationData.registration.copy(
@@ -118,8 +111,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
     }
 
     "must return a Registration when user answers are provided and we have full VAT information on the user" in {
-
-      when(mockFeatures.schemeHasStarted) thenReturn true
 
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
@@ -150,8 +141,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
     "must return a Registration when no trading names, EU countries or websites were provided" in {
 
-      when(mockFeatures.schemeHasStarted) thenReturn true
-
       val userAnswers =
         answers
           .set(hasTradingNamePage, false).success.value
@@ -176,8 +165,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
     "must return a registration when an International address is given" in {
 
-      when(mockFeatures.schemeHasStarted) thenReturn true
-
       val address = InternationalAddress("line 1", None, "town", None, None, Country("FR", "France"))
       val userAnswers =
         answers
@@ -198,28 +185,9 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return a registration when the scheme has not started and Date of First Sale is absent" in {
-
-      when(mockFeatures.schemeHasStarted) thenReturn false
-
-      val userAnswers = answers.remove(DateOfFirstSalePage).success.value
-      val today = LocalDate.of(2021, 6, 30)
-
-      val expectedRegistration =
-        RegistrationData.registration copy (
-          vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
-          commencementDate = Constants.schemeStartDate
-        )
-
-      val registration = getRegistrationService(today).fromUserAnswers(userAnswers, vrn)
-      registration mustEqual Valid(expectedRegistration)
-    }
-
     "must return a registration" - {
 
       "when Business Based in NI is missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(BusinessBasedInNiPage).success.value
 
@@ -236,8 +204,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Business Based in NI is false and Has Fixed Establishment in NI is missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers =
           answers
@@ -257,8 +223,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Has Fixed Establishment in NI is false and Sales Channels is missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers =
           answers
@@ -283,8 +247,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Registered Company Name is missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(RegisteredCompanyNamePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -292,8 +254,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Has Trading Name is missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(hasTradingNamePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -303,8 +263,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Has Trading Name is true, but there are no trading names" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(AllTradingNames).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -312,8 +270,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when UK VAT Effective Date is missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(UkVatEffectiveDatePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -323,8 +279,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Business Address in UK is missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(BusinessAddressInUkPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -332,8 +286,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Business Address in UK is true, but UK Address is missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers =
           answers
@@ -347,8 +299,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Business Address in UK is false, but International Address is missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers =
           answers
             .set(BusinessAddressInUkPage, false).success.value
@@ -361,8 +311,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Part of VAT Group is missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(PartOfVatGroupPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -370,8 +318,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Date of First Sale is missing and the scheme has started" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(DateOfFirstSalePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -381,8 +327,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Contact Details are missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(BusinessContactDetailsPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -390,8 +334,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Bank Details are missing" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(BankDetailsPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -401,8 +343,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Has Website is missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(HasWebsitePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -410,8 +350,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Has Website is true, but there are no websites" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers =
           answers
@@ -425,8 +363,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Is Online Marketplace is missing" in {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(IsOnlineMarketplacePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -434,8 +370,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       }
 
       "when Previously Registered has not been answered" in {
-
-        when(mockFeatures.schemeHasStarted) thenReturn true
 
         val userAnswers = answers.remove(PreviouslyRegisteredPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -446,8 +380,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       "when Previously Registered is true" - {
 
         "but there are no previous registrations" in {
-
-          when(mockFeatures.schemeHasStarted) thenReturn true
 
           val userAnswers =
             answers
@@ -461,8 +393,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "but there is a previous registration without a country" in {
 
-          when(mockFeatures.schemeHasStarted) thenReturn true
-
           val userAnswers = answers.remove(PreviousEuCountryPage(Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -470,8 +400,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         }
 
         "but there is a previous registration without a VAT number" in {
-
-          when(mockFeatures.schemeHasStarted) thenReturn true
 
           val userAnswers = answers.remove(PreviousEuVatNumberPage(Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -482,8 +410,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Tax Registered in EU is missing" - {
 
-        when(mockFeatures.schemeHasStarted) thenReturn true
-
         val userAnswers = answers.remove(TaxRegisteredInEuPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -493,8 +419,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       "when Tax Registered in EU is true" - {
 
         "and there are no EU country details" in {
-
-          when(mockFeatures.schemeHasStarted) thenReturn true
 
           val userAnswers =
             answers
@@ -508,8 +432,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "and there is a record with no country" in {
 
-          when(mockFeatures.schemeHasStarted) thenReturn true
-
           val userAnswers = answers.remove(EuCountryPage(Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -519,8 +441,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         "and there is a record with a country" - {
 
           "where Vat Registered is missing" in {
-
-            when(mockFeatures.schemeHasStarted) thenReturn true
 
             val userAnswers = answers.remove(VatRegisteredPage(Index(2))).success.value
             val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -532,8 +452,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
             "which does not have an answer for Has Fixed Establishment" in {
 
-              when(mockFeatures.schemeHasStarted) thenReturn true
-
               val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(2))).success.value
               val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -544,8 +462,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
               "and it does not have an EU Tax identifier" in {
 
-                when(mockFeatures.schemeHasStarted) thenReturn true
-
                 val userAnswers = answers.remove(EuTaxReferencePage(Index(2))).success.value
                 val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -554,8 +470,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
               "and it does not have a fixed establishment trading name" in {
 
-                when(mockFeatures.schemeHasStarted) thenReturn true
-
                 val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(2))).success.value
                 val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -563,8 +477,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
               }
 
               "and it does not have a fixed establishment address" in {
-
-                when(mockFeatures.schemeHasStarted) thenReturn true
 
                 val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(2))).success.value
                 val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -578,8 +490,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
             "with the VAT number missing" in {
 
-              when(mockFeatures.schemeHasStarted) thenReturn true
-
               val userAnswers = answers.remove(EuVatNumberPage(Index(0))).success.value
               val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -589,8 +499,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             "with a VAT number" - {
 
               "which does not have an answer for Has Fixed Establishment" in {
-
-                when(mockFeatures.schemeHasStarted) thenReturn true
 
                 val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(0))).success.value
                 val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -602,8 +510,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
                 "and it does not have a fixed establishment trading name" in {
 
-                  when(mockFeatures.schemeHasStarted) thenReturn true
-
                   val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(1))).success.value
                   val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -611,8 +517,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
                 }
 
                 "and it does not have a fixed establishment address" in {
-
-                  when(mockFeatures.schemeHasStarted) thenReturn true
 
                   val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(1))).success.value
                   val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)

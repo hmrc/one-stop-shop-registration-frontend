@@ -30,7 +30,7 @@ import javax.inject.Inject
 class HasTradingNameSummary @Inject()(features: FeatureFlagService) {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(new HasTradingNamePage(features)).map {
+    answers.get(HasTradingNamePage).map {
       hasTradingName =>
         val value = if (hasTradingName) "site.yes" else "site.no"
 

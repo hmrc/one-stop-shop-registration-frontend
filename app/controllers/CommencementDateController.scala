@@ -41,16 +41,12 @@ class CommencementDateController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      if (features.schemeHasStarted) {
-        request.userAnswers.get(DateOfFirstSalePage).map {
-          date =>
+      request.userAnswers.get(DateOfFirstSalePage).map {
+        date =>
 
-            val startDate = dateService.startDateBasedOnFirstSale(date)
-            Ok(view(mode, startDate.format(dateFormatter)))
-        }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-      } else {
-        Ok(view(mode, Constants.schemeStartDate.format(dateFormatter)))
-      }
+          val startDate = dateService.startDateBasedOnFirstSale(date)
+          Ok(view(mode, startDate.format(dateFormatter)))
+      }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {

@@ -16,21 +16,14 @@
 
 package services
 
-import config.Constants
-
-import java.time.LocalDate
 import play.api.Configuration
 import uk.gov.hmrc.domain.Vrn
 
-import java.time.Clock
 import javax.inject.Inject
 
-class FeatureFlagService @Inject()(configuration: Configuration, clock: Clock) {
+class FeatureFlagService @Inject()(configuration: Configuration) {
 
-  def schemeHasStarted: Boolean = LocalDate.now(clock) isAfter Constants.schemeStartDate.minusDays(1)
-
-  val proceedWhenVatApiCallFails: Boolean = configuration.get[Boolean]("features.proceed-when-vat-api-call-fails")
-
+  val proceedWhenVatApiCallFails: Boolean      = configuration.get[Boolean]("features.proceed-when-vat-api-call-fails")
   val restrictAccessUsingVrnAllowList: Boolean = configuration.get[Boolean]("features.restrict-access-using-vrn-allow-list")
   val vrnAllowList: Seq[Vrn]                   = configuration.get[Seq[String]]("features.vrn-allow-list").map(Vrn(_))
   val vrnBlockedRedirectUrl: String            = configuration.get[String]("features.vrn-blocked-redirect-url")

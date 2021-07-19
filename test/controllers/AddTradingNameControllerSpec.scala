@@ -94,9 +94,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must not populate the answer on a GET when the question has previously been answered" in {
 
-      val features    = mock[FeatureFlagService]
-      val page        = new AddTradingNamePage(features)
-      val userAnswers = baseAnswers.set(page, true).success.value
+      val userAnswers = baseAnswers.set(AddTradingNamePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -134,11 +132,10 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val page = application.injector.instanceOf[AddTradingNamePage]
-        val expectedAnswers = baseAnswers.set(page, true).success.value
+        val expectedAnswers = baseAnswers.set(AddTradingNamePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual page.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual AddTradingNamePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }

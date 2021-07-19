@@ -16,7 +16,6 @@
 
 package viewmodels.checkAnswers
 
-import config.Constants
 import formats.Format.dateFormatter
 import models.UserAnswers
 import pages.DateOfFirstSalePage
@@ -28,29 +27,18 @@ import viewmodels.implicits._
 
 import javax.inject.Inject
 
-class CommencementDateSummary @Inject()(
-                                         dateService: DateService,
-                                         features: FeatureFlagService
-                                       ) {
+class CommencementDateSummary @Inject()(dateService: DateService) {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    if(features.schemeHasStarted) {
-      answers.get(DateOfFirstSalePage).map {
-        answer =>
+    answers.get(DateOfFirstSalePage).map {
+      answer =>
 
-          val startDate = dateService.startDateBasedOnFirstSale(answer)
+        val startDate = dateService.startDateBasedOnFirstSale(answer)
 
-          SummaryListRowViewModel(
-            key = "commencementDate.checkYourAnswersLabel",
-            value = ValueViewModel(startDate.format(dateFormatter)),
-            actions = Seq.empty
-          )
-      }
-    } else {
-      Some(SummaryListRowViewModel(
-        key = "commencementDate.checkYourAnswersLabel",
-        value = ValueViewModel(Constants.schemeStartDate.format(dateFormatter)),
-        actions = Seq.empty
-      ))
+        SummaryListRowViewModel(
+          key = "commencementDate.checkYourAnswersLabel",
+          value = ValueViewModel(startDate.format(dateFormatter)),
+          actions = Seq.empty
+        )
     }
 }
