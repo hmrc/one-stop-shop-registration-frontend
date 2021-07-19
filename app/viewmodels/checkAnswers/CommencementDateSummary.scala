@@ -20,7 +20,7 @@ import formats.Format.dateFormatter
 import models.UserAnswers
 import pages.DateOfFirstSalePage
 import play.api.i18n.Messages
-import services.{DateService, FeatureFlagService}
+import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._

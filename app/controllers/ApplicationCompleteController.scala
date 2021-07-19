@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.{Constants, FrontendAppConfig}
+import config.FrontendAppConfig
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers
@@ -25,7 +25,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
 import queries.EmailConfirmationQuery
-import services.{DateService, FeatureFlagService}
+import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationCompleteView
 
@@ -37,8 +37,7 @@ class ApplicationCompleteController @Inject()(
   cc: AuthenticatedControllerComponents,
   view: ApplicationCompleteView,
   frontendAppConfig: FrontendAppConfig,
-  dateService: DateService,
-  features: FeatureFlagService
+  dateService: DateService
 ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc

@@ -27,7 +27,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
-import services.FeatureFlagService
 import views.html.HasTradingNameView
 
 import scala.concurrent.Future
@@ -78,7 +77,6 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val features    = mock[FeatureFlagService]
       val userAnswers = baseUserAnswers.set(HasTradingNamePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()

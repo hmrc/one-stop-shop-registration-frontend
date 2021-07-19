@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
+import pages.HasTradingNamePage
 import play.api.i18n.Messages
 import services.FeatureFlagService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow

@@ -17,6 +17,7 @@
 package pages
 
 import controllers.routes
+import models.NormalMode
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,7 +29,7 @@ case object HasMadeSalesPage extends QuestionPage[Boolean] {
 
   def navigate(answer: Boolean): Call =
     if (answer) {
-      controllers.auth.routes.AuthController.onSignIn()
+      routes.DateOfFirstSaleController.onPageLoad(NormalMode)
     } else {
       routes.RegisterLaterController.onPageLoad()
     }

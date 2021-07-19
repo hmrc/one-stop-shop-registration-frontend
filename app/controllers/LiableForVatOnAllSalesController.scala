@@ -39,6 +39,6 @@ class LiableForVatOnAllSalesController @Inject()(
 
   def onSubmit: Action[AnyContent] = Action{
     _ =>
-      Redirect(routes.HasMadeSalesController.onPageLoad())
+      Redirect(controllers.auth.routes.AuthController.onSignIn())
   }
 }

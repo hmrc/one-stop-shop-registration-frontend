@@ -17,15 +17,16 @@
 package pages
 
 import base.SpecBase
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
 class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
   "HasMadeSalesPage" - {
 
-    "must navigate to auth.onSignIn when the answer is yes" in {
+    "must navigate to Date Of First Sale page when the answer is yes" in {
 
-      HasMadeSalesPage.navigate(true) mustEqual controllers.auth.routes.AuthController.onSignIn()
+      HasMadeSalesPage.navigate(true) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
     }
 
     "must navigate to Register Later when the answer is no" in {
