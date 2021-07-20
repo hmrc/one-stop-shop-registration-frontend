@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.HasMadeSalesFormProvider
-import pages.HasMadeSalesPage
+import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class HasMadeSalesController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         cc: UnauthenticatedControllerComponents,
+                                         cc: AuthenticatedControllerComponents,
                                          formProvider: HasMadeSalesFormProvider,
                                          view: HasMadeSalesView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -37,9 +37,17 @@ class HasMadeSalesController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.identifyAndGetData {
+  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
+      // If business not based in Northern Ireland (northern-ireland-business) &&
+      // Does not have a fixed establishment there (northern-ireland-fixed-establishment) &&
+      // Sells some of their goods on online marketplaces (sales-on-marketplaces)
+      // Then show additional hint text
+
+      // val basedInNorthernIreland = request.userAnswers.get(BusinessBasedInNiPage)
+      // val noFixedEstablishment = request.userAnswers.get(HasFixedEstablishmentInNiPage)
+      // val sellSomeGoods = request.userAnswers.get(SalesChannelsPage)
 
       val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
         case Some(answer) => form.fill(answer)
@@ -49,7 +57,7 @@ class HasMadeSalesController @Inject()(
       Ok(view(preparedForm))
   }
 
-  def onSubmit: Action[AnyContent] = cc.identifyAndGetData.async {
+  def onSubmit: Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(

@@ -568,10 +568,11 @@ dateOfFirstSale.error.invalid = Enter a real date
 dateOfFirstSale.error.minMax = Date of first eligible sale must be between {0} and today
 dateOfFirstSale.change.hidden = date your sales start to be included in this scheme
 
-hasMadeSales.title = Have you already made sales to include in this scheme?
-hasMadeSales.heading = Have you already made sales to include in this scheme?
-hasMadeSales.caption = Only sales of goods to consumers in the EU are eligible.
-hasMadeSales.error.required = Select yes if you have already made sales to include in this scheme
+hasMadeSales.title = Have you already made eligible sales?
+hasMadeSales.heading = Have you already made eligible sales?
+hasMadeSales.caption = Only sales of goods from Northern Ireland or an EU country to consumers in other EU countries are eligible.
+hasMadeSales.caption.excludeSales = Do not include sales made on online marketplaces.
+hasMadeSales.error.required = Select yes if you have already made eligible sales
 
 isOnlineMarketplace.title = Is your business an online marketplace?
 isOnlineMarketplace.heading = Is your business an online marketplace?

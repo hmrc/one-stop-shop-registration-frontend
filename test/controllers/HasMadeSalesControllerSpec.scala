@@ -25,7 +25,7 @@ import pages.HasMadeSalesPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.UnauthenticatedSessionRepository
+import repositories.AuthenticatedSessionRepository
 import views.html.HasMadeSalesView
 
 import scala.concurrent.Future
@@ -74,12 +74,12 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      val sessionRepository = mock[AuthenticatedSessionRepository]
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[AuthenticatedSessionRepository].toInstance(sessionRepository))
           .build()
 
       running(application) {
@@ -117,7 +117,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Registered for OSS in EU for a GET if no existing data is found" in {
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -127,11 +127,11 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to Registered for OSS in EU for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -143,7 +143,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegisteredForOssInEuController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
