@@ -17,84 +17,91 @@
 package controllers
 
 import base.SpecBase
-import forms.HasMadeSalesFormProvider
-import models.NormalMode
+import formats.Format.dateFormatter
+import forms.IsPlanningFirstEligibleSaleFormProvider
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.HasMadeSalesPage
+import pages.IsPlanningFirstEligibleSalePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
-import views.html.HasMadeSalesView
+import services.DateService
+import views.html.IsPlanningFirstEligibleSaleView
 
 import scala.concurrent.Future
 
-class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
+class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new HasMadeSalesFormProvider()
+  private val dateService = new DateService(stubClockAtArbitraryDate)
+  private val dateFormatted = dateService.startOfNextQuarter.format(dateFormatter)
+
+
+  private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService)
   private val form = formProvider()
 
-  private lazy val hasMadeSalesRoute = routes.HasMadeSalesController.onPageLoad(NormalMode).url
+  private lazy val isPlanningFirstEligibleSaleRoute = routes.IsPlanningFirstEligibleSaleController.onPageLoad.url
 
-  "HasMadeSales Controller" - {
+  "IsPlanningFirstEligibleSale Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasMadeSalesRoute)
+        val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[HasMadeSalesView]
+        val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted)(request, messages(application)).toString
       }
     }
 
-    "must populate the view and return OK and the correct view for a GET when the question has already been answered" in {
+    "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val answers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
-      val application = applicationBuilder(userAnswers = Some(answers)).build()
+      val userAnswers = UserAnswers(userAnswersId).set(IsPlanningFirstEligibleSalePage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasMadeSalesRoute)
+        val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
+
+        val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[HasMadeSalesView]
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, dateFormatted)(request, messages(application)).toString
       }
     }
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val sessionRepository = mock[AuthenticatedSessionRepository]
-      when(sessionRepository.set(any())) thenReturn Future.successful(true)
+      val mockSessionRepository = mock[AuthenticatedSessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[AuthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, hasMadeSalesRoute)
+          FakeRequest(POST, isPlanningFirstEligibleSaleRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-
-        val expectedAnswers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+        val expectedAnswers = emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual HasMadeSalesPage.navigate(true).url
-        verify(sessionRepository, times(1)).set(eqTo(expectedAnswers))
+        redirectLocation(result).value mustEqual IsPlanningFirstEligibleSalePage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -104,17 +111,17 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, hasMadeSalesRoute)
+          FakeRequest(POST, isPlanningFirstEligibleSaleRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[HasMadeSalesView]
+        val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, dateFormatted)(request, messages(application)).toString
       }
     }
 
@@ -123,7 +130,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasMadeSalesRoute)
+        val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
 
         val result = route(application, request).value
 
@@ -138,7 +145,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, hasMadeSalesRoute)
+          FakeRequest(POST, isPlanningFirstEligibleSaleRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

@@ -50,7 +50,7 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
           val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
 
           HasTradingNamePage.navigate(NormalMode, answers)
-            .mustBe(routes.HasMadeSalesController.onPageLoad())
+            .mustBe(routes.HasMadeSalesController.onPageLoad(NormalMode))
         }
       }
     }

@@ -17,20 +17,20 @@
 package pages
 
 import controllers.routes
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object HasMadeSalesPage extends QuestionPage[Boolean] {
+case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "hasMadeSales"
+  override def toString: String = "isPlanningFirstEligibleSale"
 
-  def navigate(answer: Boolean): Call =
-    if (answer) {
-      routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    } else {
-      routes.IsPlanningFirstEligibleSaleController.onPageLoad()
-    }
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
+    case Some(true)  => routes.CommencementDateController.onPageLoad(NormalMode)
+    case Some(false) => routes.RegisterLaterController.onPageLoad()
+    case _           => routes.JourneyRecoveryController.onPageLoad()
+  }
+
 }

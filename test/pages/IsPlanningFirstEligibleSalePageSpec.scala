@@ -17,21 +17,16 @@
 package pages
 
 import base.SpecBase
-import models.NormalMode
 import pages.behaviours.PageBehaviours
 
-class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
+class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
 
-  "HasMadeSalesPage" - {
+  "IsPlanningFirstEligibleSalePage" - {
 
-    "must navigate to Date Of First Sale page when the answer is yes" in {
+    beRetrievable[Boolean](IsPlanningFirstEligibleSalePage)
 
-      HasMadeSalesPage.navigate(true) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    }
+    beSettable[Boolean](IsPlanningFirstEligibleSalePage)
 
-    "must navigate to Is Planning First Eligible Sale page when the answer is no" in {
-
-      HasMadeSalesPage.navigate(false) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad
-    }
+    beRemovable[Boolean](IsPlanningFirstEligibleSalePage)
   }
 }

@@ -260,8 +260,10 @@ POST        /date-of-first-sale                                       controller
 GET         /check-date-of-first-sale                                 controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-date-of-first-sale                                 controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
 
-GET         /already-made-sales                                       controllers.HasMadeSalesController.onPageLoad
-POST        /already-made-sales                                       controllers.HasMadeSalesController.onSubmit
+GET         /already-made-sales                                       controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
+POST        /already-made-sales                                       controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
+GET         /check-already-made-sales                                 controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-already-made-sales                                 controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
 
 GET         /online-marketplace                                       controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
 POST        /online-marketplace                                       controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
@@ -286,3 +288,7 @@ GET         /sales-on-marketplaces                                    controller
 POST        /sales-on-marketplaces                                    controllers.SalesChannelsController.onSubmit
 
 GET         /answers-deleted                                          controllers.AnswersDeletedController.onPageLoad
+
+GET        /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
+POST       /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
+

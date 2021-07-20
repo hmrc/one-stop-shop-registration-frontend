@@ -32,7 +32,7 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(HasTradingNamePage) match {
       case Some(true)  => routes.TradingNameController.onPageLoad(NormalMode, Index(0))
-      case Some(false) => routes.HasMadeSalesController.onPageLoad()
+      case Some(false) => routes.HasMadeSalesController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 

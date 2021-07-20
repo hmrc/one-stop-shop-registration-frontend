@@ -6,11 +6,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("hasMadeSales.title"))) {
 
-    @formHelper(action = routes.HasMadeSalesController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.HasMadeSalesController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

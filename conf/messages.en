@@ -572,7 +572,9 @@ hasMadeSales.title = Have you already made eligible sales?
 hasMadeSales.heading = Have you already made eligible sales?
 hasMadeSales.caption = Only sales of goods from Northern Ireland or an EU country to consumers in other EU countries are eligible.
 hasMadeSales.caption.excludeSales = Do not include sales made on online marketplaces.
+hasMadeSales.checkYourAnswersLabel = Already made eligible sales
 hasMadeSales.error.required = Select yes if you have already made eligible sales
+hasMadeSales.change.hidden = if already made eligible sales
 
 isOnlineMarketplace.title = Is your business an online marketplace?
 isOnlineMarketplace.heading = Is your business an online marketplace?
@@ -615,3 +617,7 @@ salesChannels.caption = Online marketplaces are websites or mobile apps where cu
 
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
+
+isPlanningFirstEligibleSale.title = Do you plan on making your first eligible sale before {0}?
+isPlanningFirstEligibleSale.heading = Do you plan on making your first eligible sale before {0}?
+isPlanningFirstEligibleSale.error.required = Select yes if you plan on making your first eligible sale before {0}

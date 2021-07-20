@@ -17,22 +17,26 @@
 package controllers
 
 import controllers.actions._
-import forms.HasMadeSalesFormProvider
-import models.Mode
-import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.HasMadeSalesView
+import formats.Format.dateFormatter
+import forms.IsPlanningFirstEligibleSaleFormProvider
 
 import javax.inject.Inject
+import models.Mode
+import pages.IsPlanningFirstEligibleSalePage
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.DateService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.IsPlanningFirstEligibleSaleView
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class HasMadeSalesController @Inject()(
+class IsPlanningFirstEligibleSaleController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          cc: AuthenticatedControllerComponents,
-                                         formProvider: HasMadeSalesFormProvider,
-                                         view: HasMadeSalesView
+                                         formProvider: IsPlanningFirstEligibleSaleFormProvider,
+                                         view: IsPlanningFirstEligibleSaleView,
+                                         dateService: DateService
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -41,35 +45,30 @@ class HasMadeSalesController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      // If business not based in Northern Ireland (northern-ireland-business) &&
-      // Does not have a fixed establishment there (northern-ireland-fixed-establishment) &&
-      // Sells some of their goods on online marketplaces (sales-on-marketplaces)
-      // Then show additional hint text
+      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
 
-      // val basedInNorthernIreland = request.userAnswers.get(BusinessBasedInNiPage)
-      // val noFixedEstablishment = request.userAnswers.get(HasFixedEstablishmentInNiPage)
-      // val sellSomeGoods = request.userAnswers.get(SalesChannelsPage)
-
-      val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
-        case Some(answer) => form.fill(answer)
-        case None         => form
+      val preparedForm = request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
+        case None => form
+        case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, firstDayOfNextCalendarQuarter.format(dateFormatter)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
+      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, firstDayOfNextCalendarQuarter.format(dateFormatter)))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(IsPlanningFirstEligibleSalePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(HasMadeSalesPage.navigate(value))
+          } yield Redirect(IsPlanningFirstEligibleSalePage.navigate(mode, updatedAnswers))
       )
   }
 }

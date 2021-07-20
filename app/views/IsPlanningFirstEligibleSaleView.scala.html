@@ -1,0 +1,30 @@
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode, formattedDate: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("isPlanningFirstEligibleSale.title", formattedDate))) {
+
+    @formHelper(action = routes.IsPlanningFirstEligibleSaleController.onSubmit, 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("isPlanningFirstEligibleSale.heading", formattedDate)).asPageHeading()
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}
