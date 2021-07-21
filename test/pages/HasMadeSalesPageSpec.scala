@@ -17,21 +17,46 @@
 package pages
 
 import base.SpecBase
-import models.NormalMode
+import controllers.routes
+import models.{CheckMode, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
   "HasMadeSalesPage" - {
 
+    beRetrievable[Boolean](HasMadeSalesPage)
+
+    beSettable[Boolean](HasMadeSalesPage)
+
+    beRemovable[Boolean](HasMadeSalesPage)
+
     "must navigate to Date Of First Sale page when the answer is yes" in {
 
-      HasMadeSalesPage.navigate(true) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
+      HasMadeSalesPage.navigate(
+        NormalMode,
+        emptyUserAnswers.set(
+          HasMadeSalesPage,
+          true
+        ).success.value) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
     }
 
     "must navigate to Is Planning First Eligible Sale page when the answer is no" in {
 
-      HasMadeSalesPage.navigate(false) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad
+      HasMadeSalesPage.navigate(NormalMode,
+        emptyUserAnswers.set(
+          HasMadeSalesPage,
+          false
+        ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        IsOnlineMarketplacePage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
     }
   }
 }

@@ -93,7 +93,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val expectedAnswers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual HasMadeSalesPage.navigate(true).url
+        redirectLocation(result).value mustEqual HasMadeSalesPage.navigate(NormalMode, expectedAnswers).url
         verify(sessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
