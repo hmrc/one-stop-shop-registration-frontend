@@ -18,27 +18,45 @@ package viewmodels.checkAnswers
 
 import formats.Format.dateFormatter
 import models.UserAnswers
-import pages.DateOfFirstSalePage
+import pages.{DateOfFirstSalePage, IsPlanningFirstEligibleSalePage}
 import play.api.i18n.Messages
 import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class CommencementDateSummary @Inject()(dateService: DateService) {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(DateOfFirstSalePage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    answers.get(DateOfFirstSalePage).isEmpty match {
+      case true =>
+        val startDate = LocalDate.now()
+        answers.get(IsPlanningFirstEligibleSalePage).map {
+          answer =>
 
-        val startDate = dateService.startDateBasedOnFirstSale(answer)
+            SummaryListRowViewModel(
+              key = "commencementDate.checkYourAnswersLabel",
+              value = ValueViewModel(startDate.format(dateFormatter)),
+              actions = Seq.empty
+            )
+        }
 
-        SummaryListRowViewModel(
-          key = "commencementDate.checkYourAnswersLabel",
-          value = ValueViewModel(startDate.format(dateFormatter)),
-          actions = Seq.empty
-        )
+      case _ =>
+        answers.get(DateOfFirstSalePage).map {
+          answer =>
+
+            val startDate = dateService.startDateBasedOnFirstSale(answer)
+
+            SummaryListRowViewModel(
+              key = "commencementDate.checkYourAnswersLabel",
+              value = ValueViewModel(startDate.format(dateFormatter)),
+              actions = Seq.empty
+            )
+        }
+
     }
+  }
 }

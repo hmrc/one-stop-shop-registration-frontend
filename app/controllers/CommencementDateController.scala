@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.Mode
-import pages.{CommencementDatePage, DateOfFirstSalePage}
+import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,6 +27,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
+
+import java.time.LocalDate
 
 class CommencementDateController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -39,12 +41,21 @@ class CommencementDateController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      request.userAnswers.get(DateOfFirstSalePage).map {
-        date =>
+      request.userAnswers.get(HasMadeSalesPage) match {
+        case Some(true) =>
+          request.userAnswers.get(DateOfFirstSalePage).map {
+            date =>
 
-          val startDate = dateService.startDateBasedOnFirstSale(date)
-          Ok(view(mode, startDate.format(dateFormatter)))
-      }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+              val startDate = dateService.startDateBasedOnFirstSale(date)
+              Ok(view(mode, startDate.format(dateFormatter)))
+          }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        case _ =>
+          request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
+            case Some(true) =>
+              val startDate = LocalDate.now()
+              Ok(view(mode, startDate.format(dateFormatter)))
+          } case _ => Redirect(routes.RegisterLaterController.onPageLoad())
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {

@@ -69,7 +69,7 @@ class HasMadeSalesController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(HasMadeSalesPage.navigate(value))
+          } yield Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers))
       )
   }
 }

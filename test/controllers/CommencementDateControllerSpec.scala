@@ -23,7 +23,7 @@ import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.DateOfFirstSalePage
+import pages.{DateOfFirstSalePage, IsPlanningFirstEligibleSalePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,7 +38,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
 
     "when the scheme has started" - {
 
-      "must return OK and the correct view for a GET" in {
+      "must return OK and the correct view for a GET when user enters date" in {
 
         val answers = emptyUserAnswers.set(DateOfFirstSalePage, arbitraryDate).success.value
         val dateService = mock[DateService]
@@ -59,6 +59,30 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(NormalMode, arbitraryDate.format(dateFormatter))(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when user answers yes to Is Planning First Eligible Sale and today's date is generated" in {
+
+        val answers = emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
+        val dateService = mock[DateService]
+
+        when(dateService.startOfNextQuarter) thenReturn LocalDate.now()
+
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CommencementDateView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(NormalMode, LocalDate.now().format(dateFormatter))(request, messages(application)).toString
         }
       }
     }
