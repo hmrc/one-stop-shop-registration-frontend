@@ -621,3 +621,5 @@ answersDeleted.heading = For your security, we deleted your answers
 isPlanningFirstEligibleSale.title = Do you plan on making your first eligible sale before {0}?
 isPlanningFirstEligibleSale.heading = Do you plan on making your first eligible sale before {0}?
 isPlanningFirstEligibleSale.error.required = Select yes if you plan on making your first eligible sale before {0}
+isPlanningFirstEligibleSale.checkYourAnswersLabel = Planning to make first eligible sale
+isPlanningFirstEligibleSale.change.hidden = if planning to make first eligible sale

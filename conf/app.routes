@@ -291,4 +291,5 @@ GET         /answers-deleted                                          controller
 
 GET        /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
 POST       /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
-
+GET        /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
+POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)

@@ -17,9 +17,12 @@
 package pages
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import queries.AllWebsites
+
+import scala.util.Try
 
 case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
 
@@ -32,5 +35,17 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
     case Some(false) => routes.RegisterLaterController.onPageLoad()
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
+    case Some(true)  => routes.CommencementDateController.onPageLoad(CheckMode)
+    case Some(false) => routes.RegisterLaterController.onPageLoad()
+    case _           => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+//  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+//    value match {
+//      case Some(false) => userAnswers.remove()
+//      case _           => super.cleanup(value, userAnswers)
+//    }
 
 }

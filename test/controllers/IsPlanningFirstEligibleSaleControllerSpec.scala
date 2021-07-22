@@ -42,7 +42,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
   private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService)
   private val form = formProvider()
 
-  private lazy val isPlanningFirstEligibleSaleRoute = routes.IsPlanningFirstEligibleSaleController.onPageLoad.url
+  private lazy val isPlanningFirstEligibleSaleRoute = routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode).url
 
   "IsPlanningFirstEligibleSale Controller" - {
 

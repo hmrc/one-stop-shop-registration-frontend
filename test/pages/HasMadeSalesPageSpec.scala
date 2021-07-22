@@ -47,7 +47,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
         emptyUserAnswers.set(
           HasMadeSalesPage,
           false
-        ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad
+        ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
     }
 
     "must navigate in Check mode" - {

@@ -45,7 +45,6 @@ class CommencementDateController @Inject()(
         case Some(true) =>
           request.userAnswers.get(DateOfFirstSalePage).map {
             date =>
-
               val startDate = dateService.startDateBasedOnFirstSale(date)
               Ok(view(mode, startDate.format(dateFormatter)))
           }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))

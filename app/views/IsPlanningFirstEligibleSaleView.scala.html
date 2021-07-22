@@ -10,7 +10,7 @@
 
 @layout(pageTitle = title(form, messages("isPlanningFirstEligibleSale.title", formattedDate))) {
 
-    @formHelper(action = routes.IsPlanningFirstEligibleSaleController.onSubmit, 'autoComplete -> "off") {
+    @formHelper(action = routes.IsPlanningFirstEligibleSaleController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

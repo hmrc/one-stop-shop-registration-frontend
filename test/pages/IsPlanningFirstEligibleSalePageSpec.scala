@@ -17,6 +17,8 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
@@ -28,5 +30,31 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
     beSettable[Boolean](IsPlanningFirstEligibleSalePage)
 
     beRemovable[Boolean](IsPlanningFirstEligibleSalePage)
+
+    "must navigate in Normal mode" - {
+
+      "to Commencement Date page when true is submitted" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          NormalMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
+        ).mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+      }
+
+      "to Register Later page when false is submitted" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          NormalMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, false).success.value
+        ).mustEqual(routes.RegisterLaterController.onPageLoad())
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Your Answers" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+    }
   }
 }

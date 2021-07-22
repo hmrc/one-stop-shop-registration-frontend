@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -29,10 +29,13 @@ case object HasMadeSalesPage extends QuestionPage[Boolean] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)      => routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    case Some(false)     => routes.IsPlanningFirstEligibleSaleController.onPageLoad()
+    case Some(false)     => routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
     case _               => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    routes.CheckYourAnswersController.onPageLoad()
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
+    case Some(true)      => routes.DateOfFirstSaleController.onPageLoad(CheckMode)
+    case Some(false)     => routes.IsPlanningFirstEligibleSaleController.onPageLoad(CheckMode)
+    case _               => routes.JourneyRecoveryController.onPageLoad()
+  }
 }
