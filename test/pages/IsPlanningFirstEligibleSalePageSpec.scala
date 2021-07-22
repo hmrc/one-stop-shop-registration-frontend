@@ -50,10 +50,18 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Check mode" - {
 
-      "to Check Your Answers" in {
+      "to Commencement Date page when true is submitted" in {
 
-        IsPlanningFirstEligibleSalePage.navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        IsPlanningFirstEligibleSalePage.navigate(
+          CheckMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
+        ).mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+      }
+
+      "to Register Later page when false is submitted" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          CheckMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, false).success.value
+        ).mustEqual(routes.RegisterLaterController.onPageLoad())
       }
     }
   }

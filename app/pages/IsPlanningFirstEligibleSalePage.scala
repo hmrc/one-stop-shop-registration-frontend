@@ -42,10 +42,4 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
 
-//  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-//    value match {
-//      case Some(false) => userAnswers.remove()
-//      case _           => super.cleanup(value, userAnswers)
-//    }
-
 }

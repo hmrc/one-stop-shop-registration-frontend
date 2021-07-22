@@ -18,8 +18,9 @@ package controllers
 
 import controllers.actions._
 import forms.HasMadeSalesFormProvider
-import models.Mode
-import pages.HasMadeSalesPage
+import models.{Mode, UserAnswers}
+import models.SalesChannels.Mixed
+import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -41,21 +42,12 @@ class HasMadeSalesController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      // If business not based in Northern Ireland (northern-ireland-business) &&
-      // Does not have a fixed establishment there (northern-ireland-fixed-establishment) &&
-      // Sells some of their goods on online marketplaces (sales-on-marketplaces)
-      // Then show additional hint text
-
-      // val basedInNorthernIreland = request.userAnswers.get(BusinessBasedInNiPage)
-      // val noFixedEstablishment = request.userAnswers.get(HasFixedEstablishmentInNiPage)
-      // val sellSomeGoods = request.userAnswers.get(SalesChannelsPage)
-
       val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
         case Some(answer) => form.fill(answer)
         case None         => form
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, showHintText(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
@@ -63,7 +55,7 @@ class HasMadeSalesController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, showHintText(request.userAnswers)))),
 
         value =>
           for {
@@ -71,5 +63,13 @@ class HasMadeSalesController @Inject()(
             _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers))
       )
+  }
+
+  // private? test?
+  def showHintText(answers: UserAnswers): Boolean = {
+    (answers.get(BusinessBasedInNiPage), answers.get(HasFixedEstablishmentInNiPage), answers.get(SalesChannelsPage)) match {
+      case (Some(false), Some(false), Some(Mixed)) => true
+      case _ => false
+    }
   }
 }

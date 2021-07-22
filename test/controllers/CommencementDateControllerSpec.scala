@@ -23,7 +23,7 @@ import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{DateOfFirstSalePage, IsPlanningFirstEligibleSalePage}
+import pages.{DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -40,10 +40,12 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view for a GET when user enters date" in {
 
-        val answers = emptyUserAnswers.set(DateOfFirstSalePage, arbitraryDate).success.value
+        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+        val answers = answer1.set(DateOfFirstSalePage, arbitraryStartDate).success.value
+
         val dateService = mock[DateService]
 
-        when(dateService.startDateBasedOnFirstSale(any())) thenReturn arbitraryDate
+        when(dateService.startDateBasedOnFirstSale(any())) thenReturn arbitraryStartDate
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -58,20 +60,17 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
           val view = application.injector.instanceOf[CommencementDateView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(NormalMode, arbitraryDate.format(dateFormatter))(request, messages(application)).toString
+          contentAsString(result) mustEqual view(NormalMode, arbitraryStartDate.format(dateFormatter))(request, messages(application)).toString
         }
       }
 
       "must return OK and the correct view for a GET when user answers yes to Is Planning First Eligible Sale and today's date is generated" in {
 
-        val answers = emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
-        val dateService = mock[DateService]
-
-        when(dateService.startOfNextQuarter) thenReturn LocalDate.now()
+        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, false).success.value
+        val answers = answer1.set(IsPlanningFirstEligibleSalePage, true).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
-            .overrides(bind[DateService].toInstance(dateService))
             .build()
 
         running(application) {

@@ -48,12 +48,14 @@ class CommencementDateController @Inject()(
               val startDate = dateService.startDateBasedOnFirstSale(date)
               Ok(view(mode, startDate.format(dateFormatter)))
           }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-        case _ =>
+        case Some(false) =>
           request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
             case Some(true) =>
               val startDate = LocalDate.now()
               Ok(view(mode, startDate.format(dateFormatter)))
-          } case _ => Redirect(routes.RegisterLaterController.onPageLoad())
+            case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
+          }
+        case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
   }
 

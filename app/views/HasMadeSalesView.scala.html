@@ -6,7 +6,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, hintTextFlag: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("hasMadeSales.title"))) {
 
@@ -16,12 +16,22 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
-            ).withHint(HintViewModel(messages("hasMadeSales.caption")))
-        )
+        @if(hintTextFlag) {
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
+                ).withHint(HintViewModel(HtmlContent(Html(messages("hasMadeSales.caption.excludeSales")))))
+            )
+        } else {
+
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
+                ).withHint(HintViewModel(messages("hasMadeSales.caption")))
+            )
+        }
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))

@@ -58,7 +58,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
         val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, Some(dateFormatted))(request, messages(application)).toString
       }
     }
 
@@ -76,7 +76,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, dateFormatted)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, Some(dateFormatted))(request, messages(application)).toString
       }
     }
 
@@ -121,7 +121,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, dateFormatted)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, Some(dateFormatted))(request, messages(application)).toString
       }
     }
 

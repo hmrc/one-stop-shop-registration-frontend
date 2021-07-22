@@ -19,10 +19,11 @@ package controllers
 import base.SpecBase
 import forms.HasMadeSalesFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.SalesChannels.Mixed
+import org.mockito.ArgumentMatchers.{any, anyBoolean, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.HasMadeSalesPage
+import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -52,7 +53,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[HasMadeSalesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, false)(request, messages(application)).toString
       }
     }
 
@@ -69,7 +70,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[HasMadeSalesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, false)(request, messages(application)).toString
       }
     }
 
@@ -114,7 +115,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, false)(request, messages(application)).toString
       }
     }
 
@@ -147,5 +148,46 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "showHintText method must return true when sales are not included from online marketplaces" in {
+
+      emptyUserAnswers.set(BusinessBasedInNiPage, false)
+      emptyUserAnswers.set(HasFixedEstablishmentInNiPage, false)
+      emptyUserAnswers.set(SalesChannelsPage, Mixed)
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasMadeSalesRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HasMadeSalesView]
+
+        val controller = application.injector.instanceOf[HasMadeSalesController]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, controller.showHintText(emptyUserAnswers))(request, messages(application)).toString
+      }
+    }
+
+    "showHintText method must return false when sales are included from online marketplaces" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasMadeSalesRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HasMadeSalesView]
+
+        val controller = application.injector.instanceOf[HasMadeSalesController]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, controller.showHintText(emptyUserAnswers))(request, messages(application)).toString
+      }
+    }
   }
+
 }
