@@ -52,7 +52,10 @@ class AlreadyRegisteredController @Inject()(
             config.feedbackUrl,
             registration.commencementDate.format(dateFormatter),
             dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter))
+            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            dateService.isStartDateAfterThe10th(registration.commencementDate),
+            dateService.isStartDateInFirstQuarter(registration.commencementDate),
+            dateService.isStartDateAfterFirstQuarter(registration.commencementDate))
           )
 
         case None =>

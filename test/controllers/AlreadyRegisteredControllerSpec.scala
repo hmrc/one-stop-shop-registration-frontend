@@ -75,7 +75,10 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
               config.feedbackUrl(request),
               registration.commencementDate.format(dateFormatter),
               lastDayOfCalendarQuarter.format(dateFormatter),
-              lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
+              lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+              false,
+              false,
+              false
             )(request, messages(application)).toString
 
           contentAsString(result) mustEqual expectedContent

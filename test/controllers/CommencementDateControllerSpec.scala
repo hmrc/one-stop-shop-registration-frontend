@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import config.Constants
 import formats.Format.dateFormatter
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
@@ -30,7 +29,7 @@ import play.api.test.Helpers._
 import services.DateService
 import views.html.CommencementDateView
 
-import java.time.{Clock, LocalDate, ZoneId}
+import java.time.LocalDate
 
 class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
 
@@ -60,7 +59,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
           val view = application.injector.instanceOf[CommencementDateView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(NormalMode, arbitraryStartDate.format(dateFormatter))(request, messages(application)).toString
+          contentAsString(result) mustEqual view(NormalMode, arbitraryStartDate.format(dateFormatter),false, false, false)(request, messages(application)).toString
         }
       }
 
@@ -81,7 +80,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar {
           val view = application.injector.instanceOf[CommencementDateView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(NormalMode, LocalDate.now().format(dateFormatter))(request, messages(application)).toString
+          contentAsString(result) mustEqual view(NormalMode, LocalDate.now().format(dateFormatter) ,false, false, false)(request, messages(application)).toString
         }
       }
     }

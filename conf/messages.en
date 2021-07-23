@@ -223,6 +223,10 @@ applicationComplete.p2 = We will contact you about how to use the new service to
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
+applicationComplete.youRegisteredAfterThe10th = You registered after the 10th day of the month following your first eligible sale.
+applicationComplete.Between1stJuly30Sept = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
+
+
 deleteTradingName.title = Are you sure you want to remove {0}?
 deleteTradingName.heading = Are you sure you want to remove {0}?
 deleteTradingName.error.required = Select yes if you need to remove this trading name
@@ -415,6 +419,11 @@ alreadyRegistered.p2 = We will contact you about how to use the new service to s
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 
+alreadyRegistered.youRegisteredAfterThe10th = You registered after the 10th day of the month following your first eligible sale.
+alreadyRegistered.Between1stJuly30Sept = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
+alreadyRegistered.After1stOct = You will be able to use this scheme for eligible sales starting from 1 October 2021.
+
+
 addPreviousRegistration.title.singular = You added one deregistration
 addPreviousRegistration.heading.singular = You added one deregistration
 addPreviousRegistration.title = You added {0} deregistrations
@@ -543,10 +552,15 @@ commencementDate.heading = Your start date
 commencementDate.p1 = Your eligible sales starting from {0} will be included in this scheme.
 commencementDate.checkYourAnswersLabel = Date your sales start to be included in this scheme
 
-registerLater.title = Come back later
-registerLater.heading = Come back later
-registerLater.p1 = Make sure you register by the 10th day of the month after your first sale.
-registerLater.p2 = This allows you to use this scheme for that supply.
+commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the month following your first eligible sale.
+commencementDate.Between1stJuly30Sept = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
+commencementDate.After1stOct = You will be able to use this scheme for eligible sales starting from 1 October 2021.
+
+
+registerLater.title = Come back after your first eligible sale
+registerLater.heading = Come back after your first eligible sale
+registerLater.p1 = You must register by the 10th day of the month following your first eligible sale.
+registerLater.p2 = This allows you to use this scheme for that sale.
 
 cannotRegisterAlreadyRegistered.title = Come back later
 cannotRegisterAlreadyRegistered.heading = Come back later

@@ -46,13 +46,16 @@ class CommencementDateController @Inject()(
           request.userAnswers.get(DateOfFirstSalePage).map {
             date =>
               val startDate = dateService.startDateBasedOnFirstSale(date)
-              Ok(view(mode, startDate.format(dateFormatter)))
+              val isStartDateAfterThe10th = dateService.isStartDateAfterThe10th(startDate)
+              val isStartDateInFirstQuarter = dateService.isStartDateInFirstQuarter(startDate)
+              val isStartDateAfterFirstQuarter = dateService.isStartDateAfterFirstQuarter(startDate)
+              Ok(view(mode, startDate.format(dateFormatter), isStartDateAfterThe10th, isStartDateInFirstQuarter, isStartDateAfterFirstQuarter))
           }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         case Some(false) =>
           request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
             case Some(true) =>
-              val startDate = LocalDate.now()
-              Ok(view(mode, startDate.format(dateFormatter)))
+              val plannedStartDate = LocalDate.now()
+              Ok(view(mode, plannedStartDate.format(dateFormatter), false, false, false))
             case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
           }
         case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())

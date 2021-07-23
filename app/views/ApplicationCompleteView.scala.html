@@ -21,7 +21,9 @@
         govukButton: GovukButton
 )
 
-@(email: String, vrn: Vrn, feedbackLink: String, showEmailConfirmation: Boolean, startDate: String, lastDayOfCalendarQuarter: String, lastDayOfMonthAfterCalendarQuarter: String)(implicit request: Request[_], messages: Messages)
+@(email: String, vrn: Vrn, feedbackLink: String, showEmailConfirmation: Boolean, startDate: String,
+  lastDayOfCalendarQuarter: String, lastDayOfMonthAfterCalendarQuarter: String, isStartDateAfterThe10th: Boolean,
+  isStartDateInFirstQuarter: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title")),  showBackLink = false) {
     <div class="grid-row column-two-thirds" id="application_complete_id">
@@ -36,6 +38,14 @@
         }
 
         <div class="govuk-body">@messages("applicationComplete.reference", vrn.vrn)</div>
+
+        if(isStartDateInFirstQuarter) {
+            <p class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</p>
+        }
+
+        if(isStartDateAfterThe10th) {
+            <p class="govuk-body">@messages("applicationComplete.Between1stJuly30Sept")</p>
+        }
 
         <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
 
