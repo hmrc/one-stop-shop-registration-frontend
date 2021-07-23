@@ -65,8 +65,7 @@ class HasMadeSalesController @Inject()(
       )
   }
 
-  // private? test?
-  def showHintText(answers: UserAnswers): Boolean = {
+  private def showHintText(answers: UserAnswers): Boolean = {
     (answers.get(BusinessBasedInNiPage), answers.get(HasFixedEstablishmentInNiPage), answers.get(SalesChannelsPage)) match {
       case (Some(false), Some(false), Some(Mixed)) => true
       case _ => false
