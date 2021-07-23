@@ -40,7 +40,12 @@ class SalesChannelsController @Inject()(
   def onPageLoad: Action[AnyContent] = cc.identifyAndGetData {
     implicit request =>
 
-      Ok(view(form))
+      val preparedForm = request.userAnswers.get(SalesChannelsPage) match {
+        case Some(answer) => form.fill(answer)
+        case None         => form
+      }
+
+      Ok(view(preparedForm))
   }
 
   def onSubmit: Action[AnyContent] = cc.identifyAndGetData.async {

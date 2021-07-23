@@ -20,7 +20,7 @@ import base.SpecBase
 import forms.HasMadeSalesFormProvider
 import models.NormalMode
 import models.SalesChannels.Mixed
-import org.mockito.ArgumentMatchers.{any, anyBoolean, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
@@ -31,8 +31,9 @@ import repositories.AuthenticatedSessionRepository
 import views.html.HasMadeSalesView
 
 import scala.concurrent.Future
+import org.scalatest.PrivateMethodTester
 
-class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
+class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with PrivateMethodTester {
 
   private val formProvider = new HasMadeSalesFormProvider()
   private val form = formProvider()
@@ -151,11 +152,11 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
     "showHintText method must return true when sales are not included from online marketplaces" in {
 
-      emptyUserAnswers.set(BusinessBasedInNiPage, false)
-      emptyUserAnswers.set(HasFixedEstablishmentInNiPage, false)
-      emptyUserAnswers.set(SalesChannelsPage, Mixed)
+      val answerBusinessBasedInNiPage = emptyUserAnswers.set(BusinessBasedInNiPage, false).success.value
+      val answerHasFixedEstablishmentInNiPage = answerBusinessBasedInNiPage.set(HasFixedEstablishmentInNiPage, false).success.value
+      val userAnswers = answerHasFixedEstablishmentInNiPage.set(SalesChannelsPage, Mixed).success.value
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasMadeSalesRoute)
@@ -166,8 +167,14 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
         val controller = application.injector.instanceOf[HasMadeSalesController]
 
+        val showHintTextMethod = PrivateMethod[Boolean]('showHintText)
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, controller.showHintText(emptyUserAnswers))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          controller invokePrivate showHintTextMethod(userAnswers)
+        )(request, messages(application)).toString
       }
     }
 
@@ -184,8 +191,14 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar {
 
         val controller = application.injector.instanceOf[HasMadeSalesController]
 
+        val showHintTextMethod = PrivateMethod[Boolean]('showHintText)
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, controller.showHintText(emptyUserAnswers))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          controller invokePrivate showHintTextMethod(emptyUserAnswers)
+        )(request, messages(application)).toString
       }
     }
   }
