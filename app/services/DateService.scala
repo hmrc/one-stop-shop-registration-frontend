@@ -54,6 +54,10 @@ class DateService @Inject()(clock: Clock) {
     startDate.getDayOfMonth > 10
   }
 
+  def isRegistrationDateAfter10thOfTheMonth(registrationDate: LocalDate): Boolean = {
+    registrationDate.getDayOfMonth > 10
+  }
+
   def isStartDateInFirstQuarter(startDate: LocalDate): Boolean = {
     startDate.isAfter(LocalDate.of(2021, 6, 30)) &&
     startDate.isBefore(LocalDate.of(2021, 10, 1))

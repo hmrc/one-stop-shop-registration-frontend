@@ -4,7 +4,7 @@
         govukButton: GovukButton
 )
 
-@(mode: Mode, formattedDate: String, isStartDateAfterThe10th: Boolean, isStartDateInFirstQuarter: Boolean, isStartDateAfterFirstQuarter: Boolean)(implicit request: Request[_], messages: Messages)
+@(mode: Mode, formattedDate: String, isRegisteredAfterThe10th: Boolean, isStartDateInFirstQuarter: Boolean, isStartDateAfterFirstQuarter: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
@@ -12,15 +12,15 @@
 
     <p class="govuk-body">@messages("commencementDate.p1", formattedDate)</p>
 
-    if(isStartDateAfterThe10th) {
+    @if(isRegisteredAfterThe10th) {
         <p class="govuk-body">@messages("commencementDate.youRegisteredAfterThe10th")</p>
     }
 
-    if(isStartDateInFirstQuarter) {
+    @if(isStartDateInFirstQuarter) {
         <p class="govuk-body">@messages("commencementDate.Between1stJuly30Sept")</p>
     }
 
-    if(isStartDateAfterFirstQuarter) {
+    @if(isStartDateAfterFirstQuarter) {
         <p class="govuk-body">@messages("commencementDate.After1stOct")</p>
     }
 
