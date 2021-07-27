@@ -46,7 +46,10 @@ class CommencementDateController @Inject()(
           request.userAnswers.get(DateOfFirstSalePage).map {
             date =>
               val startDate = dateService.startDateBasedOnFirstSale(date)
-              val isRegisteredAfterThe10th = dateService.isRegistrationDateAfter10thOfTheMonth(LocalDate.now())
+
+              val registrationDate = dateService.getRegistrationDate()
+              val isRegisteredAfterThe10th = dateService.isRegistrationDateAfter10thOfTheMonth(registrationDate)
+
               val isStartDateInFirstQuarter = dateService.isStartDateInFirstQuarter(startDate)
               val isStartDateAfterFirstQuarter = dateService.isStartDateAfterFirstQuarter(startDate)
               Ok(view(mode, startDate.format(dateFormatter), isRegisteredAfterThe10th, isStartDateInFirstQuarter, isStartDateAfterFirstQuarter))

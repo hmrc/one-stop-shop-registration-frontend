@@ -29,6 +29,64 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   private def getStubClock(date: LocalDate): Clock =
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
 
+  "getRegistrationDate" - {
+    "must return LocalDate.now" in {
+      val stubClock = getStubClock(LocalDate.now())
+      val service   = new DateService(stubClock)
+
+      service.getRegistrationDate() mustBe LocalDate.now()
+    }
+  }
+
+  "shouldStartDateBeInCurrentQuarter" - {
+
+    "when user registers AFTER 10th of month" - {
+
+      val registrationDate = LocalDate.now().withDayOfMonth(11)
+
+      "must return true when first sale BETWEEN 1st of same month and registration date" in {
+        val firstEligibleSaleDate = LocalDate.now().withDayOfMonth(1)
+
+        val stubClock = getStubClock(LocalDate.now())
+        val dateService = new DateService(stubClock)
+
+        dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSaleDate) mustBe true
+      }
+
+      "must return false when first sale BEFORE 01st of same month" in {
+        val firstEligibleSaleDate = registrationDate.minusMonths(1)
+
+        val stubClock = getStubClock(LocalDate.now())
+        val dateService = new DateService(stubClock)
+
+        dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSaleDate) mustBe false
+      }
+    }
+
+    "when user registers BEFORE 11th of month" - {
+
+      val registrationDate = LocalDate.now().withDayOfMonth(1)
+
+      "must return true when first sale AFTER 1st of previous month" in {
+        val firstEligibleSaleDate = registrationDate.minusDays(1)
+
+        val stubClock = getStubClock(LocalDate.now())
+        val dateService = new DateService(stubClock)
+
+        dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSaleDate) mustBe true
+      }
+
+      "must return false when first sale BEFORE 1st of previous month" in {
+        val firstEligibleSaleDate = registrationDate.minusMonths(2)
+
+        val stubClock = getStubClock(LocalDate.now())
+        val dateService = new DateService(stubClock)
+
+        dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSaleDate) mustBe false
+      }
+    }
+  }
+
   ".startOfNextQuarter" - {
 
     "must be 1st January of the next year for any date in October, November or December" in {
@@ -38,7 +96,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 1, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 1, 1)
       }
     }
 
@@ -49,7 +107,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 4, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 4, 1)
       }
     }
 
@@ -60,7 +118,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 7, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 7, 1)
       }
     }
 
@@ -71,7 +129,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 10, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 10, 1)
       }
     }
   }
@@ -297,7 +355,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(today)
             val service = new DateService(stubClock)
 
-            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextQuarter
+            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextQuarter()
         }
       }
 
@@ -313,7 +371,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(today)
             val service = new DateService(stubClock)
 
-            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextQuarter
+            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextQuarter()
         }
       }
     }

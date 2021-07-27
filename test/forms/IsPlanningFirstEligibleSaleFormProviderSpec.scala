@@ -19,21 +19,27 @@ package forms
 import base.SpecBase
 import formats.Format.dateFormatter
 import forms.behaviours.BooleanFieldBehaviours
+import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.mock
 import play.api.data.FormError
 import services.DateService
 
+import java.time.LocalDate
+
 class IsPlanningFirstEligibleSaleFormProviderSpec extends SpecBase with BooleanFieldBehaviours {
 
-  private val dateService = new DateService(stubClockAtArbitraryDate)
-  private val dateFormatted = dateService.startOfNextQuarter.format(dateFormatter)
+  private val dateService = mock[DateService]
+  private val date = LocalDate.now()
+  private val dateFormatted = date.format(dateFormatter)
 
   val requiredKey = "isPlanningFirstEligibleSale.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new IsPlanningFirstEligibleSaleFormProvider(dateService)()
-
   ".value" - {
 
+    when(dateService.startOfNextQuarter()).thenReturn(date)
+
+    val form = new IsPlanningFirstEligibleSaleFormProvider(dateService)()
     val fieldName = "value"
 
     behave like booleanField(

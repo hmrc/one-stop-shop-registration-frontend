@@ -24,7 +24,11 @@ import javax.inject.Inject
 
 class DateService @Inject()(clock: Clock) {
 
-  def startOfNextQuarter: LocalDate = {
+  def getRegistrationDate() = {
+    LocalDate.now()
+  }
+
+  def startOfNextQuarter(): LocalDate = {
     val today                    = LocalDate.now(clock)
     val lastMonthOfQuarter       = (((today.getMonthValue - 1) / 3) + 1) * 3
     val dateInLastMonthOfQuarter = today.withMonth(lastMonthOfQuarter)
@@ -36,18 +40,18 @@ class DateService @Inject()(clock: Clock) {
   def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
     val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
     if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {
-      startOfNextQuarter
+      startOfNextQuarter()
     } else {
       dateOfFirstSale
     }
   }
 
   def lastDayOfCalendarQuarter: LocalDate = {
-    startOfNextQuarter.minusDays(1)
+    startOfNextQuarter().minusDays(1)
   }
 
   def lastDayOfMonthAfterCalendarQuarter: LocalDate = {
-    startOfNextQuarter.withDayOfMonth(startOfNextQuarter.lengthOfMonth)
+    startOfNextQuarter().withDayOfMonth(startOfNextQuarter().lengthOfMonth)
   }
 
   def isStartDateAfterThe10th(startDate: LocalDate): Boolean = {
@@ -56,6 +60,19 @@ class DateService @Inject()(clock: Clock) {
 
   def isRegistrationDateAfter10thOfTheMonth(registrationDate: LocalDate): Boolean = {
     registrationDate.getDayOfMonth > 10
+  }
+
+  def shouldStartDateBeInCurrentQuarter(
+    registrationDate: LocalDate,
+    firstEligibleSaleDate: LocalDate
+  ): Boolean = {
+    if(registrationDate.getDayOfMonth > 10) {
+      firstEligibleSaleDate.isAfter(registrationDate.withDayOfMonth(1).minusDays(1)) &&
+      firstEligibleSaleDate.isBefore(registrationDate.plusDays(1))
+    } else {
+      val firstOfPreviousMonth = registrationDate.minusMonths(1).withDayOfMonth(1)
+      firstEligibleSaleDate.isAfter(firstOfPreviousMonth)
+    }
   }
 
   def isStartDateInFirstQuarter(startDate: LocalDate): Boolean = {
@@ -76,7 +93,7 @@ class DateService @Inject()(clock: Clock) {
     } else if (quarterStartMonths.contains(today.getMonth) && today.getDayOfMonth < 11) {
       today.minusMonths(1).withDayOfMonth(1)
     } else {
-      startOfNextQuarter.minusMonths(3)
+      startOfNextQuarter().minusMonths(3)
     }
   }
 }
