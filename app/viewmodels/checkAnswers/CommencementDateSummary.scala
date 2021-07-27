@@ -34,12 +34,14 @@ class CommencementDateSummary @Inject()(dateService: DateService) {
     answers.get(DateOfFirstSalePage).isEmpty match {
       case true =>
         val startDate = LocalDate.now()
-
-            Some(SummaryListRowViewModel(
+        answers.get(IsPlanningFirstEligibleSalePage).map {
+          _ =>
+            SummaryListRowViewModel(
               key = "commencementDate.checkYourAnswersLabel",
               value = ValueViewModel(startDate.format(dateFormatter)),
               actions = Seq.empty
-            ))
+            )
+        }
 
       case _ =>
         answers.get(DateOfFirstSalePage).map {

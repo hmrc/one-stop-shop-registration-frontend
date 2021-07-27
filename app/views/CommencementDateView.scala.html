@@ -4,24 +4,25 @@
         govukButton: GovukButton
 )
 
-@(mode: Mode, formattedDate: String, isRegisteredAfterThe10th: Boolean, isStartDateInFirstQuarter: Boolean, isStartDateAfterFirstQuarter: Boolean)(implicit request: Request[_], messages: Messages)
+@(mode: Mode, formattedDate: String, isRegisteredAfterThe10th: Boolean, isStartDateInCurrentQuarter: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("commencementDate.heading")</h1>
 
-    <p class="govuk-body">@messages("commencementDate.p1", formattedDate)</p>
+    @if(isStartDateInCurrentQuarter) {
+        <p class="govuk-body">@messages("commencementDate.p1", formattedDate)</p>
+    }
 
     @if(isRegisteredAfterThe10th) {
         <p class="govuk-body">@messages("commencementDate.youRegisteredAfterThe10th")</p>
     }
 
-    @if(isStartDateInFirstQuarter) {
-        <p class="govuk-body">@messages("commencementDate.Between1stJuly30Sept")</p>
+    @if(isStartDateInCurrentQuarter) {
+        <p class="govuk-body">@messages("commencementDate.CurrentQuarter")</p>
     }
-
-    @if(isStartDateAfterFirstQuarter) {
-        <p class="govuk-body">@messages("commencementDate.After1stOct")</p>
+    @if(!isStartDateInCurrentQuarter) {
+        <p class="govuk-body">@messages("commencementDate.NextQuarter")</p>
     }
 
     @formHelper(action = routes.CommencementDateController.onSubmit(mode), 'autoComplete -> "off") {

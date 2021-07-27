@@ -52,7 +52,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, Some(firstDayOfNextCalendarQuarter.format(dateFormatter))))
+      Ok(view(preparedForm, mode, firstDayOfNextCalendarQuarter.format(dateFormatter)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
@@ -62,7 +62,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, Some(firstDayOfNextCalendarQuarter.format(dateFormatter))))),
+          Future.successful(BadRequest(view(formWithErrors, mode, firstDayOfNextCalendarQuarter.format(dateFormatter)))),
 
         value =>
           for {

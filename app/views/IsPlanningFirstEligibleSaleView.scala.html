@@ -6,7 +6,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, formattedDate: Option[String])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, formattedDate: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("isPlanningFirstEligibleSale.title", formattedDate))) {
 

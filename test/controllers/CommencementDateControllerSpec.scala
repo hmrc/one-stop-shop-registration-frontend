@@ -21,7 +21,7 @@ import formats.Format.dateFormatter
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
-import org.mockito.Mockito
+import org.mockito.Mockito.reset
 import org.mockito.MockitoSugar.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,36 +36,33 @@ import java.time.LocalDate
 
 class CommencementDateControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  val dateService = mock[DateService]
-  when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+ private val dateService: DateService = mock[DateService]
+
+  override def beforeEach(): Unit = {
+    reset(dateService)
+  }
 
   "CommencementDate Controller" - {
 
     "when the scheme has started" - {
-
-      //1. user registers AFTER 10th of month AND enters first sale BETWEEN 01st of same month and registration date - returns user start date
-      //2. user registers AFTER 10th of month AND first sale BEFORE 01st of same month - return first date of next quarter
-      //3. user registers BETWEEN 01st and 10th of month AND first sale AFTER 01st of previous month - returns user start date
-      //4. user registers BETWEEN 01st and 10th of month AND first sale BEFORE 01st of previous month - return first date of next quarter
 
       "must return OK and the correct view for a GET" - {
 
         "when user registers after the 10th of the month" - {
 
           val registrationDate = LocalDate.now().withDayOfMonth(11)
-          when(dateService.getRegistrationDate()).thenReturn(registrationDate)
 
           "and the user enters a first sales date that is between 1st of the same month and the registration date" in {
-            val firstEligibleSale = LocalDate.now().withDayOfMonth(1)
 
+            val firstEligibleSale = registrationDate.withDayOfMonth(1)
             val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
             val answers = answer1.set(DateOfFirstSalePage, firstEligibleSale).success.value
 
-            when(dateService.startDateBasedOnFirstSale(any())) thenReturn firstEligibleSale
+            when(dateService.getRegistrationDate()).thenReturn(registrationDate)
+            when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+            when(dateService.startDateBasedOnFirstSale(eqTo(firstEligibleSale))) thenReturn firstEligibleSale
             when(dateService.isRegistrationDateAfter10thOfTheMonth(eqTo(registrationDate))) thenReturn true
-
-            when(dateService.isStartDateInFirstQuarter(any())) thenReturn true
-            when(dateService.isStartDateAfterFirstQuarter(any())) thenReturn false
+            when(dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSale)) thenReturn true
 
             val application =
               applicationBuilder(userAnswers = Some(answers))
@@ -74,33 +71,127 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
 
             running(application) {
               val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
-              val result  = route(application, request).value
-              val view    = application.injector.instanceOf[CommencementDateView]
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[CommencementDateView]
 
               status(result) mustEqual OK
               contentAsString(result) mustEqual view(
                 NormalMode,
                 firstEligibleSale.format(dateFormatter),
                 true,
-                true,
-                false
+                true
               )(request, messages(application)).toString
             }
           }
 
           "and the user enters a first sales date that is before 1st of the same month" in {
+            val firstEligibleSale = LocalDate.now().withDayOfMonth(1).minusDays(1)
 
+            val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+            val answers = answer1.set(DateOfFirstSalePage, firstEligibleSale).success.value
+
+            when(dateService.getRegistrationDate()).thenReturn(registrationDate)
+            when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+            when(dateService.startDateBasedOnFirstSale(eqTo(firstEligibleSale))) thenReturn firstEligibleSale
+            when(dateService.isRegistrationDateAfter10thOfTheMonth(eqTo(registrationDate))) thenReturn true
+            when(dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSale)) thenReturn false
+
+            val application =
+              applicationBuilder(userAnswers = Some(answers))
+                .overrides(bind[DateService].toInstance(dateService))
+                .build()
+
+            running(application) {
+              val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[CommencementDateView]
+
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(
+                NormalMode,
+                firstEligibleSale.format(dateFormatter),
+                true,
+                false
+              )(request, messages(application)).toString
+            }
           }
         }
 
         "when user registers between the 1st and 10th of the month" - {
 
-          "and the user enters a first sales date that is after the 1st of the previous month" in {
+          val registrationDate = LocalDate.now().withDayOfMonth(10)
+          when(dateService.getRegistrationDate()).thenReturn(registrationDate)
 
+          "and the user enters a first sales date that is after the 1st of the previous month" in {
+            val firstEligibleSale = registrationDate.minusMonths(1)
+
+            val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+            val answers = answer1.set(DateOfFirstSalePage, firstEligibleSale).success.value
+
+            when(dateService.getRegistrationDate()).thenReturn(registrationDate)
+            when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+            when(dateService.startDateBasedOnFirstSale(firstEligibleSale)) thenReturn firstEligibleSale
+            when(dateService.isRegistrationDateAfter10thOfTheMonth(eqTo(registrationDate))) thenReturn false
+            when(dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSale)) thenReturn true
+
+            val application =
+              applicationBuilder(userAnswers = Some(answers))
+                .overrides(bind[DateService].toInstance(dateService))
+                .build()
+
+            running(application) {
+              val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[CommencementDateView]
+
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(
+                NormalMode,
+                firstEligibleSale.format(dateFormatter),
+                false,
+                true
+              )(request, messages(application)).toString
+            }
           }
 
           "and the user enters a first sales date that is before the 1st of the previous month" in {
+            val firstEligibleSale = registrationDate.minusMonths(1).minusDays(11)
 
+            val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+            val answers = answer1.set(DateOfFirstSalePage, firstEligibleSale).success.value
+
+            when(dateService.getRegistrationDate()).thenReturn(registrationDate)
+            when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+            when(dateService.startDateBasedOnFirstSale(firstEligibleSale)) thenReturn firstEligibleSale
+            when(dateService.isRegistrationDateAfter10thOfTheMonth(eqTo(registrationDate))) thenReturn false
+            when(dateService.shouldStartDateBeInCurrentQuarter(registrationDate, firstEligibleSale)) thenReturn false
+
+            val application =
+              applicationBuilder(userAnswers = Some(answers))
+                .overrides(bind[DateService].toInstance(dateService))
+                .build()
+
+            running(application) {
+              val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[CommencementDateView]
+
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(
+                NormalMode,
+                firstEligibleSale.format(dateFormatter),
+                false,
+                false
+              )(request, messages(application)).toString
+            }
           }
         }
       }
@@ -128,7 +219,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           val view = application.injector.instanceOf[CommencementDateView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(NormalMode, arbitraryStartDate.format(dateFormatter),false, false, false)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(NormalMode, arbitraryStartDate.format(dateFormatter),false, false)(request, messages(application)).toString
         }
       }
 
@@ -149,7 +240,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           val view = application.injector.instanceOf[CommencementDateView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(NormalMode, LocalDate.now().format(dateFormatter) ,false, false, false)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(NormalMode, LocalDate.now().format(dateFormatter) ,false, false)(request, messages(application)).toString
         }
       }
     }
