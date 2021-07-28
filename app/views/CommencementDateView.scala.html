@@ -4,25 +4,22 @@
         govukButton: GovukButton
 )
 
-@(mode: Mode, formattedDate: String, isRegisteredAfterThe10th: Boolean, isStartDateInCurrentQuarter: Boolean)(implicit request: Request[_], messages: Messages)
+@(mode: Mode, formattedDate: String, isDateInCurrentQuarter: Boolean, startOfCurrentQuarter: Option[String], endOfCurrentQuarter: Option[String], startOfNextQuarter: Option[String])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("commencementDate.heading")</h1>
 
-    @if(isStartDateInCurrentQuarter) {
+    @if(isDateInCurrentQuarter) {
         <p class="govuk-body">@messages("commencementDate.p1", formattedDate)</p>
-    }
-
-    @if(isRegisteredAfterThe10th) {
+    } else {
         <p class="govuk-body">@messages("commencementDate.youRegisteredAfterThe10th")</p>
-    }
 
-    @if(isStartDateInCurrentQuarter) {
+        <h2 class="govuk-heading-m">@messages("commencementDate.CurrentQuarter.heading", startOfCurrentQuarter.getOrElse(""), endOfCurrentQuarter.getOrElse(""))</h2>
         <p class="govuk-body">@messages("commencementDate.CurrentQuarter")</p>
-    }
-    @if(!isStartDateInCurrentQuarter) {
-        <p class="govuk-body">@messages("commencementDate.NextQuarter")</p>
+
+        <h2 class="govuk-heading-m">@messages("commencementDate.nextQuarter.heading", startOfNextQuarter.getOrElse(""))</h2>
+        <p class="govuk-body">@messages("commencementDate.NextQuarter", startOfNextQuarter.getOrElse(""))</p>
     }
 
     @formHelper(action = routes.CommencementDateController.onSubmit(mode), 'autoComplete -> "off") {

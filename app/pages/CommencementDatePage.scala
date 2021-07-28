@@ -19,9 +19,16 @@ package pages
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{NormalMode, UserAnswers}
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object CommencementDatePage extends Page {
+import java.time.LocalDate
+
+case object CommencementDatePage extends QuestionPage[LocalDate] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "commencementDate"
 
   override def navigateInNormalMode(answers: UserAnswers): Call =
     euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)
