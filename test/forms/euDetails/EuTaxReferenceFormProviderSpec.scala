@@ -27,7 +27,7 @@ class EuTaxReferenceFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "euTaxReference.error.required"
   val lengthKey = "euTaxReference.error.length"
   val formatKey = "euTaxReference.error.format"
-  val maxLength = 50
+  val maxLength = 20
   val minLength = 1
 
   val country: Country = arbitrary[Country].sample.value
