@@ -36,7 +36,7 @@ import scala.concurrent.Future
 class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSugar {
 
   private val dateService = new DateService(stubClockAtArbitraryDate)
-  private val dateFormatted = dateService.startOfNextQuarter().format(dateFormatter)
+  private val dateFormatted = dateService.startOfNextQuarter.format(dateFormatter)
 
   private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService)
   private val form = formProvider()

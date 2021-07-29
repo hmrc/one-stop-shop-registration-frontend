@@ -71,9 +71,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             true,
             startDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
-            dateService.isStartDateAfterThe10th(startDate),
-            dateService.isStartDateInFirstQuarter(startDate)
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }
@@ -101,9 +99,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             false,
             startDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
-            dateService.isStartDateAfterThe10th(startDate),
-            dateService.isStartDateInFirstQuarter(startDate)
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }

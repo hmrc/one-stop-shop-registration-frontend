@@ -75,10 +75,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
               config.feedbackUrl(request),
               registration.commencementDate.format(dateFormatter),
               lastDayOfCalendarQuarter.format(dateFormatter),
-              lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
-              false,
-              false,
-              false
+              lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
             )(request, messages(application)).toString
 
           contentAsString(result) mustEqual expectedContent
@@ -88,22 +85,22 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
     "when the connector does not find an existing registration" - {
 
-      "must redirect the user to the start of the service" in {}
+      "must redirect the user to the start of the service" in {
+        when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+            .build()
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[RegistrationConnector].toInstance(mockConnector))
-          .build()
+        running(application) {
+          val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
 
-      running(application) {
-        val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
+          val result = route(application, request).value
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+        }
       }
     }
   }

@@ -37,7 +37,7 @@ class IsPlanningFirstEligibleSaleFormProviderSpec extends SpecBase with BooleanF
 
   ".value" - {
 
-    when(dateService.startOfNextQuarter()).thenReturn(date)
+    when(dateService.startOfNextQuarter).thenReturn(date)
 
     val form = new IsPlanningFirstEligibleSaleFormProvider(dateService)()
     val fieldName = "value"

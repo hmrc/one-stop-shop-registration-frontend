@@ -2,11 +2,16 @@
 
 @this(layout: templates.Layout, govukButton: GovukButton)
 
-@(companyName: String, vrn: Vrn, feedbackLink: String, startDate: String, lastDayOfCalendarQuarter: String,
-  lastDayOfMonthAfterCalendarQuarter: String, isStartDateAfterThe10th: Boolean, isStartDateInFirstQuarter: Boolean,
-  isStartDateAfterFirstQuarter: Boolean)(implicit request: Request[_], messages: Messages)
+@(
+    companyName: String,
+    vrn: Vrn,
+    feedbackLink: String,
+    startDate: String,
+    lastDayOfCalendarQuarter: String,
+    lastDayOfMonthAfterCalendarQuarter: String
+)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("alreadyRegistered.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("alreadyRegistered.title", companyName)), showBackLink = false) {
 
     <div class="grid-row column-two-thirds">
 
@@ -17,18 +22,6 @@
         <p class="govuk-body">@messages("alreadyRegistered.confirmation")</p>
 
         <p class="govuk-body">@messages("alreadyRegistered.reference", vrn)</p>
-
-        if(isStartDateAfterThe10th) {
-            <p class="govuk-body">@messages("alreadyRegistered.youRegisteredAfterThe10th")</p>
-        }
-
-        if(isStartDateInFirstQuarter) {
-            <p class="govuk-body">@messages("alreadyRegistered.Between1stJuly30Sept")</p>
-        }
-
-        if(isStartDateAfterFirstQuarter) {
-            <p class="govuk-body">@messages("alreadyRegistered.After1stOct")</p>
-        }
 
         <p class="govuk-body">@messages("alreadyRegistered.chargeVATRateOfEUCountry")</p>
 

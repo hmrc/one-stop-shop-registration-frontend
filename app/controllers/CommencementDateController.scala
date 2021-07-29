@@ -47,9 +47,7 @@ class CommencementDateController @Inject()(
           request.userAnswers.get(DateOfFirstSalePage).map {
             date =>
               val commencementDate = dateService.startDateBasedOnFirstSale(date)
-
               val isDateInCurrentQuarter = date.isEqual(commencementDate)
-
               val startOfCurrentQuarter = dateService.startOfCurrentQuarter
               val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
               val startOfNextQuarter = dateService.startOfNextQuarter

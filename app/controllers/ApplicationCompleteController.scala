@@ -56,9 +56,7 @@ class ApplicationCompleteController @Inject()(
           showEmailConfirmation,
           startDate.format(dateFormatter),
           dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-          dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
-          dateService.isStartDateAfterThe10th(startDate),
-          dateService.isStartDateInFirstQuarter(startDate)
+          dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
         ))
       }
     }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))

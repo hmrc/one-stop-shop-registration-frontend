@@ -405,6 +405,7 @@ hasFixedEstablishment.change.hidden = fixed establishment
 checkEuVatDetailsAnswers.title = Check your answers for {0}
 checkEuVatDetailsAnswers.heading = Check your answers for {0}
 
+alreadyRegistered.title = {0} is already registered
 alreadyRegistered.heading = {0} is already registered
 alreadyRegistered.confirmation = Check your email for the confirmation.
 alreadyRegistered.reference = Your reference number is your UK VAT registration number, {0}.
