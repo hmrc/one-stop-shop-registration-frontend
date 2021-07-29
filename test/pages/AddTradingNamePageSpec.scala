@@ -62,7 +62,7 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
 
             AddTradingNamePage.navigate(NormalMode, answers)
-              .mustEqual(routes.DateOfFirstSaleController.onPageLoad(NormalMode))
+              .mustEqual(routes.HasMadeSalesController.onPageLoad(NormalMode))
           }
         }
       }
