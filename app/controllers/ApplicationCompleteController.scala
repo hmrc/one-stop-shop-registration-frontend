@@ -63,6 +63,9 @@ class ApplicationCompleteController @Inject()(
   }
 
   private def getStartDate(answers: UserAnswers): Option[LocalDate] =
-    answers.get(DateOfFirstSalePage).map(dateService.startDateBasedOnFirstSale)
+    answers.get(DateOfFirstSalePage) match {
+      case Some(startDate) => Some(dateService.startDateBasedOnFirstSale(startDate))
+      case None            => Some(LocalDate.now())
+    }
 
 }

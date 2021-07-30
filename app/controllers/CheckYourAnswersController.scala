@@ -108,7 +108,9 @@ class CheckYourAnswersController @Inject()(
                     for {
                       updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
                       _              <- cc.sessionRepository.set(updatedAnswers)
-                    } yield Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+                    } yield {
+                      Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+                    }
               }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))

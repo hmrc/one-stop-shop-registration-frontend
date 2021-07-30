@@ -20,13 +20,15 @@ import base.SpecBase
 import config.FrontendAppConfig
 import formats.Format.dateFormatter
 import models.UserAnswers
-import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
+import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
 import services.DateService
 import views.html.ApplicationCompleteView
+
+import java.time.LocalDate
 
 
 class ApplicationCompleteControllerSpec extends SpecBase {
@@ -97,6 +99,39 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vrn,
             config.feedbackUrl(request),
             false,
+            commencementDate.format(dateFormatter),
+            lastDayOfCalendarQuarter.format(dateFormatter),
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view when there is no Date Of First Sale and Is Planned First Eligible Sale is true" in {
+
+        val emailAddress = "test@test.com"
+        val answer = userAnswers.copy()
+          .remove(DateOfFirstSalePage).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(IsPlanningFirstEligibleSalePage, true).success.value
+          .set(EmailConfirmationQuery, true).success.value
+        val application = applicationBuilder(userAnswers = Some(answer)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val dateService = application.injector.instanceOf[DateService]
+          val commencementDate = LocalDate.now()
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+
+          val view = application.injector.instanceOf[ApplicationCompleteView]
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            emailAddress,
+            vrn,
+            config.feedbackUrl(request),
+            true,
             commencementDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
             lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
