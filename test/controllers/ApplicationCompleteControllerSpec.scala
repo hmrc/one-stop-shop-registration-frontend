@@ -59,7 +59,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
           val dateService = application.injector.instanceOf[DateService]
-          val startDate = dateService.startDateBasedOnFirstSale(arbitraryDate)
+          val commencementDate = dateService.startDateBasedOnFirstSale(arbitraryDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
           val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
@@ -69,7 +69,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vrn,
             config.feedbackUrl(request),
             true,
-            startDate.format(dateFormatter),
+            commencementDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
             lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
           )(request, messages(application)).toString
@@ -86,7 +86,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val dateService = application.injector.instanceOf[DateService]
-          val startDate = dateService.startDateBasedOnFirstSale(arbitraryDate)
+          val commencementDate = dateService.startDateBasedOnFirstSale(arbitraryDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
           val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
 
@@ -97,7 +97,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vrn,
             config.feedbackUrl(request),
             false,
-            startDate.format(dateFormatter),
+            commencementDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
             lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
           )(request, messages(application)).toString

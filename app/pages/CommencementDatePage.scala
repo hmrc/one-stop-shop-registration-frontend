@@ -24,11 +24,7 @@ import play.api.mvc.Call
 
 import java.time.LocalDate
 
-case object CommencementDatePage extends QuestionPage[LocalDate] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "commencementDate"
+case object CommencementDatePage extends Page {
 
   override def navigateInNormalMode(answers: UserAnswers): Call =
     euRoutes.TaxRegisteredInEuController.onPageLoad(NormalMode)

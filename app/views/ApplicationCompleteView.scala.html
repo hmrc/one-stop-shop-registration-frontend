@@ -26,7 +26,7 @@
     vrn: Vrn,
     feedbackLink: String,
     showEmailConfirmation: Boolean,
-    startDate: String,
+    commencementDate: String,
     lastDayOfCalendarQuarter: String,
     lastDayOfMonthAfterCalendarQuarter: String
 )(implicit request: Request[_], messages: Messages)
@@ -54,7 +54,7 @@
             </ul>
         </p>
 
-        <p class="govuk-body">@messages("applicationComplete.startDate", startDate, lastDayOfCalendarQuarter)</p>
+        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, lastDayOfCalendarQuarter)</p>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
 

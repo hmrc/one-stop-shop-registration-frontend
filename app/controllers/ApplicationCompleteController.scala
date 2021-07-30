@@ -47,14 +47,14 @@ class ApplicationCompleteController @Inject()(
       for {
         contactDetails        <- request.userAnswers.get(BusinessContactDetailsPage)
         showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
-        startDate             <- getStartDate(request.userAnswers)
+        commencementDate      <- getStartDate(request.userAnswers)
       } yield {
         Ok(view(
           HtmlFormat.escape(contactDetails.emailAddress).toString,
           request.vrn,
           frontendAppConfig.feedbackUrl,
           showEmailConfirmation,
-          startDate.format(dateFormatter),
+          commencementDate.format(dateFormatter),
           dateService.lastDayOfCalendarQuarter.format(dateFormatter),
           dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
         ))

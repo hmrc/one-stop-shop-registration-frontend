@@ -54,19 +54,6 @@ class DateService @Inject()(clock: Clock) {
     startOfNextQuarter.withDayOfMonth(startOfNextQuarter.lengthOfMonth)
   }
 
-  def isStartDateAfterThe10th(startDate: LocalDate): Boolean = {
-    startDate.getDayOfMonth > 10
-  }
-
-  def isStartDateInFirstQuarter(startDate: LocalDate): Boolean = {
-    startDate.isAfter(LocalDate.of(2021, 6, 30)) &&
-    startDate.isBefore(LocalDate.of(2021, 10, 1))
-  }
-
-  def isStartDateAfterFirstQuarter(startDate: LocalDate): Boolean = {
-    startDate.isAfter(LocalDate.of(2021, 9, 30))
-  }
-
   def earliestSaleAllowed: LocalDate = {
     val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
     val today = LocalDate.now(clock)
