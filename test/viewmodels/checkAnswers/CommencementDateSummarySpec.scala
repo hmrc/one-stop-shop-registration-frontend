@@ -17,7 +17,6 @@
 package viewmodels.checkAnswers
 
 import base.SpecBase
-import config.Constants
 import formats.Format.dateFormatter
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DateOfFirstSalePage
@@ -25,8 +24,6 @@ import play.api.test.Helpers._
 import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.govuk.summarylist._
-
-import java.time.{Clock, Instant, LocalDate, ZoneId}
 
 class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 

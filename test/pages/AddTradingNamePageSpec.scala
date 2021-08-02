@@ -19,12 +19,9 @@ package pages
 import base.SpecBase
 import controllers.routes
 import models.{CheckMode, Index, NormalMode}
-import org.mockito.Mockito
-import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
-import services.FeatureFlagService
 
 class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSugar with BeforeAndAfterEach {
 
