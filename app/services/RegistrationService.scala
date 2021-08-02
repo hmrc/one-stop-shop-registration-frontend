@@ -44,7 +44,6 @@ class RegistrationService @Inject()(dateService: DateService) {
       getBankDetails(answers),
       getOnlineMarketplace(answers),
       getNiPresence(answers)
-//      getDateOfFirstSale(answers)
     ).mapN(
       (
         name,
@@ -58,7 +57,6 @@ class RegistrationService @Inject()(dateService: DateService) {
         bankDetails,
         isOnlineMarketplace,
         niPresence
-//        dateOfFirstSale
       ) =>
         Registration(
           vrn                   = vrn,
@@ -72,8 +70,8 @@ class RegistrationService @Inject()(dateService: DateService) {
           previousRegistrations = previousRegistrations,
           bankDetails           = bankDetails,
           isOnlineMarketplace   = isOnlineMarketplace,
-          niPresence            = niPresence
-//          dateOfFirstSale       = dateOfFirstSale
+          niPresence            = niPresence,
+          dateOfFirstSale       = answers.get(DateOfFirstSalePage)
         )
     )
 
@@ -166,7 +164,6 @@ class RegistrationService @Inject()(dateService: DateService) {
         case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
         case None            => DataMissingError(DateOfFirstSalePage).invalidNec
     }
-
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
     answers.get(BusinessContactDetailsPage) match {
@@ -361,6 +358,4 @@ class RegistrationService @Inject()(dateService: DateService) {
       case None =>
         None.validNec
     }
-
-//  private def getDateOfFirstSale(answers: UserAnswers)
 }
