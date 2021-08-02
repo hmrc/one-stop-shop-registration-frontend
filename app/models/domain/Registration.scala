@@ -35,6 +35,7 @@ final case class Registration(
                                bankDetails: BankDetails,
                                isOnlineMarketplace: Boolean,
                                niPresence: Option[NiPresence]
+//                               dateOfFirstSale: Option[LocalDate]
                              )
 
 object Registration {

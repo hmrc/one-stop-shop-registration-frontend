@@ -241,6 +241,38 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         result mustEqual Valid(expectedRegistration)
       }
+
+      "when Date of First Sale is populated and user answers Yes to the Has Made Sales" in {
+        val userAnswers =
+          answers
+            .set(HasMadeSalesPage, true).success.value
+
+        val expectedRegistration = RegistrationData.registration.copy(
+          vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+        )
+
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Valid(expectedRegistration)
+
+      }
+
+      "when Date of First Sale is not populated and user answers No to the Has Made Sales" in {
+        val userAnswers =
+          answers
+            .set(HasMadeSalesPage, false).success.value
+
+        val expectedRegistration = RegistrationData.registration.copy(
+          vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+        )
+
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Valid(expectedRegistration)
+
+      }
     }
 
     "must return Invalid" - {

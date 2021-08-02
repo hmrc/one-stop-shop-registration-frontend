@@ -37,13 +37,14 @@ class RegistrationService @Inject()(dateService: DateService) {
       getTradingNames(answers),
       getVatDetails(answers),
       getEuTaxRegistrations(answers),
-      getStartDate(answers),
+      getCommencementDate(answers),
       getContactDetails(answers),
       getWebsites(answers),
       getPreviousRegistrations(answers),
       getBankDetails(answers),
       getOnlineMarketplace(answers),
       getNiPresence(answers)
+//      getDateOfFirstSale(answers)
     ).mapN(
       (
         name,
@@ -57,6 +58,7 @@ class RegistrationService @Inject()(dateService: DateService) {
         bankDetails,
         isOnlineMarketplace,
         niPresence
+//        dateOfFirstSale
       ) =>
         Registration(
           vrn                   = vrn,
@@ -71,6 +73,7 @@ class RegistrationService @Inject()(dateService: DateService) {
           bankDetails           = bankDetails,
           isOnlineMarketplace   = isOnlineMarketplace,
           niPresence            = niPresence
+//          dateOfFirstSale       = dateOfFirstSale
         )
     )
 
@@ -158,7 +161,7 @@ class RegistrationService @Inject()(dateService: DateService) {
       getVatDetailSource(answers)
     ).mapN(VatDetails.apply)
 
-  private def getStartDate(answers: UserAnswers): ValidationResult[LocalDate] =
+  private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
     answers.get(DateOfFirstSalePage) match {
         case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
         case None            => DataMissingError(DateOfFirstSalePage).invalidNec
@@ -358,4 +361,6 @@ class RegistrationService @Inject()(dateService: DateService) {
       case None =>
         None.validNec
     }
+
+//  private def getDateOfFirstSale(answers: UserAnswers)
 }
