@@ -48,8 +48,8 @@ case class RegistrationAuditModel(
   private val niPresence: JsObject =
     if (registration.niPresence.nonEmpty) Json.obj("niPresence" -> registration.niPresence) else Json.obj()
 
-//  private val dateOfFirstSale: JsObject =
-//    if (registration.dateOfFirstSale.nonEmpty) Json.obj("dateOfFirstSale" -> registration.dateOfFirstSale) else Json.obj()
+  private val dateOfFirstSale: JsObject =
+    if (registration.dateOfFirstSale.nonEmpty) Json.obj("dateOfFirstSale" -> registration.dateOfFirstSale) else Json.obj()
 
   private val registrationDetail: JsValue = Json.obj(
     "vatRegistrationNumber" -> registration.vrn,
@@ -63,8 +63,8 @@ case class RegistrationAuditModel(
     euRegistrationDetail ++
     websiteDetail ++
     previousRegistrationDetail ++
-    niPresence
-//    dateOfFirstSale
+    niPresence ++
+    dateOfFirstSale
 
   override val detail: JsValue = Json.obj(
     "credId"              -> credId,
