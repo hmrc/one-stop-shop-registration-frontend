@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.Constants
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.Mode
@@ -25,7 +24,7 @@ import pages.{CommencementDatePage, DateOfFirstSalePage}
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{DateService, FeatureFlagService}
+import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
@@ -33,8 +32,7 @@ class CommencementDateController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
                                        view: CommencementDateView,
-                                       dateService: DateService,
-                                       features: FeatureFlagService
+                                       dateService: DateService
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc

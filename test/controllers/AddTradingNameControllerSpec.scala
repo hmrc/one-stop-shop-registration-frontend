@@ -28,7 +28,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
-import services.FeatureFlagService
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
 

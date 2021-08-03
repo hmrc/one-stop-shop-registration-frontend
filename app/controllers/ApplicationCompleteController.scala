@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.{Constants, FrontendAppConfig}
+import config.FrontendAppConfig
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers

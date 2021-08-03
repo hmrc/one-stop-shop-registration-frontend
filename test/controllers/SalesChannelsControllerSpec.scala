@@ -60,7 +60,6 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", SalesChannels.values.head.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(SalesChannelsPage, SalesChannels.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual SalesChannelsPage.navigate(SalesChannels.values.head).url
