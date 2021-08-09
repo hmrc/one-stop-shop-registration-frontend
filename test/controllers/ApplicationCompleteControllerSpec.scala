@@ -73,7 +73,10 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             true,
             commencementDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            dateService.startOfCurrentQuarter.format(dateFormatter),
+            dateService.startOfNextQuarter.format(dateFormatter),
+            dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
           )(request, messages(application)).toString
         }
       }
@@ -101,7 +104,10 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             false,
             commencementDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            dateService.startOfCurrentQuarter.format(dateFormatter),
+            dateService.startOfNextQuarter.format(dateFormatter),
+            dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
           )(request, messages(application)).toString
         }
       }
@@ -109,12 +115,12 @@ class ApplicationCompleteControllerSpec extends SpecBase {
       "must return OK and the correct view when there is no Date Of First Sale and Is Planned First Eligible Sale is true" in {
 
         val emailAddress = "test@test.com"
-        val answer = userAnswers.copy()
-          .remove(DateOfFirstSalePage).success.value
+        val answers = userAnswers.copy()
+          .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, true).success.value
-        val application = applicationBuilder(userAnswers = Some(answer)).build()
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
@@ -124,6 +130,11 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val commencementDate = LocalDate.now()
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
           val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
+          val startOfNextQuarter = dateService.startOfNextQuarter
+          val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
+
+          println("IS DOFS DIFFERENT TO COMMENCEMENT DATE: " + isDOFSDifferentToCommencementDate)
 
           val view = application.injector.instanceOf[ApplicationCompleteView]
           status(result) mustEqual OK
@@ -134,7 +145,90 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             true,
             commencementDate.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            startOfCurrentQuarter.format(dateFormatter),
+            startOfNextQuarter.format(dateFormatter),
+            isDOFSDifferentToCommencementDate
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view when Date Of First Sale is the same to the Commencement Date" in {
+        val emailAddress = "test@test.com"
+        val answers = userAnswers.copy()
+          .set(DateOfFirstSalePage, LocalDate.now()).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(IsPlanningFirstEligibleSalePage, true).success.value
+          .set(EmailConfirmationQuery, true).success.value
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[ApplicationCompleteView]
+          val dateService = application.injector.instanceOf[DateService]
+          val dateOfFirstSale = LocalDate.now()
+          val commencementDate = LocalDate.now()
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
+          val startOfNextQuarter = dateService.startOfNextQuarter
+          val isDOFSDifferentToCommencementDate =
+            dateService.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale), commencementDate)
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            emailAddress,
+            vrn,
+            config.feedbackUrl(request),
+            true,
+            commencementDate.format(dateFormatter),
+            lastDayOfCalendarQuarter.format(dateFormatter),
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            startOfCurrentQuarter.format(dateFormatter),
+            startOfNextQuarter.format(dateFormatter),
+            isDOFSDifferentToCommencementDate
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view when Date Of First Sale is different to the Commencement Date" in {
+        val emailAddress = "test@test.com"
+        val answers = userAnswers.copy()
+          .set(DateOfFirstSalePage, LocalDate.now()).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(IsPlanningFirstEligibleSalePage, true).success.value
+          .set(EmailConfirmationQuery, true).success.value
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[ApplicationCompleteView]
+          val dateService = application.injector.instanceOf[DateService]
+          val dateOfFirstSale = LocalDate.now().minusDays(7)
+          val commencementDate = LocalDate.now()
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
+          val startOfNextQuarter = dateService.startOfNextQuarter
+          val isDOFSDifferentToCommencementDate =
+            dateService.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale),commencementDate)
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            emailAddress,
+            vrn,
+            config.feedbackUrl(request),
+            true,
+            commencementDate.format(dateFormatter),
+            lastDayOfCalendarQuarter.format(dateFormatter),
+            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            startOfCurrentQuarter.format(dateFormatter),
+            startOfNextQuarter.format(dateFormatter),
+            isDOFSDifferentToCommencementDate
           )(request, messages(application)).toString
         }
       }

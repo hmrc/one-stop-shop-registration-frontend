@@ -47,17 +47,23 @@ class ApplicationCompleteController @Inject()(
       for {
         contactDetails        <- request.userAnswers.get(BusinessContactDetailsPage)
         showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
+        dateOfFirstSale       <- request.userAnswers.get(DateOfFirstSalePage)
         commencementDate      <- getStartDate(request.userAnswers)
       } yield {
-        Ok(view(
-          HtmlFormat.escape(contactDetails.emailAddress).toString,
-          request.vrn,
-          frontendAppConfig.feedbackUrl,
-          showEmailConfirmation,
-          commencementDate.format(dateFormatter),
-          dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-          dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
-        ))
+        Ok(
+          view(
+            HtmlFormat.escape(contactDetails.emailAddress).toString,
+            request.vrn,
+            frontendAppConfig.feedbackUrl,
+            showEmailConfirmation,
+            commencementDate.format(dateFormatter),
+            dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
+            dateService.startOfCurrentQuarter.format(dateFormatter),
+            dateService.startOfNextQuarter.format(dateFormatter),
+            dateService.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale), commencementDate)
+          )
+        )
       }
     }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
@@ -67,5 +73,4 @@ class ApplicationCompleteController @Inject()(
       case Some(startDate) => Some(dateService.startDateBasedOnFirstSale(startDate))
       case None            => Some(LocalDate.now())
     }
-
 }

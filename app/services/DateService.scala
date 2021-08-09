@@ -54,6 +54,10 @@ class DateService @Inject()(clock: Clock) {
     startOfNextQuarter.withDayOfMonth(startOfNextQuarter.lengthOfMonth)
   }
 
+  def isDOFSDifferentToCommencementDate(dateOfFirstSale: Option[LocalDate], commencementDate: LocalDate): Boolean = {
+    if(dateOfFirstSale.nonEmpty) dateOfFirstSale.get != commencementDate else false
+  }
+
   def earliestSaleAllowed: LocalDate = {
     val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
     val today = LocalDate.now(clock)

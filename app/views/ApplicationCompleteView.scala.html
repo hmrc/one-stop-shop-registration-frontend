@@ -28,7 +28,10 @@
     showEmailConfirmation: Boolean,
     commencementDate: String,
     lastDayOfCalendarQuarter: String,
-    lastDayOfMonthAfterCalendarQuarter: String
+    lastDayOfMonthAfterCalendarQuarter: String,
+    startOfCurrentQuarter: String,
+    startOfNextQuarter: String,
+    isDOFSDifferentToCommencementDate: Boolean
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title")),  showBackLink = false) {
@@ -44,6 +47,16 @@
         }
 
         <div class="govuk-body">@messages("applicationComplete.reference", vrn.vrn)</div>
+
+        @if(isDOFSDifferentToCommencementDate){
+            <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
+
+            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</div>
+
+            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter")</div>
+
+            <div class="govuk-body">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</div>
+        }
 
         <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
 

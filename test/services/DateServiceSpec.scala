@@ -178,6 +178,39 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
   }
 
+  ".isDateOfFirstSaleDifferentToCommencementDate" - {
+
+    "must return true if the Date Of First Sale is a different date to the Commencement Date" in {
+      val dates: Gen[(LocalDate, LocalDate)] = for {
+        dateOfFirstSale  <- datesBetween(
+          LocalDate.of(2021, 7, 1),
+          LocalDate.now().minusDays(1)
+        )
+        extraMonths <- Gen.choose(2, 12)
+      } yield (dateOfFirstSale, dateOfFirstSale.plusMonths(extraMonths))
+
+      val commencementDate = LocalDate.now()
+
+      forAll(dates) {
+        case (dateOfFirstSale, today) =>
+          val stubClock = getStubClock(today)
+          val service = new DateService(stubClock)
+
+          service.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale), commencementDate) mustEqual true
+      }
+    }
+
+    "must return false if the Date Of First Sale is the same date as the Commencement Date" in {
+      val service = new DateService(getStubClock(LocalDate.now()))
+      service.isDOFSDifferentToCommencementDate(Some(LocalDate.now()), LocalDate.now()) mustEqual false
+    }
+
+    "must return false if the Date Of First Sale is empty" in {
+      val service = new DateService(getStubClock(LocalDate.now()))
+      service.isDOFSDifferentToCommencementDate(None, LocalDate.now()) mustEqual false
+    }
+  }
+
   ".earliestSaleAllowed" - {
 
     "between 1st July 2021 and 30th September 2021" - {
