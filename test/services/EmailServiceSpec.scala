@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.EmailConnector
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.emails.{EmailToSendRequest, RegistrationConfirmationEmailParameters}
+import models.emails.{EmailToSendRequest, RegistrationConfirmationEmailPre10thParameters, RegistrationConfirmationEmailPost10thParameters}
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -34,38 +34,36 @@ import scala.concurrent.Future
 class EmailServiceSpec extends SpecBase {
 
   private val connector = mock[EmailConnector]
-  private val emailService = new EmailService(connector)
   private val dateService = new DateService(stubClockAtArbitraryDate)
+  private val emailService = new EmailService(connector, dateService)
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "EmailService.sendConfirmationEmail" - {
 
-    "call sendConfirmationEmail with the correct parameters" in {
-
+    "call sendConfirmationEmail with oss_registration_confirmation_pre_10th_of_month with the correct parameters" in {
       val maxLengthBusiness = 160
       val maxLengthContactName = 105
-      val validStartDate = LocalDate.of(2010, 1, 1)
-      val validEndDate = LocalDate.now()
+      val commencementDate = LocalDate.of(2010, 1, 1)
       val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
       val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+      val startDate = commencementDate
 
       forAll(
         validVRNs,
         validEmails,
         safeInputsWithMaxLength(maxLengthBusiness),
         safeInputsWithMaxLength(maxLengthContactName),
-        datesBetween(validStartDate, validEndDate),
       ) {
-        (vatNum: String, email: String, businessName: String, contactName: String, startDate: LocalDate) =>
+        (vatNum: String, email: String, businessName: String, contactName: String) =>
           val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
-          val expectedDate = startDate.format(formatter)
+          val expectedDate = commencementDate.format(formatter)
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
 
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
-            "oss_registration_confirmation",
-            RegistrationConfirmationEmailParameters(
+            "oss_registration_confirmation_pre_10th_of_month",
+            RegistrationConfirmationEmailPre10thParameters(
               contactName,
               businessName,
               expectedDate,
@@ -77,7 +75,70 @@ class EmailServiceSpec extends SpecBase {
           when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
 
           emailService.sendConfirmationEmail(
-            contactName, businessName, vatNum, startDate, email, lastDayOfCalendarQuarter, lastDayOfMonthAfterCalendarQuarter
+            contactName,
+            businessName,
+            vatNum,
+            commencementDate,
+            email,
+            Some(startDate)
+          ).futureValue mustBe EMAIL_ACCEPTED
+
+          verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
+      }
+    }
+
+    "call sendConfirmationEmail with oss_registration_confirmation_post_10th_of_month with the correct parameters" in {
+
+      val maxLengthBusiness = 160
+      val maxLengthContactName = 105
+      val commencementDate = LocalDate.of(2010, 1, 1)
+      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+//      val lastDayOfNextCalendarQuarter = Create new method in DateService?
+      val startDate = commencementDate.plusDays(1)
+
+//      "lastDayOfCalendarQuarter"           -> "30 September 2021",
+//      "firstDayOfNextCalendarQuarter"      -> "01 October 2021",
+//      "startDate"                          -> "1 October 2021",
+//      "lastDayOfNextCalendarQuarter"       -> "31 December 2021",
+//      "lastDayOfMonthAfterCalendarQuarter" -> "31 January 2022"
+
+      forAll(
+        validVRNs,
+        validEmails,
+        safeInputsWithMaxLength(maxLengthBusiness),
+        safeInputsWithMaxLength(maxLengthContactName),
+      ) {
+        (vatNum: String, email: String, businessName: String, contactName: String) =>
+          val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+          val expectedDate = commencementDate.format(formatter)
+          val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
+          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
+          val formattedFirstDayOfNextCalendarQuarter = firstDayOfNextCalendarQuarter.format(formatter)
+
+          val expectedEmailToSendRequest = EmailToSendRequest(
+            List(email),
+            "oss_registration_confirmation_post_10th_of_month",
+            RegistrationConfirmationEmailPost10thParameters(
+              contactName,
+              businessName,
+              expectedDate,
+              vatNum,
+              formattedLastDateOfCalendarQuarter,
+              formattedLastDayOfMonthAfterCalendarQuarter,
+              formattedFirstDayOfNextCalendarQuarter),
+          )
+
+          when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
+
+          emailService.sendConfirmationEmail(
+            contactName,
+            businessName,
+            vatNum,
+            commencementDate,
+            email,
+            Some(startDate)
           ).futureValue mustBe EMAIL_ACCEPTED
 
           verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
