@@ -25,7 +25,6 @@ import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.govuk.summarylist._
 
-
 class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 
   ".row" - {

@@ -134,8 +134,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
 
-          println("IS DOFS DIFFERENT TO COMMENCEMENT DATE: " + isDOFSDifferentToCommencementDate)
-
           val view = application.injector.instanceOf[ApplicationCompleteView]
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(

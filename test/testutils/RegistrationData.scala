@@ -64,7 +64,8 @@ object RegistrationData extends Generators with EitherValues {
       ),
       bankDetails = BankDetails("Account name", Some(bic), iban),
       isOnlineMarketplace = false,
-      niPresence = Some(PrincipalPlaceOfBusinessInNi)
+      niPresence = Some(PrincipalPlaceOfBusinessInNi),
+      dateOfFirstSale = Some(LocalDate.now())
     )
 
   private def createUkAddress(): UkAddress =

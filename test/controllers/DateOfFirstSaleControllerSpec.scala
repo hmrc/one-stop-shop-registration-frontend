@@ -109,8 +109,6 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
         val result = route(application, postRequest).value
         val expectedAnswers = emptyUserAnswers.set(DateOfFirstSalePage, date).success.value
 
-        println(date)
-        println(dateService.earliestSaleAllowed)
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual DateOfFirstSalePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))

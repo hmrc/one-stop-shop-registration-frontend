@@ -25,7 +25,6 @@ import javax.inject.Inject
 class DeleteEuDetailsFormProvider @Inject() extends Mappings {
 
   def apply(euDetails: EuDetails): Form[Boolean] = {
-    println(euDetails)
     Form(
       "value" -> boolean("deleteEuVatDetails.error.required", args = Seq(euDetails.euCountry.name))
     )

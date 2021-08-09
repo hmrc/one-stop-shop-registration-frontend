@@ -477,7 +477,7 @@ euTaxReference.title = What is your tax identification number in {0}?
 euTaxReference.heading = What is your tax identification number in {0}?
 euTaxReference.checkYourAnswersLabel = Tax identification number
 euTaxReference.error.required = Enter your tax identification number in {0}
-euTaxReference.error.length = Tax identification number must be 50 characters or less
+euTaxReference.error.length = Tax identification number must be 20 characters or less
 euTaxReference.error.format = Tax identification number must only include letters, numbers and spaces
 euTaxReference.change.hidden = your tax identification number
 

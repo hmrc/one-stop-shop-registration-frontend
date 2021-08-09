@@ -32,11 +32,11 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext
 
 class CommencementDateController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
-                                       view: CommencementDateView,
-                                       dateService: DateService,
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+   override val messagesApi: MessagesApi,
+   cc: AuthenticatedControllerComponents,
+   view: CommencementDateView,
+   dateService: DateService
+) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -52,14 +52,16 @@ class CommencementDateController @Inject()(
               val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
               val startOfNextQuarter = dateService.startOfNextQuarter
 
-              Ok(view(
-                mode,
-                commencementDate.format(dateFormatter),
-                isDateInCurrentQuarter,
-                Some(startOfCurrentQuarter.format(dateFormatter)),
-                Some(endOfCurrentQuarter.format(dateFormatter)),
-                Some(startOfNextQuarter.format(dateFormatter))
-              ))
+              Ok(
+                view(
+                  mode,
+                  commencementDate.format(dateFormatter),
+                  isDateInCurrentQuarter,
+                  Some(startOfCurrentQuarter.format(dateFormatter)),
+                  Some(endOfCurrentQuarter.format(dateFormatter)),
+                  Some(startOfNextQuarter.format(dateFormatter))
+                )
+              )
           }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 
         case Some(false) =>

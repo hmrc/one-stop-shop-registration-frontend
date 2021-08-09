@@ -100,6 +100,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(answers, vrn)
 
       val expectedRegistration = RegistrationData.registration.copy(
+        dateOfFirstSale  = Some(arbitraryDate),
         vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
         commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
       )
@@ -128,6 +129,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       val expectedRegistration =
         RegistrationData.registration.copy(
+          dateOfFirstSale       = Some(arbitraryDate),
           vatDetails            = VatDetails(regDate, address, true, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
           commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
@@ -149,6 +151,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       val expectedRegistration =
         RegistrationData.registration copy(
+          dateOfFirstSale  = Some(arbitraryDate),
           tradingNames     = Seq.empty,
           euRegistrations  = Seq.empty,
           vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered),
@@ -171,6 +174,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       val expectedRegistration =
         RegistrationData.registration copy (
+          dateOfFirstSale = Some(arbitraryDate),
           vatDetails = RegistrationData.registration.vatDetails copy(
             address = address,
             source = UserEntered
@@ -190,6 +194,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         val expectedRegistration =
           RegistrationData.registration copy (
+            dateOfFirstSale  = Some(arbitraryDate),
             vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
             niPresence       = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
@@ -209,6 +214,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         val expectedRegistration =
           RegistrationData.registration copy (
+            dateOfFirstSale  = Some(arbitraryDate),
             vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
             niPresence       = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
@@ -229,6 +235,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         val expectedRegistration =
           RegistrationData.registration copy (
+            dateOfFirstSale  = Some(arbitraryDate),
             vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
             niPresence       = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
@@ -247,7 +254,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         val expectedRegistration =
           RegistrationData.registration copy (
-            vatDetails = RegistrationData.registration.vatDetails.copy(source = UserEntered)
+            vatDetails = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            dateOfFirstSale = None
           )
 
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -542,6 +550,28 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
               }
             }
           }
+        }
+      }
+    }
+
+    "date of first sales logic" - {
+
+      "should return Valid" - {
+
+        "when Has Made Sales is Yes and Date of First Sale is populated" in {
+          val userAnswers =
+            answers
+              .set(HasMadeSalesPage, true).success.value
+
+          val expectedRegistration = RegistrationData.registration.copy(
+            dateOfFirstSale  = Some(arbitraryDate),
+            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          )
+
+          val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+          result mustEqual Valid(expectedRegistration)
         }
       }
     }

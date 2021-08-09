@@ -20,14 +20,13 @@ import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.HasTradingNamePage
 import play.api.i18n.Messages
-import services.FeatureFlagService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 import javax.inject.Inject
 
-class HasTradingNameSummary @Inject()(features: FeatureFlagService) {
+class HasTradingNameSummary @Inject()() {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HasTradingNamePage).map {

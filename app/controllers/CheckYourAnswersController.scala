@@ -64,7 +64,7 @@ class CheckYourAnswersController @Inject()(
           BusinessAddressInUkSummary.row(request.userAnswers),
           UkAddressSummary.row(request.userAnswers),
           InternationalAddressSummary.row(request.userAnswers),
-          new HasTradingNameSummary(features).row(request.userAnswers),
+          new HasTradingNameSummary().row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
           HasMadeSalesSummary.row(request.userAnswers),
           DateOfFirstSaleSummary.row(request.userAnswers),

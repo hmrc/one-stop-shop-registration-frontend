@@ -76,7 +76,7 @@ class AuthenticatedIdentifierAction @Inject()(
       case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence ~ _ =>
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) =>
-            if (confidence >= ConfidenceLevel.L250) {
+            if (confidence >= ConfidenceLevel.L200) {
               Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
             } else {
               throw InsufficientConfidenceLevel()
@@ -153,7 +153,7 @@ class AuthenticatedIdentifierAction @Inject()(
       config.ivUpliftUrl,
       Map(
         "origin"          -> Seq(config.origin),
-        "confidenceLevel" -> Seq(ConfidenceLevel.L250.toString),
+        "confidenceLevel" -> Seq(ConfidenceLevel.L200.toString),
         "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request)),
         "failureURL"      -> Seq(urlBuilder.ivFailureUrl(request))
       )
