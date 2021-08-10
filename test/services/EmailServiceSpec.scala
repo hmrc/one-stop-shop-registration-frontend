@@ -140,5 +140,52 @@ class EmailServiceSpec extends SpecBase {
           verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
       }
     }
+
+    "call sendConfirmationEmail with oss_registration_confirmation_pre_10th_of_month with the correct parameters when no date of first sale" in {
+      val maxLengthBusiness = 160
+      val maxLengthContactName = 105
+      val commencementDate = LocalDate.of(2010, 1, 1)
+      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+      val startDate = commencementDate
+
+      forAll(
+        validVRNs,
+        validEmails,
+        safeInputsWithMaxLength(maxLengthBusiness),
+        safeInputsWithMaxLength(maxLengthContactName),
+      ) {
+        (vatNum: String, email: String, businessName: String, contactName: String) =>
+          val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+          val expectedDate = commencementDate.format(formatter)
+          val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
+          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
+
+          val expectedEmailToSendRequest = EmailToSendRequest(
+            List(email),
+            "oss_registration_confirmation_pre_10th_of_month",
+            RegistrationConfirmationEmailPre10thParameters(
+              contactName,
+              businessName,
+              expectedDate,
+              vatNum,
+              formattedLastDateOfCalendarQuarter,
+              formattedLastDayOfMonthAfterCalendarQuarter)
+          )
+
+          when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
+
+          emailService.sendConfirmationEmail(
+            contactName,
+            businessName,
+            vatNum,
+            commencementDate,
+            email,
+            None
+          ).futureValue mustBe EMAIL_ACCEPTED
+
+          verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
+      }
+    }
   }
 }

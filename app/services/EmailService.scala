@@ -41,14 +41,14 @@ class EmailService@Inject()(
    startDate: Option[LocalDate]
   )(implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
 
-    val startDateEqualsCommencementDate = commencementDate == startDate.get
+    val showPre10thTemplate = if(startDate.isDefined) commencementDate == startDate.get else true
     val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
     val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
     val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
     val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
 
     val emailParameters =
-      if(startDateEqualsCommencementDate) {
+      if(showPre10thTemplate) {
         RegistrationConfirmationEmailPre10thParameters(
           recipientName_line1,
           businessName,
@@ -72,7 +72,7 @@ class EmailService@Inject()(
     emailConnector.send(
       EmailToSendRequest(
         List(emailAddress),
-        if (startDateEqualsCommencementDate) {
+        if (showPre10thTemplate) {
           registrationConfirmationPre10thTemplateId
         } else {
           registrationConfirmationPost10thTemplateId
