@@ -70,6 +70,7 @@ class CommencementDateController @Inject()(
               val commencementDate = LocalDate.now()
               Ok(view(mode, commencementDate.format(dateFormatter), true, None, None, None))
             case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
 
         case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())

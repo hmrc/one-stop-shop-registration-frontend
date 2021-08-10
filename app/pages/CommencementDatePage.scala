@@ -19,10 +19,7 @@ package pages
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
 import play.api.mvc.Call
-
-import java.time.LocalDate
 
 case object CommencementDatePage extends Page {
 

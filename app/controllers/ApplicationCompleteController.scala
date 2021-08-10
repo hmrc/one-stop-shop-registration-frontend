@@ -47,9 +47,11 @@ class ApplicationCompleteController @Inject()(
       for {
         contactDetails        <- request.userAnswers.get(BusinessContactDetailsPage)
         showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
-        dateOfFirstSale       <- request.userAnswers.get(DateOfFirstSalePage)
         commencementDate      <- getStartDate(request.userAnswers)
       } yield {
+        val dateOfFirstSale: Option[LocalDate] = request.userAnswers.get(DateOfFirstSalePage)
+        println("DOFS: " + dateOfFirstSale)
+        println("COMMENCEMENTDATE: " + commencementDate)
         Ok(
           view(
             HtmlFormat.escape(contactDetails.emailAddress).toString,
@@ -61,7 +63,7 @@ class ApplicationCompleteController @Inject()(
             dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             dateService.startOfCurrentQuarter.format(dateFormatter),
             dateService.startOfNextQuarter.format(dateFormatter),
-            dateService.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale), commencementDate)
+            dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
           )
         )
       }
@@ -70,7 +72,10 @@ class ApplicationCompleteController @Inject()(
 
   private def getStartDate(answers: UserAnswers): Option[LocalDate] =
     answers.get(DateOfFirstSalePage) match {
-      case Some(startDate) => Some(dateService.startDateBasedOnFirstSale(startDate))
+      case Some(startDate) => {
+        println("STARTDATE: " + startDate)
+        Some(dateService.startDateBasedOnFirstSale(startDate))
+      }
       case None            => Some(LocalDate.now())
     }
 }

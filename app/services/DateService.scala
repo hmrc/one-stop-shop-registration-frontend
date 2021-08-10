@@ -30,6 +30,7 @@ class DateService @Inject()(clock: Clock) {
     val dateInLastMonthOfQuarter = today.withMonth(lastMonthOfQuarter)
     val lastDayOfCurrentQuarter  = dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
 
+    println("TODAY: " + today)
     lastDayOfCurrentQuarter.plusDays(1)
   }
 
@@ -55,7 +56,10 @@ class DateService @Inject()(clock: Clock) {
   }
 
   def isDOFSDifferentToCommencementDate(dateOfFirstSale: Option[LocalDate], commencementDate: LocalDate): Boolean = {
-    if(dateOfFirstSale.nonEmpty) dateOfFirstSale.get != commencementDate else false
+    if(dateOfFirstSale.isDefined)
+      dateOfFirstSale.get != commencementDate
+    else
+      false
   }
 
   def earliestSaleAllowed: LocalDate = {

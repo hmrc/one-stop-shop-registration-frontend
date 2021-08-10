@@ -20,9 +20,7 @@ import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import queries.AllWebsites
 
-import scala.util.Try
 
 case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
 
@@ -41,5 +39,4 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
     case Some(false) => routes.RegisterLaterController.onPageLoad()
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
-
 }

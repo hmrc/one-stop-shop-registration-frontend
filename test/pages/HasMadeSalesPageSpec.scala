@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
