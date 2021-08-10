@@ -95,14 +95,8 @@ class EmailServiceSpec extends SpecBase {
       val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
       val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
       val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
-//      val lastDayOfNextCalendarQuarter = Create new method in DateService?
+      val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
       val startDate = commencementDate.plusDays(1)
-
-//      "lastDayOfCalendarQuarter"           -> "30 September 2021",
-//      "fir stDayOfNextCalendarQuarter"      -> "01 October 2021",
-//      "startDate"                          -> "1 October 2021",
-//      "lastDayOfNextCalendarQuarter"       -> "31 December 2021",
-//      "lastDayOfMonthAfterCalendarQuarter" -> "31 January 2022"
 
       forAll(
         validVRNs,
@@ -116,6 +110,7 @@ class EmailServiceSpec extends SpecBase {
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
           val formattedFirstDayOfNextCalendarQuarter = firstDayOfNextCalendarQuarter.format(formatter)
+          val formattedLastDayOfNextCalendarQuarter = lastDayOfNextCalendarQuarter.format(formatter)
 
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
@@ -127,7 +122,8 @@ class EmailServiceSpec extends SpecBase {
               vatNum,
               formattedLastDateOfCalendarQuarter,
               formattedLastDayOfMonthAfterCalendarQuarter,
-              formattedFirstDayOfNextCalendarQuarter),
+              formattedFirstDayOfNextCalendarQuarter,
+              formattedLastDayOfNextCalendarQuarter),
           )
 
           when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))

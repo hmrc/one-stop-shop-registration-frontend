@@ -16,7 +16,7 @@
 
 package services
 
-import config.Constants.{registrationConfirmationPost10thTemplateId, registrationConfirmationTemplateId}
+import config.Constants.{registrationConfirmationPost10thTemplateId, registrationConfirmationPre10thTemplateId}
 import connectors.EmailConnector
 import models.emails.{EmailSendingResult, EmailToSendRequest, RegistrationConfirmationEmailPre10thParameters, RegistrationConfirmationEmailPost10thParameters}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,6 +45,7 @@ class EmailService@Inject()(
     val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
     val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
     val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+    val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
 
     val emailParameters =
       if(startDateEqualsCommencementDate) {
@@ -63,17 +64,19 @@ class EmailService@Inject()(
           reference,
           format(lastDayOfCalendarQuarter),
           format(lastDayOfMonthAfterCalendarQuarter),
-          format(firstDayOfNextCalendarQuarter)
+          format(firstDayOfNextCalendarQuarter),
+          format(lastDayOfNextCalendarQuarter)
         )
       }
 
     emailConnector.send(
       EmailToSendRequest(
         List(emailAddress),
-        if (startDateEqualsCommencementDate)
-          registrationConfirmationTemplateId
-        else
-          registrationConfirmationPost10thTemplateId,
+        if (startDateEqualsCommencementDate) {
+          registrationConfirmationPre10thTemplateId
+        } else {
+          registrationConfirmationPost10thTemplateId
+        },
         emailParameters
       )
     )

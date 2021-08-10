@@ -54,7 +54,8 @@ case class RegistrationConfirmationEmailPost10thParameters(
   reference: String,
   lastDayOfCalendarQuarter: String,
   lastDayOfMonthAfterCalendarQuarter: String,
-  firstDayOfNextCalendarQuarter: String
+  firstDayOfNextCalendarQuarter: String,
+  lastDayOfNextCalendarQuarter: String
 ) extends EmailParameters
 
 object RegistrationConfirmationEmailPost10thParameters {
