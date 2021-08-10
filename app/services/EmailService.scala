@@ -27,7 +27,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailService@Inject()(emailConnector: EmailConnector, dateService: DateService)(implicit executionContext: ExecutionContext) {
+class EmailService@Inject()(
+   emailConnector: EmailConnector,
+   dateService: DateService
+ )(implicit executionContext: ExecutionContext) {
 
   def sendConfirmationEmail(
    recipientName_line1: String,
@@ -38,42 +41,46 @@ class EmailService@Inject()(emailConnector: EmailConnector, dateService: DateSer
    startDate: Option[LocalDate]
   )(implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
 
+    val startDateEqualsCommencementDate = commencementDate == startDate.get
     val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
     val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
     val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
 
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
-    val formattedStartDate = commencementDate.format(formatter)
-    val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
-    val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
-    val formattedFirstDayOfNextCalendarQuarter = firstDayOfNextCalendarQuarter.format(formatter)
-
-    val commencementDateBefore10th = commencementDate == startDate.get match {
-      case true => RegistrationConfirmationEmailPre10thParameters(
-        recipientName_line1,
-        businessName,
-        formattedStartDate,
-        reference,
-        formattedLastDateOfCalendarQuarter,
-        formattedLastDayOfMonthAfterCalendarQuarter
-      )
-      case false => RegistrationConfirmationEmailPost10thParameters(
-        recipientName_line1,
-        businessName,
-        formattedStartDate,
-        reference,
-        formattedLastDateOfCalendarQuarter,
-        formattedLastDayOfMonthAfterCalendarQuarter,
-        formattedFirstDayOfNextCalendarQuarter
-      )
-    }
+    val emailParameters =
+      if(startDateEqualsCommencementDate) {
+        RegistrationConfirmationEmailPre10thParameters(
+          recipientName_line1,
+          businessName,
+          format(commencementDate),
+          reference,
+          format(lastDayOfCalendarQuarter),
+          format(lastDayOfMonthAfterCalendarQuarter)
+        )} else {
+        RegistrationConfirmationEmailPost10thParameters(
+          recipientName_line1,
+          businessName,
+          format(commencementDate),
+          reference,
+          format(lastDayOfCalendarQuarter),
+          format(lastDayOfMonthAfterCalendarQuarter),
+          format(firstDayOfNextCalendarQuarter)
+        )
+      }
 
     emailConnector.send(
       EmailToSendRequest(
         List(emailAddress),
-        if (commencementDate == startDate.get) registrationConfirmationTemplateId else registrationConfirmationPost10thTemplateId,
-        commencementDateBefore10th
+        if (startDateEqualsCommencementDate)
+          registrationConfirmationTemplateId
+        else
+          registrationConfirmationPost10thTemplateId,
+        emailParameters
       )
     )
+  }
+
+  private def format(date: LocalDate) = {
+    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+    date.format(formatter)
   }
 }

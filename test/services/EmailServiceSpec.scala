@@ -99,7 +99,7 @@ class EmailServiceSpec extends SpecBase {
       val startDate = commencementDate.plusDays(1)
 
 //      "lastDayOfCalendarQuarter"           -> "30 September 2021",
-//      "firstDayOfNextCalendarQuarter"      -> "01 October 2021",
+//      "fir stDayOfNextCalendarQuarter"      -> "01 October 2021",
 //      "startDate"                          -> "1 October 2021",
 //      "lastDayOfNextCalendarQuarter"       -> "31 December 2021",
 //      "lastDayOfMonthAfterCalendarQuarter" -> "31 January 2022"
