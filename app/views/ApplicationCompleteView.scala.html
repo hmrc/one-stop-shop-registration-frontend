@@ -53,11 +53,11 @@
         @if(isDOFSDifferentToCommencementDate){
             <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
 
-            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</div>
+            <h2 class="govuk-heading-m">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</h2>
 
             <div class="govuk-body">@messages("applicationComplete.CurrentQuarter")</div>
 
-            <div class="govuk-body">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</div>
+            <h2 class="govuk-heading-m">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</h2>
         }
 
         <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
