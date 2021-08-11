@@ -52,12 +52,15 @@ class ApplicationCompleteControllerSpec extends SpecBase {
     "when the scheme has started" - {
 
       "must return OK and the correct view for a GET with email confirmation" in {
+
         val emailAddress = "test@test.com"
+
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, true).success.value
+
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail)).build()
 
         running(application) {
@@ -92,12 +95,15 @@ class ApplicationCompleteControllerSpec extends SpecBase {
       }
 
       "must return OK and the correct view for a GET without email confirmation" in {
+
         val emailAddress = "test@test.com"
+
         val userAnswersWithoutEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, false).success.value
+
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail)).build()
 
         running(application) {
@@ -112,8 +118,8 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val startOfCurrentQuarter = dateService.startOfCurrentQuarter
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
-
           val view = application.injector.instanceOf[ApplicationCompleteView]
+
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
             emailAddress,
@@ -178,9 +184,9 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
         val emailAddress = "test@test.com"
 
-        val todayInstant: Instant    = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
+        val todayInstant = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
 
-        val stubClockForToday: Clock = Clock.fixed(todayInstant, ZoneId.systemDefault)
+        val stubClockForToday = Clock.fixed(todayInstant, ZoneId.systemDefault)
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
@@ -230,10 +236,10 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
         val emailAddress = "test@test.com"
 
-        val aug11thInstant: Instant =
+        val aug11thInstant =
           LocalDate.of(2021,8,11).atStartOfDay(ZoneId.systemDefault).toInstant
 
-        val stubClockFor11Aug: Clock = Clock.fixed(aug11thInstant, ZoneId.systemDefault)
+        val stubClockFor11Aug = Clock.fixed(aug11thInstant, ZoneId.systemDefault)
 
         val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()

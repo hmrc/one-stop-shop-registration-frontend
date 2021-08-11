@@ -49,9 +49,12 @@ class ApplicationCompleteController @Inject()(
         showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
         commencementDate      <- getStartDate(request.userAnswers)
       } yield {
-        val dateOfFirstSale  = request.userAnswers.get(DateOfFirstSalePage)
-        val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+        val dateOfFirstSale   = request.userAnswers.get(DateOfFirstSalePage)
+        val vatReturnEndDate  = dateService.getVatReturnEndDate(commencementDate)
         val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+        val isDOFSDifferentToCommencementDate =
+          dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+
         Ok(
           view(
             HtmlFormat.escape(contactDetails.emailAddress).toString,
@@ -64,7 +67,7 @@ class ApplicationCompleteController @Inject()(
             dateService.lastDayOfCalendarQuarter.format(dateFormatter),
             dateService.startOfCurrentQuarter.format(dateFormatter),
             dateService.startOfNextQuarter.format(dateFormatter),
-            dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+            isDOFSDifferentToCommencementDate
           )
         )
       }

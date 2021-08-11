@@ -61,11 +61,13 @@ class DateService @Inject()(clock: Clock) {
   def getVatReturnEndDate(commencementDate: LocalDate): LocalDate = {
     val lastMonthOfQuarter       = (((commencementDate.getMonthValue - 1) / 3) + 1) * 3
     val dateInLastMonthOfQuarter = commencementDate.withMonth(lastMonthOfQuarter)
+
     dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
   }
 
   def getVatReturnDeadline(vatReturnEndDate: LocalDate): LocalDate = {
     val startOfNextQuarterAfterEndDate = vatReturnEndDate.plusDays(1)
+
     startOfNextQuarterAfterEndDate.withDayOfMonth(startOfNextQuarterAfterEndDate.lengthOfMonth)
   }
 

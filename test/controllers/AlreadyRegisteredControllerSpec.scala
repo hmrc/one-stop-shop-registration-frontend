@@ -58,9 +58,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
         running(application) {
           val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
-
           val result = route(application, request).value
-
           val view = application.injector.instanceOf[AlreadyRegisteredView]
           val config = application.injector.instanceOf[FrontendAppConfig]
           val dateService = application.injector.instanceOf[DateService]
@@ -117,6 +115,11 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
         val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
         val vatReturnEndDate = dateService.getVatReturnEndDate(registrationDiff.commencementDate)
         val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+        val isDOFSDifferentToCommencementDate =
+          dateService.isDOFSDifferentToCommencementDate(
+            registrationDiff.dateOfFirstSale,
+            registrationDiff.commencementDate
+          )
 
         status(result) mustEqual OK
 
@@ -131,7 +134,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
             lastDayOfCalendarQuarter.format(dateFormatter),
             dateService.startOfCurrentQuarter.format(dateFormatter),
             dateService.startOfNextQuarter.format(dateFormatter),
-            dateService.isDOFSDifferentToCommencementDate(registrationDiff.dateOfFirstSale, registrationDiff.commencementDate)
+            isDOFSDifferentToCommencementDate
           )(request, messages(application)).toString
 
         contentAsString(result) mustEqual expectedContent
@@ -151,9 +154,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
       running(application) {
         val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
-
         val result = route(application, request).value
-
         val view = application.injector.instanceOf[AlreadyRegisteredView]
         val config = application.injector.instanceOf[FrontendAppConfig]
         val dateService = application.injector.instanceOf[DateService]
