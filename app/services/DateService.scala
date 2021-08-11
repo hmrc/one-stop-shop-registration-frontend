@@ -40,6 +40,13 @@ class DateService @Inject()(clock: Clock) {
     lastMonthOfNextQuarter.withDayOfMonth(lengthOfMonth)
   }
 
+  def lastDayOfMonthAfterNextCalendarQuarter: LocalDate = {
+    val startOfQuarterAfterNextQuarter = startOfNextQuarter.plusMonths(3)
+    val lengthOfMonth = startOfQuarterAfterNextQuarter.lengthOfMonth()
+
+    startOfQuarterAfterNextQuarter.withDayOfMonth(lengthOfMonth)
+  }
+
   def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
     val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
     if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {

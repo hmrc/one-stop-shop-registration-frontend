@@ -93,8 +93,8 @@ class EmailServiceSpec extends SpecBase {
       val maxLengthContactName = 105
       val commencementDate = LocalDate.of(2010, 1, 1)
       val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
       val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+      val lastDayOfMonthAfterNextCalendarQuarter = dateService.lastDayOfMonthAfterNextCalendarQuarter
       val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
       val startDate = commencementDate.plusDays(1)
 
@@ -108,9 +108,9 @@ class EmailServiceSpec extends SpecBase {
           val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
-          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
+          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfNextCalendarQuarter.format(formatter)
           val formattedFirstDayOfNextCalendarQuarter = firstDayOfNextCalendarQuarter.format(formatter)
-          val formattedLastDayOfNextCalendarQuarter = lastDayOfNextCalendarQuarter.format(formatter)
+          val formattedLastDayOfMonthAfterNextCalendarQuarter = lastDayOfMonthAfterNextCalendarQuarter.format(formatter)
 
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
@@ -121,9 +121,9 @@ class EmailServiceSpec extends SpecBase {
               expectedDate,
               vatNum,
               formattedLastDateOfCalendarQuarter,
-              formattedLastDayOfMonthAfterCalendarQuarter,
+              formattedLastDayOfMonthAfterNextCalendarQuarter,
               formattedFirstDayOfNextCalendarQuarter,
-              formattedLastDayOfNextCalendarQuarter),
+              formattedLastDayOfMonthAfterCalendarQuarter)
           )
 
           when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
@@ -147,7 +147,6 @@ class EmailServiceSpec extends SpecBase {
       val commencementDate = LocalDate.of(2010, 1, 1)
       val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
       val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
-      val startDate = commencementDate
 
       forAll(
         validVRNs,

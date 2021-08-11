@@ -46,6 +46,7 @@ class EmailService@Inject()(
     val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
     val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
     val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
+    val lastDayOfMonthAfterNextCalendarQuarter = dateService.lastDayOfMonthAfterNextCalendarQuarter
 
     val emailParameters =
       if(showPre10thTemplate) {
@@ -63,7 +64,7 @@ class EmailService@Inject()(
           format(commencementDate),
           reference,
           format(lastDayOfCalendarQuarter),
-          format(lastDayOfMonthAfterCalendarQuarter),
+          format(lastDayOfMonthAfterNextCalendarQuarter) ,
           format(firstDayOfNextCalendarQuarter),
           format(lastDayOfNextCalendarQuarter)
         )
