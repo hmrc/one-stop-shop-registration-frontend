@@ -84,7 +84,7 @@ class EmailService@Inject()(
   }
 
   private def format(date: LocalDate) = {
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
     date.format(formatter)
   }
 }

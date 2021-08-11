@@ -36,6 +36,8 @@ class EmailServiceSpec extends SpecBase {
   private val connector = mock[EmailConnector]
   private val dateService = new DateService(stubClockAtArbitraryDate)
   private val emailService = new EmailService(connector, dateService)
+  private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "EmailService.sendConfirmationEmail" - {
@@ -55,7 +57,6 @@ class EmailServiceSpec extends SpecBase {
         safeInputsWithMaxLength(maxLengthContactName),
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String) =>
-          val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
@@ -105,7 +106,6 @@ class EmailServiceSpec extends SpecBase {
         safeInputsWithMaxLength(maxLengthContactName),
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String) =>
-          val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfNextCalendarQuarter.format(formatter)
@@ -155,7 +155,6 @@ class EmailServiceSpec extends SpecBase {
         safeInputsWithMaxLength(maxLengthContactName),
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String) =>
-          val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
