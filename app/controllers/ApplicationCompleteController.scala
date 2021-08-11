@@ -62,7 +62,6 @@ class ApplicationCompleteController @Inject()(
             vatReturnEndDate.format(dateFormatter),
             vatReturnDeadline.format(dateFormatter),
             dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             dateService.startOfCurrentQuarter.format(dateFormatter),
             dateService.startOfNextQuarter.format(dateFormatter),
             dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)

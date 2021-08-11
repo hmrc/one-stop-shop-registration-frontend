@@ -20,11 +20,13 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
+import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
+import queries.EmailConfirmationQuery
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyRegisteredView
@@ -46,13 +48,22 @@ class AlreadyRegisteredController @Inject()(
     implicit request =>
       connector.getRegistration().map {
         case Some(registration) =>
+          val commencementDate = registration.commencementDate
+          val dateOfFirstSale  = registration.dateOfFirstSale
+          val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+          val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+
           Ok(view(
             HtmlFormat.escape(registration.registeredCompanyName).toString,
             request.vrn,
             config.feedbackUrl,
-            registration.commencementDate.format(dateFormatter),
+            commencementDate.format(dateFormatter),
+            vatReturnEndDate.format(dateFormatter),
+            vatReturnDeadline.format(dateFormatter),
             dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter)
+            dateService.startOfCurrentQuarter.format(dateFormatter),
+            dateService.startOfNextQuarter.format(dateFormatter),
+            dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
           ))
 
         case None =>

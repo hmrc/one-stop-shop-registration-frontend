@@ -70,7 +70,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
           val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
           val startOfCurrentQuarter = dateService.startOfCurrentQuarter
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
@@ -85,7 +84,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vatReturnEndDate.format(dateFormatter),
             vatReturnDeadline.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             startOfCurrentQuarter.format(dateFormatter),
             startOfNextQuarter.format(dateFormatter),
             isDOFSDifferentToCommencementDate
@@ -111,7 +109,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
           val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
           val startOfCurrentQuarter = dateService.startOfCurrentQuarter
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
@@ -127,7 +124,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vatReturnEndDate.format(dateFormatter),
             vatReturnDeadline.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             startOfCurrentQuarter.format(dateFormatter),
             startOfNextQuarter.format(dateFormatter),
             isDOFSDifferentToCommencementDate
@@ -156,7 +152,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
           val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
           val startOfCurrentQuarter = dateService.startOfCurrentQuarter
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
@@ -172,7 +167,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vatReturnEndDate.format(dateFormatter),
             vatReturnDeadline.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             startOfCurrentQuarter.format(dateFormatter),
             startOfNextQuarter.format(dateFormatter),
             isDOFSDifferentToCommencementDate
@@ -209,7 +203,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
           val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
           val startOfCurrentQuarter = dateService.startOfCurrentQuarter
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate =
@@ -226,7 +219,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vatReturnEndDate.format(dateFormatter),
             vatReturnDeadline.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             startOfCurrentQuarter.format(dateFormatter),
             startOfNextQuarter.format(dateFormatter),
             isDOFSDifferentToCommencementDate
@@ -263,7 +255,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
           val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
           val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
           val startOfCurrentQuarter = dateService.startOfCurrentQuarter
           val startOfNextQuarter = dateService.startOfNextQuarter
           val isDOFSDifferentToCommencementDate =
@@ -280,7 +271,6 @@ class ApplicationCompleteControllerSpec extends SpecBase {
             vatReturnEndDate.format(dateFormatter),
             vatReturnDeadline.format(dateFormatter),
             lastDayOfCalendarQuarter.format(dateFormatter),
-            lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             startOfCurrentQuarter.format(dateFormatter),
             startOfNextQuarter.format(dateFormatter),
             isDOFSDifferentToCommencementDate

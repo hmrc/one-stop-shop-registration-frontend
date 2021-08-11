@@ -6,9 +6,13 @@
     companyName: String,
     vrn: Vrn,
     feedbackLink: String,
-    startDate: String,
+    commencementDate: String,
+    vatReturnEndDate: String,
+    vatReturnDeadline: String,
     lastDayOfCalendarQuarter: String,
-    lastDayOfMonthAfterCalendarQuarter: String
+    startOfCurrentQuarter: String,
+    startOfNextQuarter: String,
+    isDOFSDifferentToCommencementDate: Boolean
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("alreadyRegistered.title", companyName)), showBackLink = false) {
@@ -23,6 +27,16 @@
 
         <p class="govuk-body">@messages("alreadyRegistered.reference", vrn)</p>
 
+        @if(isDOFSDifferentToCommencementDate){
+            <div class="govuk-body">@messages("alreadyRegistered.youRegisteredAfterThe10th")</div>
+
+            <h2 class="govuk-heading-m">@messages("alreadyRegistered.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</h2>
+
+            <div class="govuk-body">@messages("alreadyRegistered.CurrentQuarter")</div>
+
+            <h2 class="govuk-heading-m">@messages("alreadyRegistered.nextQuarter.heading", startOfNextQuarter)</h2>
+        }
+
         <p class="govuk-body">@messages("alreadyRegistered.chargeVATRateOfEUCountry")</p>
 
         <p class="govuk-body">@messages("alreadyRegistered.list")
@@ -32,13 +46,13 @@
             </ul>
         </p>
 
-        <p class="govuk-body">@messages("alreadyRegistered.startDate", startDate, lastDayOfCalendarQuarter)</p>
+        <p class="govuk-body">@messages("alreadyRegistered.commencementDate", commencementDate, vatReturnEndDate)</p>
 
         <h2 class="govuk-heading-m">@messages("alreadyRegistered.next")</h2>
 
         <p class="govuk-body">@messages("alreadyRegistered.p1")</p>
 
-        <p class="govuk-body">@messages("alreadyRegistered.p2", lastDayOfMonthAfterCalendarQuarter)</p>
+        <p class="govuk-body">@messages("alreadyRegistered.p2", vatReturnDeadline)</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("alreadyRegistered.feedback.link.text")</a>
