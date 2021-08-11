@@ -49,9 +49,9 @@ class ApplicationCompleteController @Inject()(
         showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
         commencementDate      <- getStartDate(request.userAnswers)
       } yield {
-        val dateOfFirstSale: Option[LocalDate] = request.userAnswers.get(DateOfFirstSalePage)
-        println("DOFS: " + dateOfFirstSale)
-        println("COMMENCEMENTDATE: " + commencementDate)
+        val dateOfFirstSale  = request.userAnswers.get(DateOfFirstSalePage)
+        val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+        val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
         Ok(
           view(
             HtmlFormat.escape(contactDetails.emailAddress).toString,
@@ -59,6 +59,8 @@ class ApplicationCompleteController @Inject()(
             frontendAppConfig.feedbackUrl,
             showEmailConfirmation,
             commencementDate.format(dateFormatter),
+            vatReturnEndDate.format(dateFormatter),
+            vatReturnDeadline.format(dateFormatter),
             dateService.lastDayOfCalendarQuarter.format(dateFormatter),
             dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter),
             dateService.startOfCurrentQuarter.format(dateFormatter),
@@ -72,10 +74,7 @@ class ApplicationCompleteController @Inject()(
 
   private def getStartDate(answers: UserAnswers): Option[LocalDate] =
     answers.get(DateOfFirstSalePage) match {
-      case Some(startDate) => {
-        println("STARTDATE: " + startDate)
-        Some(dateService.startDateBasedOnFirstSale(startDate))
-      }
+      case Some(startDate) => Some(dateService.startDateBasedOnFirstSale(startDate))
       case None            => Some(LocalDate.now())
     }
 }

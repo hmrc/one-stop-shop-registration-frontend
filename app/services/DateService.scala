@@ -30,7 +30,6 @@ class DateService @Inject()(clock: Clock) {
     val dateInLastMonthOfQuarter = today.withMonth(lastMonthOfQuarter)
     val lastDayOfCurrentQuarter  = dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
 
-    println("TODAY: " + today)
     lastDayOfCurrentQuarter.plusDays(1)
   }
 
@@ -56,10 +55,18 @@ class DateService @Inject()(clock: Clock) {
   }
 
   def isDOFSDifferentToCommencementDate(dateOfFirstSale: Option[LocalDate], commencementDate: LocalDate): Boolean = {
-    if(dateOfFirstSale.isDefined)
-      dateOfFirstSale.get != commencementDate
-    else
-      false
+    if(dateOfFirstSale.isDefined) dateOfFirstSale.get != commencementDate else false
+  }
+
+  def getVatReturnEndDate(commencementDate: LocalDate): LocalDate = {
+    val lastMonthOfQuarter       = (((commencementDate.getMonthValue - 1) / 3) + 1) * 3
+    val dateInLastMonthOfQuarter = commencementDate.withMonth(lastMonthOfQuarter)
+    dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
+  }
+
+  def getVatReturnDeadline(vatReturnEndDate: LocalDate): LocalDate = {
+    val startOfNextQuarterAfterEndDate = vatReturnEndDate.plusDays(1)
+    startOfNextQuarterAfterEndDate.withDayOfMonth(startOfNextQuarterAfterEndDate.lengthOfMonth)
   }
 
   def earliestSaleAllowed: LocalDate = {

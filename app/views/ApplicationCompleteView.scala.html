@@ -27,6 +27,8 @@
     feedbackLink: String,
     showEmailConfirmation: Boolean,
     commencementDate: String,
+    vatReturnEndDate: String,
+    vatReturnDeadline: String,
     lastDayOfCalendarQuarter: String,
     lastDayOfMonthAfterCalendarQuarter: String,
     startOfCurrentQuarter: String,
@@ -67,13 +69,13 @@
             </ul>
         </p>
 
-        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, lastDayOfCalendarQuarter)</p>
+        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
 
         <p class="govuk-body">@messages("applicationComplete.p1")</p>
 
-        <p class="govuk-body">@messages("applicationComplete.p2", lastDayOfMonthAfterCalendarQuarter)</p>
+        <p class="govuk-body">@messages("applicationComplete.p2", vatReturnDeadline)</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
