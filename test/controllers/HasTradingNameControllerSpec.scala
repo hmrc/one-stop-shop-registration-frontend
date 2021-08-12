@@ -27,7 +27,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
-import services.FeatureFlagService
 import views.html.HasTradingNameView
 
 import scala.concurrent.Future

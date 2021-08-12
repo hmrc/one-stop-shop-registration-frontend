@@ -245,6 +245,23 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         result mustEqual Valid(expectedRegistration)
       }
+
+      "when Date Of First Sale is missing and Is Planning First Eligible Sale is true" in {
+
+        val userAnswers = answers
+          .remove(DateOfFirstSalePage).success.value
+          .set(IsPlanningFirstEligibleSalePage, true).success.value
+
+        val expectedRegistration =
+          RegistrationData.registration copy (
+            vatDetails = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            dateOfFirstSale = None
+          )
+
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Valid(expectedRegistration)
+      }
     }
 
     "must return Invalid" - {
@@ -321,12 +338,15 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         result mustEqual Invalid(NonEmptyChain(DataMissingError(PartOfVatGroupPage)))
       }
 
-      "when Date of First Sale is missing and the scheme has started" in {
+      "when both Date of First Sale and Is Planning First Eligible Sale are missing" in {
 
-        val userAnswers = answers.remove(DateOfFirstSalePage).success.value
+        val userAnswers = answers
+          .remove(DateOfFirstSalePage).success.value
+          .remove(IsPlanningFirstEligibleSalePage).success.value
+
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(DateOfFirstSalePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(IsPlanningFirstEligibleSalePage)))
       }
 
       "when Contact Details are missing" in {

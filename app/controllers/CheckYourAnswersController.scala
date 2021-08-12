@@ -66,7 +66,9 @@ class CheckYourAnswersController @Inject()(
           InternationalAddressSummary.row(request.userAnswers),
           new HasTradingNameSummary().row(request.userAnswers),
           TradingNameSummary.checkAnswersRow(request.userAnswers),
+          HasMadeSalesSummary.row(request.userAnswers),
           DateOfFirstSaleSummary.row(request.userAnswers),
+          IsPlanningFirstEligibleSaleSummary.row(request.userAnswers),
           new CommencementDateSummary(dateService).row(request.userAnswers),
           TaxRegisteredInEuSummary.row(request.userAnswers),
           EuDetailsSummary.checkAnswersRow(request.userAnswers),
@@ -105,7 +107,9 @@ class CheckYourAnswersController @Inject()(
                     for {
                       updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
                       _              <- cc.sessionRepository.set(updatedAnswers)
-                    } yield Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+                    } yield {
+                      Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+                    }
               }
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))

@@ -16,78 +16,66 @@
 
 package controllers
 
-import java.time.LocalDate
 import base.SpecBase
-import formats.Format.{dateFormatter, dateHintFormatter}
-import forms.DateOfFirstSaleFormProvider
+import formats.Format.dateFormatter
+import forms.IsPlanningFirstEligibleSaleFormProvider
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.DateOfFirstSalePage
+import pages.IsPlanningFirstEligibleSalePage
 import play.api.inject.bind
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
 import services.DateService
-import views.html.DateOfFirstSaleView
+import views.html.IsPlanningFirstEligibleSaleView
 
 import scala.concurrent.Future
 
-class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSugar {
 
-  private val date: LocalDate   = LocalDate.now(stubClockAtArbitraryDate)
-  private val dateService       = new DateService(stubClockAtArbitraryDate)
-  private val dateFormatted     = dateService.earliestSaleAllowed.format(dateFormatter)
-  private val dateHintFormatted = dateService.earliestSaleAllowed.format(dateHintFormatter)
+  private val dateService = new DateService(stubClockAtArbitraryDate)
+  private val dateFormatted = dateService.startOfNextQuarter.format(dateFormatter)
 
-  private val formProvider = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)
+  private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService)
   private val form = formProvider()
 
-  private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
+  private lazy val isPlanningFirstEligibleSaleRoute = routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode).url
 
-  private def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest(GET, dateOfFirstSaleRoute)
-
-  private def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
-    FakeRequest(POST, dateOfFirstSaleRoute)
-      .withFormUrlEncodedBody(
-        "value.day"   -> date.getDayOfMonth.toString,
-        "value.month" -> date.getMonthValue.toString,
-        "value.year"  -> date.getYear.toString
-      )
-
-  "DateOfFirstSale Controller" - {
+  "IsPlanningFirstEligibleSale Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val result = route(application, getRequest).value
+        val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
 
-        val view = application.injector.instanceOf[DateOfFirstSaleView]
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(DateOfFirstSalePage, date).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IsPlanningFirstEligibleSalePage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val view = application.injector.instanceOf[DateOfFirstSaleView]
+        val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
 
-        val result = route(application, getRequest).value
+        val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
+
+        val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(date), NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, dateFormatted)(request, messages(application)).toString
       }
     }
 
@@ -99,18 +87,19 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository),
-            bind[DateService].toInstance(dateService)
-          )
+          .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
-        val result = route(application, postRequest).value
-        val expectedAnswers = emptyUserAnswers.set(DateOfFirstSalePage, date).success.value
+        val request =
+          FakeRequest(POST, isPlanningFirstEligibleSaleRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+        val expectedAnswers = emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DateOfFirstSalePage.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual IsPlanningFirstEligibleSalePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -119,19 +108,19 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-      val request =
-        FakeRequest(POST, dateOfFirstSaleRoute)
-          .withFormUrlEncodedBody(("value", "invalid value"))
-
       running(application) {
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val request =
+          FakeRequest(POST, isPlanningFirstEligibleSaleRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val view = application.injector.instanceOf[DateOfFirstSaleView]
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[IsPlanningFirstEligibleSaleView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, dateFormatted, dateHintFormatted)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, dateFormatted)(request, messages(application)).toString
       }
     }
 
@@ -140,7 +129,9 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val result = route(application, getRequest).value
+        val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -152,7 +143,11 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val result = route(application, postRequest).value
+        val request =
+          FakeRequest(POST, isPlanningFirstEligibleSaleRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url

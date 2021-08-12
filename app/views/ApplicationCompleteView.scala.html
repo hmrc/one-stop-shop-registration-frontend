@@ -21,7 +21,19 @@
         govukButton: GovukButton
 )
 
-@(email: String, vrn: Vrn, feedbackLink: String, showEmailConfirmation: Boolean, startDate: String, lastDayOfCalendarQuarter: String, lastDayOfMonthAfterCalendarQuarter: String)(implicit request: Request[_], messages: Messages)
+@(
+    email: String,
+    vrn: Vrn,
+    feedbackLink: String,
+    showEmailConfirmation: Boolean,
+    commencementDate: String,
+    vatReturnEndDate: String,
+    vatReturnDeadline: String,
+    lastDayOfCalendarQuarter: String,
+    startOfCurrentQuarter: String,
+    startOfNextQuarter: String,
+    isDOFSDifferentToCommencementDate: Boolean
+)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title")),  showBackLink = false) {
     <div class="grid-row column-two-thirds" id="application_complete_id">
@@ -37,6 +49,16 @@
 
         <div class="govuk-body">@messages("applicationComplete.reference", vrn.vrn)</div>
 
+        @if(isDOFSDifferentToCommencementDate){
+            <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
+
+            <h2 class="govuk-heading-m">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</h2>
+
+            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter")</div>
+
+            <h2 class="govuk-heading-m">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</h2>
+        }
+
         <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
 
         <p class="govuk-body">@messages("applicationComplete.list")
@@ -46,13 +68,13 @@
             </ul>
         </p>
 
-        <p class="govuk-body">@messages("applicationComplete.startDate", startDate, lastDayOfCalendarQuarter)</p>
+        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
 
         <p class="govuk-body">@messages("applicationComplete.p1")</p>
 
-        <p class="govuk-body">@messages("applicationComplete.p2", lastDayOfMonthAfterCalendarQuarter)</p>
+        <p class="govuk-body">@messages("applicationComplete.p2", vatReturnDeadline)</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>

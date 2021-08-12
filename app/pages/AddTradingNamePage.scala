@@ -31,7 +31,7 @@ case object AddTradingNamePage extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _)         => routes.DateOfFirstSaleController.onPageLoad(NormalMode)
+      case (Some(false), _)         => routes.HasMadeSalesController.onPageLoad(NormalMode)
       case _                        => routes.JourneyRecoveryController.onPageLoad()
   }
 

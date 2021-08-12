@@ -211,15 +211,19 @@ notInControlOfMovingGoods.p2 = The online marketplaces will be responsible for p
 applicationComplete.title = You are registered for the One Stop Shop Union scheme
 applicationComplete.heading = You are registered for the One Stop Shop Union scheme
 applicationComplete.reference = Your reference number is your UK VAT registration number, {0}.
+applicationComplete.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
+applicationComplete.CurrentQuarter.heading = Between {0} and {1}
+applicationComplete.CurrentQuarter = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
+applicationComplete.nextQuarter.heading = {0} onwards
 applicationComplete.next = What happens next
 applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
 applicationComplete.vatRate = You need to charge VAT at the rate of the EU country where the goods are sent to.
 applicationComplete.list = For each calendar quarter, you need to use the new One Stop Shop service to:
 applicationComplete.list.p1 = complete a single return for eligible sales of goods to consumers in the EU
 applicationComplete.list.p2 = make a payment to HMRC of the total VAT due on eligible sales of goods to consumers in the EU
-applicationComplete.startDate = Your first return will be for eligible sales starting from {0} to {1}.
+applicationComplete.commencementDate = Your first return will be for eligible sales starting from {0} to {1}.
 applicationComplete.p1 = We will contact you if we need to check any information.
-applicationComplete.p2 = We will contact you about how to use the new service to submit your first return by {0} and make payment.
+applicationComplete.p2 = We will contact you about how to use the new service to submit your first return and make payment by {0}.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
@@ -401,17 +405,22 @@ hasFixedEstablishment.change.hidden = fixed establishment
 checkEuVatDetailsAnswers.title = Check your answers for {0}
 checkEuVatDetailsAnswers.heading = Check your answers for {0}
 
+alreadyRegistered.title = {0} is already registered
 alreadyRegistered.heading = {0} is already registered
 alreadyRegistered.confirmation = Check your email for the confirmation.
 alreadyRegistered.reference = Your reference number is your UK VAT registration number, {0}.
+alreadyRegistered.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
+alreadyRegistered.CurrentQuarter.heading = Between {0} and {1}
+alreadyRegistered.CurrentQuarter = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
+alreadyRegistered.nextQuarter.heading = {0} onwards
 alreadyRegistered.chargeVATRateOfEUCountry = You need to charge VAT at the rate of the EU country where the goods are sent to.
 alreadyRegistered.list = For each calendar quarter, you need to use the new One Stop Shop service to:
 alreadyRegistered.list.p1 = complete a single return for eligible sales of goods to consumers in the EU
 alreadyRegistered.list.p2 = make a payment to HMRC of the total VAT due on eligible sales of goods to consumers in the EU
-alreadyRegistered.startDate = Your first return will be for eligible sales starting from {0} to {1}.
+alreadyRegistered.commencementDate = Your first return will be for eligible sales starting from {0} to {1}.
 alreadyRegistered.next = What happens next
 alreadyRegistered.p1 = We will contact you if we need to check any information.
-alreadyRegistered.p2 = We will contact you about how to use the new service to submit your first return by {0} and make payment.
+alreadyRegistered.p2 = We will contact you about how to use the new service to submit your first return and make payment by {0}.
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
 
@@ -543,10 +552,16 @@ commencementDate.heading = Your start date
 commencementDate.p1 = Your eligible sales starting from {0} will be included in this scheme.
 commencementDate.checkYourAnswersLabel = Date your sales start to be included in this scheme
 
-registerLater.title = Come back later
-registerLater.heading = Come back later
-registerLater.p1 = Make sure you register by the 10th day of the month after your first sale.
-registerLater.p2 = This allows you to use this scheme for that supply.
+commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
+commencementDate.CurrentQuarter.heading = Between {0} and {1}
+commencementDate.CurrentQuarter = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
+commencementDate.nextQuarter.heading = {0} onwards
+commencementDate.NextQuarter = You will be able to use this scheme for eligible sales starting from {0}.
+
+registerLater.title = Come back after your first eligible sale
+registerLater.heading = Come back after your first eligible sale
+registerLater.p1 = You must register by the 10th day of the month following your first eligible sale.
+registerLater.p2 = This allows you to use this scheme for that sale.
 
 cannotRegisterAlreadyRegistered.title = Come back later
 cannotRegisterAlreadyRegistered.heading = Come back later
@@ -560,7 +575,7 @@ registeredForOssInEu.error.required = Select yes if your business is already reg
 dateOfFirstSale.title = Date of your first eligible sale since {0}
 dateOfFirstSale.heading = Date of your first eligible sale since {0}
 dateOfFirstSale.hint = For example, {0}
-dateOfFirstSale.checkYourAnswersLabel = Date your sales start to be included in this scheme
+dateOfFirstSale.checkYourAnswersLabel = Date of first sale
 dateOfFirstSale.error.required.all = Enter the date of your first eligible sale
 dateOfFirstSale.error.required.two = The date must include a {0} and a {1}
 dateOfFirstSale.error.required = The date must include a {0}
@@ -568,10 +583,13 @@ dateOfFirstSale.error.invalid = Enter a real date
 dateOfFirstSale.error.minMax = Date of first eligible sale must be between {0} and today
 dateOfFirstSale.change.hidden = date your sales start to be included in this scheme
 
-hasMadeSales.title = Have you already made sales to include in this scheme?
-hasMadeSales.heading = Have you already made sales to include in this scheme?
-hasMadeSales.caption = Only sales of goods to consumers in the EU are eligible.
-hasMadeSales.error.required = Select yes if you have already made sales to include in this scheme
+hasMadeSales.title = Have you already made eligible sales?
+hasMadeSales.heading = Have you already made eligible sales?
+hasMadeSales.caption = Only sales of goods from Northern Ireland or an EU country to consumers in other EU countries are eligible.
+hasMadeSales.caption.excludeSales = Only sales of goods from Northern Ireland or an EU country to consumers in other EU countries are eligible. <p>Do not include sales made on online marketplaces.</p>
+hasMadeSales.checkYourAnswersLabel = Already made eligible sales
+hasMadeSales.error.required = Select yes if you have already made eligible sales
+hasMadeSales.change.hidden = if already made eligible sales
 
 isOnlineMarketplace.title = Is your business an online marketplace?
 isOnlineMarketplace.heading = Is your business an online marketplace?
@@ -614,3 +632,9 @@ salesChannels.caption = Online marketplaces are websites or mobile apps where cu
 
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
+
+isPlanningFirstEligibleSale.title = Do you plan on making your first eligible sale before {0}?
+isPlanningFirstEligibleSale.heading = Do you plan on making your first eligible sale before {0}?
+isPlanningFirstEligibleSale.error.required = Select yes if you plan on making your first eligible sale before {0}
+isPlanningFirstEligibleSale.checkYourAnswersLabel = Planning to make first eligible sale
+isPlanningFirstEligibleSale.change.hidden = if planning to make first eligible sale

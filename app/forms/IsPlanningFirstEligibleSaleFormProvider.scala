@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package forms.euDetails
-
-import forms.mappings.Mappings
-import models.euDetails.EuDetails
-import play.api.data.Form
+package forms
 
 import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
+import services.DateService
+import formats.Format.dateFormatter
 
-class DeleteEuDetailsFormProvider @Inject() extends Mappings {
+class IsPlanningFirstEligibleSaleFormProvider @Inject()(dateService: DateService) extends Mappings {
 
-  def apply(euDetails: EuDetails): Form[Boolean] = {
+  def apply(): Form[Boolean] = {
+
+    val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+
     Form(
-      "value" -> boolean("deleteEuVatDetails.error.required", args = Seq(euDetails.euCountry.name))
+      "value" -> boolean(
+        "isPlanningFirstEligibleSale.error.required", args = Seq(firstDayOfNextCalendarQuarter.format(dateFormatter)))
     )
   }
 }

@@ -20,11 +20,13 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
+import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
+import queries.EmailConfirmationQuery
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyRegisteredView
@@ -32,13 +34,13 @@ import views.html.AlreadyRegisteredView
 import scala.concurrent.ExecutionContext
 
 class AlreadyRegisteredController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
-                                       view: AlreadyRegisteredView,
-                                       connector: RegistrationConnector,
-                                       dateService: DateService,
-                                       config: FrontendAppConfig
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+   override val messagesApi: MessagesApi,
+   cc: AuthenticatedControllerComponents,
+   view: AlreadyRegisteredView,
+   connector: RegistrationConnector,
+   dateService: DateService,
+   config: FrontendAppConfig
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -46,13 +48,26 @@ class AlreadyRegisteredController @Inject()(
     implicit request =>
       connector.getRegistration().map {
         case Some(registration) =>
-          Ok(view(
-            HtmlFormat.escape(registration.registeredCompanyName).toString,
-            request.vrn,
-            config.feedbackUrl,
-            registration.commencementDate.format(dateFormatter),
-            dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.lastDayOfMonthAfterCalendarQuarter.format(dateFormatter))
+          val commencementDate = registration.commencementDate
+          val dateOfFirstSale  = registration.dateOfFirstSale
+          val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+          val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+          val isDOFSDifferentToCommencementDate =
+            dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+
+          Ok(
+            view(
+              HtmlFormat.escape(registration.registeredCompanyName).toString,
+              request.vrn,
+              config.feedbackUrl,
+              commencementDate.format(dateFormatter),
+              vatReturnEndDate.format(dateFormatter),
+              vatReturnDeadline.format(dateFormatter),
+              dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+              dateService.startOfCurrentQuarter.format(dateFormatter),
+              dateService.startOfNextQuarter.format(dateFormatter),
+              isDOFSDifferentToCommencementDate
+            )
           )
 
         case None =>

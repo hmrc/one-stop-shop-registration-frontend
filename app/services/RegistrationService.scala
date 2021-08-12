@@ -161,8 +161,11 @@ class RegistrationService @Inject()(dateService: DateService) {
 
   private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
     answers.get(DateOfFirstSalePage) match {
-        case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
-        case None            => DataMissingError(DateOfFirstSalePage).invalidNec
+      case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
+      case None            => answers.get(IsPlanningFirstEligibleSalePage) match {
+        case Some(true)  => LocalDate.now().validNec
+        case _           => DataMissingError(IsPlanningFirstEligibleSalePage).invalidNec
+      }
     }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =

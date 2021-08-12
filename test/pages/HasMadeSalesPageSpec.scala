@@ -17,20 +17,86 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
+
+import java.time.LocalDate
 
 class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
   "HasMadeSalesPage" - {
 
-    "must navigate to auth.onSignIn when the answer is yes" in {
+    beRetrievable[Boolean](HasMadeSalesPage)
 
-      HasMadeSalesPage.navigate(true) mustEqual controllers.auth.routes.AuthController.onSignIn()
+    beSettable[Boolean](HasMadeSalesPage)
+
+    beRemovable[Boolean](HasMadeSalesPage)
+
+    "must navigate to Date Of First Sale page when the answer is yes" in {
+      HasMadeSalesPage.navigate(
+        NormalMode,
+        emptyUserAnswers.set(
+          HasMadeSalesPage,
+          true
+        ).success.value) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
     }
 
-    "must navigate to Register Later when the answer is no" in {
+    "must navigate to Is Planning First Eligible Sale page when the answer is no" in {
+      HasMadeSalesPage.navigate(NormalMode,
+        emptyUserAnswers.set(
+          HasMadeSalesPage,
+          false
+        ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
+    }
 
-      HasMadeSalesPage.navigate(false) mustEqual controllers.routes.RegisterLaterController.onPageLoad()
+    "must navigate in Check mode" - {
+
+      "to DateOfFirstSalePage and answer is Some(true)" in {
+        val userAnswers = emptyUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, true).success.value
+
+        HasMadeSalesPage.navigate(CheckMode, userAnswers)
+          .mustEqual(routes.DateOfFirstSaleController.onPageLoad(CheckMode))
+      }
+
+      "to IsPlanningFirstEligibleSaleController and answer is Some(true)" in {
+        val userAnswers = emptyUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, false).success.value
+
+        HasMadeSalesPage.navigate(CheckMode, userAnswers)
+          .mustEqual(routes.IsPlanningFirstEligibleSaleController.onPageLoad(CheckMode))
+      }
+
+      "to JourneyRecoveryController and answer is Some(true)" in {
+        HasMadeSalesPage.navigate(CheckMode, emptyUserAnswersWithVatInfo)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "cleanup" - {
+
+      "must remove IsPlanningFirstEligibleSalePage when HasMadeSales is true" in {
+        val userAnswers = emptyUserAnswersWithVatInfo
+          .set(IsPlanningFirstEligibleSalePage, true).success.value
+        val result = HasMadeSalesPage.cleanup(Some(true), userAnswers).success.value
+
+        result mustBe emptyUserAnswersWithVatInfo
+      }
+
+      "must remove DateOfFirstSalePage when HasMadeSales is false" in {
+        val userAnswers = emptyUserAnswersWithVatInfo
+          .set(DateOfFirstSalePage, LocalDate.now()).success.value
+        val result = HasMadeSalesPage.cleanup(Some(false), userAnswers).success.value
+
+        result mustBe emptyUserAnswersWithVatInfo
+      }
+
+      "must return user answers when HasMadeSales is None" in {
+        val result = HasMadeSalesPage.cleanup(None, emptyUserAnswersWithVatInfo).success.value
+
+        result mustBe emptyUserAnswersWithVatInfo
+      }
     }
   }
 }

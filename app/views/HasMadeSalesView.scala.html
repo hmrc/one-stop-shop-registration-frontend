@@ -6,22 +6,32 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, hintTextFlag: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("hasMadeSales.title"))) {
 
-    @formHelper(action = routes.HasMadeSalesController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.HasMadeSalesController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
-            ).withHint(HintViewModel(messages("hasMadeSales.caption")))
-        )
+        @if(hintTextFlag) {
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
+                ).withHint(HintViewModel(HtmlContent(Html(messages("hasMadeSales.caption.excludeSales")))))
+            )
+        } else {
+
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
+                ).withHint(HintViewModel(messages("hasMadeSales.caption")))
+            )
+        }
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
