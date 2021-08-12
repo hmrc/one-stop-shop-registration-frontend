@@ -42,6 +42,7 @@ import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -111,8 +112,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               eqTo(vrn.toString()),
               eqTo(registration.commencementDate),
               eqTo(registration.contactDetails.emailAddress),
-              eqTo(dateService.lastDayOfCalendarQuarter),
-              eqTo(dateService.lastDayOfMonthAfterCalendarQuarter)
+              eqTo(registration.dateOfFirstSale)
             )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
@@ -125,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any(), any(), any(), any())(any())
+              .sendConfirmationEmail(any(), any(), any(), any(), any(), any())(any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }

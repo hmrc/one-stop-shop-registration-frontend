@@ -22,13 +22,16 @@ sealed trait EmailParameters
 
 object EmailParameters {
   implicit val writes: Writes[EmailParameters] = Writes[EmailParameters] {
-    case x: RegistrationConfirmationEmailParameters => Json.toJson(x)(RegistrationConfirmationEmailParameters.writes)
+    case pre10th: RegistrationConfirmationEmailPre10thParameters =>
+      Json.toJson(pre10th)(RegistrationConfirmationEmailPre10thParameters.writes)
+    case post10th: RegistrationConfirmationEmailPost10thParameters =>
+      Json.toJson(post10th)(RegistrationConfirmationEmailPost10thParameters.writes)
   }
 
   implicit val reads: Reads[EmailParameters] = Json.reads[EmailParameters]
 }
 
-case class RegistrationConfirmationEmailParameters(
+case class RegistrationConfirmationEmailPre10thParameters(
   recipientName_line1: String,
   businessName:String,
   startDate: String,
@@ -37,7 +40,27 @@ case class RegistrationConfirmationEmailParameters(
   lastDayOfMonthAfterCalendarQuarter: String
 ) extends EmailParameters
 
-object RegistrationConfirmationEmailParameters {
-  implicit val writes: Writes[RegistrationConfirmationEmailParameters] = Json.writes[RegistrationConfirmationEmailParameters]
-  implicit val reads: Reads[RegistrationConfirmationEmailParameters] = Json.reads[RegistrationConfirmationEmailParameters]
+object RegistrationConfirmationEmailPre10thParameters {
+  implicit val writes: Writes[RegistrationConfirmationEmailPre10thParameters] =
+    Json.writes[RegistrationConfirmationEmailPre10thParameters]
+  implicit val reads: Reads[RegistrationConfirmationEmailPre10thParameters] =
+    Json.reads[RegistrationConfirmationEmailPre10thParameters]
+}
+
+case class RegistrationConfirmationEmailPost10thParameters(
+  recipientName_line1: String,
+  businessName:String,
+  startDate: String,
+  reference: String,
+  lastDayOfCalendarQuarter: String,
+  lastDayOfMonthAfterNextCalendarQuarter: String,
+  firstDayOfNextCalendarQuarter: String,
+  lastDayOfNextCalendarQuarter: String
+) extends EmailParameters
+
+object RegistrationConfirmationEmailPost10thParameters {
+  implicit val writes: Writes[RegistrationConfirmationEmailPost10thParameters] =
+    Json.writes[RegistrationConfirmationEmailPost10thParameters]
+  implicit val reads: Reads[RegistrationConfirmationEmailPost10thParameters] =
+    Json.reads[RegistrationConfirmationEmailPost10thParameters]
 }
