@@ -76,6 +76,99 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
   }
 
+  ".lastDayOfNextCalendarQuarter" - {
+
+    "must be 31st March of the next year for any date in October, November or December" in {
+      forAll(datesBetween(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 12, 31))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 3, 31)
+      }
+    }
+
+    "must be 30th June for any date in January, February or March" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 6, 30)
+      }
+    }
+
+    "must be 30th September for any date in April, May or June" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 9, 30)
+      }
+    }
+
+    "must be 31st December for any date in July, August or September" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 12, 31)
+      }
+    }
+  }
+
+  ".lastDayOfMonthAfterNextCalendarQuarter" - {
+
+    "must be 30th April of the next year for any date in October, November or December" in {
+
+      forAll(datesBetween(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 12, 31))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2022, 4, 30)
+      }
+    }
+
+    "must be 31st July for any date in January, February or March" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2022, 7, 31)
+      }
+    }
+
+    "must be 31st October for any date in April, May or June" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2022, 10, 31)
+      }
+    }
+
+    "must be 31st January for any date in July, August or September" in {
+
+      forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
+        date =>
+          val stubClock = getStubClock(date)
+          val service   = new DateService(stubClock)
+
+          service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2023, 1, 31)
+      }
+    }
+  }
+
   ".lastDayOfCalendarQuarter" - {
 
     "must be 30th September for any date in July, August or September" in {

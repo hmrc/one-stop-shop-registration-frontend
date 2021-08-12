@@ -38,6 +38,7 @@ import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummar
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
@@ -48,8 +49,7 @@ class CheckYourAnswersController @Inject()(
   auditService: AuditService,
   view: CheckYourAnswersView,
   emailService: EmailService,
-  dateService: DateService,
-  features: FeatureFlagService
+  dateService: DateService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -100,8 +100,7 @@ class CheckYourAnswersController @Inject()(
                 request.vrn.toString(),
                 registration.commencementDate,
                 registration.contactDetails.emailAddress,
-                dateService.lastDayOfCalendarQuarter,
-                dateService.lastDayOfMonthAfterCalendarQuarter
+                registration.dateOfFirstSale
               ) flatMap {
                   emailConfirmationResult =>
                     val emailSent = EMAIL_ACCEPTED == emailConfirmationResult
