@@ -285,8 +285,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       val commencementDate = LocalDate.now()
 
       forAll(dates) {
-        case (dateOfFirstSale, today) =>
-          val stubClock = getStubClock(today)
+        case (dateOfFirstSale, dateOfFirstSalePlusMonths) =>
+          val stubClock = getStubClock(dateOfFirstSalePlusMonths)
           val service = new DateService(stubClock)
 
           service.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale), commencementDate) mustEqual true

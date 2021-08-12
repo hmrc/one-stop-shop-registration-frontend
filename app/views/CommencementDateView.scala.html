@@ -4,7 +4,8 @@
         govukButton: GovukButton
 )
 
-@(mode: Mode, formattedDate: String, isDateInCurrentQuarter: Boolean, startOfCurrentQuarter: Option[String], endOfCurrentQuarter: Option[String], startOfNextQuarter: Option[String])(implicit request: Request[_], messages: Messages)
+@(mode: Mode, formattedDate: String, isDateInCurrentQuarter: Boolean, startOfCurrentQuarter: Option[String],
+endOfCurrentQuarter: Option[String], startOfNextQuarter: Option[String])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
