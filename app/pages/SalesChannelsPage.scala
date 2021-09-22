@@ -27,10 +27,10 @@ case object SalesChannelsPage extends QuestionPage[SalesChannels] {
 
   override def toString: String = "salesChannels"
 
-  def navigate(answer: SalesChannels): Call =
-    if (answer == SalesChannels.OnlineMarketplaces) {
-      routes.NotLiableForVatController.onPageLoad()
-    } else {
-      routes.LiableForVatOnDirectSalesController.onPageLoad()
-    }
+  def navigate(answer: SalesChannels): Call = answer match {
+    case SalesChannels.OnlineMarketplaces => routes.NotLiableForVatController.onPageLoad()
+    case SalesChannels.Mixed => routes.LiableForVatOnDirectSalesController.onPageLoad()
+    case SalesChannels.NotOnlineMarketplaces => routes.LiableForVatOnAllSalesController.onPageLoad()
+    case _ => routes.JourneyRecoveryController.onPageLoad()
+  }
 }

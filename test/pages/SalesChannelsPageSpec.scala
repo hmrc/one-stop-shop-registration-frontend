@@ -47,7 +47,7 @@ class SalesChannelsSpec extends SpecBase with PageBehaviours {
 
       "to Liable for VAT on Direct Sales when the answer Not Online Marketplaces" in {
 
-        SalesChannelsPage.navigate(NotOnlineMarketplaces) mustEqual routes.LiableForVatOnDirectSalesController.onPageLoad()
+        SalesChannelsPage.navigate(NotOnlineMarketplaces) mustEqual routes.LiableForVatOnAllSalesController.onPageLoad()
       }
     }
   }

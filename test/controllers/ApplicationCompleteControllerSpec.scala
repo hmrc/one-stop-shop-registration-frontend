@@ -29,7 +29,7 @@ import queries.EmailConfirmationQuery
 import services.DateService
 import views.html.ApplicationCompleteView
 
-import java.time.{Clock, Instant, LocalDate, ZoneId}
+import java.time.{Clock, LocalDate, ZoneId}
 
 
 class ApplicationCompleteControllerSpec extends SpecBase {
