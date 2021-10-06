@@ -57,7 +57,7 @@ object Country {
   )
 
   val euCountrySelectItems: Seq[SelectItem] = {
-    SelectItem(value = None, text = "") +:
+    SelectItem(value = None, text = "&nbsp;") +:
     euCountries.map {
       country =>
         SelectItemViewModel(
