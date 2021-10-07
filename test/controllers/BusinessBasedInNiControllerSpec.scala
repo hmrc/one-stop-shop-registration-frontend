@@ -21,7 +21,7 @@ import forms.BusinessBasedInNiFormProvider
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.BusinessBasedInNiPage
+import pages.{BusinessAddressInUkPage, BusinessBasedInNiPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.UnauthenticatedSessionRepository
@@ -72,7 +72,7 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when the user answers true to the BusinessBasedInNiPage" in {
 
       val sessionRepository = mock[UnauthenticatedSessionRepository]
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
@@ -89,9 +89,36 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val expectedAnswers = emptyUserAnswers.set(BusinessBasedInNiPage, true).success.value
+        val expectedAnswers = emptyUserAnswers
+          .set(BusinessBasedInNiPage, true).success.value
+          .set(BusinessAddressInUkPage, true).success.value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual BusinessBasedInNiPage.navigate(true).url
+        verify(sessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must save relevant answers and redirect to the next page when the user answers false to the BusinessBasedInNiPage" in {
+
+      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      when(sessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, businessBasedInNiRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        val expectedAnswers = emptyUserAnswers
+          .set(BusinessBasedInNiPage, false).success.value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual BusinessBasedInNiPage.navigate(false).url
         verify(sessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
