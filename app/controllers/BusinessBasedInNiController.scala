@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.BusinessBasedInNiFormProvider
-import pages.{BusinessAddressInUkPage, BusinessBasedInNiPage}
+import pages.BusinessBasedInNiPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -58,12 +58,7 @@ class BusinessBasedInNiController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessBasedInNiPage, value))
-            updatedNIAnswer <- if(value) {
-              Future.fromTry(updatedAnswers.set(BusinessAddressInUkPage, value))
-            } else {
-              Future.successful(updatedAnswers)
-            }
-            _              <- cc.sessionRepository.set(updatedNIAnswer)
+            _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(BusinessBasedInNiPage.navigate(value))
       )
   }
