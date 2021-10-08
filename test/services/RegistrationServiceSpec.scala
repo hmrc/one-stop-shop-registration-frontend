@@ -205,6 +205,24 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         result mustEqual Valid(expectedRegistration)
       }
 
+      "when Business Based in NI is true and Business Address In UK question is unanswered" in {
+        val userAnswers =
+          answers
+            .set(BusinessBasedInNiPage, true).success.value
+            .remove(BusinessAddressInUkPage).success.value
+
+        val expectedRegistration =
+          RegistrationData.registration copy (
+            dateOfFirstSale  = Some(arbitraryDate),
+            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          )
+
+        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+        result mustEqual Valid(expectedRegistration)
+      }
+
       "when Business Based in NI is false and Has Fixed Establishment in NI is missing" in {
 
         val userAnswers =
@@ -300,7 +318,9 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Business Address in UK is missing" in {
 
-        val userAnswers = answers.remove(BusinessAddressInUkPage).success.value
+        val userAnswers = answers
+          .remove(BusinessAddressInUkPage).success.value
+          .remove(UkAddressPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessAddressInUkPage)))
