@@ -118,7 +118,10 @@ class RegistrationService @Inject()(dateService: DateService) {
               case None          => DataMissingError(InternationalAddressPage).invalidNec
             }
           case None =>
-            DataMissingError(BusinessAddressInUkPage).invalidNec
+            answers.get(UkAddressPage) match {
+              case Some(address) => address.validNec
+              case None          => DataMissingError(BusinessAddressInUkPage).invalidNec
+            }
         }
     }
 
