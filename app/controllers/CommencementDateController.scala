@@ -28,14 +28,15 @@ import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate}
 import scala.concurrent.ExecutionContext
 
 class CommencementDateController @Inject()(
    override val messagesApi: MessagesApi,
    cc: AuthenticatedControllerComponents,
    view: CommencementDateView,
-   dateService: DateService
+   dateService: DateService,
+   clock: Clock
 ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -67,7 +68,7 @@ class CommencementDateController @Inject()(
         case Some(false) =>
           request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
             case Some(true) =>
-              val commencementDate = LocalDate.now()
+              val commencementDate = LocalDate.now(clock)
               Ok(view(mode, commencementDate.format(dateFormatter), true, None, None, None))
             case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
             case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
