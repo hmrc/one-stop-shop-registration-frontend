@@ -119,7 +119,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       }
 
       "must return OK and the correct view when user answers no to hasMadeSales and yes to Is Planning First Eligible Sale" in {
-        val nowFormatted = LocalDate.now().format(dateFormatter)
+        val nowFormatted = LocalDate.now(stubClockAtArbitraryDate).format(dateFormatter)
         val answer1 = emptyUserAnswers.set(HasMadeSalesPage, false).success.value
         val answers = answer1.set(IsPlanningFirstEligibleSalePage, true).success.value
 
