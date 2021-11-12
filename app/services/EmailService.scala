@@ -45,6 +45,7 @@ class EmailService@Inject()(
     val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
     val lastDayOfCalendarQuarterForPeriod = dateService.getVatReturnEndDate(commencementDate)
     val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
+    val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
     val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
     val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
     val lastDayOfMonthAfterNextCalendarQuarter = dateService.lastDayOfMonthAfterNextCalendarQuarter
@@ -57,7 +58,7 @@ class EmailService@Inject()(
           format(commencementDate),
           reference,
           format(lastDayOfCalendarQuarterForPeriod),
-          format(lastDayOfMonthAfterCalendarQuarter)
+          format(lastDayOfMonthAfterCalendarQuarterForPeriod)
         )} else {
         RegistrationConfirmationEmailPost10thParameters(
           recipientName_line1,
