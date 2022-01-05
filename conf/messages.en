@@ -485,11 +485,11 @@ euTaxReference.error.length = Tax identification number must be 20 characters or
 euTaxReference.error.format = Tax identification number must only include letters, numbers and spaces
 euTaxReference.change.hidden = your tax identification number
 
-hasWebsite.title = Do you want to give us website addresses that you use to sell your goods?
-hasWebsite.heading = Do you want to give us website addresses that you use to sell your goods?
-hasWebsite.checkYourAnswersLabel = Want to give us website addresses
-hasWebsite.error.required = Select yes if you want to give us website addresses that you use to sell your goods
-hasWebsite.change.hidden = if you want to give us website addresses
+hasWebsite.title = Do you sell your goods online?
+hasWebsite.heading = Do you sell your goods online?
+hasWebsite.checkYourAnswersLabel = Sell goods online
+hasWebsite.error.required = Select yes if you sell your goods online
+hasWebsite.change.hidden = if you sell your goods online
 
 inControlOfMovingGoods.title = How do you ship goods to consumers in the EU?
 inControlOfMovingGoods.heading = How do you ship goods to consumers in the EU?
