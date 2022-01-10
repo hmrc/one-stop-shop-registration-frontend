@@ -57,6 +57,15 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
         }
       }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check mode" - {
@@ -117,6 +126,15 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
           }
         }
       }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check Loop mode" - {
@@ -175,6 +193,15 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
             VatRegisteredPage(index).navigate(CheckLoopMode, answers)
               .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
           }
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
       }
     }

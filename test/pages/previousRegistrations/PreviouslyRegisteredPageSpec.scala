@@ -55,6 +55,15 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
         }
       }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          PreviouslyRegisteredPage.navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check mode" - {
@@ -96,6 +105,15 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
 
           PreviouslyRegisteredPage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          PreviouslyRegisteredPage.navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
     }

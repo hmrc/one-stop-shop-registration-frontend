@@ -63,6 +63,13 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
           }
         }
       }
+
+      "when the answer is none" - {
+        "to Journey recovery" in {
+          AddTradingNamePage.navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check mode" - {
@@ -92,6 +99,14 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
       }
+
+      "when the answer is none" - {
+        "to Journey recovery" in {
+          AddTradingNamePage.navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
+
   }
 }

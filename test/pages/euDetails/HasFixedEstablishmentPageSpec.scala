@@ -239,6 +239,15 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
         }
       }
+
+      "when the user answers is empty" - {
+
+        "to Journey recovery" in {
+
+          HasFixedEstablishmentPage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must remove EU Tax Reference number, Fixed Establishment Trading Name and Address for this index when the answer is no" in {

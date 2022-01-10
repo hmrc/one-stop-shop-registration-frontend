@@ -46,6 +46,12 @@ class CheckVatNumberPageSpec extends SpecBase with PageBehaviours {
         CheckVatNumberPage.navigate(NormalMode, answers)
           .mustBe(routes.UseOtherAccountController.onPageLoad())
       }
+
+      "to Journey recovery when the answer is empty" in {
+
+        CheckVatNumberPage.navigate(NormalMode, emptyUserAnswers)
+          .mustBe(routes.JourneyRecoveryController.onPageLoad())
+      }
     }
   }
 }

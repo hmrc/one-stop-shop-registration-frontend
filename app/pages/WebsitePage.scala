@@ -25,7 +25,7 @@ case class WebsitePage(index: Index) extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ "websites" \ index.position
 
-  override def toString: String = "website"
+  override val toString: String = "website"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     routes.AddWebsiteController.onPageLoad(NormalMode)

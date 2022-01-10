@@ -93,6 +93,22 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery and the correct view for a GET when cannot derive number of websites" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, addWebsiteRoute)
+
+        implicit val msgs: Messages = messages(application)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must not populate the answer on a GET when the question has previously been answered" in {
 
       val userAnswers = baseAnswers.set(AddWebsitePage, true).success.value

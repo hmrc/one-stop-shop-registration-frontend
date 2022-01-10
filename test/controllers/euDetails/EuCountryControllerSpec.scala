@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
-import pages.euDetails.EuCountryPage
+import pages.euDetails.{EuCountryPage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -63,7 +63,12 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(euDetails.EuCountryPage(index), country).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(euDetails.EuCountryPage(index), country).success.value
+        .set(VatRegisteredPage(index), false).success.value
+        .set(EuVatNumberPage(index), "test").success.value
+        .set(HasFixedEstablishmentPage(index), false).success.value
+        .set(EuTaxReferencePage(index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -107,6 +112,33 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, euCountryRoute)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[EuCountryView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted and question has been answered" in {
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(euDetails.EuCountryPage(index), country).success.value
+        .set(VatRegisteredPage(index), false).success.value
+        .set(EuVatNumberPage(index), "test").success.value
+        .set(HasFixedEstablishmentPage(index), false).success.value
+        .set(EuTaxReferencePage(index), "test").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =

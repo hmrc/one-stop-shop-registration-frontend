@@ -59,6 +59,36 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return OK and the correct view for a GET when the user has answered the registered company name question and has partial vat info" in {
+
+      val application = applicationBuilder(userAnswers = Some(partialUserAnswersWithVatInfo.set(RegisteredCompanyNamePage, registeredCompanyName).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasTradingNameRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HasTradingNameView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, registeredCompanyName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when the user has not answered the registered company name question and has partial vat info" in {
+
+      val application = applicationBuilder(userAnswers = Some(partialUserAnswersWithVatInfo)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasTradingNameRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when we have the user's company name in their VAT details" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()

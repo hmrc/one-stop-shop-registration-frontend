@@ -18,13 +18,13 @@ package controllers
 
 import base.SpecBase
 import formats.Format.dateFormatter
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.reset
 import org.mockito.MockitoSugar.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
+import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -78,6 +78,32 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
             Some(nowFormatted),
             Some(nowFormatted)
           )(request, messages(application)).toString
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET when DateOfFirstSale is missing" in {
+        val now = LocalDate.now()
+        val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
+
+        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+
+        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.startDateBasedOnFirstSale(any())) thenReturn dateOfFirstSale
+        when(dateService.startOfCurrentQuarter) thenReturn now
+        when(dateService.lastDayOfCalendarQuarter) thenReturn now
+        when(dateService.startOfNextQuarter)thenReturn now
+
+        val application =
+          applicationBuilder(userAnswers = Some(answer1))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -165,6 +191,98 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           status(result) mustEqual SEE_OTHER
         }
       }
+
+      "must redirect to Journey Recovery when user answers no to hasMadeSales and Is Planning First Eligible Sale is empty" in {
+        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, false).success.value
+
+        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+
+        val application =
+          applicationBuilder(userAnswers = Some(answer1))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery when user answers are empty" in {
+        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
+
+    "must redirect to correct page for POST in Normal Mode" in {
+      val now = LocalDate.now()
+      val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
+
+      val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+      val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
+
+      when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+      when(dateService.startDateBasedOnFirstSale(any())) thenReturn dateOfFirstSale
+      when(dateService.startOfCurrentQuarter) thenReturn now
+      when(dateService.lastDayOfCalendarQuarter) thenReturn now
+      when(dateService.startOfNextQuarter)thenReturn now
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[DateService].toInstance(dateService))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CommencementDateController.onPageLoad(NormalMode).url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual CommencementDatePage.navigate(NormalMode, answers).url
+      }
+    }
+
+    "must redirect to correct page for POST in Check Mode" in {
+      val now = LocalDate.now()
+      val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
+
+      val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+      val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
+
+      when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+      when(dateService.startDateBasedOnFirstSale(any())) thenReturn dateOfFirstSale
+      when(dateService.startOfCurrentQuarter) thenReturn now
+      when(dateService.lastDayOfCalendarQuarter) thenReturn now
+      when(dateService.startOfNextQuarter)thenReturn now
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[DateService].toInstance(dateService))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CommencementDateController.onPageLoad(CheckMode).url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual CommencementDatePage.navigate(CheckMode, answers).url
+      }
+    }
+
   }
 }

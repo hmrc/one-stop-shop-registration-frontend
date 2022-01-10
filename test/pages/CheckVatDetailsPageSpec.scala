@@ -98,6 +98,14 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.UpdateVatDetailsController.onPageLoad())
         }
       }
+
+      "when the user answers are empty" - {
+
+        "to Update VAT Details" in {
+          CheckVatDetailsPage.navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
   }
 }

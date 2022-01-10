@@ -54,10 +54,24 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
         "to Is Online Markterplace" in {
 
-          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+          val answers = emptyUserAnswers
+            .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+            .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+            .set(PreviouslyRegisteredPage, true).success.value
+            .set(AddPreviousRegistrationPage, false).success.value
 
-          PreviouslyRegisteredPage.navigate(NormalMode, answers)
+          AddPreviousRegistrationPage.navigate(NormalMode, answers)
             .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
+        }
+      }
+
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          AddPreviousRegistrationPage.navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
     }
@@ -85,10 +99,24 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
         "to Check Your Answers" in {
 
-          val answers = emptyUserAnswers.set(AddPreviousRegistrationPage, false).success.value
+          val answers = emptyUserAnswers
+            .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+            .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+            .set(PreviousEuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+            .set(PreviousEuVatNumberPage(Index(1)), "ES123").success.value
+            .set(AddPreviousRegistrationPage, false).success.value
 
           AddPreviousRegistrationPage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          AddPreviousRegistrationPage.navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
     }

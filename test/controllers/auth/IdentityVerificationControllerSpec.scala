@@ -164,7 +164,6 @@ class IdentityVerificationControllerSpec extends SpecBase with MockitoSugar with
         }
       }
 
-
       "must redirect to the Locked Out page when the result was Locked Oout" in {
 
         when(mockConnector.getJourneyStatus(any())(any())) thenReturn Future.successful(Some(LockedOut))
@@ -237,6 +236,33 @@ class IdentityVerificationControllerSpec extends SpecBase with MockitoSugar with
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.IvReturnController.preconditionFailed().url
+        }
+      }
+
+      "must redirect to the IvReturnController error page when the result was None" in {
+
+        when(mockConnector.getJourneyStatus(any())(any())) thenReturn Future.successful(None)
+
+        val application = buildApplication
+
+        running(application) {
+          val request = FakeRequest(GET, routes.IdentityVerificationController.handleIvFailure(continueUrl, journeyId).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.IvReturnController.error().url
+        }
+      }
+
+      "must redirect to the IdentityVerificationController identityError page when the journey id is missing" in {
+        val application = buildApplication
+
+        running(application) {
+          val request = FakeRequest(GET, routes.IdentityVerificationController.handleIvFailure(continueUrl, None).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.IdentityVerificationController.identityError(continueUrl).url
         }
       }
     }

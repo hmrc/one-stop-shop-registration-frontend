@@ -96,6 +96,28 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           result.value.vrn mustEqual vrn
           result.value.userAnswers.value mustEqual answers
         }
+
+        "must migrate data from the authenticated repository when no session id" in {
+
+          val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
+
+          val sessionRepository = mock[AuthenticatedSessionRepository]
+          val migrationService  = mock[DataMigrationService]
+
+          when(sessionRepository.get(any())) thenReturn Future.successful(None)
+          when(sessionRepository.set(any())) thenReturn Future.successful(true)
+          when(migrationService.migrate(any(), any())) thenReturn Future.successful(answers)
+
+          val action = new AuthenticatedHarness(sessionRepository, migrationService)
+          val request = FakeRequest(GET, "/test/url")
+
+          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn)).futureValue
+
+          verifyNoInteractions(migrationService)
+          result.value.credentials mustEqual testCredentials
+          result.value.vrn mustEqual vrn
+          result.value.userAnswers mustBe None
+        }
       }
 
       "and there is data in the authenticated repository" - {

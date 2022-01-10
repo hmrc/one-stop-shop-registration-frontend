@@ -25,7 +25,7 @@ case class TradingNamePage(index: Index) extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ "tradingNames" \ index.position
 
-  override def toString: String = "tradingName"
+  override val toString: String = "tradingName"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     routes.AddTradingNameController.onPageLoad(NormalMode)

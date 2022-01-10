@@ -47,6 +47,31 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
         value.set(JsPath, Json.obj()) mustEqual JsError("path cannot be empty")
       }
 
+      "must return an error for recursive search" in {
+        val value = Json.obj(
+          "firstField" -> Json.obj("name" -> "testName"),
+          "secondField" -> Json.arr(
+            Json.obj("name" -> "testName"),
+            Json.obj("name" -> "testName")
+          )
+        )
+        val namesPath = JsPath \\ "name"
+        value.set(namesPath, value) mustEqual JsError("recursive search not supported")
+      }
+
+      "must return an error for recursive search 2" in {
+        val value = Json.arr(
+          Json.obj(
+            "firstField" -> Json.obj("name" -> "testName"),
+            "secondField" -> Json.arr(
+              Json.obj("name" -> "testName"),
+              Json.obj("name" -> "testName")
+            )
+          ))
+        val namesPath = JsPath \ 1 \\ "name"
+        value.set(namesPath, value) mustEqual JsError("recursive search is not supported")
+      }
+
       "must set a value on a JsObject" in {
 
         val gen = for {
@@ -232,7 +257,7 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val value = Json.obj()
 
-      value.set(JsPath, Json.obj()) mustEqual JsError("path cannot be empty")
+      value.remove(JsPath) mustEqual JsError("path cannot be empty")
     }
 
 
@@ -280,6 +305,15 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
           testObject mustNot equal(initialObj)
           testObject.remove(pathToRemove) mustEqual JsSuccess(initialObj)
       }
+    }
+
+    "must return an error given a keyPathNode for an array" in {
+          val testObject = Json.arr(Json.obj("n" -> "n"))
+
+          val pathToRemove = JsPath \ nonEmptyAlphaStr.sample.value
+
+          testObject.remove(pathToRemove) mustEqual JsError(s"cannot remove a key on $testObject")
+
     }
 
     "must remove a value given an index node and return the new object for one array" in {
@@ -343,6 +377,21 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
         "key2" -> JsArray(Seq(Json.toJson(1), Json.toJson(2)))
       )
     )
+  }
+
+  "return an error for recursive search in arrays" in {
+
+    val value = Json.arr(
+      Json.obj(
+        "firstField" -> Json.obj("name" -> "testName"),
+        "secondField" -> Json.arr(
+          Json.obj("name" -> "testName"),
+          Json.obj("name" -> "testName")
+        )
+      ))
+    val namesPath = JsPath \ 1 \\ "name"
+
+    value.remove(namesPath) mustBe JsError("recursive search is not supported")
   }
 
   "remove the value if the last value is deleted from an array" in {

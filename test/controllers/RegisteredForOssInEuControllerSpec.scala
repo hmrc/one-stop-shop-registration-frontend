@@ -72,6 +72,22 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return OK and the correct view for a GET when there are no user answers" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllerRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[RegisteredForOssInEuView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
 
       val sessionRepository = mock[UnauthenticatedSessionRepository]
@@ -79,6 +95,26 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, controllerRoute).withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual RegisteredForOssInEuPage.navigate(true).url
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted and there were no user answers" in {
+
+      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      when(sessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = None)
           .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
           .build()
 

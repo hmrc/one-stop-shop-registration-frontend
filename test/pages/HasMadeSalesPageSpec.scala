@@ -33,21 +33,28 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
     beRemovable[Boolean](HasMadeSalesPage)
 
-    "must navigate to Date Of First Sale page when the answer is yes" in {
-      HasMadeSalesPage.navigate(
-        NormalMode,
-        emptyUserAnswers.set(
-          HasMadeSalesPage,
-          true
-        ).success.value) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    }
+    "must navigate in NormalMode" - {
+      "must navigate to Date Of First Sale page when the answer is yes" in {
+        HasMadeSalesPage.navigate(
+          NormalMode,
+          emptyUserAnswers.set(
+            HasMadeSalesPage,
+            true
+          ).success.value) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
+      }
 
-    "must navigate to Is Planning First Eligible Sale page when the answer is no" in {
-      HasMadeSalesPage.navigate(NormalMode,
-        emptyUserAnswers.set(
-          HasMadeSalesPage,
-          false
-        ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
+      "must navigate to Is Planning First Eligible Sale page when the answer is no" in {
+        HasMadeSalesPage.navigate(NormalMode,
+          emptyUserAnswers.set(
+            HasMadeSalesPage,
+            false
+          ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
+      }
+
+      "to JourneyRecoveryController and answer is empty" in {
+        HasMadeSalesPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
     "must navigate in Check mode" - {
@@ -68,7 +75,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.IsPlanningFirstEligibleSaleController.onPageLoad(CheckMode))
       }
 
-      "to JourneyRecoveryController and answer is Some(true)" in {
+      "to JourneyRecoveryController and answer is empty" in {
         HasMadeSalesPage.navigate(CheckMode, emptyUserAnswersWithVatInfo)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
