@@ -56,6 +56,15 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
         }
       }
+
+      "when the answer is emoty" - {
+
+        "to Previously Registered" in {
+
+          TaxRegisteredInEuPage.navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check mode" - {
@@ -98,6 +107,15 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
           TaxRegisteredInEuPage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+
+      "when the answer is emoty" - {
+
+        "to Previously Registered" in {
+
+          TaxRegisteredInEuPage.navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
     }

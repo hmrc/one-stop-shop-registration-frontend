@@ -46,6 +46,12 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
           NormalMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, false).success.value
         ).mustEqual(routes.RegisterLaterController.onPageLoad())
       }
+
+      "to Journey recovery when answer is empty" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          NormalMode, emptyUserAnswers).mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
     "must navigate in Check mode" - {
@@ -62,6 +68,12 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
         IsPlanningFirstEligibleSalePage.navigate(
           CheckMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, false).success.value
         ).mustEqual(routes.RegisterLaterController.onPageLoad())
+      }
+
+      "to Journey recovery when answer is empty" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          CheckMode, emptyUserAnswers).mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
   }

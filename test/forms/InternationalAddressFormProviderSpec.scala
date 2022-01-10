@@ -168,7 +168,7 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
     "must not bind any values other than valid country codes" in {
 
-      val invalidAnswers = arbitrary[String] suchThat (x => !Country.internationalCountries.map(_.code).contains(x))
+      val invalidAnswers = arbitrary[String].retryUntil(x => !Country.internationalCountries.map(_.code).contains(x))
 
       forAll(invalidAnswers) {
         answer =>

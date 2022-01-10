@@ -22,7 +22,7 @@ import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.PreviousEuCountryPage
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -61,7 +61,9 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
+      val userAnswers = emptyUserAnswers
+        .set(PreviousEuCountryPage(index), country).success.value
+        .set(PreviousEuVatNumberPage(index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -77,7 +79,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer andredirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedSessionRepository]
 
@@ -105,6 +107,30 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, previousEuCountryRoute)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[PreviousEuCountryView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted and the question has been answered" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(PreviousEuCountryPage(index), country).success.value
+        .set(PreviousEuVatNumberPage(index), "test").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =

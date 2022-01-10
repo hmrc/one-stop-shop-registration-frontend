@@ -59,6 +59,15 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
         }
       }
+
+      "when the user answers empty" - {
+
+        "must be Journey recovery" in {
+
+          AddEuDetailsPage.navigate(NormalMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check Mode" - {
@@ -88,6 +97,15 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
                 
           AddEuDetailsPage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+      }
+
+      "when the user answers empty" - {
+
+        "must be Journey recovery" in {
+
+          AddEuDetailsPage.navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
     }

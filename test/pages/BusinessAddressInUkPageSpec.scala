@@ -44,11 +44,16 @@ class BusinessAddressInUkPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.UkAddressController.onPageLoad(NormalMode))
       }
 
-      "to International address when the answer is yes" in {
+      "to International address when the answer is no" in {
 
         val answers = emptyUserAnswers.set(BusinessAddressInUkPage, false).success.value
         BusinessAddressInUkPage.navigate(NormalMode, answers)
           .mustEqual(routes.InternationalAddressController.onPageLoad(NormalMode))
+      }
+
+      "to Journey recovery address when the answer is none" in {
+        BusinessAddressInUkPage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
@@ -94,6 +99,11 @@ class BusinessAddressInUkPageSpec extends SpecBase with PageBehaviours {
           BusinessAddressInUkPage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
+      }
+
+      "to Journey recovery address when the answer is none" in {
+        BusinessAddressInUkPage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
 

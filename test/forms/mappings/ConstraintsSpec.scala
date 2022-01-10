@@ -87,6 +87,34 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
     }
   }
 
+  "inRange" - {
+
+    "must return Invalid for a number less than the lower threshold" in {
+      val result = inRange(1, 5, "error.max").apply(0)
+      result mustEqual Invalid("error.max", 1, 5)
+    }
+
+    "must return Valid for a number equal to the lower threshold" in {
+      val result = inRange(1, 5, "error.max").apply(1)
+      result mustEqual Valid
+    }
+
+    "must return Valid for a number equal to the upper threshold" in {
+      val result = inRange(1, 5, "error.max").apply(5)
+      result mustEqual Valid
+    }
+
+    "must return Valid for a number in range" in {
+      val result = inRange(1, 5, "error.max").apply(3)
+      result mustEqual Valid
+    }
+
+    "must return Invalid for a number above the upper threshold" in {
+      val result = inRange(1, 5, "error.max").apply(6)
+      result mustEqual Invalid("error.max", 1, 5)
+    }
+  }
+
   "regexp" - {
 
     "must return Valid for an input that matches the expression" in {
@@ -119,6 +147,29 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
     "must return Invalid for a string longer than the allowed length" in {
       val result = maxLength(10, "error.length")("a" * 11)
+      result mustEqual Invalid("error.length", 10)
+    }
+  }
+
+  "minLength" - {
+
+    "must return Valid for a string longer than the min allowed length" in {
+      val result = minLength(5, "error.length")("a" * 9)
+      result mustEqual Valid
+    }
+
+    "must return Invalid for an empty string" in {
+      val result = minLength(10, "error.length")("")
+      result mustEqual Invalid("error.length", 10)
+    }
+
+    "must return Valid for a string equal to the allowed length" in {
+      val result = minLength(10, "error.length")("a" * 10)
+      result mustEqual Valid
+    }
+
+    "must return Invalid for a string shorter than the allowed min length" in {
+      val result = minLength(10, "error.length")("a" * 5)
       result mustEqual Invalid("error.length", 10)
     }
   }
@@ -209,6 +260,26 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
           result mustEqual Invalid("error.past", "foo")
       }
     }
+  }
+
+  "nonEmptySet" - {
+
+    "must return Valid when set is not empty" in {
+
+      val set = Set("bar", "baz")
+
+      val result = nonEmptySet("error.set")(set)
+      result mustEqual Valid
+    }
+
+    "must return Invalid when set is empty" in {
+
+      val set = Set.empty
+
+      val result = nonEmptySet("error.set")(set)
+      result mustEqual Invalid("error.set")
+    }
+
   }
 
   "notADuplicate" - {

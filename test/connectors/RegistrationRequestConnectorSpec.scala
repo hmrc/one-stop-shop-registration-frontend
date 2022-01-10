@@ -20,7 +20,7 @@ import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
 import models.DesAddress
 import models.domain.VatCustomerInfo
-import models.responses.{ConflictFound, NotFound, UnexpectedResponseStatus}
+import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.libs.json.Json
@@ -70,6 +70,21 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         val result = connector.submitRegistration(registration).futureValue
 
         result mustEqual Left(ConflictFound)
+      }
+    }
+
+    "must return Left(ConflictFound) when the backend returns UnexpectedResponseStatus" in {
+
+      val url = s"/one-stop-shop-registration/create"
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(post(urlEqualTo(url)).willReturn(aResponse().withStatus(123)))
+
+        val result = connector.submitRegistration(registration).futureValue
+
+        result mustEqual Left(UnexpectedResponseStatus(123, "Unexpected response, status 123 returned"))
       }
     }
   }
@@ -132,6 +147,21 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         val result = connector.getVatCustomerInfo().futureValue
 
         result mustEqual Right(vatInfo)
+      }
+    }
+
+    "must return invalid json when the backend returns some" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val responseBody = Json.obj("test" -> "test").toString()
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getVatCustomerInfo().futureValue
+
+        result mustEqual Left(InvalidJson)
       }
     }
 

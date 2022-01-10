@@ -71,6 +71,20 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       }
     }
 
+    "must redirect to Journey Recovery if user answers are empty" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        implicit val msgs: Messages = messages(application)
+        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "on a POST" - {
 
       "must redirect to the next page" in {

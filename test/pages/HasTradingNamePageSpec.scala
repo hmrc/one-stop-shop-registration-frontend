@@ -53,6 +53,15 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .mustBe(routes.HasMadeSalesController.onPageLoad(NormalMode))
         }
       }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasTradingNamePage.navigate(NormalMode, emptyUserAnswers)
+            .mustBe(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
     }
 
     "must navigate in Check mode" - {
@@ -76,6 +85,15 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
 
           HasTradingNamePage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+
+        "when the answer is empty" - {
+
+          "to Journey recovery" in {
+
+            HasTradingNamePage.navigate(CheckMode, emptyUserAnswers)
+              .mustBe(routes.JourneyRecoveryController.onPageLoad())
+          }
         }
       }
 

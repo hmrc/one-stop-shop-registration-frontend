@@ -46,7 +46,7 @@ class LiableForVatOnDirectSalesControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(POST, routes.LiableForVatOnAllSalesController.onPageLoad().url)
+        val request = FakeRequest(POST, routes.LiableForVatOnDirectSalesController.onPageLoad().url)
 
         val result = route(application, request).value
 

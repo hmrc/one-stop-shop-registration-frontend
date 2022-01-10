@@ -43,6 +43,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
   private type RetrievalsType = Option[Credentials] ~ Enrolments ~ Option[AffinityGroup] ~ ConfidenceLevel ~ Option[CredentialRole]
   private val vatEnrolment = Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "123456789")), "Activated")))
+  private val vatdecEnrolment = Enrolments(Set(Enrolment("HMCE-VATDEC-ORG", Seq(EnrolmentIdentifier("VATRegNo", "123456789")), "Activated")))
 
   class Harness(authAction: AuthenticatedIdentifierAction, defaultAction: DefaultActionBuilder) {
     def onPageLoad(): Action[AnyContent] = (defaultAction andThen authAction) { _ => Results.Ok }
@@ -69,6 +70,29 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
           
           when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(testCredentials) ~ vatEnrolment ~ Some(Organisation) ~ ConfidenceLevel.L50 ~ Some(User)))
+
+          val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
+          val controller = new Harness(action, actionBuilder)
+          val result = controller.onPageLoad()(fakeRequest)
+
+          status(result) mustEqual OK
+        }
+      }
+    }
+
+    "when the user is logged in as an Organisation Admin with a VATDEC enrolment and strong credentials" - {
+
+      "must succeed" in {
+
+        val application = applicationBuilder(None).build()
+
+        running(application) {
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val urlBuilder = application.injector.instanceOf[UrlBuilderService]
+          val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
+
+          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(testCredentials) ~ vatdecEnrolment ~ Some(Organisation) ~ ConfidenceLevel.L50 ~ Some(User)))
 
           val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
           val controller = new Harness(action, actionBuilder)
@@ -198,6 +222,31 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
       }
     }
 
+    "when the user has logged in as an Individual with no credentials" - {
+        "must redirect the user to an Unauthorised page" in {
+
+          val application = applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val urlBuilder = application.injector.instanceOf[UrlBuilderService]
+            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
+            when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+              .thenReturn(Future.successful(None ~ Enrolments(Set.empty) ~ Some(Individual) ~ ConfidenceLevel.L50 ~ Some(User)))
+
+            val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
+            val controller = new Harness(action, actionBuilder)
+            val request = FakeRequest().withHeaders(HeaderNames.xSessionId -> "123")
+            val result = controller.onPageLoad()(request)
+
+            status(result) mustBe SEE_OTHER
+
+            redirectLocation(result).value mustBe controllers.routes.UnauthorisedController.onPageLoad().url
+          }
+      }
+
+    }
+
     "when the user hasn't logged in" - {
 
       "must redirect the user to log in " in {
@@ -302,6 +351,32 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
           status(result) mustBe SEE_OTHER
 
           redirectLocation(result).value mustBe "http://localhost:9553/bas-gateway/uplift-mfa?origin=OSS&continueUrl=http%3A%2F%2Flocalhost%3A10200%2F%3Fk%3D123"
+        }
+      }
+    }
+
+    "the connector returns other AuthorisationException" - {
+
+      val exceptions = List( new InternalError(), new FailedRelationship(),  IncorrectNino)
+      exceptions.foreach { e =>
+        s"$e must redirect the user to an Unauthorised page" in {
+
+          val application = applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val urlBuilder = application.injector.instanceOf[UrlBuilderService]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
+            val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
+
+            val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(e), appConfig, urlBuilder)
+            val controller = new Harness(authAction, actionBuilder)
+            val request = FakeRequest().withHeaders(HeaderNames.xSessionId -> "123")
+            val result = controller.onPageLoad()(request)
+
+            status(result) mustBe SEE_OTHER
+
+            redirectLocation(result).value mustBe controllers.routes.UnauthorisedController.onPageLoad().url
+          }
         }
       }
     }

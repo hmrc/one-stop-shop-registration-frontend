@@ -46,6 +46,12 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
         HasWebsitePage.navigate(NormalMode, answers)
           .mustEqual(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
       }
+
+      "to Journey recovery when the answer is empty" in {
+
+        HasWebsitePage.navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
     "must navigate in Check mode" - {
@@ -81,6 +87,12 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
           HasWebsitePage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
+      }
+
+      "to Journey recovery when the answer is empty" in {
+
+        HasWebsitePage.navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
 

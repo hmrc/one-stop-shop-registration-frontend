@@ -283,6 +283,18 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           )(request, messages(application)).toString
         }
       }
+
+      "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+          val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
   }
 }
