@@ -18,11 +18,12 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
+import models.euDetails.EuOptionalDetails
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuVatNumberPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -37,17 +38,25 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new AddEuDetailsFormProvider()
   private val form = formProvider()
+  private val index = Index(0)
+  private val country               = Country.euCountries.head
 
   private lazy val addEuVatDetailsRoute = routes.AddEuDetailsController.onPageLoad(NormalMode).url
-
+  private def addEuVatDetailsPostRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
   private val baseAnswers =
     emptyUserAnswers
-      .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
-      .set(EuVatNumberPage(Index(0)), "foo").success.value
+      .set(EuCountryPage(index), country).success.value
+      .set(VatRegisteredPage(index), false).success.value
+      .set(HasFixedEstablishmentPage(index), false).success.value
+
+  private val incompleteAnswers =
+    emptyUserAnswers
+      .set(EuCountryPage(index), country).success.value
+      .set(VatRegisteredPage(index), true).success.value
 
   "AddEuDetails Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when answers are complete" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
@@ -62,6 +71,26 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when answers are incomplete" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, addEuVatDetailsRoute)
+
+        val result = route(application, request).value
+
+        val view                    = application.injector.instanceOf[AddEuDetailsView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = EuDetailsSummary.addToListRows(incompleteAnswers, NormalMode)
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true,
+          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None))
+        )(request, implicitly).toString
       }
     }
 
@@ -98,7 +127,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsRoute)
+          FakeRequest(POST, addEuVatDetailsPostRoute())
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -116,7 +145,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsRoute)
+          FakeRequest(POST, addEuVatDetailsPostRoute())
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -166,13 +195,45 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsRoute)
+          FakeRequest(POST, addEuVatDetailsPostRoute())
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must refresh the page for a POST if answers are incomplete and the prompt has not been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute())
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.AddEuDetailsController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to CheckEuDetailsAnswers page for a POST if answers are incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url
       }
     }
   }
