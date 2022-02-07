@@ -20,7 +20,7 @@ import controllers.previousRegistrations.routes
 import models.{CheckMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.AllPreviousRegistrationsQuery
+import queries.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
@@ -30,7 +30,7 @@ import viewmodels.implicits._
 object PreviousRegistrationSummary {
 
   def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
-    answers.get(AllPreviousRegistrationsQuery).getOrElse(List.empty).zipWithIndex.map {
+    answers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.previousEuCountry.name).toString,

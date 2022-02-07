@@ -176,9 +176,9 @@ POST        /first-check-tax-details/:index                           controller
 GET         /already-registered                                       controllers.AlreadyRegisteredController.onPageLoad()
 
 GET         /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode)
+POST        /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
 GET         /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode)
+POST        /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
 
 GET         /deregistered-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /deregistered-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
