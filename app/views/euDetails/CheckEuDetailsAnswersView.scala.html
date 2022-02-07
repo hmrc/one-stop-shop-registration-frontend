@@ -22,18 +22,39 @@
         govukButton: GovukButton
 )
 
-@(list: SummaryList, mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, mode: Mode, index: Index, country: Country, incompleteDetails: Boolean = false)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkEuVatDetailsAnswers.title", country.name))) {
 
-    @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index)) {
-
         <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
 
-        @govukSummaryList(list)
+        @if(incompleteDetails) {
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    @messages("error.missing_answers")
+                </strong>
+            </div>
+        }
+        @if(!incompleteDetails){
+            @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, false)) {
+                @govukSummaryList(list)
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
-    }
+                @govukButton(
+                    ButtonViewModel(messages("site.continue"))
+                )
+            }
+        } else {
+            <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
+            <p class="govuk-body">@messages("error.missing_answers_prompt", country.name)</p>
+
+            @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, true)) {
+                @govukButton(
+                    ButtonViewModel(messages("error.resolve_missing_answers"))
+                )
+            }
+
+        }
+
 }
