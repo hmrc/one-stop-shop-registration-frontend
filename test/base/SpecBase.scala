@@ -19,11 +19,14 @@ package base
 import controllers.actions._
 import generators.Generators
 import models.domain.VatCustomerInfo
-import models.{DesAddress, UserAnswers}
+import models.{Country, DesAddress, Index, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
+import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
+import pages.previousRegistrations.PreviouslyRegisteredPage
+import pages.{HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage, WebsitePage}
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -74,7 +77,16 @@ trait SpecBase
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val partialUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(partialVatCustomerInfo))
-
+  val completeUserAnswers: UserAnswers = emptyUserAnswersWithVatInfo
+    .set(HasTradingNamePage, false).success.value
+    .set(HasMadeSalesPage, false).success.value
+    .set(TaxRegisteredInEuPage, false).success.value
+    .set(PreviouslyRegisteredPage, false).success.value
+    .set(IsOnlineMarketplacePage, false).success.value
+    .set(HasWebsitePage, false).success.value
+  val invalidUserAnswers = completeUserAnswers
+    .set(TaxRegisteredInEuPage, true).success.value
+    .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None): GuiceApplicationBuilder = {

@@ -16,10 +16,11 @@
 
 package utils
 
-import models.{Country, Index}
+import models.{CheckMode, Country, Index}
 import models.euDetails.EuOptionalDetails
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
 import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, EuOptionalDetailsQuery}
 
@@ -29,8 +30,8 @@ trait CompletionChecks {
 
 
   protected def withCompleteDataModel[A](index: Index, data: Index => Option[A], onFailure: Option[A] => Result)
-                                   (onSuccess: => Result)
-                                   (implicit request: AuthenticatedDataRequest[AnyContent]): Result = {
+                                        (onSuccess: => Result)
+                                        (implicit request: AuthenticatedDataRequest[AnyContent]): Result = {
 
     val incomplete = data(index)
     if (incomplete.isEmpty) {
@@ -41,11 +42,11 @@ trait CompletionChecks {
   }
 
   protected def withCompleteDataAsync[A](data: () => Seq[A], onFailure: Seq[A] => Future[Result])
-                                   ( onSuccess: => Future[Result])
-                                   ( implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+                                        (onSuccess: => Future[Result])
+                                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
 
     val incomplete = data()
-    if(incomplete.isEmpty) {
+    if (incomplete.isEmpty) {
       onSuccess
     } else {
       onFailure(incomplete)
@@ -87,17 +88,40 @@ trait CompletionChecks {
   }
 
   def firstIndexedIncompleteDeregisteredCountry(incompleteCountries: Seq[Country])
-                                          (implicit request: AuthenticatedDataRequest[AnyContent]): Option[(PreviousRegistrationDetailsWithOptionalVatNumber, Int)] = {
+                                               (implicit request: AuthenticatedDataRequest[AnyContent]): Option[(PreviousRegistrationDetailsWithOptionalVatNumber, Int)] = {
     request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery)
       .getOrElse(List.empty).zipWithIndex
       .find(indexedDetails => incompleteCountries.contains(indexedDetails._1.previousEuCountry))
   }
 
   def firstIndexedIncompleteEuDetails(incompleteCountries: Seq[Country])
-                                               (implicit request: AuthenticatedDataRequest[AnyContent]): Option[(EuOptionalDetails, Int)] = {
+                                     (implicit request: AuthenticatedDataRequest[AnyContent]): Option[(EuOptionalDetails, Int)] = {
     request.userAnswers.get(AllEuOptionalDetailsQuery)
       .getOrElse(List.empty).zipWithIndex
       .find(indexedDetails => incompleteCountries.contains(indexedDetails._1.euCountry))
+  }
+
+  def validate()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    getAllIncompleteDeregisteredDetails.isEmpty && getAllIncompleteEuDetails.isEmpty
+  }
+
+  def getFirstValidationError()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
+
+    val incompleteEuDetails = firstIndexedIncompleteEuDetails(getAllIncompleteEuDetails().map(
+      _.euCountry
+    )).map(
+      incompleteCountry =>
+        Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+    )
+
+    val incompleteDeregisteredCountry = firstIndexedIncompleteDeregisteredCountry(getAllIncompleteDeregisteredDetails().map(
+      _.previousEuCountry
+    )).map(
+      incompleteCountry =>
+        Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+    )
+
+    (incompleteEuDetails ++ incompleteDeregisteredCountry).headOption
   }
 
 }

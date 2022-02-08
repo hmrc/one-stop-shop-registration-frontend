@@ -14,7 +14,7 @@ GET         /refresh-session-unauthenticated                          controller
 GET         /there-is-a-problem                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /check-answers                                            controllers.CheckYourAnswersController.onPageLoad
-POST        /check-answers                                            controllers.CheckYourAnswersController.onSubmit
+POST        /check-answers/:incompletePrompt                          controllers.CheckYourAnswersController.onSubmit(incompletePrompt: Boolean)
 
 GET         /unauthorised                                             controllers.UnauthorisedController.onPageLoad
 

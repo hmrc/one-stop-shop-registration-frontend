@@ -31,6 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.EmailConfirmationQuery
 import services._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CompletionChecks
 import utils.FutureSyntax._
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
@@ -38,7 +39,6 @@ import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummar
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
 
-import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
@@ -50,7 +50,7 @@ class CheckYourAnswersController @Inject()(
   view: CheckYourAnswersView,
   emailService: EmailService,
   dateService: DateService
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -82,10 +82,11 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      Ok(view(list))
+      val isValid = validate()
+      Ok(view(list, isValid))
   }
 
-  def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       val registration = registrationService.fromUserAnswers(request.userAnswers, request.vrn)
 
@@ -122,11 +123,18 @@ class CheckYourAnswersController @Inject()(
           }
 
         case Invalid(errors) =>
-          val errorList = errors.toChain.toList
-          val errorMessages = errorList.map(_.errorMessage).mkString("\n")
-          logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-
-          Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
+          Future.successful(getFirstValidationError.map(
+            checkPageRefresh => if(incompletePrompt) {
+              checkPageRefresh
+            } else {
+              Redirect(routes.CheckYourAnswersController.onPageLoad())
+            }
+          ).getOrElse {
+            val errorList = errors.toChain.toList
+            val errorMessages = errorList.map(_.errorMessage).mkString("\n")
+            logger.error(s"Unable to create a registration request from user answers: $errorMessages")
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          })
       }
   }
 }
