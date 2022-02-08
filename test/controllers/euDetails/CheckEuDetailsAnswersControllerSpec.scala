@@ -24,13 +24,13 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
-import pages.euDetails.CheckEuDetailsAnswersPage
+import pages.euDetails.{CheckEuDetailsAnswersPage, EuCountryPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedSessionRepository
-import viewmodels.checkAnswers.euDetails.VatRegisteredSummary
+import viewmodels.checkAnswers.euDetails.{HasFixedEstablishmentSummary, VatRegisteredSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
 
@@ -47,13 +47,35 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       .set(euDetails.EuCountryPage(index), Country.euCountries.head).success.value
       .set(euDetails.VatRegisteredPage(index), true).success.value
 
+  private val answersNotRegisteredNoEstablishment = baseUserAnswers.set(EuCountryPage(index), country).success.value
+    .set(VatRegisteredPage(index), false).success.value
+    .set(HasFixedEstablishmentPage(index), false).success.value
+
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
   }
 
   "CheckEuVatDetailsAnswersController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when answers are complete" in {
+
+      val application = applicationBuilder(userAnswers = Some(answersNotRegisteredNoEstablishment)).build()
+
+      running(application) {
+        implicit val msgs: Messages = messages(application)
+        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
+        val result = route(application, request).value
+        val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
+        val list = SummaryListViewModel(
+          Seq(VatRegisteredSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode), HasFixedEstablishmentSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode)).flatten
+        )
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(list, NormalMode, index, country)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when answers aren't complete" in {
 
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
@@ -62,12 +84,10 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
-        val list = SummaryListViewModel(
-          Seq(VatRegisteredSummary.row(baseUserAnswers, index, NormalMode)).flatten
-        )
+        val list = SummaryListViewModel(Seq.empty)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(list, NormalMode, index, country, true)(request, messages(application)).toString
       }
     }
 
@@ -87,21 +107,57 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
     "on a POST" - {
 
-      "must redirect to the next page" in {
+      "must redirect to the next page when answers are complete" in {
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(userAnswers = Some(answersNotRegisteredNoEstablishment))
             .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
             .build()
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         running(application) {
-          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index).url)
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index, false).url)
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, emptyUserAnswers).url
+          redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, answersNotRegisteredNoEstablishment).url
+        }
+      }
+
+      "must redirect to the Eu Country page when answers aren't complete and the prompt has been shown" in {
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseUserAnswers))
+            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index, true).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.EuCountryController.onPageLoad(NormalMode, index).url
+        }
+      }
+
+      "must refresh the page when answers aren't complete and the prompt has not been shown" in {
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseUserAnswers))
+            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index, false).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url
         }
       }
     }

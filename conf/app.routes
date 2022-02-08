@@ -167,11 +167,11 @@ GET         /first-check-eu-fixed-establishment/:index                controller
 POST        /first-check-eu-fixed-establishment/:index                controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
 GET         /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
+POST        /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index, incompletePromptShown: Boolean)
 GET         /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
+POST        /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index, incompletePromptShown: Boolean)
 GET         /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index, incompletePromptShown: Boolean)
 
 GET         /already-registered                                       controllers.AlreadyRegisteredController.onPageLoad()
 

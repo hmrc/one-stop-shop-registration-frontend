@@ -17,6 +17,7 @@
 package controllers.euDetails
 
 import controllers.actions.AuthenticatedControllerComponents
+import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
 import pages.euDetails
@@ -24,6 +25,7 @@ import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CompletionChecks
 import viewmodels.checkAnswers.euDetails._
 import viewmodels.govuk.summarylist._
 import views.html.euDetails.CheckEuDetailsAnswersView
@@ -35,7 +37,7 @@ class CheckEuDetailsAnswersController @Inject()(
                                                  override val messagesApi: MessagesApi,
                                                  cc: AuthenticatedControllerComponents,
                                                  view: CheckEuDetailsAnswersView
-                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -55,13 +57,29 @@ class CheckEuDetailsAnswersController @Inject()(
             ).flatten
           )
 
-          Future.successful(Ok(view(list, mode, index, country)))
+          Future.successful(withCompleteDataModel[EuOptionalDetails](
+            index,
+            data = getIncompleteEuDetails _,
+            onFailure = (incomplete: Option[EuOptionalDetails]) => {
+              Ok(view(list, mode, index, country, incomplete.isDefined))
+            }) {
+            Ok(view(list, mode, index, country))
+          })
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, index: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
+      val incomplete = getIncompleteEuDetails(index)
+      if(incomplete.isEmpty) {
+        Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
+      } else {
+        if(!incompletePromptShown) {
+          Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, index))
+        } else{
+          Redirect(routes.EuCountryController.onPageLoad(mode, index))
+        }
+      }
   }
 
   private def getCountry(index: Index)
