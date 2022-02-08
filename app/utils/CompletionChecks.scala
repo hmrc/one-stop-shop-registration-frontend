@@ -20,6 +20,8 @@ import models.{CheckMode, Country, Index}
 import models.euDetails.EuOptionalDetails
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
+import pages.euDetails.TaxRegisteredInEuPage
+import pages.previousRegistrations.PreviouslyRegisteredPage
 import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
@@ -123,12 +125,28 @@ trait CompletionChecks {
     }
   }
 
+  def isEuDetailsPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(TaxRegisteredInEuPage).exists {
+      case true => request.userAnswers.get(AllEuOptionalDetailsQuery).isDefined
+      case false => true
+    }
+  }
+
+  def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(PreviouslyRegisteredPage).exists {
+      case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
+      case false => true
+    }
+  }
+
   def validate()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     getAllIncompleteDeregisteredDetails.isEmpty &&
       getAllIncompleteEuDetails.isEmpty &&
       isTradingNamesValid &&
       isAlreadyMadeSalesValid &&
-      hasWebsiteValid
+      hasWebsiteValid &&
+      isEuDetailsPopulated &&
+      isDeregisteredPopulated
   }
 
   def getFirstValidationError()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
@@ -165,11 +183,26 @@ trait CompletionChecks {
       None
     }
 
-    (incompleteEuDetails ++
-      incompleteDeregisteredCountry ++
-      incompleteTradingName ++
+    val emptyEuDetails = if(!isEuDetailsPopulated)  {
+      Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode)))
+    } else {
+      None
+    }
+
+    val emptyDeregistered = if(!isDeregisteredPopulated)  {
+      Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)))
+    } else {
+      None
+    }
+
+    (incompleteTradingName ++
       incompleteEligibleSales ++
-      incompleteWebsiteUrls).headOption
+      emptyEuDetails ++
+      incompleteEuDetails ++
+      emptyDeregistered ++
+      incompleteDeregisteredCountry ++
+      incompleteWebsiteUrls
+      ).headOption
   }
 }
 

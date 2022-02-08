@@ -30,8 +30,9 @@ import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.EuTaxReferencePage
-import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasWebsitePage}
+import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
+import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -47,6 +48,7 @@ import viewmodels.checkAnswers._
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -57,80 +59,197 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
   private val registrationConnector = mock[RegistrationConnector]
   private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
+  private val dateService = mock[DateService]
+  private val country = arbitraryCountry.arbitrary.sample.value
+  private val commencementDate = LocalDate.of(2022, 1, 1)
 
   override def beforeEach(): Unit = {
     Mockito.reset(
       registrationConnector,
       registrationService,
       auditService,
-      emailService
+      emailService,
+      dateService
     )
   }
 
   "Check Your Answers Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "GET" - {
+      "must return OK and the correct view when answers are complete" in {
+        val commencementDate = LocalDate.of(2022, 1, 1)
+        when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+        when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
-      val application = applicationBuilder(userAnswers = Some(completeUserAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[DateService].toInstance(dateService))
+          .build()
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        implicit val msgs: Messages = messages(application)
-        val list = SummaryListViewModel(rows = Seq(
-          RegisteredCompanyNameSummary.row(completeUserAnswers),
-          PartOfVatGroupSummary.row(completeUserAnswers),
-          UkVatEffectiveDateSummary.row(completeUserAnswers),
-          BusinessAddressInUkSummary.row(completeUserAnswers),
-          UkAddressSummary.row(completeUserAnswers),
-          InternationalAddressSummary.row(completeUserAnswers),
-          new HasTradingNameSummary().row(completeUserAnswers),
-          HasMadeSalesSummary.row(completeUserAnswers),
-          IsPlanningFirstEligibleSaleSummary.row(completeUserAnswers),
-          TaxRegisteredInEuSummary.row(completeUserAnswers),
-          PreviouslyRegisteredSummary.row(completeUserAnswers),
-          IsOnlineMarketplaceSummary.row(completeUserAnswers),
-          HasWebsiteSummary.row(completeUserAnswers),
-          BusinessContactDetailsSummary.row(completeUserAnswers),
-          BankDetailsSummary.row(completeUserAnswers)
-        ).flatten)
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[CheckYourAnswersView]
+          implicit val msgs: Messages = messages(application)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, true)(request, messages(application)).toString
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(list, true)(request, messages(application)).toString
+        }
       }
-    }
 
-    "must redirect to corresponding url when no data is present when validated" in {
+      "must return OK and view with invalid prompt when" - {
+        "trading name is missing" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
 
-      val application = applicationBuilder(userAnswers = Some(invalidUserAnswers))
-        .build()
+          val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        implicit val msgs: Messages = messages(application)
-        val list = SummaryListViewModel(rows = Seq(
-          RegisteredCompanyNameSummary.row(completeUserAnswers),
-          PartOfVatGroupSummary.row(completeUserAnswers),
-          UkVatEffectiveDateSummary.row(completeUserAnswers),
-          BusinessAddressInUkSummary.row(completeUserAnswers),
-          UkAddressSummary.row(completeUserAnswers),
-          InternationalAddressSummary.row(completeUserAnswers),
-          new HasTradingNameSummary().row(completeUserAnswers),
-          HasMadeSalesSummary.row(completeUserAnswers),
-          IsPlanningFirstEligibleSaleSummary.row(completeUserAnswers),
-          TaxRegisteredInEuSummary.row(invalidUserAnswers),
-          PreviouslyRegisteredSummary.row(completeUserAnswers),
-          IsOnlineMarketplaceSummary.row(completeUserAnswers),
-          HasWebsiteSummary.row(completeUserAnswers),
-          BusinessContactDetailsSummary.row(completeUserAnswers),
-          BankDetailsSummary.row(completeUserAnswers)
-        ).flatten)
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, false)(request, messages(application)).toString
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+        }
+
+        "websites are missing" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+
+          val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+        }
+
+        "eligible sales is not populated correctly" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+
+          val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+        }
+
+        "tax registered in eu is not populated correctly" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+
+          val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+        }
+
+        "previous registrations is not populated correctly" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+
+          val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+        }
+
+        "tax registered in eu has a country with missing data" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+
+          val answers = completeUserAnswers
+            .set(TaxRegisteredInEuPage, true).success.value
+            .set(EuCountryPage(Index(0)), country).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+        }
+
+        "previous registrations has a country with missing data" in {
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+
+          val answers = completeUserAnswers
+            .set(PreviouslyRegisteredPage, true).success.value
+            .set(PreviousEuCountryPage(Index(0)), country).success.value
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[CheckYourAnswersView]
+            implicit val msgs: Messages = messages(application)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(list, isValid = false)(request, messages(application)).toString
+          }
+
+        }
       }
     }
 
@@ -192,7 +311,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
 
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          val application = applicationBuilder(userAnswers = None)
             .overrides(bind[RegistrationService].toInstance(registrationService)).build()
 
           running(application) {
