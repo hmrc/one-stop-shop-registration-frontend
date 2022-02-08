@@ -26,17 +26,18 @@
 
 @layout(pageTitle = titleNoForm(messages("checkEuVatDetailsAnswers.title", country.name))) {
 
+        @if(incompleteDetails) {
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                @messages("error.missing_answers")
+            </strong>
+        </div>
+        }
+
         <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
 
-        @if(incompleteDetails) {
-            <div class="govuk-warning-text">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-warning-text__assistive">Warning</span>
-                    @messages("error.missing_answers")
-                </strong>
-            </div>
-        }
         @if(!incompleteDetails){
             @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, false)) {
                 @govukSummaryList(list)
