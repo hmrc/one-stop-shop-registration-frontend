@@ -20,9 +20,10 @@ import models.{CheckMode, Country, Index}
 import models.euDetails.EuOptionalDetails
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
+import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
-import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, EuOptionalDetailsQuery}
+import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
 
 import scala.concurrent.Future
 
@@ -101,8 +102,33 @@ trait CompletionChecks {
       .find(indexedDetails => incompleteCountries.contains(indexedDetails._1.euCountry))
   }
 
+  def isTradingNamesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(HasTradingNamePage).exists {
+      case true => request.userAnswers.get(AllTradingNames).getOrElse(List.empty).nonEmpty
+      case false => true
+    }
+  }
+
+  def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(HasMadeSalesPage).exists {
+      case true => request.userAnswers.get(DateOfFirstSalePage).isDefined
+      case false => request.userAnswers.get(IsPlanningFirstEligibleSalePage).isDefined
+    }
+  }
+
+  def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(HasWebsitePage).exists {
+      case true => request.userAnswers.get(AllWebsites).getOrElse(List.empty).nonEmpty
+      case false => true
+    }
+  }
+
   def validate()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
-    getAllIncompleteDeregisteredDetails.isEmpty && getAllIncompleteEuDetails.isEmpty
+    getAllIncompleteDeregisteredDetails.isEmpty &&
+      getAllIncompleteEuDetails.isEmpty &&
+      isTradingNamesValid &&
+      isAlreadyMadeSalesValid &&
+      hasWebsiteValid
   }
 
   def getFirstValidationError()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
@@ -121,7 +147,29 @@ trait CompletionChecks {
         Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
     )
 
-    (incompleteEuDetails ++ incompleteDeregisteredCountry).headOption
-  }
+    val incompleteTradingName = if(!isTradingNamesValid) {
+      Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(CheckMode)))
+    } else {
+      None
+    }
 
+    val incompleteEligibleSales = if(!isAlreadyMadeSalesValid) {
+      Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(CheckMode)))
+    } else {
+      None
+    }
+
+    val incompleteWebsiteUrls = if(!hasWebsiteValid) {
+      Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(CheckMode)))
+    } else {
+      None
+    }
+
+    (incompleteEuDetails ++
+      incompleteDeregisteredCountry ++
+      incompleteTradingName ++
+      incompleteEligibleSales ++
+      incompleteWebsiteUrls).headOption
+  }
 }
+
