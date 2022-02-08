@@ -35,8 +35,6 @@
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
 
-            <h1 class="govuk-heading-xl">@messages("addEuDetails.heading" + messageSuffix, list.size)</h1>
-
             @if(!incompleteCountries.isEmpty) {
             <div class="govuk-warning-text">
                 <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -46,6 +44,8 @@
                 </strong>
             </div>
             }
+
+            <h1 class="govuk-heading-xl">@messages("addEuDetails.heading" + messageSuffix, list.size)</h1>
 
             @addToList(list, Long, "addEuDetails.change.hidden", "addEuDetails.remove.hidden")
             @if(incompleteCountries.isEmpty) {
