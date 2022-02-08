@@ -18,13 +18,15 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.AddEuDetailsFormProvider
+import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Mode}
+import models.{Country, Index, Mode}
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CompletionChecks
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
 import views.html.euDetails.AddEuDetailsView
 
@@ -36,7 +38,7 @@ class AddEuDetailsController @Inject()(
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: AddEuDetailsFormProvider,
                                         view: AddEuDetailsView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
   private val form = formProvider()
@@ -49,28 +51,50 @@ class AddEuDetailsController @Inject()(
           val canAddCountries = number < Country.euCountries.size
           val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
 
-          Future.successful(Ok(view(form, mode, list, canAddCountries)))
+          withCompleteDataAsync[EuOptionalDetails](
+            data = getAllIncompleteEuDetails,
+            onFailure = (incomplete: Seq[EuOptionalDetails]) => {
+              Future.successful(Ok(view(form, mode, list, canAddCountries, incomplete)))
+            }) {
+            Future.successful(Ok(view(form, mode, list, canAddCountries)))
+          }
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getNumberOfEuCountries {
-        number =>
-          val canAddCountries = number < Country.euCountries.size
-          form.bindFromRequest().fold(
-            formWithErrors => {
-              val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+      withCompleteDataAsync[EuOptionalDetails](
+        data = getAllIncompleteEuDetails,
+        onFailure = (incomplete: Seq[EuOptionalDetails]) => {
+          if(incompletePromptShown) {
+            firstIndexedIncompleteEuDetails(incomplete.map(_.euCountry)) match {
+              case Some(incompleteCountry) =>
+                Future.successful(Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, Index(incompleteCountry._2))))
+              case None =>
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            }
+          } else {
+            Future.successful(Redirect(routes.AddEuDetailsController.onPageLoad(mode)))
+          }
+        }) {
+        getNumberOfEuCountries {
+          number =>
+            val canAddCountries = number < Country.euCountries.size
+            form.bindFromRequest().fold(
+              formWithErrors => {
+                val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
 
-              Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
-            },
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuDetailsPage, value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(AddEuDetailsPage.navigate(mode, updatedAnswers))
-          )
+                Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
+              },
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEuDetailsPage, value))
+                  _              <- cc.sessionRepository.set(updatedAnswers)
+                } yield Redirect(AddEuDetailsPage.navigate(mode, updatedAnswers))
+            )
+        }
       }
+
   }
 
   private def getNumberOfEuCountries(block: Int => Future[Result])

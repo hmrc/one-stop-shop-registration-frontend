@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ListItem, Long}
 @import viewmodels.LegendSize
+@import models.previousRegistrations._
 
 @this(
         layout: templates.Layout,
@@ -26,38 +27,59 @@
         addToList: components.addToList
 )
 
-@(form: Form[_], mode: Mode, list: Seq[ListItem], canAddCountries: Boolean)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: Seq[ListItem], canAddCountries: Boolean, incompleteCountries: Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = List.empty)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
     @layout(pageTitle = title(form, messages("addPreviousRegistration.title" + messageSuffix, list.size))) {
 
-        @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode), 'autoComplete -> "off") {
-
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form))
+            }
+
+            @if(!incompleteCountries.isEmpty) {
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    @messages("error.missing_answers")
+                </strong>
+            </div>
             }
 
             <h1 class="govuk-heading-xl">@messages("addPreviousRegistration.heading" + messageSuffix, list.size)</h1>
 
             @addToList(list, Long, "addPreviousRegistration.change.hidden", "addPreviousRegistration.remove.hidden")
 
-            @if(canAddCountries) {
-                @govukRadios(
-                    RadiosViewModel.yesNo(
-                        field = form("value"),
-                        legend = LegendViewModel(
-                            HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("addPreviousRegistration.addAnother") + "</h2>"))
-                        ).withSize(LegendSize.Medium)
-                    ).withHint(HintViewModel(messages("addPreviousRegistration.addAnother.hint")))
-                )
-            } else {
-                <p class="govuk-body">@messages("addPreviousRegistration.maximumReached")</p>
-                <input type="hidden" name="value" id="value" value="false"/>
-            }
+            @if(incompleteCountries.isEmpty) {
+                @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode, false), 'autoComplete -> "off") {
+                    @if(canAddCountries) {
+                        @govukRadios(
+                            RadiosViewModel.yesNo(
+                            field = form("value"),
+                            legend = LegendViewModel(
+                                HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("addPreviousRegistration.addAnother") + "</h2>"))
+                                ).withSize(LegendSize.Medium)
+                            ).withHint(HintViewModel(messages("addPreviousRegistration.addAnother.hint")))
+                        )
+                    } else {
+                        <p class="govuk-body">@messages("addPreviousRegistration.maximumReached")</p>
+                        <input type="hidden" name="value" id="value" value="false"/>
+                    }
 
-            @govukButton(
-                ButtonViewModel(messages("site.continue"))
-            )
-        }
+                    @govukButton(
+                        ButtonViewModel(messages("site.continue"))
+                    )
+
+                }
+            } else {
+                <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
+                <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.map(_.previousEuCountry.name).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.previousEuCountry.name} else {incompleteCountries.head.previousEuCountry.name})</p>
+
+                @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode, true)) {
+                    @govukButton(
+                        ButtonViewModel(messages("error.resolve_missing_answers"))
+                    )
+                }
+            }
     }
 }
