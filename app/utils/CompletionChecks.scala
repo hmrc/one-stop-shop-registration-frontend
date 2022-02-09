@@ -149,60 +149,62 @@ trait CompletionChecks {
       isDeregisteredPopulated
   }
 
-  def getFirstValidationError()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
-
-    val incompleteEuDetails = firstIndexedIncompleteEuDetails(getAllIncompleteEuDetails().map(
-      _.euCountry
-    )).map(
-      incompleteCountry =>
-        Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
-    )
-
-    val incompleteDeregisteredCountry = firstIndexedIncompleteDeregisteredCountry(getAllIncompleteDeregisteredDetails().map(
-      _.previousEuCountry
-    )).map(
-      incompleteCountry =>
-        Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
-    )
-
-    val incompleteTradingName = if(!isTradingNamesValid) {
-      Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(CheckMode)))
-    } else {
-      None
-    }
-
-    val incompleteEligibleSales = if(!isAlreadyMadeSalesValid) {
-      Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(CheckMode)))
-    } else {
-      None
-    }
-
-    val incompleteWebsiteUrls = if(!hasWebsiteValid) {
-      Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(CheckMode)))
-    } else {
-      None
-    }
-
-    val emptyEuDetails = if(!isEuDetailsPopulated)  {
-      Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode)))
-    } else {
-      None
-    }
-
-    val emptyDeregistered = if(!isDeregisteredPopulated)  {
-      Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)))
-    } else {
-      None
-    }
-
-    (incompleteTradingName ++
-      incompleteEligibleSales ++
-      emptyEuDetails ++
-      incompleteEuDetails ++
-      emptyDeregistered ++
-      incompleteDeregisteredCountry ++
-      incompleteWebsiteUrls
+  def getFirstValidationErrorRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
+    (incompleteTradingNameRedirect ++
+      incompleteEligibleSalesRedirect ++
+      emptyEuDetailsRedirect ++
+      incompleteEuDetailsRedirect ++
+      emptyDeregisteredRedirect ++
+      incompleteDeregisteredCountryRedirect ++
+      incompleteWebsiteUrlsRedirect
       ).headOption
   }
+
+  private def incompleteEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) =
+    firstIndexedIncompleteEuDetails(getAllIncompleteEuDetails().map(
+    _.euCountry
+  )).map(
+    incompleteCountry =>
+      Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+  )
+
+  private def incompleteDeregisteredCountryRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) =
+    firstIndexedIncompleteDeregisteredCountry(getAllIncompleteDeregisteredDetails().map(
+    _.previousEuCountry
+  )).map(
+    incompleteCountry =>
+      Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+  )
+
+  private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {
+    Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(CheckMode)))
+  } else {
+    None
+  }
+
+  private def incompleteEligibleSalesRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isAlreadyMadeSalesValid) {
+    Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(CheckMode)))
+  } else {
+    None
+  }
+
+  private def incompleteWebsiteUrlsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!hasWebsiteValid) {
+    Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(CheckMode)))
+  } else {
+    None
+  }
+
+  private def emptyEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isEuDetailsPopulated)  {
+    Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode)))
+  } else {
+    None
+  }
+
+  private def emptyDeregisteredRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isDeregisteredPopulated)  {
+    Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)))
+  } else {
+    None
+  }
+
 }
 

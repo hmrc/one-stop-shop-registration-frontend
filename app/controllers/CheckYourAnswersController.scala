@@ -123,9 +123,9 @@ class CheckYourAnswersController @Inject()(
           }
 
         case Invalid(errors) =>
-          Future.successful(getFirstValidationError.map(
-            checkPageRefresh => if(incompletePrompt) {
-              checkPageRefresh
+          Future.successful(getFirstValidationErrorRedirect.map(
+            errorRedirect => if(incompletePrompt) {
+              errorRedirect
             } else {
               Redirect(routes.CheckYourAnswersController.onPageLoad())
             }

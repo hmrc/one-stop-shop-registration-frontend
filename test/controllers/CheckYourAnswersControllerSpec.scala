@@ -99,8 +99,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "must return OK and view with invalid prompt when" - {
         "trading name is missing" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -121,8 +121,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
 
         "websites are missing" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -142,8 +142,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
 
         "eligible sales is not populated correctly" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -163,8 +163,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
 
         "tax registered in eu is not populated correctly" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -184,8 +184,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
 
         "previous registrations is not populated correctly" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -205,8 +205,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
 
         "tax registered in eu has a country with missing data" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers
             .set(TaxRegisteredInEuPage, true).success.value
@@ -228,8 +228,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         }
 
         "previous registrations has a country with missing data" in {
-          when(dateService.startDateBasedOnFirstSale(any())) thenReturn(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn(commencementDate)
+          when(dateService.startDateBasedOnFirstSale(any())) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
 
           val answers = completeUserAnswers
             .set(PreviouslyRegisteredPage, true).success.value
@@ -339,19 +339,136 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           }
         }
 
-        "the user is redirected when the incomplete prompt is shown" in {
+        "the user is redirected when the incomplete prompt is shown" - {
 
-          when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+          "to Check EU Details when one of the tax registered countries is incomplete" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers
+              .set(TaxRegisteredInEuPage, true).success.value
+              .set(EuCountryPage(Index(0)), country).success.value
 
-          val application = applicationBuilder(userAnswers = Some(invalidUserAnswers))
-            .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
 
-          running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
-            val result = route(application, request).value
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(0)).url
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(0)).url
+
+            }
+
+          }
+
+          "to Previous Eu Vat Number when one of the previously registered countries is incomplete" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers
+              .set(PreviouslyRegisteredPage, true).success.value
+              .set(PreviousEuCountryPage(Index(0)), country).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual
+                controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(0)).url
+
+            }
+
+          }
+
+          "to Has Trading Name when trading names are not populated correctly" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasTradingNameController.onPageLoad(CheckMode).url
+
+            }
+
+          }
+
+          "to Has Made Sales when eligible sales are not populated correctly" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasMadeSalesController.onPageLoad(CheckMode).url
+
+            }
+
+          }
+
+          "to Has Website when websites are not populated correctly" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasWebsiteController.onPageLoad(CheckMode).url
+
+            }
+
+          }
+
+          "to Tax Registered In Eu when eu details are not populated correctly" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode).url
+
+            }
+
+          }
+
+          "to Previously Registered when previous registrations are not populated correctly" in {
+            when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
+            val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode).url
+
+            }
+
           }
         }
       }
