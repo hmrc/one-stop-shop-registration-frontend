@@ -62,7 +62,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[DeletePreviousRegistrationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, previousRegistration)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, previousRegistration.previousEuCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -134,7 +134,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, previousRegistration)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, previousRegistration.previousEuCountry.name)(request, messages(application)).toString
       }
     }
 
