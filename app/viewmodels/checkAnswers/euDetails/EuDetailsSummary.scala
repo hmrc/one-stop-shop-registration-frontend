@@ -20,7 +20,7 @@ import controllers.euDetails.routes
 import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.AllEuDetailsQuery
+import queries.{AllEuDetailsQuery, AllEuOptionalDetailsQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
@@ -37,7 +37,7 @@ object EuDetailsSummary {
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }
 
-    answers.get(AllEuDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
+    answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.euCountry.name).toString,

@@ -14,7 +14,7 @@ GET         /refresh-session-unauthenticated                          controller
 GET         /there-is-a-problem                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /check-answers                                            controllers.CheckYourAnswersController.onPageLoad
-POST        /check-answers                                            controllers.CheckYourAnswersController.onSubmit
+POST        /check-answers/:incompletePrompt                          controllers.CheckYourAnswersController.onSubmit(incompletePrompt: Boolean)
 
 GET         /unauthorised                                             controllers.UnauthorisedController.onPageLoad
 
@@ -65,9 +65,9 @@ GET         /first-check-eu-vat/:index                                controller
 POST        /first-check-eu-vat/:index                                controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
 GET         /add-tax-details                                          controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-tax-details                                          controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = NormalMode)
+POST        /add-tax-details                                          controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
 GET         /check-add-tax-details                                    controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-tax-details                                    controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = CheckMode)
+POST        /check-add-tax-details                                    controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
 
 GET         /remove-tax-details/:index                                controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-tax-details/:index                                controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -167,18 +167,18 @@ GET         /first-check-eu-fixed-establishment/:index                controller
 POST        /first-check-eu-fixed-establishment/:index                controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
 GET         /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
+POST        /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index, incompletePromptShown: Boolean)
 GET         /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
+POST        /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index, incompletePromptShown: Boolean)
 GET         /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index, incompletePromptShown: Boolean)
 
 GET         /already-registered                                       controllers.AlreadyRegisteredController.onPageLoad()
 
 GET         /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode)
+POST        /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
 GET         /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode)
+POST        /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
 
 GET         /deregistered-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /deregistered-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)

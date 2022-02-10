@@ -18,13 +18,13 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
-import models.previousRegistrations.PreviousRegistrationDetails
+import models.previousRegistrations.{PreviousRegistrationDetails, PreviousRegistrationDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.previousRegistrations.DeletePreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.PreviousRegistrationQuery
+import queries.{PreviousRegistrationQuery, PreviousRegistrationWithOptionalVatNumberQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
@@ -45,7 +45,7 @@ class DeletePreviousRegistrationController @Inject()(
     implicit request =>
       getPreviousRegistration(index) {
         details =>
-          Future.successful(Ok(view(form, mode, index, details)))
+          Future.successful(Ok(view(form, mode, index, details.previousEuCountry.name)))
       }
   }
 
@@ -56,7 +56,7 @@ class DeletePreviousRegistrationController @Inject()(
 
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, index, details))),
+              Future.successful(BadRequest(view(formWithErrors, mode, index, details.previousEuCountry.name))),
 
             value =>
               if (value) {
@@ -73,9 +73,9 @@ class DeletePreviousRegistrationController @Inject()(
 
 
   private def getPreviousRegistration(index: Index)
-                             (block: PreviousRegistrationDetails => Future[Result])
+                             (block: PreviousRegistrationDetailsWithOptionalVatNumber => Future[Result])
                              (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousRegistrationQuery(index)).map {
+    request.userAnswers.get(PreviousRegistrationWithOptionalVatNumberQuery(index)).map {
       details =>
         block(details)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

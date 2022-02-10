@@ -1,19 +1,18 @@
 @*
- * Copyright 2021 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *@
-
+* Copyright 2021 HM Revenue & Customs
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*@
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
@@ -22,20 +21,42 @@
         govukButton: GovukButton
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, isValid: Boolean)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
 
-        @formHelper(action = routes.CheckYourAnswersController.onSubmit()) {
+        @if(!isValid) {
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-warning-text__assistive">Warning</span>
+                    @messages("error.missing_answers")
+                </strong>
+            </div>
+        }
 
-            <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
 
-            @govukSummaryList(list)
+        @govukSummaryList(list)
 
-            <p class="govuk-body">@messages("checkYourAnswers.info")</p>
+        <p class="govuk-body">@messages("checkYourAnswers.info")</p>
 
-            @govukButton(
-                ButtonViewModel(messages("site.submit"))
-            )
+
+        @if(isValid) {
+            @formHelper(action = routes.CheckYourAnswersController.onSubmit(false)) {
+                @govukButton(
+                    ButtonViewModel(messages("site.submit"))
+                )
+            }
+        } else {
+            <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
+            <p class="govuk-body">@messages("error.missing_answers_prompt.general")</p>
+
+            @formHelper(action = routes.CheckYourAnswersController.onSubmit(true)) {
+                @govukButton(
+                    ButtonViewModel(messages("error.resolve_missing_answers"))
+                )
+            }
         }
     }
+

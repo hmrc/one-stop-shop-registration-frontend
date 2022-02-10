@@ -18,6 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
+import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -39,15 +40,20 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider()
 
   private lazy val addPreviousRegistrationRoute = routes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+  private def addPreviousRegistrationRoutePost(prompt: Boolean) = routes.AddPreviousRegistrationController.onSubmit(NormalMode, prompt).url
 
   private val baseAnswers =
     emptyUserAnswers
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(PreviousEuVatNumberPage(Index(0)), "foo").success.value
 
+  private val incompleteAnswers =
+    emptyUserAnswers
+      .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+
   "AddPreviousRegistration Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when answers are complete" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
@@ -65,6 +71,24 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return OK and the correct view for a GET when answers aren't complete" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, addPreviousRegistrationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[AddPreviousRegistrationView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, NormalMode)
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true, Seq(PreviousRegistrationDetailsWithOptionalVatNumber(Country.euCountries.head, None)))(request, implicitly).toString
+      }
+    }
+
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedSessionRepository]
@@ -78,7 +102,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addPreviousRegistrationRoute)
+          FakeRequest(POST, addPreviousRegistrationRoutePost(false))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -96,7 +120,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addPreviousRegistrationRoute)
+          FakeRequest(POST, addPreviousRegistrationRoutePost(false))
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -146,13 +170,45 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addPreviousRegistrationRoute)
+          FakeRequest(POST, addPreviousRegistrationRoutePost(false))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must refresh the page for a POST if answers are incomplete and prompt has not been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addPreviousRegistrationRoutePost(false))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to the PreviousEuVatNumber page for a POST if answers are incomplete and prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addPreviousRegistrationRoutePost(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.PreviousEuVatNumberController.onPageLoad(NormalMode, Index(0)).url
       }
     }
   }

@@ -29,7 +29,7 @@ class DeleteEuDetailsFormProviderSpec extends BooleanFieldBehaviours {
   private val country = Country.euCountries.head
   private val euVatDetails = EuDetails(country, true, Some("12345678"), false, None, None, None)
 
-  val form = new DeleteEuDetailsFormProvider()(euVatDetails)
+  val form = new DeleteEuDetailsFormProvider()(euVatDetails.euCountry.name)
 
   ".value" - {
 

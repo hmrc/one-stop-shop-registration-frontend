@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package forms.euDetails
+package models.previousRegistrations
 
-import forms.mappings.Mappings
-import models.euDetails.EuDetails
-import play.api.data.Form
+import models.Country
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.Inject
+case class PreviousRegistrationDetailsWithOptionalVatNumber(
+                                        previousEuCountry: Country,
+                                        previousEuVatNumber: Option[String]
+                                      )
 
-class DeleteEuDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(country: String): Form[Boolean] = {
-    Form(
-      "value" -> boolean("deleteEuVatDetails.error.required", args = Seq(country))
-    )
-  }
+object PreviousRegistrationDetailsWithOptionalVatNumber {
+
+  implicit val format: OFormat[PreviousRegistrationDetailsWithOptionalVatNumber] = Json.format[PreviousRegistrationDetailsWithOptionalVatNumber]
 }

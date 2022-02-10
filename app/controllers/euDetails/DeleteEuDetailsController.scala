@@ -18,13 +18,13 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.DeleteEuDetailsFormProvider
-import models.euDetails.EuDetails
+import models.euDetails.{EuDetails, EuOptionalDetails}
 import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.euDetails.DeleteEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.EuDetailsQuery
+import queries.{EuDetailsQuery, EuOptionalDetailsQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.DeleteEuDetailsView
 
@@ -46,9 +46,9 @@ class DeleteEuDetailsController @Inject()(
       getEuVatDetails(index) {
         details =>
 
-          val form = formProvider(details)
+          val form = formProvider(details.euCountry.name)
 
-          Future.successful(Ok(view(form, mode, index, details)))
+          Future.successful(Ok(view(form, mode, index, details.euCountry.name)))
       }
   }
 
@@ -57,11 +57,11 @@ class DeleteEuDetailsController @Inject()(
       getEuVatDetails(index) {
         details =>
 
-          val form = formProvider(details)
+          val form = formProvider(details.euCountry.name)
 
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, index, details))),
+              Future.successful(BadRequest(view(formWithErrors, mode, index, details.euCountry.name))),
 
             value =>
               if (value) {
@@ -78,9 +78,9 @@ class DeleteEuDetailsController @Inject()(
 
 
   private def getEuVatDetails(index: Index)
-                             (block: EuDetails => Future[Result])
+                             (block: EuOptionalDetails => Future[Result])
                              (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuDetailsQuery(index)).map {
+    request.userAnswers.get(EuOptionalDetailsQuery(index)).map {
       details =>
         block(details)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

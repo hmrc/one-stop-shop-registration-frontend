@@ -19,11 +19,14 @@ package base
 import controllers.actions._
 import generators.Generators
 import models.domain.VatCustomerInfo
-import models.{DesAddress, UserAnswers}
+import models.{Country, DesAddress, Index, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
+import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
+import pages.previousRegistrations.PreviouslyRegisteredPage
+import pages.{HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage, IsPlanningFirstEligibleSalePage, WebsitePage}
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -31,8 +34,12 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
+import services.DateService
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
+import viewmodels.checkAnswers.euDetails.TaxRegisteredInEuSummary
+import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
+import viewmodels.checkAnswers.{BankDetailsSummary, BusinessAddressInUkSummary, BusinessContactDetailsSummary, CommencementDateSummary, HasMadeSalesSummary, HasTradingNameSummary, HasWebsiteSummary, InternationalAddressSummary, IsOnlineMarketplaceSummary, IsPlanningFirstEligibleSaleSummary, PartOfVatGroupSummary, RegisteredCompanyNameSummary, UkAddressSummary, UkVatEffectiveDateSummary}
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 
@@ -74,7 +81,17 @@ trait SpecBase
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val partialUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(partialVatCustomerInfo))
-
+  val completeUserAnswers: UserAnswers = emptyUserAnswersWithVatInfo
+    .set(HasTradingNamePage, false).success.value
+    .set(HasMadeSalesPage, false).success.value
+    .set(IsPlanningFirstEligibleSalePage, true).success.value
+    .set(TaxRegisteredInEuPage, false).success.value
+    .set(PreviouslyRegisteredPage, false).success.value
+    .set(IsOnlineMarketplacePage, false).success.value
+    .set(HasWebsitePage, false).success.value
+  val invalidUserAnswers = completeUserAnswers
+    .set(TaxRegisteredInEuPage, true).success.value
+    .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None): GuiceApplicationBuilder = {
@@ -93,5 +110,26 @@ trait SpecBase
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
+
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) ={
+    Seq(
+      RegisteredCompanyNameSummary.row(answers),
+      PartOfVatGroupSummary.row(answers),
+      UkVatEffectiveDateSummary.row(answers),
+      BusinessAddressInUkSummary.row(answers),
+      UkAddressSummary.row(answers),
+      InternationalAddressSummary.row(answers),
+      new HasTradingNameSummary().row(answers),
+      HasMadeSalesSummary.row(answers),
+      IsPlanningFirstEligibleSaleSummary.row(answers),
+      new CommencementDateSummary(dateService).row(answers),
+      TaxRegisteredInEuSummary.row(answers),
+      PreviouslyRegisteredSummary.row(answers),
+      IsOnlineMarketplaceSummary.row(answers),
+      HasWebsiteSummary.row(answers),
+      BusinessContactDetailsSummary.row(answers),
+      BankDetailsSummary.row(answers)
+    ).flatten
+  }
 
 }

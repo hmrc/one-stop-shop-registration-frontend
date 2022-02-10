@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package forms.euDetails
+package queries
 
-import forms.mappings.Mappings
-import models.euDetails.EuDetails
-import play.api.data.Form
+import models.euDetails.EuOptionalDetails
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object AllEuOptionalDetailsQuery extends Gettable[List[EuOptionalDetails]] with Settable[List[EuOptionalDetails]] {
 
-class DeleteEuDetailsFormProvider @Inject() extends Mappings {
-
-  def apply(country: String): Form[Boolean] = {
-    Form(
-      "value" -> boolean("deleteEuVatDetails.error.required", args = Seq(country))
-    )
-  }
+  override def path: JsPath = JsPath \ "euDetails"
 }

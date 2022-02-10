@@ -24,9 +24,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index, euDetails: EuDetails)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deleteEuVatDetails.title", euDetails.euCountry.name))) {
+@layout(pageTitle = title(form, messages("deleteEuVatDetails.title", country))) {
 
     @formHelper(action = controllers.euDetails.routes.DeleteEuDetailsController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("deleteEuVatDetails.heading", euDetails.euCountry.name)).asPageHeading()
+                legend = LegendViewModel(messages("deleteEuVatDetails.heading", country)).asPageHeading()
             )
         )
 
