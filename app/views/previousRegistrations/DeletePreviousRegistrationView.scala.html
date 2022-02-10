@@ -24,9 +24,9 @@
         govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index, previousRegistration: PreviousRegistrationDetails)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deletePreviousRegistration.title", previousRegistration.previousEuCountry.name))) {
+@layout(pageTitle = title(form, messages("deletePreviousRegistration.title", country))) {
 
     @formHelper(action = controllers.previousRegistrations.routes.DeletePreviousRegistrationController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("deletePreviousRegistration.heading", previousRegistration.previousEuCountry.name)).asPageHeading()
+                legend = LegendViewModel(messages("deletePreviousRegistration.heading", country)).asPageHeading()
             )
         )
 

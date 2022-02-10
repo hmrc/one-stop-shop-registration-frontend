@@ -41,7 +41,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, index).url
 
   private val formProvider = new DeleteEuDetailsFormProvider()
-  private val form = formProvider(euVatDetails)
+  private val form = formProvider(euVatDetails.euCountry.name)
 
   private val baseUserAnswers =
     emptyUserAnswers
@@ -64,7 +64,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[DeleteEuDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, euVatDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, euVatDetails.euCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -134,7 +134,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, euVatDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, euVatDetails.euCountry.name)(request, messages(application)).toString
       }
     }
 
