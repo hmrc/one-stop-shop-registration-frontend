@@ -23,7 +23,7 @@ import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import queries.{DeriveNumberOfEuRegistrations, DeriveNumberOfEuVatRegistrations}
+import queries.DeriveNumberOfEuRegistrations
 
 case object AddEuDetailsPage extends QuestionPage[Boolean] {
 
@@ -39,7 +39,7 @@ case object AddEuDetailsPage extends QuestionPage[Boolean] {
     }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuVatRegistrations)) match {
+    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(CheckMode, Index(size))
       case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
       case _                        => routes.JourneyRecoveryController.onPageLoad()
