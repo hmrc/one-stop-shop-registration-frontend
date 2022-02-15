@@ -29,15 +29,15 @@ case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
   override def toString: String = "euTaxReference"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
+    euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(FixedEstablishmentTradingNamePage(index)) match {
-    case Some(_) => FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers)
-    case None    => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index)
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
+  case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+    case None    => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
   }
 
-  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = answers.get(FixedEstablishmentTradingNamePage(index)) match {
-    case Some(_) => FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)
-    case None    => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index)
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
+    case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+    case None    => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
   }
 }

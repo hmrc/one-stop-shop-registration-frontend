@@ -32,55 +32,35 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
   override def toString: String = "hasFixedEstablishment"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    (answers.get(HasFixedEstablishmentPage(index)), answers.get(VatRegisteredPage(index))) match {
-      case (Some(true), Some(true))  => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
-      case (Some(true), Some(false)) => euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index)
-      case (Some(false), _)          => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
-      case _                         => routes.JourneyRecoveryController.onPageLoad()
+    answers.get(HasFixedEstablishmentPage(index)) match {
+      case Some(true)  => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      case _           => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    (answers.get(HasFixedEstablishmentPage(index)), answers.get(VatRegisteredPage(index))) match {
-      case (Some(true), Some(vatRegistered)) =>
-        if (vatRegistered) {
-          if (answers.get(FixedEstablishmentTradingNamePage(index)).isDefined) {
-            FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers)
-          } else {
-            euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index)
-          }
+    answers.get(HasFixedEstablishmentPage(index)) match {
+      case Some(true) =>
+        if (answers.get(FixedEstablishmentTradingNamePage(index)).isDefined) {
+          FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers)
         } else {
-          if (answers.get(EuTaxReferencePage(index)).isDefined) {
-            EuTaxReferencePage(index).navigate(CheckMode, answers)
-          } else {
-            euRoutes.EuTaxReferenceController.onPageLoad(CheckMode, index)
-          }
+          euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index)
         }
-
-      case (Some(false), _) =>
+      case Some(false) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
-
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
-    (answers.get(HasFixedEstablishmentPage(index)), answers.get(VatRegisteredPage(index))) match {
-      case (Some(true), Some(vatRegistered)) =>
-        if (vatRegistered) {
-          if (answers.get(FixedEstablishmentTradingNamePage(index)).isDefined) {
-            FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)
-          } else {
-            euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index)
-          }
+    answers.get(HasFixedEstablishmentPage(index)) match {
+      case Some(true) =>
+        if (answers.get(FixedEstablishmentTradingNamePage(index)).isDefined) {
+          FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)
         } else {
-          if (answers.get(EuTaxReferencePage(index)).isDefined) {
-            EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
-          } else {
-            euRoutes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index)
-          }
+          euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index)
         }
-
-      case (Some(false), _) =>
+      case Some(false) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
 
       case _ =>
