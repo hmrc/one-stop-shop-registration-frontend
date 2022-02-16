@@ -50,8 +50,8 @@ class CheckEuDetailsAnswersController @Inject()(
             rows = Seq(
               VatRegisteredSummary.row(request.userAnswers, index, mode),
               EuVatNumberSummary.row(request.userAnswers, index, mode),
-              HasFixedEstablishmentSummary.row(request.userAnswers, index, mode),
               EuTaxReferenceSummary.row(request.userAnswers, index, mode),
+              HasFixedEstablishmentSummary.row(request.userAnswers, index, mode),
               FixedEstablishmentTradingNameSummary.row(request.userAnswers, index, mode),
               FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode)
             ).flatten

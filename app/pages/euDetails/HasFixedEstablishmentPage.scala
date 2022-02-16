@@ -70,8 +70,7 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if (value.contains(false)) {
       userAnswers
-        .remove(EuTaxReferencePage(index))
-        .flatMap(_.remove(FixedEstablishmentTradingNamePage(index)))
+        .remove(FixedEstablishmentTradingNamePage(index))
         .flatMap(_.remove(FixedEstablishmentAddressPage(index)))
     } else {
       super.cleanup(value, userAnswers)

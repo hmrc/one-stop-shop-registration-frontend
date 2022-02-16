@@ -164,43 +164,37 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
       }
     }
 
-    "must remove EU Tax Reference number, Fixed Establishment Trading Name and Address for this index when the answer is no" in {
+    "must remove Fixed Establishment Trading Name and Address for this index when the answer is no" in {
 
       val address1 = arbitrary[InternationalAddress].sample.value
       val address2 = arbitrary[InternationalAddress].sample.value
 
       val answers =
         UserAnswers("id")
-          .set(EuTaxReferencePage(Index(0)), "123").success.value
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
           .set(FixedEstablishmentAddressPage(Index(0)), address1).success.value
-          .set(EuTaxReferencePage(Index(1)), "123").success.value
           .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
           .set(FixedEstablishmentAddressPage(Index(1)), address2).success.value
 
       val result = answers.set(HasFixedEstablishmentPage(Index(1)), false).success.value
 
-      result.get(EuTaxReferencePage(Index(0))).value mustEqual "123"
       result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
       result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
-      result.get(EuTaxReferencePage(Index(1))) must not be defined
       result.get(FixedEstablishmentTradingNamePage(Index(1))) must not be defined
       result.get(FixedEstablishmentAddressPage(Index(1))) must not be defined
     }
 
-    "must preserve EU Tax Reference, Fixed Establishment Trading Name and Address when the answer is no" in {
+    "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
 
       val address = arbitrary[InternationalAddress].sample.value
 
       val answers =
         UserAnswers("id")
-          .set(EuTaxReferencePage(Index(0)), "123").success.value
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
           .set(FixedEstablishmentAddressPage(Index(0)), address).success.value
 
       val result = answers.set(HasFixedEstablishmentPage(Index(0)), true).success.value
 
-      result.get(EuTaxReferencePage(Index(0))).value mustEqual "123"
       result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
       result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address
     }
