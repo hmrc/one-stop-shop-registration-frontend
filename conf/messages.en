@@ -591,12 +591,12 @@ hasMadeSales.checkYourAnswersLabel = Already made eligible sales
 hasMadeSales.error.required = Select yes if you have already made eligible sales
 hasMadeSales.change.hidden = if already made eligible sales
 
-isOnlineMarketplace.title = Is your business an online marketplace?
-isOnlineMarketplace.heading = Is your business an online marketplace?
-isOnlineMarketplace.checkYourAnswersLabel = An online marketplace
-isOnlineMarketplace.caption = This means customers can buy goods from different sellers on your website or mobile app.
-isOnlineMarketplace.error.required = Select yes if your business is an online marketplace
-isOnlineMarketplace.change.hidden = if your business is an online marketplace
+isOnlineMarketplace.title = Do other businesses sell goods on your website or app?
+isOnlineMarketplace.heading = Do other businesses sell goods on your website or app?
+isOnlineMarketplace.checkYourAnswersLabel = Other businesses sell goods on your website or app
+isOnlineMarketplace.caption = This is called an online marketplace.
+isOnlineMarketplace.error.required = Select yes if other businesses sell goods on your website or app
+isOnlineMarketplace.change.hidden = if other businesses sell goods on your website or app
 
 businessBasedInNi.title = Is your principal place of business in Northern Ireland?
 businessBasedInNi.heading = Is your principal place of business in Northern Ireland?
