@@ -128,10 +128,10 @@ euCountry.checkYourAnswersLabel = Country of tax registration
 euCountry.error.required = Select an EU country where your business is registered for tax
 euCountry.error.duplicate = You selected this country already. Select a different one.
 
-vatRegistered.title = Are you registered for VAT in {0}?
-vatRegistered.heading = Are you registered for VAT in {0}?
+vatRegistered.title = Is your business registered for VAT in {0}?
+vatRegistered.heading = Is your business registered for VAT in {0}?
 vatRegistered.checkYourAnswersLabel = VAT registered
-vatRegistered.error.required = Select yes if you are registered for VAT in {0}
+vatRegistered.error.required = Select yes if your business is registered for VAT in {0}
 vatRegistered.change.hidden = if VAT registered
 
 addEuDetails.title.singular = You added tax details for one EU country
@@ -396,10 +396,10 @@ fixedEstablishmentTradingName.error.length = Trading name must be 100 characters
 fixedEstablishmentTradingName.change.hidden = trading name
 fixedEstablishmentTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 
-hasFixedEstablishment.title = Do you have a fixed establishment in {0}?
-hasFixedEstablishment.heading = Do you have a fixed establishment in {0}?
+hasFixedEstablishment.title = Does your business have a fixed establishment in {0}?
+hasFixedEstablishment.heading = Does your business have a fixed establishment in {0}?
 hasFixedEstablishment.checkYourAnswersLabel = Fixed establishment
-hasFixedEstablishment.error.required = Select yes if you have a fixed establishment in {0}
+hasFixedEstablishment.error.required = Select yes if your business has a fixed establishment in {0}
 hasFixedEstablishment.change.hidden = fixed establishment
 
 checkEuVatDetailsAnswers.title = Check your answers for {0}
@@ -477,10 +477,10 @@ bankDetails.error.accountName.invalid = Account name must only include letters, 
 bankDetails.error.bic.invalid = Enter a real BIC
 bankDetails.change.hidden = your bank account details
 
-euTaxReference.title = What is your tax identification number in {0}?
-euTaxReference.heading = What is your tax identification number in {0}?
+euTaxReference.title = What is your business''s tax identification number in {0}?
+euTaxReference.heading = What is your business''s tax identification number in {0}?
 euTaxReference.checkYourAnswersLabel = Tax identification number
-euTaxReference.error.required = Enter your tax identification number in {0}
+euTaxReference.error.required = Enter your business''s tax identification number in {0}
 euTaxReference.error.length = Tax identification number must be 20 characters or less
 euTaxReference.error.format = Tax identification number must only include letters, numbers and spaces
 euTaxReference.change.hidden = your tax identification number
@@ -501,10 +501,10 @@ sellsGoodsFromNi.title = Will your business sell goods from Northern Ireland to 
 sellsGoodsFromNi.heading = Will your business sell goods from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.error.required = Select yes if your business will sell goods from Northern Ireland to consumers in the EU
 
-taxRegisteredInEu.title = Is your business registered for tax in EU countries
-taxRegisteredInEu.heading = Is your business registered for tax in EU countries?
+taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries
+taxRegisteredInEu.heading = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
-taxRegisteredInEu.error.required = Select yes if your business is registered for tax in EU countries
+taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
 taxRegisteredInEu.change.hidden = if registered for tax in EU countries
 
 updateVatDetails.title = Update your VAT details

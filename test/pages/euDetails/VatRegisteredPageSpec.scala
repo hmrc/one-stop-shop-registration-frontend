@@ -49,12 +49,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Has Fixed Establishment for the same index" in {
+        "to EU Tax Reference for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+            .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index))
         }
       }
 
@@ -100,29 +100,29 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and Has Fixed Establishment has not been answered" - {
+        "and EU Tax Reference has not been answered" - {
 
-          "to Has Fixed Establishment" in {
+          "to EU Tax Reference" in {
 
             val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
             VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index))
+              .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(CheckMode, index))
           }
         }
 
-        "and Has Fixed Establishment has been answered" - {
+        "and EU Tax Reference has been answered" - {
 
-          "to wherever Has Fixed Establishment navigates to" in {
+          "to wherever EU Tax Reference navigates to" in {
 
             val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value
-                .set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
+                .set(EuTaxReferencePage(index), "123").success.value
 
             VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
+              .mustEqual(EuTaxReferencePage(index).navigate(CheckMode, answers))
           }
         }
       }
@@ -169,29 +169,29 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and Has Fixed Establishment has not been answered" - {
+        "and EU Tax Reference has not been answered" - {
 
-          "to Has Fixed Establishment" in {
+          "to EU Tax Reference" in {
 
             val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
             VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index))
+              .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index))
           }
         }
 
-        "and Has Fixed Establishment has been answered" - {
+        "and EU Tax Reference has been answered" - {
 
-          "to wherever Has Fixed Establishment navigates to" in {
+          "to wherever EU Tax Reference navigates to" in {
 
             val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value
-                .set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
+                .set(EuTaxReferencePage(index), "123").success.value
 
             VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
+              .mustEqual(EuTaxReferencePage(index).navigate(CheckLoopMode, answers))
           }
         }
       }
