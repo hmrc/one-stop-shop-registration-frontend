@@ -131,7 +131,7 @@ euCountry.error.duplicate = You selected this country already. Select a differen
 vatRegistered.title = Is your business registered for VAT in {0}?
 vatRegistered.heading = Is your business registered for VAT in {0}?
 vatRegistered.checkYourAnswersLabel = VAT registered
-vatRegistered.error.required = Select yes your business is registered for VAT in {0}
+vatRegistered.error.required = Select yes if your business is registered for VAT in {0}
 vatRegistered.change.hidden = if VAT registered
 
 addEuDetails.title.singular = You added tax details for one EU country
