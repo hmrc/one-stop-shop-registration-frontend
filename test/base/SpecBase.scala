@@ -26,7 +26,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages.{HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage, IsPlanningFirstEligibleSalePage, WebsitePage}
+import pages.{HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage, IsPlanningFirstEligibleSalePage, RegisteredForOssInEuPage, WebsitePage}
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -79,9 +79,11 @@ trait SpecBase
 
   val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
+  val basicUserAnswers: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
+  val basicUserAnswersWithVatInfo: UserAnswers = basicUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val partialUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(partialVatCustomerInfo))
-  val completeUserAnswers: UserAnswers = emptyUserAnswersWithVatInfo
+  val completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
     .set(HasTradingNamePage, false).success.value
     .set(HasMadeSalesPage, false).success.value
     .set(IsPlanningFirstEligibleSalePage, true).success.value

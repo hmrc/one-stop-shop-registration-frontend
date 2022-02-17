@@ -42,7 +42,7 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, salesChannelsRoute)
@@ -58,7 +58,7 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view and return OK and the correct view for a GET when the question has already been answered" in {
 
-      val answers = emptyUserAnswers.set(SalesChannelsPage, SalesChannels.Mixed).success.value
+      val answers = basicUserAnswers.set(SalesChannelsPage, SalesChannels.Mixed).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -79,7 +79,7 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
 
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
         .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
         .build()
 
@@ -89,7 +89,7 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", SalesChannels.values.head.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(SalesChannelsPage, SalesChannels.values.head).success.value
+        val expectedAnswers = basicUserAnswers.set(SalesChannelsPage, SalesChannels.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual SalesChannelsPage.navigate(SalesChannels.values.head).url
@@ -99,7 +99,7 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

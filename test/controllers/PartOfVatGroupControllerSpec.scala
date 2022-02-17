@@ -42,7 +42,7 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, partOfVatGroupRoute)
@@ -81,7 +81,7 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,7 +91,7 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(PartOfVatGroupPage, true).success.value
+        val expectedAnswers = basicUserAnswers.set(PartOfVatGroupPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual PartOfVatGroupPage.navigate(NormalMode, expectedAnswers).url
@@ -101,7 +101,7 @@ class PartOfVatGroupControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

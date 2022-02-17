@@ -26,7 +26,7 @@ class FirstAuthedPageSpec extends SpecBase {
 
     "to Check VAT Details when we have VAT details for the user" in {
 
-      FirstAuthedPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+      FirstAuthedPage.navigate(NormalMode, basicUserAnswersWithVatInfo)
         .mustEqual(routes.CheckVatDetailsController.onPageLoad())
     }
 

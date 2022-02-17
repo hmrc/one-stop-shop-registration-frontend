@@ -33,6 +33,8 @@ class AuthenticatedDataRequiredAction @Inject()(implicit val executionContext: E
     request.userAnswers match {
       case None =>
         Left(Redirect(routes.JourneyRecoveryController.onPageLoad())).toFuture
+      case Some(data) if data.data.value.isEmpty =>
+        Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
       case Some(data) =>
         Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, data)).toFuture
     }

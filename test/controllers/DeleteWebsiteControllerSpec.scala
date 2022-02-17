@@ -40,7 +40,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
   private val website = "foo"
   private lazy val deleteWebsiteRoute = routes.DeleteWebsiteController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = emptyUserAnswers.set(WebsitePage(index), website).success.value
+  private val baseUserAnswers = basicUserAnswers.set(WebsitePage(index), website).success.value
 
   "DeleteEuVatDetails Controller" - {
 
@@ -150,7 +150,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if the trading name is not found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, deleteWebsiteRoute)

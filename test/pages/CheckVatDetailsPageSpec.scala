@@ -42,10 +42,10 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
             "to wherever the Registered Company Name page would navigate to" in {
 
-              val answers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
+              val answers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
 
               CheckVatDetailsPage.navigate(NormalMode, answers)
-                .mustEqual(RegisteredCompanyNamePage.navigate(NormalMode, emptyUserAnswersWithVatInfo))
+                .mustEqual(RegisteredCompanyNamePage.navigate(NormalMode, basicUserAnswersWithVatInfo))
             }
           }
 
@@ -55,7 +55,7 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
               val vatInfo = vatCustomerInfo copy (organisationName = None)
               val answers =
-                emptyUserAnswersWithVatInfo
+                basicUserAnswersWithVatInfo
                   .copy(vatInfo = Some(vatInfo))
                   .set(CheckVatDetailsPage, Yes).success.value
 

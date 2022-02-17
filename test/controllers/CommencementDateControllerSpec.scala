@@ -50,7 +50,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val nowFormatted = LocalDate.now().format(dateFormatter)
         val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
 
-        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+        val answer1 = basicUserAnswers.set(HasMadeSalesPage, true).success.value
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
@@ -85,7 +85,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val now = LocalDate.now()
         val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
 
-        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+        val answer1 = basicUserAnswers.set(HasMadeSalesPage, true).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
         when(dateService.startDateBasedOnFirstSale(any())) thenReturn dateOfFirstSale
@@ -113,7 +113,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val dateOfFirstSale = LocalDate.now().minusMonths(2)
         val commencementDate = now.plusMonths(2)
 
-        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+        val answer1 = basicUserAnswers.set(HasMadeSalesPage, true).success.value
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
@@ -146,7 +146,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
 
       "must return OK and the correct view when user answers no to hasMadeSales and yes to Is Planning First Eligible Sale" in {
         val nowFormatted = LocalDate.now(stubClockAtArbitraryDate).format(dateFormatter)
-        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, false).success.value
+        val answer1 = basicUserAnswers.set(HasMadeSalesPage, false).success.value
         val answers = answer1.set(IsPlanningFirstEligibleSalePage, true).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
@@ -174,7 +174,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       }
 
       "must return OK and the correct view when user answers no to hasMadeSales and no to Is Planning First Eligible Sale" in {
-        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, false).success.value
+        val answer1 = basicUserAnswers.set(HasMadeSalesPage, false).success.value
         val answers = answer1.set(IsPlanningFirstEligibleSalePage, false).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
@@ -193,7 +193,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       }
 
       "must redirect to Journey Recovery when user answers no to hasMadeSales and Is Planning First Eligible Sale is empty" in {
-        val answer1 = emptyUserAnswers.set(HasMadeSalesPage, false).success.value
+        val answer1 = basicUserAnswers.set(HasMadeSalesPage, false).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
 
@@ -215,7 +215,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(bind[DateService].toInstance(dateService))
             .build()
 
@@ -234,7 +234,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       val now = LocalDate.now()
       val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
 
-      val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+      val answer1 = basicUserAnswers.set(HasMadeSalesPage, true).success.value
       val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
       when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
@@ -261,7 +261,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       val now = LocalDate.now()
       val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
 
-      val answer1 = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+      val answer1 = basicUserAnswers.set(HasMadeSalesPage, true).success.value
       val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
       when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate

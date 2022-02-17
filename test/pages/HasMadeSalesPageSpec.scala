@@ -52,7 +52,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
       }
 
       "to JourneyRecoveryController and answer is empty" in {
-        HasMadeSalesPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+        HasMadeSalesPage.navigate(NormalMode, basicUserAnswersWithVatInfo)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
@@ -60,7 +60,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
     "must navigate in Check mode" - {
 
       "to DateOfFirstSalePage and answer is Some(true)" in {
-        val userAnswers = emptyUserAnswersWithVatInfo
+        val userAnswers = basicUserAnswersWithVatInfo
           .set(HasMadeSalesPage, true).success.value
 
         HasMadeSalesPage.navigate(CheckMode, userAnswers)
@@ -68,7 +68,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
       }
 
       "to IsPlanningFirstEligibleSaleController and answer is Some(true)" in {
-        val userAnswers = emptyUserAnswersWithVatInfo
+        val userAnswers = basicUserAnswersWithVatInfo
           .set(HasMadeSalesPage, false).success.value
 
         HasMadeSalesPage.navigate(CheckMode, userAnswers)
@@ -76,7 +76,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
       }
 
       "to JourneyRecoveryController and answer is empty" in {
-        HasMadeSalesPage.navigate(CheckMode, emptyUserAnswersWithVatInfo)
+        HasMadeSalesPage.navigate(CheckMode, basicUserAnswersWithVatInfo)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
@@ -84,25 +84,25 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
     "cleanup" - {
 
       "must remove IsPlanningFirstEligibleSalePage when HasMadeSales is true" in {
-        val userAnswers = emptyUserAnswersWithVatInfo
+        val userAnswers = basicUserAnswersWithVatInfo
           .set(IsPlanningFirstEligibleSalePage, true).success.value
         val result = HasMadeSalesPage.cleanup(Some(true), userAnswers).success.value
 
-        result mustBe emptyUserAnswersWithVatInfo
+        result mustBe basicUserAnswersWithVatInfo
       }
 
       "must remove DateOfFirstSalePage when HasMadeSales is false" in {
-        val userAnswers = emptyUserAnswersWithVatInfo
+        val userAnswers = basicUserAnswersWithVatInfo
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
         val result = HasMadeSalesPage.cleanup(Some(false), userAnswers).success.value
 
-        result mustBe emptyUserAnswersWithVatInfo
+        result mustBe basicUserAnswersWithVatInfo
       }
 
       "must return user answers when HasMadeSales is None" in {
-        val result = HasMadeSalesPage.cleanup(None, emptyUserAnswersWithVatInfo).success.value
+        val result = HasMadeSalesPage.cleanup(None, basicUserAnswersWithVatInfo).success.value
 
-        result mustBe emptyUserAnswersWithVatInfo
+        result mustBe basicUserAnswersWithVatInfo
       }
     }
   }

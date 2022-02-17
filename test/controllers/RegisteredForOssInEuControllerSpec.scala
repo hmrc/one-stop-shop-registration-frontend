@@ -57,7 +57,7 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view and return OK and the correct view for a GET when the question has been answered" in {
 
-      val answers = emptyUserAnswers.set(RegisteredForOssInEuPage, true).success.value
+      val answers = basicUserAnswers.set(RegisteredForOssInEuPage, true).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -94,7 +94,7 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
           .build()
 
@@ -130,7 +130,7 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, controllerRoute).withFormUrlEncodedBody(("value", "invalid"))

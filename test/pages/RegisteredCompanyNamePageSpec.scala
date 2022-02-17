@@ -38,8 +38,8 @@ class RegisteredCompanyNamePageSpec extends SpecBase with PageBehaviours {
 
         "to wherever the Part of VAT Group page would navigate to" in {
 
-          RegisteredCompanyNamePage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
-            .mustBe(PartOfVatGroupPage.navigate(NormalMode, emptyUserAnswersWithVatInfo))
+          RegisteredCompanyNamePage.navigate(NormalMode, basicUserAnswersWithVatInfo)
+            .mustBe(PartOfVatGroupPage.navigate(NormalMode, basicUserAnswersWithVatInfo))
         }
       }
 

@@ -37,8 +37,8 @@ class PartOfVatGroupPageSpec extends SpecBase with PageBehaviours {
 
         "to wherever the UK VAT Effective Date page would navigate to" in {
 
-          PartOfVatGroupPage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
-            .mustBe(UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswersWithVatInfo))
+          PartOfVatGroupPage.navigate(NormalMode, basicUserAnswersWithVatInfo)
+            .mustBe(UkVatEffectiveDatePage.navigate(NormalMode, basicUserAnswersWithVatInfo))
         }
       }
 

@@ -42,7 +42,7 @@ class UkVatEffectiveDatePageSpec extends SpecBase with PageBehaviours {
 
       "to Has Trading Name if we have the user's VAT info" in {
 
-        UkVatEffectiveDatePage.navigate(NormalMode, emptyUserAnswersWithVatInfo)
+        UkVatEffectiveDatePage.navigate(NormalMode, basicUserAnswersWithVatInfo)
           .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
       }
 

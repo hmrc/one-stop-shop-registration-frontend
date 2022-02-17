@@ -43,7 +43,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, checkVatDetailsRoute)
@@ -61,7 +61,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+      val userAnswers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -87,7 +87,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(
             bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
           )
@@ -99,7 +99,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", CheckVatDetails.Yes.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual CheckVatDetailsPage.navigate(NormalMode, expectedAnswers).url
@@ -109,7 +109,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =
@@ -145,7 +145,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no VAT data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, checkVatDetailsRoute)
@@ -175,7 +175,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no VAT data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

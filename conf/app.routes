@@ -13,6 +13,8 @@ GET         /refresh-session-unauthenticated                          controller
 
 GET         /there-is-a-problem                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
+GET         /start-again                                              controllers.JourneyRecoveryController.onMissingAnswers()
+
 GET         /check-answers                                            controllers.CheckYourAnswersController.onPageLoad
 POST        /check-answers/:incompletePrompt                          controllers.CheckYourAnswersController.onSubmit(incompletePrompt: Boolean)
 

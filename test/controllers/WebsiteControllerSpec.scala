@@ -45,7 +45,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, websiteRoute)
@@ -84,7 +84,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -94,7 +94,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "www.example.com"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(WebsitePage(index), "www.example.com").success.value
+        val expectedAnswers = basicUserAnswers.set(WebsitePage(index), "www.example.com").success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual WebsitePage(index).navigate(NormalMode, expectedAnswers).url
@@ -104,7 +104,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =
@@ -154,7 +154,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "must return NOT_FOUND for a GET with an index of position 10 or greater" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
       val highIndex = Gen.choose(10, Int.MaxValue).map(Index(_)).sample.value
 
       running(application) {
@@ -170,7 +170,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
     "must return NOT_FOUND for a POST with an index of position 10 or greater" in {
 
       val answers =
-        emptyUserAnswers
+        basicUserAnswers
           .set(WebsitePage(Index(0)), "foo").success.value
           .set(WebsitePage(Index(1)), "foo").success.value
           .set(WebsitePage(Index(2)), "foo").success.value
