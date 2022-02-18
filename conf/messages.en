@@ -54,10 +54,9 @@ journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
 journeyRecovery.startAgain.guidance.heading = You did not answer all the questions
 journeyRecovery.startAgain.guidance = You need to fill in all the missing information before we can register you
 
-journeyRecovery.missing-user-answers.startAgain.title = Your registration session timed out as you were inactive for more than 15 minutes
-journeyRecovery.missing-user-answers.startAgain.heading = Your registration session timed out as you were inactive for more than 15 minutes
-journeyRecovery.missing-user-answers.startAgain.guidance.heading = We have deleted your answers
-journeyRecovery.missing-user-answers.startAgain.guidance = You have to start your registration again
+journeyRecovery.missing-user-answers.startAgain.title = Your registration session has timed out
+journeyRecovery.missing-user-answers.startAgain.heading = Your registration session has timed out
+journeyRecovery.missing-user-answers.startAgain.guidance = For your security, we deleted your answers.
 
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
