@@ -44,7 +44,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasMadeSalesRoute)
@@ -60,7 +60,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
     "must populate the view and return OK and the correct view for a GET when the question has already been answered" in {
 
-      val answers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+      val answers = basicUserAnswers.set(HasMadeSalesPage, true).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -81,7 +81,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[AuthenticatedSessionRepository].toInstance(sessionRepository))
           .build()
 
@@ -92,7 +92,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
         val result = route(application, request).value
 
-        val expectedAnswers = emptyUserAnswers.set(HasMadeSalesPage, true).success.value
+        val expectedAnswers = basicUserAnswers.set(HasMadeSalesPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual HasMadeSalesPage.navigate(NormalMode, expectedAnswers).url
@@ -102,7 +102,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =
@@ -152,7 +152,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
     "showHintText method must return true when sales are not included from online marketplaces" in {
 
-      val answerBusinessBasedInNiPage = emptyUserAnswers.set(BusinessBasedInNiPage, false).success.value
+      val answerBusinessBasedInNiPage = basicUserAnswers.set(BusinessBasedInNiPage, false).success.value
       val answerHasFixedEstablishmentInNiPage = answerBusinessBasedInNiPage.set(HasFixedEstablishmentInNiPage, false).success.value
       val userAnswers = answerHasFixedEstablishmentInNiPage.set(SalesChannelsPage, Mixed).success.value
 
@@ -180,7 +180,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
     "showHintText method must return false when sales are included from online marketplaces" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasMadeSalesRoute)
@@ -197,7 +197,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
         contentAsString(result) mustEqual view(
           form,
           NormalMode,
-          controller invokePrivate showHintTextMethod(emptyUserAnswers)
+          controller invokePrivate showHintTextMethod(basicUserAnswers)
         )(request, messages(application)).toString
       }
     }

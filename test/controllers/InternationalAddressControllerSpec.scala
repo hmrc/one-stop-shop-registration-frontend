@@ -39,13 +39,13 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
   private lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
 
   private val address = InternationalAddress("line 1", Some("line 2"), "town", None, None, Country("FR", "France"))
-  private val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
+  private val userAnswers = basicUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, internationalAddressRoute)
@@ -82,7 +82,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(
             bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
           )
@@ -103,7 +103,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

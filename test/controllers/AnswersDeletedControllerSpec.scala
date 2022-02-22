@@ -39,7 +39,7 @@ class AnswersDeletedControllerSpec extends SpecBase with MockitoSugar {
       when(sessionRepository.clear(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
           .build()
 

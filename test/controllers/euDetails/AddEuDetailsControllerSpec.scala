@@ -44,13 +44,13 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private lazy val addEuVatDetailsRoute = routes.AddEuDetailsController.onPageLoad(NormalMode).url
   private def addEuVatDetailsPostRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
   private val baseAnswers =
-    emptyUserAnswers
+    basicUserAnswers
       .set(EuCountryPage(index), country).success.value
       .set(VatRegisteredPage(index), false).success.value
       .set(HasFixedEstablishmentPage(index), false).success.value
 
   private val incompleteAnswers =
-    emptyUserAnswers
+    basicUserAnswers
       .set(EuCountryPage(index), country).success.value
       .set(VatRegisteredPage(index), true).success.value
 
@@ -177,7 +177,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addEuVatDetailsRoute)

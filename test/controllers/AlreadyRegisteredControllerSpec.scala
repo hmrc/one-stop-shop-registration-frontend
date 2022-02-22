@@ -52,7 +52,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .build()
 
@@ -100,7 +100,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
       when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDiff))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[RegistrationConnector].toInstance(mockConnector))
           .build()
 
@@ -148,7 +148,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
       when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDOFSEmpty))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[RegistrationConnector].toInstance(mockConnector))
           .build()
 
@@ -193,7 +193,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
         val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .build()
 

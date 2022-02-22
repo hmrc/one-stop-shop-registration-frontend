@@ -40,7 +40,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val addWebsiteRoute = routes.AddWebsiteController.onPageLoad(NormalMode).url
 
-  private val baseAnswers = emptyUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
+  private val baseAnswers = basicUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
 
   "AddWebsite Controller" - {
 
@@ -65,7 +65,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET when the maximum number of websites have already been added" in {
 
       val answers =
-        emptyUserAnswers
+        basicUserAnswers
           .set(WebsitePage(Index(0)), "foo").success.value
           .set(WebsitePage(Index(1)), "foo").success.value
           .set(WebsitePage(Index(2)), "foo").success.value
@@ -95,7 +95,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery and the correct view for a GET when cannot derive number of websites" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)

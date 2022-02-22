@@ -39,7 +39,7 @@ class HasFixedEstablishmentControllerSpec extends SpecBase with MockitoSugar {
   private val index = Index(0)
   private lazy val hasFixedEstablishmentRoute = routes.HasFixedEstablishmentController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
 
   "HasFixedEstablishment Controller" - {
 
@@ -138,7 +138,7 @@ class HasFixedEstablishmentControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasFixedEstablishmentRoute)

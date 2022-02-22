@@ -266,7 +266,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           doNothing().when(auditService).audit(any())(any(), any())
 
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-          val userAnswers = emptyUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+          val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .overrides(
@@ -481,7 +481,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -491,7 +491,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -510,7 +510,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -520,7 +520,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER

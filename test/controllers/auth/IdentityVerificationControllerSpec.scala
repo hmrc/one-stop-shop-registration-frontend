@@ -53,7 +53,7 @@ class IdentityVerificationControllerSpec extends SpecBase with MockitoSugar with
 
       "must return OK and the correct view" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
         val request = FakeRequest(GET, routes.IdentityVerificationController.identityError(continueUrl).url)
 

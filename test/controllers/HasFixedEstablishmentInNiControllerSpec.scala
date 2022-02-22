@@ -41,7 +41,7 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasFixedEstablishmentInNiRoute)
@@ -57,7 +57,7 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
 
     "must populate the view and return OK and the correct view for a GET when the question has already been answered" in {
 
-      val answers = emptyUserAnswers.set(HasFixedEstablishmentInNiPage, true).success.value
+      val answers = basicUserAnswers.set(HasFixedEstablishmentInNiPage, true).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -78,7 +78,7 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
           .build()
 
@@ -89,7 +89,7 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
 
         val result = route(application, request).value
 
-        val expectedAnswers = emptyUserAnswers.set(HasFixedEstablishmentInNiPage, true).success.value
+        val expectedAnswers = basicUserAnswers.set(HasFixedEstablishmentInNiPage, true).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual HasFixedEstablishmentInNiPage.navigate(true).url
@@ -99,7 +99,7 @@ class HasFixedEstablishmentInNiControllerSpec extends SpecBase with MockitoSugar
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

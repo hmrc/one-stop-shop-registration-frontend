@@ -57,7 +57,7 @@ class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val result = route(application, getRequest).value
@@ -92,13 +92,13 @@ class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val result = route(application, postRequest).value
-        val expectedAnswers = emptyUserAnswers.set(UkVatEffectiveDatePage, validAnswer).success.value
+        val expectedAnswers = basicUserAnswers.set(UkVatEffectiveDatePage, validAnswer).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual UkVatEffectiveDatePage.navigate(NormalMode, expectedAnswers).url
@@ -108,7 +108,7 @@ class UkVatEffectiveDateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       val request =
         FakeRequest(POST, ukVatEffectiveDateRoute)

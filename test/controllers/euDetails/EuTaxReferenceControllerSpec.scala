@@ -41,7 +41,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euTaxReferenceRoute = routes.EuTaxReferenceController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
 
   "EuTaxReference Controller" - {
 
@@ -140,7 +140,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, euTaxReferenceRoute)

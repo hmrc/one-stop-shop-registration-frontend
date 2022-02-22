@@ -41,7 +41,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
   private lazy val fixedEstablishmentAddressRoute = routes.FixedEstablishmentAddressController.onPageLoad(NormalMode, index).url
 
   private val address         = InternationalAddress("value 1", None, "value 2", None, None, country)
-  private val baseUserAnswers = emptyUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
   private val userAnswers     = baseUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
 
   "FixedEstablishmentAddress Controller" - {
@@ -139,7 +139,7 @@ class FixedEstablishmentAddressControllerSpec extends SpecBase with MockitoSugar
 
     "must redirect to Journey Recovery for a GET if no user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, fixedEstablishmentAddressRoute)

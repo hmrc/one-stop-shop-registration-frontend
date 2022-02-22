@@ -39,13 +39,13 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
   private lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
 
   private val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-  private val userAnswers = emptyUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+  private val userAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
   "BusinessContactDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, businessContactDetailsRoute)
@@ -82,7 +82,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(
             bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
           )
@@ -94,7 +94,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+        val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual BusinessContactDetailsPage.navigate(NormalMode, expectedAnswers).url
@@ -104,7 +104,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

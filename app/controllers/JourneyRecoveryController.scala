@@ -23,14 +23,15 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl._
 import uk.gov.hmrc.play.bootstrap.binders._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
+import views.html.{JourneyRecoveryContinueView, JourneyRecoveryMissingUserAnswersStartAgainView, JourneyRecoveryStartAgainView}
 
 import javax.inject.Inject
 
 class JourneyRecoveryController @Inject()(
                                            cc: AuthenticatedControllerComponents,
                                            continueView: JourneyRecoveryContinueView,
-                                           startAgainView: JourneyRecoveryStartAgainView
+                                           startAgainView: JourneyRecoveryStartAgainView,
+                                           missingUserAnswersView: JourneyRecoveryMissingUserAnswersStartAgainView
                                          ) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -53,4 +54,10 @@ class JourneyRecoveryController @Inject()(
         .map(url => Ok(continueView(url)))
         .getOrElse(Ok(startAgainView()))
   }
+
+  def onMissingAnswers(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+    implicit request =>
+    Ok(missingUserAnswersView())
+  }
 }
+

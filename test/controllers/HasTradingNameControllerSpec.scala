@@ -39,7 +39,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val hasTradingNameRoute = routes.HasTradingNameController.onPageLoad(NormalMode).url
 
-  private val baseUserAnswers = emptyUserAnswers.set(RegisteredCompanyNamePage, registeredCompanyName).success.value
+  private val baseUserAnswers = basicUserAnswers.set(RegisteredCompanyNamePage, registeredCompanyName).success.value
 
   "HasTradingName Controller" - {
 
@@ -85,13 +85,13 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onMissingAnswers().url
       }
     }
 
     "must return OK and the correct view for a GET when we have the user's company name in their VAT details" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasTradingNameRoute)
@@ -187,7 +187,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to Journey Recovery for a GET if Registered Company Name has not been answered" +
       "and we don't have the user's company in their VAT details" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasTradingNameRoute)
@@ -218,7 +218,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to Journey Recovery for a POST if Registered Company Name has not been answered" +
       "and we don't have the user's company name in their VAT details" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

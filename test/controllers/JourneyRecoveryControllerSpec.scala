@@ -20,7 +20,7 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
+import views.html.{JourneyRecoveryContinueView, JourneyRecoveryMissingUserAnswersStartAgainView, JourneyRecoveryStartAgainView}
 
 class JourneyRecoveryControllerSpec extends SpecBase {
 
@@ -70,7 +70,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
 
       "must return OK and the start again view with link to auth on sign in" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithVatInfo)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
         running(application) {
           val request = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad().url)
@@ -84,6 +84,25 @@ class JourneyRecoveryControllerSpec extends SpecBase {
           status(result) mustEqual OK
           contentAsString(result) mustEqual startAgainView(expectedRedirectURl)(request, messages(application)).toString
         }
+      }
+    }
+  }
+
+  ".onMissingAnswers" - {
+
+    "must display Journey Recovery Missing User Answers Start Again page when there are empty user answers" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request     = FakeRequest(GET, routes.JourneyRecoveryController.onMissingAnswers().url)
+
+        val result = route(application, request).value
+
+        val missingAnswersView = application.injector.instanceOf[JourneyRecoveryMissingUserAnswersStartAgainView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual missingAnswersView()(request, messages(application)).toString
       }
     }
   }

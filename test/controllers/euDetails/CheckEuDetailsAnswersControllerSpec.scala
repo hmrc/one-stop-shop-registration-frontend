@@ -43,7 +43,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
   private val mockSessionRepository = mock[AuthenticatedSessionRepository]
 
   private val baseUserAnswers =
-    emptyUserAnswers
+    basicUserAnswers
       .set(euDetails.EuCountryPage(index), Country.euCountries.head).success.value
       .set(euDetails.VatRegisteredPage(index), true).success.value
 
@@ -93,7 +93,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
     "must redirect to Journey Recovery if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         implicit val msgs: Messages = messages(application)
