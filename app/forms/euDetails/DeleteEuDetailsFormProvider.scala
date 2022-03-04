@@ -17,7 +17,6 @@
 package forms.euDetails
 
 import forms.mappings.Mappings
-import models.euDetails.EuDetails
 import play.api.data.Form
 
 import javax.inject.Inject

@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
-import models.previousRegistrations.{PreviousRegistrationDetails, PreviousRegistrationDetailsWithOptionalVatNumber}
+import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.previousRegistrations.DeletePreviousRegistrationPage

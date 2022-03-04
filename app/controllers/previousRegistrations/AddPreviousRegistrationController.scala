@@ -17,7 +17,6 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
-import controllers.routes
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
