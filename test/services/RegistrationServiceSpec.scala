@@ -76,6 +76,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(FixedEstablishmentAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany"))).success.value
       .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
+      .set(EuTaxReferencePage(Index(3)), "IE123456789").success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
       .set(
         UkAddressPage,
