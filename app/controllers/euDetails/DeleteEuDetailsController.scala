@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.DeleteEuDetailsFormProvider
-import models.euDetails.{EuDetails, EuOptionalDetails}
+import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import pages.euDetails.DeleteEuDetailsPage

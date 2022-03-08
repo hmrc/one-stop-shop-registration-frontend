@@ -20,17 +20,14 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
-import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
-import queries.EmailConfirmationQuery
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyRegisteredView
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class AlreadyRegisteredController @Inject()(

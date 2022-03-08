@@ -20,8 +20,6 @@ import controllers.actions._
 import formats.Format.dateFormatter
 import models.Mode
 import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.DateService
@@ -29,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
 import java.time.{Clock, LocalDate}
-import scala.concurrent.ExecutionContext
+import javax.inject.Inject
 
 class CommencementDateController @Inject()(
    override val messagesApi: MessagesApi,

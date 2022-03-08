@@ -17,7 +17,7 @@
 package queries
 
 import models.Index
-import models.previousRegistrations.{PreviousRegistrationDetails, PreviousRegistrationDetailsWithOptionalVatNumber}
+import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import play.api.libs.json.JsPath
 
 case class PreviousRegistrationWithOptionalVatNumberQuery(index: Index) extends Gettable[PreviousRegistrationDetailsWithOptionalVatNumber] with Settable[PreviousRegistrationDetailsWithOptionalVatNumber] {
