@@ -247,12 +247,8 @@ class RegistrationService @Inject()(dateService: DateService) {
 
           case Some(false) =>
             answers.get(VatRegisteredPage(index)) match {
-              case Some(true) =>
+              case Some(_) =>
                 getEuVatRegistration(answers, country, index)
-
-              case Some(false) =>
-                RegistrationWithoutFixedEstablishment(country).validNec
-
               case None =>
                 DataMissingError(VatRegisteredPage(index)).invalidNec
             }
@@ -291,9 +287,9 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
 
   private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] =
-    getEuVatNumber(answers, index).map {
-      vatNumber =>
-        EuVatRegistration(country, vatNumber)
+    getEuTaxIdentifier(answers, index).map {
+      taxId =>
+        RegistrationWithoutFixedEstablishment(country, taxId)
     }
 
   private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] =
