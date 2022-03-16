@@ -589,8 +589,9 @@ dateOfFirstSale.change.hidden = date your sales start to be included in this sch
 
 hasMadeSales.title = Have you already made eligible sales?
 hasMadeSales.heading = Have you already made eligible sales?
-hasMadeSales.caption = Only sales of goods from Northern Ireland or an EU country to consumers in other EU countries are eligible.
-hasMadeSales.caption.excludeSales = Only sales of goods from Northern Ireland or an EU country to consumers in other EU countries are eligible. <p>Do not include sales made on online marketplaces.</p>
+hasMadeSales.caption = These are sales of goods from Northern Ireland or an EU country to consumers in other EU countries.
+hasMadeSales.caption.excludeSales = <p>Do not include sales made on online marketplaces.</p>
+hasMadeSales.caption.youCanStillRegister = <p>You can still register, even if you have not made eligible sales.</p>
 hasMadeSales.checkYourAnswersLabel = Already made eligible sales
 hasMadeSales.error.required = Select yes if you have already made eligible sales
 hasMadeSales.change.hidden = if already made eligible sales
