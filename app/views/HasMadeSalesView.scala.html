@@ -16,22 +16,17 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @if(hintTextFlag) {
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
-                ).withHint(HintViewModel(HtmlContent(Html(messages("hasMadeSales.caption.excludeSales")))))
-            )
-        } else {
 
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
-                ).withHint(HintViewModel(messages("hasMadeSales.caption")))
-            )
-        }
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
+            ).withHint(HintViewModel(HtmlContent(Html(
+                    if(hintTextFlag) {messages("hasMadeSales.caption") + messages("hasMadeSales.caption.youCanStillRegister") + messages("hasMadeSales.caption.excludeSales")}
+                    else {messages("hasMadeSales.caption") + messages("hasMadeSales.caption.youCanStillRegister")}
+                ))))
+        )
+
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
