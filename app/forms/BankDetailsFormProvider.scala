@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.commonTextPattern
+import forms.Validation.Validation.{bankAccountNamePattern, commonTextPattern}
 import forms.mappings.Mappings
 import models.BankDetails
 import play.api.data.Form
@@ -31,7 +31,7 @@ class BankDetailsFormProvider @Inject() extends Mappings {
       "accountName" -> text("bankDetails.error.accountName.required")
         .verifying(firstError(
           maxLength(70, "bankDetails.error.accountName.length"),
-          regexp(commonTextPattern, "bankDetails.error.accountName.invalid")
+          regexp(bankAccountNamePattern, "bankDetails.error.accountName.invalid")
         )),
       "bic"  -> optional(bic("bankDetails.error.bic.required", "bankDetails.error.bic.invalid")),
       "iban" -> iban("bankDetails.error.iban.required", "bankDetails.error.iban.invalid", "bankDetails.error.iban.checksum")
