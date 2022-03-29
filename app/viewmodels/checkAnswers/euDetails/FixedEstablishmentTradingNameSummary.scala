@@ -21,6 +21,7 @@ import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -40,7 +41,7 @@ object FixedEstablishmentTradingNameSummary {
 
         SummaryListRowViewModel(
           key = "fixedEstablishmentTradingName.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value = ValueViewModel(HtmlContent(HtmlFormat.escape(answer).toString)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.FixedEstablishmentTradingNameController.onPageLoad(changeLinkMode, index).url)
               .withVisuallyHiddenText(messages("fixedEstablishmentTradingName.change.hidden"))

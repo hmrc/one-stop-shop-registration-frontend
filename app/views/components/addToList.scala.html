@@ -10,7 +10,7 @@
     @for(item <- itemList) {
         <div class="hmrc-add-to-a-list__contents">
             <dt class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
-            @item.name
+            @Html(item.name)
             </dt>
             <dd class="hmrc-add-to-a-list__change">
                 <a class="govuk-link" href="@item.changeUrl">

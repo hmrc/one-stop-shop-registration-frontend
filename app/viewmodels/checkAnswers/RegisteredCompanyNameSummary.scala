@@ -21,6 +21,7 @@ import models.{CheckMode, UserAnswers}
 import pages.RegisteredCompanyNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -33,7 +34,7 @@ object RegisteredCompanyNameSummary  {
 
         SummaryListRowViewModel(
           key     = "registeredCompanyName.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value   = ValueViewModel(HtmlContent(HtmlFormat.escape(answer).toString)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.RegisteredCompanyNameController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("registeredCompanyName.change.hidden"))
