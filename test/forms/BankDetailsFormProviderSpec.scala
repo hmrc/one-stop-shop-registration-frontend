@@ -28,15 +28,20 @@ class BankDetailsFormProviderSpec extends StringFieldBehaviours {
   ".accountName" - {
 
     val fieldName = "accountName"
+    val invalid = "bankDetails.error.accountName.invalid"
     val requiredKey = "bankDetails.error.accountName.required"
     val lengthKey = "bankDetails.error.accountName.length"
     val maxLength = 70
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      safeInputsWithMaxLength(maxLength)
-    )
+    s"bind strings that do not contain forbidden characters" in {
+        val result = form.bind(Map(fieldName -> "Abc 123 -?:().,'+")).apply(fieldName)
+        result.errors mustBe empty
+    }
+
+    s"do not bind strings that contain forbidden characters" in {
+      val result = form.bind(Map(fieldName -> "A & B")).apply(fieldName)
+      result.errors must contain only FormError(fieldName, invalid, Seq("^[A-Za-z0-9/\\-?:().,'+ ]*$"))
+    }
 
     behave like fieldWithMaxLength(
       form,
