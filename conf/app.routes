@@ -294,3 +294,5 @@ GET        /planned-first-sale                                        controller
 POST       /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
 GET        /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
+
+POST       /external-entry                                            controllers.external.ExternalController.onExternal()
