@@ -24,7 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.BusinessBasedInNiPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.UnauthenticatedSessionRepository
+import repositories.UnauthenticatedUserAnswersRepository
 import views.html.BusinessBasedInNiView
 import play.api.inject.bind
 
@@ -74,12 +74,12 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
-          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(sessionRepository))
           .build()
 
       running(application) {

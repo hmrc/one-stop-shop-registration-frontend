@@ -28,7 +28,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
-import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
+import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 import services.DataMigrationService
 import uk.gov.hmrc.http.HeaderNames
 
@@ -38,13 +38,13 @@ import scala.concurrent.Future
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValues {
 
   class AuthenticatedHarness (
-                               sessionRepository: AuthenticatedSessionRepository,
+                               sessionRepository: AuthenticatedUserAnswersRepository,
                                migrationService: DataMigrationService
                              ) extends AuthenticatedDataRetrievalAction(sessionRepository, migrationService) {
     def callRefine[A](request: AuthenticatedIdentifierRequest[A]): Future[Either[Result, AuthenticatedOptionalDataRequest[A]]] = refine(request)
   }
 
-  class UnauthenticatedHarness(sessionRepository: UnauthenticatedSessionRepository) extends UnauthenticatedDataRetrievalAction(sessionRepository) {
+  class UnauthenticatedHarness(sessionRepository: UnauthenticatedUserAnswersRepository) extends UnauthenticatedDataRetrievalAction(sessionRepository) {
     def callTransform[A](request: SessionRequest[A]): Future[UnauthenticatedOptionalDataRequest[A]] = transform(request)
   }
 
@@ -54,7 +54,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
 
       "must migrate the session then redirect the user to the same path without the key" in {
 
-        val sessionRepository = mock[AuthenticatedSessionRepository]
+        val sessionRepository = mock[AuthenticatedUserAnswersRepository]
         val migrationService  = mock[DataMigrationService]
 
         when(sessionRepository.get(userAnswersId)) thenReturn Future.successful(None)
@@ -78,7 +78,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
 
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
-          val sessionRepository = mock[AuthenticatedSessionRepository]
+          val sessionRepository = mock[AuthenticatedUserAnswersRepository]
           val migrationService  = mock[DataMigrationService]
 
           when(sessionRepository.get(any())) thenReturn Future.successful(None)
@@ -101,7 +101,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
 
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
-          val sessionRepository = mock[AuthenticatedSessionRepository]
+          val sessionRepository = mock[AuthenticatedUserAnswersRepository]
           val migrationService  = mock[DataMigrationService]
 
           when(sessionRepository.get(any())) thenReturn Future.successful(None)
@@ -126,7 +126,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
 
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
-          val sessionRepository = mock[AuthenticatedSessionRepository]
+          val sessionRepository = mock[AuthenticatedUserAnswersRepository]
           val migrationService  = mock[DataMigrationService]
 
           when(sessionRepository.get(any())) thenReturn Future.successful(Some(answers))
@@ -150,7 +150,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
 
       "must set userAnswers to 'None' in the request" in {
 
-        val sessionRepository = mock[UnauthenticatedSessionRepository]
+        val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
         when(sessionRepository.get("12345")) thenReturn Future(None)
         val action = new UnauthenticatedHarness(sessionRepository)
 
@@ -164,7 +164,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
 
       "must build a userAnswers object and add it to the request" in {
 
-        val sessionRepository = mock[UnauthenticatedSessionRepository]
+        val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
         when(sessionRepository.get("12345")) thenReturn Future(Some(UserAnswers("12345")))
         val action = new UnauthenticatedHarness(sessionRepository)
 

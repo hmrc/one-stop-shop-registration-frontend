@@ -21,7 +21,7 @@ import models.UserAnswers
 import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.Result
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import services.DataMigrationService
 import uk.gov.hmrc.domain.Vrn
 import utils.FutureSyntax._
@@ -43,6 +43,6 @@ class FakeAuthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers], vr
 }
 
 object FakeAuthenticatedDataRetrievalAction {
-  val mockSessionRepository: AuthenticatedSessionRepository = mock[AuthenticatedSessionRepository]
+  val mockSessionRepository: AuthenticatedUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
   val mockMigrationService: DataMigrationService = mock[DataMigrationService]
 }

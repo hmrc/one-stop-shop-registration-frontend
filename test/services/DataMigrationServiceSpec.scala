@@ -27,14 +27,14 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.must.Matchers.include
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
+import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataMigrationServiceSpec extends AnyFreeSpec with MockitoSugar with ScalaFutures with Matchers with BeforeAndAfterEach  {
-  val authenticatedRepository   = mock[AuthenticatedSessionRepository]
-  val unauthenticatedRepository = mock[UnauthenticatedSessionRepository]
+  val authenticatedRepository   = mock[AuthenticatedUserAnswersRepository]
+  val unauthenticatedRepository = mock[UnauthenticatedUserAnswersRepository]
   override def beforeEach() = {
     reset(authenticatedRepository)
     reset(unauthenticatedRepository)

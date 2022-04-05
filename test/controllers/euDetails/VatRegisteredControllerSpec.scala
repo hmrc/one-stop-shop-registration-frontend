@@ -26,7 +26,7 @@ import pages.euDetails.{EuCountryPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.euDetails.VatRegisteredView
 
 import scala.concurrent.Future
@@ -81,13 +81,13 @@ class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[AuthenticatedSessionRepository]
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {

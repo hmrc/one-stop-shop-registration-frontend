@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.UnauthenticatedSessionRepository
+import repositories.UnauthenticatedUserAnswersRepository
 import uk.gov.hmrc.http.SessionKeys
 import views.html.AnswersDeletedView
 
@@ -35,12 +35,12 @@ class AnswersDeletedControllerSpec extends SpecBase with MockitoSugar {
 
     "must delete the user's answers and return OK and the correct view for a GET" in {
 
-      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
       when(sessionRepository.clear(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
-          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(sessionRepository))
           .build()
 
       running(application) {

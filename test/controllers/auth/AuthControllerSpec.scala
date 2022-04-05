@@ -30,7 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.VatApiCallResultQuery
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView, UnsupportedAuthProviderView, UnsupportedCredentialRoleView}
 
 import java.net.URLEncoder
@@ -42,13 +42,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
 
   private val mockConnector  = mock[RegistrationConnector]
-  private val mockRepository = mock[AuthenticatedSessionRepository]
+  private val mockRepository = mock[AuthenticatedUserAnswersRepository]
 
   private def appBuilder(answers: Option[UserAnswers]) =
     applicationBuilder(answers)
       .overrides(
         bind[RegistrationConnector].toInstance(mockConnector),
-        bind[AuthenticatedSessionRepository].toInstance(mockRepository)
+        bind[AuthenticatedUserAnswersRepository].toInstance(mockRepository)
       )
 
   override def beforeEach(): Unit = {

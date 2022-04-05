@@ -20,14 +20,14 @@ import javax.inject.Inject
 import models.requests._
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, ActionTransformer, Result}
-import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
+import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 import services.DataMigrationService
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.FutureSyntax._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedDataRetrievalAction @Inject()(sessionRepository: AuthenticatedSessionRepository,
+class AuthenticatedDataRetrievalAction @Inject()(sessionRepository: AuthenticatedUserAnswersRepository,
                                                  migrationService: DataMigrationService)
                                                 (implicit val executionContext: ExecutionContext)
   extends ActionRefiner[AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest] {
@@ -63,7 +63,7 @@ class AuthenticatedDataRetrievalAction @Inject()(sessionRepository: Authenticate
   }
 }
 
-class UnauthenticatedDataRetrievalAction @Inject()(val sessionRepository: UnauthenticatedSessionRepository)
+class UnauthenticatedDataRetrievalAction @Inject()(val sessionRepository: UnauthenticatedUserAnswersRepository)
                                                 (implicit val executionContext: ExecutionContext)
   extends ActionTransformer[SessionRequest, UnauthenticatedOptionalDataRequest] {
 

@@ -29,7 +29,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
+import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 import testutils.RegistrationData.registration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}

@@ -26,7 +26,7 @@ import pages.{DeleteTradingNamePage, TradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.DeleteTradingNameView
 
 import scala.concurrent.Future
@@ -62,14 +62,14 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must delete a record and redirect to the next page when the user answers Yes" in {
 
-      val mockSessionRepository = mock[AuthenticatedSessionRepository]
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -90,14 +90,14 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must not delete a record and redirect to the next page when the user answers Yes" in {
 
-      val mockSessionRepository = mock[AuthenticatedSessionRepository]
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(
-            bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
           )
           .build()
 

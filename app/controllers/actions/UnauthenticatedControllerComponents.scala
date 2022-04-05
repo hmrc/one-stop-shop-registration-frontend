@@ -20,7 +20,7 @@ import models.requests.{UnauthenticatedDataRequest, UnauthenticatedOptionalDataR
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc._
-import repositories.UnauthenticatedSessionRepository
+import repositories.UnauthenticatedUserAnswersRepository
 import services.FeatureFlagService
 
 import javax.inject.Inject
@@ -28,7 +28,7 @@ import javax.inject.Inject
 trait UnauthenticatedControllerComponents extends MessagesControllerComponents {
 
   def actionBuilder: DefaultActionBuilder
-  def sessionRepository: UnauthenticatedSessionRepository
+  def sessionRepository: UnauthenticatedUserAnswersRepository
   def identify: SessionIdentifierAction
   def getData: UnauthenticatedDataRetrievalAction
   def requireData: UnauthenticatedDataRequiredAction
@@ -47,16 +47,16 @@ trait UnauthenticatedControllerComponents extends MessagesControllerComponents {
 }
 
 case class DefaultUnauthenticatedControllerComponents @Inject()(
-                                                               messagesActionBuilder: MessagesActionBuilder,
-                                                               actionBuilder: DefaultActionBuilder,
-                                                               parsers: PlayBodyParsers,
-                                                               messagesApi: MessagesApi,
-                                                               langs: Langs,
-                                                               fileMimeTypes: FileMimeTypes,
-                                                               executionContext: scala.concurrent.ExecutionContext,
-                                                               sessionRepository: UnauthenticatedSessionRepository,
-                                                               identify: SessionIdentifierAction,
-                                                               getData: UnauthenticatedDataRetrievalAction,
-                                                               requireData: UnauthenticatedDataRequiredAction,
-                                                               features: FeatureFlagService
+                                                                 messagesActionBuilder: MessagesActionBuilder,
+                                                                 actionBuilder: DefaultActionBuilder,
+                                                                 parsers: PlayBodyParsers,
+                                                                 messagesApi: MessagesApi,
+                                                                 langs: Langs,
+                                                                 fileMimeTypes: FileMimeTypes,
+                                                                 executionContext: scala.concurrent.ExecutionContext,
+                                                                 sessionRepository: UnauthenticatedUserAnswersRepository,
+                                                                 identify: SessionIdentifierAction,
+                                                                 getData: UnauthenticatedDataRetrievalAction,
+                                                                 requireData: UnauthenticatedDataRequiredAction,
+                                                                 features: FeatureFlagService
                                                              ) extends UnauthenticatedControllerComponents

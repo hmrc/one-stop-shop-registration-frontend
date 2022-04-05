@@ -17,14 +17,14 @@
 package services
 
 import models.UserAnswers
-import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
+import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataMigrationService @Inject()(
-                                      authenticatedSessionRepository: AuthenticatedSessionRepository,
-                                      unauthenticatedSessionRepository: UnauthenticatedSessionRepository
+                                      authenticatedSessionRepository: AuthenticatedUserAnswersRepository,
+                                      unauthenticatedSessionRepository: UnauthenticatedUserAnswersRepository
                                     )(implicit ec: ExecutionContext) {
 
   def migrate(sessionId: String, userId: String): Future[UserAnswers] =
