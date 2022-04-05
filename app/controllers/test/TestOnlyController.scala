@@ -17,7 +17,7 @@
 package controllers.test
 
 import connectors.test.TestOnlyConnector
-import controllers.actions.AuthenticatedControllerComponents
+import controllers.actions.{AuthenticatedControllerComponents, UnauthenticatedControllerComponents}
 import models.external.ExternalRequest
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext
 
 class TestOnlyController @Inject()(testConnector: TestOnlyConnector,
                                    externalService: ExternalService,
-                                   cc: AuthenticatedControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
+                                   cc: UnauthenticatedControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   def deleteAccounts(): Action[AnyContent] = Action.async { implicit request =>
     testConnector.dropAccounts()
