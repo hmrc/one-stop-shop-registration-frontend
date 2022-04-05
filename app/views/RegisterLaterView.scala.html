@@ -3,7 +3,7 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(externalUrl: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("registerLater.title"))) {
 
@@ -12,4 +12,10 @@
     <p class="govuk-body">@messages("registerLater.p1")</p>
 
     <p class="govuk-body">@messages("registerLater.p2")</p>
+
+@externalUrl.map(
+url => Html(
+s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("site.back.BTA") + "</a></p>"
+))
+
 }

@@ -19,21 +19,29 @@ package controllers
 import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.external.ExternalReturnUrlQuery
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.RegisterLaterView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class RegisterLaterController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: UnauthenticatedControllerComponents,
+                                       sessionRepository: SessionRepository,
                                        view: RegisterLaterView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      Ok(view())
+      sessionRepository.get(request.userId).map {
+        sessionData =>
+          Ok(view(sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))))
+      }
+
   }
 }
