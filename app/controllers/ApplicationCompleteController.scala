@@ -25,53 +25,61 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
 import queries.EmailConfirmationQuery
+import queries.external.ExternalReturnUrlQuery
+import repositories.SessionRepository
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ApplicationCompleteView
 
 import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class ApplicationCompleteController @Inject()(
   override val messagesApi: MessagesApi,
   cc: AuthenticatedControllerComponents,
   view: ApplicationCompleteView,
   frontendAppConfig: FrontendAppConfig,
-  dateService: DateService
-) extends FrontendBaseController with I18nSupport {
+  dateService: DateService,
+  sessionRepository: SessionRepository
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData) {
+  def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData).async {
     implicit request => {
-      for {
-        contactDetails        <- request.userAnswers.get(BusinessContactDetailsPage)
-        showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
-        commencementDate      <- getStartDate(request.userAnswers)
-      } yield {
-        val dateOfFirstSale   = request.userAnswers.get(DateOfFirstSalePage)
-        val vatReturnEndDate  = dateService.getVatReturnEndDate(commencementDate)
-        val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-        val isDOFSDifferentToCommencementDate =
-          dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
-
-        Ok(
-          view(
-            HtmlFormat.escape(contactDetails.emailAddress).toString,
-            request.vrn,
-            frontendAppConfig.feedbackUrl,
-            showEmailConfirmation,
-            commencementDate.format(dateFormatter),
-            vatReturnEndDate.format(dateFormatter),
-            vatReturnDeadline.format(dateFormatter),
-            dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.startOfCurrentQuarter.format(dateFormatter),
-            dateService.startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate
-          )
-        )
+      sessionRepository.get(request.userId).map {
+        sessionData =>
+          {for {
+            contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)
+            showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
+            commencementDate <- getStartDate(request.userAnswers)
+          } yield {
+            val dateOfFirstSale = request.userAnswers.get(DateOfFirstSalePage)
+            val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+            val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+            val isDOFSDifferentToCommencementDate =
+              dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+            val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
+            Ok(
+              view(
+                HtmlFormat.escape(contactDetails.emailAddress).toString,
+                request.vrn,
+                frontendAppConfig.feedbackUrl,
+                showEmailConfirmation,
+                commencementDate.format(dateFormatter),
+                vatReturnEndDate.format(dateFormatter),
+                vatReturnDeadline.format(dateFormatter),
+                dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+                dateService.startOfCurrentQuarter.format(dateFormatter),
+                dateService.startOfNextQuarter.format(dateFormatter),
+                isDOFSDifferentToCommencementDate,
+                savedUrl
+              )
+            )
+          }}.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
-    }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
   }
 
   private def getStartDate(answers: UserAnswers): Option[LocalDate] =

@@ -45,7 +45,7 @@ class TestOnlyController @Inject()(testConnector: TestOnlyConnector,
   def enterFromExternal(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async  {
     implicit request =>
       externalService.getExternalResponse(externalRequest, request.userId).map{
-        response => Ok(Json.toJson(response))
+        response => Redirect(response.redirectUrl)
       }
 
   }

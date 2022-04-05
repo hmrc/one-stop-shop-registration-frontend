@@ -32,7 +32,8 @@
     lastDayOfCalendarQuarter: String,
     startOfCurrentQuarter: String,
     startOfNextQuarter: String,
-    isDOFSDifferentToCommencementDate: Boolean
+    isDOFSDifferentToCommencementDate: Boolean,
+    externalUrl: Option[String] = None
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title")),  showBackLink = false) {
@@ -71,7 +72,10 @@
         <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
-
+        @externalUrl.map(
+        url => Html(
+        s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("applicationComplete.link.BTA") + "</a></p>"
+        ))
         <p class="govuk-body">@messages("applicationComplete.p1")</p>
 
         <p class="govuk-body">@messages("applicationComplete.p2", vatReturnDeadline)</p>
