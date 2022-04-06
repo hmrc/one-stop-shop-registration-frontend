@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 
 class RegisterLaterController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       cc: UnauthenticatedControllerComponents,
+                                       cc: AuthenticatedControllerComponents,
                                        sessionRepository: SessionRepository,
                                        view: RegisterLaterView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
