@@ -27,7 +27,7 @@ import utils.FutureSyntax._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedDataRetrievalAction @Inject()(sessionRepository: AuthenticatedUserAnswersRepository,
+class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
                                                  migrationService: DataMigrationService)
                                                 (implicit val executionContext: ExecutionContext)
   extends ActionRefiner[AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest] {
@@ -41,7 +41,7 @@ class AuthenticatedDataRetrievalAction @Inject()(sessionRepository: Authenticate
           .map(_ => Left(Redirect(request.path)))
 
       case None =>
-        sessionRepository
+        authenticatedUserAnswersRepository
           .get(request.userId)
           .flatMap {
             case None =>
