@@ -48,7 +48,7 @@ class ApplicationCompleteController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData).async {
     implicit request => {
-      sessionRepository.get(hc.sessionId.map(_.value).getOrElse(request.userId)).map {
+      sessionRepository.get(request.userId).map {
         sessionData =>
           {for {
             contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)

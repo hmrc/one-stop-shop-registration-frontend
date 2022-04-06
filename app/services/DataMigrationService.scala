@@ -16,15 +16,16 @@
 
 package services
 
-import models.UserAnswers
-import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
+import models.{SessionData, UserAnswers}
+import repositories.{AuthenticatedUserAnswersRepository, SessionRepository, UnauthenticatedUserAnswersRepository}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataMigrationService @Inject()(
                                       authenticatedSessionRepository: AuthenticatedUserAnswersRepository,
-                                      unauthenticatedSessionRepository: UnauthenticatedUserAnswersRepository
+                                      unauthenticatedSessionRepository: UnauthenticatedUserAnswersRepository,
+                                      sessionRepository: SessionRepository
                                     )(implicit ec: ExecutionContext) {
 
   def migrate(sessionId: String, userId: String): Future[UserAnswers] =
@@ -32,6 +33,9 @@ class DataMigrationService @Inject()(
       maybeAnswers <- unauthenticatedSessionRepository.get(sessionId)
       answers      = maybeAnswers.fold(UserAnswers(userId))(_.copy(id = userId))
       success      <- authenticatedSessionRepository.set(answers)
+      sessionData  <- sessionRepository.get(sessionId)
+      updatedSessionData = sessionData.headOption.fold(SessionData(userId))(_.copy(userId = userId))
+      _ <- sessionRepository.set(updatedSessionData)
     } yield if (success) {
       answers
     } else {
