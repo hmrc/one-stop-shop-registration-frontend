@@ -15,7 +15,7 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuthenticatedSessionRepositorySpec
+class UnauthenticatedUserAnswersRepositorySpec
   extends AnyFreeSpec
     with Matchers
     with DefaultPlayMongoRepositorySupport[UserAnswers]
@@ -32,7 +32,7 @@ class AuthenticatedSessionRepositorySpec
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
 
-  protected override val repository = new AuthenticatedSessionRepository(
+  protected override val repository = new UnauthenticatedUserAnswersRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     clock          = stubClock

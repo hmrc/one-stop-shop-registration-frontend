@@ -20,7 +20,7 @@ import controllers.actions.FakeUnauthenticatedDataRetrievalAction.mockSessionRep
 import models.UserAnswers
 import models.requests.{SessionRequest, UnauthenticatedOptionalDataRequest}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import repositories.UnauthenticatedSessionRepository
+import repositories.UnauthenticatedUserAnswersRepository
 import uk.gov.hmrc.domain.Vrn
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,5 +33,5 @@ class FakeUnauthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers], 
 }
 
 object FakeUnauthenticatedDataRetrievalAction {
-  val mockSessionRepository: UnauthenticatedSessionRepository = mock[UnauthenticatedSessionRepository]
+  val mockSessionRepository: UnauthenticatedUserAnswersRepository = mock[UnauthenticatedUserAnswersRepository]
 }

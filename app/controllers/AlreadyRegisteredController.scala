@@ -23,6 +23,8 @@ import formats.Format.dateFormatter
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
+import queries.external.ExternalReturnUrlQuery
+import repositories.SessionRepository
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AlreadyRegisteredView
@@ -36,6 +38,7 @@ class AlreadyRegisteredController @Inject()(
    view: AlreadyRegisteredView,
    connector: RegistrationConnector,
    dateService: DateService,
+   sessionRepository: SessionRepository,
    config: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -43,32 +46,39 @@ class AlreadyRegisteredController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      connector.getRegistration().map {
-        case Some(registration) =>
-          val commencementDate = registration.commencementDate
-          val dateOfFirstSale  = registration.dateOfFirstSale
-          val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
-          val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-          val isDOFSDifferentToCommencementDate =
-            dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+      for {
+        sessionData <- sessionRepository.get(request.userId)
+        registrationData <- connector.getRegistration()
+      } yield {
+        registrationData match {
+          case Some(registration) =>
+            val commencementDate = registration.commencementDate
+            val dateOfFirstSale = registration.dateOfFirstSale
+            val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+            val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+            val isDOFSDifferentToCommencementDate =
+              dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+            val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
 
-          Ok(
-            view(
-              HtmlFormat.escape(registration.registeredCompanyName).toString,
-              request.vrn,
-              config.feedbackUrl,
-              commencementDate.format(dateFormatter),
-              vatReturnEndDate.format(dateFormatter),
-              vatReturnDeadline.format(dateFormatter),
-              dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-              dateService.startOfCurrentQuarter.format(dateFormatter),
-              dateService.startOfNextQuarter.format(dateFormatter),
-              isDOFSDifferentToCommencementDate
+            Ok(
+              view(
+                HtmlFormat.escape(registration.registeredCompanyName).toString,
+                request.vrn,
+                config.feedbackUrl,
+                commencementDate.format(dateFormatter),
+                vatReturnEndDate.format(dateFormatter),
+                vatReturnDeadline.format(dateFormatter),
+                dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+                dateService.startOfCurrentQuarter.format(dateFormatter),
+                dateService.startOfNextQuarter.format(dateFormatter),
+                isDOFSDifferentToCommencementDate,
+                savedUrl
+              )
             )
-          )
 
-        case None =>
-          Redirect(routes.IndexController.onPageLoad())
+          case None =>
+            Redirect(routes.IndexController.onPageLoad())
+        }
       }
   }
 }

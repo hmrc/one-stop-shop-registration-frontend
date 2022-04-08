@@ -39,7 +39,7 @@ import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import queries.EmailConfirmationQuery
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import services.{AuditService, DateService, EmailService, RegistrationService}
 import testutils.RegistrationData
 import viewmodels.checkAnswers.euDetails.TaxRegisteredInEuSummary
@@ -258,7 +258,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
         "must audit the event and redirect to the next page and successfully send email confirmation" in {
-          val mockSessionRepository = mock[AuthenticatedSessionRepository]
+          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
@@ -274,7 +274,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[EmailService].toInstance(emailService),
               bind[AuditService].toInstance(auditService),
-              bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository)
+              bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
             ).build()
 
           running(application) {

@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import viewmodels.checkAnswers.euDetails.{HasFixedEstablishmentSummary, VatRegisteredSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
@@ -40,7 +40,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
   private val index                 = Index(0)
   private val country               = Country.euCountries.head
-  private val mockSessionRepository = mock[AuthenticatedSessionRepository]
+  private val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
   private val baseUserAnswers =
     basicUserAnswers
@@ -111,7 +111,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
         val application =
           applicationBuilder(userAnswers = Some(answersNotRegisteredNoEstablishment))
-            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -129,7 +129,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
-            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -147,7 +147,7 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
-            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)

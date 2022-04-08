@@ -25,7 +25,7 @@ import pages.RegisteredForOssInEuPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.UnauthenticatedSessionRepository
+import repositories.UnauthenticatedUserAnswersRepository
 import views.html.RegisteredForOssInEuView
 
 import scala.concurrent.Future
@@ -90,12 +90,12 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
-          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(sessionRepository))
           .build()
 
       running(application) {
@@ -110,12 +110,12 @@ class RegisteredForOssInEuControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted and there were no user answers" in {
 
-      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = None)
-          .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(sessionRepository))
           .build()
 
       running(application) {

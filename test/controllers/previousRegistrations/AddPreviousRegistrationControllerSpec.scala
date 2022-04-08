@@ -28,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
 import views.html.previousRegistrations.AddPreviousRegistrationView
 
@@ -91,13 +91,13 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[AuthenticatedSessionRepository]
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
-          .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {

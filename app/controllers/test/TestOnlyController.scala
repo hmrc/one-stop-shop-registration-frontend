@@ -17,7 +17,11 @@
 package controllers.test
 
 import connectors.test.TestOnlyConnector
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.actions.{AuthenticatedControllerComponents, UnauthenticatedControllerComponents}
+import models.external.ExternalRequest
+import play.api.libs.json.Json
+import play.api.mvc.{Action, AnyContent}
+import services.external.ExternalService
 import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -25,7 +29,8 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class TestOnlyController @Inject()(testConnector: TestOnlyConnector,
-                                   mcc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(mcc) {
+                                   externalService: ExternalService,
+                                   cc: UnauthenticatedControllerComponents)(implicit ec: ExecutionContext) extends FrontendController(cc) {
 
   def deleteAccounts(): Action[AnyContent] = Action.async { implicit request =>
     testConnector.dropAccounts()
@@ -33,6 +38,16 @@ class TestOnlyController @Inject()(testConnector: TestOnlyConnector,
       .recover {
         case _: NotFoundException => Ok("Perf Tests Accounts did not exist")
       }
+  }
+
+  private val externalRequest = ExternalRequest("BTA", "/business-account")
+
+  def enterFromExternal(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async  {
+    implicit request =>
+      externalService.getExternalResponse(externalRequest, request.userId).map{
+        response => Redirect(response.redirectUrl)
+      }
+
   }
 
 }

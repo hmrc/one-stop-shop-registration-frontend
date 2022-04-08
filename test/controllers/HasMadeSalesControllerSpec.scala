@@ -27,7 +27,7 @@ import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSales
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedSessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.HasMadeSalesView
 
 import scala.concurrent.Future
@@ -77,12 +77,12 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val sessionRepository = mock[AuthenticatedSessionRepository]
+      val sessionRepository = mock[AuthenticatedUserAnswersRepository]
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
-          .overrides(bind[AuthenticatedSessionRepository].toInstance(sessionRepository))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(sessionRepository))
           .build()
 
       running(application) {

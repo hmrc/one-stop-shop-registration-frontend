@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.{AuthenticatedSessionRepository, UnauthenticatedSessionRepository}
+import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 
 import scala.concurrent.Future
 
@@ -35,12 +35,12 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
       "must keep the answers alive and return OK" in {
 
-        val mockSessionRepository = mock[AuthenticatedSessionRepository]
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(Some(basicUserAnswers))
-            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         running(application) {
@@ -59,12 +59,12 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK" in {
 
-        val mockSessionRepository = mock[AuthenticatedSessionRepository]
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(None)
-            .overrides(bind[AuthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         running(application) {
@@ -86,12 +86,12 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
       "must keep the answers alive and return OK" in {
 
-        val mockSessionRepository = mock[UnauthenticatedSessionRepository]
+        val mockSessionRepository = mock[UnauthenticatedUserAnswersRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(Some(basicUserAnswers))
-            .overrides(bind[UnauthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         running(application) {
@@ -110,12 +110,12 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK" in {
 
-        val mockSessionRepository = mock[UnauthenticatedSessionRepository]
+        val mockSessionRepository = mock[UnauthenticatedUserAnswersRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(None)
-            .overrides(bind[UnauthenticatedSessionRepository].toInstance(mockSessionRepository))
+            .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         running(application) {

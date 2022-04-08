@@ -22,7 +22,7 @@ import models.SalesChannels
 import pages.SalesChannelsPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.UnauthenticatedSessionRepository
+import repositories.UnauthenticatedUserAnswersRepository
 import views.html.SalesChannelsView
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -75,12 +75,12 @@ class SalesChannelsControllerSpec extends SpecBase with MockitoSugar {
 
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
-      val sessionRepository = mock[UnauthenticatedSessionRepository]
+      val sessionRepository = mock[UnauthenticatedUserAnswersRepository]
 
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
-        .overrides(bind[UnauthenticatedSessionRepository].toInstance(sessionRepository))
+        .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(sessionRepository))
         .build()
 
       running(application) {
