@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.commonTextPattern
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces}
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -33,6 +33,8 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "internationalAddress.error.line1.required"
     val lengthKey = "internationalAddress.error.line1.length"
     val formatKey = "internationalAddress.error.line1.format"
+    val leadingTrailingSpacesKey = "internationalAddress.error.line1.leadingtrailing"
+    val doubleSpacesKey = "internationalAddress.error.line1.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -54,6 +56,13 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
       FormError(fieldName, lengthKey, Seq(maxLength)),
       maxLength
     )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
+    )
   }
 
   ".line2" - {
@@ -61,6 +70,8 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line2"
     val lengthKey = "internationalAddress.error.line2.length"
     val formatKey = "internationalAddress.error.line2.format"
+    val leadingTrailingSpacesKey = "internationalAddress.error.line2.leadingtrailing"
+    val doubleSpacesKey = "internationalAddress.error.line2.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -75,6 +86,13 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
       FormError(fieldName, formatKey, Seq(commonTextPattern)),
       FormError(fieldName, lengthKey, Seq(maxLength)),
       maxLength
+    )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
     )
   }
 
@@ -84,6 +102,8 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "internationalAddress.error.townOrCity.required"
     val lengthKey = "internationalAddress.error.townOrCity.length"
     val formatKey = "internationalAddress.error.townOrCity.format"
+    val leadingTrailingSpacesKey = "internationalAddress.error.townOrCity.leadingtrailing"
+    val doubleSpacesKey = "internationalAddress.error.townOrCity.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -105,6 +125,13 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
+    )
   }
 
   ".stateOrRegion" - {
@@ -112,6 +139,8 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "stateOrRegion"
     val lengthKey = "internationalAddress.error.stateOrRegion.length"
     val formatKey = "internationalAddress.error.stateOrRegion.format"
+    val leadingTrailingSpacesKey = "internationalAddress.error.stateOrRegion.leadingtrailing"
+    val doubleSpacesKey = "internationalAddress.error.stateOrRegion.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -126,6 +155,13 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
       FormError(fieldName, formatKey, Seq(commonTextPattern)),
       FormError(fieldName, lengthKey, Seq(maxLength)),
       maxLength
+    )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
     )
   }
 

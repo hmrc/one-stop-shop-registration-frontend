@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{commonTextPattern, emailPattern, telephonePattern}
+import forms.Validation.Validation.{commonTextPattern, emailPattern, noDoubleSpaces, noLeadingOrTrailingSpaces, telephonePattern}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -31,7 +31,9 @@ class BusinessContactDetailsFormProvider @Inject() extends Mappings {
       "fullName" -> text("businessContactDetails.error.fullName.required")
         .verifying(firstError(
           maxLength(100, "businessContactDetails.error.fullName.length"),
-          regexp(commonTextPattern, "businessContactDetails.error.fullName.invalid"))),
+          regexp(commonTextPattern, "businessContactDetails.error.fullName.invalid"),
+          regexp(noLeadingOrTrailingSpaces, "businessContactDetails.error.fullName.leadingtrailing"),
+          regexp(noDoubleSpaces, "businessContactDetails.error.fullName.doublespaces"))),
       "telephoneNumber" -> text("businessContactDetails.error.telephoneNumber.required")
         .verifying(firstError(
           maxLength(20, "businessContactDetails.error.telephoneNumber.length"),

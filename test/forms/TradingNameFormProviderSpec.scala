@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.commonTextPattern
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces}
 import forms.behaviours.StringFieldBehaviours
 import models.Index
 import play.api.data.FormError
@@ -26,6 +26,8 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "tradingName.error.required"
   val lengthKey = "tradingName.error.length"
   val invalidKey = "tradingName.error.invalid"
+  val leadingTrailingSpacesKey = "tradingName.error.leadingtrailing"
+  val doubleSpacesKey = "tradingName.error.doublespaces"
   val maxLength = 160
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[String]
@@ -55,6 +57,13 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
     )
 
     "must fail to bind when given a duplicate value" in {

@@ -193,7 +193,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def commonFieldString(maxLength: Int): Gen[String] = (for {
     length <- choose(1, maxLength)
     chars  <- listOfN(length, commonFieldSafeInputs)
-  } yield chars.mkString).suchThat(_.trim.nonEmpty)
+  } yield chars.mkString.trim).map(_.replaceAll(" {2,10}", " ")).suchThat(_.trim.nonEmpty)
 
   def alphaNumStringWithLength(minLength: Int, maxLength: Int): Gen[String] = (
     for {

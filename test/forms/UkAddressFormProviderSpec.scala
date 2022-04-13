@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{commonTextPattern, postCodePattern}
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces, postCodePattern}
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -31,6 +31,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "ukAddress.error.line1.required"
     val lengthKey = "ukAddress.error.line1.length"
     val invalidKey = "ukAddress.error.line1.invalid"
+    val leadingTrailingSpacesKey = "ukAddress.error.line1.leadingtrailing"
+    val doubleSpacesKey = "ukAddress.error.line1.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -52,6 +54,13 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
 
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
+    )
+
     "must not bind invalid Line 1" in {
       val invalidLine1 = "^Invalid~ !@=£"
       val result = form.bind(Map(fieldName -> invalidLine1)).apply(fieldName)
@@ -64,6 +73,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line2"
     val lengthKey = "ukAddress.error.line2.length"
     val invalidKey = "ukAddress.error.line2.invalid"
+    val leadingTrailingSpacesKey = "ukAddress.error.line2.leadingtrailing"
+    val doubleSpacesKey = "ukAddress.error.line2.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -77,6 +88,13 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
     )
 
     "must not bind invalid Line 2" in {
@@ -92,6 +110,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "ukAddress.error.townOrCity.required"
     val lengthKey = "ukAddress.error.townOrCity.length"
     val invalidKey = "ukAddress.error.townOrCity.invalid"
+    val leadingTrailingSpacesKey = "ukAddress.error.townOrCity.leadingtrailing"
+    val doubleSpacesKey = "ukAddress.error.townOrCity.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -113,6 +133,13 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
 
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
+    )
+
     "must not bind invalid Town or City" in {
       val invalidTownOrCity = "^Invalid~ !@=£"
       val result = form.bind(Map(fieldName -> invalidTownOrCity)).apply(fieldName)
@@ -125,6 +152,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "county"
     val lengthKey = "ukAddress.error.county.length"
     val invalidKey = "ukAddress.error.county.invalid"
+    val leadingTrailingSpacesKey = "ukAddress.error.county.leadingtrailing"
+    val doubleSpacesKey = "ukAddress.error.county.doublespaces"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -138,6 +167,13 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
     )
 
     "must not bind invalid County" in {

@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{commonTextPattern, emailPattern, telephonePattern}
+import forms.Validation.Validation.{commonTextPattern, emailPattern, noDoubleSpaces, noLeadingOrTrailingSpaces, telephonePattern}
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -31,6 +31,8 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
     val requiredKey = "businessContactDetails.error.fullName.required"
     val lengthKey = "businessContactDetails.error.fullName.length"
     val invalidKey = "businessContactDetails.error.fullName.invalid"
+    val leadingTrailingSpacesKey = "businessContactDetails.error.fullName.leadingtrailing"
+    val doubleSpacesKey = "businessContactDetails.error.fullName.doublespaces"
     val validData = "Tom Smith"
     val maxLength = 100
 
@@ -51,6 +53,13 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like stringFieldWithSpacesRules(
+      form,
+      fieldName,
+      leadingTrailingSpacesError = FormError(fieldName, leadingTrailingSpacesKey, Seq(noLeadingOrTrailingSpaces)),
+      doubleSpacesError = FormError(fieldName, doubleSpacesKey, Seq(noDoubleSpaces))
     )
 
     "must not bind invalid full name" in {

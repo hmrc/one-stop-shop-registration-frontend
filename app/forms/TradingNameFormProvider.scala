@@ -17,7 +17,7 @@
 package forms
 
 import config.Constants.tradingNameReservedWords
-import forms.Validation.Validation.commonTextPattern
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -33,6 +33,8 @@ class TradingNameFormProvider @Inject() extends Mappings {
           maxLength(160, "tradingName.error.length"),
           notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
           regexp(commonTextPattern, "tradingName.error.invalid"),
+          regexp(noLeadingOrTrailingSpaces, "tradingName.error.leadingtrailing"),
+          regexp(noDoubleSpaces, "tradingName.error.doublespaces"),
           notContainStrings(tradingNameReservedWords, "tradingName.error.invalid")
         )),
     )

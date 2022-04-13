@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.commonTextPattern
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -30,16 +30,24 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
     mapping(
       "line1" -> text("internationalAddress.error.line1.required")
         .verifying(maxLength(35, "internationalAddress.error.line1.length"))
-        .verifying(regexp(commonTextPattern, "internationalAddress.error.line1.format")),
+        .verifying(regexp(commonTextPattern, "internationalAddress.error.line1.format"))
+        .verifying(regexp(noLeadingOrTrailingSpaces, "internationalAddress.error.line1.leadingtrailing"))
+        .verifying(regexp(noDoubleSpaces, "internationalAddress.error.line1.doublespaces")),
       "line2" -> optional(text("internationalAddress.error.line2.required")
         .verifying(maxLength(35, "internationalAddress.error.line2.length"))
-        .verifying(regexp(commonTextPattern, "internationalAddress.error.line2.format"))),
+        .verifying(regexp(commonTextPattern, "internationalAddress.error.line2.format"))
+        .verifying(regexp(noLeadingOrTrailingSpaces, "internationalAddress.error.line2.leadingtrailing"))
+        .verifying(regexp(noDoubleSpaces, "internationalAddress.error.line2.doublespaces"))),
       "townOrCity" -> text("internationalAddress.error.townOrCity.required")
         .verifying(maxLength(35, "internationalAddress.error.townOrCity.length"))
-        .verifying(regexp(commonTextPattern, "internationalAddress.error.townOrCity.format")),
+        .verifying(regexp(commonTextPattern, "internationalAddress.error.townOrCity.format"))
+        .verifying(regexp(noLeadingOrTrailingSpaces, "internationalAddress.error.townOrCity.leadingtrailing"))
+        .verifying(regexp(noDoubleSpaces, "internationalAddress.error.townOrCity.doublespaces")),
       "stateOrRegion" -> optional(text("internationalAddress.error.stateOrRegion.required")
         .verifying(maxLength(35, "internationalAddress.error.stateOrRegion.length"))
-        .verifying(regexp(commonTextPattern, "internationalAddress.error.stateOrRegion.format"))),
+        .verifying(regexp(commonTextPattern, "internationalAddress.error.stateOrRegion.format"))
+        .verifying(regexp(noLeadingOrTrailingSpaces, "internationalAddress.error.stateOrRegion.leadingtrailing"))
+        .verifying(regexp(noDoubleSpaces, "internationalAddress.error.stateOrRegion.doublespaces"))),
       "postCode" -> optional(text("internationalAddress.error.postCode.required")
         .verifying(maxLength(50, "internationalAddress.error.postCode.length"))),
       "country" -> text("internationalAddress.error.country.required")

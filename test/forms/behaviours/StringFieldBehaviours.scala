@@ -16,6 +16,7 @@
 
 package forms.behaviours
 
+import forms.Validation.Validation.{noDoubleSpaces, noLeadingOrTrailingSpaces}
 import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
@@ -47,6 +48,30 @@ trait StringFieldBehaviours extends FieldBehaviours {
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
           result.errors must contain only lengthError
       }
+    }
+  }
+
+  def stringFieldWithSpacesRules(form: Form[_],
+                      fieldName: String,
+                       leadingTrailingSpacesError: FormError,
+                       doubleSpacesError: FormError): Unit = {
+
+    "not bind a string with leading spaces" in {
+      val invalidString = " tom smith"
+      val result = form.bind(Map(fieldName -> invalidString)).apply(fieldName)
+      result.errors must contain only leadingTrailingSpacesError
+    }
+
+    "not bind a string with trailing spaces" in {
+      val invalidString = "tom smith "
+      val result = form.bind(Map(fieldName -> invalidString)).apply(fieldName)
+      result.errors must contain only leadingTrailingSpacesError
+    }
+
+    "not bind a string with double spaces" in {
+      val invalidString = "tom  smith"
+      val result = form.bind(Map(fieldName -> invalidString)).apply(fieldName)
+      result.errors must contain only doubleSpacesError
     }
   }
 

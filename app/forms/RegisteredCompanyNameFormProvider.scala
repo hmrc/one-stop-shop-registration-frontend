@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.commonTextPattern
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -29,6 +29,8 @@ class RegisteredCompanyNameFormProvider @Inject() extends Mappings {
       "value" -> text("registeredCompanyName.error.required")
         .verifying(firstError(
           maxLength(100, "registeredCompanyName.error.length"),
-          regexp(commonTextPattern, "registeredCompanyName.error.invalid")))
+          regexp(commonTextPattern, "registeredCompanyName.error.invalid"),
+          regexp(noLeadingOrTrailingSpaces, "registeredCompanyName.error.leadingtrailing"),
+          regexp(noDoubleSpaces, "registeredCompanyName.error.doublespaces")))
     )
 }

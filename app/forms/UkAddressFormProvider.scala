@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{commonTextPattern, postCodePattern}
+import forms.Validation.Validation.{commonTextPattern, noDoubleSpaces, noLeadingOrTrailingSpaces, postCodePattern}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
@@ -31,19 +31,27 @@ class UkAddressFormProvider @Inject() extends Mappings {
       "line1" -> text("ukAddress.error.line1.required")
         .verifying(firstError(
           maxLength(35, "ukAddress.error.line1.length"),
-          regexp(commonTextPattern, "ukAddress.error.line1.invalid"))),
+          regexp(commonTextPattern, "ukAddress.error.line1.invalid"),
+          regexp(noLeadingOrTrailingSpaces, "ukAddress.error.line1.leadingtrailing"),
+          regexp(noDoubleSpaces, "ukAddress.error.line1.doublespaces"))),
       "line2" -> optional(text("ukAddress.error.line2.required")
         .verifying(firstError(
           maxLength(35, "ukAddress.error.line2.length"),
-          regexp(commonTextPattern, "ukAddress.error.line2.invalid")))),
+          regexp(commonTextPattern, "ukAddress.error.line2.invalid"),
+          regexp(noLeadingOrTrailingSpaces, "ukAddress.error.line2.leadingtrailing"),
+          regexp(noDoubleSpaces, "ukAddress.error.line2.doublespaces")))),
        "townOrCity" -> text("ukAddress.error.townOrCity.required")
        .verifying(firstError(
          maxLength(35, "ukAddress.error.townOrCity.length"),
-         regexp(commonTextPattern, "ukAddress.error.townOrCity.invalid"))),
+         regexp(commonTextPattern, "ukAddress.error.townOrCity.invalid"),
+         regexp(noLeadingOrTrailingSpaces, "ukAddress.error.townOrCity.leadingtrailing"),
+         regexp(noDoubleSpaces, "ukAddress.error.townOrCity.doublespaces"))),
        "county" -> optional(text("ukAddress.error.county.required")
          .verifying(firstError(
            maxLength(35, "ukAddress.error.county.length"),
-           regexp(commonTextPattern, "ukAddress.error.county.invalid")))),
+           regexp(commonTextPattern, "ukAddress.error.county.invalid"),
+           regexp(noLeadingOrTrailingSpaces, "ukAddress.error.county.leadingtrailing"),
+           regexp(noDoubleSpaces, "ukAddress.error.county.doublespaces")))),
        "postCode" -> text("ukAddress.error.postCode.required")
          .verifying(firstError(
            maxLength(10, "ukAddress.error.postCode.length"),
