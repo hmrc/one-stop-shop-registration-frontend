@@ -14,6 +14,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.submit = Register
+site.tryAgain = Try again
 
 date.day = Day
 date.month = Month
@@ -337,6 +338,9 @@ ivNotEnoughEvidenceSources.title = You have registered for Government Gateway bu
 ivNotEnoughEvidenceSources.heading = You have registered for Government Gateway but cannot claim yet
 ivNotEnoughEvidenceSources.p1 = We are limiting the number of people who can access our services at one time.
 ivNotEnoughEvidenceSources.p2 = You can try again later by signing into Government Gateway.
+
+ivFailed.title = We could not confirm your identity
+ivFailed.p = We could not confirm your identity
 
 ivFailedMatching.title = We could not confirm your identity
 ivFailedMatching.heading = We could not confirm your identity
