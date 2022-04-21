@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package models
+package models.domain
 
-import play.api.libs.json._
-import domain.ModelHelpers._
+import scala.annotation.tailrec
 
-case class BusinessContactDetails (
-  fullName: String,
-  telephoneNumber: String,
-  emailAddress: String
-)
+object ModelHelpers {
 
-object BusinessContactDetails {
-  implicit val format = Json.format[BusinessContactDetails]
+  def normaliseSpaces(string: String): String = {
 
-  def apply(fullName: String, telephoneNumber: String, emailAddress: String): BusinessContactDetails =
-    new BusinessContactDetails(normaliseSpaces(fullName), telephoneNumber, emailAddress)
+    @tailrec
+    def removeDoubleSpaces(string: String): String = {
+      if(!string.contains("  ")) {
+        string
+      } else {
+        removeDoubleSpaces(string.replaceAll("[ ]{2}", " "))
+      }
+    }
+
+    removeDoubleSpaces(string.trim)
+  }
+
+  def normaliseSpaces(string: Option[String]): Option[String] = string.map(normaliseSpaces)
+
 }

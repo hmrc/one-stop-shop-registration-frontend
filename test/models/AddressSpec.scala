@@ -63,6 +63,24 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         Json.toJson(address) mustEqual expectedJson
         expectedJson.validate[Address] mustEqual JsSuccess(address)
       }
+
+      "excluding trailing and leading whitespace and double spaces" in {
+
+        val json = Json.obj(
+          "line1"       -> "      line     1",
+          "line2"       -> "   line  2    ",
+          "townOrCity"  -> "   town    ",
+          "county"      -> "  county  ",
+          "postCode"    -> "AA11     1AA",
+          "country"     -> Json.obj(
+            "code" -> "GB",
+            "name" -> "United Kingdom"
+          )
+        )
+
+        json.as[UkAddress] mustEqual UkAddress("line 1", Some("line 2"), "town", Some("county"), "AA11 1AA")
+
+      }
     }
 
     "must serialise and deserialise from and to an International address" - {
@@ -103,6 +121,30 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         Json.toJson(address) mustEqual expectedJson
         expectedJson.validate[Address] mustEqual JsSuccess(address)
       }
+
+      "excluding trailing and leading whitespace and double spaces" in {
+
+        val expectedJson = Json.obj(
+          "line1"         -> "  line   1",
+          "line2"         -> "  line  2   ",
+          "townOrCity"    -> "     town ",
+          "stateOrRegion" -> "     region   ",
+          "postCode"      -> "AA11       1AA",
+          "country"       -> Json.obj(
+            "code" -> "FR",
+            "name" -> "France"
+          )
+        )
+
+        expectedJson.as[InternationalAddress] mustEqual InternationalAddress(
+          "line 1",
+          Some("line 2"),
+          "town",
+          Some("region"),
+          Some("AA11 1AA"),
+          Country("FR", "France"))
+
+      }
     }
 
     "must serialise / deserialise from and to a DES address" - {
@@ -137,6 +179,29 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         Json.toJson(address) mustEqual expectedJson
         expectedJson.validate[Address] mustEqual JsSuccess(address)
       }
+
+      "excluding trailing and leading whitespace and double spaces" in {
+        val expectedJson = Json.obj(
+          "line1"       -> "  line   1",
+          "line2"       -> " line     2",
+          "line3"       -> " line    3  ",
+          "line4"       -> "  line   4 ",
+          "line5"       -> "       line    5  ",
+          "postCode"    -> "postcode",
+          "countryCode" -> "CC"
+        )
+
+        expectedJson.as[DesAddress] mustEqual DesAddress(
+          "line 1",
+          Some("line 2"),
+          Some("line 3"),
+          Some("line 4"),
+          Some("line 5"),
+          Some("postcode"),
+          "CC"
+        )
+      }
     }
+
   }
 }
