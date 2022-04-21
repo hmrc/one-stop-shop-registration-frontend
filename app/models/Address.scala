@@ -17,6 +17,7 @@
 package models
 
 import play.api.libs.json._
+import domain.ModelHelpers._
 
 sealed trait Address
 
@@ -44,6 +45,17 @@ case class UkAddress(
 ) extends Address {
 
   val country: Country = Country("GB", "United Kingdom")
+
+  def apply( line1: String,
+             line2: Option[String],
+             townOrCity: String,
+             county: Option[String],
+             postCode: String): UkAddress = new UkAddress(normaliseSpaces(line1),
+                                                          normaliseSpaces(line2),
+                                                          normaliseSpaces(townOrCity),
+                                                          normaliseSpaces(county),
+                                                          normaliseSpaces(postCode))
+
 }
 
 object UkAddress {
@@ -56,11 +68,11 @@ object UkAddress {
         if (t == "GB") Reads(_ => JsSuccess(t)) else Reads(_ => JsError("countryCode must be GB"))
     }.andKeep(
       (
-        (__ \ "line1").read[String] and
-        (__ \ "line2").readNullable[String] and
-        (__ \ "townOrCity").read[String] and
-        (__ \ "county").readNullable[String] and
-        (__ \ "postCode").read[String]
+        (__ \ "line1").read[String].map(normaliseSpaces) and
+        (__ \ "line2").readNullable[String].map(normaliseSpaces) and
+        (__ \ "townOrCity").read[String].map(normaliseSpaces) and
+        (__ \ "county").readNullable[String].map(normaliseSpaces) and
+        (__ \ "postCode").read[String].map(normaliseSpaces)
       )(UkAddress(_, _, _, _, _)
     ))
   }
@@ -81,8 +93,7 @@ object UkAddress {
   }
 }
 
-case class DesAddress(
-                       line1: String,
+case class DesAddress( line1: String,
                        line2: Option[String],
                        line3: Option[String],
                        line4: Option[String],
@@ -94,11 +105,25 @@ case class DesAddress(
 object DesAddress {
 
   implicit val format: OFormat[DesAddress] = Json.format[DesAddress]
+
+  def apply( line1: String,
+             line2: Option[String],
+             line3: Option[String],
+             line4: Option[String],
+             line5: Option[String],
+             postCode: Option[String],
+             countryCode: String): DesAddress = new DesAddress( normaliseSpaces(line1),
+                                                                normaliseSpaces(line2),
+                                                                normaliseSpaces(line3),
+                                                                normaliseSpaces(line4),
+                                                                normaliseSpaces(line5),
+                                                                normaliseSpaces(postCode),
+                                                                countryCode)
+
 }
 
 
-case class InternationalAddress (
-                                  line1: String,
+case class InternationalAddress ( line1: String,
                                   line2: Option[String],
                                   townOrCity: String,
                                   stateOrRegion: Option[String],
@@ -109,4 +134,16 @@ case class InternationalAddress (
 object InternationalAddress {
 
   implicit val format: OFormat[InternationalAddress] = Json.format[InternationalAddress]
+
+  def apply(line1: String,
+            line2: Option[String],
+            townOrCity: String,
+            stateOrRegion: Option[String],
+            postCode: Option[String],
+            country: Country): InternationalAddress = new InternationalAddress( normaliseSpaces(line1),
+                                                                                normaliseSpaces(line2),
+                                                                                normaliseSpaces(townOrCity),
+                                                                                normaliseSpaces(stateOrRegion),
+                                                                                normaliseSpaces(postCode),
+                                                                                country)
 }
