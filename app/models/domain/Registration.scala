@@ -19,6 +19,7 @@ package models.domain
 import models.{BankDetails, BusinessContactDetails}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
+import ModelHelpers._
 
 import java.time.LocalDate
 
@@ -41,4 +42,32 @@ final case class Registration(
 object Registration {
 
   implicit val format: OFormat[Registration] = Json.format[Registration]
+
+  def apply( vrn: Vrn,
+             registeredCompanyName: String,
+             tradingNames: Seq[String],
+             vatDetails: VatDetails,
+             euRegistrations: Seq[EuTaxRegistration],
+             contactDetails: BusinessContactDetails,
+             websites: Seq[String],
+             commencementDate: LocalDate,
+             previousRegistrations: Seq[PreviousRegistration],
+             bankDetails: BankDetails,
+             isOnlineMarketplace: Boolean,
+             niPresence: Option[NiPresence],
+             dateOfFirstSale: Option[LocalDate]): Registration = new Registration(
+    vrn,
+    normaliseSpaces(registeredCompanyName),
+    tradingNames.map(normaliseSpaces),
+    vatDetails,
+    euRegistrations,
+    contactDetails,
+    websites,
+    commencementDate,
+    previousRegistrations,
+    bankDetails,
+    isOnlineMarketplace,
+    niPresence,
+    dateOfFirstSale)
+
 }
