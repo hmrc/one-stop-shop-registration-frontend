@@ -20,6 +20,7 @@ import base.SpecBase
 import forms.euDetails.EuSendGoodsFormProvider
 import models.domain.EuTaxRegistration
 import models.{Country, Index, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -45,6 +46,8 @@ class EuSendGoodsControllerSpec extends SpecBase with MockitoSugar {
 
   private val answers = emptyUserAnswers .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), country).success.value
+
+  private lazy val euSendGoodsRoute = routes.EuSendGoodsController.onPageLoad(NormalMode).url
 
   "EuSendGoods Controller" - {
 
