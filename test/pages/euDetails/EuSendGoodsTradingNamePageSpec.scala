@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package forms
+package pages.euDetails
 
-import javax.inject.Inject
+import base.SpecBase
+import models.Index
+import pages.behaviours.PageBehaviours
 
-import forms.mappings.Mappings
-import play.api.data.Form
+class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
 
-class EuSendGoodsTradingNameFormProvider @Inject() extends Mappings {
+  private val index = Index(0)
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("euSendGoodsTradingName.error.required")
-        .verifying(maxLength(100, "euSendGoodsTradingName.error.length"))
-    )
+  "EuSendGoodsTradingNamePage" - {
+
+    beRetrievable[String](EuSendGoodsTradingNamePage(index))
+
+    beSettable[String](EuSendGoodsTradingNamePage(index))
+
+    beRemovable[String](EuSendGoodsTradingNamePage(index))
+  }
 }

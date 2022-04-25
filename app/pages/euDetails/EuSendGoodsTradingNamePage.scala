@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.euDetails
 
+import models.Index
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object EuSendGoodsTradingNamePage extends QuestionPage[String] {
+case class EuSendGoodsTradingNamePage(index: Index) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "euSendGoodsTradingName"
 }
