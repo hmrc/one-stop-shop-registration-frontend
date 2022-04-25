@@ -24,6 +24,9 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage.type] =
+    Arbitrary(EuSendGoodsPage)
+
   implicit lazy val arbitraryIsPlanningFirstEligibleSalePage: Arbitrary[IsPlanningFirstEligibleSalePage.type] =
     Arbitrary(IsPlanningFirstEligibleSalePage)
 
