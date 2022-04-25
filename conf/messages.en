@@ -568,6 +568,14 @@ error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
 
+euSendGoodsTradingName.title = euSendGoodsTradingName
+euSendGoodsTradingName.heading = euSendGoodsTradingName
+euSendGoodsTradingName.checkYourAnswersLabel = euSendGoodsTradingName
+euSendGoodsTradingName.error.required = Enter euSendGoodsTradingName
+euSendGoodsTradingName.error.length = EuSendGoodsTradingName must be 100 characters or less
+euSendGoodsTradingName.change.hidden = EuSendGoodsTradingName
+
+
 noMoreWelsh.title = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.heading = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.submit = Yn eich blaen

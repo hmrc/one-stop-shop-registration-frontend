@@ -263,6 +263,12 @@ POST       /planned-first-sale                                        controller
 GET        /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
+
+GET        /euSendGoodsTradingName                        controllers.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /euSendGoodsTradingName                        controllers.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeEuSendGoodsTradingName                  controllers.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeEuSendGoodsTradingName                  controllers.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode)
+
 POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
 GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()
 GET        /cannot-register-ni-protocol                               controllers.NiProtocolRejectionController.onPageLoad()
@@ -278,3 +284,5 @@ GET        /no-saved-registration                                      controlle
 GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
 
 GET        /already-registered-other-country                           controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
+
+POST       /external-entry                                            controllers.external.ExternalController.onExternal()
