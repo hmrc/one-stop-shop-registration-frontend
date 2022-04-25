@@ -656,3 +656,9 @@ error.missing_answers_prompt.general = You need to complete the missing informat
 error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
+euSendGoodsTradingName.title = euSendGoodsTradingName
+euSendGoodsTradingName.heading = euSendGoodsTradingName
+euSendGoodsTradingName.checkYourAnswersLabel = euSendGoodsTradingName
+euSendGoodsTradingName.error.required = Enter euSendGoodsTradingName
+euSendGoodsTradingName.error.length = EuSendGoodsTradingName must be 100 characters or less
+euSendGoodsTradingName.change.hidden = EuSendGoodsTradingName
