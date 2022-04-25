@@ -296,3 +296,7 @@ GET        /check-planned-first-sale                                  controller
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
 POST       /external-entry                                            controllers.external.ExternalController.onExternal()
+GET        /businessTaxIdNumber                        controllers.BusinessTaxIdNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessTaxIdNumber                        controllers.BusinessTaxIdNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessTaxIdNumber                  controllers.BusinessTaxIdNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessTaxIdNumber                  controllers.BusinessTaxIdNumberController.onSubmit(mode: Mode = CheckMode)

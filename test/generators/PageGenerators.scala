@@ -24,6 +24,9 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryBusinessTaxIdNumberPage: Arbitrary[BusinessTaxIdNumberPage.type] =
+    Arbitrary(BusinessTaxIdNumberPage)
+
   implicit lazy val arbitraryIsPlanningFirstEligibleSalePage: Arbitrary[IsPlanningFirstEligibleSalePage.type] =
     Arbitrary(IsPlanningFirstEligibleSalePage)
 

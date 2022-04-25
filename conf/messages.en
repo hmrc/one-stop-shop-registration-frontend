@@ -656,3 +656,9 @@ error.missing_answers_prompt.general = You need to complete the missing informat
 error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
+businessTaxIdNumber.title = businessTaxIdNumber
+businessTaxIdNumber.heading = businessTaxIdNumber
+businessTaxIdNumber.checkYourAnswersLabel = businessTaxIdNumber
+businessTaxIdNumber.error.required = Enter businessTaxIdNumber
+businessTaxIdNumber.error.length = BusinessTaxIdNumber must be 100 characters or less
+businessTaxIdNumber.change.hidden = BusinessTaxIdNumber
