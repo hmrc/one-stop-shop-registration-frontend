@@ -286,3 +286,8 @@ GET        /account-restore-error                                      controlle
 GET        /already-registered-other-country                           controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
 
 POST       /external-entry                                            controllers.external.ExternalController.onExternal()
+
+GET        /euSendGoods                        controllers.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode)
+POST       /euSendGoods                        controllers.EuSendGoodsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeEuSendGoods                  controllers.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeEuSendGoods                  controllers.EuSendGoodsController.onSubmit(mode: Mode = CheckMode)
