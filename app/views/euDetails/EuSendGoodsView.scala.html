@@ -10,7 +10,7 @@
 
 @layout(pageTitle = title(form, messages("euSendGoods.title"))) {
 
-    @formHelper(action = routes.EuSendGoodsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = controllers.euDetails.routes.EuSendGoodsController.onSubmit(mode), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
