@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package forms
+package forms.euDetails
 
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class EuSendGoodsTradingNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "euSendGoodsTradingName.error.required"
   val lengthKey = "euSendGoodsTradingName.error.length"
+  val validData = "Another trading name"
   val maxLength = 100
 
-  val form = new EuSendGoodsTradingNameFormProvider()()
+  private val country: Country = arbitrary[Country].sample.value
+
+  val formProvider: EuSendGoodsTradingNameFormProvider = new EuSendGoodsTradingNameFormProvider()
+  val form = formProvider(country)
+
 
   ".value" - {
 
@@ -34,7 +41,7 @@ class EuSendGoodsTradingNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -47,7 +54,7 @@ class EuSendGoodsTradingNameFormProviderSpec extends StringFieldBehaviours {
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

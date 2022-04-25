@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package pages
+package forms.euDetails
 
-import base.SpecBase
-import pages.behaviours.PageBehaviours
+import forms.mappings.Mappings
+import models.Country
+import play.api.data.Form
 
-class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
+import javax.inject.Inject
 
-  "EuSendGoodsTradingNamePage" - {
+class EuSendGoodsTradingNameFormProvider @Inject() extends Mappings {
 
-    beRetrievable[String](EuSendGoodsTradingNamePage)
-
-    beSettable[String](EuSendGoodsTradingNamePage)
-
-    beRemovable[String](EuSendGoodsTradingNamePage)
-  }
+  def apply(country: Country): Form[String] =
+    Form(
+      "value" -> text("euSendGoodsTradingName.error.required", Seq(country.name))
+        .verifying(maxLength(100, "euSendGoodsTradingName.error.length"))
+    )
 }

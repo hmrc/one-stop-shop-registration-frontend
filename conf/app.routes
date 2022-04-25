@@ -264,10 +264,10 @@ GET        /check-planned-first-sale                                  controller
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
 
-GET        /euSendGoodsTradingName                        controllers.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /euSendGoodsTradingName                        controllers.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeEuSendGoodsTradingName                  controllers.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeEuSendGoodsTradingName                  controllers.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET        /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
 GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()

@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.euDetails
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
-import pages.EuSendGoodsTradingNamePage
+import controllers.euDetails.routes
+import models.{CheckMode, Index, UserAnswers}
+import pages.euDetails.EuSendGoodsTradingNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object EuSendGoodsTradingNameSummary  {
+object EuSendGoodsTradingNameSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(EuSendGoodsTradingNamePage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(EuSendGoodsTradingNamePage(index)).map {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "euSendGoodsTradingName.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "euSendGoodsTradingName.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.EuSendGoodsTradingNameController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, index).url)
               .withVisuallyHiddenText(messages("euSendGoodsTradingName.change.hidden"))
           )
         )
