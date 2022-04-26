@@ -24,6 +24,7 @@ import pages._
 import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
+import testutils.RegistrationData.arbitraryEuSendGoodsPage
 
 trait UserAnswersGenerator extends TryValues {
   self: Generators =>

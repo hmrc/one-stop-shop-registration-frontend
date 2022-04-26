@@ -67,10 +67,19 @@ class EuSendGoodsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(EuSendGoodsPage(index), value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(EuSendGoodsPage.navigate(mode, updatedAnswers))
+              } yield Redirect(EuSendGoodsPage(index).navigate(mode, updatedAnswers))
           )
       }
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(EuCountryPage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+}
 
   private def getCountry(index: Index)
                         (block: Country => Future[Result])
