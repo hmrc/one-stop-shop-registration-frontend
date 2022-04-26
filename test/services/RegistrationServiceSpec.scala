@@ -64,6 +64,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(VatRegisteredPage(Index(0)), true).success.value
       .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
       .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+      .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
       .set(EuCountryPage(Index(1)), Country("ES", "Spain")).success.value
       .set(VatRegisteredPage(Index(1)), true).success.value
       .set(EuVatNumberPage(Index(1)), "ES123456789").success.value
@@ -80,6 +81,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(VatRegisteredPage(Index(3)), false).success.value
       .set(EuTaxReferencePage(Index(3)), "IE123456789").success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
+      .set(EuSendGoodsTradingNamePage(Index(3)), "Irish trading name").success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
