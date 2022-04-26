@@ -296,7 +296,7 @@ GET        /check-planned-first-sale                                  controller
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
 POST       /external-entry                                            controllers.external.ExternalController.onExternal()
-GET        /euSendGoods                        controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode)
-POST       /euSendGoods                        controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode)
-GET        /changeEuSendGoods                  controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeEuSendGoods                  controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode)
+GET        /euSendGoods/:index                                        controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /euSendGoods/:index                                        controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeEuSendGoods/:index                                  controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeEuSendGoods/:index                                  controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode, index: Index)

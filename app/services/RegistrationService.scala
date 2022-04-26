@@ -286,16 +286,28 @@ class RegistrationService @Inject()(dateService: DateService) {
         DataMissingError(VatRegisteredPage(index)).invalidNec
     }
 
-  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] =
+  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] = {
+
     getEuTaxIdentifier(answers, index).map {
       taxId =>
-        RegistrationWithoutFixedEstablishment(country, taxId)
+        getEuSendGoods(answers, index).map {
+          sendsGoods =>
+            RegistrationWithoutFixedEstablishment(country, taxId, Some(sendsGoods))
+        }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, None))
+
     }
+  }
 
   private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] =
     answers.get(EuVatNumberPage(index)) match {
       case Some(vatNumber) => vatNumber.validNec
       case None            => DataMissingError(EuVatNumberPage(index)).invalidNec
+    }
+
+  private def getEuSendGoods(answers: UserAnswers, index: Index): ValidationResult[Boolean] =
+    answers.get(EuSendGoodsPage(index)) match {
+      case Some(sendsGoods) => sendsGoods.validNec
+      case None            => DataMissingError(EuSendGoodsPage(index)).invalidNec
     }
 
   private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =
