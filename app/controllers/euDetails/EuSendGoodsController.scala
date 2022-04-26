@@ -67,7 +67,9 @@ class EuSendGoodsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(EuSendGoodsPage(index), value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(EuSendGoodsPage(index).navigate(mode, updatedAnswers))
+              } yield Ok(view(form, mode, index, country.name))
+                //TODO add navigation
+                //Redirect(EuSendGoodsPage(index).navigate(mode, updatedAnswers))
           )
       }
   }
