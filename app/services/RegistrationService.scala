@@ -235,19 +235,31 @@ class RegistrationService @Inject()(dateService: DateService) {
         DataMissingError(VatRegisteredPage(index)).invalidNec
     }
 
-  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] =
+  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] = {
+
     getEuTaxIdentifier(answers, index).map {
       taxId =>
-        getEuSendGoodsTradingName(answers, index).map {
-          tradingName =>
-            RegistrationWithoutFixedEstablishment(country, taxId, Some(tradingName))
-        }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, None))
+        getEuSendGoods(answers, index).map {
+          sendsGoods =>
+            getEuSendGoodsTradingName(answers, index).map {
+              tradingName =>
+                RegistrationWithoutFixedEstablishment(country, taxId, Some(sendsGoods), Some(tradingName))
+            }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, Some(sendsGoods), None))
+        }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, None, None))
+
     }
+  }
 
   private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] =
     answers.get(EuVatNumberPage(index)) match {
       case Some(vatNumber) => vatNumber.validNec
       case None            => DataMissingError(EuVatNumberPage(index)).invalidNec
+    }
+
+  private def getEuSendGoods(answers: UserAnswers, index: Index): ValidationResult[Boolean] =
+    answers.get(EuSendGoodsPage(index)) match {
+      case Some(sendsGoods) => sendsGoods.validNec
+      case None            => DataMissingError(EuSendGoodsPage(index)).invalidNec
     }
 
   private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =

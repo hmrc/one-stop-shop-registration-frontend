@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers.euDetails
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{Index, Mode, UserAnswers}
 import pages.EuSendGoodsPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,8 +25,8 @@ import viewmodels.implicits._
 
 object EuSendGoodsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(EuSendGoodsPage).map {
+  def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(EuSendGoodsPage(index)).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
@@ -36,7 +35,7 @@ object EuSendGoodsSummary {
           key = "euSendGoods.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.euDetails.routes.EuSendGoodsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.euDetails.routes.EuSendGoodsController.onPageLoad(currentMode, index).url)
               .withVisuallyHiddenText(messages("euSendGoods.change.hidden"))
           )
         )
