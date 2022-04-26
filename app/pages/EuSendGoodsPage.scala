@@ -16,11 +16,12 @@
 
 package pages
 
+import models.Index
 import play.api.libs.json.JsPath
 
-case object EuSendGoodsPage extends QuestionPage[Boolean] {
+case class EuSendGoodsPage(index: Index) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "euSendGoods"
 }

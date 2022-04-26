@@ -18,10 +18,12 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.EuSendGoodsFormProvider
-import models.Mode
+import models.requests.AuthenticatedDataRequest
+import models.{Country, Index, Mode}
 import pages.EuSendGoodsPage
+import pages.euDetails.EuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.EuSendGoodsView
 
@@ -38,29 +40,43 @@ class EuSendGoodsController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountry(index) {
+        country =>
 
-      val preparedForm = request.userAnswers.get(EuSendGoodsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val preparedForm = request.userAnswers.get(EuSendGoodsPage(index)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Future.successful(Ok(view(preparedForm, mode, index, country.name)))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountry(index) {
+        country =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, country.name))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(EuSendGoodsPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(EuSendGoodsPage.navigate(mode, updatedAnswers))
-      )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuSendGoodsPage(index), value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(EuSendGoodsPage(index).navigate(mode, updatedAnswers))
+          )
+      }
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(EuCountryPage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
