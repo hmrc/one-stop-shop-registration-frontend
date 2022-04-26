@@ -634,3 +634,10 @@ alreadyRegisteredOtherCountry.heading = This account is already registered on a 
 alreadyRegisteredOtherCountry.register = You can only register on one OSS Union scheme at a time.
 alreadyRegisteredOtherCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 alreadyRegisteredOtherCountry.returnBTA = <a class="govuk-link" href="/business-account">Return to Business Tax Account</a>
+
+euSendGoodsAddress.title = euSendGoodsAddress
+euSendGoodsAddress.heading = euSendGoodsAddress
+euSendGoodsAddress.checkYourAnswersLabel = euSendGoodsAddress
+euSendGoodsAddress.error.required = Enter euSendGoodsAddress
+euSendGoodsAddress.error.length = EuSendGoodsAddress must be 100 characters or less
+euSendGoodsAddress.change.hidden = EuSendGoodsAddress
