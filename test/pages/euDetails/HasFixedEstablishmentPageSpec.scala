@@ -169,9 +169,6 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
       val address1 = arbitrary[InternationalAddress].sample.value
       val address2 = arbitrary[InternationalAddress].sample.value
 
-      println(address1)
-      println(address2)
-
       val answers =
         UserAnswers("id")
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
@@ -190,7 +187,6 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
     "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
 
       val address = arbitrary[InternationalAddress].sample.value
-      println(address)
 
       val answers =
         UserAnswers("id")
