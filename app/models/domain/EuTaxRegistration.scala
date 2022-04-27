@@ -61,10 +61,11 @@ object RegistrationWithFixedEstablishment {
 }
 
 final case class RegistrationWithoutFixedEstablishment(
-                                    country: Country,
-                                    taxIdentifier: EuTaxIdentifier,
-                                    tradingName: Option[String]
-                                  ) extends EuTaxRegistration
+                                                        country: Country,
+                                                        taxIdentifier: EuTaxIdentifier,
+                                                        sendsGoods: Option[Boolean],
+                                                        tradingName: Option[String]
+                                                      ) extends EuTaxRegistration
 
 object RegistrationWithoutFixedEstablishment {
 
