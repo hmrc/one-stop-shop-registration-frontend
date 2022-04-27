@@ -72,7 +72,7 @@ class EuSendGoodsTradingNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, country)(request, messages(application)).toString
       }
     }
-
+    //TODO Add navigation
 //    "must save the answer and redirect to the next page when valid data is submitted" in {
 //
 //      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
