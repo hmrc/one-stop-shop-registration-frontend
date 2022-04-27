@@ -166,33 +166,30 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
     "must remove Fixed Establishment Trading Name and Address for this index when the answer is no" in {
 
-      for {
-        address1 <- arbitrary[InternationalAddress]
-        address2 <- arbitrary[InternationalAddress]
-      } yield {
-        println(address1)
-        println(address2)
+      val address1 = arbitrary[InternationalAddress].sample.value
+      val address2 = arbitrary[InternationalAddress].sample.value
 
-        val answers =
-          UserAnswers("id")
-            .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
-            .set(FixedEstablishmentAddressPage(Index(0)), address1).success.value
-            .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
-            .set(FixedEstablishmentAddressPage(Index(1)), address2).success.value
+      println(address1)
+      println(address2)
 
-        val result = answers.set(HasFixedEstablishmentPage(Index(1)), false).success.value
+      val answers =
+        UserAnswers("id")
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), address1).success.value
+          .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
+          .set(FixedEstablishmentAddressPage(Index(1)), address2).success.value
 
-        result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
-        result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
-        result.get(FixedEstablishmentTradingNamePage(Index(1))) must not be defined
-        result.get(FixedEstablishmentAddressPage(Index(1))) must not be defined
-      }
+      val result = answers.set(HasFixedEstablishmentPage(Index(1)), false).success.value
+
+      result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
+      result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
+      result.get(FixedEstablishmentTradingNamePage(Index(1))) must not be defined
+      result.get(FixedEstablishmentAddressPage(Index(1))) must not be defined
     }
 
     "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
 
       val address = arbitrary[InternationalAddress].sample.value
-
       println(address)
 
       val answers =
