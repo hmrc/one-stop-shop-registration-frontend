@@ -170,6 +170,8 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
         address1 <- arbitrary[InternationalAddress]
         address2 <- arbitrary[InternationalAddress]
       } yield {
+        println(address1)
+        println(address2)
 
         val answers =
           UserAnswers("id")
@@ -190,6 +192,8 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
     "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
 
       val address = arbitrary[InternationalAddress].sample.value
+
+      println(address)
 
       val answers =
         UserAnswers("id")
