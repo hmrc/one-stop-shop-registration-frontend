@@ -31,7 +31,7 @@ class EuTaxRegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
     forAll(arbitrary[Country], arbitrary[EuTaxIdentifier]) {
       case (country, vatNumber) =>
 
-        val euVatRegistration = RegistrationWithoutFixedEstablishment(country, vatNumber)
+        val euVatRegistration = RegistrationWithoutFixedEstablishment(country, vatNumber, None)
 
         val json = Json.toJson(euVatRegistration)
         json.validate[EuTaxRegistration] mustEqual JsSuccess(euVatRegistration)

@@ -656,3 +656,8 @@ error.missing_answers_prompt.general = You need to complete the missing informat
 error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
+euSendGoods.title = Do you send goods from {0}
+euSendGoods.heading = Do you send goods from {0}
+euSendGoods.checkYourAnswersLabel = euSendGoods
+euSendGoods.error.required = Select yes if you send goods from {0}
+euSendGoods.change.hidden = EuSendGoods
