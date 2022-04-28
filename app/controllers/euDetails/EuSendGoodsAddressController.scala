@@ -20,7 +20,7 @@ import controllers.actions._
 import forms.euDetails.EuSendGoodsAddressFormProvider
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
-import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage}
+import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -81,14 +81,8 @@ class EuSendGoodsAddressController @Inject()(
   private def getBusinessName(index: Index)
                         (block: String => Future[Result])
                         (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
-
-    // TODO: fetch business name
-
-    val businessName: String = "???"
-
-    request.userAnswers.get(EuCountryPage(index)).map {
-      _ =>
-        block(businessName)
+    request.userAnswers.get(EuSendGoodsTradingNamePage(index)).map {
+      businessName => block(businessName)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
   }
 
@@ -96,7 +90,6 @@ class EuSendGoodsAddressController @Inject()(
                         (block: Country => Future[Result])
                         (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(EuCountryPage(index)).map {
-      country =>
-        block(country)
+      country => block(country)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }

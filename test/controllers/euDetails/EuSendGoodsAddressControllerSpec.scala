@@ -22,7 +22,7 @@ import models.{Country, Index, InternationalAddress, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, anyDouble, intThat, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage}
+import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsTradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -35,7 +35,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private val country: Country = Country("FR", "France")
   private val index: Index = Index(0)
-  private val businessName: String = "???"
+  private val businessName: String = "Business Address"
 
   private val exampleAddress: InternationalAddress = InternationalAddress("line1", None, "town", None, None, country)
 
@@ -45,7 +45,9 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euSendGoodsAddressRoute = routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswers
+    .set(EuCountryPage(index), country).success.value
+    .set(EuSendGoodsTradingNamePage(index), businessName).success.value
 
   "EuSendGoodsAddress Controller" - {
 
