@@ -38,11 +38,23 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is yes" - {
 
-          "to Fixed Establishment Trading Name for the same index" in {
+        "to Eu Tax Reference when no Vat Number provided" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(VatRegisteredPage(index), false).success.value
+              .set(HasFixedEstablishmentPage(index), true).success.value
+
+          HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
+            .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index))
+        }
+
+          "to Fixed Establishment Trading Name for the same index when Vat number is provided" in {
 
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), true).success.value
+                .set(EuVatNumberPage(index), "123").success.value
                 .set(HasFixedEstablishmentPage(index), true).success.value
 
             HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
@@ -53,14 +65,14 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
 
       "when the user answers no" - {
 
-        "to Check EU Details Answers in Normal mode" in {
+        "to Eu Send Goods in Normal mode" in {
 
           val answers =
             emptyUserAnswers
               .set(HasFixedEstablishmentPage(index), false).success.value
 
           HasFixedEstablishmentPage(index).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
+            .mustEqual(euRoutes.EuSendGoodsController.onPageLoad(NormalMode, index))
         }
       }
     }

@@ -286,16 +286,27 @@ class RegistrationService @Inject()(dateService: DateService) {
         DataMissingError(VatRegisteredPage(index)).invalidNec
     }
 
-  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] =
-    getEuTaxIdentifier(answers, index).map {
-      taxId =>
-        RegistrationWithoutFixedEstablishment(country, taxId)
+  private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] = {
+    (
+      getEuTaxIdentifier(answers, index),
+      getEuSendGoods(answers, index),
+      getEuSendGoodsTradingName(answers, index)
+    ).mapN {
+      case (euTaxIdentifier, euSendGoods, euSendGoodsTradingName) =>
+        RegistrationWithoutFixedEstablishment(country, euTaxIdentifier, Some(euSendGoods), Some(euSendGoodsTradingName))
     }
+  }
 
   private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] =
     answers.get(EuVatNumberPage(index)) match {
       case Some(vatNumber) => vatNumber.validNec
       case None            => DataMissingError(EuVatNumberPage(index)).invalidNec
+    }
+
+  private def getEuSendGoods(answers: UserAnswers, index: Index): ValidationResult[Boolean] =
+    answers.get(pages.euDetails.EuSendGoodsPage(index)) match {
+      case Some(sendsGoods) => sendsGoods.validNec
+      case None            => DataMissingError(pages.euDetails.EuSendGoodsPage(index)).invalidNec
     }
 
   private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =
@@ -360,4 +371,12 @@ class RegistrationService @Inject()(dateService: DateService) {
       case None =>
         None.validNec
     }
+
+  private def getEuSendGoodsTradingName(userAnswers: UserAnswers, index: Index): ValidationResult[String] = {
+    userAnswers.get(EuSendGoodsTradingNamePage(index)) match {
+      case Some(answer) => answer.validNec
+      //TODO conditional dependency on EuSendGoods page?
+      case None => DataMissingError(EuSendGoodsTradingNamePage(index)).invalidNec
+    }
+  }
 }

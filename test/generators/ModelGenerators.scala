@@ -17,8 +17,10 @@
 package generators
 
 import models._
+import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Vrn
 
@@ -74,13 +76,13 @@ trait ModelGenerators {
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
-        line1         <- arbitrary[String]
-        line2         <- Gen.option(arbitrary[String])
-        townOrCity    <- arbitrary[String]
-        stateOrRegion <- Gen.option(arbitrary[String])
+        line1         <- commonFieldString(35)
+        line2         <- Gen.option(commonFieldString(35))
+        townOrCity    <- commonFieldString(35)
+        stateOrRegion <- Gen.option(commonFieldString(35))
         postCode      <- Gen.option(arbitrary[String])
-        country       <- arbitrary[Country]
-      } yield InternationalAddress(line1, line2, townOrCity, stateOrRegion, postCode, country)
+        country       <- Gen.oneOf(Country.internationalCountries)
+      } yield InternationalAddress(normaliseSpaces(line1), normaliseSpaces(line2), normaliseSpaces(townOrCity), normaliseSpaces(stateOrRegion), normaliseSpaces(postCode), country)
     }
 
   implicit val arbitraryEuTaxIdentifierType: Arbitrary[EuTaxIdentifierType] =
@@ -135,12 +137,12 @@ trait ModelGenerators {
   implicit lazy val arbitraryUkAddress: Arbitrary[UkAddress] =
     Arbitrary {
       for {
-        line1      <- arbitrary[String]
-        line2      <- Gen.option(arbitrary[String])
-        townOrCity <- arbitrary[String]
-        county     <- Gen.option(arbitrary[String])
-        postCode   <- arbitrary[String]
-      } yield UkAddress(line1, line2, townOrCity, county, postCode)
+        line1      <- commonFieldString(35)
+        line2      <- Gen.option(commonFieldString(35))
+        townOrCity <- commonFieldString(35)
+        county     <- Gen.option(commonFieldString(35))
+        postCode   <- ukPostcode()
+      } yield UkAddress(normaliseSpaces(line1), normaliseSpaces(line2), normaliseSpaces(townOrCity), normaliseSpaces(county), normaliseSpaces(postCode))
     }
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
@@ -151,4 +153,37 @@ trait ModelGenerators {
       Vrn(prefix + chars.mkString(""))
     }
   }
+
+  def ukPostcode(): Gen[String] = (
+    for {
+      numberOfFirstLetters <- choose(1,2)
+      firstLetters <- listOfN(numberOfFirstLetters, Gen.alphaChar)
+      firstNumber <- Gen.numChar
+      numberOfMiddle <- choose(0,1)
+      middle <- listOfN(numberOfMiddle, Gen.alphaNumChar)
+      lastNumber <- Gen.numChar
+      lastLetters <- listOfN(2, Gen.alphaChar)
+
+    } yield firstLetters.mkString + firstNumber.toString + middle.mkString + lastNumber.toString + lastLetters.mkString
+    )
+
+  private def commonFieldString(maxLength: Int): Gen[String] = (for {
+    length <- choose(1, maxLength)
+    chars  <- listOfN(length, commonFieldSafeInputs)
+  } yield chars.mkString).retryUntil(_.trim.nonEmpty)
+
+  private def commonFieldSafeInputs: Gen[Char] = Gen.oneOf(
+    Gen.alphaNumChar,
+    Gen.oneOf('À' to 'ÿ'),
+    Gen.const('.'),
+    Gen.const(','),
+    Gen.const('/'),
+    Gen.const('’'),
+    Gen.const('\''),
+    Gen.const('"'),
+    Gen.const('_'),
+    Gen.const('&'),
+    Gen.const(' '),
+    Gen.const('\'')
+  )
 }

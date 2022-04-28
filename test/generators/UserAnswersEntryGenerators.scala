@@ -26,7 +26,29 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
+  implicit lazy val arbitraryEuSendGoodsUserAnswersEntry: Arbitrary[(EuSendGoodsPage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[EuSendGoodsPage]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
+  implicit lazy val arbitraryEuSendGoodsTradingNameUserAnswersEntry: Arbitrary[(EuSendGoodsTradingNamePage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[EuSendGoodsTradingNamePage]
+        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryEuSendGoodsAddressUserAnswersEntry: Arbitrary[(EuSendGoodsAddressPage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[EuSendGoodsAddressPage]
+        value <- arbitrary[InternationalAddress].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryIsPlanningFirstEligibleSaleUserAnswersEntry: Arbitrary[(IsPlanningFirstEligibleSalePage.type, JsValue)] =
     Arbitrary {
@@ -176,14 +198,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[FixedEstablishmentAddressPage]
-        value <- arbitrary[InternationalAddress].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryEuSendGoodsAddressUserAnswersEntry: Arbitrary[(EuSendGoodsAddressPage, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[EuSendGoodsAddressPage]
         value <- arbitrary[InternationalAddress].map(Json.toJson(_))
       } yield (page, value)
     }
