@@ -236,17 +236,13 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
 
   private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] = {
-
-    getEuTaxIdentifier(answers, index).map {
-      taxId =>
-        getEuSendGoods(answers, index).map {
-          sendsGoods =>
-            getEuSendGoodsTradingName(answers, index).map {
-              tradingName =>
-                RegistrationWithoutFixedEstablishment(country, taxId, Some(sendsGoods), Some(tradingName))
-            }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, Some(sendsGoods), None))
-        }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, None, None))
-
+    (
+      getEuTaxIdentifier(answers, index),
+      getEuSendGoods(answers, index),
+      getEuSendGoodsTradingName(answers, index)
+    ).mapN {
+      case (euTaxIdentifier, euSendGoods, euSendGoodsTradingName) =>
+        RegistrationWithoutFixedEstablishment(country, euTaxIdentifier, Some(euSendGoods), Some(euSendGoodsTradingName))
     }
   }
 
