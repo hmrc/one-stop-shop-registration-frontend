@@ -291,3 +291,12 @@ GET        /euSendGoods/:index                                        controller
 POST       /euSendGoods/:index                                        controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET        /changeEuSendGoods/:index                                  controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST       /changeEuSendGoods/:index                                  controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET        /first-check-EuSendGoods/:index                            controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST       /first-check-EuSendGoods/:index                            controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET        /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET        /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST       /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)

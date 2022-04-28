@@ -18,12 +18,13 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
+import models.domain.EuTaxIdentifier
 import models.euDetails.EuOptionalDetails
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -48,6 +49,9 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       .set(EuCountryPage(index), country).success.value
       .set(VatRegisteredPage(index), false).success.value
       .set(HasFixedEstablishmentPage(index), false).success.value
+      .set(EuSendGoodsPage(index), true).success.value
+      .set(EuTaxReferencePage(index), "123456").success.value
+      .set(EuSendGoodsTradingNamePage(index), "Some name").success.value
 
   private val incompleteAnswers =
     basicUserAnswers
@@ -89,7 +93,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true,
-          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None))
+          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None, None, None))
         )(request, implicitly).toString
       }
     }

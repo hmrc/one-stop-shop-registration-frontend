@@ -24,13 +24,13 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
-import pages.euDetails.{CheckEuDetailsAnswersPage, EuCountryPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{CheckEuDetailsAnswersPage, EuCountryPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import viewmodels.checkAnswers.euDetails.{HasFixedEstablishmentSummary, VatRegisteredSummary}
+import viewmodels.checkAnswers.euDetails.{EuSendGoodsSummary, EuSendGoodsTradingNameSummary, EuTaxReferenceSummary, HasFixedEstablishmentSummary, VatRegisteredSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
 
@@ -48,8 +48,11 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       .set(euDetails.VatRegisteredPage(index), true).success.value
 
   private val answersNotRegisteredNoEstablishment = baseUserAnswers.set(EuCountryPage(index), country).success.value
+    .set(EuTaxReferencePage(index), "123456").success.value
     .set(VatRegisteredPage(index), false).success.value
     .set(HasFixedEstablishmentPage(index), false).success.value
+    .set(EuSendGoodsPage(index), true).success.value
+    .set(EuSendGoodsTradingNamePage(index), "Some company name").success.value
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
@@ -67,7 +70,12 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
         val list = SummaryListViewModel(
-          Seq(VatRegisteredSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode), HasFixedEstablishmentSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode)).flatten
+          Seq(
+            VatRegisteredSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode),
+            EuTaxReferenceSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode),
+            HasFixedEstablishmentSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode),
+            EuSendGoodsSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode),
+            EuSendGoodsTradingNameSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode)).flatten
         )
 
         status(result) mustEqual OK

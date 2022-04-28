@@ -27,7 +27,7 @@ class DeleteEuDetailsFormProviderSpec extends BooleanFieldBehaviours {
   val invalidKey = "error.boolean"
 
   private val country = Country.euCountries.head
-  private val euVatDetails = EuDetails(country, true, Some("12345678"), false, None, None, None)
+  private val euVatDetails = EuDetails(country, true, Some("12345678"), false, None, None, None, None, None)
 
   val form = new DeleteEuDetailsFormProvider()(euVatDetails.euCountry.name)
 
