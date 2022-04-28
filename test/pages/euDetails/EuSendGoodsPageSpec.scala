@@ -17,9 +17,9 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.Index
-import pages.EuSendGoodsPage
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
+import pages.euDetails
 
 class EuSendGoodsPageSpec extends SpecBase with PageBehaviours {
 
@@ -27,10 +27,42 @@ class EuSendGoodsPageSpec extends SpecBase with PageBehaviours {
 
   "EuSendGoodsPage" - {
 
-    beRetrievable[Boolean](EuSendGoodsPage(index))
+    beRetrievable[Boolean](euDetails.EuSendGoodsPage(index))
 
-    beSettable[Boolean](EuSendGoodsPage(index))
+    beSettable[Boolean](euDetails.EuSendGoodsPage(index))
 
-    beRemovable[Boolean](EuSendGoodsPage(index))
+    beRemovable[Boolean](euDetails.EuSendGoodsPage(index))
+
+    "must navigate in Normal mode" - {
+      "when the answer is yes" - {
+        "to Eu Tax Reference when no Vat number provided" in {
+          EuSendGoodsPage(index).navigate(
+            NormalMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+          ) mustBe controllers.euDetails.routes.EuTaxReferenceController.onPageLoad(NormalMode, index)
+        }
+
+        "to Eu Send Goods Trading Name when Vat number provided" in {
+          EuSendGoodsPage(index).navigate(
+            NormalMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+              .set(EuVatNumberPage(index), "123").success.value
+          ) mustBe controllers.euDetails.routes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index)
+        }
+      }
+
+      "when the answer is no" - {
+        "to Check Eu Details Answers" in {
+          EuSendGoodsPage(index).navigate(
+            NormalMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), false).success.value
+          ) mustBe controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+        }
+      }
+
+      "to Journey Recovery when no answer is provided" in {
+        EuSendGoodsPage(index).navigate(NormalMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+    }
   }
 }

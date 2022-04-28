@@ -14,14 +14,29 @@
  * limitations under the License.
  */
 
-package pages
-
-import models.Index
+package pages.euDetails
+import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
+import models.{Index, NormalMode, UserAnswers}
+import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class EuSendGoodsPage(index: Index) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "euSendGoods"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(EuSendGoodsPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isEmpty) {
+          euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index)
+        } else {
+          euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index)
+        }
+      case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
