@@ -17,16 +17,19 @@
 package pages.euDetails
 
 import base.SpecBase
+import models.{Index, InternationalAddress}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
 
+  private val index: Index = Index(0)
+
   "EuSendGoodsAddressPage" - {
 
-    beRetrievable[String](EuSendGoodsAddressPage)
+    beRetrievable[InternationalAddress](EuSendGoodsAddressPage(index))
 
-    beSettable[String](EuSendGoodsAddressPage)
+    beSettable[InternationalAddress](EuSendGoodsAddressPage(index))
 
-    beRemovable[String](EuSendGoodsAddressPage)
+    beRemovable[InternationalAddress](EuSendGoodsAddressPage(index))
   }
 }

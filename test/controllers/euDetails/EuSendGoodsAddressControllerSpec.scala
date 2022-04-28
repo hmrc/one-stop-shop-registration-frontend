@@ -18,8 +18,8 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.EuSendGoodsAddressFormProvider
-import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.{Country, Index, InternationalAddress, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.{any, anyDouble, intThat, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage}
@@ -33,18 +33,25 @@ import scala.concurrent.Future
 
 class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
 
+  private val country: Country = Country("FR", "France")
+  private val index: Index = Index(0)
+  private val businessName: String = "???"
+
+  private val exampleAddress: InternationalAddress = InternationalAddress("line1", None, "town", None, None, country)
+
+
   private val formProvider = new EuSendGoodsAddressFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(country)
 
-  private lazy val euSendGoodsAddressRoute = routes.EuSendGoodsAddressController.onPageLoad(NormalMode).url
+  private lazy val euSendGoodsAddressRoute = routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index).url
 
-//  private val baseUserAnswers =
+  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
 
   "EuSendGoodsAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, euSendGoodsAddressRoute)
@@ -54,13 +61,15 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[EuSendGoodsAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, businessName, country)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = basicUserAnswers.set(EuSendGoodsAddressPage, "answer").success.value
+
+
+      val userAnswers = baseUserAnswers.set(EuSendGoodsAddressPage(index), exampleAddress).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -72,7 +81,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(exampleAddress), NormalMode, index, businessName, country)(request, messages(application)).toString
       }
     }
 
@@ -93,7 +102,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(EuSendGoodsAddressPage, "answer").success.value
+        val expectedAnswers = emptyUserAnswers.set(EuSendGoodsAddressPage(index), exampleAddress).success.value
 
         // TODO: Add navigation
 //        status(result) mustEqual SEE_OTHER
@@ -104,7 +113,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
         val request =
@@ -118,7 +127,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, businessName, country)(request, messages(application)).toString
       }
     }
 

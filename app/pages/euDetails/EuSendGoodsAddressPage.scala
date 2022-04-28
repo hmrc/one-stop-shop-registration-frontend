@@ -16,12 +16,14 @@
 
 package pages.euDetails
 
+import models.{Index, InternationalAddress}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object EuSendGoodsAddressPage extends QuestionPage[String] {
+case class EuSendGoodsAddressPage(index: Index) extends QuestionPage[InternationalAddress] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
 
   override def toString: String = "euSendGoodsAddress"
+
 }
