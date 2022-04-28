@@ -17,24 +17,34 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import pages.euDetails.EuSendGoodsAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object EuSendGoodsAddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(EuSendGoodsAddressPage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(EuSendGoodsAddressPage(index)).map {
       answer =>
+
+        val value = Seq(
+          Some(HtmlFormat.escape(answer.line1).toString),
+          answer.line2.map(HtmlFormat.escape),
+          Some(HtmlFormat.escape(answer.townOrCity).toString),
+          answer.stateOrRegion.map(HtmlFormat.escape),
+          answer.postCode.map(HtmlFormat.escape)
+        ).flatten.mkString("<br/>")
+
         SummaryListRowViewModel(
           key = "euSendGoodsAddress.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.EuSendGoodsAddressController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.EuSendGoodsAddressController.onPageLoad(CheckMode, index).url)
               .withVisuallyHiddenText(messages("euSendGoodsAddress.change.hidden"))
           )
         )

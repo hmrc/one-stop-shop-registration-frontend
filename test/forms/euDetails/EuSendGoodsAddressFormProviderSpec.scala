@@ -16,7 +16,10 @@
 
 package forms.euDetails
 
+import forms.Validation.Validation.{commonTextPattern, postcodePattern}
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class EuSendGoodsAddressFormProviderSpec extends StringFieldBehaviours {
@@ -25,16 +28,125 @@ class EuSendGoodsAddressFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "euSendGoodsAddress.error.length"
   val maxLength = 100
 
-  val form = new EuSendGoodsAddressFormProvider()()
+  private val country = arbitrary[Country].sample.value
 
-  ".value" - {
+  val formProvider = new EuSendGoodsAddressFormProvider()
+  val form = formProvider(country)
 
-    val fieldName = "value"
+  ".line1" - {
+
+    val fieldName = "line1"
+    val requiredKey = "euSendGoodsAddress.error.line1.required"
+    val lengthKey = "euSendGoodsAddress.error.line1.length"
+    val formatKey = "euSendGoodsAddress.error.line1.format"
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
       stringsWithMaxLength(maxLength)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like commonTextField(
+      form,
+      fieldName,
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
+    )
+  }
+
+  ".line2" - {
+
+    val fieldName = "line2"
+    val lengthKey = "euSendGoodsAddress.error.line2.length"
+    val formatKey = "euSendGoodsAddress.error.line2.format"
+    val maxLength = 35
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like commonTextField(
+      form,
+      fieldName,
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
+    )
+  }
+
+  ".townOrCity" - {
+
+    val fieldName = "townOrCity"
+    val requiredKey = "euSendGoodsAddress.error.townOrCity.required"
+    val lengthKey = "euSendGoodsAddress.error.townOrCity.length"
+    val formatKey = "euSendGoodsAddress.error.townOrCity.format"
+    val maxLength = 35
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like commonTextField(
+      form,
+      fieldName,
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
+    )
+  }
+
+  ".stateOrRegion" - {
+
+    val fieldName = "stateOrRegion"
+    val lengthKey = "euSendGoodsAddress.error.stateOrRegion.length"
+    val formatKey = "euSendGoodsAddress.error.stateOrRegion.format"
+    val maxLength = 35
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like commonTextField(
+      form,
+      fieldName,
+      FormError(fieldName, formatKey, Seq(commonTextPattern)),
+      FormError(fieldName, lengthKey, Seq(maxLength)),
+      maxLength
+    )
+  }
+
+  ".postCode" - {
+
+    val fieldName = "postCode"
+    val lengthKey = "euSendGoodsAddress.error.postCode.length"
+    val invalidKey = "euSendGoodsAddress.error.postCode.invalid"
+    val maxLength = 50
+    val validData = "75700 PARIS CEDEX"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -44,10 +156,10 @@ class EuSendGoodsAddressFormProviderSpec extends StringFieldBehaviours {
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    "must not bind invalid postcode" in {
+      val invalidPostcode = "*@[]%abc"
+      val result = form.bind(Map(fieldName -> invalidPostcode)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(postcodePattern)))
+    }
   }
 }
