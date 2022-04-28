@@ -65,9 +65,11 @@ trait CompletionChecks {
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
-            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty))
+            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
+          (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
+          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty ||
+            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))
       )
-
   }
 
   def getAllIncompleteEuDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[EuOptionalDetails] = {
@@ -78,7 +80,10 @@ trait CompletionChecks {
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
-            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty))
+            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
+            (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
+          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty ||
+            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))
       )
     ).getOrElse(List.empty)
   }
