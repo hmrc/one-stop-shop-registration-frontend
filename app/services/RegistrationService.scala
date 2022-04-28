@@ -304,9 +304,9 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
 
   private def getEuSendGoods(answers: UserAnswers, index: Index): ValidationResult[Boolean] =
-    answers.get(EuSendGoodsPage(index)) match {
+    answers.get(pages.euDetails.EuSendGoodsPage(index)) match {
       case Some(sendsGoods) => sendsGoods.validNec
-      case None            => DataMissingError(EuSendGoodsPage(index)).invalidNec
+      case None            => DataMissingError(pages.euDetails.EuSendGoodsPage(index)).invalidNec
     }
 
   private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =

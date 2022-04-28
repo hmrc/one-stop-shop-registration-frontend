@@ -17,7 +17,8 @@
 package viewmodels.checkAnswers.euDetails
 
 import models.{Index, Mode, UserAnswers}
-import pages.EuSendGoodsPage
+import pages.euDetails
+import pages.euDetails.EuSendGoodsPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
@@ -26,7 +27,7 @@ import viewmodels.implicits._
 object EuSendGoodsSummary {
 
   def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(EuSendGoodsPage(index)).map {
+    answers.get(euDetails.EuSendGoodsPage(index)).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
