@@ -287,14 +287,13 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
 
   private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] = {
-
-    getEuTaxIdentifier(answers, index).map {
-      taxId =>
-        getEuSendGoods(answers, index).map {
-          sendsGoods =>
-            RegistrationWithoutFixedEstablishment(country, taxId, Some(sendsGoods))
-        }.getOrElse(RegistrationWithoutFixedEstablishment(country, taxId, None))
-
+    (
+      getEuTaxIdentifier(answers, index),
+      getEuSendGoods(answers, index),
+      getEuSendGoodsTradingName(answers, index)
+    ).mapN {
+      case (euTaxIdentifier, euSendGoods, euSendGoodsTradingName) =>
+        RegistrationWithoutFixedEstablishment(country, euTaxIdentifier, Some(euSendGoods), Some(euSendGoodsTradingName))
     }
   }
 
@@ -372,4 +371,12 @@ class RegistrationService @Inject()(dateService: DateService) {
       case None =>
         None.validNec
     }
+
+  private def getEuSendGoodsTradingName(userAnswers: UserAnswers, index: Index): ValidationResult[String] = {
+    userAnswers.get(EuSendGoodsTradingNamePage(index)) match {
+      case Some(answer) => answer.validNec
+      //TODO conditional dependency on EuSendGoods page?
+      case None => DataMissingError(EuSendGoodsTradingNamePage(index)).invalidNec
+    }
+  }
 }
