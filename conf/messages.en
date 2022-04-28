@@ -669,3 +669,4 @@ euSendGoodsTradingName.checkYourAnswersLabel = Trading name
 euSendGoodsTradingName.error.required = Enter your trading name in {0}
 euSendGoodsTradingName.error.length = Trading name must be 100 characters or less
 euSendGoodsTradingName.change.hidden = trading name
+

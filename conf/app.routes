@@ -306,3 +306,4 @@ GET        /eu-send-goods-trading-name/:index                         controller
 POST       /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET        /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST       /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+
