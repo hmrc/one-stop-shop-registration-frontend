@@ -35,10 +35,16 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Has Fixed Establishment" in {
+      "to Fixed Establishment Trading Name when Has Fixed Establishment is true" in {
 
-        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value)
+          .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+      }
+
+      "to Eu Send Goods Trading Name when Has Fixed Establishment is false" in {
+
+        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value)
+          .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index))
       }
     }
 

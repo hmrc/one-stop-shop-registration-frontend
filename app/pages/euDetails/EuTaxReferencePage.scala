@@ -17,6 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
+import controllers.routes
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -28,8 +29,13 @@ case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
 
   override def toString: String = "euTaxReference"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    answers.get(HasFixedEstablishmentPage(index)) match {
+      case Some(true) => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
   case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckMode, answers)

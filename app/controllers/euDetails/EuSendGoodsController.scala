@@ -20,8 +20,8 @@ import controllers.actions._
 import forms.euDetails.EuSendGoodsFormProvider
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
-import pages.EuSendGoodsPage
-import pages.euDetails.EuCountryPage
+import pages.euDetails
+import pages.euDetails.{EuCountryPage, EuSendGoodsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -45,7 +45,7 @@ class EuSendGoodsController @Inject()(
       getCountry(index) {
         country =>
 
-          val preparedForm = request.userAnswers.get(EuSendGoodsPage(index)) match {
+          val preparedForm = request.userAnswers.get(euDetails.EuSendGoodsPage(index)) match {
             case None => form
             case Some(value) => form.fill(value)
           }
@@ -65,11 +65,9 @@ class EuSendGoodsController @Inject()(
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuSendGoodsPage(index), value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(euDetails.EuSendGoodsPage(index), value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield Ok(view(form, mode, index, country.name))
-                //TODO add navigation
-                //Redirect(EuSendGoodsPage(index).navigate(mode, updatedAnswers))
+              } yield Redirect(euDetails.EuSendGoodsPage(index).navigate(mode, updatedAnswers))
           )
       }
   }

@@ -25,8 +25,8 @@ import models.{Country, Index, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.EuSendGoodsPage
-import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
+import pages.euDetails
+import pages.euDetails.{EuCountryPage, EuSendGoodsPage, TaxRegisteredInEuPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -73,7 +73,7 @@ class EuSendGoodsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = answers.set(EuSendGoodsPage(index), true).success.value
+      val userAnswers = answers.set(euDetails.EuSendGoodsPage(index), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -106,7 +106,7 @@ class EuSendGoodsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value.futureValue
-        val expectedAnswers = answers.set(EuSendGoodsPage(index), true).success.value
+        val expectedAnswers = answers.set(euDetails.EuSendGoodsPage(index), true).success.value
 
         //TODO add navigation
 //        status(result) mustEqual SEE_OTHER

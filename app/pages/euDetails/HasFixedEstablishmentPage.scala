@@ -33,8 +33,13 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(HasFixedEstablishmentPage(index)) match {
-      case Some(true)  => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
-      case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      case Some(true)  =>
+        if(answers.get(EuVatNumberPage(index)).isEmpty) {
+          euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index)
+        } else {
+          euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
+        }
+      case Some(false) => euRoutes.EuSendGoodsController.onPageLoad(NormalMode, index)
       case _           => routes.JourneyRecoveryController.onPageLoad()
     }
 
