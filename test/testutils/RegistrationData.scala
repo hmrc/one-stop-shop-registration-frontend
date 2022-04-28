@@ -43,7 +43,7 @@ object RegistrationData extends Generators with EitherValues {
       euRegistrations = Seq(
         RegistrationWithoutFixedEstablishment(Country("FR", "France"),
           EuTaxIdentifier(EuTaxIdentifierType.Vat, "FR123456789"),
-          None,
+          Some(true),
           Some("French trading name")
         ),
         RegistrationWithFixedEstablishment(
@@ -59,7 +59,7 @@ object RegistrationData extends Generators with EitherValues {
         RegistrationWithoutFixedEstablishment(
           Country("IE", "Ireland"),
           EuTaxIdentifier(EuTaxIdentifierType.Other, "IE123456789"),
-          None,
+          Some(true),
           Some("Irish trading name")
         )
       ),
