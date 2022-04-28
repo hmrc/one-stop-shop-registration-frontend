@@ -170,7 +170,7 @@ trait ModelGenerators {
   private def commonFieldString(maxLength: Int): Gen[String] = (for {
     length <- choose(1, maxLength)
     chars  <- listOfN(length, commonFieldSafeInputs)
-  } yield chars.mkString).suchThat(_.trim.nonEmpty)
+  } yield chars.mkString).retryUntil(_.trim.nonEmpty)
 
   private def commonFieldSafeInputs: Gen[Char] = Gen.oneOf(
     Gen.alphaNumChar,
