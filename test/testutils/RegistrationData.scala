@@ -44,7 +44,15 @@ object RegistrationData extends Generators with EitherValues {
         RegistrationWithoutFixedEstablishment(Country("FR", "France"),
           EuTaxIdentifier(EuTaxIdentifierType.Vat, "FR123456789"),
           Some(true),
-          Some("French trading name")
+          Some("French trading name"),
+          Some(InternationalAddress(
+            line1 = "Line 1",
+            line2 = None,
+            townOrCity = "Town",
+            stateOrRegion = None,
+            None,
+            Country("FR", "France")
+          ))
         ),
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
@@ -60,7 +68,15 @@ object RegistrationData extends Generators with EitherValues {
           Country("IE", "Ireland"),
           EuTaxIdentifier(EuTaxIdentifierType.Other, "IE123456789"),
           Some(true),
-          Some("Irish trading name")
+          Some("Irish trading name"),
+          Some(InternationalAddress(
+            line1 = "Line 1",
+            line2 = None,
+            townOrCity = "Town",
+            stateOrRegion = None,
+            None,
+            Country("IE", "Ireland")
+          ))
         )
       ),
       contactDetails = createBusinessContactDetails(),
