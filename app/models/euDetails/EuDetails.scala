@@ -26,7 +26,9 @@ case class EuDetails(
                          hasFixedEstablishment: Boolean,
                          euTaxReference: Option[String],
                          fixedEstablishmentTradingName: Option[String],
-                         fixedEstablishmentAddress: Option[InternationalAddress]
+                         fixedEstablishmentAddress: Option[InternationalAddress],
+                         euSendGoods: Option[Boolean],
+                         euSendGoodsTradingName: Option[String]
                        )
 
 object EuDetails {

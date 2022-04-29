@@ -659,9 +659,9 @@ site.back.BTA = Return to Business Tax Account
 
 euSendGoods.title = Do you send goods from {0}
 euSendGoods.heading = Do you send goods from {0}
-euSendGoods.checkYourAnswersLabel = euSendGoods
+euSendGoods.checkYourAnswersLabel = Send goods
 euSendGoods.error.required = Select yes if you send goods from {0}
-euSendGoods.change.hidden = EuSendGoods
+euSendGoods.change.hidden = Send goods
 
 euSendGoodsTradingName.title = What is the trading name of the business you send goods from in {0}
 euSendGoodsTradingName.heading = What is the trading name of the business you send goods from in {0}
