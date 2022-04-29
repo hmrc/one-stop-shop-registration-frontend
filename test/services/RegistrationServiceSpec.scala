@@ -64,6 +64,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(HasFixedEstablishmentPage(Index(0)), false).success.value
       .set(pages.euDetails.EuSendGoodsPage(Index(0)), true).success.value
       .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
+      .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
       .set(EuCountryPage(Index(1)), Country("ES", "Spain")).success.value
       .set(VatRegisteredPage(Index(1)), true).success.value
       .set(EuVatNumberPage(Index(1)), "ES123456789").success.value
@@ -82,6 +83,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
       .set(pages.euDetails.EuSendGoodsPage(Index(3)), true).success.value
       .set(EuSendGoodsTradingNamePage(Index(3)), "Irish trading name").success.value
+      .set(EuSendGoodsAddressPage(Index(3)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
       .set(
         UkAddressPage,
         UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
