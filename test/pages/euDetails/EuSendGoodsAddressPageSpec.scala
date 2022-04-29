@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{Index, InternationalAddress}
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
@@ -31,5 +31,26 @@ class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
     beSettable[InternationalAddress](EuSendGoodsAddressPage(index))
 
     beRemovable[InternationalAddress](EuSendGoodsAddressPage(index))
+
+    "must navigate in Normal Mode" - {
+      "to Check Eu Details Answers" in {
+        EuSendGoodsAddressPage(index).navigate(NormalMode, emptyUserAnswers)mustBe
+          controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      }
+    }
+
+    "must navigate in Check Mode" - {
+      "to Check Eu Details Answers" in {
+        EuSendGoodsAddressPage(index).navigate(CheckMode, emptyUserAnswers)mustBe
+          controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+      }
+    }
+
+    "must navigate in Check Loop Mode" - {
+      "to Check Eu Details Answers" in {
+        EuSendGoodsAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers)mustBe
+          controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      }
+    }
   }
 }

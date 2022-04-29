@@ -90,6 +90,7 @@ case class EuSendGoodsPage(index: Index) extends QuestionPage[Boolean] {
     if (value.contains(false)) {
       userAnswers
         .remove(EuSendGoodsTradingNamePage(index))
+        .flatMap(_.remove(EuSendGoodsAddressPage(index)))
     } else {
       super.cleanup(value, userAnswers)
     }

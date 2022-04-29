@@ -681,7 +681,6 @@ euSendGoodsAddress.line2 = Address line 2 (optional)
 euSendGoodsAddress.townOrCity = Town or city
 euSendGoodsAddress.stateOrRegion = Region or state (optional)
 euSendGoodsAddress.postCode = Postcode (optional)
-euSendGoodsAddress.checkYourAnswersLabel = Fixed establishment address
 euSendGoodsAddress.error.line1.required = Enter address line 1
 euSendGoodsAddress.error.townOrCity.required = Enter the town or city
 euSendGoodsAddress.error.line1.length = Address line 1 must be 35 characters or less

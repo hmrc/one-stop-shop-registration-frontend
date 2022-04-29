@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, Index, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails.EuSendGoodsAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,9 +28,15 @@ import viewmodels.implicits._
 
 object EuSendGoodsAddressSummary {
 
-  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(EuSendGoodsAddressPage(index)).map {
       answer =>
+
+        val changeLinkMode = currentMode match {
+          case NormalMode    => CheckLoopMode
+          case CheckMode     => CheckMode
+          case CheckLoopMode => CheckLoopMode
+        }
 
         val value = Seq(
           Some(HtmlFormat.escape(answer.line1).toString),
@@ -44,7 +50,7 @@ object EuSendGoodsAddressSummary {
           key = "euSendGoodsAddress.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.EuSendGoodsAddressController.onPageLoad(CheckMode, index).url)
+            ActionItemViewModel("site.change", routes.EuSendGoodsAddressController.onPageLoad(changeLinkMode, index).url)
               .withVisuallyHiddenText(messages("euSendGoodsAddress.change.hidden"))
           )
         )
