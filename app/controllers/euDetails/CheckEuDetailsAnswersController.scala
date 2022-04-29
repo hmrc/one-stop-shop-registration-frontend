@@ -55,7 +55,8 @@ class CheckEuDetailsAnswersController @Inject()(
               FixedEstablishmentTradingNameSummary.row(request.userAnswers, index, mode),
               FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode),
               EuSendGoodsSummary.row(request.userAnswers, index, mode),
-              EuSendGoodsTradingNameSummary.row(request.userAnswers, index, mode)
+              EuSendGoodsTradingNameSummary.row(request.userAnswers, index, mode),
+              EuSendGoodsAddressSummary.row(request.userAnswers, index, mode)
             ).flatten
           )
 

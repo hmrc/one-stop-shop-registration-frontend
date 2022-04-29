@@ -109,5 +109,6 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
       userAnswers
         .remove(EuSendGoodsPage(index))
         .flatMap(_.remove(EuSendGoodsTradingNamePage(index)))
+        .flatMap(_.remove(EuSendGoodsAddressPage(index)))
     }
 }

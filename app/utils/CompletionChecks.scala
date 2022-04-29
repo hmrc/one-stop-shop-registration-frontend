@@ -64,7 +64,7 @@ trait CompletionChecks {
           (details.hasFixedEstablishment.contains(true) &&
             (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
           (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
-          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty ||
+          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
             (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))
       )
   }
@@ -79,7 +79,7 @@ trait CompletionChecks {
           (details.hasFixedEstablishment.contains(true) &&
             (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
             (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
-          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty ||
+          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
             (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))
       )
     ).getOrElse(List.empty)

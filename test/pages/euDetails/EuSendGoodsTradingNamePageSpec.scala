@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.Index
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
@@ -31,5 +31,38 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
     beSettable[String](EuSendGoodsTradingNamePage(index))
 
     beRemovable[String](EuSendGoodsTradingNamePage(index))
+
+    "must navigate in Normal Mode" - {
+      "to Eu Send Goods Address" in {
+        EuSendGoodsTradingNamePage(index).navigate(NormalMode, emptyUserAnswers)mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index)
+      }
+    }
+
+    "must navigate in Check Mode" - {
+      "to Eu Send Goods Address if it hasn't been answered" in {
+        EuSendGoodsTradingNamePage(index).navigate(CheckMode, emptyUserAnswers)mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(CheckMode, index)
+      }
+
+      "to wherever Eu Send Goods Address navigates if it has been answered" in {
+        val address = arbitraryInternationalAddress.arbitrary.sample.value
+        EuSendGoodsTradingNamePage(index).navigate(CheckMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
+          EuSendGoodsAddressPage(index).navigate(CheckMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
+      }
+    }
+
+    "must navigate in Check Loop Mode" - {
+      "to Eu Send Goods Address if it hasn't been answered" in {
+        EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, emptyUserAnswers)mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(CheckLoopMode, index)
+      }
+
+      "to wherever Eu Send Goods Address navigates if it has been answered" in {
+        val address = arbitraryInternationalAddress.arbitrary.sample.value
+        EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
+          EuSendGoodsAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
+      }
+    }
   }
 }
