@@ -21,7 +21,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import play.api.libs.json.{JsValue, Json}
 
@@ -63,6 +63,7 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(TradingNamePage, JsValue)] ::
     arbitrary[(RegisteredCompanyNamePage.type, JsValue)] ::
     arbitrary[(PartOfVatGroupPage.type, JsValue)] ::
+    arbitrary[(EuSendGoodsAddressPage, JsValue)] ::
     Nil
 
   implicit lazy val arbitraryUserData: Arbitrary[UserAnswers] = {

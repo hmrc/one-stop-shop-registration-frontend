@@ -310,3 +310,8 @@ GET        /change-eu-send-goods-trading-name/:index                  controller
 POST       /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET        /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST       /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET        /euSendGoodsAddress/:index                               controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST       /euSendGoodsAddress/:index                               controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET        /changeEuSendGoodsAddress/:index                         controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST       /changeEuSendGoodsAddress/:index                         controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)

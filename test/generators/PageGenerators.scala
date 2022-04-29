@@ -19,7 +19,7 @@ package generators
 import models.Index
 import org.scalacheck.Arbitrary
 import pages.{euDetails, _}
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
@@ -92,6 +92,9 @@ trait PageGenerators {
 
   implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage] =
     Arbitrary(euDetails.FixedEstablishmentAddressPage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsAddressPage: Arbitrary[EuSendGoodsAddressPage] =
+    Arbitrary(euDetails.EuSendGoodsAddressPage(Index(0)))
 
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)

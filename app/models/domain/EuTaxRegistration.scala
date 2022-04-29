@@ -16,7 +16,7 @@
 
 package models.domain
 
-import models.Country
+import models.{Country, InternationalAddress}
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
 sealed trait EuTaxRegistration
@@ -64,7 +64,8 @@ final case class RegistrationWithoutFixedEstablishment(
                                                         country: Country,
                                                         taxIdentifier: EuTaxIdentifier,
                                                         sendsGoods: Option[Boolean],
-                                                        tradingName: Option[String]
+                                                        tradingName: Option[String],
+                                                        address: Option[InternationalAddress]
                                                       ) extends EuTaxRegistration
 
 object RegistrationWithoutFixedEstablishment {
