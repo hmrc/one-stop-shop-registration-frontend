@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{Index, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -62,6 +62,108 @@ class EuSendGoodsPageSpec extends SpecBase with PageBehaviours {
 
       "to Journey Recovery when no answer is provided" in {
         EuSendGoodsPage(index).navigate(NormalMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+    }
+
+    "must navigate in Check mode" - {
+      "when the answer is yes" - {
+        "to Eu Tax Reference when no Vat number provided and it hasn't been answered" in {
+          EuSendGoodsPage(index).navigate(
+            CheckMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+          ) mustBe controllers.euDetails.routes.EuTaxReferenceController.onPageLoad(CheckMode, index)
+        }
+
+        "to wherever Eu Tax Reference navigates when no Vat number provided and it has been answered" in {
+          val answers = emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+            .set(EuTaxReferencePage(index), "123").success.value
+          EuSendGoodsPage(index).navigate(
+            CheckMode,
+            answers
+          ) mustBe EuTaxReferencePage(index).navigate(CheckMode, answers)
+        }
+
+        "to Eu Send Goods Trading Name when Vat number provided and it hasn't been answered" in {
+          EuSendGoodsPage(index).navigate(
+            CheckMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+              .set(EuVatNumberPage(index), "123").success.value
+          ) mustBe controllers.euDetails.routes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, index)
+        }
+
+        "to Eu Send Goods Trading Name when Vat number provided and it has been answered" in {
+          val answers = emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+            .set(EuVatNumberPage(index), "123").success.value
+            .set(EuSendGoodsTradingNamePage(index), "foo").success.value
+          EuSendGoodsPage(index).navigate(
+            CheckMode,
+            answers
+          ) mustBe EuSendGoodsTradingNamePage(index).navigate(CheckMode, answers)
+        }
+      }
+
+      "when the answer is no" - {
+        "to Check Eu Details Answers" in {
+          EuSendGoodsPage(index).navigate(
+            CheckMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), false).success.value
+          ) mustBe controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+        }
+      }
+
+      "to Journey Recovery when no answer is provided" in {
+        EuSendGoodsPage(index).navigate(CheckMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+    }
+
+    "must navigate in CheckLoop mode" - {
+      "when the answer is yes" - {
+        "to Eu Tax Reference when no Vat number provided and it hasn't been answered" in {
+          EuSendGoodsPage(index).navigate(
+            CheckLoopMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+          ) mustBe controllers.euDetails.routes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index)
+        }
+
+        "to wherever Eu Tax Reference navigates when no Vat number provided and it has been answered" in {
+          val answers = emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+            .set(EuTaxReferencePage(index), "123").success.value
+          EuSendGoodsPage(index).navigate(
+            CheckLoopMode,
+            answers
+          ) mustBe EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
+        }
+
+        "to Eu Send Goods Trading Name when Vat number provided and it hasn't been answered" in {
+          EuSendGoodsPage(index).navigate(
+            CheckLoopMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+              .set(EuVatNumberPage(index), "123").success.value
+          ) mustBe controllers.euDetails.routes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, index)
+        }
+
+        "to Eu Send Goods Trading Name when Vat number provided and it has been answered" in {
+          val answers = emptyUserAnswers.set(EuSendGoodsPage(index), true).success.value
+            .set(EuVatNumberPage(index), "123").success.value
+            .set(EuSendGoodsTradingNamePage(index), "foo").success.value
+          EuSendGoodsPage(index).navigate(
+            CheckLoopMode,
+            answers
+          ) mustBe EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, answers)
+        }
+      }
+
+      "when the answer is no" - {
+        "to CheckLoop Eu Details Answers" in {
+          EuSendGoodsPage(index).navigate(
+            CheckLoopMode,
+            emptyUserAnswers.set(EuSendGoodsPage(index), false).success.value
+          ) mustBe controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+        }
+      }
+
+      "to Journey Recovery when no answer is provided" in {
+        EuSendGoodsPage(index).navigate(CheckLoopMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
       }
     }
   }

@@ -47,10 +47,10 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
         }
       case Some(false) =>
-        if (answers.get(EuTaxReferencePage(index)).isDefined) {
-          EuTaxReferencePage(index).navigate(CheckMode, answers)
-        } else {
+        if (answers.get(HasFixedEstablishmentPage(index)).isEmpty) {
           euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
+        } else {
+          HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
         }
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -66,10 +66,10 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
         }
 
       case Some(false) =>
-        if (answers.get(EuTaxReferencePage(index)).isDefined) {
-          EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
-        } else {
+        if (answers.get(HasFixedEstablishmentPage(index)).isEmpty) {
           euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
+        } else {
+          HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
         }
 
       case None =>
