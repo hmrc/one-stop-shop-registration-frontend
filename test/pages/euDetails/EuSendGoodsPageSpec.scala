@@ -17,7 +17,8 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode, UserAnswers}
+import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -165,6 +166,40 @@ class EuSendGoodsPageSpec extends SpecBase with PageBehaviours {
       "to Journey Recovery when no answer is provided" in {
         EuSendGoodsPage(index).navigate(CheckLoopMode, emptyUserAnswers) mustBe controllers.routes.JourneyRecoveryController.onPageLoad()
       }
+    }
+
+    "must remove Send Goods Trading Name and Address for this index when the answer is no" in {
+      val address = arbitrary[InternationalAddress].sample.value
+
+      val answers =
+        UserAnswers("id")
+          .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+          .set(EuSendGoodsPage(Index(0)), true).success.value
+          .set(EuSendGoodsTradingNamePage(Index(0)), "foo").success.value
+          .set(EuSendGoodsAddressPage(Index(0)), address).success.value
+      val result = answers.set(EuSendGoodsPage(Index(1)), false).success.value
+
+      result.get(EuSendGoodsTradingNamePage(Index(1))) must not be defined
+      result.get(EuSendGoodsAddressPage(Index(1))) must not be defined
+    }
+
+    "must preserve Send Goods Trading Name and Address when the answer is yes and remove Sends Goods answers" in {
+
+      val address = arbitrary[InternationalAddress].sample.value
+
+      val answers =
+        UserAnswers("id")
+          .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+          .set(EuSendGoodsPage(Index(0)), true).success.value
+          .set(EuSendGoodsTradingNamePage(Index(0)), "foo").success.value
+          .set(EuSendGoodsAddressPage(Index(0)), address).success.value
+
+      val result = answers.set(EuSendGoodsPage(Index(0)), true).success.value
+
+      result.get(EuSendGoodsTradingNamePage(Index(0))).value mustEqual "foo"
+      result.get(EuSendGoodsAddressPage(Index(0))).value mustEqual address
+      result.get(EuSendGoodsPage(Index(0))).value mustEqual true
+
     }
   }
 }

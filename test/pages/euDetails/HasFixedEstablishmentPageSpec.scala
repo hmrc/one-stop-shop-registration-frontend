@@ -286,7 +286,7 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
       result.get(FixedEstablishmentAddressPage(Index(1))) must not be defined
     }
 
-    "must preserve Fixed Establishment Trading Name and Address when the answer is no" in {
+    "must preserve Fixed Establishment Trading Name and Address when the answer is yes and remove Sends Goods answers" in {
 
       val address = arbitrary[InternationalAddress].sample.value
 
@@ -294,11 +294,18 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
         UserAnswers("id")
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
           .set(FixedEstablishmentAddressPage(Index(0)), address).success.value
+          .set(EuSendGoodsPage(Index(0)), true).success.value
+          .set(EuSendGoodsTradingNamePage(Index(0)), "foo").success.value
+          .set(EuSendGoodsAddressPage(Index(0)), arbitraryInternationalAddress.arbitrary.sample.value).success.value
 
       val result = answers.set(HasFixedEstablishmentPage(Index(0)), true).success.value
 
       result.get(FixedEstablishmentTradingNamePage(Index(0))).value mustEqual "first"
       result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address
+      result.get(EuSendGoodsPage(Index(1))) must not be defined
+      result.get(EuSendGoodsTradingNamePage(Index(1))) must not be defined
+      result.get(EuSendGoodsAddressPage(Index(1))) must not be defined
+
     }
   }
 }
