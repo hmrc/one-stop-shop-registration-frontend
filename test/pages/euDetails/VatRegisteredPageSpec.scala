@@ -99,7 +99,7 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and EU Tax Reference has not been answered" - {
+        "and Has Fixed Establishment has not been answered" - {
 
           "to Has Fixed Establishment" in {
 
@@ -110,17 +110,17 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
           }
         }
 
-        "and EU Tax Reference has been answered" - {
+        "and Has Fixed Establishment has been answered" - {
 
-          "to wherever EU Tax Reference navigates to" in {
+          "to wherever Has Fixed Establishment navigates to" in {
 
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value
-                .set(EuTaxReferencePage(index), "123").success.value
+                .set(HasFixedEstablishmentPage(index), true).success.value
 
             VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(EuTaxReferencePage(index).navigate(CheckMode, answers))
+              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
           }
         }
       }
@@ -167,7 +167,7 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and EU Tax Reference has not been answered" - {
+        "and Has Fixed Establishment has not been answered" - {
 
           "to Has Fixed Establishment" in {
 
@@ -178,16 +178,16 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
           }
         }
 
-        "and EU Tax Reference has been answered" - {
+        "and Has Fixed Establishment has been answered" - {
 
-          "to wherever EU Tax Reference navigates to" in {
+          "to wherever Has Fixed Establishment navigates to" in {
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value
-                .set(EuTaxReferencePage(index), "123").success.value
+                .set(HasFixedEstablishmentPage(index), true).success.value
 
             VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(EuTaxReferencePage(index).navigate(CheckLoopMode, answers))
+              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
           }
         }
       }

@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -30,5 +30,11 @@ case class EuSendGoodsTradingNamePage(index: Index) extends QuestionPage[String]
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
       euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index) //TODO navigate to trading address page
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index) //TODO navigate to trading address page
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index) //TODO navigate to trading address page
 
 }
