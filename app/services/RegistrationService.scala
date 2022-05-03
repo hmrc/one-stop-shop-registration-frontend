@@ -294,7 +294,11 @@ class RegistrationService @Inject()(dateService: DateService) {
       getEuSendGoodsAddress(answers, index)
     ).mapN {
       case (euTaxIdentifier, euSendGoods, euSendGoodsTradingName, euSendGoodsAddress) =>
-        RegistrationWithoutFixedEstablishment(country, euTaxIdentifier, Some(euSendGoods), Some(euSendGoodsTradingName), Some(euSendGoodsAddress))
+        if(euSendGoods){
+          RegistrationWithoutFixedEstablishment(country, euTaxIdentifier, euSendGoods)
+        } else {
+          RegistrationWithoutFixedEstablishmentSendingGoods(country, euTaxIdentifier, euSendGoods, euSendGoodsTradingName, euSendGoodsAddress)
+        }
     }
   }
 
@@ -376,7 +380,6 @@ class RegistrationService @Inject()(dateService: DateService) {
   private def getEuSendGoodsTradingName(userAnswers: UserAnswers, index: Index): ValidationResult[String] = {
     userAnswers.get(EuSendGoodsTradingNamePage(index)) match {
       case Some(answer) => answer.validNec
-      //TODO conditional dependency on EuSendGoods page?
       case None => DataMissingError(EuSendGoodsTradingNamePage(index)).invalidNec
     }
   }
