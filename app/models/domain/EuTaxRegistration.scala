@@ -79,7 +79,7 @@ object RegistrationSendingGoods {
 
 final case class RegistrationWithoutFixedEstablishment(
                                            country: Country,
-                                           taxIdentifier: Option[EuTaxIdentifier],
+                                           taxIdentifier: EuTaxIdentifier,
                                            sendsGoods: Option[Boolean]
                                          ) extends EuTaxRegistration
 
