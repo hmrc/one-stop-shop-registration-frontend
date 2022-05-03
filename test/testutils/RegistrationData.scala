@@ -77,6 +77,14 @@ object RegistrationData extends Generators with EitherValues {
             None,
             Country("IE", "Ireland")
           ))
+        ),
+        RegistrationWithoutTaxId(
+          Country("CR", "Croatia")
+        ),
+        RegistrationWithoutFixedEstablishment(
+          Country("PL", "Poland"),
+          EuTaxIdentifier(EuTaxIdentifierType.Vat, "PL123456789"),
+          Some(false)
         )
       ),
       contactDetails = createBusinessContactDetails(),

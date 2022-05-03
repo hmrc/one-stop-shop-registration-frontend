@@ -86,6 +86,15 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(pages.euDetails.EuSendGoodsPage(Index(3)), true).success.value
       .set(EuSendGoodsTradingNamePage(Index(3)), "Irish trading name").success.value
       .set(EuSendGoodsAddressPage(Index(3)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
+      .set(EuCountryPage(Index(4)), Country("CR", "Croatia")).success.value
+      .set(VatRegisteredPage(Index(4)), false).success.value
+      .set(HasFixedEstablishmentPage(Index(4)), false).success.value
+      .set(pages.euDetails.EuSendGoodsPage(Index(4)), false).success.value
+      .set(EuCountryPage(Index(5)), Country("PL", "Poland")).success.value
+      .set(VatRegisteredPage(Index(5)), true).success.value
+      .set(EuVatNumberPage(Index(5)), "PL123456789").success.value
+      .set(HasFixedEstablishmentPage(Index(5)), false).success.value
+      .set(pages.euDetails.EuSendGoodsPage(Index(5)), false).success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
@@ -517,6 +526,44 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
                 result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(2)))))
               }
             }
+
+            "and Has Fixed Establishment is false" - {
+
+              "and Sends Goods is missing" in {
+
+                val userAnswers = answers.remove(EuSendGoodsPage(Index(3))).success.value
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsPage(Index(3)))))
+              }
+
+              "and Send Goods is true" - {
+
+                "and it does not have a trading name" in {
+
+                  val userAnswers = answers.remove(EuSendGoodsTradingNamePage(Index(3))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsTradingNamePage(Index(3)))))
+                }
+
+                "and it does not have an address" in {
+
+                  val userAnswers = answers.remove(EuSendGoodsAddressPage(Index(3))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsAddressPage(Index(3)))))
+                }
+
+                "and it does not have a tax id" in {
+
+                  val userAnswers = answers.remove(EuTaxReferencePage(Index(3))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(3)))))
+                }
+              }
+            }
           }
 
           "with a VAT registration" - {
@@ -555,6 +602,36 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
                   val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
                   result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(1)))))
+                }
+              }
+
+              "and Has Fixed Establishment is false" - {
+
+                "and Sends Goods is missing" in {
+
+                  val userAnswers = answers.remove(EuSendGoodsPage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsPage(Index(0)))))
+                }
+
+                "and Send Goods is true" - {
+
+                  "and it does not have a trading name" in {
+
+                    val userAnswers = answers.remove(EuSendGoodsTradingNamePage(Index(0))).success.value
+                    val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsTradingNamePage(Index(0)))))
+                  }
+
+                  "and it does not have an address" in {
+
+                    val userAnswers = answers.remove(EuSendGoodsAddressPage(Index(0))).success.value
+                    val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsAddressPage(Index(0)))))
+                  }
                 }
               }
             }
