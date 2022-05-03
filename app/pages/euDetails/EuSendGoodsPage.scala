@@ -17,10 +17,12 @@
 package pages.euDetails
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+
+import scala.util.Try
 
 case class EuSendGoodsPage(index: Index) extends QuestionPage[Boolean] {
 
@@ -38,5 +40,58 @@ case class EuSendGoodsPage(index: Index) extends QuestionPage[Boolean] {
         }
       case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
       case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    {
+      val sendGoods = answers.get(EuSendGoodsPage(index))
+      val euVatNumber = answers.get(EuVatNumberPage(index))
+      val euTaxReference = answers.get(EuTaxReferencePage(index))
+      val euSendGoodsTradingName = answers.get(EuSendGoodsTradingNamePage(index))
+
+      (sendGoods, euVatNumber, euTaxReference, euSendGoodsTradingName) match {
+        case (Some(true), Some(_), _, None) =>
+          euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, index)
+        case (Some(true), Some(_), _, Some(_)) =>
+          EuSendGoodsTradingNamePage(index).navigate(CheckMode, answers)
+        case (Some(true), None, None, _) =>
+          euRoutes.EuTaxReferenceController.onPageLoad(CheckMode, index)
+        case (Some(true), None, Some(_), _) =>
+          EuTaxReferencePage(index).navigate(CheckMode, answers)
+        case (Some(false), _, _, _) =>
+          euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+        case _ => routes.JourneyRecoveryController.onPageLoad()
+      }
+    }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
+  {
+    val sendGoods = answers.get(EuSendGoodsPage(index))
+    val euVatNumber = answers.get(EuVatNumberPage(index))
+    val euTaxReference = answers.get(EuTaxReferencePage(index))
+    val euSendGoodsTradingName = answers.get(EuSendGoodsTradingNamePage(index))
+
+    (sendGoods, euVatNumber, euTaxReference, euSendGoodsTradingName) match {
+      case (Some(true), Some(_), _, None) =>
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, index)
+      case (Some(true), Some(_), _, Some(_)) =>
+        EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, answers)
+      case (Some(true), None, None, _) =>
+        euRoutes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index)
+      case (Some(true), None, Some(_), _) =>
+        EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
+      case (Some(false), _, _, _) =>
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (value.contains(false)) {
+      userAnswers
+        .remove(EuSendGoodsTradingNamePage(index))
+        .flatMap(_.remove(EuSendGoodsAddressPage(index)))
+    } else {
+      super.cleanup(value, userAnswers)
     }
 }

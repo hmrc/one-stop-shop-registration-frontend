@@ -28,7 +28,8 @@ case class EuOptionalDetails(
                          fixedEstablishmentTradingName: Option[String],
                          fixedEstablishmentAddress: Option[InternationalAddress],
                          euSendGoods: Option[Boolean],
-                         euSendGoodsTradingName: Option[String]
+                         euSendGoodsTradingName: Option[String],
+                         euSendGoodsAddress: Option[InternationalAddress]
                        )
 
 

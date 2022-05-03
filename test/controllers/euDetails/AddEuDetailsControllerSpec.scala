@@ -24,7 +24,7 @@ import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -52,6 +52,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       .set(EuSendGoodsPage(index), true).success.value
       .set(EuTaxReferencePage(index), "123456").success.value
       .set(EuSendGoodsTradingNamePage(index), "Some name").success.value
+      .set(EuSendGoodsAddressPage(index), arbitraryInternationalAddress.arbitrary.sample.value).success.value
 
   private val incompleteAnswers =
     basicUserAnswers
@@ -93,7 +94,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true,
-          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None, None, None))
+          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None, None, None, None))
         )(request, implicitly).toString
       }
     }

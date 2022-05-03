@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -29,6 +29,22 @@ case class EuSendGoodsTradingNamePage(index: Index) extends QuestionPage[String]
   override def toString: String = "euSendGoodsTradingName"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-      euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index) //TODO navigate to trading address page
+      euRoutes.EuSendGoodsAddressController.onPageLoad(NormalMode, index)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    if(answers.get(EuSendGoodsAddressPage(index)).isEmpty) {
+      euRoutes.EuSendGoodsAddressController.onPageLoad(CheckMode, index)
+    } else {
+      EuSendGoodsAddressPage(index).navigate(CheckMode, answers)
+    }
+  }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
+    if(answers.get(EuSendGoodsAddressPage(index)).isEmpty) {
+      euRoutes.EuSendGoodsAddressController.onPageLoad(CheckLoopMode, index)
+    } else {
+      EuSendGoodsAddressPage(index).navigate(CheckLoopMode, answers)
+    }
+  }
 
 }

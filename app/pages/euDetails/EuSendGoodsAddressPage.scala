@@ -16,9 +16,11 @@
 
 package pages.euDetails
 
-import models.{Index, InternationalAddress}
+import controllers.euDetails.{routes => euRoutes}
+import models.{CheckMode, Index, InternationalAddress, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case class EuSendGoodsAddressPage(index: Index) extends QuestionPage[InternationalAddress] {
 
@@ -26,4 +28,12 @@ case class EuSendGoodsAddressPage(index: Index) extends QuestionPage[Internation
 
   override def toString: String = "euSendGoodsAddress"
 
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
 }
