@@ -243,7 +243,7 @@ class RegistrationService @Inject()(dateService: DateService) {
       getEuSendGoodsAddress(answers, index)
     ).mapN {
       case (euTaxIdentifier, euSendGoods, euSendGoodsTradingName, euSendGoodsAddress) =>
-        RegistrationWithoutFixedEstablishment(country, euTaxIdentifier, Some(euSendGoods), Some(euSendGoodsTradingName), Some(euSendGoodsAddress))
+        RegistrationSendingGoods(country, euTaxIdentifier, (euSendGoods), (euSendGoodsTradingName), (euSendGoodsAddress))
     }
   }
 
