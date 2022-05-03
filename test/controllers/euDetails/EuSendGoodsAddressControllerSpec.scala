@@ -22,7 +22,7 @@ import models.{Country, Index, InternationalAddress, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, anyDouble, intThat, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsTradingNamePage}
+import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuVatNumberPage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -45,8 +45,13 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euSendGoodsAddressRoute = routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = basicUserAnswers
+  private val baseUserAnswers =
+    basicUserAnswers.set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(index), country).success.value
+      .set(HasFixedEstablishmentPage(index), false).success.value
+      .set(VatRegisteredPage(index), true).success.value
+      .set(EuVatNumberPage(index), "123456778").success.value
+    .set(EuSendGoodsPage(index), true).success.value
     .set(EuSendGoodsTradingNamePage(index), businessName).success.value
 
   "EuSendGoodsAddress Controller" - {
@@ -94,22 +99,24 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, euSendGoodsAddressRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("line1", exampleAddress.line1), ("country", exampleAddress.country.code),
+              ("townOrCity", exampleAddress.townOrCity)
+            )
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(EuSendGoodsAddressPage(index), exampleAddress).success.value
+        val expectedAnswers = baseUserAnswers
+          .set(EuSendGoodsAddressPage(index), exampleAddress).success.value
 
-        // TODO: Add navigation
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual EuSendGoodsAddressPage.navigate(NormalMode, expectedAnswers).url
-//        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual EuSendGoodsAddressPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 

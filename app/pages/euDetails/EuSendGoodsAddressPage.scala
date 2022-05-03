@@ -29,11 +29,11 @@ case class EuSendGoodsAddressPage(index: Index) extends QuestionPage[Internation
   override def toString: String = "euSendGoodsAddress"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index) //TODO navigate to trading address page
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index) //TODO navigate to trading address page
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
-    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index) //TODO navigate to trading address page
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
 }

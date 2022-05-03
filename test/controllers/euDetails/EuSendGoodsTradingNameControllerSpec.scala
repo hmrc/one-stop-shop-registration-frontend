@@ -19,12 +19,19 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.EuSendGoodsTradingNameFormProvider
 import models.{Country, Index, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers._
+import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.Mockito._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuSendGoodsTradingNamePage}
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.euDetails.EuSendGoodsTradingNameView
+
+import scala.concurrent.Future
 
 class EuSendGoodsTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
@@ -72,31 +79,31 @@ class EuSendGoodsTradingNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, country)(request, messages(application)).toString
       }
     }
-    //TODO Add navigation
-//    "must save the answer and redirect to the next page when valid data is submitted" in {
-//
-//      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-//
-//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-//
-//      val application =
-//        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-//          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-//          .build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, euSendGoodsTradingNameRoute)
-//            .withFormUrlEncodedBody(("value", "answer"))
-//
-//        val result = route(application, request).value
-//        val expectedAnswers = emptyUserAnswers.set(EuSendGoodsTradingNamePage, "answer").success.value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual EuSendGoodsTradingNamePage.navigate(NormalMode, expectedAnswers).url
-//        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-//      }
-//    }
+
+    "must save the answer and redirect to the next page when valid data is submitted" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .overrides(inject.bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, euSendGoodsTradingNameRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+        val expectedAnswers = baseUserAnswers.set(EuSendGoodsTradingNamePage(index), "answer").success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual EuSendGoodsTradingNamePage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
