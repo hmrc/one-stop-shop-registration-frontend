@@ -63,15 +63,27 @@ object RegistrationWithFixedEstablishment {
 final case class RegistrationWithoutFixedEstablishment(
                                                         country: Country,
                                                         taxIdentifier: EuTaxIdentifier,
-                                                        sendsGoods: Option[Boolean],
-                                                        tradingName: Option[String],
-                                                        address: Option[InternationalAddress]
+                                                        sendGoods: Boolean
                                                       ) extends EuTaxRegistration
 
 object RegistrationWithoutFixedEstablishment {
 
   implicit val format: OFormat[RegistrationWithoutFixedEstablishment] =
     Json.format[RegistrationWithoutFixedEstablishment]
+}
+
+final case class RegistrationWithoutFixedEstablishmentSendingGoods(
+                                                        country: Country,
+                                                        taxIdentifier: EuTaxIdentifier,
+                                                        sendGoods: Boolean,
+                                                        tradingName: String,
+                                                        address: InternationalAddress
+                                                      ) extends EuTaxRegistration
+
+object RegistrationWithoutFixedEstablishmentSendingGoods {
+
+  implicit val format: OFormat[RegistrationWithoutFixedEstablishmentSendingGoods] =
+    Json.format[RegistrationWithoutFixedEstablishmentSendingGoods]
 }
 
 final case class RegistrationWithoutTaxId(country: Country) extends EuTaxRegistration
