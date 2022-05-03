@@ -16,6 +16,7 @@
 
 package services
 
+import cats.data.Validated
 import cats.implicits._
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
@@ -235,15 +236,36 @@ class RegistrationService @Inject()(dateService: DateService) {
         DataMissingError(VatRegisteredPage(index)).invalidNec
     }
 
+  private def getOptionalEuTaxIdentifier(answers: UserAnswers, index: Index): ValidationResult[Option[EuTaxIdentifier]] =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        getEuVatNumber(answers, index).map(number => Some(EuTaxIdentifier(Vat, number)))
+
+      case Some(false) =>
+        Validated.Valid(answers.get(EuTaxReferencePage(index)) map(value => EuTaxIdentifier(Other, value)))
+
+      case None =>
+        DataMissingError(VatRegisteredPage(index)).invalidNec
+    }
+
   private def getEuVatRegistration(answers: UserAnswers, country: Country, index: Index): ValidationResult[EuTaxRegistration] = {
-    (
-      getEuTaxIdentifier(answers, index),
-      getEuSendGoods(answers, index),
-      getEuSendGoodsTradingName(answers, index),
-      getEuSendGoodsAddress(answers, index)
-    ).mapN {
-      case (euTaxIdentifier, euSendGoods, euSendGoodsTradingName, euSendGoodsAddress) =>
-        RegistrationSendingGoods(country, euTaxIdentifier, (euSendGoods), (euSendGoodsTradingName), (euSendGoodsAddress))
+    val sendGoods = answers.get(EuSendGoodsPage(index))
+    sendGoods match {
+      case None => DataMissingError(EuSendGoodsPage(index)).invalidNec
+      case Some(true) => (
+        getEuTaxIdentifier(answers, index),
+        getEuSendGoodsTradingName(answers, index),
+        getEuSendGoodsAddress(answers, index)
+        ).mapN {
+        case (euTaxIdentifier, euSendGoodsTradingName, euSendGoodsAddress) =>
+          RegistrationSendingGoods(country, euTaxIdentifier, true, euSendGoodsTradingName, euSendGoodsAddress)
+      }
+      case Some(false) => (
+        getOptionalEuTaxIdentifier(answers, index)
+      ) map {
+        case Some(taxId) => RegistrationWithoutFixedEstablishment(country, taxId, Some(false))
+        case None => RegistrationWithoutTaxId(country)
+      }
     }
   }
 
@@ -251,12 +273,6 @@ class RegistrationService @Inject()(dateService: DateService) {
     answers.get(EuVatNumberPage(index)) match {
       case Some(vatNumber) => vatNumber.validNec
       case None            => DataMissingError(EuVatNumberPage(index)).invalidNec
-    }
-
-  private def getEuSendGoods(answers: UserAnswers, index: Index): ValidationResult[Boolean] =
-    answers.get(pages.euDetails.EuSendGoodsPage(index)) match {
-      case Some(sendsGoods) => sendsGoods.validNec
-      case None            => DataMissingError(pages.euDetails.EuSendGoodsPage(index)).invalidNec
     }
 
   private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =
@@ -325,7 +341,6 @@ class RegistrationService @Inject()(dateService: DateService) {
   private def getEuSendGoodsTradingName(userAnswers: UserAnswers, index: Index): ValidationResult[String] = {
     userAnswers.get(EuSendGoodsTradingNamePage(index)) match {
       case Some(answer) => answer.validNec
-      //TODO conditional dependency on EuSendGoods page?
       case None => DataMissingError(EuSendGoodsTradingNamePage(index)).invalidNec
     }
   }
