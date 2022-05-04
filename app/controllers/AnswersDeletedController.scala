@@ -34,7 +34,7 @@ class AnswersDeletedController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData).async {
     implicit request =>
       cc.sessionRepository
         .clear(request.userId)
