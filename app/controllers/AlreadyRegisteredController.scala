@@ -44,7 +44,7 @@ class AlreadyRegisteredController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData).async {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
       for {
         sessionData <- sessionRepository.get(request.userId)
@@ -59,6 +59,7 @@ class AlreadyRegisteredController @Inject()(
             val isDOFSDifferentToCommencementDate =
               dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
             val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
+            println(savedUrl)
 
             Ok(
               view(

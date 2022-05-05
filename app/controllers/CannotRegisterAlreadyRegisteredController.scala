@@ -37,7 +37,7 @@ class CannotRegisterAlreadyRegisteredController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData).async {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
       sessionRepository.get(request.userId).map {
         sessionData =>
