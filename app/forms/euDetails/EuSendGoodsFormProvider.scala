@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 class EuSendGoodsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(country: String): Form[Boolean] =
     Form(
-      "value" -> boolean("euSendGoods.error.required")
+      "value" -> boolean("euSendGoods.error.required", args = Seq(country))
     )
 }
