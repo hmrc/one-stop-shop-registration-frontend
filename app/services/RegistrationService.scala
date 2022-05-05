@@ -258,7 +258,7 @@ class RegistrationService @Inject()(dateService: DateService) {
         getEuSendGoodsAddress(answers, index)
         ).mapN {
         case (euTaxIdentifier, euSendGoodsTradingName, euSendGoodsAddress) =>
-          RegistrationWithoutFixedEstablishmentWithTradeDetails(country, euTaxIdentifier, SendGoodsTradeDetails(euSendGoodsTradingName, euSendGoodsAddress))
+          RegistrationWithoutFixedEstablishmentWithTradeDetails(country, euTaxIdentifier, TradeDetails(euSendGoodsTradingName, euSendGoodsAddress))
       }
       case Some(false) => (
         getOptionalEuTaxIdentifier(answers, index)
@@ -275,11 +275,11 @@ class RegistrationService @Inject()(dateService: DateService) {
       case None            => DataMissingError(EuVatNumberPage(index)).invalidNec
     }
 
-  private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[FixedEstablishment] =
+  private def getFixedEstablishment(answers: UserAnswers, index: Index): ValidationResult[TradeDetails] =
     (
       getFixedEstablishmentTradingName(answers, index),
       getFixedEstablishmentAddress(answers, index)
-    ).mapN(FixedEstablishment.apply)
+    ).mapN(TradeDetails.apply)
 
   private def getFixedEstablishmentTradingName(answers: UserAnswers, index: Index): ValidationResult[String] =
     answers.get(FixedEstablishmentTradingNamePage(index)) match {

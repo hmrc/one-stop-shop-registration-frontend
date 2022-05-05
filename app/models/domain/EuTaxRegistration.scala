@@ -54,7 +54,7 @@ object EuVatRegistration {
 final case class RegistrationWithFixedEstablishment(
                                                     country: Country,
                                                     taxIdentifier: EuTaxIdentifier,
-                                                    fixedEstablishment: FixedEstablishment
+                                                    fixedEstablishment: TradeDetails
                                                   ) extends EuTaxRegistration
 
 object RegistrationWithFixedEstablishment {
@@ -65,7 +65,7 @@ object RegistrationWithFixedEstablishment {
 final case class RegistrationWithoutFixedEstablishmentWithTradeDetails(
                                                         country: Country,
                                                         taxIdentifier: EuTaxIdentifier,
-                                                        tradeDetails: SendGoodsTradeDetails
+                                                        tradeDetails: TradeDetails
                                                       ) extends EuTaxRegistration
 
 object RegistrationWithoutFixedEstablishmentWithTradeDetails {
