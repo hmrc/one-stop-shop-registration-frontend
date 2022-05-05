@@ -23,8 +23,9 @@ class EuSendGoodsFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "euSendGoods.error.required"
   val invalidKey = "error.boolean"
+  val country = arbitraryCountry.arbitrary.sample.value
 
-  val form = new EuSendGoodsFormProvider()()
+  val form = new EuSendGoodsFormProvider()(country.name)
 
   ".value" - {
 
@@ -33,13 +34,13 @@ class EuSendGoodsFormProviderSpec extends BooleanFieldBehaviours {
     behave like booleanField(
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      invalidError = FormError(fieldName, invalidKey, Seq(country.name))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

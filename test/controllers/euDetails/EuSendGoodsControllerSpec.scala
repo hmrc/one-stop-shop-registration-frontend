@@ -38,12 +38,12 @@ import scala.concurrent.Future
 class EuSendGoodsControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new EuSendGoodsFormProvider()
-  private val form = formProvider()
+  private val country = arbitraryCountry.arbitrary.sample.value
+  private val form = formProvider(country.name)
   private val index = Index(0)
 
   private lazy val euSendGoodsRoute = routes.EuSendGoodsController.onPageLoad(NormalMode, index).url
 
-  private val country = arbitraryCountry.arbitrary.sample.value
 
   private val answers = emptyUserAnswers .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), country).success.value
