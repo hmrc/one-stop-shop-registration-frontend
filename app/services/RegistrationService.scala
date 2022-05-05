@@ -309,12 +309,12 @@ class RegistrationService @Inject()(dateService: DateService) {
         getEuSendGoodsAddress(answers, index)
         ).mapN {
         case (euTaxIdentifier, euSendGoodsTradingName, euSendGoodsAddress) =>
-          RegistrationSendingGoods(country, euTaxIdentifier, true, euSendGoodsTradingName, euSendGoodsAddress)
+          RegistrationWithoutFixedEstablishmentWithTradeDetails(country, euTaxIdentifier, SendGoodsTradeDetails(euSendGoodsTradingName, euSendGoodsAddress))
       }
       case Some(false) => (
         getOptionalEuTaxIdentifier(answers, index)
       ) map {
-        case Some(taxId) => RegistrationWithoutFixedEstablishment(country, taxId, Some(false))
+        case Some(taxId) => RegistrationWithoutFixedEstablishment(country, taxId)
         case None => RegistrationWithoutTaxId(country)
       }
     }
