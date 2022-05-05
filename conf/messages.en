@@ -668,6 +668,7 @@ euSendGoodsTradingName.heading = What is the trading name of the business you se
 euSendGoodsTradingName.checkYourAnswersLabel = Trading name
 euSendGoodsTradingName.error.required = Enter your trading name in {0}
 euSendGoodsTradingName.error.length = Trading name must be 100 characters or less
+euSendGoodsTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 euSendGoodsTradingName.change.hidden = trading name
 
 
