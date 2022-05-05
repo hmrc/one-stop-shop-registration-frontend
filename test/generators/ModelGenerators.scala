@@ -18,7 +18,7 @@ package generators
 
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
@@ -112,12 +112,12 @@ trait ModelGenerators {
       } yield BankDetails(accountName, bic, iban)
     }
 
-  implicit lazy val arbitraryFixedEstablishment: Arbitrary[FixedEstablishment] =
+  implicit lazy val arbitraryFixedEstablishment: Arbitrary[TradeDetails] =
     Arbitrary {
       for {
         tradingName <- arbitrary[String]
         address     <- arbitrary[InternationalAddress]
-      } yield FixedEstablishment(tradingName, address)
+      } yield TradeDetails(tradingName, address)
     }
 
   implicit lazy val arbitraryCountry: Arbitrary[Country] =
