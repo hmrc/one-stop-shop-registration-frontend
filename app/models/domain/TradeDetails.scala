@@ -18,10 +18,14 @@ package models.domain
 
 import models.InternationalAddress
 import play.api.libs.json.{Json, OFormat}
+import models.domain.ModelHelpers._
 
 final case class TradeDetails(tradingName: String, address: InternationalAddress)
 
 object TradeDetails {
 
   implicit val format: OFormat[TradeDetails] = Json.format[TradeDetails]
+
+  def apply(tradingName: String, address: InternationalAddress): TradeDetails =
+    new TradeDetails(normaliseSpaces(tradingName), address)
 }
