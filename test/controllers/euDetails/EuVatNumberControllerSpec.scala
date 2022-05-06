@@ -35,7 +35,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
 
-  private val country = Country.euCountries.head
+  private val country = Country("SI", "Slovenia")
   private val formProvider = new EuVatNumberFormProvider()
   private val form = formProvider(country)
 
@@ -93,10 +93,10 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, euVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "FR1234567"))
+            .withFormUrlEncodedBody(("value", "12345678"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), "FR1234567").success.value
+        val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), "12345678").success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
