@@ -37,14 +37,13 @@ class EuSendGoodsController @Inject()(
                                          view: EuSendGoodsView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(index) {
         country =>
-
+          val form = formProvider(country.name)
           val preparedForm = request.userAnswers.get(euDetails.EuSendGoodsPage(index)) match {
             case None => form
             case Some(value) => form.fill(value)
@@ -58,7 +57,7 @@ class EuSendGoodsController @Inject()(
     implicit request =>
       getCountry(index) {
         country =>
-
+          val form = formProvider(country.name)
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, index, country.name))),
