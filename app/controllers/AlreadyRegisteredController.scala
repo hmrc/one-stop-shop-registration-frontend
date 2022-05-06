@@ -59,7 +59,6 @@ class AlreadyRegisteredController @Inject()(
             val isDOFSDifferentToCommencementDate =
               dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
             val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
-            println(savedUrl)
 
             Ok(
               view(
