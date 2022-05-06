@@ -16,6 +16,7 @@
 
 package forms.euDetails
 
+import forms.Validation.Validation.commonTextPattern
 import forms.mappings.Mappings
 import models.Country
 import play.api.data.Form
@@ -27,6 +28,8 @@ class EuSendGoodsTradingNameFormProvider @Inject() extends Mappings {
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("euSendGoodsTradingName.error.required", Seq(country.name))
-        .verifying(maxLength(100, "euSendGoodsTradingName.error.length"))
-    )
+        .verifying(firstError(maxLength(100, "euSendGoodsTradingName.error.length"),
+        regexp(commonTextPattern, "euSendGoodsTradingName.error.invalid")))
+
+  )
 }

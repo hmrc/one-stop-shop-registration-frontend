@@ -16,6 +16,7 @@
 
 package forms.euDetails
 
+import forms.Validation.Validation.commonTextPattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary
@@ -25,6 +26,7 @@ class EuSendGoodsTradingNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "euSendGoodsTradingName.error.required"
   val lengthKey = "euSendGoodsTradingName.error.length"
+  val invalidKey = "euSendGoodsTradingName.error.invalid"
   val validData = "Another trading name"
   val maxLength = 100
 
@@ -56,5 +58,11 @@ class EuSendGoodsTradingNameFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
+
+    "must not bind invalid Trading Name" in {
+      val invalidFixedEstablishmentTradingName = "^Fixed est~ tr@ding=nam£"
+      val result = form.bind(Map(fieldName -> invalidFixedEstablishmentTradingName)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
+    }
   }
 }
