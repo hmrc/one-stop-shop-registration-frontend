@@ -86,11 +86,26 @@ case class EuSendGoodsPage(index: Index) extends QuestionPage[Boolean] {
     }
   }
 
+  private def cleanUpTaxRef(userAnswers: UserAnswers): Try[UserAnswers] = {
+      val removed: Option[Try[UserAnswers]] = for {
+        hasFixedEstablishment <- userAnswers.get[Boolean](HasFixedEstablishmentPage(index))
+        vatRegisteredInEu <- userAnswers.get[Boolean](VatRegisteredPage(index))
+      } yield {
+        if (!hasFixedEstablishment && !vatRegisteredInEu) {
+          userAnswers.remove(EuTaxReferencePage(index))
+        } else {
+          Try(userAnswers)
+        }
+      }
+      removed.getOrElse(Try(userAnswers))
+  }
+
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if (value.contains(false)) {
       userAnswers
         .remove(EuSendGoodsTradingNamePage(index))
         .flatMap(_.remove(EuSendGoodsAddressPage(index)))
+        .flatMap(cleanUpTaxRef)
     } else {
       super.cleanup(value, userAnswers)
     }

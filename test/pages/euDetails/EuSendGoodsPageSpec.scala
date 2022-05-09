@@ -183,6 +183,42 @@ class EuSendGoodsPageSpec extends SpecBase with PageBehaviours {
       result.get(EuSendGoodsAddressPage(Index(1))) must not be defined
     }
 
+    "must remove EuTaxReference for this index when HasFixedEstablishment is no and answer is no" in {
+
+      val address = arbitrary[InternationalAddress].sample.value
+
+      val answers =
+        UserAnswers("id")
+          .set(VatRegisteredPage(Index(0)), false).success.value
+          .set(EuTaxReferencePage(Index(0)), "123456879").success.value
+          .set(HasFixedEstablishmentPage(Index(0)), false).success.value
+          .set(EuSendGoodsPage(Index(0)), true).success.value
+          .set(EuSendGoodsTradingNamePage(Index(0)), "foo").success.value
+          .set(EuSendGoodsAddressPage(Index(0)), address).success.value
+
+      val result = answers.set(EuSendGoodsPage(Index(0)), false).success.value
+      result.get(EuTaxReferencePage(Index(0))) mustEqual None
+
+    }
+
+    "must preserve EuTaxReference for this index when HasFixedEstablishment is yes and answer is no" in {
+
+      val address = arbitrary[InternationalAddress].sample.value
+
+      val answers =
+        UserAnswers("id")
+          .set(VatRegisteredPage(Index(0)), false).success.value
+          .set(EuTaxReferencePage(Index(0)), "123456879").success.value
+          .set(HasFixedEstablishmentPage(Index(0)), true).success.value
+          .set(EuSendGoodsPage(Index(0)), true).success.value
+          .set(EuSendGoodsTradingNamePage(Index(0)), "foo").success.value
+          .set(EuSendGoodsAddressPage(Index(0)), address).success.value
+
+      val result = answers.set(EuSendGoodsPage(Index(0)), false).success.value
+      result.get(EuTaxReferencePage(Index(0))) mustEqual Some("123456879")
+
+    }
+
     "must preserve Send Goods Trading Name and Address when the answer is yes and remove Sends Goods answers" in {
 
       val address = arbitrary[InternationalAddress].sample.value
