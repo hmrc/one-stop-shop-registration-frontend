@@ -23,7 +23,6 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-import scala.concurrent.Future
 import scala.util.Try
 
 case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean] {
@@ -100,11 +99,28 @@ case class HasFixedEstablishmentPage(index: Index) extends QuestionPage[Boolean]
     }
   }
 
+  private def cleanUpTaxRef(userAnswers: UserAnswers): Try[UserAnswers] = {
+    val removed: Option[Try[UserAnswers]] = for {
+      sendsGoods <- userAnswers.get[Boolean](EuSendGoodsPage(index))
+      vatRegisteredInEu <- userAnswers.get[Boolean](VatRegisteredPage(index))
+    } yield {
+      if (!sendsGoods && !vatRegisteredInEu) {
+        userAnswers.remove(EuTaxReferencePage(index))
+      } else {
+        Try(userAnswers)
+      }
+    }
+    removed.getOrElse(Try(userAnswers))
+  }
+
+
+
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if (value.contains(false)) {
       userAnswers
         .remove(FixedEstablishmentTradingNamePage(index))
         .flatMap(_.remove(FixedEstablishmentAddressPage(index)))
+        .flatMap(cleanUpTaxRef)
     } else {
       userAnswers
         .remove(EuSendGoodsPage(index))

@@ -274,6 +274,7 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
       val answers =
         UserAnswers("id")
           .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
           .set(FixedEstablishmentAddressPage(Index(0)), address1).success.value
           .set(FixedEstablishmentTradingNamePage(Index(1)), "second").success.value
           .set(FixedEstablishmentAddressPage(Index(1)), address2).success.value
@@ -284,6 +285,41 @@ class HasFixedEstablishmentPageSpec extends SpecBase with PageBehaviours {
       result.get(FixedEstablishmentAddressPage(Index(0))).value mustEqual address1
       result.get(FixedEstablishmentTradingNamePage(Index(1))) must not be defined
       result.get(FixedEstablishmentAddressPage(Index(1))) must not be defined
+
+    }
+
+    "must remove EuTaxReference for this index when EuSendGoodsPage is no and answer is no" in {
+
+      val address = arbitrary[InternationalAddress].sample.value
+
+      val answers =
+        UserAnswers("id")
+          .set(EuSendGoodsPage(Index(0)), false).success.value
+          .set(VatRegisteredPage(Index(0)), false).success.value
+          .set(EuTaxReferencePage(Index(0)), "123456879").success.value
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), address).success.value
+
+      val result = answers.set(HasFixedEstablishmentPage(Index(0)), false).success.value
+      result.get(EuTaxReferencePage(Index(0))) mustEqual None
+
+    }
+
+    "must preserve EuTaxReference for this index when EuSendGoodsPage is yes and answer is no" in {
+
+      val address = arbitrary[InternationalAddress].sample.value
+
+      val answers =
+        UserAnswers("id")
+          .set(EuSendGoodsPage(Index(0)), true).success.value
+          .set(VatRegisteredPage(Index(0)), false).success.value
+          .set(EuTaxReferencePage(Index(0)), "123456879").success.value
+          .set(FixedEstablishmentTradingNamePage(Index(0)), "first").success.value
+          .set(FixedEstablishmentAddressPage(Index(0)), address).success.value
+
+      val result = answers.set(HasFixedEstablishmentPage(Index(0)), false).success.value
+      result.get(EuTaxReferencePage(Index(0))) mustEqual Some("123456879")
+
     }
 
     "must preserve Fixed Establishment Trading Name and Address when the answer is yes and remove Sends Goods answers" in {
