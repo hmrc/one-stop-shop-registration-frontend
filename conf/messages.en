@@ -453,7 +453,7 @@ sellsGoodsFromNi.title = Will your business sell goods from Northern Ireland to 
 sellsGoodsFromNi.heading = Will your business sell goods from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.error.required = Select yes if your business will sell goods from Northern Ireland to consumers in the EU
 
-taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries
+taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.heading = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
 taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
@@ -568,11 +568,11 @@ error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
 
-euSendGoods.title = Do you send goods from {0}?
-euSendGoods.heading = Do you send goods from {0}?
-euSendGoods.checkYourAnswersLabel = Send goods
+euSendGoods.title = Does your business send goods from {0}?
+euSendGoods.heading = Does your business send goods from {0}?
+euSendGoods.checkYourAnswersLabel = Sends goods
 euSendGoods.error.required = Select yes if you send goods from {0}
-euSendGoods.change.hidden = Send goods
+euSendGoods.change.hidden = Sends goods
 
 euSendGoodsTradingName.title = What is the trading name of the business you send goods from in {0}?
 euSendGoodsTradingName.heading = What is the trading name of the business you send goods from in {0}?
