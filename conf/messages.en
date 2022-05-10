@@ -621,24 +621,24 @@ liableForVatOnAllSales.heading = Report and pay VAT on sales
 liableForVatOnAllSales.p1 = Your business is responsible for VAT on all sales to consumers in EU countries.
 liableForVatOnAllSales.p2 = This includes sales made on online marketplaces.
 
-liableForVatOnDirectSales.title = Do not report and pay VAT on sales made on online marketplaces
-liableForVatOnDirectSales.heading = Do not report and pay VAT on sales made on online marketplaces
-liableForVatOnDirectSales.p1 = The online marketplaces will be responsible for the VAT on those sales.
-liableForVatOnDirectSales.p2 = Your business is responsible for VAT on sales made to consumers in EU countries via other channels.
-liableForVatOnDirectSales.p3 = Only sales made via other channels count towards the £8,818 (10,000 euros) threshold for your business.
+liableForVatOnDirectSales.title = Do not include sales made on online marketplaces on your OSS returns
+liableForVatOnDirectSales.heading = Do not include sales made on online marketplaces on your OSS returns
+liableForVatOnDirectSales.p1 = The online marketplaces will be responsible for VAT on those sales.
+liableForVatOnDirectSales.p2 = Online marketplace sales do not count towards the £8,818 (10,000 euros) threshold for your business.
+liableForVatOnDirectSales.p3 = Your business is responsible for VAT on all other sales.
 
 notLiableForVat.title = You cannot register
 notLiableForVat.heading = You cannot register
 notLiableForVat.p1 = Your business is not responsible for reporting and paying VAT on sales to consumers in EU countries.
 notLiableForVat.p2 = The online marketplaces you use to sell goods will be responsible for VAT and registering for this scheme.
 
-salesChannels.title = How much of your sales of goods to consumers in EU countries will be made on online marketplaces?
-salesChannels.heading = How much of your sales of goods to consumers in EU countries will be made on online marketplaces?
+salesChannels.title = How many of your eligible sales will be made on online marketplaces?
+salesChannels.heading = How many of your eligible sales will be made on online marketplaces?
 salesChannels.onlineMarketplaces = All
 salesChannels.mixed = Some
 salesChannels.notOnlineMarketplaces = None
-salesChannels.error.required = Select how much of your sales will be made on online marketplaces?
-salesChannels.caption = Online marketplaces are websites or mobile apps where customers can buy goods from different sellers.
+salesChannels.error.required = Select how many of your eligible sales will be made on online marketplaces
+salesChannels.caption = Online marketplaces are websites or mobile apps where different businesses can register to sell goods.
 
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
