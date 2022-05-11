@@ -16,82 +16,30 @@
 
 package forms.mappings
 
+import models.CountryWithValidationDetails
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
 trait EuVatNumberConstraints {
 
-  val austriaVatNumberRegex = """^U[0-9]{8}$"""
-  val belgiumVatNumberRegex = """^(0|1)[0-9]{9}$"""
-  val bulgariaVatNumberRegex = """^[0-9]{9,10}$"""
-  val cyprusVatNumberRegex = """^[0-9]{8}[A-Z]$"""
-  val czechRepublicVatNumberRegex = """^[0-9]{8,10}$"""
-  val germanyVatNumberRegex = """^[0-9]{9}$"""
-  val denmarkVatNumberRegex = """^[0-9]{8}$"""
-  val estoniaVatNumberRegex = """^[0-9]{9}$"""
-  val greeceVatNumberRegex = """^[0-9]{9}$"""
-  val spainVatNumberRegex = """^[A-Z][0-9]{8}$|^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$"""
-  val finlandVatNumberRegex = """^[0-9]{8}$"""
-  val franceVatNumberRegex = """^[A-Z0-9]{2}[0-9]{9}$"""
-  val croatiaVatNumberRegex = """^[0-9]{11}$"""
-  val hungaryVatNumberRegex = """^[0-9]{8}$"""
-  val irelandVatNumberRegex = """^[0-9][A-Z0-9\+\*][0-9]{5}[A-Z]$|^[0-9]{7}WI$"""
-  val italyVatNumberRegex = """^[0-9]{11}$"""
-  val lithuaniaVatNumberRegex = """^[0-9]{9}$|^[0-9]{12}$"""
-  val luxembourgVatNumberRegex = """^[0-9]{8}$"""
-  val latviaVatNumberRegex = """^[0-9]{11}$"""
-  val maltaVatNumberRegex = """^[0-9]{8}$"""
-  val netherlandsVatNumberRegex = """^[A-Z0-9\+\*]{12}$"""
-  val polandVatNumberRegex = """^[0-9]{10}$"""
-  val portugalVatNumberRegex = """^[0-9]{9}$"""
-  val romaniaVatNumberRegex = """^[0-9]{2,10}$"""
-  val swedenVatNumberRegex = """^[0-9]{12}$"""
-  val sloveniaVatNumberRegex = """^[0-9]{8}$"""
-  val slovakiaVatNumberRegex = """^[0-9]{10}$"""
 
+  private def getCountryVatRegex(countryCode: String): String =
+    CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == countryCode)
+    match {
+      case Some(countryWithValidationDetails) =>
+        countryWithValidationDetails.vrnRegex
+      case _ => throw new Exception("invalid country code")
+    }
 
   def validateEuVatNumber(countryCode: String, errorKey: String): Constraint[String] = {
+    val regex = getCountryVatRegex(countryCode)
     Constraint {
       input =>
-
-        val regex = getCountryVatRegex(countryCode)
-
-        if(input.matches(regex)) {
+        if (input.matches(regex)) {
           Valid
         } else {
           Invalid(errorKey)
         }
     }
-  }
-
-  private def getCountryVatRegex(countryCode: String): String = countryCode match {
-    case "AT" => austriaVatNumberRegex
-    case "BE" => belgiumVatNumberRegex
-    case "BG" => bulgariaVatNumberRegex
-    case "HR" => croatiaVatNumberRegex
-    case "CY" => cyprusVatNumberRegex
-    case "CZ" => czechRepublicVatNumberRegex
-    case "DK" => denmarkVatNumberRegex
-    case "EE" => estoniaVatNumberRegex
-    case "FI" => finlandVatNumberRegex
-    case "FR" => franceVatNumberRegex
-    case "DE" => germanyVatNumberRegex
-    case "EL" => greeceVatNumberRegex
-    case "HU" => hungaryVatNumberRegex
-    case "IE" => irelandVatNumberRegex
-    case "IT" => italyVatNumberRegex
-    case "LV" => latviaVatNumberRegex
-    case "LT" => lithuaniaVatNumberRegex
-    case "LU" => luxembourgVatNumberRegex
-    case "MT" => maltaVatNumberRegex
-    case "NL" => netherlandsVatNumberRegex
-    case "PL" => polandVatNumberRegex
-    case "PT" => portugalVatNumberRegex
-    case "RO" => romaniaVatNumberRegex
-    case "SK" => slovakiaVatNumberRegex
-    case "SI" => sloveniaVatNumberRegex
-    case "ES" => spainVatNumberRegex
-    case "SE" => swedenVatNumberRegex
-    case _ => throw new Exception("invalid country code")
   }
 
 

@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.EuVatNumberFormProvider
-import models.{Country, Index, NormalMode}
+import models.{Country, CountryWithValidationDetails, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,6 +36,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
   private val index = Index(0)
 
   private val country = Country("SI", "Slovenia")
+  private val countryWithValidation = CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == "SI").value
   private val formProvider = new EuVatNumberFormProvider()
   private val form = formProvider(country)
 
@@ -57,7 +58,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[EuVatNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -75,7 +76,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -120,7 +121,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
