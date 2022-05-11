@@ -510,7 +510,7 @@ sellsGoodsFromNi.title = Will your business sell goods from Northern Ireland to 
 sellsGoodsFromNi.heading = Will your business sell goods from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.error.required = Select yes if your business will sell goods from Northern Ireland to consumers in the EU
 
-taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries
+taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.heading = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
 taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
@@ -621,24 +621,24 @@ liableForVatOnAllSales.heading = Report and pay VAT on sales
 liableForVatOnAllSales.p1 = Your business is responsible for VAT on all sales to consumers in EU countries.
 liableForVatOnAllSales.p2 = This includes sales made on online marketplaces.
 
-liableForVatOnDirectSales.title = Do not report and pay VAT on sales made on online marketplaces
-liableForVatOnDirectSales.heading = Do not report and pay VAT on sales made on online marketplaces
-liableForVatOnDirectSales.p1 = The online marketplaces will be responsible for the VAT on those sales.
-liableForVatOnDirectSales.p2 = Your business is responsible for VAT on sales made to consumers in EU countries via other channels.
-liableForVatOnDirectSales.p3 = Only sales made via other channels count towards the £8,818 (10,000 euros) threshold for your business.
+liableForVatOnDirectSales.title = Do not include sales made on online marketplaces on your OSS returns
+liableForVatOnDirectSales.heading = Do not include sales made on online marketplaces on your OSS returns
+liableForVatOnDirectSales.p1 = The online marketplaces will be responsible for VAT on those sales.
+liableForVatOnDirectSales.p2 = Online marketplace sales do not count towards the £8,818 (10,000 euros) threshold for your business.
+liableForVatOnDirectSales.p3 = Your business is responsible for VAT on all other sales.
 
 notLiableForVat.title = You cannot register
 notLiableForVat.heading = You cannot register
 notLiableForVat.p1 = Your business is not responsible for reporting and paying VAT on sales to consumers in EU countries.
 notLiableForVat.p2 = The online marketplaces you use to sell goods will be responsible for VAT and registering for this scheme.
 
-salesChannels.title = How much of your sales of goods to consumers in EU countries will be made on online marketplaces?
-salesChannels.heading = How much of your sales of goods to consumers in EU countries will be made on online marketplaces?
+salesChannels.title = How many of your eligible sales will be made on online marketplaces?
+salesChannels.heading = How many of your eligible sales will be made on online marketplaces?
 salesChannels.onlineMarketplaces = All
 salesChannels.mixed = Some
 salesChannels.notOnlineMarketplaces = None
-salesChannels.error.required = Select how much of your sales will be made on online marketplaces?
-salesChannels.caption = Online marketplaces are websites or mobile apps where customers can buy goods from different sellers.
+salesChannels.error.required = Select how many of your eligible sales will be made on online marketplaces
+salesChannels.caption = Online marketplaces are websites or mobile apps where different businesses can register to sell goods.
 
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
@@ -657,11 +657,11 @@ error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
 
-euSendGoods.title = Do you send goods from {0}?
-euSendGoods.heading = Do you send goods from {0}?
-euSendGoods.checkYourAnswersLabel = Send goods
+euSendGoods.title = Does your business send goods from {0}?
+euSendGoods.heading = Does your business send goods from {0}?
+euSendGoods.checkYourAnswersLabel = Sends goods
 euSendGoods.error.required = Select yes if you send goods from {0}
-euSendGoods.change.hidden = Send goods
+euSendGoods.change.hidden = Sends goods
 
 euSendGoodsTradingName.title = What is the trading name of the business you send goods from in {0}?
 euSendGoodsTradingName.heading = What is the trading name of the business you send goods from in {0}?

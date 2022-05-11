@@ -19,10 +19,11 @@ package controllers.actions
 import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.routes
+import models.UserAnswers
 import models.requests.AuthenticatedIdentifierRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -30,6 +31,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.DataMigrationService
 import testutils.RegistrationData
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,11 +39,12 @@ import scala.concurrent.Future
 
 class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness(connector: RegistrationConnector) extends CheckRegistrationFilterImpl(connector) {
+  class Harness(connector: RegistrationConnector, migrationService: DataMigrationService) extends CheckRegistrationFilterImpl(connector, migrationService) {
     def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   private val mockConnector = mock[RegistrationConnector]
+  private val mockService = mock[DataMigrationService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockConnector)
@@ -57,7 +60,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
-        val controller = new Harness(mockConnector)
+        val controller = new Harness(mockConnector, mockService)
 
         val result = controller.callFilter(request).futureValue
 
@@ -65,17 +68,19 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       }
     }
 
-    "must redirect to Already Registered when an existing registration is found" in {
+    "must redirect to Already Registered and migrate data when an existing registration is found" in {
 
       when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+      when(mockService.migrate(any(), any())) thenReturn Future.successful(UserAnswers(userAnswersId))
 
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
-        val controller = new Harness(mockConnector)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn)
+        val controller = new Harness(mockConnector, mockService)
 
         val result = controller.callFilter(request).futureValue
+        verify(mockService, times(1)).migrate(any(), any())
 
         result.value mustEqual Redirect(routes.AlreadyRegisteredController.onPageLoad())
       }
