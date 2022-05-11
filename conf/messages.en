@@ -121,10 +121,10 @@ ukVatRegisteredPostcode.change.hidden = the postcode where your business is regi
 
 euVatNumber.title = What is your VAT registration number for {0}?
 euVatNumber.heading = What is your VAT registration number for {0}?
+euVatNumber.hint = This is {0} after the country code ''{1}'', for example {2}. You can find it on your VAT registration confirmation. {3}
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
-euVatNumber.error.length = EU VAT registration number must be 12 characters or less
-euVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, asterisk, plus symbol and numbers
+euVatNumber.error.invalid = Enter a VAT registration number in the correct format
 euVatNumber.change.hidden = VAT registration number
 
 euCountry.title = Enter an EU country where your business is registered for tax
@@ -452,8 +452,7 @@ previousEuCountry.error.duplicate = You selected this EU country already. Select
 previousEuVatNumber.title = What was your VAT registration number for {0}?
 previousEuVatNumber.heading = What was your VAT registration number for {0}?
 previousEuVatNumber.error.required = Enter your VAT registration number for {0}
-previousEuVatNumber.error.length = VAT registration number must be 100 characters or less
-previousEuVatNumber.error.invalid = EU VAT registration number must only include letters A to Z, asterisk, plus symbol and numbers
+previousEuVatNumber.error.invalid = Enter a VAT registration number in the correct format
 
 previouslyRegistered.title = Has your business deregistered from the One Stop Shop Union scheme in an EU country?
 previouslyRegistered.heading = Has your business deregistered from the One Stop Shop Union scheme in an EU country?

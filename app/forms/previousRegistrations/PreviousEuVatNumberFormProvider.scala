@@ -17,20 +17,20 @@
 package forms.previousRegistrations
 
 import forms.Validation.Validation.euVatNumberPattern
-import forms.mappings.Mappings
+import forms.mappings.{EuVatNumberConstraints, Mappings}
 import models.Country
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class PreviousEuVatNumberFormProvider @Inject() extends Mappings {
+class PreviousEuVatNumberFormProvider @Inject() extends Mappings with EuVatNumberConstraints{
 
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
-        .verifying(firstError(
-          maxLength(12, "previousEuVatNumber.error.length"),
-            regexp(euVatNumberPattern, "previousEuVatNumber.error.invalid")))
+        .verifying(
+          validateEuVatNumber(country.code, "previousEuVatNumber.error.invalid")
+        )
         .transform[String](_.toUpperCase, value => value)
     )
 }

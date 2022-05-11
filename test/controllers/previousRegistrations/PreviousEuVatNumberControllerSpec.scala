@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousEuVatNumberFormProvider
-import models.{Country, Index, NormalMode}
+import models.{Country, CountryWithValidationDetails, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,7 +34,8 @@ import scala.concurrent.Future
 class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private val country = Country.euCountries.head
+  private val country = Country("SI", "Slovenia")
+  private val countryWithValidation = CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == "SI").value
   private val formProvider = new PreviousEuVatNumberFormProvider()
   private val form = formProvider(country)
 
@@ -57,7 +58,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousEuVatNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -75,7 +76,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -93,10 +94,10 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousEuVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "FR1234567"))
+            .withFormUrlEncodedBody(("value", "12345678"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousEuVatNumberPage(index), "FR1234567").success.value
+        val expectedAnswers = baseAnswers.set(PreviousEuVatNumberPage(index), "12345678").success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual PreviousEuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
@@ -120,7 +121,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 

@@ -16,23 +16,19 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.euVatNumberPattern
-import forms.mappings.Mappings
+import forms.mappings.{EuVatNumberConstraints, Mappings}
 import models.Country
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class EuVatNumberFormProvider @Inject() extends Mappings {
+class EuVatNumberFormProvider @Inject() extends Mappings with EuVatNumberConstraints {
 
   def apply(country: Country): Form[String] =
     Form(
       "value" -> text("euVatNumber.error.required", Seq(country.name))
         .verifying(
-          firstError(
-            maxLength(12, "euVatNumber.error.length"),
-            regexp(euVatNumberPattern, "euVatNumber.error.invalid")
-          )
+            validateEuVatNumber(country.code, "euVatNumber.error.invalid")
         ).transform[String](_.toUpperCase, value => value)
     )
 }
