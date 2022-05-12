@@ -557,7 +557,7 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
-commencementDate.p1 = Your eligible sales starting from {0} will be included in this scheme.
+commencementDate.p1 = You must include all eligible sales from {0} in your first return.
 commencementDate.checkYourAnswersLabel = Date your sales start to be included in this scheme
 
 commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
