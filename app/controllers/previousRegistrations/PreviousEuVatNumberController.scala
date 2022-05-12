@@ -19,7 +19,7 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.PreviousEuVatNumberFormProvider
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
+import models.{Country, CountryWithValidationDetails, Index, Mode}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -49,8 +49,10 @@ class PreviousEuVatNumberController @Inject()(
             case None => form
             case Some(value) => form.fill(value)
           }
-
-          Future.successful(Ok(view(preparedForm, mode, index, country)))
+          CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
+            case countryWithValidationDetails =>
+              Future.successful(Ok(view(preparedForm, mode, index, countryWithValidationDetails)))
+          }
       }
   }
 
@@ -63,7 +65,10 @@ class PreviousEuVatNumberController @Inject()(
 
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
+              CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
+                case countryWithValidationDetails =>
+                  Future.successful(BadRequest(view(formWithErrors, mode, index, countryWithValidationDetails)))
+              },
 
             value =>
               for {
