@@ -18,7 +18,7 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import models.{CheckLoopMode, CheckMode, Country, Index, NormalMode, UserAnswers}
-import pages.QuestionPage
+import pages.{PartOfVatGroupPage, QuestionPage}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,16 +28,43 @@ case class EuCountryPage(index: Index) extends QuestionPage[Country] {
 
   override def toString: String = "euCountry"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    val isPartOfVatGroup = answers.vatInfo.flatMap(
+      vatInfo => vatInfo.partOfVatGroup
+    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    if (isPartOfVatGroup) {
+      euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
+    } else {
+      euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
+    }
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(VatRegisteredPage(index)) match {
-    case Some(_) => VatRegisteredPage(index).navigate(CheckMode, answers)
-    case None    => euRoutes.VatRegisteredController.onPageLoad(CheckMode, index)
   }
 
-  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = answers.get(VatRegisteredPage(index)) match {
-    case Some(_) => VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-    case None    => euRoutes.VatRegisteredController.onPageLoad(CheckLoopMode, index)
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    val isPartOfVatGroup = answers.vatInfo.flatMap(
+      vatInfo => vatInfo.partOfVatGroup
+    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    if (isPartOfVatGroup) {
+      euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
+    } else {
+      answers.get(VatRegisteredPage(index)) match {
+        case Some(_) => VatRegisteredPage(index).navigate(CheckMode, answers)
+        case None => euRoutes.VatRegisteredController.onPageLoad(CheckMode, index)
+      }
+    }
+  }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
+    val isPartOfVatGroup = answers.vatInfo.flatMap(
+      vatInfo => vatInfo.partOfVatGroup
+    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    if (isPartOfVatGroup) {
+      euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
+    } else {
+      answers.get(VatRegisteredPage(index)) match {
+        case Some(_) => VatRegisteredPage(index).navigate(CheckLoopMode, answers)
+        case None => euRoutes.VatRegisteredController.onPageLoad(CheckLoopMode, index)
+      }
+    }
   }
 }
