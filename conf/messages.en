@@ -5,6 +5,7 @@ site.remove = Remove
 site.remove.hidden = Remove tax details for {0}
 site.change = Change
 site.change.hidden = Change tax details for {0}
+change.euVatNumber.hidden = Change VAT registration number for {0}
 site.deregistered.hidden = Change if you have deregistered from the VAT One Stop Shop for goods in {0}
 site.no = No
 site.yes = Yes
