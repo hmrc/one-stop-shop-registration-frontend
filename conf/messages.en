@@ -515,6 +515,10 @@ taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
 taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
 taxRegisteredInEu.change.hidden = if registered for tax in EU countries
 
+taxRegisteredInEu.vatOnly.title = Is your business registered for VAT in EU countries?
+taxRegisteredInEu.vatOnly.heading = Is your business registered for VAT in EU countries?
+taxRegisteredInEu.vatOnly.error.required = Select yes if your business is registered for VAT in EU countries
+
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
 updateVatDetails.guidance = Sign into your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a> to update your UK VAT details before registering for this scheme.
