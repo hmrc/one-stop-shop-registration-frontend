@@ -5,6 +5,7 @@ site.remove = Remove
 site.remove.hidden = Remove tax details for {0}
 site.change = Change
 site.change.hidden = Change tax details for {0}
+change.euVatNumber.hidden = Change VAT registration number for {0}
 site.deregistered.hidden = Change if you have deregistered from the VAT One Stop Shop for goods in {0}
 site.no = No
 site.yes = Yes
@@ -514,6 +515,10 @@ taxRegisteredInEu.heading = Is your business registered for VAT or other taxes i
 taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
 taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
 taxRegisteredInEu.change.hidden = if registered for tax in EU countries
+
+taxRegisteredInEu.vatOnly.title = Is your business registered for VAT in EU countries?
+taxRegisteredInEu.vatOnly.heading = Is your business registered for VAT in EU countries?
+taxRegisteredInEu.vatOnly.error.required = Select yes if your business is registered for VAT in EU countries
 
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details

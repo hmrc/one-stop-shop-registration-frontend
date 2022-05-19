@@ -37,7 +37,7 @@ object RegistrationData extends Generators with EitherValues {
       vatDetails = VatDetails(
         registrationDate = LocalDate.now,
         address          = createUkAddress(),
-        partOfVatGroup   = true,
+        partOfVatGroup   = false,
         source           = VatDetailSource.Etmp
       ),
       euRegistrations = Seq(
