@@ -31,7 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
-import views.html.euDetails.AddEuDetailsView
+import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
 
 import scala.concurrent.Future
 
@@ -61,7 +61,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   "AddEuDetails Controller" - {
 
-    "must return OK and the correct view for a GET when answers are complete" in {
+    "must return OK and the correct view for a GET when answers are complete and user is not part of Vat Group" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
@@ -73,6 +73,26 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view                    = application.injector.instanceOf[AddEuDetailsView]
         implicit val msgs: Messages = messages(application)
         val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when answers are complete and user is part of Vat Group" in {
+
+      val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true))))
+        .set(EuVatNumberPage(index), "12345").success.value
+      )).build()
+
+      running(application) {
+        val request = FakeRequest(GET, addEuVatDetailsRoute)
+
+        val result = route(application, request).value
+
+        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(index), "12345").success.value, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -144,7 +164,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must return a Bad Request and errors when invalid data is submitted and user is not part of vat group" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
@@ -158,6 +178,30 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view                    = application.injector.instanceOf[AddEuDetailsView]
         implicit val msgs: Messages = messages(application)
         val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted and user is part of vat group" in {
+
+      val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true))))
+        .set(EuVatNumberPage(index), "12345").success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute())
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        implicit val msgs: Messages = messages(application)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(index), "12345").success.value, NormalMode)
 
         val result = route(application, request).value
 

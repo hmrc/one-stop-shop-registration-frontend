@@ -64,14 +64,15 @@ trait CompletionChecks {
     request.userAnswers
       .get(EuOptionalDetailsQuery(index))
       .find(details =>
-        !isPartOfVatGroup && (details.vatRegistered.isEmpty ||
+        (isPartOfVatGroup && details.euVatNumber.isEmpty) ||
+        (!isPartOfVatGroup && (details.vatRegistered.isEmpty ||
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
             (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
           (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
           (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
-            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty))))
+            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))))
       )
   }
 
@@ -83,14 +84,15 @@ trait CompletionChecks {
     request.userAnswers
       .get(AllEuOptionalDetailsQuery).map(
       _.filter(details =>
-        !isPartOfVatGroup && (details.vatRegistered.isEmpty ||
+        (isPartOfVatGroup && details.euVatNumber.isEmpty) ||
+          (!isPartOfVatGroup && (details.vatRegistered.isEmpty ||
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
             (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
             (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
           (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
-            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty))))
+            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))))
       )
     ).getOrElse(List.empty)
   }
