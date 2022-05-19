@@ -65,7 +65,15 @@ trait SpecBase
 
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
-      registrationDate = LocalDate.now(stubClockAtArbitraryDate),
+      registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
+      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup   = Some(false),
+      organisationName = Some("Company name")
+    )
+
+  val partialVatCustomerInfo: VatCustomerInfo =
+    VatCustomerInfo(
+      registrationDate = LocalDate.now(stubClockAtArbitraryDate),,
       address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
       partOfVatGroup   = true,
       organisationName = "Company name"
@@ -92,7 +100,7 @@ trait SpecBase
   val basicUserAnswers: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val basicUserAnswersWithVatInfo: UserAnswers = basicUserAnswers copy (vatInfo = Some(vatCustomerInfo))
-  val completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
+  val  completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
     .set(HasTradingNamePage, false).success.value
     .set(HasMadeSalesPage, false).success.value
     .set(IsPlanningFirstEligibleSalePage, true).success.value

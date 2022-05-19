@@ -189,24 +189,32 @@ class RegistrationService @Inject()(dateService: DateService) {
   }
 
   private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[EuTaxRegistration] = {
+    val isPartOfVatGroup = answers.vatInfo.flatMap(
+      vatInfo => vatInfo.partOfVatGroup
+    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
     answers.get(EuCountryPage(index)) match {
       case Some(country) =>
-        answers.get(HasFixedEstablishmentPage(index)) match {
-          case Some(true) =>
-            getRegistrationWithFixedEstablishment(answers, country, index)
+        if(isPartOfVatGroup){
+          getEuVatNumber(answers, index).map(
+            vrn => EuVatRegistration(country, vrn)
+          )
+        } else {
+          answers.get(HasFixedEstablishmentPage(index)) match {
+            case Some(true) =>
+              getRegistrationWithFixedEstablishment(answers, country, index)
 
-          case Some(false) =>
-            answers.get(VatRegisteredPage(index)) match {
-              case Some(_) =>
-                getEuVatRegistration(answers, country, index)
-              case None =>
-                DataMissingError(VatRegisteredPage(index)).invalidNec
-            }
+            case Some(false) =>
+              answers.get(VatRegisteredPage(index)) match {
+                case Some(_) =>
+                  getEuVatRegistration(answers, country, index)
+                case None =>
+                  DataMissingError(VatRegisteredPage(index)).invalidNec
+              }
 
-          case None =>
-            DataMissingError(HasFixedEstablishmentPage(index)).invalidNec
+            case None =>
+              DataMissingError(HasFixedEstablishmentPage(index)).invalidNec
+          }
         }
-
       case None =>
         DataMissingError(EuCountryPage(index)).invalidNec
     }

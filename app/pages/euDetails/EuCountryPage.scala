@@ -45,7 +45,10 @@ case class EuCountryPage(index: Index) extends QuestionPage[Country] {
       vatInfo => vatInfo.partOfVatGroup
     ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
     if (isPartOfVatGroup) {
-      euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
+      answers.get(EuVatNumberPage(index)) match {
+        case Some(_) => EuVatNumberPage(index).navigate(CheckMode, answers)
+        case None => euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
+      }
     } else {
       answers.get(VatRegisteredPage(index)) match {
         case Some(_) => VatRegisteredPage(index).navigate(CheckMode, answers)
@@ -59,7 +62,10 @@ case class EuCountryPage(index: Index) extends QuestionPage[Country] {
       vatInfo => vatInfo.partOfVatGroup
     ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
     if (isPartOfVatGroup) {
-      euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
+      answers.get(EuVatNumberPage(index)) match {
+        case Some(_) => EuVatNumberPage(index).navigate(CheckLoopMode, answers)
+        case None => euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
+      }
     } else {
       answers.get(VatRegisteredPage(index)) match {
         case Some(_) => VatRegisteredPage(index).navigate(CheckLoopMode, answers)
