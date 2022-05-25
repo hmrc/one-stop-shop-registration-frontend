@@ -655,3 +655,8 @@ error.missing_answers_prompt.general = You need to complete the missing informat
 error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
+
+
+noMoreWelsh.title = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
+noMoreWelsh.heading = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
+noMoreWelsh.submit = Yn eich blaen
