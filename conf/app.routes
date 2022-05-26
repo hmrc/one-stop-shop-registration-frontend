@@ -296,4 +296,4 @@ GET        /check-planned-first-sale                                  controller
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
 POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
-GET        /no-more-welsh                                             controllers.external.NoMoreWelshController.onPageLoad()
+GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()
