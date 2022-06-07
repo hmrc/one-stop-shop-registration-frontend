@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
-import models.{DesAddress, ValidateRegistration}
+import models.{DesAddress, RegistrationValidationResult}
 import models.domain.VatCustomerInfo
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
@@ -209,7 +209,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
-        val validateRegistration = ValidateRegistration(
+        val validateRegistration = RegistrationValidationResult(
           validRegistration = true
         )
 

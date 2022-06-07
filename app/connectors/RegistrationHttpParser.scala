@@ -17,7 +17,7 @@
 package connectors
 
 import logging.Logging
-import models.ValidateRegistration
+import models.RegistrationValidationResult
 import models.responses.{ConflictFound, ErrorResponse, InvalidJson, NotFound, UnexpectedResponseStatus}
 import play.api.http.Status.{CONFLICT, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.{JsError, JsSuccess}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 object RegistrationHttpParser extends Logging {
 
   type RegistrationResultResponse = Either[ErrorResponse, Unit]
-  type ValidateRegistrationResponse = Either[ErrorResponse, ValidateRegistration]
+  type ValidateRegistrationResponse = Either[ErrorResponse, RegistrationValidationResult]
 
   implicit object RegistrationResponseReads extends HttpReads[RegistrationResultResponse] {
     override def read(method: String, url: String, response: HttpResponse): RegistrationResultResponse =
@@ -40,7 +40,7 @@ object RegistrationHttpParser extends Logging {
   implicit object ValidateRegistrationReads extends HttpReads[ValidateRegistrationResponse] {
     override def read(method: String, url: String, response: HttpResponse): ValidateRegistrationResponse = {
       response.status match {
-        case OK => response.json.validate[ValidateRegistration] match {
+        case OK => response.json.validate[RegistrationValidationResult] match {
           case JsSuccess(validateRegistration, _) => Right(validateRegistration)
           case JsError(errors) =>
             logger.warn(s"Failed trying to parse JSON $errors. Json was ${response.json}", errors)
