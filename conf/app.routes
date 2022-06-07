@@ -297,4 +297,4 @@ POST       /check-planned-first-sale                                  controller
 
 POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
 GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()
-GET        /niProtocolRejection                       controllers.NiProtocolRejectionController.onPageLoad()
+GET        /niProtocolRejection                                       controllers.NiProtocolRejectionController.onPageLoad()
