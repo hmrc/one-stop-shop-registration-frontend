@@ -17,6 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import controllers.actions.{AuthenticatedDataRetrievalAction, AuthenticatedIdentifierAction, CheckNiProtocolFilter, CheckRegistrationFilter, FakeAuthenticatedDataRetrievalAction, FakeAuthenticatedIdentifierAction, FakeCheckNiProtocolFilter, FakeCheckRegistrationFilter, FakeUnauthenticatedDataRetrievalAction, UnauthenticatedDataRetrievalAction}
 import models.iv.IdentityVerificationResult.Success
 import models.iv.{IdentityVerificationUnexpectedResponse, NtcService, P60Service, PayslipService}
 import org.scalacheck.Gen
@@ -26,10 +27,13 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, running}
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
+
+import java.time.Clock
 
 class IdentityVerificationConnectorSpec
   extends AnyFreeSpec
@@ -45,6 +49,9 @@ class IdentityVerificationConnectorSpec
   private def application: Application =
     new GuiceApplicationBuilder()
       .configure("microservice.services.identity-verification.port" -> server.port)
+      .overrides(
+        bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter())
+      )
       .build()
 
   "getJourneyStatus" - {
