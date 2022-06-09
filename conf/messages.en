@@ -249,8 +249,8 @@ addTradingName.remove.hidden = Remove {0}
 addTradingName.addAnother = Add another trading name?
 addTradingName.addAnother.hint = You can add up to 10 trading names.
 
-website.title = Enter a website address
-website.heading = Enter a website address
+website.title = Enter a website you use to sell your goods
+website.heading = Enter a website you use to sell your goods
 website.checkYourAnswersLabel = Website address
 website.error.required = Enter a website address
 website.error.length = Website address must be 250 characters or less
@@ -376,8 +376,8 @@ useOtherAccount.p2.1 = You need to
 useOtherAccount.p2.link.text = sign in with a different Government Gateway user ID
 useOtherAccount.p2.2 = if you want to register for a business with a different VAT registration number.
 
-fixedEstablishmentAddress.title = Enter your fixed establishment address in {0}
-fixedEstablishmentAddress.heading = Enter your fixed establishment address in {0}
+fixedEstablishmentAddress.title = What is the fixed establishment address in {0}
+fixedEstablishmentAddress.heading = What is the fixed establishment address in {0}
 fixedEstablishmentAddress.line1 = Address line 1
 fixedEstablishmentAddress.line2 = Address line 2 (optional)
 fixedEstablishmentAddress.townOrCity = Town or city
@@ -445,8 +445,8 @@ addPreviousRegistration.remove.hidden = Remove deregistration in {0}
 addPreviousRegistration.addAnother = Add another deregistration?
 addPreviousRegistration.addAnother.hint = You must tell us about all deregistrations from the Union scheme in EU countries.
 
-previousEuCountry.title = Select an EU country where you are no longer registered for the Union scheme
-previousEuCountry.heading = Select an EU country where you are no longer registered for the Union scheme
+previousEuCountry.title = Enter an EU country where you are no longer registered for the Union scheme
+previousEuCountry.heading = Enter an EU country where you are no longer registered for the Union scheme
 previousEuCountry.error.required = Select an EU country
 previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
@@ -486,8 +486,8 @@ bankDetails.error.accountName.invalid = Account name must only include letters, 
 bankDetails.error.bic.invalid = Enter a real BIC
 bankDetails.change.hidden = your bank account details
 
-euTaxReference.title = What is your business''s tax identification number in {0}?
-euTaxReference.heading = What is your business''s tax identification number in {0}?
+euTaxReference.title = What is your business tax identification number in {0}?
+euTaxReference.heading = What is your business tax identification number in {0}?
 euTaxReference.checkYourAnswersLabel = Tax identification number
 euTaxReference.error.required = Enter your business''s tax identification number in {0}
 euTaxReference.error.length = Tax identification number must be 20 characters or less
