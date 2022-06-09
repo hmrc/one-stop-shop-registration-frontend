@@ -196,8 +196,8 @@ addTradingName.remove.hidden = Remove {0}
 addTradingName.addAnother = Add another trading name?
 addTradingName.addAnother.hint = You can add up to 10 trading names.
 
-website.title = Enter a website address
-website.heading = Enter a website address
+website.title = Enter a website you use to sell your goods
+website.heading = Enter a website you use to sell your goods
 website.checkYourAnswersLabel = Website address
 website.error.required = Enter a website address
 website.error.length = Website address must be 250 characters or less
