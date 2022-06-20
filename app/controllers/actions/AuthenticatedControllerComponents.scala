@@ -36,12 +36,14 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def checkVrnAllowList: VrnAllowListFilter
   def limitIndex: MaximumIndexFilterProvider
   def features: FeatureFlagService
+  def checkNiProtocol: CheckNiProtocolFilter
 
   def authAndGetData(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
+      checkNiProtocol andThen
       getData andThen
       requireData
 
@@ -50,6 +52,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
+      checkNiProtocol andThen
       getData
 }
 
@@ -68,5 +71,6 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                getData: AuthenticatedDataRetrievalAction,
                                                                requireData: AuthenticatedDataRequiredAction,
                                                                limitIndex: MaximumIndexFilterProvider,
-                                                               features: FeatureFlagService
+                                                               features: FeatureFlagService,
+                                                               checkNiProtocol: CheckNiProtocolFilter
                                                              ) extends AuthenticatedControllerComponents

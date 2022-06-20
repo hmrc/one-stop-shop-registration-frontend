@@ -35,15 +35,14 @@ class ExternalController @Inject()(
 
   override protected def controllerComponents: MessagesControllerComponents = cc
 
-  def onExternal(): Action[JsValue] =  (cc.actionBuilder andThen cc.identify).async(parse.json) {
+  def onExternal(lang: Option[String] = None): Action[JsValue] =  (cc.actionBuilder andThen cc.identify).async(parse.json) {
     implicit request =>
       withJsonBody[ExternalRequest] {
-      externalRequest =>
-        externalService.getExternalResponse(externalRequest, request.userId).map {
-          response => Ok(Json.toJson(response))
-        }
-
-    }
+        externalRequest =>
+          externalService.getExternalResponse(externalRequest, request.userId, lang) map {
+            response => Ok(Json.toJson(response))
+          }
+      }
   }
 
 

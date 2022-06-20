@@ -17,11 +17,12 @@
 package connectors
 
 import config.Service
-import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
+import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse, ValidateRegistrationReads, ValidateRegistrationResponse}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
 import models.responses.ErrorResponse
 import play.api.Configuration
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
 
 import javax.inject.Inject
@@ -43,4 +44,8 @@ class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpCli
 
   def getVatCustomerInfo()(implicit hc: HeaderCarrier): Future[VatCustomerInfoResponse] =
     httpClient.GET[VatCustomerInfoResponse](s"$baseUrl/vat-information")
+
+  def validateRegistration(vrn: Vrn)(implicit hc: HeaderCarrier): Future[ValidateRegistrationResponse] = {
+    httpClient.GET[ValidateRegistrationResponse](s"$baseUrl/registration/validate/${vrn.value}")
+  }
 }

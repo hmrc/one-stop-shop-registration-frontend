@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
-import models.DesAddress
+import models.{DesAddress, RegistrationValidationResult}
 import models.domain.VatCustomerInfo
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
@@ -26,6 +26,7 @@ import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testutils.{RegistrationData, WireMockHelper}
+import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -35,6 +36,8 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
   private val registration = RegistrationData.registration
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+
+  private def getValidateRegistrationUrl(vrn: Vrn) = s"/one-stop-shop-registration/registration/validate/${vrn.value}"
 
   private def application: Application =
     applicationBuilder()
@@ -193,4 +196,64 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       }
     }
   }
+
+  ".validateRegistration" - {
+
+    //TODO Test for feature flag - only call this method when enabled
+    "must "
+
+    "must return a Right(ValidateRegistration) when the server returns OK for a recognised payload" in {
+
+      val vrn = Vrn("111111111")
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val validateRegistration = RegistrationValidationResult(
+          validRegistration = true
+        )
+
+        val responseBody = Json.toJson(validateRegistration).toString()
+
+        server.stubFor(get(urlEqualTo(getValidateRegistrationUrl(vrn))).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.validateRegistration(vrn).futureValue
+
+        result mustBe Right(validateRegistration)
+      }
+
+    }
+
+    "must return Left(NotFound) when the server returns NOT_FOUND" in {
+
+      val vrn = Vrn("111111111")
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(getValidateRegistrationUrl(vrn))).willReturn(notFound()))
+
+        val result = connector.validateRegistration(vrn).futureValue
+
+        result mustBe Left(NotFound)
+      }
+    }
+
+    "must return Left(UnexpectedStatus) when the backend returns another error code" in {
+
+      val vrn = Vrn("111111111")
+      val status = Gen.oneOf(400, 500, 501, 502, 503).sample.value
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(getValidateRegistrationUrl(vrn))).willReturn(aResponse().withStatus(status)))
+
+        val result = connector.validateRegistration(vrn).futureValue
+
+        result mustBe Left(UnexpectedResponseStatus(status, s"Unexpected response, status $status returned"))
+      }
+    }
+  }
+
 }

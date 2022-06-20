@@ -31,11 +31,31 @@ import scala.concurrent.Future
 class ExternalServiceSpec extends SpecBase {
 
   "getExternalResponse" - {
-    "must return ExternalResponse and save url in session" in {
+    "must return ExternalResponse and save url in session when language is not Welsh" in {
       val externalRequest = ExternalRequest("BTA", "/business-account")
       val sessionRepository = mock[SessionRepository]
       when(sessionRepository.get(any())) thenReturn Future.successful(Seq.empty)
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
+      val service = new ExternalService(sessionRepository)
+      service.getExternalResponse(externalRequest, "id").futureValue mustBe ExternalResponse(controllers.routes.IndexController.onPageLoad().url)
+      verify(sessionRepository, times(1)).set(any())
+    }
+
+    "must return ExternalResponse and save url in session when language is Welsh" in {
+      val externalRequest = ExternalRequest("BTA", "/business-account")
+      val sessionRepository = mock[SessionRepository]
+      when(sessionRepository.get(any())) thenReturn Future.successful(Seq.empty)
+      when(sessionRepository.set(any())) thenReturn Future.successful(true)
+      val service = new ExternalService(sessionRepository)
+      service.getExternalResponse(externalRequest, "id", Some("cy")).futureValue mustBe ExternalResponse(controllers.external.routes.NoMoreWelshController.onPageLoad().url)
+      verify(sessionRepository, times(1)).set(any())
+    }
+
+    "must return ExternalResponse when session repository throws exception" in {
+      val externalRequest = ExternalRequest("BTA", "/business-account")
+      val sessionRepository = mock[SessionRepository]
+      when(sessionRepository.get(any())) thenReturn Future.successful(Seq.empty)
+      when(sessionRepository.set(any())) thenReturn Future.failed(new Exception("error"))
       val service = new ExternalService(sessionRepository)
       service.getExternalResponse(externalRequest, "id").futureValue mustBe ExternalResponse(controllers.routes.IndexController.onPageLoad().url)
       verify(sessionRepository, times(1)).set(any())
