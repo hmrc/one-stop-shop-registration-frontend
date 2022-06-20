@@ -376,8 +376,8 @@ useOtherAccount.p2.1 = You need to
 useOtherAccount.p2.link.text = sign in with a different Government Gateway user ID
 useOtherAccount.p2.2 = if you want to register for a business with a different VAT registration number.
 
-fixedEstablishmentAddress.title = What is the fixed establishment address in {0}
-fixedEstablishmentAddress.heading = What is the fixed establishment address in {0}
+fixedEstablishmentAddress.title = What is the fixed establishment address in {0}?
+fixedEstablishmentAddress.heading = What is the fixed establishment address in {0}?
 fixedEstablishmentAddress.line1 = Address line 1
 fixedEstablishmentAddress.line2 = Address line 2 (optional)
 fixedEstablishmentAddress.townOrCity = Town or city
