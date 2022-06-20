@@ -50,7 +50,7 @@ object EuDetailsSummary {
   }
 
   def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllEuDetailsQuery).map {
+    answers.get(AllEuOptionalDetailsQuery).map {
       euVatDetails =>
 
         val value = euVatDetails.map {
