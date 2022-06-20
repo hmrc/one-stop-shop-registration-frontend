@@ -42,9 +42,9 @@ class TestOnlyController @Inject()(testConnector: TestOnlyConnector,
 
   private val externalRequest = ExternalRequest("BTA", "/business-account")
 
-  def enterFromExternal(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async  {
+  def enterFromExternal(lang: Option[String] = None): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async  {
     implicit request =>
-      externalService.getExternalResponse(externalRequest, request.userId).map{
+      externalService.getExternalResponse(externalRequest, request.userId, lang).map{
         response => Redirect(response.redirectUrl)
       }
 

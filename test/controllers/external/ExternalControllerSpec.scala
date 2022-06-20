@@ -42,9 +42,10 @@ class ExternalControllerSpec extends SpecBase {
     "when correct ExternalRequest is posted" - {
         "must respond with OK(IndexController.onPageLoad().url)" in {
           val mockExternalService = mock[ExternalService]
+          val url = controllers.routes.IndexController.onPageLoad().url
 
-          when(mockExternalService.getExternalResponse(any(), any())) thenReturn
-            Future.successful(ExternalResponse(controllers.routes.IndexController.onPageLoad().url))
+          when(mockExternalService.getExternalResponse(any(), any(), any())) thenReturn
+            Future.successful(ExternalResponse(url))
 
           val application = applicationBuilder()
             .overrides(inject.bind[ExternalService].toInstance(mockExternalService))
@@ -57,7 +58,7 @@ class ExternalControllerSpec extends SpecBase {
 
             val result = route(application, request).value
             status(result) mustBe OK
-            contentAsJson(result).as[ExternalResponse] mustBe ExternalResponse(controllers.routes.IndexController.onPageLoad().url)
+            contentAsJson(result).as[ExternalResponse] mustBe ExternalResponse(url)
           }
         }
 

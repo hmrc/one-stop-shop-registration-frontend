@@ -28,11 +28,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ExternalService @Inject()(sessionRepository: SessionRepository)(implicit executionContext: ExecutionContext) extends Logging {
 
-  def getExternalResponse(externalRequest: ExternalRequest, userId: String): Future[ExternalResponse] = {
+  def getExternalResponse(externalRequest: ExternalRequest, userId: String, language: Option[String] = None): Future[ExternalResponse] = {
       for {
         _ <- saveReturnUrl(userId, externalRequest)
       } yield {
+        if(language.contains("cy")) {
+          ExternalResponse(controllers.external.routes.NoMoreWelshController.onPageLoad().url)
+        } else {
           ExternalResponse(controllers.routes.IndexController.onPageLoad().url)
+        }
+
       }
   }
 
