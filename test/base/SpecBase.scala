@@ -37,7 +37,7 @@ import play.api.test.FakeRequest
 import services.DateService
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
-import viewmodels.checkAnswers.euDetails.TaxRegisteredInEuSummary
+import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
 import viewmodels.checkAnswers.{BankDetailsSummary, BusinessAddressInUkSummary, BusinessContactDetailsSummary, CommencementDateSummary, HasMadeSalesSummary, HasTradingNameSummary, HasWebsiteSummary, InternationalAddressSummary, IsOnlineMarketplaceSummary, IsPlanningFirstEligibleSaleSummary, PartOfVatGroupSummary, RegisteredCompanyNameSummary, UkAddressSummary, UkVatEffectiveDateSummary}
 
@@ -127,6 +127,7 @@ trait SpecBase
       IsPlanningFirstEligibleSaleSummary.row(answers),
       new CommencementDateSummary(dateService).row(answers),
       TaxRegisteredInEuSummary.row(answers),
+      EuDetailsSummary.checkAnswersRow(answers),
       PreviouslyRegisteredSummary.row(answers),
       IsOnlineMarketplaceSummary.row(answers),
       HasWebsiteSummary.row(answers),
