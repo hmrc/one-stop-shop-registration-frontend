@@ -6,7 +6,7 @@ object AppDependencies {
   val compile = Seq(
     play.sbt.PlayImport.ws,
     "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "3.4.0-play-28",
-    "uk.gov.hmrc"       %% "play-conditional-form-mapping"  % "1.10.0-play-28",
+    "uk.gov.hmrc"       %% "play-conditional-form-mapping"  % "1.11.0-play-28",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"     % "5.24.0",
     "uk.gov.hmrc"       %% "play-language"                  % "5.3.0-play-28",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % "0.66.0",
