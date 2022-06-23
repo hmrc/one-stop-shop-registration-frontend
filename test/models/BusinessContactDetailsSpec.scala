@@ -18,7 +18,7 @@ package models
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.Json
 
 class BusinessContactDetailsSpec extends AnyFreeSpec with Matchers {
 

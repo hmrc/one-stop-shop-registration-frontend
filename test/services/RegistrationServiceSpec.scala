@@ -21,7 +21,7 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import models._
 import models.domain.VatDetailSource.UserEntered
-import models.domain.{FixedEstablishmentInNi, NoPresence, PreviousRegistration, VatCustomerInfo, VatDetailSource, VatDetails}
+import models.domain._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._

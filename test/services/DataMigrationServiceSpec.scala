@@ -24,7 +24,6 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.must.Matchers.include
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import repositories.{AuthenticatedUserAnswersRepository, SessionRepository, UnauthenticatedUserAnswersRepository}
@@ -89,7 +88,6 @@ class DataMigrationServiceSpec extends AnyFreeSpec with MockitoSugar with ScalaF
       "throw DataOperationFailedError" in {
         val sessionId                 = "session-id"
         val userId                    = "userId"
-        val captor                    = ArgumentCaptor.forClass(classOf[UserAnswers])
         val json                      = Json.obj("foo" -> "bar")
         val unauthenticatedData       = UserAnswers(sessionId, json, None)
 

@@ -17,7 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import controllers.actions.{AuthenticatedDataRetrievalAction, AuthenticatedIdentifierAction, CheckNiProtocolFilter, CheckRegistrationFilter, FakeAuthenticatedDataRetrievalAction, FakeAuthenticatedIdentifierAction, FakeCheckNiProtocolFilter, FakeCheckRegistrationFilter, FakeUnauthenticatedDataRetrievalAction, UnauthenticatedDataRetrievalAction}
+import controllers.actions.{CheckNiProtocolFilter, FakeCheckNiProtocolFilter}
 import models.iv.IdentityVerificationResult.Success
 import models.iv.{IdentityVerificationUnexpectedResponse, NtcService, P60Service, PayslipService}
 import org.scalacheck.Gen
@@ -32,8 +32,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, running}
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
-
-import java.time.Clock
 
 class IdentityVerificationConnectorSpec
   extends AnyFreeSpec

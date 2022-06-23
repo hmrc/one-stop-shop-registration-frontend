@@ -33,9 +33,7 @@ trait CompletionChecks {
 
 
   protected def withCompleteDataModel[A](index: Index, data: Index => Option[A], onFailure: Option[A] => Result)
-                                        (onSuccess: => Result)
-                                        (implicit request: AuthenticatedDataRequest[AnyContent]): Result = {
-
+                                        (onSuccess: => Result): Result = {
     val incomplete = data(index)
     if (incomplete.isEmpty) {
       onSuccess
@@ -45,8 +43,7 @@ trait CompletionChecks {
   }
 
   protected def withCompleteDataAsync[A](data: () => Seq[A], onFailure: Seq[A] => Future[Result])
-                                        (onSuccess: => Future[Result])
-                                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+                                        (onSuccess: => Future[Result]): Future[Result] = {
 
     val incomplete = data()
     if (incomplete.isEmpty) {

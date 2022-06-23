@@ -199,9 +199,6 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
   ".validateRegistration" - {
 
-    //TODO Test for feature flag - only call this method when enabled
-    "must "
-
     "must return a Right(ValidateRegistration) when the server returns OK for a recognised payload" in {
 
       val vrn = Vrn("111111111")

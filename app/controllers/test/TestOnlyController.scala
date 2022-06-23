@@ -17,9 +17,8 @@
 package controllers.test
 
 import connectors.test.TestOnlyConnector
-import controllers.actions.{AuthenticatedControllerComponents, UnauthenticatedControllerComponents}
+import controllers.actions.UnauthenticatedControllerComponents
 import models.external.ExternalRequest
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import services.external.ExternalService
 import uk.gov.hmrc.http.NotFoundException

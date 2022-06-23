@@ -46,9 +46,7 @@ class EmailServiceSpec extends SpecBase {
       val maxLengthBusiness = 160
       val maxLengthContactName = 105
       val commencementDate = LocalDate.of(2010, 1, 1)
-      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
       val lastDayOfCalendarQuarterForPeriod = dateService.getVatReturnEndDate(commencementDate)
-      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
       val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
       val startDate = commencementDate
 
@@ -60,9 +58,7 @@ class EmailServiceSpec extends SpecBase {
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String) =>
           val expectedDate = commencementDate.format(formatter)
-          val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfCalendarQuarterForPeriod = lastDayOfCalendarQuarterForPeriod.format(formatter)
-          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarterForPeriod = lastDayOfMonthAfterCalendarQuarterForPeriod.format(formatter)
 
           val expectedEmailToSendRequest = EmailToSendRequest(
@@ -149,9 +145,7 @@ class EmailServiceSpec extends SpecBase {
       val maxLengthBusiness = 160
       val maxLengthContactName = 105
       val commencementDate = LocalDate.of(2010, 1, 1)
-      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
       val lastDayOfCalendarQuarterForPeriod = dateService.getVatReturnEndDate(commencementDate)
-      val lastDayOfMonthAfterCalendarQuarter = dateService.lastDayOfMonthAfterCalendarQuarter
       val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
 
       forAll(
@@ -162,8 +156,6 @@ class EmailServiceSpec extends SpecBase {
       ) {
         (vatNum: String, email: String, businessName: String, contactName: String) =>
           val expectedDate = commencementDate.format(formatter)
-          val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
-          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfMonthAfterCalendarQuarter.format(formatter)
           val formattedLastDayOfCalendarQuarterForPeriod = lastDayOfCalendarQuarterForPeriod.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarterForPeriod = lastDayOfMonthAfterCalendarQuarterForPeriod.format(formatter)
 

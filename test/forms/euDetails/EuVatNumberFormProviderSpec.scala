@@ -16,7 +16,6 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.euVatNumberPattern
 import forms.behaviours.StringFieldBehaviours
 import models.Country
 import org.scalacheck.Arbitrary.arbitrary

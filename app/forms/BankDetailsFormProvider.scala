@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.Validation.Validation.{bankAccountNamePattern, commonTextPattern}
+import forms.Validation.Validation.bankAccountNamePattern
 import forms.mappings.Mappings
 import models.BankDetails
 import play.api.data.Form

@@ -23,7 +23,7 @@ import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, HasFixedEstablishmentPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest

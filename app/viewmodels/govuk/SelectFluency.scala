@@ -17,7 +17,6 @@
 package viewmodels.govuk
 
 import play.api.data.Field
-import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
@@ -33,7 +32,7 @@ trait SelectFluency {
                field: Field,
                items: Seq[SelectItem],
                label: Label
-             )(implicit messages: Messages): Select =
+             ): Select =
       Select(
         id    = field.id,
         name  = field.name,
