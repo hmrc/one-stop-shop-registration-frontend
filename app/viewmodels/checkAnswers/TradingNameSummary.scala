@@ -29,7 +29,7 @@ import viewmodels.implicits._
 
 object TradingNameSummary  {
 
-  def addToListRows(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
     answers.get(AllTradingNames).getOrElse(List.empty).zipWithIndex.map {
       case (name, index) =>
         ListItem(

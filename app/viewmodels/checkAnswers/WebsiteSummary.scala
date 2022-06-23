@@ -29,7 +29,7 @@ import viewmodels.implicits._
 
 object WebsiteSummary {
 
-  def addToListRows(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
     answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {
       case (website, index) =>
         ListItem(

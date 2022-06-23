@@ -100,8 +100,6 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
-        implicit val msgs: Messages = messages(application)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

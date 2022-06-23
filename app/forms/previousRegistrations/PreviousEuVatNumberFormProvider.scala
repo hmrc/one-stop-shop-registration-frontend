@@ -16,7 +16,6 @@
 
 package forms.previousRegistrations
 
-import forms.Validation.Validation.euVatNumberPattern
 import forms.mappings.{EuVatNumberConstraints, Mappings}
 import models.Country
 import play.api.data.Form

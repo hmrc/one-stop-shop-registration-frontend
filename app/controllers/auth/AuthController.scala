@@ -82,7 +82,6 @@ class AuthController @Inject()(
   }
 
   def redirectToRegister(continueUrl: String): Action[AnyContent] = Action {
-    implicit request =>
       Redirect(
         config.registerUrl,
         Map(
@@ -93,7 +92,6 @@ class AuthController @Inject()(
   }
 
   def redirectToLogin(continueUrl: String): Action[AnyContent] = Action {
-    implicit request =>
         Redirect(config.loginUrl,
           Map(
             "origin"   -> Seq(config.origin),

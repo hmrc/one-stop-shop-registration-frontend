@@ -31,13 +31,13 @@ import viewmodels.govuk.summarylist._
 import views.html.euDetails.CheckEuDetailsAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class CheckEuDetailsAnswersController @Inject()(
                                                  override val messagesApi: MessagesApi,
                                                  cc: AuthenticatedControllerComponents,
                                                  view: CheckEuDetailsAnswersView
-                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                               ) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 

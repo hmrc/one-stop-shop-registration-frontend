@@ -17,14 +17,12 @@
 package models.domain
 
 import generators.Generators
-import models.{SalesChannels, UkAddress}
-import org.scalacheck.Arbitrary.arbitrary
+import models.UkAddress
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json._
-import testutils.RegistrationData
 
 class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators with OptionValues {
 

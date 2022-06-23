@@ -80,7 +80,6 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
-        implicit val msgs: Messages = messages(application)
         val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
@@ -96,7 +95,6 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
-        implicit val msgs: Messages = messages(application)
         val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
         val result = route(application, request).value
 
