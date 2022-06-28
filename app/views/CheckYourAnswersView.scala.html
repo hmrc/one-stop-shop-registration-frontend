@@ -13,12 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *@
+@import components.ButtonGroup
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        button: ButtonGroup
 )
 
 @(list: SummaryList, isValid: Boolean)(implicit request: Request[_], messages: Messages)
@@ -44,9 +47,7 @@
 
         @if(isValid) {
             @formHelper(action = routes.CheckYourAnswersController.onSubmit(false)) {
-                @govukButton(
-                    ButtonViewModel(messages("site.submit"))
-                )
+                @button("site.submit", routes.CheckYourAnswersController.onPageLoad().url)
             }
         } else {
             <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
