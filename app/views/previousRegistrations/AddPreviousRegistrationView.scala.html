@@ -17,13 +17,14 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ListItem, Long}
 @import viewmodels.LegendSize
 @import models.previousRegistrations._
+@import components.ButtonGroup
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukRadios: GovukRadios,
-        govukButton: GovukButton,
+        button: ButtonGroup,
         addToList: components.addToList
 )
 
@@ -66,19 +67,17 @@
                         <input type="hidden" name="value" id="value" value="false"/>
                     }
 
-                    @govukButton(
-                        ButtonViewModel(messages("site.continue"))
-                    )
+                    @button("site.continue",  controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(mode).url)
 
-                }
+}
             } else {
                 <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
                 <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.map(_.previousEuCountry.name).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.previousEuCountry.name} else {incompleteCountries.head.previousEuCountry.name})</p>
 
                 @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode, true)) {
-                    @govukButton(
-                        ButtonViewModel(messages("error.resolve_missing_answers"))
-                    )
+
+                    @button("error.resolve_missing_answers",  controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(mode).url)
+
                 }
             }
     }

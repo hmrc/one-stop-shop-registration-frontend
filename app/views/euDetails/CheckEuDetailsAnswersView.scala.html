@@ -14,12 +14,14 @@
 * limitations under the License.
 *@
 
+@import components.ButtonGroup
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton
+        button: ButtonGroup
 )
 
 @(list: SummaryList, mode: Mode, index: Index, country: Country, incompleteDetails: Boolean = false)(implicit request: Request[_], messages: Messages)
@@ -42,18 +44,17 @@
             @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, false)) {
                 @govukSummaryList(list)
 
-                @govukButton(
-                    ButtonViewModel(messages("site.continue"))
-                )
-            }
+            @button("site.continue",  controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, index).url)
+
+}
         } else {
             <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
             <p class="govuk-body">@messages("error.missing_answers_prompt", country.name)</p>
 
             @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, true)) {
-                @govukButton(
-                    ButtonViewModel(messages("error.resolve_missing_answers"))
-                )
+
+                @button("error.resolve_missing_answers",  controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, index).url)
+
             }
 
         }

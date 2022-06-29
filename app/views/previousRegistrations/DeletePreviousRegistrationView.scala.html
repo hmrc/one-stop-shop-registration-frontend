@@ -15,13 +15,14 @@
 *@
 
 @import models.previousRegistrations.PreviousRegistrationDetails
+@import components.ButtonGroup
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukRadios: GovukRadios,
-        govukButton: GovukButton
+        button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, index: Index, country: String)(implicit request: Request[_], messages: Messages)
@@ -41,8 +42,6 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue",  controllers.previousRegistrations.routes.DeletePreviousRegistrationController.onPageLoad(mode, index).url)
     }
 }

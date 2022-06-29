@@ -20,7 +20,6 @@
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
         button: ButtonGroup
 )
 
@@ -54,9 +53,7 @@
             <p class="govuk-body">@messages("error.missing_answers_prompt.general")</p>
 
             @formHelper(action = routes.CheckYourAnswersController.onSubmit(true)) {
-                @govukButton(
-                    ButtonViewModel(messages("error.resolve_missing_answers"))
-                )
+                @button("error.resolve_missing_answers", routes.CheckYourAnswersController.onPageLoad().url)
             }
         }
     }

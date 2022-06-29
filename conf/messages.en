@@ -663,3 +663,12 @@ noMoreWelsh.heading = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o 
 noMoreWelsh.submit = Yn eich blaen
 niProtocolRejection.title = niProtocolRejection
 niProtocolRejection.heading = niProtocolRejection
+
+saveProgress.button = Save and come back later
+savedProgress.title = We have saved your progress
+savedProgress.subtitle = We''ll keep your information until <br>{0}
+savedProgress.nextSteps = What happens next
+savedProgress.listStart = You can:
+savedProgress.continue.registration = continue to complete your registration
+savedProgress.sign.out = sign out and come back later
+savedProgress.sign.in = If you sign out, you must sign back into your <a href="{0}">Government Gateway</a> to continue.
