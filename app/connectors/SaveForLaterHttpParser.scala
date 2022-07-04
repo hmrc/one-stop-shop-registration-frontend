@@ -17,6 +17,7 @@
 package connectors
 
 import logging.Logging
+import models.domain.VatCustomerInfo
 import models.responses.{ConflictFound, ErrorResponse, InvalidJson, NotFound, UnexpectedResponseStatus}
 import play.api.http.Status.{CONFLICT, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.{JsError, JsObject, JsSuccess, Json, OFormat}
@@ -81,6 +82,7 @@ object SaveForLaterHttpParser extends Logging {
 case class SavedUserAnswers(
                              vrn: Vrn,
                              data: JsObject,
+                             vatInfo: Option[VatCustomerInfo],
                              lastUpdated: Instant
                            )
 

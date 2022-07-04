@@ -17,13 +17,14 @@
 package controllers.auth
 
 import config.FrontendAppConfig
-import connectors.RegistrationConnector
+import connectors.{RegistrationConnector, SaveForLaterConnector}
 import controllers.actions.AuthenticatedControllerComponents
 import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
-import pages.FirstAuthedPage
+import pages.{FirstAuthedPage, SavedProgressPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.VatApiCallResultQuery
+import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.auth._
 
@@ -45,11 +46,13 @@ class AuthController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onSignIn: Action[AnyContent] = cc.authAndGetOptionalData.async {
+  def onSignIn: Action[AnyContent] = cc.authAndGetOptionalSavedData.async {
     implicit request =>
-
       val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
 
+      answers.get(SavedProgressPage).map {
+        savedUrl => Future.successful(Redirect(savedUrl))
+      }.getOrElse(
       answers.get(VatApiCallResultQuery) match {
         case Some(_) =>
           Redirect(FirstAuthedPage.navigate(NormalMode, answers)).toFuture
@@ -79,6 +82,7 @@ class AuthController @Inject()(
               }
           }
       }
+      )
   }
 
   def redirectToRegister(continueUrl: String): Action[AnyContent] = Action {
