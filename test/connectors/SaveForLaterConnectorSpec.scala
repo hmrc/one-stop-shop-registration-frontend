@@ -47,10 +47,10 @@ class SaveForLaterConnectorSpec extends SpecBase with WireMockHelper with Either
     "must return Right(Some(SavedUserAnswers)) when the server responds with CREATED" in {
 
       running(application) {
-        val saveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"))
+        val saveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"), None)
         val expectedSavedUserAnswers =
           SavedUserAnswers(
-            vrn, JsObject(Seq("test" -> Json.toJson("test"))),
+            vrn, JsObject(Seq("test" -> Json.toJson("test"))), None,
             Instant.now(stubClockAtArbitraryDate)
           )
         val responseJson = Json.toJson(expectedSavedUserAnswers)
@@ -70,7 +70,7 @@ class SaveForLaterConnectorSpec extends SpecBase with WireMockHelper with Either
     "must return Left(ConflictFound) when the server response with CONFLICT" in {
 
       running(application) {
-        val saveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"))
+        val saveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"), None)
 
         val connector = application.injector.instanceOf[SaveForLaterConnector]
 
@@ -85,7 +85,7 @@ class SaveForLaterConnectorSpec extends SpecBase with WireMockHelper with Either
     "must return Left(UnexpectedResponseStatus) when the server response with an error code" in {
 
       running(application) {
-        val saveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"))
+        val saveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"), None)
 
         val connector = application.injector.instanceOf[SaveForLaterConnector]
 

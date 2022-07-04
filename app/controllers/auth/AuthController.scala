@@ -17,21 +17,20 @@
 package controllers.auth
 
 import config.FrontendAppConfig
-import connectors.{RegistrationConnector, SaveForLaterConnector}
+import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
 import pages.{FirstAuthedPage, SavedProgressPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.VatApiCallResultQuery
-import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax._
 import views.html.auth._
 
 import java.time.{Clock, Instant}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import utils.FutureSyntax._
 
 class AuthController @Inject()(
                                 cc: AuthenticatedControllerComponents,

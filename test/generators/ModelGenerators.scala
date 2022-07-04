@@ -197,6 +197,6 @@ trait ModelGenerators {
         vrn         <- arbitrary[Vrn]
         data        = JsObject(Seq("test" -> Json.toJson("test")))
         now         = Instant.now
-      } yield SavedUserAnswers(vrn, data, now)
+      } yield SavedUserAnswers(vrn, data, None, now)
     }
 }
