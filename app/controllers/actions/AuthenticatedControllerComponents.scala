@@ -56,14 +56,6 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkNiProtocol andThen
       getData
 
-  def authAndGetOptionalSavedData: ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
-    actionBuilder andThen
-      identify andThen
-      checkVrnAllowList andThen
-      checkRegistration andThen
-      checkNiProtocol andThen
-      getData andThen
-      retrieveSavedAnswers()
 }
 
 case class DefaultAuthenticatedControllerComponents @Inject()(

@@ -19,6 +19,7 @@ package controllers.actions
 import connectors.SaveForLaterConnector
 import models.UserAnswers
 import models.requests.AuthenticatedOptionalDataRequest
+import pages.SavedProgressPage
 import play.api.mvc.ActionTransformer
 import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,20 +34,26 @@ class SavedAnswersRetrievalAction (repository: AuthenticatedUserAnswersRepositor
 
   override protected def transform[A](request: AuthenticatedOptionalDataRequest[A]): Future[AuthenticatedOptionalDataRequest[A]] = {
     val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.request.session)
-    val userAnswers = for {
+    val userAnswers =
+      if(request.userAnswers.flatMap(_.get(SavedProgressPage)).isEmpty) {
+      for {
       savedForLater <- saveForLaterConnector.get()(hc)
     } yield {
-      val answers =
-        savedForLater match {
-          case Right(Some(answers)) => {
-            val newAnswers = UserAnswers(request.userId, answers.data, None, answers.lastUpdated)
-            repository.set(newAnswers)
-            Some(newAnswers)
+        val answers = {
+          savedForLater match {
+            case Right(Some(answers)) => {
+              val newAnswers = UserAnswers(request.userId, answers.data, None, answers.lastUpdated)
+              repository.set(newAnswers)
+              Some(newAnswers)
+            }
+            case _ => request.userAnswers
           }
-          case _ => request.userAnswers
         }
-      answers
-    }
+        answers
+      }
+    } else {
+        Future.successful(request.userAnswers)
+      }
 
     userAnswers.map {
       AuthenticatedOptionalDataRequest(request.request, request.credentials, request.vrn, _)

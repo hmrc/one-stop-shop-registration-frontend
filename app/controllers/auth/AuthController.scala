@@ -45,7 +45,7 @@ class AuthController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onSignIn: Action[AnyContent] = cc.authAndGetOptionalSavedData.async {
+  def onSignIn: Action[AnyContent] = (cc.authAndGetOptionalData andThen cc.retrieveSavedAnswers()).async {
     implicit request =>
       val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
 
