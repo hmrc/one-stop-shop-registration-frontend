@@ -42,7 +42,7 @@ class SavedAnswersRetrievalAction (repository: AuthenticatedUserAnswersRepositor
         val answers = {
           savedForLater match {
             case Right(Some(answers)) => {
-              val newAnswers = UserAnswers(request.userId, answers.data, None, answers.lastUpdated)
+              val newAnswers = UserAnswers(request.userId, answers.data, answers.vatInfo, answers.lastUpdated)
               repository.set(newAnswers)
               Some(newAnswers)
             }
