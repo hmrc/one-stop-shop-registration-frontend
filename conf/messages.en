@@ -657,9 +657,12 @@ error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
 
-
 noMoreWelsh.title = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.heading = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.submit = Yn eich blaen
 niProtocolRejection.title = niProtocolRejection
 niProtocolRejection.heading = niProtocolRejection
+
+applicationComplete.enrolment.heading = We've received your registration request
+applicationComplete.enrolment.title = We've received your registration request
+applicationComplete.enrolment.confirmation = We'll send a confirmation to {0} when your registration is complete.
