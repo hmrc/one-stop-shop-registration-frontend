@@ -104,6 +104,7 @@ trait SpecBase
       .overrides(
         bind[AuthenticatedIdentifierAction].to[FakeAuthenticatedIdentifierAction],
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
+        bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
