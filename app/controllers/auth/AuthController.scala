@@ -50,7 +50,7 @@ class AuthController @Inject()(
       val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
 
       answers.get(SavedProgressPage).map {
-        savedUrl => Future.successful(Redirect(savedUrl))
+        savedUrl => Future.successful(Redirect(controllers.routes.ContinueRegistrationController.onPageLoad()))
       }.getOrElse(
       answers.get(VatApiCallResultQuery) match {
         case Some(_) =>

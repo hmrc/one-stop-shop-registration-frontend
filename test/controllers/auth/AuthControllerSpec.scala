@@ -63,7 +63,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
     "when we already have some user answers" - {
 
-      "must redirect to the saved url if it was retrieved from saved answers" in {
+      "must redirect to the ContinueRegistration page if saved url was retrieved from saved answers" in {
 
         val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
           .set(SavedProgressPage, "/url").success.value
@@ -76,7 +76,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual "/url"
+          redirectLocation(result).value mustEqual controllers.routes.ContinueRegistrationController.onPageLoad().url
           verify(mockConnector, never()).getVatCustomerInfo()(any())
           verify(mockRepository, never()).set(any())
         }
