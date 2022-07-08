@@ -301,5 +301,5 @@ GET        /niProtocolRejection                                       controller
 
 GET        /progress-saved                                            controllers.SavedProgressController.onPageLoad(continueUrl: String)
 
-GET        /continueRegistration                                      controllers.ContinueRegistrationController.onPageLoad()
-POST       /continueRegistration                                      controllers.ContinueRegistrationController.onSubmit()
+GET        /continue-registration                                      controllers.ContinueRegistrationController.onPageLoad()
+POST       /continue-registration                                      controllers.ContinueRegistrationController.onSubmit()
