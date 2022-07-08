@@ -36,7 +36,7 @@ object ContinueRegistration extends Enumerable.Implicits {
       RadioItem(
         content = Text(messages(s"continueRegistration.${value.toString}")),
         value   = Some(value.toString),
-        id      = Some(s"value_$index")
+        id      = Some(s"${value}Progress")
       )
   }
 
