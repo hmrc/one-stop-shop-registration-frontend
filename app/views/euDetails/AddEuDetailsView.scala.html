@@ -16,13 +16,14 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ListItem, Long}
 @import viewmodels.LegendSize
+@import components.ButtonGroup
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton,
+    button: ButtonGroup,
     addToList: components.addToList
 )
 
@@ -64,18 +65,15 @@
                         <input type="hidden" name="value" id="value" value="false"/>
                     }
 
-                    @govukButton(
-                        ButtonViewModel(messages("site.continue"))
-                    )
+                    @button("site.continue",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
                 }
             } else {
                 <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
                 <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.map(_.euCountry.name).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.euCountry.name} else {incompleteCountries.head.euCountry.name})</p>
 
                 @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, true)) {
-                    @govukButton(
-                        ButtonViewModel(messages("error.resolve_missing_answers"))
-                    )
+
+                    @button("error.resolve_missing_answers",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
                 }
             }
     }

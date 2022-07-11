@@ -1,9 +1,11 @@
+@import components.ButtonGroup
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukDateInput: GovukDateInput,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, dateFormatted: String, dateHintFormatted: String)(implicit request: Request[_], messages: Messages)
@@ -24,8 +26,6 @@
             .withHint(HintViewModel(messages("dateOfFirstSale.hint", dateHintFormatted)))
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue", routes.DateOfFirstSaleController.onPageLoad(mode).url)
     }
 }

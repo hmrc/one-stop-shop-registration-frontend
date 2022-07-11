@@ -16,13 +16,17 @@
 
 package generators
 
+import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
+
+import java.time.Instant
 
 trait ModelGenerators {
 
@@ -186,4 +190,13 @@ trait ModelGenerators {
     Gen.const(' '),
     Gen.const('\'')
   )
+
+  implicit val arbitrarySavedUserAnswers: Arbitrary[SavedUserAnswers] =
+    Arbitrary {
+      for {
+        vrn         <- arbitrary[Vrn]
+        data        = JsObject(Seq("test" -> Json.toJson("test")))
+        now         = Instant.now
+      } yield SavedUserAnswers(vrn, data, None, now)
+    }
 }

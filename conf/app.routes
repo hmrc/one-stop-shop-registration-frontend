@@ -298,3 +298,8 @@ POST       /check-planned-first-sale                                  controller
 POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
 GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()
 GET        /niProtocolRejection                                       controllers.NiProtocolRejectionController.onPageLoad()
+
+GET        /progress-saved                                            controllers.SavedProgressController.onPageLoad(continueUrl: String)
+
+GET        /continue-registration                                      controllers.ContinueRegistrationController.onPageLoad()
+POST       /continue-registration                                      controllers.ContinueRegistrationController.onSubmit()

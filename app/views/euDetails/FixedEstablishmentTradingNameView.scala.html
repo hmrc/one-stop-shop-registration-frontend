@@ -1,11 +1,12 @@
 @import viewmodels.InputWidth._
+@import components.ButtonGroup
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
@@ -26,8 +27,6 @@
             .withWidth(Full)
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue",  controllers.euDetails.routes.FixedEstablishmentTradingNameController.onPageLoad(mode, index).url)
     }
 }

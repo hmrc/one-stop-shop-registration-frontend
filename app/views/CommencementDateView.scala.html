@@ -1,7 +1,9 @@
+@import components.ButtonGroup
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
-        govukButton: GovukButton
+        button: ButtonGroup
 )
 
 @(mode: Mode, formattedDate: String, isDateInCurrentQuarter: Boolean, startOfCurrentQuarter: Option[String],
@@ -25,8 +27,6 @@ endOfCurrentQuarter: Option[String], startOfNextQuarter: Option[String])(implici
 
     @formHelper(action = routes.CommencementDateController.onSubmit(mode), 'autoComplete -> "off") {
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue", routes.CommencementDateController.onPageLoad(mode).url)
     }
 }

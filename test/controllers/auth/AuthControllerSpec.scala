@@ -18,14 +18,14 @@ package controllers.auth
 
 import base.SpecBase
 import config.FrontendAppConfig
-import connectors.RegistrationConnector
+import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.FirstAuthedPage
+import pages.{FirstAuthedPage, SavedProgressPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -34,6 +34,7 @@ import repositories.AuthenticatedUserAnswersRepository
 import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView, UnsupportedAuthProviderView, UnsupportedCredentialRoleView}
 
 import java.net.URLEncoder
+import java.time.Instant
 import scala.concurrent.Future
 
 class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
@@ -43,16 +44,18 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
   private val mockConnector  = mock[RegistrationConnector]
   private val mockRepository = mock[AuthenticatedUserAnswersRepository]
+  private val mockSavedAnswersConnector = mock[SaveForLaterConnector]
 
   private def appBuilder(answers: Option[UserAnswers]) =
     applicationBuilder(answers)
       .overrides(
         bind[RegistrationConnector].toInstance(mockConnector),
-        bind[AuthenticatedUserAnswersRepository].toInstance(mockRepository)
+        bind[AuthenticatedUserAnswersRepository].toInstance(mockRepository),
+        bind[SaveForLaterConnector].toInstance(mockSavedAnswersConnector)
       )
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector, mockRepository)
+    Mockito.reset(mockConnector, mockRepository, mockSavedAnswersConnector)
   }
 
 
@@ -60,13 +63,32 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
     "when we already have some user answers" - {
 
+      "must redirect to the ContinueRegistration page if saved url was retrieved from saved answers" in {
+
+        val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+          .set(SavedProgressPage, "/url").success.value
+        val application = appBuilder(Some(answers)).build()
+        when(mockSavedAnswersConnector.get()(any())) thenReturn
+          Future.successful(Right(Some(SavedUserAnswers(vrn,answers.data, None, Instant.now))))
+
+        running(application) {
+          val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ContinueRegistrationController.onPageLoad().url
+          verify(mockConnector, never()).getVatCustomerInfo()(any())
+          verify(mockRepository, never()).set(any())
+        }
+      }
+
       "and we have made a call to get VAT info" - {
 
         "must redirect to the next page without makings calls to get data or updating the user answers" in {
 
           val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
           val application = appBuilder(Some(answers)).build()
-
+          when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
           running(application) {
             val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
             val result = route(application, request).value
@@ -89,6 +111,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
             when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
             when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
             running(application) {
 
@@ -112,6 +135,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
             when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(responses.NotFound))
             when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
             running(application) {
 
@@ -142,6 +166,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
               when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
               when(mockRepository.set(any())) thenReturn Future.successful(true)
+              when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
               running(application) {
 
@@ -168,6 +193,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
               when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
               when(mockRepository.set(any())) thenReturn Future.successful(true)
+              when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
               running(application) {
 
@@ -193,6 +219,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
           when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
           when(mockRepository.set(any())) thenReturn Future.successful(true)
+          when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
           running(application) {
 
@@ -216,6 +243,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
           when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(responses.NotFound))
           when(mockRepository.set(any())) thenReturn Future.successful(true)
+          when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
           running(application) {
 
@@ -246,6 +274,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
             when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
             when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
             running(application) {
 
@@ -272,6 +301,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
             when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
             when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
             running(application) {
 
