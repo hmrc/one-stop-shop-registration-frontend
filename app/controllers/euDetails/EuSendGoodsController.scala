@@ -21,7 +21,7 @@ import forms.euDetails.EuSendGoodsFormProvider
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
 import pages.euDetails
-import pages.euDetails.{EuCountryPage, EuSendGoodsPage}
+import pages.euDetails.EuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController

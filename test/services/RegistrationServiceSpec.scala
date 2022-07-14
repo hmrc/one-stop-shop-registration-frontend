@@ -28,7 +28,6 @@ import pages.euDetails._
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 import queries.{AllEuDetailsRawQuery, AllPreviousRegistrationsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
-import testutils.RegistrationData.createUkAddress
 
 import java.time.{Clock, LocalDate, ZoneId}
 

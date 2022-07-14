@@ -19,7 +19,7 @@ package controllers.euDetails
 import controllers.actions._
 import forms.euDetails.EuSendGoodsAddressFormProvider
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
+import models.{Index, Mode}
 import pages.QuestionPage
 import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}

@@ -18,7 +18,6 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
-import models.domain.EuTaxIdentifier
 import models.euDetails.EuOptionalDetails
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}

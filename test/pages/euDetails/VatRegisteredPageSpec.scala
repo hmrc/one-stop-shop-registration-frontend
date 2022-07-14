@@ -181,6 +181,7 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
         "and Has Fixed Establishment has been answered" - {
 
           "to wherever Has Fixed Establishment navigates to" in {
+
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value
