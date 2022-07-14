@@ -16,7 +16,7 @@
 
 package models.domain
 
-import models.{Country, InternationalAddress}
+import models.Country
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
 sealed trait EuTaxRegistration

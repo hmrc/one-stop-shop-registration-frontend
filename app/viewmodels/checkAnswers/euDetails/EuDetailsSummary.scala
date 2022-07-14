@@ -20,11 +20,9 @@ import controllers.euDetails.routes
 import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.{AllEuDetailsQuery, AllEuOptionalDetailsQuery}
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import queries.AllEuOptionalDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{Table, TableRow}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._

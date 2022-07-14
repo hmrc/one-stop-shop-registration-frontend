@@ -182,7 +182,6 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
           "to wherever Has Fixed Establishment navigates to" in {
 
-            val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value

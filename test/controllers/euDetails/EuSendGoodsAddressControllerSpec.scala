@@ -18,8 +18,8 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.EuSendGoodsAddressFormProvider
-import models.{Country, Index, InternationalAddress, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, anyDouble, intThat, eq => eqTo}
+import models.{Country, Index, InternationalAddress, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuVatNumberPage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}

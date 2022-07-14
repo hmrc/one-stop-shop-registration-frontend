@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.EuSendGoodsTradingNameFormProvider
-import models.{Country, Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers._
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito._

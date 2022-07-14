@@ -18,8 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.EuSendGoodsFormProvider
-import models.domain.EuTaxRegistration
-import models.{Country, Index, NormalMode, UserAnswers}
+import models.{Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar

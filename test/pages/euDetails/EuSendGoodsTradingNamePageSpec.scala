@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import models.{CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
