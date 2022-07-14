@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.controller.WithJsonBody
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ExternalController @Inject()(
                                     externalService: ExternalService,

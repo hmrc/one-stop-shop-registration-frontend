@@ -27,7 +27,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
 import services.DateService
-import views.html.ApplicationCompleteView
+import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.{Clock, LocalDate, ZoneId}
 
@@ -51,7 +51,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
 
     "when the scheme has started" - {
 
-      "must return OK and the correct view for a GET with email confirmation" in {
+      "must return OK and the correct view for a GET with email confirmation and no enrolments" in {
 
         val emailAddress = "test@test.com"
 
@@ -61,13 +61,60 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, true).success.value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
+          val dateService = application.injector.instanceOf[DateService]
+          val commencementDate = LocalDate.now()
+          val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
+          val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
+          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
+          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
+          val startOfNextQuarter = dateService.startOfNextQuarter
+          val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            emailAddress,
+            vrn,
+            config.feedbackUrl(request),
+            true,
+            commencementDate.format(dateFormatter),
+            vatReturnEndDate.format(dateFormatter),
+            vatReturnDeadline.format(dateFormatter),
+            lastDayOfCalendarQuarter.format(dateFormatter),
+            startOfCurrentQuarter.format(dateFormatter),
+            startOfNextQuarter.format(dateFormatter),
+            isDOFSDifferentToCommencementDate
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET with email confirmation and enrolments enabled" in {
+
+        val emailAddress = "test@test.com"
+
+        val userAnswersWithEmail = userAnswers.copy()
+          .remove(DateOfFirstSalePage).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(IsPlanningFirstEligibleSalePage, true).success.value
+          .set(EmailConfirmationQuery, true).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
+          .configure("features.enrolments-enabled" -> "true")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[ApplicationCompleteWithEnrolmentView]
           val dateService = application.injector.instanceOf[DateService]
           val commencementDate = LocalDate.now()
           val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
@@ -104,7 +151,9 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, false).success.value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
@@ -147,7 +196,9 @@ class ApplicationCompleteControllerSpec extends SpecBase {
           .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, true).success.value
 
-        val application = applicationBuilder(userAnswers = Some(answers)).build()
+        val application = applicationBuilder(userAnswers = Some(answers))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
@@ -197,6 +248,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .configure("features.enrolments-enabled" -> "false")
             .build()
 
         running(application) {
@@ -249,6 +301,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .configure("features.enrolments-enabled" -> "false")
             .build()
 
         running(application) {
@@ -285,7 +338,9 @@ class ApplicationCompleteControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)

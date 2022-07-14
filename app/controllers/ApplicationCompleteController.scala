@@ -29,7 +29,7 @@ import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ApplicationCompleteView
+import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -39,6 +39,7 @@ class ApplicationCompleteController @Inject()(
   override val messagesApi: MessagesApi,
   cc: AuthenticatedControllerComponents,
   view: ApplicationCompleteView,
+  viewEnrolments: ApplicationCompleteWithEnrolmentView,
   frontendAppConfig: FrontendAppConfig,
   dateService: DateService,
   sessionRepository: SessionRepository
@@ -61,22 +62,41 @@ class ApplicationCompleteController @Inject()(
             val isDOFSDifferentToCommencementDate =
               dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
             val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
-            Ok(
-              view(
-                HtmlFormat.escape(contactDetails.emailAddress).toString,
-                request.vrn,
-                frontendAppConfig.feedbackUrl,
-                showEmailConfirmation,
-                commencementDate.format(dateFormatter),
-                vatReturnEndDate.format(dateFormatter),
-                vatReturnDeadline.format(dateFormatter),
-                dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-                dateService.startOfCurrentQuarter.format(dateFormatter),
-                dateService.startOfNextQuarter.format(dateFormatter),
-                isDOFSDifferentToCommencementDate,
-                savedUrl
+            if(frontendAppConfig.enrolmentsEnabled) {
+              Ok(
+                viewEnrolments(
+                  HtmlFormat.escape(contactDetails.emailAddress).toString,
+                  request.vrn,
+                  frontendAppConfig.feedbackUrl,
+                  showEmailConfirmation,
+                  commencementDate.format(dateFormatter),
+                  vatReturnEndDate.format(dateFormatter),
+                  vatReturnDeadline.format(dateFormatter),
+                  dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+                  dateService.startOfCurrentQuarter.format(dateFormatter),
+                  dateService.startOfNextQuarter.format(dateFormatter),
+                  isDOFSDifferentToCommencementDate,
+                  savedUrl
+                )
               )
-            )
+            } else {
+              Ok(
+                view(
+                  HtmlFormat.escape(contactDetails.emailAddress).toString,
+                  request.vrn,
+                  frontendAppConfig.feedbackUrl,
+                  showEmailConfirmation,
+                  commencementDate.format(dateFormatter),
+                  vatReturnEndDate.format(dateFormatter),
+                  vatReturnDeadline.format(dateFormatter),
+                  dateService.lastDayOfCalendarQuarter.format(dateFormatter),
+                  dateService.startOfCurrentQuarter.format(dateFormatter),
+                  dateService.startOfNextQuarter.format(dateFormatter),
+                  isDOFSDifferentToCommencementDate,
+                  savedUrl
+                )
+              )
+            }
           }}.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }

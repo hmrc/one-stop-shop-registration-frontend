@@ -98,8 +98,6 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)
 
-        implicit val msgs: Messages = messages(application)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

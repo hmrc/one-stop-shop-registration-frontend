@@ -20,17 +20,17 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
-import pages.FirstAuthedPage
+import pages.{FirstAuthedPage, SavedProgressPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.VatApiCallResultQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax._
 import views.html.auth._
 
 import java.time.{Clock, Instant}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import utils.FutureSyntax._
 
 class AuthController @Inject()(
                                 cc: AuthenticatedControllerComponents,
@@ -45,11 +45,13 @@ class AuthController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onSignIn: Action[AnyContent] = cc.authAndGetOptionalData.async {
+  def onSignIn: Action[AnyContent] = (cc.authAndGetOptionalData andThen cc.retrieveSavedAnswers()).async {
     implicit request =>
-
       val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
 
+      answers.get(SavedProgressPage).map {
+        savedUrl => Future.successful(Redirect(controllers.routes.ContinueRegistrationController.onPageLoad()))
+      }.getOrElse(
       answers.get(VatApiCallResultQuery) match {
         case Some(_) =>
           Redirect(FirstAuthedPage.navigate(NormalMode, answers)).toFuture
@@ -79,10 +81,10 @@ class AuthController @Inject()(
               }
           }
       }
+      )
   }
 
   def redirectToRegister(continueUrl: String): Action[AnyContent] = Action {
-    implicit request =>
       Redirect(
         config.registerUrl,
         Map(
@@ -93,7 +95,6 @@ class AuthController @Inject()(
   }
 
   def redirectToLogin(continueUrl: String): Action[AnyContent] = Action {
-    implicit request =>
         Redirect(config.loginUrl,
           Map(
             "origin"   -> Seq(config.origin),

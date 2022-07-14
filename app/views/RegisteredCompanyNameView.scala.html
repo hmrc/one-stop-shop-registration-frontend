@@ -15,13 +15,14 @@
  *@
 
 @import viewmodels.InputWidth._
+@import components.ButtonGroup
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -43,8 +44,7 @@
             .withHint(HintViewModel(HtmlContent(messages("registeredCompanyName.hint"))))
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue",  routes.RegisteredCompanyNameController.onPageLoad(mode).url)
+
     }
 }

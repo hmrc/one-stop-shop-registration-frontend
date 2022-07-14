@@ -15,13 +15,14 @@
  *@
 
 @import viewmodels.InputWidth._
+@import components.ButtonGroup
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, index: Index, countryWithValidationDetails: CountryWithValidationDetails)(implicit request: Request[_], messages: Messages)
@@ -43,8 +44,6 @@
             .withHint(HintViewModel(messages("euVatNumber.hint", countryWithValidationDetails.messageInput, countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))))
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue",  controllers.euDetails.routes.EuVatNumberController.onPageLoad(mode, index).url)
     }
 }

@@ -1,9 +1,11 @@
+@import components.ButtonGroup
+
 @this(
     layout: templates.UnauthenticatedLayout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, hintTextFlag: Boolean)(implicit request: Request[_], messages: Messages)
@@ -28,8 +30,6 @@
         )
 
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @button("site.continue",  routes.HasMadeSalesController.onPageLoad(mode).url)
     }
 }

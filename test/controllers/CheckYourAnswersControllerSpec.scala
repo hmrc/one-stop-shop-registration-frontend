@@ -32,7 +32,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
-import pages.{BusinessContactDetailsPage, CheckYourAnswersPage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
+import pages._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -42,9 +42,6 @@ import queries.EmailConfirmationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.{AuditService, DateService, EmailService, RegistrationService}
 import testutils.RegistrationData
-import viewmodels.checkAnswers.euDetails.TaxRegisteredInEuSummary
-import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
-import viewmodels.checkAnswers._
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
@@ -278,7 +275,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             ).build()
 
           running(application) {
-            val dateService = application.injector.instanceOf[DateService]
             when(emailService.sendConfirmationEmail(
               eqTo(registration.contactDetails.fullName),
               eqTo(registration.registeredCompanyName),

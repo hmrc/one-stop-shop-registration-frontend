@@ -26,7 +26,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages.{HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage, IsPlanningFirstEligibleSalePage, RegisteredForOssInEuPage, WebsitePage}
+import pages._
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -39,7 +39,7 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
-import viewmodels.checkAnswers.{BankDetailsSummary, BusinessAddressInUkSummary, BusinessContactDetailsSummary, CommencementDateSummary, HasMadeSalesSummary, HasTradingNameSummary, HasWebsiteSummary, InternationalAddressSummary, IsOnlineMarketplaceSummary, IsPlanningFirstEligibleSaleSummary, PartOfVatGroupSummary, RegisteredCompanyNameSummary, UkAddressSummary, UkVatEffectiveDateSummary}
+import viewmodels.checkAnswers._
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 
@@ -104,6 +104,7 @@ trait SpecBase
       .overrides(
         bind[AuthenticatedIdentifierAction].to[FakeAuthenticatedIdentifierAction],
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
+        bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),

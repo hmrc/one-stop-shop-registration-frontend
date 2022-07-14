@@ -17,18 +17,15 @@
 package controllers.external
 
 import base.SpecBase
-import controllers.routes
 import models.external.{ExternalRequest, ExternalResponse}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status.OK
 import play.api.inject
-import play.api.inject.bind
 import play.api.libs.json.{JsNull, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import services.external.ExternalService
 
 import scala.concurrent.Future

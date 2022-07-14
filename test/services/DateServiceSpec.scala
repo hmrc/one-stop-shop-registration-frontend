@@ -411,6 +411,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               case MAY      | JUNE      => APRIL
               case AUGUST   | SEPTEMBER => JULY
               case NOVEMBER | DECEMBER  => OCTOBER
+              case _ => month
             }
           } yield (LocalDate.of(year, month, day), LocalDate.of(year, quarterStart, 1))
 

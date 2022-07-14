@@ -19,7 +19,6 @@ package pages.euDetails
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import models.{CheckLoopMode, CheckMode, Index, NormalMode}
-import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
 class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -115,7 +114,6 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
           "to wherever Has Fixed Establishment navigates to" in {
 
-            val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
             val answers =
               emptyUserAnswers
                 .set(VatRegisteredPage(index), false).success.value

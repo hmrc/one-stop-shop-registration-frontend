@@ -1,0 +1,88 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.domain.Vrn
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(
+    email: String,
+    vrn: Vrn,
+    feedbackLink: String,
+    showEmailConfirmation: Boolean,
+    commencementDate: String,
+    vatReturnEndDate: String,
+    vatReturnDeadline: String,
+    lastDayOfCalendarQuarter: String,
+    startOfCurrentQuarter: String,
+    startOfNextQuarter: String,
+    isDOFSDifferentToCommencementDate: Boolean,
+    externalUrl: Option[String] = None
+)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("applicationComplete.enrolment.title")),  showBackLink = false) {
+    <div class="grid-row column-two-thirds" id="application_complete_id">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">@messages("applicationComplete.enrolment.heading")</h1>
+        </div>
+
+        @if(showEmailConfirmation) {
+            <div class="govuk-body">
+                @Html(messages("applicationComplete.enrolment.confirmation", email))
+            </div>
+        }
+
+        <div class="govuk-body">@messages("applicationComplete.reference", vrn.vrn)</div>
+
+        @if(isDOFSDifferentToCommencementDate){
+            <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
+
+            <h2 class="govuk-heading-m">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</h2>
+
+            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter")</div>
+
+            <h2 class="govuk-heading-m">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</h2>
+        }
+
+        <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
+
+        <p class="govuk-body">@messages("applicationComplete.list")
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("applicationComplete.list.p1")</li>
+                <li>@messages("applicationComplete.list.p2")</li>
+            </ul>
+        </p>
+
+        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
+
+        <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
+        @externalUrl.map(
+        url => Html(
+        s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("applicationComplete.link.BTA") + "</a></p>"
+        ))
+        <p class="govuk-body">@messages("applicationComplete.p1")</p>
+
+        <p class="govuk-body">@messages("applicationComplete.p2", vatReturnDeadline)</p>
+
+        <p class="govuk-body">
+            <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
+            @messages("applicationComplete.feedback.30seconds")
+        </p>
+    </div>
+}
