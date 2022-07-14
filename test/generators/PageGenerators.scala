@@ -19,10 +19,16 @@ package generators
 import models.Index
 import org.scalacheck.Arbitrary
 import pages.{euDetails, _}
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage] =
+    Arbitrary(euDetails.EuSendGoodsPage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsTradingNamePage: Arbitrary[EuSendGoodsTradingNamePage] =
+    Arbitrary(EuSendGoodsTradingNamePage(Index(0)))
 
   implicit lazy val arbitraryIsPlanningFirstEligibleSalePage: Arbitrary[IsPlanningFirstEligibleSalePage.type] =
     Arbitrary(IsPlanningFirstEligibleSalePage)
@@ -86,6 +92,9 @@ trait PageGenerators {
 
   implicit lazy val arbitraryFixedEstablishmentAddressPage: Arbitrary[FixedEstablishmentAddressPage] =
     Arbitrary(euDetails.FixedEstablishmentAddressPage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsAddressPage: Arbitrary[EuSendGoodsAddressPage] =
+    Arbitrary(euDetails.EuSendGoodsAddressPage(Index(0)))
 
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)

@@ -1,0 +1,30 @@
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode, index: Index, country: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("euSendGoods.title", country))) {
+
+    @formHelper(action = controllers.euDetails.routes.EuSendGoodsController.onSubmit(mode, index), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("euSendGoods.heading", country)).asPageHeading()
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

@@ -23,8 +23,16 @@ import javax.inject.Inject
 
 class TaxRegisteredInEuFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("taxRegisteredInEu.error.required")
-    )
+  def apply(vatOnly: Boolean): Form[Boolean] = {
+    if(vatOnly){
+      Form(
+        "value" -> boolean("taxRegisteredInEu.vatOnly.error.required")
+      )
+    } else {
+      Form(
+        "value" -> boolean("taxRegisteredInEu.error.required")
+      )
+    }
+
+  }
 }

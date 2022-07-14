@@ -34,7 +34,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(VatRegisteredPage(index)) match {
       case Some(true)  => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
-      case Some(false) => euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -47,10 +47,10 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
         }
       case Some(false) =>
-        if (answers.get(EuTaxReferencePage(index)).isDefined) {
-          EuTaxReferencePage(index).navigate(CheckMode, answers)
+        if (answers.get(HasFixedEstablishmentPage(index)).isEmpty) {
+          euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
         } else {
-          euRoutes.EuTaxReferenceController.onPageLoad(CheckMode, index)
+          HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
         }
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -66,10 +66,10 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
         }
 
       case Some(false) =>
-        if (answers.get(EuTaxReferencePage(index)).isDefined) {
-          EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
+        if (answers.get(HasFixedEstablishmentPage(index)).isEmpty) {
+          euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
         } else {
-          euRoutes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index)
+          HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
         }
 
       case None =>

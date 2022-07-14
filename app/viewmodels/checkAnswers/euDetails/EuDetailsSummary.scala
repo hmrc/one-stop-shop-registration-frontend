@@ -20,9 +20,9 @@ import controllers.euDetails.routes
 import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.{AllEuDetailsQuery, AllEuOptionalDetailsQuery}
+import queries.AllEuOptionalDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -32,8 +32,8 @@ object EuDetailsSummary {
   def addToListRows(answers: UserAnswers, currentMode: Mode): Seq[ListItem] = {
 
     val changeLinkMode = currentMode match {
-      case NormalMode    => CheckLoopMode
-      case CheckMode     => CheckMode
+      case NormalMode => CheckLoopMode
+      case CheckMode => CheckMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }
 
@@ -48,7 +48,7 @@ object EuDetailsSummary {
   }
 
   def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllEuDetailsQuery).map {
+    answers.get(AllEuOptionalDetailsQuery).map {
       euVatDetails =>
 
         val value = euVatDetails.map {
@@ -65,4 +65,34 @@ object EuDetailsSummary {
           )
         )
     }
+
+  def countryAndVatNumberList(answers: UserAnswers, currentMode: Mode)(implicit messages: Messages) = {
+    val changeLinkMode = currentMode match {
+      case NormalMode => CheckLoopMode
+      case CheckMode => CheckMode
+      case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
+    }
+
+      SummaryList(
+        answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
+        case (euVatDetails, index) =>
+
+          val value = euVatDetails.euVatNumber.getOrElse("")
+
+          SummaryListRowViewModel(
+            key = euVatDetails.euCountry.name,
+            value = ValueViewModel(HtmlContent(value)),
+            actions = Seq(
+              ActionItemViewModel("site.change", routes.EuVatNumberController.onPageLoad(changeLinkMode, Index(index)).url)
+                .withVisuallyHiddenText(messages("change.euVatNumber.hidden", euVatDetails.euCountry.name)),
+              ActionItemViewModel("site.remove", routes.DeleteEuDetailsController.onPageLoad(currentMode, Index(index)).url)
+                .withVisuallyHiddenText(messages("site.remove.hidden", euVatDetails.euCountry.name))
+            ),
+            actionClasses = "govuk-!-width-one-third"
+          )
+      }
+      )
+  }
+
+
 }

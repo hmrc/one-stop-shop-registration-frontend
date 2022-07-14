@@ -53,7 +53,10 @@ class CheckEuDetailsAnswersController @Inject()(
               EuTaxReferenceSummary.row(request.userAnswers, index, mode),
               HasFixedEstablishmentSummary.row(request.userAnswers, index, mode),
               FixedEstablishmentTradingNameSummary.row(request.userAnswers, index, mode),
-              FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode)
+              FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode),
+              EuSendGoodsSummary.row(request.userAnswers, index, mode),
+              EuSendGoodsTradingNameSummary.row(request.userAnswers, index, mode),
+              EuSendGoodsAddressSummary.row(request.userAnswers, index, mode)
             ).flatten
           )
 

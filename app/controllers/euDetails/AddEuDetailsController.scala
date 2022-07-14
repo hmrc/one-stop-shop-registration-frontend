@@ -21,6 +21,7 @@ import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
+import pages.PartOfVatGroupPage
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -28,7 +29,7 @@ import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
-import views.html.euDetails.AddEuDetailsView
+import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +38,8 @@ class AddEuDetailsController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: AddEuDetailsFormProvider,
-                                        view: AddEuDetailsView
+                                        view: AddEuDetailsView,
+                                        viewPartOfVatGroup: PartOfVatGroupAddEuDetailsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -45,24 +47,37 @@ class AddEuDetailsController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      val vatOnly = request.userAnswers.vatInfo.flatMap(_.partOfVatGroup).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
       getNumberOfEuCountries {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
 
           withCompleteDataAsync[EuOptionalDetails](
             data = getAllIncompleteEuDetails,
             onFailure = (incomplete: Seq[EuOptionalDetails]) => {
-              Future.successful(Ok(view(form, mode, list, canAddCountries, incomplete)))
+              if(vatOnly){
+                val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
+                Future.successful(Ok(viewPartOfVatGroup(form, mode, list, canAddCountries, incomplete)))
+              } else {
+                val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+                Future.successful(Ok(view(form, mode, list, canAddCountries, incomplete)))
+              }
             }) {
-            Future.successful(Ok(view(form, mode, list, canAddCountries)))
+            if(vatOnly) {
+              val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
+              Future.successful(Ok(viewPartOfVatGroup(form, mode, list, canAddCountries)))
+            } else {
+              val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+              Future.successful(Ok(view(form, mode, list, canAddCountries)))
+            }
           }
       }
   }
 
   def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      val vatOnly = request.userAnswers.vatInfo.flatMap(_.partOfVatGroup).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
       withCompleteDataAsync[EuOptionalDetails](
         data = getAllIncompleteEuDetails,
         onFailure = (incomplete: Seq[EuOptionalDetails]) => {
@@ -82,9 +97,14 @@ class AddEuDetailsController @Inject()(
             val canAddCountries = number < Country.euCountries.size
             form.bindFromRequest().fold(
               formWithErrors => {
-                val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+                if(vatOnly) {
+                  val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
+                  Future.successful(BadRequest(viewPartOfVatGroup(formWithErrors, mode, list, canAddCountries)))
+                } else {
+                  val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+                  Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
+                }
 
-                Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
               },
               value =>
                 for {
