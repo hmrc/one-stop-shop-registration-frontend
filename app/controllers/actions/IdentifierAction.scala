@@ -65,24 +65,27 @@ class AuthenticatedIdentifierAction @Inject()(
         Retrievals.credentialRole) {
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
-        findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
-          case None      => throw InsufficientEnrolments()
+        (findVrnFromEnrolments(enrolments), hasRegistration(enrolments)) match {
+          case (Some(vrn), false) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
+          case (Some(vrn), true) => Left(Redirect(controllers.routes.AlreadyRegisteredController.onPageLoad())).toFuture
+          case _      => throw InsufficientEnrolments()
         }
 
       case _ ~ _ ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == Assistant =>
         throw UnsupportedCredentialRole()
 
       case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence ~ _ =>
-        findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) =>
+        (findVrnFromEnrolments(enrolments), hasRegistration(enrolments)) match {
+          case (Some(vrn), false) =>
             if (confidence >= ConfidenceLevel.L200) {
               Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
             } else {
               throw InsufficientConfidenceLevel()
             }
 
-          case None =>
+          case (Some(vrn), true) => Left(Redirect(controllers.routes.AlreadyRegisteredController.onPageLoad())).toFuture
+
+          case _ =>
             throw InsufficientEnrolments()
         }
 
@@ -126,6 +129,10 @@ class AuthenticatedIdentifierAction @Inject()(
         logger.info("Unauthorised exception", e.message)
         Left(Redirect(routes.UnauthorisedController.onPageLoad())).toFuture
     }
+  }
+
+  private def hasRegistration(enrolments: Enrolments): Boolean = {
+    config.enrolmentsEnabled && enrolments.enrolments.exists(_.key == config.ossEnrolment)
   }
 
   private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] =
