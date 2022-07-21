@@ -65,25 +65,23 @@ class AuthenticatedIdentifierAction @Inject()(
         Retrievals.credentialRole) {
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
-        findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
-          case None      => throw InsufficientEnrolments()
+        (findVrnFromEnrolments(enrolments), hasOssEnrolment(enrolments)) match {
+          case (Some(vrn), true) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
+          case _ => throw InsufficientEnrolments()
         }
 
       case _ ~ _ ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == Assistant =>
         throw UnsupportedCredentialRole()
 
       case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence ~ _ =>
-        findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) =>
+        (findVrnFromEnrolments(enrolments), hasOssEnrolment(enrolments)) match {
+          case (Some(vrn), true) =>
             if (confidence >= ConfidenceLevel.L200) {
               Right(AuthenticatedIdentifierRequest(request, credentials, vrn)).toFuture
             } else {
               throw InsufficientConfidenceLevel()
             }
-
-          case None =>
-            throw InsufficientEnrolments()
+          case _ => throw InsufficientEnrolments()
         }
 
       case _ =>
@@ -128,6 +126,10 @@ class AuthenticatedIdentifierAction @Inject()(
     }
   }
 
+  private def hasOssEnrolment(enrolments: Enrolments): Boolean = {
+    !config.enrolmentsEnabled || enrolments.enrolments.exists(_.key == config.ossEnrolment)
+  }
+
   private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] =
     enrolments.enrolments.find(_.key == "HMRC-MTD-VAT")
       .flatMap {
@@ -143,7 +145,7 @@ class AuthenticatedIdentifierAction @Inject()(
     Left(Redirect(
       config.mfaUpliftUrl,
       Map(
-        "origin"      -> Seq(config.origin),
+        "origin" -> Seq(config.origin),
         "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request))
       )
     )).toFuture
@@ -152,10 +154,10 @@ class AuthenticatedIdentifierAction @Inject()(
     Left(Redirect(
       config.ivUpliftUrl,
       Map(
-        "origin"          -> Seq(config.origin),
+        "origin" -> Seq(config.origin),
         "confidenceLevel" -> Seq(ConfidenceLevel.L200.toString),
-        "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request)),
-        "failureURL"      -> Seq(urlBuilder.ivFailureUrl(request))
+        "completionURL" -> Seq(urlBuilder.loginContinueUrl(request)),
+        "failureURL" -> Seq(urlBuilder.ivFailureUrl(request))
       )
     )).toFuture
 }
