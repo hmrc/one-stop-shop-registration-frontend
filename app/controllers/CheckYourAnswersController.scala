@@ -18,16 +18,17 @@ package controllers
 
 import cats.data.Validated.{Invalid, Valid}
 import com.google.inject.Inject
-import connectors.RegistrationConnector
+import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.NormalMode
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
+import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.responses.ConflictFound
-import pages.CheckYourAnswersPage
+import pages.{CheckYourAnswersPage, SavedProgressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import queries.EmailConfirmationQuery
 import services._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -49,7 +50,8 @@ class CheckYourAnswersController @Inject()(
   auditService: AuditService,
   view: CheckYourAnswersView,
   emailService: EmailService,
-  dateService: DateService
+  dateService: DateService,
+  saveForLaterConnector: SaveForLaterConnector
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -119,22 +121,43 @@ class CheckYourAnswersController @Inject()(
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
-              Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
+              saveAnswers(routes.ErrorSubmittingRegistrationController.onPageLoad())
           }
 
         case Invalid(errors) =>
-          Future.successful(getFirstValidationErrorRedirect.map(
+          getFirstValidationErrorRedirect.map(
             errorRedirect => if(incompletePrompt) {
-              errorRedirect
+              errorRedirect.toFuture
             } else {
-              Redirect(routes.CheckYourAnswersController.onPageLoad())
+              Redirect(routes.CheckYourAnswersController.onPageLoad()).toFuture
             }
           ).getOrElse {
             val errorList = errors.toChain.toList
             val errorMessages = errorList.map(_.errorMessage).mkString("\n")
             logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
-          })
+            saveAnswers(routes.ErrorSubmittingRegistrationController.onPageLoad())
+          }
+      }
+  }
+
+  private def saveAnswers(redirectLocation: Call)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+      Future.fromTry(request.userAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url)).flatMap {
+        updatedAnswers =>
+          val s4LRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
+          saveForLaterConnector.submit(s4LRequest).flatMap {
+            case Right(Some(_: SavedUserAnswers)) =>
+              for {
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield {
+                Redirect(redirectLocation)
+              }
+            case Left(e) =>
+              logger.error(s"Unexpected result on submit: ${e.toString}")
+              Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+            case Right(None) =>
+              logger.error(s"Unexpected result on submit")
+              Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          }
       }
   }
 }
