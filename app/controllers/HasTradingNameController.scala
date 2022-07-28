@@ -79,9 +79,8 @@ class HasTradingNameController @Inject()(
     request.userAnswers.vatInfo match {
       case Some(vatInfo) =>
         val name = vatInfo.organisationName
-        name
-          .map(block)
-          .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+        block(name)
+      case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
 }

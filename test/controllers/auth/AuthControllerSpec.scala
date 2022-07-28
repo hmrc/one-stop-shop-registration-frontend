@@ -95,7 +95,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
+            redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
             verify(mockConnector, never()).getVatCustomerInfo()(any())
             verify(mockRepository, never()).set(any())
           }
@@ -122,7 +122,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
               val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
+              redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
               verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
             }
           }
@@ -204,7 +204,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
+            redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
             verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
           }
         }
