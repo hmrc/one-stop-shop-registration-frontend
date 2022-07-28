@@ -19,7 +19,7 @@ package controllers.auth
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
+import models.{NormalMode, UserAnswers, VatApiCallResult}
 import pages.{FirstAuthedPage, SavedProgressPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -64,21 +64,12 @@ class AuthController @Inject()(
                 _              <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
 
-            case Left(responses.NotFound) =>
-              for {
-                updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.NotFound))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
-
             case _ =>
-              if (cc.features.proceedWhenVatApiCallFails) {
                 for {
                   updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.Error))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
-              } else {
-                InternalServerError.toFuture
-              }
+                } yield Redirect(controllers.routes.VatApiDownController.onPageLoad())
+
           }
       }
       )
