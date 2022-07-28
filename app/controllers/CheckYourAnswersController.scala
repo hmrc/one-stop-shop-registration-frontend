@@ -58,7 +58,6 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(
-          UkVatEffectiveDateSummary.row(request.userAnswers),
           BusinessAddressInUkSummary.row(request.userAnswers),
           UkAddressSummary.row(request.userAnswers),
           InternationalAddressSummary.row(request.userAnswers),

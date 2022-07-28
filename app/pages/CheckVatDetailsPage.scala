@@ -30,7 +30,7 @@ case object CheckVatDetailsPage extends QuestionPage[CheckVatDetails] {
 
   override def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.get(CheckVatDetailsPage), answers.vatInfo) match {
-      case (Some(Yes), Some(vatInfo))                                       => UkVatEffectiveDatePage.navigate(NormalMode, answers)
+      case (Some(Yes), Some(vatInfo)) if vatInfo.address.line1.nonEmpty     => routes.HasTradingNameController.onPageLoad(NormalMode)
       case (Some(WrongAccount), _)                                          => routes.UseOtherAccountController.onPageLoad()
       case (Some(DetailsIncorrect), _)                                      => routes.UpdateVatDetailsController.onPageLoad()
       case _                                                                => routes.JourneyRecoveryController.onPageLoad()

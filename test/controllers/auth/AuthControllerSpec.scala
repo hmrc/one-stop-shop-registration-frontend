@@ -19,13 +19,14 @@ package controllers.auth
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
+import controllers.routes
 import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{FirstAuthedPage, SavedProgressPage}
+import pages.SavedProgressPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -94,7 +95,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, answers).url
+            redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
             verify(mockConnector, never()).getVatCustomerInfo()(any())
             verify(mockRepository, never()).set(any())
           }
@@ -121,7 +122,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
               val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+              redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
               verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
             }
           }
@@ -203,7 +204,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual FirstAuthedPage.navigate(NormalMode, expectedAnswers).url
+            redirectLocation(result).value mustEqual routes.CheckVatDetailsController.onPageLoad().url
             verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
           }
         }

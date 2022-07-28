@@ -19,8 +19,8 @@ package controllers.auth
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import models.{NormalMode, UserAnswers, VatApiCallResult}
-import pages.{FirstAuthedPage, SavedProgressPage}
+import models.{UserAnswers, VatApiCallResult}
+import pages.SavedProgressPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.VatApiCallResultQuery
@@ -54,7 +54,7 @@ class AuthController @Inject()(
       }.getOrElse(
       answers.get(VatApiCallResultQuery) match {
         case Some(_) =>
-          Redirect(FirstAuthedPage.navigate(NormalMode, answers)).toFuture
+          Redirect(controllers.routes.CheckVatDetailsController.onPageLoad()).toFuture
 
         case None =>
           connector.getVatCustomerInfo().flatMap {
@@ -62,7 +62,7 @@ class AuthController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
+              } yield Redirect(controllers.routes.CheckVatDetailsController.onPageLoad())
 
             case _ =>
                 for {

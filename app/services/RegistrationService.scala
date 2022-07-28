@@ -124,11 +124,6 @@ class RegistrationService @Inject()(dateService: DateService) {
     answers.vatInfo match {
       case Some(VatCustomerInfo(_, Some(registrationDate), _, _)) =>
         registrationDate.validNec
-      case _ =>
-        answers.get(UkVatEffectiveDatePage) match {
-          case Some(date) => date.validNec
-          case None       => DataMissingError(UkVatEffectiveDatePage).invalidNec
-        }
     }
 
   private def getPartOfVatGroup(answers: UserAnswers): ValidationResult[Boolean] =

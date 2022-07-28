@@ -30,11 +30,6 @@ POST        /uk-trading-name/:index                                   controller
 GET         /check-uk-trading-name/:index                             controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-uk-trading-name/:index                             controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /uk-vat-registration-date                                 controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = NormalMode)
-POST        /uk-vat-registration-date                                 controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = NormalMode)
-GET         /checkuk-vat-registration-date                            controllers.UkVatEffectiveDateController.onPageLoad(mode: Mode = CheckMode)
-POST        /checkuk-vat-registration-date                            controllers.UkVatEffectiveDateController.onSubmit(mode: Mode = CheckMode)
-
 GET         /eu-vat-number/:index                                     controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-vat-number/:index                                     controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-eu-vat-number/:index                               controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
@@ -131,9 +126,6 @@ GET         /on-sign-in                                               controller
 
 GET         /confirm-vat-details                                      controllers.CheckVatDetailsController.onPageLoad
 POST        /confirm-vat-details                                      controllers.CheckVatDetailsController.onSubmit
-
-GET         /confirm-vat-number                                       controllers.CheckVatNumberController.onPageLoad
-POST        /confirm-vat-number                                       controllers.CheckVatNumberController.onSubmit
 
 GET         /register-different-business                              controllers.UseOtherAccountController.onPageLoad
 

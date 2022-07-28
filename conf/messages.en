@@ -72,23 +72,6 @@ hasTradingName.checkYourAnswersLabel = Have a different UK trading name
 hasTradingName.error.required = Select yes if you use a different trading name in the UK
 hasTradingName.change.hidden = if you have a different UK trading name
 
-partOfVatGroup.title = Is your business part of a UK VAT group?
-partOfVatGroup.heading = Is your business part of a UK VAT group?
-partOfVatGroup.guidance = VAT groups are when 2 or more companies or limited liability partnerships register as one ‘taxable’ person for VAT.
-partOfVatGroup.checkYourAnswersLabel = Part of a UK VAT group
-partOfVatGroup.error.required = Select yes if your business is part of a UK VAT group
-partOfVatGroup.change.hidden = if part of a UK VAT group
-
-registeredCompanyName.title = What is your business name?
-registeredCompanyName.heading = What is your business name?
-registeredCompanyName.hint = Make sure it matches the name on your VAT certificate in your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account (opens in new tab)</a>.
-registeredCompanyName.hint.link.text = business tax account
-registeredCompanyName.checkYourAnswersLabel = Business name
-registeredCompanyName.error.required = Enter your business name
-registeredCompanyName.error.length = Business name must be 100 characters or less
-registeredCompanyName.error.invalid = Business name must only include letters, numbers, hyphens, spaces and apostrophes
-registeredCompanyName.change.hidden = business name
-
 tradingName.title = What is your UK trading name?
 tradingName.heading = What is your UK trading name?
 tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’ or ‘plc’.
@@ -361,12 +344,6 @@ checkVatDetails.address = Principal place of business address
 checkVatDetails.yes = Yes
 checkVatDetails.detailsIncorrect = Yes, but some of my VAT details are incorrect
 checkVatDetails.wrongAccount = No, I want to register a different business
-
-checkVatNumber.title = Confirm VAT details for your business
-checkVatNumber.heading = Confirm VAT details for your business
-checkVatNumber.question = Do you want to register this business for the One Stop Shop Union scheme?
-checkVatNumber.error.required = Select yes if you want to register this business for the One Stop Shop Union scheme
-checkVatNumber.vrn.title = UK VAT registration number
 
 useOtherAccount.title = Sign in with a different Government Gateway user ID
 useOtherAccount.heading = Sign in with a different Government Gateway user ID
