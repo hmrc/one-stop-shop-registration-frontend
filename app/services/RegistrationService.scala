@@ -79,11 +79,6 @@ class RegistrationService @Inject()(dateService: DateService) {
     answers.vatInfo match {
       case Some(VatCustomerInfo(_, _, _, Some(organisationName))) =>
         organisationName.validNec
-      case _ =>
-        answers.get(RegisteredCompanyNamePage) match {
-          case Some(name) => name.validNec
-          case None       => DataMissingError(RegisteredCompanyNamePage).invalidNec
-        }
     }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
@@ -140,11 +135,6 @@ class RegistrationService @Inject()(dateService: DateService) {
     answers.vatInfo match {
       case Some(VatCustomerInfo(_, _, Some(partOfVatGroup), _)) =>
         partOfVatGroup.validNec
-      case _ =>
-        answers.get(PartOfVatGroupPage) match {
-          case Some(answer) => answer.validNec
-          case None         => DataMissingError(PartOfVatGroupPage).invalidNec
-        }
     }
 
   private def getVatDetailSource(answers: UserAnswers): ValidationResult[VatDetailSource] =

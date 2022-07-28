@@ -25,16 +25,6 @@ POST        /have-uk-trading-name                                     controller
 GET         /check-have-uk-trading-name                               controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-have-uk-trading-name                               controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
 
-GET         /uk-vat-group                                             controllers.PartOfVatGroupController.onPageLoad(mode: Mode = NormalMode)
-POST        /uk-vat-group                                             controllers.PartOfVatGroupController.onSubmit(mode: Mode = NormalMode)
-GET         /check-uk-vat-group                                       controllers.PartOfVatGroupController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-uk-vat-group                                       controllers.PartOfVatGroupController.onSubmit(mode: Mode = CheckMode)
-
-GET         /business-name                                            controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /business-name                                            controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = NormalMode)
-GET         /check-business-name                                      controllers.RegisteredCompanyNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-business-name                                      controllers.RegisteredCompanyNameController.onSubmit(mode: Mode = CheckMode)
-
 GET         /uk-trading-name/:index                                   controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /uk-trading-name/:index                                   controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-uk-trading-name/:index                             controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)

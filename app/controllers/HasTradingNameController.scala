@@ -20,7 +20,7 @@ import controllers.actions._
 import forms.HasTradingNameFormProvider
 import models.Mode
 import models.requests.AuthenticatedDataRequest
-import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
+import pages.HasTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -78,13 +78,8 @@ class HasTradingNameController @Inject()(
                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.vatInfo match {
       case Some(vatInfo) =>
-        val name = vatInfo.organisationName orElse request.userAnswers.get(RegisteredCompanyNamePage)
+        val name = vatInfo.organisationName
         name
-          .map(block)
-          .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
-      case None =>
-        request.userAnswers
-          .get(RegisteredCompanyNamePage)
           .map(block)
           .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
     }
