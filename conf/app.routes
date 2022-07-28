@@ -303,3 +303,4 @@ GET        /progress-saved                                            controller
 
 GET        /continue-registration                                      controllers.ContinueRegistrationController.onPageLoad()
 POST       /continue-registration                                      controllers.ContinueRegistrationController.onSubmit()
+GET        /registration-service-error                                                 controllers.VatApiDownController.onPageLoad()

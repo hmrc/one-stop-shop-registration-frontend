@@ -681,3 +681,10 @@ continueRegistration.heading = You have a registration in progress. Do you want 
 continueRegistration.error.required = Select yes if want to continue your registration
 continueRegistration.continue = Yes
 continueRegistration.delete = No, delete my answers and start again
+
+vatApiDown.title = Sorry, there is a problem with the service
+vatApiDown.heading = Sorry, there is a problem with the service
+vatApiDown.tryAgain = Try again later.
+vatApiDown.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+
+
