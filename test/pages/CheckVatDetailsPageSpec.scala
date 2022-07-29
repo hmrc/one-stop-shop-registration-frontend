@@ -38,41 +38,24 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
         "when we have VAT details" - {
 
-          "with the organisation name" - {
-
-            "to wherever the Registered Company Name page would navigate to" in {
+          "to wherever the Has Trading Name page would navigate to" in {
 
               val answers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
 
               CheckVatDetailsPage.navigate(NormalMode, answers)
-                .mustEqual(RegisteredCompanyNamePage.navigate(NormalMode, basicUserAnswersWithVatInfo))
+                .mustEqual(controllers.routes.HasTradingNameController.onPageLoad(NormalMode))
             }
-          }
 
-          "Without the organisation name" - {
-
-            "to Registered Company Name" in {
-
-              val vatInfo = vatCustomerInfo copy (organisationName = None)
-              val answers =
-                basicUserAnswersWithVatInfo
-                  .copy(vatInfo = Some(vatInfo))
-                  .set(CheckVatDetailsPage, Yes).success.value
-
-              CheckVatDetailsPage.navigate(NormalMode, answers)
-                .mustEqual(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
-            }
-          }
         }
 
         "when we don't have VAT details" - {
 
-          "to Registered Company Name" in {
+          "to Journey Recovery" in {
 
             val answers = emptyUserAnswers.set(CheckVatDetailsPage, Yes).success.value
 
             CheckVatDetailsPage.navigate(NormalMode, answers)
-              .mustEqual(routes.RegisteredCompanyNameController.onPageLoad(NormalMode))
+              .mustEqual(routes.JourneyRecoveryController.onPageLoad())
           }
         }
       }

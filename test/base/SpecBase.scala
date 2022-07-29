@@ -63,18 +63,10 @@ trait SpecBase
 
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
-      registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
+      registrationDate = LocalDate.now(stubClockAtArbitraryDate),
       address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-      partOfVatGroup   = Some(true),
-      organisationName = Some("Company name")
-    )
-
-  val partialVatCustomerInfo: VatCustomerInfo =
-    VatCustomerInfo(
-      registrationDate = None,
-      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-      partOfVatGroup   = None,
-      organisationName = None
+      partOfVatGroup   = true,
+      organisationName = "Company name"
     )
 
   val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
@@ -82,7 +74,6 @@ trait SpecBase
   val basicUserAnswers: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val basicUserAnswersWithVatInfo: UserAnswers = basicUserAnswers copy (vatInfo = Some(vatCustomerInfo))
-  val partialUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(partialVatCustomerInfo))
   val completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
     .set(HasTradingNamePage, false).success.value
     .set(HasMadeSalesPage, false).success.value
@@ -117,12 +108,6 @@ trait SpecBase
 
   def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) ={
     Seq(
-      RegisteredCompanyNameSummary.row(answers),
-      PartOfVatGroupSummary.row(answers),
-      UkVatEffectiveDateSummary.row(answers),
-      BusinessAddressInUkSummary.row(answers),
-      UkAddressSummary.row(answers),
-      InternationalAddressSummary.row(answers),
       new HasTradingNameSummary().row(answers),
       HasMadeSalesSummary.row(answers),
       IsPlanningFirstEligibleSaleSummary.row(answers),

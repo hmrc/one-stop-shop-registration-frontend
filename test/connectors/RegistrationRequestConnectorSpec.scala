@@ -136,12 +136,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
-        val vatInfo = VatCustomerInfo(
-          registrationDate = Some(LocalDate.now),
-          address          = DesAddress("Line 1", Some("Line 2"), None, None, None, Some("AA11 1AA"), "GB"),
-          partOfVatGroup   = None,
-          organisationName = None
-        )
+        val vatInfo = vatCustomerInfo
 
         val responseBody = Json.toJson(vatInfo).toString
 

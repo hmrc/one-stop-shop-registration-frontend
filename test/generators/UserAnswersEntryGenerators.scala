@@ -74,22 +74,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryInternationalAddressUserAnswersEntry: Arbitrary[(InternationalAddressPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[InternationalAddressPage.type]
-        value <- arbitrary[InternationalAddress].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryBusinessAddressInUkUserAnswersEntry: Arbitrary[(BusinessAddressInUkPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[BusinessAddressInUkPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryTaxRegisteredInEuUserAnswersEntry: Arbitrary[(TaxRegisteredInEuPage.type, JsValue)] =
     Arbitrary {
       for {
@@ -186,14 +170,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryCheckVaNumberUserAnswersEntry: Arbitrary[(CheckVatNumberPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[CheckVatNumberPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryWebsiteUserAnswersEntry: Arbitrary[(WebsitePage, JsValue)] =
     Arbitrary {
       for {
@@ -207,14 +183,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       for {
         page  <- arbitrary[BusinessContactDetailsPage.type]
         value <- arbitrary[BusinessContactDetails].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryUkAddressUserAnswersEntry: Arbitrary[(UkAddressPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[UkAddressPage.type]
-        value <- arbitrary[UkAddress].map(Json.toJson(_))
       } yield (page, value)
     }
 
@@ -250,14 +218,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryUkVatEffectiveDateUserAnswersEntry: Arbitrary[(UkVatEffectiveDatePage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[UkVatEffectiveDatePage.type]
-        value <- arbitrary[Int].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryTradingNameUserAnswersEntry: Arbitrary[(TradingNamePage, JsValue)] =
     Arbitrary {
       for {
@@ -266,19 +226,4 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryRegisteredCompanyNameUserAnswersEntry: Arbitrary[(RegisteredCompanyNamePage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[RegisteredCompanyNamePage.type]
-        value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryPartOfVatGroupUserAnswersEntry: Arbitrary[(PartOfVatGroupPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[PartOfVatGroupPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
 }
