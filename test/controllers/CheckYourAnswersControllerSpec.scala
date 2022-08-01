@@ -19,10 +19,10 @@ package controllers
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
-import connectors.RegistrationConnector
+import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -45,7 +45,7 @@ import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -54,6 +54,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
   private val registrationService = mock[RegistrationService]
   private val registrationConnector = mock[RegistrationConnector]
+  private val saveForLaterConnector = mock[SaveForLaterConnector]
   private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
   private val dateService = mock[DateService]
@@ -66,7 +67,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       registrationService,
       auditService,
       emailService,
-      dateService
+      dateService,
+      saveForLaterConnector
     )
   }
 
@@ -499,17 +501,50 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "when the submission fails because of a technical issue" - {
 
-        "the user is redirected to the Journey Recovery page" in {
+        "the user is redirected to the Error Submitting Registration page and their answers are saved" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+          val savedAnswers = basicUserAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
+          when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, basicUserAnswers.data, None, Instant.now))))
           doNothing().when(auditService).audit(any())(any(), any())
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
+              bind[SaveForLaterConnector].toInstance(saveForLaterConnector),
+              bind[AuditService].toInstance(auditService)
+            ).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val result = route(application, request).value
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.ErrorSubmittingRegistrationController.onPageLoad().url
+            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+            verify(saveForLaterConnector, times(1)).submit(eqTo(SaveForLaterRequest(savedAnswers, vrn)))(any())
+          }
+        }
+
+        "the user is redirected to the Journey Recovery page when saving answers fails" in {
+
+          val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+          val savedAnswers = basicUserAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
+          when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(123, "error")))
+          doNothing().when(auditService).audit(any())(any(), any())
+
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+            .overrides(
+              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationConnector].toInstance(registrationConnector),
+              bind[SaveForLaterConnector].toInstance(saveForLaterConnector),
               bind[AuditService].toInstance(auditService)
             ).build()
 
@@ -522,6 +557,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+            verify(saveForLaterConnector, times(1)).submit(eqTo(SaveForLaterRequest(savedAnswers, vrn)))(any())
           }
         }
       }

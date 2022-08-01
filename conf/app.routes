@@ -270,4 +270,6 @@ GET        /progress-saved                                            controller
 
 GET        /continue-registration                                      controllers.ContinueRegistrationController.onPageLoad()
 POST       /continue-registration                                      controllers.ContinueRegistrationController.onSubmit()
-GET        /registration-service-error                                                 controllers.VatApiDownController.onPageLoad()
+GET        /registration-service-error                                 controllers.VatApiDownController.onPageLoad()
+
+GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
