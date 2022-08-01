@@ -15,9 +15,7 @@ content = HtmlContent(messages("errorSubmittingRegistration.heading")),
 classes = "red-background"
 ))
 
-<p class="govuk-body">@messages("errorSubmittingRegistration.savedAnswers")</p>
-
-<p class="govuk-body">@Html(messages("errorSubmittingRegistration.knownIssues"))</p>
+<p class="govuk-body">@Html(messages("errorSubmittingRegistration.savedAnswers", controllers.routes.CheckYourAnswersController.onPageLoad().url))</p>
 
 <p class="govuk-body">@Html(messages("errorSubmittingRegistration.contactUs"))</p>
 

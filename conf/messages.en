@@ -596,7 +596,6 @@ vatApiDown.contactUs = If the problem continues, you can email us at <a class="g
 
 errorSubmittingRegistration.title = We have a problem with our service right now
 errorSubmittingRegistration.heading = Your registration is not submitted
-errorSubmittingRegistration.savedAnswers = We have saved your answers and you can submit it from your account later.
-errorSubmittingRegistration.knownIssues = Check our <a class="govuk-link" href="https://www.gov.uk/government/publications/one-stop-shop-union-scheme-service-availability-and-issues">service page</a> for any known system issues.
+errorSubmittingRegistration.savedAnswers = We have saved you answers and you can <a class="govuk-link" href="{0}">try again later</a>.
 errorSubmittingRegistration.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 errorSubmittingRegistration.your.account = Back to your account

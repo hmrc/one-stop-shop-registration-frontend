@@ -42,7 +42,6 @@ import queries.EmailConfirmationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.{AuditService, DateService, EmailService, RegistrationService}
 import testutils.RegistrationData
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
