@@ -26,9 +26,9 @@ import uk.gov.hmrc.domain.Vrn
 
 case class CheckVatDetailsViewModel(vrn: Vrn, vatCustomerInfo: VatCustomerInfo)(implicit messages: Messages) {
 
-  val organisationName: Option[String] = vatCustomerInfo.organisationName.map(HtmlFormat.escape).map(_.toString)
+  val organisationName: String = HtmlFormat.escape(vatCustomerInfo.organisationName).toString
 
-  val formattedDate: Option[String] = vatCustomerInfo.registrationDate.map(_.format(dateFormatter))
+  val formattedDate: String = vatCustomerInfo.registrationDate.format(dateFormatter)
 
   private val country: Option[Country] = Country.allCountries.find(_.code == vatCustomerInfo.address.countryCode)
 
@@ -44,8 +44,10 @@ case class CheckVatDetailsViewModel(vrn: Vrn, vatCustomerInfo: VatCustomerInfo)(
     ).flatten.mkString("<br/>")
   )
 
-  val partOfVatGroup: Option[String] = vatCustomerInfo.partOfVatGroup.map {
-    case true  => messages("site.yes")
-    case false => messages("site.no")
+  val partOfVatGroup: String =
+    if (vatCustomerInfo.partOfVatGroup) {
+    messages("site.yes")
+  } else {
+    messages("site.no")
   }
 }

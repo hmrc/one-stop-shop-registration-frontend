@@ -1,0 +1,15 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("vatApiDown.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("vatApiDown.heading")</h1>
+
+    <p class="govuk-body">@messages("vatApiDown.tryAgain")</p>
+
+    <p class="govuk-body">@Html(messages("vatApiDown.contactUs"))</p>
+}

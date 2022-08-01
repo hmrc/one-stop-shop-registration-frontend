@@ -48,15 +48,18 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
   private val hasTradingNamePage = HasTradingNamePage
 
   private val answers =
-    UserAnswers("id")
+    UserAnswers("id",
+      vatInfo = Some(VatCustomerInfo(
+        DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+        LocalDate.now,
+        true,
+      "foo"
+    ))
+    )
       .set(BusinessBasedInNiPage, true).success.value
       .set(DateOfFirstSalePage, arbitraryDate).success.value
-      .set(RegisteredCompanyNamePage, "foo").success.value
       .set(hasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
-      .set(PartOfVatGroupPage, true).success.value
-      .set(UkVatEffectiveDatePage, LocalDate.now).success.value
-      .set(BusinessAddressInUkPage, true).success.value
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
       .set(VatRegisteredPage(Index(0)), true).success.value
@@ -79,10 +82,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(EuTaxReferencePage(Index(3)), "IE123456789").success.value
       .set(HasFixedEstablishmentPage(Index(3)), false).success.value
       .set(
-        UkAddressPage,
-        UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
-      ).success.value
-      .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
       .set(HasWebsitePage, true).success.value
@@ -96,35 +95,19 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
   "fromUserAnswers" - {
 
-    "must return a Registration when user answers are provided and the user manually entered all their VAT details" in {
-
-      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(answers, vrn)
-
-      val expectedRegistration = RegistrationData.registration.copy(
-        dateOfFirstSale  = Some(arbitraryDate),
-        vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
-        commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
-      )
-
-      registration mustEqual Valid(expectedRegistration)
-    }
-
     "must return a Registration when user answers are provided and we have full VAT information on the user" in {
 
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
       val vatInfo = VatCustomerInfo(
-        registrationDate = Some(regDate),
+        registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(true),
-        organisationName = Some("bar")
+        partOfVatGroup = true,
+        organisationName = "bar"
       )
 
       val userAnswers =
         answers.copy(vatInfo = Some(vatInfo))
-          .remove(UkVatEffectiveDatePage).success.value
-          .remove(UkAddressPage).success.value
-          .remove(PartOfVatGroupPage).success.value
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -139,53 +122,20 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return a Registration when user answers are provided and we have not full VAT information on the user" in {
-
-      val regDate = LocalDate.of(2000, 1, 1)
-      val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
-      val vatInfo = VatCustomerInfo(
-        registrationDate = Some(regDate),
-        address = address,
-        partOfVatGroup = Some(true),
-        organisationName = None
-      )
-
-      val userAnswers =
-        answers.copy(vatInfo = Some(vatInfo))
-          .remove(UkVatEffectiveDatePage).success.value
-          .remove(UkAddressPage).success.value
-          .remove(PartOfVatGroupPage).success.value
-
-      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-      val expectedRegistration =
-        RegistrationData.registration.copy(
-          dateOfFirstSale       = Some(arbitraryDate),
-          vatDetails            = VatDetails(regDate, address, true, VatDetailSource.Mixed),
-          registeredCompanyName = "foo",
-          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
-        )
-
-      registration mustEqual Valid(expectedRegistration)
-    }
-
     "must return a Registration when user answers are provided and PreviouslyRegisteredPage is false" in {
 
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
       val vatInfo = VatCustomerInfo(
-        registrationDate = Some(regDate),
+        registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(true),
-        organisationName = Some("bar")
+        partOfVatGroup = true,
+        organisationName = "bar"
       )
 
       val userAnswers =
         answers.copy(vatInfo = Some(vatInfo))
           .set(PreviouslyRegisteredPage, false).success.value
-          .remove(UkVatEffectiveDatePage).success.value
-          .remove(UkAddressPage).success.value
-          .remove(PartOfVatGroupPage).success.value
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -217,7 +167,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           dateOfFirstSale  = Some(arbitraryDate),
           tradingNames     = Seq.empty,
           euRegistrations  = Seq.empty,
-          vatDetails       = RegistrationData.registration.vatDetails copy (source = UserEntered),
+          vatDetails       = RegistrationData.registration.vatDetails,
           websites         = Seq.empty,
           commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
         )
@@ -231,19 +181,16 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
       val vatInfo = VatCustomerInfo(
-        registrationDate = Some(regDate),
+        registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(true),
-        organisationName = Some("bar")
+        partOfVatGroup = true,
+        organisationName = "bar"
       )
 
       val userAnswers =
         answers.copy(vatInfo = Some(vatInfo))
           .set(BusinessBasedInNiPage, false).success.value
           .set(HasFixedEstablishmentInNiPage, true).success.value
-          .remove(UkVatEffectiveDatePage).success.value
-          .remove(UkAddressPage).success.value
-          .remove(PartOfVatGroupPage).success.value
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -264,10 +211,10 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
       val vatInfo = VatCustomerInfo(
-        registrationDate = Some(regDate),
+        registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(true),
-        organisationName = Some("bar")
+        partOfVatGroup = true,
+        organisationName = "bar"
       )
 
       val userAnswers =
@@ -275,9 +222,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           .set(BusinessBasedInNiPage, false).success.value
           .set(HasFixedEstablishmentInNiPage, false).success.value
           .set(SalesChannelsPage, SalesChannels.OnlineMarketplaces).success.value
-          .remove(UkVatEffectiveDatePage).success.value
-          .remove(UkAddressPage).success.value
-          .remove(PartOfVatGroupPage).success.value
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
@@ -293,29 +237,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return a registration when an International address is given" in {
-
-      val address = InternationalAddress("line 1", None, "town", None, None, Country("FR", "France"))
-      val userAnswers =
-        answers
-          .set(BusinessAddressInUkPage, false).success.value
-          .set(InternationalAddressPage, address).success.value
-          .remove(UkAddressPage).success.value
-
-      val expectedRegistration =
-        RegistrationData.registration copy (
-          dateOfFirstSale = Some(arbitraryDate),
-          vatDetails = RegistrationData.registration.vatDetails copy(
-            address = address,
-            source = UserEntered
-          ),
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
-          )
-
-      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-      registration mustEqual Valid(expectedRegistration)
-    }
-
     "must return a registration" - {
 
       "when Business Based in NI is missing" in {
@@ -325,26 +246,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val expectedRegistration =
           RegistrationData.registration copy (
             dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            vatDetails       = RegistrationData.registration.vatDetails,
             niPresence       = None,
-            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
-          )
-
-        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-        result mustEqual Valid(expectedRegistration)
-      }
-
-      "when Business Based in NI is true and Business Address In UK question is unanswered" in {
-        val userAnswers =
-          answers
-            .set(BusinessBasedInNiPage, true).success.value
-            .remove(BusinessAddressInUkPage).success.value
-
-        val expectedRegistration =
-          RegistrationData.registration copy (
-            dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 
@@ -363,7 +266,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val expectedRegistration =
           RegistrationData.registration copy (
             dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            vatDetails       = RegistrationData.registration.vatDetails,
             niPresence       = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
@@ -384,7 +287,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val expectedRegistration =
           RegistrationData.registration copy (
             dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            vatDetails       = RegistrationData.registration.vatDetails,
             niPresence       = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
@@ -402,7 +305,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         val expectedRegistration =
           RegistrationData.registration copy (
-            vatDetails = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            vatDetails = RegistrationData.registration.vatDetails,
             dateOfFirstSale = None
           )
 
@@ -414,12 +317,12 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
     "must return Invalid" - {
 
-      "when Registered Company Name is missing" in {
+      "when Vat Customer Info is missing" in {
 
-        val userAnswers = answers.remove(RegisteredCompanyNamePage).success.value
+        val userAnswers = answers.copy(vatInfo = None)
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(RegisteredCompanyNamePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(CheckVatDetailsPage), DataMissingError(CheckVatDetailsPage)))
       }
 
       "when Has Trading Name is missing" in {
@@ -438,55 +341,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllTradingNames)))
       }
 
-      "when UK VAT Effective Date is missing" in {
-
-        val userAnswers = answers.remove(UkVatEffectiveDatePage).success.value
-        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(UkVatEffectiveDatePage)))
-      }
-
-      "when Business Address in UK is missing" in {
-
-        val userAnswers = answers
-          .remove(BusinessAddressInUkPage).success.value
-          .remove(UkAddressPage).success.value
-        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessAddressInUkPage)))
-      }
-
-      "when Business Address in UK is true, but UK Address is missing" in {
-
-        val userAnswers =
-          answers
-            .set(BusinessAddressInUkPage, true).success.value
-            .remove(UkAddressPage).success.value
-
-        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(UkAddressPage)))
-      }
-
-      "when Business Address in UK is false, but International Address is missing" in {
-
-        val userAnswers =
-          answers
-            .set(BusinessAddressInUkPage, false).success.value
-            .remove(InternationalAddressPage).success.value
-
-        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(InternationalAddressPage)))
-      }
-
-      "when Part of VAT Group is missing" in {
-
-        val userAnswers = answers.remove(PartOfVatGroupPage).success.value
-        val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(PartOfVatGroupPage)))
-      }
 
       "when both Date of First Sale and Is Planning First Eligible Sale are missing" in {
 
@@ -708,17 +562,14 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val regDate = LocalDate.of(2000, 1, 1)
         val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
         val vatInfo = VatCustomerInfo(
-          registrationDate = Some(regDate),
+          registrationDate = regDate,
           address = address,
-          partOfVatGroup = Some(true),
-          organisationName = Some("bar")
+          partOfVatGroup = true,
+          organisationName = "bar"
         )
 
         val userAnswers =
           answers.copy(vatInfo = Some(vatInfo))
-            .remove(UkVatEffectiveDatePage).success.value
-            .remove(UkAddressPage).success.value
-            .remove(PartOfVatGroupPage).success.value
             .remove(VatRegisteredPage(Index(0))).success.value
 
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -739,7 +590,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
           val expectedRegistration = RegistrationData.registration.copy(
             dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails.copy(source = UserEntered),
+            vatDetails       = RegistrationData.registration.vatDetails,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 

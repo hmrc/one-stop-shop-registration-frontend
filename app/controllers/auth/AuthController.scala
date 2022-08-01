@@ -19,8 +19,8 @@ package controllers.auth
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
-import pages.{FirstAuthedPage, SavedProgressPage}
+import models.{UserAnswers, VatApiCallResult}
+import pages.SavedProgressPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.VatApiCallResultQuery
@@ -54,7 +54,7 @@ class AuthController @Inject()(
       }.getOrElse(
       answers.get(VatApiCallResultQuery) match {
         case Some(_) =>
-          Redirect(FirstAuthedPage.navigate(NormalMode, answers)).toFuture
+          Redirect(controllers.routes.CheckVatDetailsController.onPageLoad()).toFuture
 
         case None =>
           connector.getVatCustomerInfo().flatMap {
@@ -62,23 +62,14 @@ class AuthController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
-
-            case Left(responses.NotFound) =>
-              for {
-                updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.NotFound))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
+              } yield Redirect(controllers.routes.CheckVatDetailsController.onPageLoad())
 
             case _ =>
-              if (cc.features.proceedWhenVatApiCallFails) {
                 for {
                   updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.Error))
                   _              <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(FirstAuthedPage.navigate(NormalMode, updatedAnswers))
-              } else {
-                InternalServerError.toFuture
-              }
+                } yield Redirect(controllers.routes.VatApiDownController.onPageLoad())
+
           }
       }
       )

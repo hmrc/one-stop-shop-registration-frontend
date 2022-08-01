@@ -18,7 +18,7 @@ package testutils
 
 import generators.Generators
 import models.domain._
-import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, InternationalAddress, UkAddress}
+import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, UkAddress}
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
 
@@ -36,7 +36,7 @@ object RegistrationData extends Generators with EitherValues {
       tradingNames = List("single", "double"),
       vatDetails = VatDetails(
         registrationDate = LocalDate.now,
-        address          = createUkAddress(),
+        address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         partOfVatGroup   = true,
         source           = VatDetailSource.Etmp
       ),
@@ -69,14 +69,6 @@ object RegistrationData extends Generators with EitherValues {
       dateOfFirstSale = Some(LocalDate.now())
     )
 
-  private def createUkAddress(): UkAddress =
-    UkAddress(
-      "123 Street",
-      Some("Street"),
-      "City",
-      Some("county"),
-      "AA12 1AB"
-    )
 
   private def createBusinessContactDetails(): BusinessContactDetails =
     BusinessContactDetails(

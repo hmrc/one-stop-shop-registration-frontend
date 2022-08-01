@@ -22,7 +22,7 @@ import models.NormalMode
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{HasTradingNamePage, RegisteredCompanyNamePage}
+import pages.HasTradingNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -39,7 +39,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val hasTradingNameRoute = routes.HasTradingNameController.onPageLoad(NormalMode).url
 
-  private val baseUserAnswers = basicUserAnswers.set(RegisteredCompanyNamePage, registeredCompanyName).success.value
+  private val baseUserAnswers = basicUserAnswers.copy(vatInfo = Some(vatCustomerInfo))
 
   "HasTradingName Controller" - {
 
@@ -59,36 +59,6 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return OK and the correct view for a GET when the user has answered the registered company name question and has partial vat info" in {
-
-      val application = applicationBuilder(userAnswers = Some(partialUserAnswersWithVatInfo.set(RegisteredCompanyNamePage, registeredCompanyName).success.value)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, hasTradingNameRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[HasTradingNameView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, registeredCompanyName)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET when the user has not answered the registered company name question and has partial vat info" in {
-
-      val application = applicationBuilder(userAnswers = Some(partialUserAnswersWithVatInfo)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, hasTradingNameRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onMissingAnswers().url
-      }
-    }
-
     "must return OK and the correct view for a GET when we have the user's company name in their VAT details" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
@@ -101,7 +71,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[HasTradingNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, vatCustomerInfo.organisationName.value)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, vatCustomerInfo.organisationName)(request, messages(application)).toString
       }
     }
 
@@ -202,23 +172,6 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, hasTradingNameRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if Registered Company Name has not been answered" +
-      "and we don't have the user's company name in their VAT details" in {
-
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request =

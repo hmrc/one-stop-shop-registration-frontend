@@ -77,13 +77,8 @@ class RegistrationService @Inject()(dateService: DateService) {
 
   private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
     answers.vatInfo match {
-      case Some(VatCustomerInfo(_, _, _, Some(organisationName))) =>
-        organisationName.validNec
-      case _ =>
-        answers.get(RegisteredCompanyNamePage) match {
-          case Some(name) => name.validNec
-          case None       => DataMissingError(RegisteredCompanyNamePage).invalidNec
-        }
+      case Some(vatInfo) => vatInfo.organisationName.validNec
+      case _ => DataMissingError(CheckVatDetailsPage).invalidNec
     }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
@@ -102,65 +97,19 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
   }
 
-  private def getAddress(answers: UserAnswers): ValidationResult[Address] =
-    answers.vatInfo match {
-      case Some(VatCustomerInfo(address, _, _, _)) => address.validNec
-      case None =>
-        answers.get(BusinessAddressInUkPage) match {
-          case Some(true) =>
-            answers.get(UkAddressPage) match {
-              case Some(address) => address.validNec
-              case None          => DataMissingError(UkAddressPage).invalidNec
-            }
-          case Some(false) =>
-            answers.get(InternationalAddressPage) match {
-              case Some(address) => address.validNec
-              case None          => DataMissingError(InternationalAddressPage).invalidNec
-            }
-          case None =>
-            answers.get(UkAddressPage) match {
-              case Some(address) => address.validNec
-              case None          => DataMissingError(BusinessAddressInUkPage).invalidNec
-            }
-        }
-    }
-
-  private def getRegistrationDate(answers: UserAnswers): ValidationResult[LocalDate] =
-    answers.vatInfo match {
-      case Some(VatCustomerInfo(_, Some(registrationDate), _, _)) =>
-        registrationDate.validNec
-      case _ =>
-        answers.get(UkVatEffectiveDatePage) match {
-          case Some(date) => date.validNec
-          case None       => DataMissingError(UkVatEffectiveDatePage).invalidNec
-        }
-    }
-
-  private def getPartOfVatGroup(answers: UserAnswers): ValidationResult[Boolean] =
-    answers.vatInfo match {
-      case Some(VatCustomerInfo(_, _, Some(partOfVatGroup), _)) =>
-        partOfVatGroup.validNec
-      case _ =>
-        answers.get(PartOfVatGroupPage) match {
-          case Some(answer) => answer.validNec
-          case None         => DataMissingError(PartOfVatGroupPage).invalidNec
-        }
-    }
-
-  private def getVatDetailSource(answers: UserAnswers): ValidationResult[VatDetailSource] =
-    answers.vatInfo match {
-      case Some(VatCustomerInfo(_, Some(_), Some(_), Some(_))) => VatDetailSource.Etmp.validNec
-      case Some(_)                                             => VatDetailSource.Mixed.validNec
-      case None                                                => VatDetailSource.UserEntered.validNec
-    }
-
-  private def getVatDetails(answers: UserAnswers): ValidationResult[VatDetails] =
-    (
-      getRegistrationDate(answers),
-      getAddress(answers),
-      getPartOfVatGroup(answers),
-      getVatDetailSource(answers)
-    ).mapN(VatDetails.apply)
+  private def getVatDetails(answers: UserAnswers): ValidationResult[VatDetails] = {
+    answers.vatInfo.map(
+      vatInfo =>
+        VatDetails(
+          vatInfo.registrationDate,
+          vatInfo.address,
+          vatInfo.partOfVatGroup,
+          VatDetailSource.Etmp
+        ).validNec
+    ).getOrElse(
+      DataMissingError(CheckVatDetailsPage).invalidNec
+    )
+  }
 
   private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
     answers.get(DateOfFirstSalePage) match {

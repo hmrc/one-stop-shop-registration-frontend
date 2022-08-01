@@ -45,12 +45,6 @@ trait PageGenerators {
   implicit lazy val arbitraryDateOfFirstSalePage: Arbitrary[DateOfFirstSalePage.type] =
     Arbitrary(DateOfFirstSalePage)
 
-  implicit lazy val arbitraryInternationalAddressPage: Arbitrary[InternationalAddressPage.type] =
-    Arbitrary(InternationalAddressPage)
-
-  implicit lazy val arbitraryBusinessAddressInUkPage: Arbitrary[BusinessAddressInUkPage.type] =
-    Arbitrary(BusinessAddressInUkPage)
-
   implicit lazy val arbitraryTaxRegisteredInEuPage: Arbitrary[TaxRegisteredInEuPage.type] =
     Arbitrary(TaxRegisteredInEuPage)
 
@@ -90,17 +84,11 @@ trait PageGenerators {
   implicit lazy val arbitraryCheckVatDetailsPage: Arbitrary[CheckVatDetailsPage.type] =
     Arbitrary(CheckVatDetailsPage)
 
-  implicit lazy val arbitraryCheckVatNumberPage: Arbitrary[CheckVatNumberPage.type] =
-    Arbitrary(CheckVatNumberPage)
-
   implicit lazy val arbitraryWebsitePage: Arbitrary[WebsitePage] =
     Arbitrary(WebsitePage(Index(0)))
 
   implicit lazy val arbitraryBusinessContactDetailsPage: Arbitrary[BusinessContactDetailsPage.type] =
     Arbitrary(BusinessContactDetailsPage)
-
-  implicit lazy val arbitraryUkAddressPage: Arbitrary[UkAddressPage.type] =
-    Arbitrary(UkAddressPage)
 
   implicit lazy val arbitraryAddEuVatDetailsPage: Arbitrary[AddEuDetailsPage.type] =
     Arbitrary(AddEuDetailsPage)
@@ -114,15 +102,7 @@ trait PageGenerators {
   implicit lazy val arbitraryEuVatNumberPage: Arbitrary[EuVatNumberPage] =
     Arbitrary(euDetails.EuVatNumberPage(Index(0)))
 
-  implicit lazy val arbitraryUkVatEffectiveDatePage: Arbitrary[UkVatEffectiveDatePage.type] =
-    Arbitrary(UkVatEffectiveDatePage)
-
   implicit lazy val arbitraryTradingNamePage: Arbitrary[TradingNamePage] =
     Arbitrary(TradingNamePage(Index(0)))
 
-  implicit lazy val arbitraryRegisteredCompanyNamePage: Arbitrary[RegisteredCompanyNamePage.type] =
-    Arbitrary(RegisteredCompanyNamePage)
-
-  implicit lazy val arbitraryPartOfVatGroupPage: Arbitrary[PartOfVatGroupPage.type] =
-    Arbitrary(PartOfVatGroupPage)
 }

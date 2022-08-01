@@ -35,8 +35,6 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(BusinessBasedInNiPage.type, JsValue)] ::
     arbitrary[(IsOnlineMarketplacePage.type, JsValue)] ::
     arbitrary[(DateOfFirstSalePage.type, JsValue)] ::
-    arbitrary[(InternationalAddressPage.type, JsValue)] ::
-    arbitrary[(BusinessAddressInUkPage.type, JsValue)] ::
     arbitrary[(TaxRegisteredInEuPage.type, JsValue)] ::
     arbitrary[(HasWebsitePage.type, JsValue)] ::
     arbitrary[(EuTaxReferencePage, JsValue)] ::
@@ -49,18 +47,13 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(FixedEstablishmentTradingNamePage, JsValue)] ::
     arbitrary[(FixedEstablishmentAddressPage, JsValue)] ::
     arbitrary[(CheckVatDetailsPage.type, JsValue)] ::
-    arbitrary[(CheckVatNumberPage.type, JsValue)] ::
     arbitrary[(WebsitePage, JsValue)] ::
     arbitrary[(BusinessContactDetailsPage.type, JsValue)] ::
-    arbitrary[(UkAddressPage.type, JsValue)] ::
     arbitrary[(AddEuDetailsPage.type, JsValue)] ::
     arbitrary[(VatRegisteredPage, JsValue)] ::
     arbitrary[(EuCountryPage, JsValue)] ::
     arbitrary[(EuVatNumberPage, JsValue)] ::
-    arbitrary[(UkVatEffectiveDatePage.type, JsValue)] ::
     arbitrary[(TradingNamePage, JsValue)] ::
-    arbitrary[(RegisteredCompanyNamePage.type, JsValue)] ::
-    arbitrary[(PartOfVatGroupPage.type, JsValue)] ::
     Nil
 
   implicit lazy val arbitraryUserData: Arbitrary[UserAnswers] = {

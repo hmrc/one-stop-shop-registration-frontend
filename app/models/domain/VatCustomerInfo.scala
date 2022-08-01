@@ -23,9 +23,9 @@ import java.time.LocalDate
 
 case class VatCustomerInfo(
                             address: DesAddress,
-                            registrationDate: Option[LocalDate],
-                            partOfVatGroup: Option[Boolean],
-                            organisationName: Option[String]
+                            registrationDate: LocalDate,
+                            partOfVatGroup: Boolean,
+                            organisationName: String
                           )
 
 object VatCustomerInfo {
