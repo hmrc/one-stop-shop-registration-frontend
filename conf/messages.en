@@ -408,6 +408,7 @@ previousRegistrations.change.hidden = One Stop Shop Union scheme deregistration 
 
 bankDetails.title = Enter your bank or building society account details
 bankDetails.heading = Enter your bank or building society account details
+bankDetails.hint = EU member states will only use these if they need to repay you.
 bankDetails.accountName = Name on the account
 bankDetails.accountName.hint = Enter the name as it appears on your bank statement.
 bankDetails.bic = BIC or SWIFT code
