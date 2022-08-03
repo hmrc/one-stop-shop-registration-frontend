@@ -332,7 +332,7 @@ fixedEstablishmentAddress.error.townOrCity.length = Town or city must be 35 char
 fixedEstablishmentAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces and apostrophes
 fixedEstablishmentAddress.error.stateOrRegion.length = State or region must be 35 characters or less
 fixedEstablishmentAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces and apostrophes
-fixedEstablishmentAddress.error.postCode.length = Postcode must be 50 characters or less
+fixedEstablishmentAddress.error.postCode.length = Postcode must be 40 characters or less
 fixedEstablishmentAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
 fixedEstablishmentAddress.change.hidden = fixed establishment address
 
@@ -340,7 +340,7 @@ fixedEstablishmentTradingName.title = What is your trading name in {0}?
 fixedEstablishmentTradingName.heading = What is your trading name in {0}?
 fixedEstablishmentTradingName.checkYourAnswersLabel = Trading name
 fixedEstablishmentTradingName.error.required = Enter your trading name in {0}
-fixedEstablishmentTradingName.error.length = Trading name must be 100 characters or less
+fixedEstablishmentTradingName.error.length = Trading name must be 40 characters or less
 fixedEstablishmentTradingName.change.hidden = trading name
 fixedEstablishmentTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 

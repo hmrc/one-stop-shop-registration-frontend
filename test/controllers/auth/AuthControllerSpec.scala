@@ -19,8 +19,7 @@ package controllers.auth
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
-import controllers.routes
-import models.{NormalMode, UserAnswers, VatApiCallResult, responses}
+import models.{UserAnswers, VatApiCallResult, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
