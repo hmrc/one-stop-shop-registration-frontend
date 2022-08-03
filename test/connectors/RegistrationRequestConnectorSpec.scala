@@ -18,8 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
-import models.{DesAddress, RegistrationValidationResult}
-import models.domain.VatCustomerInfo
+import models.RegistrationValidationResult
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
@@ -28,8 +27,6 @@ import play.api.test.Helpers._
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
-
-import java.time.LocalDate
 
 class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 

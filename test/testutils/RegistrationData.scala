@@ -18,7 +18,7 @@ package testutils
 
 import generators.Generators
 import models.domain._
-import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, UkAddress}
+import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress}
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
 

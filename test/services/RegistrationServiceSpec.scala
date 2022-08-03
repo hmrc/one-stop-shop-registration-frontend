@@ -20,7 +20,6 @@ import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import models._
-import models.domain.VatDetailSource.UserEntered
 import models.domain._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
