@@ -29,7 +29,7 @@ class FixedEstablishmentTradingNameFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("fixedEstablishmentTradingName.error.required", Seq(country.name))
         .verifying(firstError(
-          maxLength(100, "fixedEstablishmentTradingName.error.length"),
+          maxLength(40, "fixedEstablishmentTradingName.error.length"),
           regexp(commonTextPattern, "fixedEstablishmentTradingName.error.invalid")))
     )
 }

@@ -42,7 +42,7 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
          .verifying(regexp(commonTextPattern, "fixedEstablishmentAddress.error.stateOrRegion.format"))),
        "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
          .verifying(firstError(
-           maxLength(50, "fixedEstablishmentAddress.error.postCode.length"),
+           maxLength(40, "fixedEstablishmentAddress.error.postCode.length"),
            regexp(postcodePattern, "fixedEstablishmentAddress.error.postCode.invalid"))))
      )(InternationalAddress(_, _, _, _, _, country))(x => Some((x.line1, x.line2, x.townOrCity, x.stateOrRegion, x.postCode)))
    )
