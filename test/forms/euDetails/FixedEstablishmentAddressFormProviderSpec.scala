@@ -135,7 +135,7 @@ class FixedEstablishmentAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "postCode"
     val lengthKey = "fixedEstablishmentAddress.error.postCode.length"
     val invalidKey = "fixedEstablishmentAddress.error.postCode.invalid"
-    val maxLength = 50
+    val maxLength = 40
     val validData = "75700 PARIS CEDEX"
 
     behave like fieldThatBindsValidData(
