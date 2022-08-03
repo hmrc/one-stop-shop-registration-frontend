@@ -19,7 +19,6 @@ package controllers.euDetails
 import controllers.actions._
 import forms.euDetails.TaxRegisteredInEuFormProvider
 import models.Mode
-import pages.PartOfVatGroupPage
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,7 +40,7 @@ class TaxRegisteredInEuController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.flatMap(_.partOfVatGroup).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
+      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       val form = formProvider(vatOnly)
       val preparedForm = request.userAnswers.get(TaxRegisteredInEuPage) match {
         case None => form
@@ -56,7 +55,7 @@ class TaxRegisteredInEuController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.flatMap(_.partOfVatGroup).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
+      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       val form = formProvider(vatOnly)
       form.bindFromRequest().fold(
         formWithErrors =>

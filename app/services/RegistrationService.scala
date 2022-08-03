@@ -189,9 +189,7 @@ class RegistrationService @Inject()(dateService: DateService) {
   }
 
   private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[EuTaxRegistration] = {
-    val isPartOfVatGroup = answers.vatInfo.flatMap(
-      vatInfo => vatInfo.partOfVatGroup
-    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
     answers.get(EuCountryPage(index)) match {
       case Some(country) =>
         if(isPartOfVatGroup){

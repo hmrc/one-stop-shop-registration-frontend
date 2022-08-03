@@ -44,7 +44,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider(euVatDetails.euCountry.name)
 
   private val baseUserAnswers =
-    basicUserAnswers
+    basicUserAnswersWithVatInfo
       .set(EuCountryPage(index), euVatDetails.euCountry).success.value
       .set(VatRegisteredPage(index), true).success.value
       .set(EuVatNumberPage(index), "VAT Number").success.value
@@ -154,7 +154,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no EU VAT details exist" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, deleteEuVatDetailsRoute)

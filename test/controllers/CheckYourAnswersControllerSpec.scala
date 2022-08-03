@@ -518,7 +518,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -528,7 +528,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -543,13 +543,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "the user is redirected to the Error Submitting Registration page and their answers are saved" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
-          val savedAnswers = basicUserAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
+          val savedAnswers = basicUserAnswersWithVatInfo.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
-          when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, basicUserAnswers.data, None, Instant.now))))
+          when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, basicUserAnswersWithVatInfo.data, None, Instant.now))))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -560,7 +560,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -573,13 +573,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "the user is redirected to the Journey Recovery page when saving answers fails" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
-          val savedAnswers = basicUserAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
+          val savedAnswers = basicUserAnswersWithVatInfo.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(123, "error")))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -590,7 +590,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER

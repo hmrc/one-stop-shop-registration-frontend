@@ -44,7 +44,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private lazy val addEuVatDetailsRoute = routes.AddEuDetailsController.onPageLoad(NormalMode).url
   private def addEuVatDetailsPostRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
   private val baseAnswers =
-    basicUserAnswers
+    basicUserAnswersWithVatInfo
       .set(EuCountryPage(index), country).success.value
       .set(VatRegisteredPage(index), false).success.value
       .set(HasFixedEstablishmentPage(index), false).success.value
@@ -54,7 +54,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       .set(EuSendGoodsAddressPage(index), arbitraryInternationalAddress.arbitrary.sample.value).success.value
 
   private val incompleteAnswers =
-    basicUserAnswers
+    basicUserAnswersWithVatInfo
       .set(EuCountryPage(index), country).success.value
       .set(VatRegisteredPage(index), true).success.value
 
@@ -80,7 +80,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET when answers are complete and user is part of Vat Group" in {
 
-      val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true))))
+      val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
         .set(EuVatNumberPage(index), "12345").success.value
       )).build()
 
@@ -187,7 +187,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted and user is part of vat group" in {
 
-      val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true))))
+      val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
         .set(EuVatNumberPage(index), "12345").success.value
       )).build()
 
@@ -225,7 +225,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, addEuVatDetailsRoute)

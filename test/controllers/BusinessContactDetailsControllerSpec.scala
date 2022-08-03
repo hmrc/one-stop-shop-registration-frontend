@@ -46,7 +46,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
   private lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
 
-  private val userAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+  private val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
   private val mockEmailVerificationService = mock[EmailVerificationService]
 
@@ -62,7 +62,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, businessContactDetailsRoute)
@@ -148,7 +148,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         eqTo(emailVerificationRequest.continueUrl))(any())) thenReturn Future.successful(Right(emailVerificationResponse))
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(
             bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
             bind[EmailVerificationService].toInstance(mockEmailVerificationService)
@@ -162,7 +162,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
         val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual config.emailVerificationUrl + emailVerificationResponse.redirectUri
@@ -229,7 +229,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =

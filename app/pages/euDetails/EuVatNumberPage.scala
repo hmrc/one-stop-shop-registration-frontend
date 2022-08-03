@@ -18,7 +18,7 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
-import pages.{PartOfVatGroupPage, QuestionPage}
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -29,9 +29,7 @@ case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
   override def toString: String = "euVatNumber"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = {
-    val isPartOfVatGroup = answers.vatInfo.flatMap(
-      vatInfo => vatInfo.partOfVatGroup
-    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
     if (isPartOfVatGroup) {
       euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
     }
@@ -42,9 +40,7 @@ case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = {
-    val isPartOfVatGroup = answers.vatInfo.flatMap(
-      vatInfo => vatInfo.partOfVatGroup
-    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
     if (isPartOfVatGroup) {
       euRoutes.AddEuDetailsController.onPageLoad(CheckMode)
     }
@@ -57,9 +53,7 @@ case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
   }
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
-    val isPartOfVatGroup = answers.vatInfo.flatMap(
-      vatInfo => vatInfo.partOfVatGroup
-    ).getOrElse(answers.get(PartOfVatGroupPage).contains(true))
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
     if (isPartOfVatGroup) {
       euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
     }

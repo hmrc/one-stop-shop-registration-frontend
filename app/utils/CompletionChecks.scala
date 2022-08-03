@@ -22,7 +22,7 @@ import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNu
 import models.requests.AuthenticatedDataRequest
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage, PartOfVatGroupPage}
+import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
 import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
@@ -55,14 +55,12 @@ trait CompletionChecks {
 
 
   def getIncompleteEuDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[EuOptionalDetails] = {
-    val isPartOfVatGroup = request.userAnswers.vatInfo.flatMap(
-      vatInfo => vatInfo.partOfVatGroup
-    ).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
+    val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
     request.userAnswers
       .get(EuOptionalDetailsQuery(index))
       .find(details =>
-        (isPartOfVatGroup && details.euVatNumber.isEmpty) ||
-        (!isPartOfVatGroup && (details.vatRegistered.isEmpty ||
+        (isPartOfVatGroup.contains(true) && details.euVatNumber.isEmpty) ||
+        (isPartOfVatGroup.contains(false) && (details.vatRegistered.isEmpty ||
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
@@ -74,15 +72,12 @@ trait CompletionChecks {
   }
 
   def getAllIncompleteEuDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[EuOptionalDetails] = {
-    val isPartOfVatGroup = request.userAnswers.vatInfo.flatMap(
-      vatInfo => vatInfo.partOfVatGroup
-    ).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
-
+    val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
     request.userAnswers
       .get(AllEuOptionalDetailsQuery).map(
       _.filter(details =>
-        (isPartOfVatGroup && details.euVatNumber.isEmpty) ||
-          (!isPartOfVatGroup && (details.vatRegistered.isEmpty ||
+        (isPartOfVatGroup.contains(true) && details.euVatNumber.isEmpty) ||
+          (isPartOfVatGroup.contains(false) && (details.vatRegistered.isEmpty ||
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&

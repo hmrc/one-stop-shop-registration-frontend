@@ -42,7 +42,7 @@ class EuSendGoodsTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euSendGoodsTradingNameRoute = routes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
 
   "EuSendGoodsTradingName Controller" - {
 

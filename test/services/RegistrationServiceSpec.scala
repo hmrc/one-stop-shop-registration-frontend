@@ -51,7 +51,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       vatInfo = Some(VatCustomerInfo(
         DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         LocalDate.now,
-        true,
+        false,
       "foo"
     ))
     )
@@ -284,47 +284,16 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return a registration when an International address is given" in {
-
-      val address = InternationalAddress("line 1", None, "town", None, None, Country("FR", "France"))
+    "must return a registration when a user is part of a vat group and has eu registrations with vat numbers and no other details" in {
       val userAnswers =
-        answers
-          .set(BusinessAddressInUkPage, false).success.value
-          .set(InternationalAddressPage, address).success.value
-          .remove(UkAddressPage).success.value
-
-      val expectedRegistration =
-        RegistrationData.registration copy (
-          dateOfFirstSale = Some(arbitraryDate),
-          vatDetails = RegistrationData.registration.vatDetails copy(
-            address = address,
-            source = UserEntered
-          ),
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
-          )
-
-      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-      registration mustEqual Valid(expectedRegistration)
-    }
-
-    "must return a registration when a user is not part of a vat group and has eu registrations with vat numbers and no other details" in {
-      val userAnswers =
-        UserAnswers("id")
+        UserAnswers("id", vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
           .set(BusinessBasedInNiPage, true).success.value
           .set(DateOfFirstSalePage, arbitraryDate).success.value
-          .set(RegisteredCompanyNamePage, "foo").success.value
           .set(hasTradingNamePage, true).success.value
           .set(AllTradingNames, List("single", "double")).success.value
-          .set(PartOfVatGroupPage, true).success.value
-          .set(UkVatEffectiveDatePage, LocalDate.now).success.value
-          .set(BusinessAddressInUkPage, true).success.value
           .set(TaxRegisteredInEuPage, true).success.value
           .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
           .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-          .set(
-            UkAddressPage,
-            UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
-          ).success.value
           .set(
             BusinessContactDetailsPage,
             BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
@@ -339,11 +308,12 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val expectedRegistration = {
         RegistrationData.registration copy(
           dateOfFirstSale = Some(arbitraryDate),
+          registeredCompanyName = "Company name",
           vatDetails = VatDetails(
-            registrationDate = LocalDate.now,
-            address = UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB"),
+            registrationDate = LocalDate.now(stubClockAtArbitraryDate),
+            address = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
             partOfVatGroup = true,
-            source = VatDetailSource.UserEntered
+            source = VatDetailSource.Etmp
           ),
           commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
           previousRegistrations = Seq.empty,
@@ -589,21 +559,13 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
           "with Vat Number missing when a user is part of vat group" in {
             val userAnswers =
-              UserAnswers("id")
+              UserAnswers("id", vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
                 .set(BusinessBasedInNiPage, true).success.value
                 .set(DateOfFirstSalePage, arbitraryDate).success.value
-                .set(RegisteredCompanyNamePage, "foo").success.value
                 .set(hasTradingNamePage, true).success.value
                 .set(AllTradingNames, List("single", "double")).success.value
-                .set(PartOfVatGroupPage, true).success.value
-                .set(UkVatEffectiveDatePage, LocalDate.now).success.value
-                .set(BusinessAddressInUkPage, true).success.value
                 .set(TaxRegisteredInEuPage, true).success.value
                 .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-                .set(
-                  UkAddressPage,
-                  UkAddress("123 Street", Some("Street"), "City", Some("county"), "AA12 1AB")
-                ).success.value
                 .set(
                   BusinessContactDetailsPage,
                   BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value

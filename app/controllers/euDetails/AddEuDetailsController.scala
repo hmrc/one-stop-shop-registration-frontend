@@ -21,7 +21,6 @@ import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
-import pages.PartOfVatGroupPage
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -47,7 +46,7 @@ class AddEuDetailsController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.flatMap(_.partOfVatGroup).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
+      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       getNumberOfEuCountries {
         number =>
 
@@ -77,7 +76,7 @@ class AddEuDetailsController @Inject()(
 
   def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.flatMap(_.partOfVatGroup).getOrElse(request.userAnswers.get(PartOfVatGroupPage).contains(true))
+      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       withCompleteDataAsync[EuOptionalDetails](
         data = getAllIncompleteEuDetails,
         onFailure = (incomplete: Seq[EuOptionalDetails]) => {

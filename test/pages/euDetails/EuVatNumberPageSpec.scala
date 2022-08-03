@@ -21,7 +21,7 @@ import controllers.euDetails.{routes => euRoutes}
 import models.{CheckLoopMode, CheckMode, Index, NormalMode}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
-import pages.{PartOfVatGroupPage, euDetails}
+import pages.euDetails
 
 class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
@@ -45,7 +45,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Eu Details for the same index if the user is part of vat group" in {
 
-        EuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true)))))
+        EuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
       }
     }
@@ -77,7 +77,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Eu Details for the same index if the user is part of vat group" in {
 
-        EuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers.set(PartOfVatGroupPage, true).success.value)
+        EuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(CheckMode))
       }
     }
@@ -109,7 +109,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Eu Details for the same index if the user is part of vat group" in {
 
-        EuVatNumberPage(index).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true)))))
+        EuVatNumberPage(index).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
       }
     }

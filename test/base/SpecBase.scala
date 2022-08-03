@@ -97,9 +97,8 @@ trait SpecBase
 
   val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
-  val basicUserAnswers: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value
+  val basicUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value copy (vatInfo = Some(vatCustomerInfo))
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
-  val basicUserAnswersWithVatInfo: UserAnswers = basicUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val  completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
     .set(HasTradingNamePage, false).success.value
     .set(HasMadeSalesPage, false).success.value

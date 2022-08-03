@@ -22,7 +22,7 @@ import models.{CheckLoopMode, CheckMode, Country, Index, NormalMode, UserAnswers
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.behaviours.PageBehaviours
-import pages.{PartOfVatGroupPage, euDetails}
+import pages.euDetails
 
 
 class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckPropertyChecks {
@@ -47,7 +47,7 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
 
       "to Eu Vat Number for the same index when user is part of vat group" in {
 
-        EuCountryPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true)))))
+        EuCountryPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
           .mustEqual(euRoutes.EuVatNumberController.onPageLoad(NormalMode, index))
       }
     }
@@ -72,7 +72,6 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
               baseAnswers =>
 
                 val answers = baseAnswers
-                  .set(PartOfVatGroupPage, false).success.value
                   .set(VatRegisteredPage(Index(0)), true).success.value
 
                 EuCountryPage(index).navigate(CheckMode, answers)
@@ -87,7 +86,7 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
 
           "to Eu Vat Number for the same index" in {
 
-            EuCountryPage(index).navigate(CheckMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true)))))
+            EuCountryPage(index).navigate(CheckMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
               .mustEqual(euRoutes.EuVatNumberController.onPageLoad(CheckMode, index))
           }
         }
@@ -99,7 +98,7 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
             forAll(arbitrary[UserAnswers]) {
               baseAnswers =>
 
-                val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true))))
+                val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
                   .set(EuVatNumberPage(Index(0)), "1234567").success.value
 
                 EuCountryPage(index).navigate(CheckMode, answers)
@@ -130,7 +129,6 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
               baseAnswers =>
 
                 val answers = baseAnswers
-                  .set(PartOfVatGroupPage, false).success.value
                   .set(VatRegisteredPage(Index(0)), true).success.value
 
                 EuCountryPage(index).navigate(CheckLoopMode, answers)
@@ -145,7 +143,7 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
 
           "to Eu Vat Number for the same index" in {
 
-            EuCountryPage(index).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = Some(true)))))
+            EuCountryPage(index).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
               .mustEqual(euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index))
           }
         }
@@ -157,8 +155,7 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
             forAll(arbitrary[UserAnswers]) {
               baseAnswers =>
 
-                val answers = baseAnswers
-                  .set(PartOfVatGroupPage, true).success.value
+                val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
                   .set(EuVatNumberPage(Index(0)), "1234567").success.value
 
                 EuCountryPage(index).navigate(CheckLoopMode, answers)

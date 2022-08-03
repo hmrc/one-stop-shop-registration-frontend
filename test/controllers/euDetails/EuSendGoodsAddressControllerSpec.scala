@@ -46,7 +46,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
   private lazy val euSendGoodsAddressRoute = routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index).url
 
   private val baseUserAnswers =
-    basicUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+    basicUserAnswersWithVatInfo.set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(index), country).success.value
       .set(HasFixedEstablishmentPage(index), false).success.value
       .set(VatRegisteredPage(index), true).success.value
