@@ -28,7 +28,7 @@ class EuSendGoodsTradingNameFormProviderSpec extends StringFieldBehaviours {
   val lengthKey = "euSendGoodsTradingName.error.length"
   val invalidKey = "euSendGoodsTradingName.error.invalid"
   val validData = "Another trading name"
-  val maxLength = 100
+  val maxLength = 40
 
   private val country: Country = arbitrary[Country].sample.value
 

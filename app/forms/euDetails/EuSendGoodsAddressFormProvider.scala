@@ -43,7 +43,7 @@ class EuSendGoodsAddressFormProvider @Inject() extends Mappings {
           .verifying(regexp(commonTextPattern, "euSendGoodsAddress.error.stateOrRegion.format"))),
         "postCode" -> optional(text("euSendGoodsAddress.error.postCode.required")
           .verifying(firstError(
-            maxLength(50, "euSendGoodsAddress.error.postCode.length"),
+            maxLength(40, "euSendGoodsAddress.error.postCode.length"),
             regexp(postcodePattern, "euSendGoodsAddress.error.postCode.invalid"))))
       )(InternationalAddress(_, _, _, _, _, country))(x => Some((x.line1, x.line2, x.townOrCity, x.stateOrRegion, x.postCode)))
     )
