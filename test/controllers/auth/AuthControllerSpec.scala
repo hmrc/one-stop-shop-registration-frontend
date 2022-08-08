@@ -264,6 +264,40 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
     }
   }
 
+  "continueOnSignIn" - {
+
+      "must redirect to the ContinueRegistration page if saved url was retrieved from saved answers" in {
+
+        val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+          .set(SavedProgressPage, "/url").success.value
+        val application = appBuilder(Some(answers)).build()
+        when(mockSavedAnswersConnector.get()(any())) thenReturn
+          Future.successful(Right(Some(SavedUserAnswers(vrn,answers.data, None, Instant.now))))
+
+        running(application) {
+          val request = FakeRequest(GET, routes.AuthController.continueOnSignIn().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ContinueRegistrationController.onPageLoad().url
+        }
+      }
+
+    "must redirect to NoRegistrationInProgress when there is no saved answers" in {
+      val application = appBuilder(None).build()
+      when(mockSavedAnswersConnector.get()(any())) thenReturn
+        Future.successful(Right(None))
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.continueOnSignIn().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.NoRegistrationInProgressController.onPageLoad().url
+      }
+    }
+  }
+
   "signOut" - {
 
     "must redirect to sign out, specifying the exit survey as the continue URL" in {
