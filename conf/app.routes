@@ -274,5 +274,5 @@ POST       /continue-registration                                      controlle
 GET        /registration-service-error                                 controllers.VatApiDownController.onPageLoad()
 
 GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
-GET        /no-registration-in-progress                                controllers.NoRegistrationInProgressController.onPageLoad()
+GET        /no-saved-registration                                      controllers.NoRegistrationInProgressController.onPageLoad()
 GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
