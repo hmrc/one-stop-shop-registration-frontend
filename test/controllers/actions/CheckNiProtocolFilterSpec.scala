@@ -32,6 +32,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.Enrolments
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -59,7 +60,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           ).build()
 
         running(app) {
-          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(mockConnector, config)
 
@@ -83,7 +84,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
 
 
         running(app) {
-          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(mockConnector, config)
 
@@ -107,7 +108,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
 
 
         running(app) {
-          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(mockConnector, config)
 
@@ -127,7 +128,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           ).build()
 
         running(app) {
-          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(mockConnector, config)
 
