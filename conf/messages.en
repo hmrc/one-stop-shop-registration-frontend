@@ -600,3 +600,6 @@ errorSubmittingRegistration.heading = Your registration is not submitted
 errorSubmittingRegistration.savedAnswers = We have saved you answers and you can <a class="govuk-link" href="{0}">try again later</a>.
 errorSubmittingRegistration.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 errorSubmittingRegistration.your.account = Back to your account
+
+problemWithAccount.title = problemWithAccount
+problemWithAccount.heading = problemWithAccount

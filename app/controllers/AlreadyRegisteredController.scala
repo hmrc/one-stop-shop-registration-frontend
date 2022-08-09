@@ -77,7 +77,7 @@ class AlreadyRegisteredController @Inject()(
             )
 
           case None =>
-            Redirect(routes.IndexController.onPageLoad())
+            Redirect(controllers.routes.ProblemWithAccountController.onPageLoad())
         }
       }
   }

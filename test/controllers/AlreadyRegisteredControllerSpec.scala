@@ -189,7 +189,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
     "when the connector does not find an existing registration" - {
 
-      "must redirect the user to the start of the service" in {
+      "must redirect the user to the Problem With Account page" in {
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
         val application =
@@ -203,7 +203,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+          redirectLocation(result).value mustEqual routes.ProblemWithAccountController.onPageLoad().url
         }
       }
     }
