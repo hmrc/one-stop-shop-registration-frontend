@@ -274,4 +274,4 @@ GET        /registration-service-error                                 controlle
 
 GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
 
-GET        /problemWithAccount                                         controllers.ProblemWithAccountController.onPageLoad()
+GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
