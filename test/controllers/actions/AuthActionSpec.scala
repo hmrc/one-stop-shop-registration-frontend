@@ -43,30 +43,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
   private type RetrievalsType = Option[Credentials] ~ Enrolments ~ Option[AffinityGroup] ~ ConfidenceLevel ~ Option[CredentialRole]
   private val vatEnrolment = Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "123456789")), "Activated")))
-  private val registrationEnrolment = Enrolments(
-    Set(
-      Enrolment(
-        "HMRC-MTD-VAT",
-        Seq(EnrolmentIdentifier("VRN", "123456789")),
-        "Activated"
-      ),
-      Enrolment(
-        "HMRC-OSS-ORG",
-        Seq(EnrolmentIdentifier("VRN", "123456789")),
-        "Activated"
-      )
-    )
-  )
   private val vatdecEnrolment = Enrolments(Set(Enrolment("HMCE-VATDEC-ORG", Seq(EnrolmentIdentifier("VATRegNo", "123456789")), "Activated")))
-  private val vatdecWithRegistrationEnrolment =
-    Enrolments(Set(
-      Enrolment("HMCE-VATDEC-ORG", Seq(EnrolmentIdentifier("VATRegNo", "123456789")), "Activated"),
-      Enrolment(
-        "HMRC-OSS-ORG",
-        Seq(EnrolmentIdentifier("VRN", "123456789")),
-        "Activated"
-      )
-    ))
 
   class Harness(authAction: AuthenticatedIdentifierAction, defaultAction: DefaultActionBuilder) {
     def onPageLoad(): Action[AnyContent] = (defaultAction andThen authAction) { _ => Results.Ok }
@@ -106,30 +83,6 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             status(result) mustEqual OK
           }
         }
-
-        "must redirect to already registered when registration enrolment found" in {
-
-          val application = applicationBuilder(None)
-            .configure("features.enrolments-enabled" -> "true")
-            .configure("oss-enrolment" -> "HMRC-OSS-ORG")
-            .build()
-
-          running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-            val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
-
-            when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-              .thenReturn(Future.successful(Some(testCredentials) ~ registrationEnrolment ~ Some(Organisation) ~ ConfidenceLevel.L50 ~ Some(User)))
-
-            val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
-            val controller = new Harness(action, actionBuilder)
-            val result = controller.onPageLoad()(fakeRequest)
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).get mustBe controllers.routes.AlreadyRegisteredController.onPageLoad().url
-          }
-        }
       }
 
       "when the user is logged in as an Organisation Admin with a VATDEC enrolment and strong credentials" - {
@@ -156,30 +109,6 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             status(result) mustEqual OK
           }
         }
-
-        "must redirect to already registered when registration enrolment found" in {
-
-          val application = applicationBuilder(None)
-            .configure("features.enrolments-enabled" -> "true")
-            .configure("oss-enrolment" -> "HMRC-OSS-ORG")
-            .build()
-
-          running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-            val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
-
-            when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-              .thenReturn(Future.successful(Some(testCredentials) ~ vatdecWithRegistrationEnrolment ~ Some(Organisation) ~ ConfidenceLevel.L50 ~ Some(User)))
-
-            val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
-            val controller = new Harness(action, actionBuilder)
-            val result = controller.onPageLoad()(fakeRequest)
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).get mustBe controllers.routes.AlreadyRegisteredController.onPageLoad().url
-          }
-        }
       }
 
       "when the user is logged in as an Individual with a VAT enrolment, strong credentials and confidence level 200" - {
@@ -204,30 +133,6 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             val result = controller.onPageLoad()(fakeRequest)
 
             status(result) mustEqual OK
-          }
-        }
-
-        "must redirect to already registered when registration enrolment found" in {
-
-          val application = applicationBuilder(None)
-            .configure("features.enrolments-enabled" -> "true")
-            .configure("oss-enrolment" -> "HMRC-OSS-ORG")
-            .build()
-
-          running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-            val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
-
-            when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-              .thenReturn(Future.successful(Some(testCredentials) ~ registrationEnrolment ~ Some(Individual) ~ ConfidenceLevel.L200 ~ None))
-
-            val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
-            val controller = new Harness(action, actionBuilder)
-            val result = controller.onPageLoad()(fakeRequest)
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).get mustBe controllers.routes.AlreadyRegisteredController.onPageLoad().url
           }
         }
       }

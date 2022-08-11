@@ -17,6 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
+import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
 import models.UserAnswers
@@ -33,34 +34,50 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.DataMigrationService
 import testutils.RegistrationData
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness(connector: RegistrationConnector, migrationService: DataMigrationService) extends CheckRegistrationFilterImpl(connector, migrationService) {
+  class Harness(connector: RegistrationConnector, config:FrontendAppConfig, migrationService: DataMigrationService)
+    extends CheckRegistrationFilterImpl(connector, config, migrationService) {
     def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   private val mockConnector = mock[RegistrationConnector]
   private val mockService = mock[DataMigrationService]
-
+  private val registrationEnrolment = Enrolments(
+    Set(
+      Enrolment(
+        "HMRC-MTD-VAT",
+        Seq(EnrolmentIdentifier("VRN", "123456789")),
+        "Activated"
+      ),
+      Enrolment(
+        "HMRC-OSS-ORG",
+        Seq(EnrolmentIdentifier("VRN", "123456789")),
+        "Activated"
+      )
+    )
+  )
   override def beforeEach(): Unit = {
     Mockito.reset(mockConnector)
   }
 
   ".filter" - {
 
-    "must return None when an existing registration is not found" in {
+    "must return None when an existing registration or enrolment is not found" in {
 
       when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
-        val controller = new Harness(mockConnector, mockService)
+        val config = app.injector.instanceOf[FrontendAppConfig]
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+        val controller = new Harness(mockConnector, config, mockService)
 
         val result = controller.callFilter(request).futureValue
 
@@ -76,11 +93,35 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
 
       running(app) {
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn)
-        val controller = new Harness(mockConnector, mockService)
+        val config = app.injector.instanceOf[FrontendAppConfig]
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty))
+        val controller = new Harness(mockConnector, config, mockService)
 
         val result = controller.callFilter(request).futureValue
         verify(mockService, times(1)).migrate(any(), any())
+
+        result.value mustEqual Redirect(routes.AlreadyRegisteredController.onPageLoad())
+      }
+    }
+
+    "must redirect to Already Registered when an enrolment is found" in {
+
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
+
+
+      val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector))
+        .configure(
+          "features.enrolments-enabled" -> true,
+          "oss-enrolment" -> "HMRC-OSS-ORG"
+        )
+        .build()
+
+      running(app) {
+        val config = app.injector.instanceOf[FrontendAppConfig]
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment)
+        val controller = new Harness(mockConnector, config, mockService)
+
+        val result = controller.callFilter(request).futureValue
 
         result.value mustEqual Redirect(routes.AlreadyRegisteredController.onPageLoad())
       }

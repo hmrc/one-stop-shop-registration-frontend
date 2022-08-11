@@ -16,12 +16,14 @@
 
 package controllers.actions
 
+import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
 import models.requests.AuthenticatedIdentifierRequest
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -29,6 +31,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector,
+                                            config: FrontendAppConfig,
                                             migrationService: DataMigrationService)
                                            (implicit val executionContext: ExecutionContext)
   extends CheckRegistrationFilter {
@@ -37,15 +40,23 @@ class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector,
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    connector.getRegistration() map {
-      case Some(_) =>
+    for {
+      registration <- connector.getRegistration()
+    } yield {
+      if(registration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
         request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
-        migrationService
-          .migrate(sessionId, request.userId)
+          migrationService
+            .migrate(sessionId, request.userId)
         )
         Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
-      case None    => None
+      } else {
+        None
+      }
     }
+  }
+
+  private def hasRegistrationEnrolment(enrolments: Enrolments): Boolean = {
+    config.enrolmentsEnabled && enrolments.enrolments.exists(_.key == config.ossEnrolment)
   }
 }
 

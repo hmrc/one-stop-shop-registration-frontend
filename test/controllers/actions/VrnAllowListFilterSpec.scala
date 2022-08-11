@@ -25,6 +25,7 @@ import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.FeatureFlagService
+import uk.gov.hmrc.auth.core.Enrolments
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -53,7 +54,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request    = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val features   = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
@@ -78,7 +79,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request    = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val features   = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
@@ -106,7 +107,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 

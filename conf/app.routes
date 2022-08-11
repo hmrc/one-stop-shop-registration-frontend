@@ -273,3 +273,5 @@ POST       /continue-registration                                      controlle
 GET        /registration-service-error                                 controllers.VatApiDownController.onPageLoad()
 
 GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
+
+GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
