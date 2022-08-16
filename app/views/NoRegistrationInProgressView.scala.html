@@ -1,0 +1,20 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(redirectURL: String = controllers.routes.AlreadyRegisteredController.onPageLoad().url)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("noRegistrationInProgress.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("noRegistrationInProgress.heading")</h1>
+
+    <p class="govuk-body">@messages("noRegistrationInProgress.sessionExpired")</p>
+
+    <p class="govuk-body">
+        @govukButton(
+        ButtonViewModel(messages("site.startAgain"))
+        .asLink(redirectURL)
+        )
+    </p>
+}

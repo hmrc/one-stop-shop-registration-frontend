@@ -118,6 +118,7 @@ GET         /account/credential-unsupported                           controller
 GET         /account/role-unsupported                                 controllers.auth.AuthController.unsupportedCredentialRole
 
 GET         /on-sign-in                                               controllers.auth.AuthController.onSignIn
+GET         /continue-on-sign-in                                      controllers.auth.AuthController.continueOnSignIn
 
 GET         /confirm-vat-details                                      controllers.CheckVatDetailsController.onPageLoad
 POST        /confirm-vat-details                                      controllers.CheckVatDetailsController.onSubmit
@@ -273,5 +274,5 @@ POST       /continue-registration                                      controlle
 GET        /registration-service-error                                 controllers.VatApiDownController.onPageLoad()
 
 GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
-
+GET        /no-saved-registration                                      controllers.NoRegistrationInProgressController.onPageLoad()
 GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
