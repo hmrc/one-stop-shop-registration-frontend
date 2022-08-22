@@ -37,10 +37,10 @@
 
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
         @if(enrolmentsEnabled) {
-          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetailsWithBta.caption")</p>
+          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetailsWithBta.p1")</p>
+          <p class="govuk-body govuk-!-margin-bottom-9">@Html(messages("businessContactDetailsWithBta.p2"))</p>
         } else {
-          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.p1")</p>
-          <p class="govuk-body govuk-!-margin-bottom-9">@messages("businessContactDetails.p2")</p>
+          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.caption")</p>
         }
 
         @govukInput(
