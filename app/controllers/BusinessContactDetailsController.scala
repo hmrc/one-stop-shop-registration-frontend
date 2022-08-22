@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
 import models.Mode
@@ -32,6 +33,7 @@ class BusinessContactDetailsController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       cc: AuthenticatedControllerComponents,
                                       formProvider: BusinessContactDetailsFormProvider,
+                                      config: FrontendAppConfig,
                                       view: BusinessContactDetailsView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -46,7 +48,7 @@ class BusinessContactDetailsController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, config.enrolmentsEnabled))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
@@ -54,7 +56,7 @@ class BusinessContactDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled))),
 
         value =>
           for {

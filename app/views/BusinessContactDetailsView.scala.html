@@ -22,10 +22,10 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    button: ButtonGroup
+    button: ButtonGroup,
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, enrolmentsEnabled: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("businessContactDetails.title"))) {
 
@@ -36,8 +36,12 @@
         }
 
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
-        <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.p1")</p>
-        <p class="govuk-body govuk-!-margin-bottom-9">@messages("businessContactDetails.p2")</p>
+        @if(enrolmentsEnabled) {
+          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetailsWithBta.caption")</p>
+        } else {
+          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.p1")</p>
+          <p class="govuk-body govuk-!-margin-bottom-9">@messages("businessContactDetails.p2")</p>
+        }
 
         @govukInput(
             InputViewModel(
