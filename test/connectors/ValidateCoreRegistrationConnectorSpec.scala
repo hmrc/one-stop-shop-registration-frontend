@@ -17,9 +17,10 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{get, notFound, ok, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, urlEqualTo}
 import models.core.{CoreRegistrationValidationResult, MatchType, Matches}
-import models.responses.NotFound
+import models.responses.UnexpectedResponseStatus
+import org.scalacheck.Gen
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
@@ -50,10 +51,11 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
         Matches(
           matchType = MatchType.FixedEstablishmentQuarantinedNETP,
           traderId = "444444444",
+          intermediary = Some("IN4819283759"),
           memberState = "DE",
           exclusionStatusCode = Some(3),
-          exclusionDecisionDate = Some(LocalDate.of(2022, 6, 25).format(Matches.dateFormatter)),
-          exclusionEffectiveDate = Some(LocalDate.of(2022, 7, 1).format(Matches.dateFormatter)),
+          exclusionDecisionDate = Some(LocalDate.now().format(Matches.dateFormatter)),
+          exclusionEffectiveDate = Some(LocalDate.now().format(Matches.dateFormatter)),
           nonCompliantReturns = Some(0),
           nonCompliantPayments = Some(0)
         )
@@ -84,13 +86,24 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       }
     }
 
-    "must return Left(NotFound) when the server returns NOT_FOUND" in {
+    "must return Left(UnexpectedStatus) when the server returns another error code" in {
 
       val vrn = Vrn("111111111")
+      val status = Gen.oneOf(
+        BAD_REQUEST,
+        NOT_FOUND,
+        METHOD_NOT_ALLOWED,
+        NOT_ACCEPTABLE,
+        UNSUPPORTED_MEDIA_TYPE,
+        INTERNAL_SERVER_ERROR,
+        BAD_GATEWAY,
+        SERVICE_UNAVAILABLE
+      ).sample.value
 
       server.stubFor(
         get(urlEqualTo(getValidateCoreRegistrationUrl))
-          .willReturn(notFound())
+          .willReturn(aResponse()
+            .withStatus(status))
       )
 
       running(application) {
@@ -98,10 +111,10 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
         val result = connector.validateCoreRegistration(vrn).futureValue
 
-        result mustBe Left(NotFound)
+        result mustBe Left(
+          UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
       }
     }
-
   }
 
 }

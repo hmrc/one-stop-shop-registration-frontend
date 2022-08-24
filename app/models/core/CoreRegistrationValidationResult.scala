@@ -37,6 +37,7 @@ object CoreRegistrationValidationResult {
 case class Matches(
                     matchType: MatchType,
                     traderId: String,
+                    intermediary: Option[String],
                     memberState: String,
                     exclusionStatusCode: Option[Int],
                     exclusionDecisionDate: Option[String],

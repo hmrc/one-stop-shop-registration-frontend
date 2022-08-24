@@ -35,3 +35,4 @@ class ValidateCoreRegistrationConnector @Inject()(config: Configuration, httpCli
   }
 
 }
+

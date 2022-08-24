@@ -18,8 +18,8 @@ package connectors
 
 import logging.Logging
 import models.core.CoreRegistrationValidationResult
-import models.responses.{ErrorResponse, InvalidJson, NotFound}
-import play.api.http.Status.{NOT_FOUND, OK}
+import models.responses.{ErrorResponse, InvalidJson, UnexpectedResponseStatus}
+import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
@@ -33,16 +33,17 @@ object ValidateCoreRegistrationHttpParser extends Logging {
         case OK => response.json.validate[CoreRegistrationValidationResult] match {
           case JsSuccess(validateCoreRegistration, _) => Right(validateCoreRegistration)
           case JsError(errors) =>
-            logger.warn(s"Failed trying to parse JSON $errors. JSON was ${response.json}", errors)
+            logger.error(s"Failed trying to parse JSON $errors. JSON was ${response.json}", errors)
             Left(InvalidJson)
         }
 
-        case NOT_FOUND =>
-          logger.warn(s"Received NotFound")
-          Left(NotFound)
+        case status =>
+          logger.error(s"Received UnexpectedResponseStatus with status code $status with body ${response.body}")
+          Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
       }
     }
   }
 
 }
+
 
