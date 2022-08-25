@@ -25,7 +25,7 @@ case class CoreRegistrationValidationResult(
                                              searchIdIntermediary: Option[String],
                                              searchIdIssuedBy: String,
                                              traderFound: Boolean,
-                                             matches: Seq[Matches]
+                                             matches: Seq[Match]
                                            )
 
 object CoreRegistrationValidationResult {
@@ -34,7 +34,7 @@ object CoreRegistrationValidationResult {
 
 }
 
-case class Matches(
+case class Match(
                     matchType: MatchType,
                     traderId: String,
                     intermediary: Option[String],
@@ -46,10 +46,10 @@ case class Matches(
                     nonCompliantPayments: Option[Int]
                   )
 
-object Matches {
+object Match {
 
   val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy MM dd")
 
-  implicit val format: OFormat[Matches] = Json.format[Matches]
+  implicit val format: OFormat[Match] = Json.format[Match]
 
 }

@@ -37,14 +37,14 @@ class CoreRegistrationValidationResultSpec extends AnyFreeSpec with Matchers wit
             Some("IN4747493822"),
             "FR",
             true,
-            Seq(Matches(
+            Seq(Match(
               MatchType.FixedEstablishmentQuarantinedNETP,
               "IM0987654321",
               Some("444444444"),
               "DE",
               Some(3),
-              Some(LocalDate.now().format(Matches.dateFormatter)),
-              Some(LocalDate.now().format(Matches.dateFormatter)),
+              Some(LocalDate.now().format(Match.dateFormatter)),
+              Some(LocalDate.now().format(Match.dateFormatter)),
               None,
               None
             ))
@@ -62,8 +62,8 @@ class CoreRegistrationValidationResultSpec extends AnyFreeSpec with Matchers wit
               "intermediary" -> "444444444",
               "memberState" -> "DE",
               "exclusionStatusCode" -> 3,
-              "exclusionDecisionDate" -> s"${LocalDate.now().format(Matches.dateFormatter)}",
-              "exclusionEffectiveDate" -> s"${LocalDate.now().format(Matches.dateFormatter)}"
+              "exclusionDecisionDate" -> s"${LocalDate.now().format(Match.dateFormatter)}",
+              "exclusionEffectiveDate" -> s"${LocalDate.now().format(Match.dateFormatter)}"
             ))
         )
 
@@ -78,7 +78,7 @@ class CoreRegistrationValidationResultSpec extends AnyFreeSpec with Matchers wit
             None,
             "FR",
             true,
-            Seq(Matches(
+            Seq(Match(
               MatchType.FixedEstablishmentQuarantinedNETP,
               "IM0987654321",
               None,

@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, urlEqualTo}
-import models.core.{CoreRegistrationValidationResult, MatchType, Matches}
+import models.core.{CoreRegistrationValidationResult, MatchType, Match}
 import models.responses.UnexpectedResponseStatus
 import org.scalacheck.Gen
 import play.api.Application
@@ -48,14 +48,14 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       searchIdIssuedBy = "FR",
       traderFound = true,
       matches = Seq(
-        Matches(
+        Match(
           matchType = MatchType.FixedEstablishmentQuarantinedNETP,
           traderId = "444444444",
           intermediary = Some("IN4819283759"),
           memberState = "DE",
           exclusionStatusCode = Some(3),
-          exclusionDecisionDate = Some(LocalDate.now().format(Matches.dateFormatter)),
-          exclusionEffectiveDate = Some(LocalDate.now().format(Matches.dateFormatter)),
+          exclusionDecisionDate = Some(LocalDate.now().format(Match.dateFormatter)),
+          exclusionEffectiveDate = Some(LocalDate.now().format(Match.dateFormatter)),
           nonCompliantReturns = Some(0),
           nonCompliantPayments = Some(0)
         )
