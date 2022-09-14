@@ -20,6 +20,7 @@ import models.{BankDetails, BusinessContactDetails}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
 import ModelHelpers._
+import models.exclusions.ExcludedTrader
 
 import java.time.LocalDate
 
@@ -36,7 +37,8 @@ final case class Registration(
                                bankDetails: BankDetails,
                                isOnlineMarketplace: Boolean,
                                niPresence: Option[NiPresence],
-                               dateOfFirstSale: Option[LocalDate]
+                               dateOfFirstSale: Option[LocalDate],
+                               excludedTrader: Option[ExcludedTrader] = None
                              )
 
 object Registration {
@@ -55,7 +57,8 @@ object Registration {
              bankDetails: BankDetails,
              isOnlineMarketplace: Boolean,
              niPresence: Option[NiPresence],
-             dateOfFirstSale: Option[LocalDate]): Registration = new Registration(
+             dateOfFirstSale: Option[LocalDate],
+             excludedTrader: Option[ExcludedTrader] = None): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
     tradingNames.map(normaliseSpaces),
@@ -68,6 +71,7 @@ object Registration {
     bankDetails,
     isOnlineMarketplace,
     niPresence,
-    dateOfFirstSale)
+    dateOfFirstSale,
+    excludedTrader)
 
 }
