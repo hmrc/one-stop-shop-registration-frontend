@@ -35,7 +35,6 @@ case class RegistrationConfirmationEmailPre10thParameters(
   recipientName_line1: String,
   businessName:String,
   startDate: String,
-  reference: String,
   lastDayOfCalendarQuarter: String,
   lastDayOfMonthAfterCalendarQuarter: String
 ) extends EmailParameters
@@ -51,7 +50,6 @@ case class RegistrationConfirmationEmailPost10thParameters(
   recipientName_line1: String,
   businessName:String,
   startDate: String,
-  reference: String,
   lastDayOfCalendarQuarter: String,
   lastDayOfMonthAfterNextCalendarQuarter: String,
   firstDayOfNextCalendarQuarter: String,

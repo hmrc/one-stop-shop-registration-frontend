@@ -51,12 +51,11 @@ class EmailServiceSpec extends SpecBase {
       val startDate = commencementDate
 
       forAll(
-        validVRNs,
         validEmails,
         safeInputsWithMaxLength(maxLengthBusiness),
         safeInputsWithMaxLength(maxLengthContactName),
       ) {
-        (vatNum: String, email: String, businessName: String, contactName: String) =>
+        (email: String, businessName: String, contactName: String) =>
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDayOfCalendarQuarterForPeriod = lastDayOfCalendarQuarterForPeriod.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarterForPeriod = lastDayOfMonthAfterCalendarQuarterForPeriod.format(formatter)
@@ -68,7 +67,6 @@ class EmailServiceSpec extends SpecBase {
               contactName,
               businessName,
               expectedDate,
-              vatNum,
               formattedLastDayOfCalendarQuarterForPeriod,
               formattedLastDayOfMonthAfterCalendarQuarterForPeriod)
           )
@@ -78,7 +76,6 @@ class EmailServiceSpec extends SpecBase {
           emailService.sendConfirmationEmail(
             contactName,
             businessName,
-            vatNum,
             commencementDate,
             email,
             Some(startDate)
@@ -100,12 +97,11 @@ class EmailServiceSpec extends SpecBase {
       val startDate = commencementDate.plusDays(1)
 
       forAll(
-        validVRNs,
         validEmails,
         safeInputsWithMaxLength(maxLengthBusiness),
         safeInputsWithMaxLength(maxLengthContactName),
       ) {
-        (vatNum: String, email: String, businessName: String, contactName: String) =>
+        (email: String, businessName: String, contactName: String) =>
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfNextCalendarQuarter.format(formatter)
@@ -119,7 +115,6 @@ class EmailServiceSpec extends SpecBase {
               contactName,
               businessName,
               expectedDate,
-              vatNum,
               formattedLastDateOfCalendarQuarter,
               formattedLastDayOfMonthAfterNextCalendarQuarter,
               formattedFirstDayOfNextCalendarQuarter,
@@ -131,7 +126,6 @@ class EmailServiceSpec extends SpecBase {
           emailService.sendConfirmationEmail(
             contactName,
             businessName,
-            vatNum,
             commencementDate,
             email,
             Some(startDate)
@@ -149,12 +143,11 @@ class EmailServiceSpec extends SpecBase {
       val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
 
       forAll(
-        validVRNs,
         validEmails,
         safeInputsWithMaxLength(maxLengthBusiness),
         safeInputsWithMaxLength(maxLengthContactName),
       ) {
-        (vatNum: String, email: String, businessName: String, contactName: String) =>
+        (email: String, businessName: String, contactName: String) =>
           val expectedDate = commencementDate.format(formatter)
           val formattedLastDayOfCalendarQuarterForPeriod = lastDayOfCalendarQuarterForPeriod.format(formatter)
           val formattedLastDayOfMonthAfterCalendarQuarterForPeriod = lastDayOfMonthAfterCalendarQuarterForPeriod.format(formatter)
@@ -166,7 +159,6 @@ class EmailServiceSpec extends SpecBase {
               contactName,
               businessName,
               expectedDate,
-              vatNum,
               formattedLastDayOfCalendarQuarterForPeriod,
               formattedLastDayOfMonthAfterCalendarQuarterForPeriod)
           )
@@ -176,7 +168,6 @@ class EmailServiceSpec extends SpecBase {
           emailService.sendConfirmationEmail(
             contactName,
             businessName,
-            vatNum,
             commencementDate,
             email,
             None

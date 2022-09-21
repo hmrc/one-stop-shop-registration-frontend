@@ -94,7 +94,6 @@ class CheckYourAnswersController @Inject()(
               emailService.sendConfirmationEmail(
                 registration.contactDetails.fullName,
                 registration.registeredCompanyName,
-                request.vrn.toString(),
                 registration.commencementDate,
                 registration.contactDetails.emailAddress,
                 registration.dateOfFirstSale

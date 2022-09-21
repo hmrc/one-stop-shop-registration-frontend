@@ -35,7 +35,6 @@ class EmailService@Inject()(
   def sendConfirmationEmail(
    recipientName_line1: String,
    businessName: String,
-   reference: String,
    commencementDate: LocalDate,
    emailAddress: String,
    startDate: Option[LocalDate]
@@ -55,7 +54,6 @@ class EmailService@Inject()(
           recipientName_line1,
           businessName,
           format(commencementDate),
-          reference,
           format(lastDayOfCalendarQuarterForPeriod),
           format(lastDayOfMonthAfterCalendarQuarterForPeriod)
         )} else {
@@ -63,7 +61,6 @@ class EmailService@Inject()(
           recipientName_line1,
           businessName,
           format(commencementDate),
-          reference,
           format(lastDayOfCalendarQuarter),
           format(lastDayOfMonthAfterNextCalendarQuarter) ,
           format(firstDayOfNextCalendarQuarter),
