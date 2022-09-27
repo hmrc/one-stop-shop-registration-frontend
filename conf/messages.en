@@ -162,21 +162,21 @@ notInControlOfMovingGoods.p2 = The online marketplaces will be responsible for p
 
 applicationComplete.title = You are registered for the One Stop Shop Union scheme
 applicationComplete.heading = You are registered for the One Stop Shop Union scheme
-applicationComplete.reference = Your reference number is your UK VAT registration number, {0}.
+applicationComplete.reference = Your reference number is <span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
 applicationComplete.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
 applicationComplete.CurrentQuarter.heading = Between {0} and {1}
 applicationComplete.CurrentQuarter = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
 applicationComplete.nextQuarter.heading = {0} onwards
 applicationComplete.next = What happens next
-applicationComplete.link.BTA = Manage your One Stop Shop returns in your business tax account.
+applicationComplete.link.BTA = Manage your One Stop Shop returns in your account.
 applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-applicationComplete.vatRate = You need to charge VAT at the rate of the EU country where the goods are sent to.
-applicationComplete.list = For each calendar quarter, you need to use the new One Stop Shop service to:
-applicationComplete.list.p1 = complete a single return for eligible sales of goods to consumers in the EU
-applicationComplete.list.p2 = make a payment to HMRC of the total VAT due on eligible sales of goods to consumers in the EU
-applicationComplete.commencementDate = Your first return will be for eligible sales starting from {0} to {1}.
-applicationComplete.p1 = We will contact you if we need to check any information.
-applicationComplete.p2 = We will contact you about how to use the new service to submit your first return and make payment by {0}.
+applicationComplete.vatRate = You must charge VAT at the rate for the EU country where you send your goods.
+applicationComplete.list = Each calendar quarter, you should use this service to:
+applicationComplete.list.p1 = complete a single VAT return for all eligible sales of goods to consumers in the EU
+applicationComplete.list.p2 = pay HMRC the total VAT due on eligible sales
+applicationComplete.commencementDate = Your first return period will be {0} to {1}.
+applicationComplete.contact.email = We''ll only contact you by email
+applicationComplete.contact.bta = or through your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account</a>.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
@@ -576,9 +576,9 @@ niProtocolRejection.heading = Register to trade under the Northern Ireland Proto
 niProtocolRejection.paragraph = You need a VAT number starting with 'XI' to use this service.
 niProtocolRejection.guidance = <a class="govuk-link" href="https://www.gov.uk/register-for-vat/selling-or-moving-goods-between-northern-ireland-and-the-eu">Find out more and register</a>
 
-applicationComplete.enrolment.heading = We've received your registration request
-applicationComplete.enrolment.title = We've received your registration request
-applicationComplete.enrolment.confirmation = We'll send a confirmation to {0} when your registration is complete.
+applicationComplete.enrolment.heading = We''ve received your registration request
+applicationComplete.enrolment.title = We''ve received your registration request
+applicationComplete.enrolment.confirmation = We''ll send a confirmation to <span class="govuk-body govuk-!-font-weight-bold">{0}</span> when your registration is complete.
 saveProgress.button = Save and come back later
 
 savedProgress.title = We have saved your progress

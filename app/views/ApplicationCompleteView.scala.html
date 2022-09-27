@@ -48,7 +48,7 @@
             </div>
         }
 
-        <div class="govuk-body">@messages("applicationComplete.reference", vrn.vrn)</div>
+        <div class="govuk-body">@Html(messages("applicationComplete.reference", vrn.vrn))</div>
 
         @if(isDOFSDifferentToCommencementDate){
             <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
@@ -60,8 +60,6 @@
             <h2 class="govuk-heading-m">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</h2>
         }
 
-        <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
-
         <p class="govuk-body">@messages("applicationComplete.list")
             <ul class="govuk-list govuk-list--bullet">
                 <li>@messages("applicationComplete.list.p1")</li>
@@ -69,16 +67,17 @@
             </ul>
         </p>
 
-        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
+        <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
         @externalUrl.map(
         url => Html(
         s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("applicationComplete.link.BTA") + "</a></p>"
         ))
-        <p class="govuk-body">@messages("applicationComplete.p1")</p>
 
-        <p class="govuk-body">@messages("applicationComplete.p2", vatReturnDeadline)</p>
+        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
+
+        <p class="govuk-body">@messages("applicationComplete.contact.email")</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
