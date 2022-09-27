@@ -75,4 +75,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val ossEnrolment: String       = configuration.get[String]("oss-enrolment")
 
   val saveForLaterTtl: Int = configuration.get[Int]("mongodb.saveForLaterTTLInDays")
+
+  val accessibilityStatementUrl: String = configuration.get[String]("accessibility-statement.service-path")
 }
