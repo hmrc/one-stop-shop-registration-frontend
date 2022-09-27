@@ -33,7 +33,7 @@ object ValidateEmailHttpParser extends Logging {
       response.status match {
         case CREATED =>
           response.json.validate[ValidateEmailResponse] match {
-            case JsSuccess(r, _) => Right(r)
+            case JsSuccess(validateEmail, _) => Right(validateEmail)
             case JsError(errors) =>
               logger.error(s"ValidateEmailResponse: ${response.json}, failed to parse with errors: $errors.")
               Left(InvalidJson)
@@ -46,3 +46,4 @@ object ValidateEmailHttpParser extends Logging {
   }
 
 }
+

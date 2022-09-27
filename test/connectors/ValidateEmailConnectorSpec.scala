@@ -18,9 +18,12 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
-import models.{ValidateEmailRequest, VerifyEmail}
+import models.responses.UnexpectedResponseStatus
+import models.{ValidateEmailRequest, ValidateEmailResponse, VerifyEmail}
+import org.scalacheck.Gen
 import play.api.Application
-import play.api.http.Status.{BAD_REQUEST, CREATED}
+import play.api.http.Status.{BAD_GATEWAY, BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, UNAUTHORIZED}
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -30,6 +33,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ValidateEmailConnectorSpec extends SpecBase with WireMockHelper {
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+
+  val url = "/email-verification/verify-email"
 
   private val verifyEmail: VerifyEmail =
     VerifyEmail(
@@ -54,7 +59,7 @@ class ValidateEmailConnectorSpec extends SpecBase with WireMockHelper {
       .configure("microservice.services.email-verification.port" -> server.port)
       .build()
 
-  ".verifyEmail" - {
+  ".validateEmail" - {
 
     "must return CREATED when verify email request initiated" in {
 
@@ -62,28 +67,40 @@ class ValidateEmailConnectorSpec extends SpecBase with WireMockHelper {
 
         val connector = application.injector.instanceOf[ValidateEmailConnector]
 
+        val expectedValidateEmailResponse = ValidateEmailResponse(redirectUrl = "/test")
+
+        val responseBody = Json.toJson(expectedValidateEmailResponse).toString
+
         server.stubFor(
-          post(urlEqualTo("/hmrc/verify-email"))
-            .willReturn(aResponse.withStatus(201))
+          post(urlEqualTo(url))
+            .willReturn(aResponse
+              .withStatus(CREATED)
+              .withBody(responseBody)
+            )
         )
 
-        connector.verifyEmail(validateEmailRequest).futureValue mustBe CREATED
+        connector.validateEmail(validateEmailRequest).futureValue mustBe Right(expectedValidateEmailResponse)
       }
 
     }
 
-    "must return false when email not verified" in {
+    "must return Left(UnexpectedResponseStatus) when the server responds with an Http Exception" in {
 
       running(application) {
+
+        val errorCode = Gen.oneOf(BAD_REQUEST, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_GATEWAY).sample.value
 
         val connector = application.injector.instanceOf[ValidateEmailConnector]
 
         server.stubFor(
-          post(urlEqualTo("/hmrc/verify-email"))
-            .willReturn(aResponse.withStatus(400))
+          post(urlEqualTo(url))
+            .willReturn(aResponse.withStatus(errorCode))
         )
 
-        connector.verifyEmail(validateEmailRequest).futureValue mustBe BAD_REQUEST
+        connector.validateEmail(validateEmailRequest)
+          .futureValue mustBe Left(
+          UnexpectedResponseStatus(errorCode, s"Unexpected response, status $errorCode returned")
+        )
       }
     }
 

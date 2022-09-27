@@ -19,7 +19,6 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class ValidateEmailResponse(
-                                credId: String,
                                 redirectUrl: String
                                 )
 

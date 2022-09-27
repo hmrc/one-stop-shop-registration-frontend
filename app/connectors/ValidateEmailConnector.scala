@@ -17,32 +17,32 @@
 package connectors
 
 import config.Service
-import logging.Logging
-import models.{ValidateEmailRequest, ValidateEmailResponse}
-import play.api.Configuration
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpException}
 import connectors.ValidateEmailHttpParser.{ReturnValidateEmailReads, ReturnValidateEmailResponse}
+import logging.Logging
+import models.ValidateEmailRequest
 import models.responses.UnexpectedResponseStatus
+import play.api.Configuration
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ValidateEmailConnector @Inject()(
-                                      config: Configuration,
-                                      client: HttpClient
-                                      ) extends Logging {
+                                        config: Configuration,
+                                        httpClient: HttpClient
+                                      ) extends HttpErrorFunctions with Logging {
 
   private val baseUrl = config.get[Service]("microservice.services.email-verification")
 
-  def verifyEmail(validateEmailRequest: ValidateEmailRequest)
-                 (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[ValidateEmailResponse] = {
-    val url = s"${baseUrl}hmrc/verify-email"
-    client.POST[ValidateEmailRequest, ReturnValidateEmailResponse](url, validateEmailRequest)
+  def validateEmail(validateEmailRequest: ValidateEmailRequest)
+                   (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[ReturnValidateEmailResponse] = {
+    val url = s"${baseUrl}/verify-email"
+    httpClient.POST[ValidateEmailRequest, ReturnValidateEmailResponse](url, validateEmailRequest)
       .recover {
-      case e: HttpException =>
-        logger.error(s"ValidateEmailResponse received an unexpected error wirth status: ${e.responseCode}")
-        Left(UnexpectedResponseStatus(e.responseCode, s"Unexpected response, status ${e.responseCode} returned"))
-    }
+        case e: HttpException =>
+          logger.error(s"ValidateEmailResponse received an unexpected error wirth status: ${e.responseCode}")
+          Left(UnexpectedResponseStatus(e.responseCode, s"Unexpected response, status ${e.responseCode} returned"))
+      }
   }
 
 }
