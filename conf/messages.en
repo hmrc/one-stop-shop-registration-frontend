@@ -175,8 +175,8 @@ applicationComplete.list = Each calendar quarter, you should use this service to
 applicationComplete.list.p1 = complete a single VAT return for all eligible sales of goods to consumers in the EU
 applicationComplete.list.p2 = pay HMRC the total VAT due on eligible sales
 applicationComplete.commencementDate = Your first return period will be {0} to {1}.
-applicationComplete.contact.email = We''ll only contact you by email
-applicationComplete.contact.bta = or through your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">business tax account</a>.
+applicationComplete.contactWithEmail = We''ll only contact you by email.
+applicationComplete.contactWithBTA = We''ll only contact you by email or through your <a class="govuk-link" href="/business-account">business tax account</a>.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
 
