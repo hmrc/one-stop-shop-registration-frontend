@@ -17,10 +17,10 @@
 package controllers
 
 import base.SpecBase
-import connectors.ValidateEmailConnector
+import connectors.EmailVerificationConnector
 import forms.BusinessContactDetailsFormProvider
 import models.responses.UnexpectedResponseStatus
-import models.{BusinessContactDetails, NormalMode, ValidateEmailRequest, ValidateEmailResponse, VerifyEmail}
+import models.{NormalMode, EmailVerificationResponse}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalacheck.Gen
@@ -31,10 +31,8 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.BusinessContactDetailsView
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
@@ -44,31 +42,12 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
 
-  private val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
   private val userAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
-  private val mockValidateEmailConnector = mock[ValidateEmailConnector]
+  private val mockEmailVerificationConnector = mock[EmailVerificationConnector]
 
-  private implicit lazy val hc: HeaderCarrier = HeaderCarrier()
-
-  private val verifyEmail: VerifyEmail = VerifyEmail(
-    address = contactDetails.emailAddress,
-    enterUrl = "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
-  )
-
-  private val validateEmailRequest: ValidateEmailRequest = ValidateEmailRequest(
-    credId = userAnswersId,
-    continueUrl = "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/bank-details",
-    origin = "OSS",
-    deskproServiceName = Some("one-stop-shop-registration-frontend"),
-    accessibilityStatementUrl = "/register-and-pay-vat-on-goods-sold-to-eu-from-northern-ireland",
-    pageTitle = Some("Register to pay VAT on distance sales of goods from Northern Ireland to the EU"),
-    backUrl = Some("/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"),
-    email = Some(verifyEmail)
-  )
-
-  private val validateEmailResponse: ValidateEmailResponse = ValidateEmailResponse(
-    redirectUrl = routes.BankDetailsController.onPageLoad(NormalMode).url
+  private val emailVerificationResponse: EmailVerificationResponse = EmailVerificationResponse(
+    redirectUri = routes.BankDetailsController.onPageLoad(NormalMode).url
   )
 
   "BusinessContactDetails Controller" - {
@@ -110,13 +89,14 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockValidateEmailConnector.validateEmail(eqTo(validateEmailRequest))(any(), any())) thenReturn Future.successful(Right(validateEmailResponse))
+      when(mockEmailVerificationConnector.verifyEmail(eqTo(emailVerificationRequest))(any(), any())) thenReturn
+        Future.successful(Right(emailVerificationResponse))
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(
             bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-            bind[ValidateEmailConnector].toInstance(mockValidateEmailConnector)
+            bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
           )
           .build()
 
@@ -129,27 +109,27 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual validateEmailResponse.redirectUrl
+        redirectLocation(result).value mustEqual emailVerificationResponse.redirectUri
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-//        verify(mockValidateEmailConnector.validateEmail(eqTo(validateEmailRequest))(any(), any()), times(1))
+//TODO        verify(mockEmailVerificationConnector.verifyEmail(eqTo(emailVerificationRequest))(any(), any()), times(1))
       }
     }
 
-    "must not save the answer and redirect to the current page when invalid email request is submitted" in {
+    "must not save the answer and redirect to the current page when invalid email is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       val httpStatus = Gen.oneOf(BAD_REQUEST, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_GATEWAY).sample.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockValidateEmailConnector.validateEmail(any())(any(), any())) thenReturn
+      when(mockEmailVerificationConnector.verifyEmail(any())(any(), any())) thenReturn
         Future.successful(Left(UnexpectedResponseStatus(httpStatus, "error")))
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
           .overrides(
             bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-            bind[ValidateEmailConnector].toInstance(mockValidateEmailConnector)
+            bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
           )
           .build()
 
@@ -163,7 +143,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
         verifyNoInteractions(mockSessionRepository)
-//        verify(mockValidateEmailConnector, times(1)).validateEmail(eqTo(validateEmailRequest)).futureValue
+//TODO        verify(mockEmailVerificationConnector, times(1)).verifyEmail(eqTo(emailVerificationRequest)).futureValue
       }
     }
 

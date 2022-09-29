@@ -16,16 +16,14 @@
 
 package models
 
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{Json, OFormat}
 
-case class VerifyEmail(
-                      address: String,
-                      enterUrl: String
-                      )
+case class EmailVerificationResponse(
+                                      redirectUri: String
+                                    )
 
-object VerifyEmail {
+object EmailVerificationResponse {
 
-  implicit val reads: Reads[VerifyEmail] = Json.reads[VerifyEmail]
-  implicit val writes: Writes[VerifyEmail] = Json.writes[VerifyEmail]
+  implicit val format: OFormat[EmailVerificationResponse] = Json.format[EmailVerificationResponse]
 
 }

@@ -17,9 +17,9 @@
 package connectors
 
 import config.Service
-import connectors.ValidateEmailHttpParser.{ReturnValidateEmailReads, ReturnValidateEmailResponse}
+import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationReads, ReturnEmailVerificationResponse}
 import logging.Logging
-import models.ValidateEmailRequest
+import models.EmailVerificationRequest
 import models.responses.UnexpectedResponseStatus
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
@@ -27,20 +27,20 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpExce
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ValidateEmailConnector @Inject()(
+class EmailVerificationConnector @Inject()(
                                         config: Configuration,
                                         httpClient: HttpClient
                                       ) extends HttpErrorFunctions with Logging {
 
   private val baseUrl = config.get[Service]("microservice.services.email-verification")
 
-  def validateEmail(validateEmailRequest: ValidateEmailRequest)
-                   (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[ReturnValidateEmailResponse] = {
+  def verifyEmail(emailVerificationRequest: EmailVerificationRequest)
+                 (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[ReturnEmailVerificationResponse] = {
     val url = s"${baseUrl}/verify-email"
-    httpClient.POST[ValidateEmailRequest, ReturnValidateEmailResponse](url, validateEmailRequest)
+    httpClient.POST[EmailVerificationRequest, ReturnEmailVerificationResponse](url, emailVerificationRequest)
       .recover {
         case e: HttpException =>
-          logger.error(s"ValidateEmailResponse received an unexpected error wirth status: ${e.responseCode}")
+          logger.error(s"EmailVerificationResponse received an unexpected error with status: ${e.responseCode}")
           Left(UnexpectedResponseStatus(e.responseCode, s"Unexpected response, status ${e.responseCode} returned"))
       }
   }

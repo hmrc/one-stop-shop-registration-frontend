@@ -17,29 +17,29 @@
 package connectors
 
 import logging.Logging
-import models.ValidateEmailResponse
+import models.EmailVerificationResponse
 import models.responses.{ErrorResponse, InvalidJson, UnexpectedResponseStatus}
 import play.api.http.Status.CREATED
 import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
-object ValidateEmailHttpParser extends Logging {
+object EmailVerificationHttpParser extends Logging {
 
-  type ReturnValidateEmailResponse = Either[ErrorResponse, ValidateEmailResponse]
+  type ReturnEmailVerificationResponse = Either[ErrorResponse, EmailVerificationResponse]
 
-  implicit object ReturnValidateEmailReads extends HttpReads[ReturnValidateEmailResponse] {
+  implicit object ReturnEmailVerificationReads extends HttpReads[ReturnEmailVerificationResponse] {
 
-    override def read(method: String, url: String, response: HttpResponse): ReturnValidateEmailResponse = {
+    override def read(method: String, url: String, response: HttpResponse): ReturnEmailVerificationResponse = {
       response.status match {
         case CREATED =>
-          response.json.validate[ValidateEmailResponse] match {
-            case JsSuccess(validateEmail, _) => Right(validateEmail)
+          response.json.validate[EmailVerificationResponse] match {
+            case JsSuccess(verifyEmail, _) => Right(verifyEmail)
             case JsError(errors) =>
-              logger.error(s"ValidateEmailResponse: ${response.json}, failed to parse with errors: $errors.")
+              logger.error(s"EmailVerificationResponse: ${response.json}, failed to parse with errors: $errors.")
               Left(InvalidJson)
           }
         case status =>
-          logger.error(s"ValidateEmailResponse received unexpected error with status: ${response.status}")
+          logger.error(s"EmailVerificationResponse received an unexpected error with status: ${response.status}")
           Left(UnexpectedResponseStatus(response.status, s"Unexpected response, status $status returned"))
       }
     }

@@ -77,4 +77,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val saveForLaterTtl: Int = configuration.get[Int]("mongodb.saveForLaterTTLInDays")
 
   val accessibilityStatementUrl: String = configuration.get[String]("accessibility-statement.service-path")
+
 }

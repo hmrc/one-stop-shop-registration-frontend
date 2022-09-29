@@ -16,9 +16,9 @@
 
 package models
 
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{Json, OFormat}
 
-case class ValidateEmailRequest(
+case class EmailVerificationRequest(
                                credId: String,
                                continueUrl: String,
                                origin: String,
@@ -26,12 +26,23 @@ case class ValidateEmailRequest(
                                accessibilityStatementUrl: String,
                                pageTitle: Option[String],
                                backUrl: Option[String],
-                               email: Option[VerifyEmail]
+                               email: Option[VerifyEmail],
+                               lang: String = "en"
                                )
 
-object ValidateEmailRequest {
+object EmailVerificationRequest {
 
-  implicit val reads: Reads[ValidateEmailRequest] = Json.reads[ValidateEmailRequest]
-  implicit val writes: Writes[ValidateEmailRequest] = Json.writes[ValidateEmailRequest]
+  implicit val format: OFormat[EmailVerificationRequest] = Json.format[EmailVerificationRequest]
+
+}
+
+case class VerifyEmail(
+                        address: String,
+                        enterUrl: String
+                      )
+
+object VerifyEmail {
+
+  implicit val format: OFormat[VerifyEmail] = Json.format[VerifyEmail]
 
 }

@@ -17,10 +17,10 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.ValidateEmailConnector
+import connectors.EmailVerificationConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
-import models.{CheckMode, Mode, NormalMode, ValidateEmailRequest, VerifyEmail}
+import models.{CheckMode, Mode, NormalMode, EmailVerificationRequest, VerifyEmail}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
-                                                  validateEmailConnector: ValidateEmailConnector,
+                                                  emailVerificationConnector: EmailVerificationConnector,
                                                   formProvider: BusinessContactDetailsFormProvider,
                                                   config: FrontendAppConfig,
                                                   view: BusinessContactDetailsView
@@ -70,7 +70,7 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          val validateEmailRequest: ValidateEmailRequest = ValidateEmailRequest(
+          val emailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
             credId = request.userAnswers.id,
             continueUrl = continueUrl,
             origin = config.origin,
@@ -86,13 +86,13 @@ class BusinessContactDetailsController @Inject()(
             )
           )
 
-          validateEmailConnector.validateEmail(validateEmailRequest)
+          emailVerificationConnector.verifyEmail(emailVerificationRequest)
             .flatMap {
               case Right(validResponse) =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                   _ <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(validResponse.redirectUrl)
+                } yield Redirect(validResponse.redirectUri)
               case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
             }
         }

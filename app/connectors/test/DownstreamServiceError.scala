@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package models
+package connectors.test
 
-import play.api.libs.json.{Json, OFormat}
+class ServiceError(private val message: String, private val cause: Throwable)
+  extends Exception(message, cause) {}
 
-case class ValidateEmailResponse(
-                                redirectUrl: String
-                                )
-
-object ValidateEmailResponse {
-
-  implicit val format: OFormat[ValidateEmailResponse] = Json.format[ValidateEmailResponse]
-
-}
+case class DownstreamServiceError(private val message: String, private val cause: Throwable)
+  extends ServiceError(message, cause) {}
