@@ -17,14 +17,14 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
-import models.EmailVerificationResponse
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, urlEqualTo}
+import models.emailVerification.{EmailStatus, EmailVerificationResponse, VerificationStatus}
 import models.responses.UnexpectedResponseStatus
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.http.Status._
 import play.api.libs.json.Json
-import play.api.test.Helpers.running
+import play.api.test.Helpers.{OK, running}
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,12 +34,60 @@ class EmailVerificationConnectorSpec extends SpecBase with WireMockHelper {
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
-  val url = "/email-verification/verify-email"
+  private val url = "/email-verification/verify-email"
+  private val statusUrl = s"/email-verification/verification-status/$userAnswersId"
 
   private def application: Application =
     applicationBuilder()
       .configure("microservice.services.email-verification.port" -> server.port)
       .build()
+
+  ".getStatus" - {
+
+    "must return an Option[VerificationStatus] when valid response received from server" in {
+
+      running(application) {
+
+        val connector = application.injector.instanceOf[EmailVerificationConnector]
+
+        val expectedVerificationStatusResponse = VerificationStatus(Seq(EmailStatus("mail@mail.com", true, false)))
+
+        val responseBody = Json.toJson(expectedVerificationStatusResponse).toString
+
+        server.stubFor(
+          get(urlEqualTo(statusUrl))
+            .willReturn(aResponse
+              .withStatus(OK)
+              .withBody(responseBody)
+            )
+        )
+
+        connector.getStatus(userAnswersId).futureValue mustBe Right(Some(expectedVerificationStatusResponse))
+      }
+    }
+
+    "must return an UnexpectedResponseStatus when the server responds with an Http Exception" in {
+
+      running(application) {
+
+        val errorCode = Gen.oneOf(BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR).sample.value
+
+        val connector = application.injector.instanceOf[EmailVerificationConnector]
+
+        val expectedErrorResponse = Left(UnexpectedResponseStatus(errorCode, s"Unexpected response, status $errorCode returned"))
+
+        server.stubFor(
+          get(urlEqualTo(statusUrl))
+            .willReturn(aResponse
+              .withStatus(errorCode)
+            )
+        )
+
+        connector.getStatus(userAnswersId).futureValue mustBe expectedErrorResponse
+      }
+    }
+
+  }
 
   ".verifyEmail" - {
 
@@ -74,15 +122,15 @@ class EmailVerificationConnectorSpec extends SpecBase with WireMockHelper {
 
         val connector = application.injector.instanceOf[EmailVerificationConnector]
 
+        val expectedErrorResponse = Left(UnexpectedResponseStatus(errorCode, s"Unexpected response, status $errorCode returned"))
+
         server.stubFor(
           post(urlEqualTo(url))
             .willReturn(aResponse.withStatus(errorCode))
         )
 
-        connector.verifyEmail(emailVerificationRequest)
-          .futureValue mustBe Left(
-          UnexpectedResponseStatus(errorCode, s"Unexpected response, status $errorCode returned")
-        )
+        connector.verifyEmail(emailVerificationRequest).futureValue mustBe expectedErrorResponse
+
       }
     }
 

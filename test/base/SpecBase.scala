@@ -19,7 +19,8 @@ package base
 import controllers.actions._
 import generators.Generators
 import models.domain.VatCustomerInfo
-import models.{BusinessContactDetails, Country, DesAddress, Index, UserAnswers, EmailVerificationRequest, VerifyEmail}
+import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
+import models.{BusinessContactDetails, Country, DesAddress, Index, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers

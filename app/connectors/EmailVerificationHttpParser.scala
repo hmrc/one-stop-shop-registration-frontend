@@ -17,15 +17,16 @@
 package connectors
 
 import logging.Logging
-import models.EmailVerificationResponse
+import models.emailVerification.{EmailVerificationResponse, VerificationStatus}
 import models.responses.{ErrorResponse, InvalidJson, UnexpectedResponseStatus}
-import play.api.http.Status.CREATED
+import play.api.http.Status.{CREATED, OK}
 import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object EmailVerificationHttpParser extends Logging {
 
   type ReturnEmailVerificationResponse = Either[ErrorResponse, EmailVerificationResponse]
+  type ReturnVerificationStatus = Either[ErrorResponse, Option[VerificationStatus]]
 
   implicit object ReturnEmailVerificationReads extends HttpReads[ReturnEmailVerificationResponse] {
 
@@ -40,6 +41,24 @@ object EmailVerificationHttpParser extends Logging {
           }
         case status =>
           logger.error(s"EmailVerificationResponse received an unexpected error with status: ${response.status}")
+          Left(UnexpectedResponseStatus(response.status, s"Unexpected response, status $status returned"))
+      }
+    }
+  }
+
+  implicit object ReturnVerificationStatusReads extends HttpReads[ReturnVerificationStatus] {
+
+    override def read(method: String, url: String, response: HttpResponse): ReturnVerificationStatus = {
+      response.status match {
+        case OK =>
+          response.json.validate[VerificationStatus] match {
+            case JsSuccess(verificationStatus, _) => Right(Some(verificationStatus))
+            case JsError(errors) =>
+              logger.error(s"VerificationStatus: ${response.json}, failed to parse with errors: $errors")
+              Left(InvalidJson)
+          }
+        case status =>
+          logger.error(s"VerificationStatus received an unexpected error with status: ${response.status}")
           Left(UnexpectedResponseStatus(response.status, s"Unexpected response, status $status returned"))
       }
     }

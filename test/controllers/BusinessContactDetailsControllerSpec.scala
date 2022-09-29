@@ -20,7 +20,8 @@ import base.SpecBase
 import connectors.EmailVerificationConnector
 import forms.BusinessContactDetailsFormProvider
 import models.responses.UnexpectedResponseStatus
-import models.{NormalMode, EmailVerificationResponse}
+import models.NormalMode
+import models.emailVerification.EmailVerificationResponse
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalacheck.Gen

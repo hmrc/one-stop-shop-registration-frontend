@@ -17,9 +17,9 @@
 package connectors
 
 import config.Service
-import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationReads, ReturnEmailVerificationResponse}
+import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationReads, ReturnEmailVerificationResponse, ReturnVerificationStatusReads, ReturnVerificationStatus}
 import logging.Logging
-import models.EmailVerificationRequest
+import models.emailVerification.EmailVerificationRequest
 import models.responses.UnexpectedResponseStatus
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
@@ -33,6 +33,17 @@ class EmailVerificationConnector @Inject()(
                                       ) extends HttpErrorFunctions with Logging {
 
   private val baseUrl = config.get[Service]("microservice.services.email-verification")
+
+  def getStatus(credId: String)
+               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[ReturnVerificationStatus] = {
+    val url = s"$baseUrl/verification-status/$credId"
+    httpClient.GET[ReturnVerificationStatus](url)
+      .recover {
+        case e: HttpException =>
+          logger.error(s"VerificationStatus received an unexpected error with status: ${e.responseCode}")
+          Left(UnexpectedResponseStatus(e.responseCode, s"Unexpected response, status ${e.responseCode} returned"))
+      }
+  }
 
   def verifyEmail(emailVerificationRequest: EmailVerificationRequest)
                  (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[ReturnEmailVerificationResponse] = {

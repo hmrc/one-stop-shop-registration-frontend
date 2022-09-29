@@ -20,7 +20,8 @@ import config.FrontendAppConfig
 import connectors.EmailVerificationConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
-import models.{CheckMode, Mode, NormalMode, EmailVerificationRequest, VerifyEmail}
+import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
+import models.{CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
