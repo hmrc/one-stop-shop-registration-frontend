@@ -73,7 +73,9 @@ class CheckYourAnswersController @Inject()(
           IsOnlineMarketplaceSummary.row(request.userAnswers),
           HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
-          BusinessContactDetailsSummary.row(request.userAnswers),
+          BusinessContactDetailsSummary.rowContactName(request.userAnswers),
+          BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers),
+          BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
           BankDetailsSummary.rowAccountName(request.userAnswers),
           BankDetailsSummary.rowBIC(request.userAnswers),
           BankDetailsSummary.rowIBAN(request.userAnswers)

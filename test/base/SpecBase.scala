@@ -116,7 +116,9 @@ trait SpecBase
       PreviouslyRegisteredSummary.row(answers),
       IsOnlineMarketplaceSummary.row(answers),
       HasWebsiteSummary.row(answers),
-      BusinessContactDetailsSummary.row(answers),
+      BusinessContactDetailsSummary.rowContactName(answers),
+      BusinessContactDetailsSummary.rowTelephoneNumber(answers),
+      BusinessContactDetailsSummary.rowEmailAddress(answers),
       BankDetailsSummary.rowAccountName(answers),
       BankDetailsSummary.rowBIC(answers),
       BankDetailsSummary.rowIBAN(answers)

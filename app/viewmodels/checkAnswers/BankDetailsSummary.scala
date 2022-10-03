@@ -50,7 +50,7 @@ object BankDetailsSummary  {
 
         val value = Seq(
           answer.bic.map(bic => HtmlFormat.escape(bic.toString))
-        ).flatten.mkString("<br/>")
+        ).flatten.mkString
 
         SummaryListRowViewModel(
           key     = "bankDetails.bic",
