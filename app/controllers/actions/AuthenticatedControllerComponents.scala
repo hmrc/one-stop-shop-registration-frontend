@@ -38,6 +38,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def features: FeatureFlagService
   def checkNiProtocol: CheckNiProtocolFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
+  def checkEmailVerificationStatus: CheckEmailVerificationFilter
 
   def authAndGetData(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     actionBuilder andThen
@@ -75,5 +76,6 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                limitIndex: MaximumIndexFilterProvider,
                                                                features: FeatureFlagService,
                                                                checkNiProtocol: CheckNiProtocolFilter,
-                                                               retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
+                                                               retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
+                                                               checkEmailVerificationStatus: CheckEmailVerificationFilter
                                                              ) extends AuthenticatedControllerComponents

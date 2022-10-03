@@ -117,6 +117,7 @@ trait SpecBase
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
+        bind[CheckEmailVerificationFilter].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[Clock].toInstance(clockToBind)
       )
   }

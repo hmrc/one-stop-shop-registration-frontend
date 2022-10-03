@@ -52,7 +52,7 @@ object EmailVerificationHttpParser extends Logging {
       response.status match {
         case OK =>
           response.json.validate[VerificationStatus] match {
-            case JsSuccess(verificationStatus, _) => Right(Some(verificationStatus))
+            case JsSuccess(verificationStatus, _) => Right(Some(verificationStatus.toVerificationStatus))
             case JsError(errors) =>
               logger.error(s"VerificationStatus: ${response.json}, failed to parse with errors: $errors")
               Left(InvalidJson)
