@@ -46,7 +46,7 @@
         @govukInput(
             InputViewModel(
                 field = form("fullName"),
-                label = LabelViewModel(messages("businessContactDetails.fullName"))
+                label = LabelViewModel(messages("businessContactDetails.fullName")).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
             .withAutocomplete("name")
@@ -56,7 +56,7 @@
         @govukInput(
             InputViewModel(
                 field = form("telephoneNumber"),
-                label = LabelViewModel(messages("businessContactDetails.telephoneNumber"))
+                label = LabelViewModel(messages("businessContactDetails.telephoneNumber")).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed20)
             .withInputType("tel")
@@ -67,7 +67,7 @@
         @govukInput(
             InputViewModel(
                 field = form("emailAddress"),
-                label = LabelViewModel(messages("businessContactDetails.emailAddress"))
+                label = LabelViewModel(messages("businessContactDetails.emailAddress")).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
             .asEmail()

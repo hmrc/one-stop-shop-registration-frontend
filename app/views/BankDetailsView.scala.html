@@ -26,7 +26,7 @@
         @govukInput(
             InputViewModel(
                 field = form("accountName"),
-                label = LabelViewModel(messages("bankDetails.accountName"))
+                label = LabelViewModel(messages("bankDetails.accountName")).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
             .withHint(HintViewModel(messages("bankDetails.accountName.hint")))
@@ -35,7 +35,7 @@
         @govukInput(
             InputViewModel(
                 field = form("bic"),
-                label = LabelViewModel(messages("bankDetails.bic"))
+                label = LabelViewModel(messages("bankDetails.bic")).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed10)
             .withHint(HintViewModel(messages("bankDetails.bic.hint")))
@@ -45,7 +45,7 @@
         @govukInput(
             InputViewModel(
                 field = form("iban"),
-                label = LabelViewModel(messages("bankDetails.iban"))
+                label = LabelViewModel(messages("bankDetails.iban")).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed30)
             .withHint(HintViewModel(messages("bankDetails.iban.hint")))
