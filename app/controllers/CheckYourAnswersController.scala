@@ -74,7 +74,9 @@ class CheckYourAnswersController @Inject()(
           HasWebsiteSummary.row(request.userAnswers),
           WebsiteSummary.checkAnswersRow(request.userAnswers),
           BusinessContactDetailsSummary.row(request.userAnswers),
-          BankDetailsSummary.row(request.userAnswers)
+          BankDetailsSummary.rowAccountName(request.userAnswers),
+          BankDetailsSummary.rowBIC(request.userAnswers),
+          BankDetailsSummary.rowIBAN(request.userAnswers)
         ).flatten
       )
 

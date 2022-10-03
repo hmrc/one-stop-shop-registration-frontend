@@ -28,18 +28,48 @@ import viewmodels.implicits._
 
 object BankDetailsSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def rowAccountName(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(BankDetailsPage).map {
       answer =>
 
-      val value = Seq(
-        Some(HtmlFormat.escape(answer.accountName).toString),
-        answer.bic.map(bic => HtmlFormat.escape(bic.toString)),
-        Some(HtmlFormat.escape(answer.iban.toString).toString)
-      ).flatten.mkString("<br/>")
+       val value = HtmlFormat.escape(answer.accountName).toString
 
         SummaryListRowViewModel(
-          key     = "bankDetails.checkYourAnswersLabel",
+          key     = "bankDetails.accountName",
+          value   = ValueViewModel(HtmlContent(value)),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
+          )
+        )
+    }
+
+  def rowBIC(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BankDetailsPage).map {
+      answer =>
+
+        val value = Seq(
+          answer.bic.map(bic => HtmlFormat.escape(bic.toString))
+        ).flatten.mkString("<br/>")
+
+        SummaryListRowViewModel(
+          key     = "bankDetails.bic",
+          value   = ValueViewModel(HtmlContent(value)),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
+          )
+        )
+    }
+
+  def rowIBAN(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BankDetailsPage).map {
+      answer =>
+
+        val value = HtmlFormat.escape(answer.iban.toString).toString
+
+        SummaryListRowViewModel(
+          key     = "bankDetails.iban",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(CheckMode).url)
@@ -48,3 +78,4 @@ object BankDetailsSummary  {
         )
     }
 }
+

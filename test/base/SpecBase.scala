@@ -117,7 +117,9 @@ trait SpecBase
       IsOnlineMarketplaceSummary.row(answers),
       HasWebsiteSummary.row(answers),
       BusinessContactDetailsSummary.row(answers),
-      BankDetailsSummary.row(answers)
+      BankDetailsSummary.rowAccountName(answers),
+      BankDetailsSummary.rowBIC(answers),
+      BankDetailsSummary.rowIBAN(answers)
     ).flatten
   }
 
