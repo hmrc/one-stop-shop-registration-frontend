@@ -46,7 +46,7 @@ class EmailVerificationServiceSpec extends SpecBase {
 
   ".createEmailVerificationRequest" - {
 
-    "must return a verification code when email verification connector verifyEmail method called with valid payload" in {
+    "must return a Right of Email Verification Response when connector verifyEmail method called with valid payload" in {
 
       val continueUrl: String = "/continueUrl"
 
@@ -61,7 +61,7 @@ class EmailVerificationServiceSpec extends SpecBase {
         continueUrl
       )
 
-      result.futureValue mustBe journeyId
+      result.futureValue mustBe Right(emailVerificationResponse)
     }
   }
 

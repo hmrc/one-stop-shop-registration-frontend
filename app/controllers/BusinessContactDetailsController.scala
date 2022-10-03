@@ -17,14 +17,13 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.EmailVerificationConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
-import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.{CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.EmailVerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BusinessContactDetailsView
 
@@ -34,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
-                                                  emailVerificationConnector: EmailVerificationConnector,
+                                                  emailVerificationService: EmailVerificationService,
                                                   formProvider: BusinessContactDetailsFormProvider,
                                                   config: FrontendAppConfig,
                                                   view: BusinessContactDetailsView
@@ -71,23 +70,15 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          val emailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
-            credId = request.userAnswers.id,
-            continueUrl = continueUrl,
-            origin = config.origin,
-            deskproServiceName = Some("one-stop-shop-registration-frontend"),
-            accessibilityStatementUrl = config.accessibilityStatementUrl,
-            pageTitle = Some(messages("service.name")),
-            backUrl = Some(routes.BusinessContactDetailsController.onPageLoad(mode).url),
-            email = Some(
-              VerifyEmail(
-                address = value.emailAddress,
-                enterUrl = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
-              )
-            )
+          val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
+            mode,
+            request.userId,
+            value.emailAddress,
+            Some(messages("service.name")),
+            continueUrl
           )
 
-          emailVerificationConnector.verifyEmail(emailVerificationRequest)
+          emailVerificationRequest
             .flatMap {
               case Right(validResponse) =>
                 for {

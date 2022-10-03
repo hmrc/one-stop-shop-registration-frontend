@@ -18,7 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.EmailVerificationConnector
-import connectors.EmailVerificationHttpParser.ReturnVerificationStatus
+import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationResponse, ReturnVerificationStatus}
 import controllers.routes
 import logging.Logging
 import models.emailVerification.{EmailStatus, EmailVerificationRequest, VerifyEmail}
@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EmailVerificationService @Inject()(
-                                        config: FrontendAppConfig,
-                                        validateEmailConnector: EmailVerificationConnector
-                                        )(implicit hc: HeaderCarrier, ec: ExecutionContext) extends Logging {
+                                          config: FrontendAppConfig,
+                                          validateEmailConnector: EmailVerificationConnector
+                                        )(implicit ec: ExecutionContext) extends Logging {
 
 
   def createEmailVerificationRequest(mode: Mode,
@@ -40,7 +40,7 @@ class EmailVerificationService @Inject()(
                                      emailAddress: String,
                                      pageTitle: Option[String],
                                      continueUrl: String
-                                  ): Future[String] = {
+                                    )(implicit hc: HeaderCarrier): Future[ReturnEmailVerificationResponse] = {
     validateEmailConnector.verifyEmail(
       EmailVerificationRequest(
         credId = credId,
@@ -57,10 +57,7 @@ class EmailVerificationService @Inject()(
           )
         )
       )
-    ).map {
-      case Right(response) => response.redirectUri
-      case Left(error) => error.body
-    }
+    )
   }
 
   private def getStatus(credId: String)(implicit hc: HeaderCarrier): Future[ReturnVerificationStatus] = {
@@ -69,17 +66,17 @@ class EmailVerificationService @Inject()(
 
   def isEmailVerified(emailAddress: String, credId: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
     getStatus(credId).map {
-        case Right(Some(verificationStatus)) =>
-          verificationStatus.emails.exists {
-            case emailStatus @ EmailStatus(_, true, _) if emailStatus.emailAddress == emailAddress => true
-            case _ => false
-          }
-        case Right(None) =>
-          false
-        case Left(error) =>
-          logger.error(s"There was an error retrieving verification status", error.body)
-          false
-      }
+      case Right(Some(verificationStatus)) =>
+        verificationStatus.emails.exists {
+          case emailStatus@EmailStatus(_, true, _) if emailStatus.emailAddress == emailAddress => true
+          case _ => false
+        }
+      case Right(None) =>
+        false
+      case Left(error) =>
+        logger.error(s"There was an error retrieving verification status", error.body)
+        false
+    }
   }
 
 }

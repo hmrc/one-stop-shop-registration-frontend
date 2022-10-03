@@ -56,7 +56,7 @@ class CheckYourAnswersController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail() {
     implicit request =>
       val list = SummaryListViewModel(
         rows = Seq(

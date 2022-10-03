@@ -57,6 +57,10 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkNiProtocol andThen
       getData
 
+  def authAndGetDataAndCheckVerifyEmail(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+    authAndGetData() andThen
+      checkEmailVerificationStatus
+
 }
 
 case class DefaultAuthenticatedControllerComponents @Inject()(
