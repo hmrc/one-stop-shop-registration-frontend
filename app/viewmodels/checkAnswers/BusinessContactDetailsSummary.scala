@@ -28,16 +28,46 @@ import viewmodels.implicits._
 
 object BusinessContactDetailsSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def rowContactName(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(BusinessContactDetailsPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.fullName).toString + "<br/>" +
-        HtmlFormat.escape(answer.telephoneNumber).toString + "<br/>" +
-        HtmlFormat.escape(answer.emailAddress).toString + "<br/>"
+      val value = HtmlFormat.escape(answer.fullName).toString
 
         SummaryListRowViewModel(
-          key     = "businessContactDetails.checkYourAnswersLabel",
+          key     = "businessContactDetails.fullName",
+          value   = ValueViewModel(HtmlContent(value)),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.BusinessContactDetailsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("businessContactDetails.change.hidden"))
+          )
+        )
+    }
+
+  def rowTelephoneNumber(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BusinessContactDetailsPage).map {
+      answer =>
+
+        val value = HtmlFormat.escape(answer.telephoneNumber).toString
+
+        SummaryListRowViewModel(
+          key     = "businessContactDetails.telephoneNumber",
+          value   = ValueViewModel(HtmlContent(value)),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.BusinessContactDetailsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("businessContactDetails.change.hidden"))
+          )
+        )
+    }
+
+  def rowEmailAddress(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BusinessContactDetailsPage).map {
+      answer =>
+
+        val value = HtmlFormat.escape(answer.emailAddress).toString
+
+        SummaryListRowViewModel(
+          key     = "businessContactDetails.emailAddress",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.BusinessContactDetailsController.onPageLoad(CheckMode).url)
