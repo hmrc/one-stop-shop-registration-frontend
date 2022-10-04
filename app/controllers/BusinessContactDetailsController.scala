@@ -70,7 +70,7 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
+          lazy val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
             mode,
             request.userId,
             value.emailAddress,
@@ -78,15 +78,24 @@ class BusinessContactDetailsController @Inject()(
             continueUrl
           )
 
-          emailVerificationRequest
-            .flatMap {
-              case Right(validResponse) =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
-                  _ <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(validResponse.redirectUri)
-              case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
-            }
+          emailVerificationService.isEmailVerified(value.emailAddress, request.userId).flatMap {
+            case true =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
+
+            case false =>
+              emailVerificationRequest
+                .flatMap {
+                  case Right(validResponse) =>
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+                      _ <- cc.sessionRepository.set(updatedAnswers)
+                    } yield Redirect(validResponse.redirectUri)
+                  case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+                }
+          }
         }
       )
   }
