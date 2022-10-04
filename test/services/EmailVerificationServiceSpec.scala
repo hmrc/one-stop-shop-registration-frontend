@@ -65,6 +65,33 @@ class EmailVerificationServiceSpec extends SpecBase {
     }
   }
 
+  ".getStatus" - {
+
+    "must return Right verification status when an email verification request exists" in {
+
+      val verifiedEmail = EmailStatus(emailAddress = contactDetails.emailAddress, verified = true, locked = false)
+      val verificationStatus: VerificationStatus = VerificationStatus(Seq(verifiedEmail))
+
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
+
+      val result = emailVerificationService.getStatus(userAnswersId).futureValue
+
+      result mustBe Right(Some(verificationStatus))
+    }
+
+    "must return Left UnexpectedResponseStatus when an error occurs " in {
+
+      val errorCode = Gen.oneOf(BAD_REQUEST, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_GATEWAY).sample.value
+
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn
+        Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
+
+      val result = emailVerificationService.getStatus(userAnswersId).futureValue
+
+      result mustBe Left(UnexpectedResponseStatus(errorCode, "error"))
+    }
+  }
+
   ".isEmailVerified" - {
 
     "must return true if email is verified" in {

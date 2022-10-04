@@ -60,7 +60,7 @@ class EmailVerificationService @Inject()(
     )
   }
 
-  private def getStatus(credId: String)(implicit hc: HeaderCarrier): Future[ReturnVerificationStatus] = {
+  def getStatus(credId: String)(implicit hc: HeaderCarrier): Future[ReturnVerificationStatus] = {
     validateEmailConnector.getStatus(credId)
   }
 

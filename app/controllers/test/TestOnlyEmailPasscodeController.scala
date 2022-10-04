@@ -20,7 +20,9 @@ import connectors.test.TestOnlyEmailPasscodeConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import services.EmailVerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
@@ -28,7 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TestOnlyEmailPasscodeController @Inject()(
                                                  cc: AuthenticatedControllerComponents,
-                                                 testOnlyEmailPasscodeConnector: TestOnlyEmailPasscodeConnector
+                                                 testOnlyEmailPasscodeConnector: TestOnlyEmailPasscodeConnector,
+                                                 emailVerificationService: EmailVerificationService
                                                )(implicit ec: ExecutionContext) extends FrontendController(cc) with I18nSupport with Logging {
 
   def testOnlyGetPasscodes(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
@@ -37,6 +40,15 @@ class TestOnlyEmailPasscodeController @Inject()(
       testOnlyEmailPasscodeConnector.getTestOnlyPasscode().flatMap {
         case Right(response) => Future.successful(Ok(response))
         case Left(error) => throw error
-    }
+      }
+  }
+
+  def testOnlyGetEmailVerificationStatus(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
+    implicit request =>
+      emailVerificationService.getStatus(request.userId).map {
+        case Right(Some(verificationStatus)) => Ok(Json.toJson(verificationStatus))
+        case Right(None) => Ok(Json.toJson("None"))
+        case Left(error) => InternalServerError(error.body)
+      }
   }
 }

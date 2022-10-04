@@ -15,3 +15,4 @@ GET      /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/delete
 GET      /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/from-external    @controllers.test.TestOnlyController.enterFromExternal(lang: Option[String] ?= None)
 
 GET      /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-passcodes    @controllers.test.TestOnlyEmailPasscodeController.testOnlyGetPasscodes()
+GET      /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-status       @controllers.test.TestOnlyEmailPasscodeController.testOnlyGetEmailVerificationStatus()
