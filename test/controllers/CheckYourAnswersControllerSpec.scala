@@ -27,7 +27,7 @@ import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito.{doNothing, times, verify, when}
+import org.mockito.Mockito.{doNothing, times, verify, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
@@ -256,7 +256,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-        "must audit the event and redirect to the next page and successfully send email confirmation" in {
+        "must audit the event and redirect to the next page and successfully send email confirmation when enrolment is not enabled" in {
           val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -268,6 +268,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .configure("features.enrolments-enabled" -> "false")
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -300,6 +301,45 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
         }
+
+        "must audit the event and redirect to the next page and not send email confirmation when enrolment is enabled" in {
+          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+          when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
+          when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Right(()))
+          doNothing().when(auditService).audit(any())(any(), any())
+
+          val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
+          val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .configure("features.enrolments-enabled" -> "true")
+            .overrides(
+              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationConnector].toInstance(registrationConnector),
+              bind[EmailService].toInstance(emailService),
+              bind[AuditService].toInstance(auditService),
+              bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
+            ).build()
+
+          running(application) {
+
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val result = route(application, request).value
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
+            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
+            val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, false).success.value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
+
+            verifyNoInteractions(emailService)
+            verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
+            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+          }
+        }
+
       }
 
       "when the user has not answered all necessary data" - {

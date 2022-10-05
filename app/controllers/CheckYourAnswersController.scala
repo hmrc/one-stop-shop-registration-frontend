@@ -18,12 +18,14 @@ package controllers
 
 import cats.data.Validated.{Invalid, Valid}
 import com.google.inject.Inject
+import config.FrontendAppConfig
 import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.NormalMode
 import models.audit.{RegistrationAuditModel, SubmissionResult}
-import models.emails.EmailSendingResult.EMAIL_ACCEPTED
+import models.domain.Registration
+import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT}
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.responses.ConflictFound
 import pages.{CheckYourAnswersPage, SavedProgressPage}
@@ -31,6 +33,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
 import services._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import utils.FutureSyntax._
@@ -51,7 +54,8 @@ class CheckYourAnswersController @Inject()(
   view: CheckYourAnswersView,
   emailService: EmailService,
   dateService: DateService,
-  saveForLaterConnector: SaveForLaterConnector
+  saveForLaterConnector: SaveForLaterConnector,
+  frontendAppConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -95,22 +99,7 @@ class CheckYourAnswersController @Inject()(
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
-              emailService.sendConfirmationEmail(
-                registration.contactDetails.fullName,
-                registration.registeredCompanyName,
-                registration.commencementDate,
-                registration.contactDetails.emailAddress,
-                registration.dateOfFirstSale
-              ) flatMap {
-                  emailConfirmationResult =>
-                    val emailSent = EMAIL_ACCEPTED == emailConfirmationResult
-                    for {
-                      updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-                      _              <- cc.sessionRepository.set(updatedAnswers)
-                    } yield {
-                      Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
-                    }
-              }
+              sendEmailConfirmation(request, registration)
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
               Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
@@ -135,6 +124,35 @@ class CheckYourAnswersController @Inject()(
             saveAnswers(routes.ErrorSubmittingRegistrationController.onPageLoad())
           }
       }
+  }
+
+  private def sendEmailConfirmation(request: AuthenticatedDataRequest[AnyContent], registration: Registration)(implicit hc: HeaderCarrier) = {
+    if (frontendAppConfig.enrolmentsEnabled) {
+      val emailSent = false
+      for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
+        _ <- cc.sessionRepository.set(updatedAnswers)
+      } yield {
+        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+      }
+    } else {
+      emailService.sendConfirmationEmail(
+        registration.contactDetails.fullName,
+        registration.registeredCompanyName,
+        registration.commencementDate,
+        registration.contactDetails.emailAddress,
+        registration.dateOfFirstSale
+      ) flatMap {
+        emailConfirmationResult =>
+          val emailSent = EMAIL_ACCEPTED == emailConfirmationResult
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
+            _ <- cc.sessionRepository.set(updatedAnswers)
+          } yield {
+            Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+          }
+      }
+    }
   }
 
   private def saveAnswers(redirectLocation: Call)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
