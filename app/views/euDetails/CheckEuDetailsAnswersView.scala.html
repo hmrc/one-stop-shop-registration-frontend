@@ -21,7 +21,8 @@
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukErrorSummary: GovukErrorSummary,
-        button: ButtonGroup
+        button: ButtonGroup,
+        govukWarningText: GovukWarningText
 )
 
 @(list: SummaryList, mode: Mode, index: Index, country: Country, incompleteDetails: Boolean = false)(implicit request: Request[_], messages: Messages)
@@ -29,13 +30,10 @@
 @layout(pageTitle = titleNoForm(messages("checkEuVatDetailsAnswers.title", country.name))) {
 
         @if(incompleteDetails) {
-        <div class="govuk-warning-text">
-            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-            <strong class="govuk-warning-text__text">
-                <span class="govuk-warning-text__assistive">Warning</span>
-                @messages("error.missing_answers")
-            </strong>
-        </div>
+            @govukWarningText(WarningText(
+                iconFallbackText = messages("site.warning"),
+                content = Text(messages("error.missing_answers"))
+            ))
         }
 
         <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
