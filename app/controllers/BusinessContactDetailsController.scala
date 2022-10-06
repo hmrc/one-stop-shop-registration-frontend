@@ -19,10 +19,11 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.EmailVerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BusinessContactDetailsView
 
@@ -30,12 +31,13 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessContactDetailsController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      cc: AuthenticatedControllerComponents,
-                                      formProvider: BusinessContactDetailsFormProvider,
-                                      config: FrontendAppConfig,
-                                      view: BusinessContactDetailsView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                  override val messagesApi: MessagesApi,
+                                                  cc: AuthenticatedControllerComponents,
+                                                  emailVerificationService: EmailVerificationService,
+                                                  formProvider: BusinessContactDetailsFormProvider,
+                                                  config: FrontendAppConfig,
+                                                  view: BusinessContactDetailsView
+                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -54,15 +56,47 @@ class BusinessContactDetailsController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
+      val messages = messagesApi.preferred(request)
+
+      val continueUrl = if (mode == CheckMode) {
+        routes.CheckYourAnswersController.onPageLoad().url
+      } else {
+        routes.BankDetailsController.onPageLoad(NormalMode).url
+      }
+
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
+        value => {
+
+          lazy val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
+            mode,
+            request.userId,
+            value.emailAddress,
+            Some(messages("service.name")),
+            continueUrl
+          )
+
+          emailVerificationService.isEmailVerified(value.emailAddress, request.userId).flatMap {
+            case true =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
+
+            case false =>
+              emailVerificationRequest
+                .flatMap {
+                  case Right(validResponse) =>
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+                      _ <- cc.sessionRepository.set(updatedAnswers)
+                    } yield Redirect(validResponse.redirectUri)
+                  case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+                }
+          }
+        }
       )
   }
 }

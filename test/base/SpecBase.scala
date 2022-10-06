@@ -19,7 +19,8 @@ package base
 import controllers.actions._
 import generators.Generators
 import models.domain.VatCustomerInfo
-import models.{Country, DesAddress, Index, UserAnswers}
+import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
+import models.{BusinessContactDetails, Country, DesAddress, Index, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -60,6 +61,7 @@ trait SpecBase
   val stubClockAtArbitraryDate: Clock = Clock.fixed(arbitraryInstant, ZoneId.systemDefault)
 
   val userAnswersId: String = "12345-credId"
+  val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
 
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
@@ -68,6 +70,22 @@ trait SpecBase
       partOfVatGroup   = true,
       organisationName = "Company name"
     )
+
+  val verifyEmail: VerifyEmail = VerifyEmail(
+    address = contactDetails.emailAddress,
+    enterUrl = "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
+  )
+
+  val emailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
+    credId = userAnswersId,
+    continueUrl = "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/bank-details",
+    origin = "OSS",
+    deskproServiceName = Some("one-stop-shop-registration-frontend"),
+    accessibilityStatementUrl = "/register-and-pay-vat-on-goods-sold-to-eu-from-northern-ireland",
+    pageTitle = Some("Register to pay VAT on distance sales of goods from Northern Ireland to the EU"),
+    backUrl = Some("/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"),
+    email = Some(verifyEmail)
+  )
 
   val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
   val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
@@ -99,6 +117,7 @@ trait SpecBase
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
+        bind[CheckEmailVerificationFilter].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[Clock].toInstance(clockToBind)
       )
   }

@@ -38,7 +38,7 @@ class BankDetailsController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail() {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BankDetailsPage) match {
