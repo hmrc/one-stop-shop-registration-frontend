@@ -47,7 +47,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
     "when the connector returns a registration" - {
 
-      "must return OK and the correct view for a GET where Commencement Date is the same as the Date of First sale" in {
+      "must return OK and the correct view for a GET" in {
 
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
@@ -61,129 +61,16 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
           val result = route(application, request).value
           val view = application.injector.instanceOf[AlreadyRegisteredView]
           val config = application.injector.instanceOf[FrontendAppConfig]
-          val dateService = application.injector.instanceOf[DateService]
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val vatReturnEndDate = dateService.getVatReturnEndDate(registration.commencementDate)
-          val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-          val isDOFSDifferentToCommencementDate =
-            dateService.isDOFSDifferentToCommencementDate(
-              registration.dateOfFirstSale,
-              registration.commencementDate
-            )
 
           status(result) mustEqual OK
 
           val expectedContent =
             view(
-              registration.registeredCompanyName,
-              vrn,
-              config.feedbackUrl(request),
-              registration.commencementDate.format(dateFormatter),
-              vatReturnEndDate.format(dateFormatter),
-              vatReturnDeadline.format(dateFormatter),
-              lastDayOfCalendarQuarter.format(dateFormatter),
-              dateService.startOfCurrentQuarter.format(dateFormatter),
-              dateService.startOfNextQuarter.format(dateFormatter),
-              isDOFSDifferentToCommencementDate
+              config.feedbackUrl(request)
             )(request, messages(application)).toString
 
           contentAsString(result) mustEqual expectedContent
         }
-      }
-    }
-
-    "must return OK and the correct view for a GET where Commencement Date is different to the Date of First sale" in {
-
-      val registrationDiff =
-        registration copy (dateOfFirstSale = Some(LocalDate.now().minusDays(1)))
-
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDiff))
-
-      val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
-          .overrides(bind[RegistrationConnector].toInstance(mockConnector))
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[AlreadyRegisteredView]
-        val config = application.injector.instanceOf[FrontendAppConfig]
-        val dateService = application.injector.instanceOf[DateService]
-        val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-        val vatReturnEndDate = dateService.getVatReturnEndDate(registrationDiff.commencementDate)
-        val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-        val isDOFSDifferentToCommencementDate =
-          dateService.isDOFSDifferentToCommencementDate(
-            registrationDiff.dateOfFirstSale,
-            registrationDiff.commencementDate
-          )
-
-        status(result) mustEqual OK
-
-        val expectedContent =
-          view(
-            registrationDiff.registeredCompanyName,
-            vrn,
-            config.feedbackUrl(request),
-            registrationDiff.commencementDate.format(dateFormatter),
-            vatReturnEndDate.format(dateFormatter),
-            vatReturnDeadline.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.startOfCurrentQuarter.format(dateFormatter),
-            dateService.startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate
-          )(request, messages(application)).toString
-
-        contentAsString(result) mustEqual expectedContent
-      }
-    }
-
-    "must return OK and the correct view for a GET where the Date of First sale is not present" in {
-
-      val registrationDOFSEmpty = registration copy (dateOfFirstSale = None)
-
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDOFSEmpty))
-
-      val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
-          .overrides(bind[RegistrationConnector].toInstance(mockConnector))
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[AlreadyRegisteredView]
-        val config = application.injector.instanceOf[FrontendAppConfig]
-        val dateService = application.injector.instanceOf[DateService]
-        val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-        val vatReturnEndDate = dateService.getVatReturnEndDate(registrationDOFSEmpty.commencementDate)
-        val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-        val isDOFSDifferentToCommencementDate =
-          dateService.isDOFSDifferentToCommencementDate(
-            registrationDOFSEmpty.dateOfFirstSale,
-            registrationDOFSEmpty.commencementDate
-          )
-
-        status(result) mustEqual OK
-
-        val expectedContent =
-          view(
-            registrationDOFSEmpty.registeredCompanyName,
-            vrn,
-            config.feedbackUrl(request),
-            registrationDOFSEmpty.commencementDate.format(dateFormatter),
-            vatReturnEndDate.format(dateFormatter),
-            vatReturnDeadline.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.startOfCurrentQuarter.format(dateFormatter),
-            dateService.startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate
-          )(request, messages(application)).toString
-
-        contentAsString(result) mustEqual expectedContent
       }
     }
 

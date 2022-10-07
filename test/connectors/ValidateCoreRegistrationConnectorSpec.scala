@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, urlEqualTo}
-import models.core.{CoreRegistrationValidationResult, MatchType, Match}
+import models.core.{CoreRegistrationRequest, CoreRegistrationValidationResult, Match, MatchType, SourceType}
 import models.responses.UnexpectedResponseStatus
 import org.scalacheck.Gen
 import play.api.Application
@@ -34,7 +34,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
-  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/validateCoreRegistration"
+  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/coreValidateRegistration"
 
   private def application: Application =
     applicationBuilder()
@@ -68,6 +68,8 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
       val vrn = Vrn("111111111")
 
+      val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
+
       val validateCoreRegistration = validCoreRegistrationResponse
 
       val responseJson = Json.prettyPrint(Json.toJson(validateCoreRegistration))
@@ -80,7 +82,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       running(application) {
         val connector = application.injector.instanceOf[ValidateCoreRegistrationConnector]
 
-        val result = connector.validateCoreRegistration(vrn).futureValue
+        val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
 
         result mustBe Right(validateCoreRegistration)
       }
@@ -89,6 +91,9 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
     "must return Left(UnexpectedStatus) when the server returns another error code" in {
 
       val vrn = Vrn("111111111")
+
+      val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
+
       val status = Gen.oneOf(
         BAD_REQUEST,
         NOT_FOUND,
@@ -109,7 +114,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       running(application) {
         val connector = application.injector.instanceOf[ValidateCoreRegistrationConnector]
 
-        val result = connector.validateCoreRegistration(vrn).futureValue
+        val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
 
         result mustBe Left(
           UnexpectedResponseStatus(status, s"Received unexpected response code $status"))

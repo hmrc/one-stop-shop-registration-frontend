@@ -1,0 +1,11 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(memberState: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("alreadyRegisteredOtherCountry.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("alreadyRegisteredOtherCountry.heading", memberState)</h1>
+}

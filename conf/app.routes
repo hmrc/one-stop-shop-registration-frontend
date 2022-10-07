@@ -276,3 +276,5 @@ GET        /registration-service-error                                 controlle
 GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
 GET        /no-saved-registration                                      controllers.NoRegistrationInProgressController.onPageLoad()
 GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
+
+GET        /already-registered-other-country                           controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)

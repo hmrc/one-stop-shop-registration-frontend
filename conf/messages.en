@@ -355,8 +355,8 @@ hasFixedEstablishment.change.hidden = fixed establishment
 checkEuVatDetailsAnswers.title = Check your answers for {0}
 checkEuVatDetailsAnswers.heading = Check your answers for {0}
 
-alreadyRegistered.title = {0} is already registered
-alreadyRegistered.heading = {0} is already registered
+alreadyRegistered.title = This account is already registered for the One Stop Shop scheme
+alreadyRegistered.heading = This account is already registered for the One Stop Shop scheme
 alreadyRegistered.confirmation = Check your email for the confirmation.
 alreadyRegistered.reference = Your reference number is your UK VAT registration number, {0}.
 alreadyRegistered.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
@@ -614,3 +614,5 @@ problemWithAccount.title = There is a problem with your account
 problemWithAccount.heading = There is a problem with your account
 problemWithAccount.contact = Contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a> to restore your account.
 
+alreadyRegisteredOtherCountry.title = This account is already registered on a One Stop Shop scheme in {0}
+alreadyRegisteredOtherCountry.heading = This account is already registered on a One Stop Shop scheme in {0}

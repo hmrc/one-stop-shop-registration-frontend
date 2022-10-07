@@ -38,6 +38,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def features: FeatureFlagService
   def checkNiProtocol: CheckNiProtocolFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
+  def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
   def checkEmailVerificationStatus: CheckEmailVerificationFilter
 
   def authAndGetData(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
@@ -46,6 +47,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkVrnAllowList andThen
       checkRegistration andThen
       checkNiProtocol andThen
+      checkOtherCountryRegistration andThen
       getData andThen
       requireData
 
@@ -55,6 +57,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkVrnAllowList andThen
       checkRegistration andThen
       checkNiProtocol andThen
+      checkOtherCountryRegistration andThen
       getData
 
   def authAndGetDataAndCheckVerifyEmail(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
@@ -81,5 +84,6 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                features: FeatureFlagService,
                                                                checkNiProtocol: CheckNiProtocolFilter,
                                                                retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
+                                                               checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
                                                                checkEmailVerificationStatus: CheckEmailVerificationFilter
                                                              ) extends AuthenticatedControllerComponents

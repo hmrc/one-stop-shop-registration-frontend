@@ -19,10 +19,8 @@ package controllers
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
-import formats.Format.dateFormatter
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.twirl.api.HtmlFormat
 import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import services.DateService
@@ -51,27 +49,11 @@ class AlreadyRegisteredController @Inject()(
         registrationData <- connector.getRegistration()
       } yield {
         registrationData match {
-          case Some(registration) =>
-            val commencementDate = registration.commencementDate
-            val dateOfFirstSale = registration.dateOfFirstSale
-            val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
-            val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-            val isDOFSDifferentToCommencementDate =
-              dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
+          case Some(_) =>
             val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
-
             Ok(
               view(
-                HtmlFormat.escape(registration.registeredCompanyName).toString,
-                request.vrn,
                 config.feedbackUrl,
-                commencementDate.format(dateFormatter),
-                vatReturnEndDate.format(dateFormatter),
-                vatReturnDeadline.format(dateFormatter),
-                dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-                dateService.startOfCurrentQuarter.format(dateFormatter),
-                dateService.startOfNextQuarter.format(dateFormatter),
-                isDOFSDifferentToCommencementDate,
                 savedUrl
               )
             )

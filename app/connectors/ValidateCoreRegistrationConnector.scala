@@ -18,8 +18,8 @@ package connectors
 
 import config.Service
 import connectors.ValidateCoreRegistrationHttpParser.{ValidateCoreRegistrationReads, ValidateCoreRegistrationResponse}
+import models.core.CoreRegistrationRequest
 import play.api.Configuration
-import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
 
 import javax.inject.Inject
@@ -30,8 +30,10 @@ class ValidateCoreRegistrationConnector @Inject()(config: Configuration, httpCli
 
   private val baseUrl = config.get[Service]("microservice.services.core-validation")
 
-  def validateCoreRegistration(vrn: Vrn)(implicit hc: HeaderCarrier): Future[ValidateCoreRegistrationResponse] = {
-    httpClient.GET[ValidateCoreRegistrationResponse](s"$baseUrl/validateCoreRegistration")
+  def validateCoreRegistration(coreRegistrationRequest: CoreRegistrationRequest)(implicit hc: HeaderCarrier):
+  Future[ValidateCoreRegistrationResponse] = {
+    val url = s"$baseUrl/coreValidateRegistration/${coreRegistrationRequest}"
+    httpClient.GET[ValidateCoreRegistrationResponse](url)
   }
 
 }
