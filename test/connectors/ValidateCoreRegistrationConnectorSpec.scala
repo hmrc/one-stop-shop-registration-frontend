@@ -75,7 +75,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       val responseJson = Json.prettyPrint(Json.toJson(validateCoreRegistration))
 
       server.stubFor(
-        get(urlEqualTo(getValidateCoreRegistrationUrl))
+        get(urlEqualTo(s"$getValidateCoreRegistrationUrl/${coreRegistrationRequest.toString}"))
           .willReturn(ok(responseJson))
       )
 
@@ -106,7 +106,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       ).sample.value
 
       server.stubFor(
-        get(urlEqualTo(getValidateCoreRegistrationUrl))
+        get(urlEqualTo(s"$getValidateCoreRegistrationUrl/${coreRegistrationRequest.toString}"))
           .willReturn(aResponse()
             .withStatus(status))
       )
