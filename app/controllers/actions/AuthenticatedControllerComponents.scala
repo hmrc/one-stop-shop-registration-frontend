@@ -60,6 +60,10 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkOtherCountryRegistration andThen
       getData
 
+  def authAndGetDataAndCheckOtherCountryRegistration(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+    authAndGetData() andThen
+      checkOtherCountryRegistration
+
   def authAndGetDataAndCheckVerifyEmail(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     authAndGetData() andThen
       checkEmailVerificationStatus

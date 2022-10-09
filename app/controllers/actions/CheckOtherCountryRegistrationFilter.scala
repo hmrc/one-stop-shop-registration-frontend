@@ -18,7 +18,7 @@ package controllers.actions
 
 import controllers.routes
 import models.core.Match
-import models.requests.AuthenticatedIdentifierRequest
+import models.requests.AuthenticatedDataRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
 import services.CoreRegistrationValidationService
@@ -32,7 +32,7 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistratio
                                                        (implicit val executionContext: ExecutionContext)
   extends CheckOtherCountryRegistrationFilter {
 
-  override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
@@ -46,4 +46,4 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistratio
 }
 
 
-trait CheckOtherCountryRegistrationFilter extends ActionFilter[AuthenticatedIdentifierRequest]
+trait CheckOtherCountryRegistrationFilter extends ActionFilter[AuthenticatedDataRequest]
