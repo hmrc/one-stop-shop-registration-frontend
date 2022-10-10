@@ -373,6 +373,7 @@ alreadyRegistered.p1 = We will contact you if we need to check any information.
 alreadyRegistered.p2 = We will contact you about how to use the new service to submit your first return and make payment by {0}.
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
+alreadyRegistered.continue = Continue to your account
 
 addPreviousRegistration.title.singular = You added one deregistration
 addPreviousRegistration.heading.singular = You added one deregistration
