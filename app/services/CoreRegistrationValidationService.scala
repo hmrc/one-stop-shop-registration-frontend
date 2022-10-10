@@ -33,8 +33,8 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.exists(_.matchType == MatchType.OtherMSNETPActiveNETP) =>
-        coreRegistrationResponse.matches.find(_.matchType == MatchType.OtherMSNETPActiveNETP) match {
+      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.exists(_.matchType == MatchType.FixedEstablishmentActiveNETP) =>
+        coreRegistrationResponse.matches.find(_.matchType == MatchType.FixedEstablishmentActiveNETP) match {
 
           case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(-1) || activeMatch.exclusionStatusCode.contains(6) =>
             None
