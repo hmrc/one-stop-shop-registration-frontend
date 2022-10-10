@@ -33,7 +33,7 @@ class AlreadyRegisteredOtherCountryController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(countryCode: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.checkOtherCountryRegistrationStatus) {
+  def onPageLoad(countryCode: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
       Ok(view(getCountryName(countryCode)))
   }
