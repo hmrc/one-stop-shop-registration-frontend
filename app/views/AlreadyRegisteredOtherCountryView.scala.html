@@ -8,4 +8,11 @@
 @layout(pageTitle = titleNoForm(messages("alreadyRegisteredOtherCountry.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("alreadyRegisteredOtherCountry.heading", memberState)</h1>
+
+    <p class="govuk-body">@messages("alreadyRegisteredOtherCountry.register")</p>
+
+    <p class="govuk-body">@Html(messages("alreadyRegisteredOtherCountry.contact"))</p>
+
+    <p class="govuk-body">@Html(messages("alreadyRegisteredOtherCountry.returnBTA"))</p>
+
 }

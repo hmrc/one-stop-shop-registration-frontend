@@ -17,7 +17,7 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, ok, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, ok, post, urlEqualTo}
 import models.core.{CoreRegistrationRequest, CoreRegistrationValidationResult, Match, MatchType, SourceType}
 import models.responses.UnexpectedResponseStatus
 import org.scalacheck.Gen
@@ -34,7 +34,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
-  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/coreValidateRegistration"
+  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/validateCoreRegistration"
 
   private def application: Application =
     applicationBuilder()
@@ -75,7 +75,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       val responseJson = Json.prettyPrint(Json.toJson(validateCoreRegistration))
 
       server.stubFor(
-        get(urlEqualTo(s"$getValidateCoreRegistrationUrl/${coreRegistrationRequest.toString}"))
+        post(urlEqualTo(s"$getValidateCoreRegistrationUrl"))
           .willReturn(ok(responseJson))
       )
 
@@ -106,7 +106,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       ).sample.value
 
       server.stubFor(
-        get(urlEqualTo(s"$getValidateCoreRegistrationUrl/${coreRegistrationRequest.toString}"))
+        post(urlEqualTo(s"$getValidateCoreRegistrationUrl"))
           .willReturn(aResponse()
             .withStatus(status))
       )

@@ -31,9 +31,10 @@ class ValidateCoreRegistrationConnector @Inject()(config: Configuration, httpCli
   private val baseUrl = config.get[Service]("microservice.services.core-validation")
 
   def validateCoreRegistration(coreRegistrationRequest: CoreRegistrationRequest)(implicit hc: HeaderCarrier):
+
   Future[ValidateCoreRegistrationResponse] = {
-    val url = s"$baseUrl/coreValidateRegistration/${coreRegistrationRequest}"
-    httpClient.GET[ValidateCoreRegistrationResponse](url)
+    val url = s"$baseUrl/validateCoreRegistration"
+    httpClient.POST[CoreRegistrationRequest,ValidateCoreRegistrationResponse](url, coreRegistrationRequest)
   }
 
 }
