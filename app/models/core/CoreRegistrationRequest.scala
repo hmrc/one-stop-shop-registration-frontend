@@ -18,13 +18,6 @@ package models.core
 
 import play.api.libs.json.{Json, OFormat}
 
-/*
-    • VATNumber
-    • EUVATNumber
-    • EUTraderId
-    • TraderId
- */
-
 case class CoreRegistrationRequest(source: String,
                                    scheme: Option[String],
                                    searchId: String,

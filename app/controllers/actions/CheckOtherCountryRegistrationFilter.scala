@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import config.FrontendAppConfig
 import controllers.routes
 import models.core.Match
 import models.requests.AuthenticatedIdentifierRequest
@@ -28,7 +29,9 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistrationValidationService)
+class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistrationValidationService,
+                                                        appConfig: FrontendAppConfig
+                                                       )
                                                        (implicit val executionContext: ExecutionContext)
   extends CheckOtherCountryRegistrationFilter {
 
@@ -36,14 +39,17 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistratio
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    service.searchUkVrn(request.vrn).map {
+    if (appConfig.otherCountryRegistrationValidationEnabled) {
+      service.searchUkVrn(request.vrn).map {
 
-      case Some(Match(_, _, _, memberState, _, _, _, _, _)) => Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(memberState)))
+        case Some(Match(_, _, _, memberState, _, _, _, _, _)) => Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(memberState)))
 
-      case _ => None
+        case _ => None
+      }
+    } else {
+      Future.successful(None)
     }
   }
 }
-
 
 trait CheckOtherCountryRegistrationFilter extends ActionFilter[AuthenticatedIdentifierRequest]

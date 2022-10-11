@@ -17,6 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.core.{Match, MatchType}
 import models.requests.AuthenticatedIdentifierRequest
 import org.mockito.ArgumentMatchers.any
@@ -50,47 +51,87 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
     None
   )
 
-  class Harness(service: CoreRegistrationValidationService) extends
-    CheckOtherCountryRegistrationFilterImpl(service) {
+  class Harness(service: CoreRegistrationValidationService, appConfig: FrontendAppConfig) extends
+    CheckOtherCountryRegistrationFilterImpl(service, appConfig) {
     def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   ".filter" - {
-    "must redirect to AlreadyRegisteredOtherCountry page when the user is registered in another OSS service" in {
-      val vrn = Vrn("333333331")
-      val app = applicationBuilder(None)
-        .overrides(
-          bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
-        ).build()
 
-      running(app) {
+    "when other country registration validation toggle is true" - {
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(),any())) thenReturn Future.successful(Option(genericMatch))
+      "must redirect to AlreadyRegisteredOtherCountry page when the user is registered in another OSS service" in {
 
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-        val controller = new Harness(mockCoreRegistrationValidationService)
+        val vrn = Vrn("333333331")
+        val app = applicationBuilder(None)
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
 
-        val result = controller.callFilter(request).futureValue
+        running(app) {
 
-        result mustBe Some(Redirect(controllers.routes.AlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url))
+          when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(genericMatch))
+
+          val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
+
+          val result = controller.callFilter(request).futureValue
+
+          result mustBe Some(Redirect(controllers.routes.AlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url))
+        }
       }
     }
 
     "must return none e when the user is not registered in another OSS service" in {
+
       val vrn = Vrn("333333331")
       val app = applicationBuilder(None)
+        .configure(
+          "features.other-country-reg-validation-enabled" -> true
+        )
         .overrides(
           bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
         ).build()
 
       running(app) {
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(),any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(None)
 
         val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-        val controller = new Harness(mockCoreRegistrationValidationService)
+        val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+        val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
+
+        val result = controller.callFilter(request).futureValue
+
+        result mustBe None
+      }
+    }
+  }
+
+  "when other country registration validation toggle is false" - {
+
+    "must return None" in {
+
+      val vrn = Vrn("333333331")
+      val app = applicationBuilder(None)
+        .configure(
+          "features.other-country-reg-validation-enabled" -> false
+        )
+        .overrides(
+          bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+        ).build()
+
+      running(app) {
+
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+        val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+        val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
         val result = controller.callFilter(request).futureValue
 

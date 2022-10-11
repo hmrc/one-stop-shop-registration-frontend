@@ -76,6 +76,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val saveForLaterTtl: Int = configuration.get[Int]("mongodb.saveForLaterTTLInDays")
 
+  val otherCountryRegistrationValidationEnabled: Boolean = configuration.get[Boolean]("features.other-country-reg-validation-enabled")
+
   val accessibilityStatementUrl: String = configuration.get[String]("accessibility-statement.service-path")
 
 }
