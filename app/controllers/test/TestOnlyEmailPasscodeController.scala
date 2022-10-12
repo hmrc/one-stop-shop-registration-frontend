@@ -32,11 +32,10 @@ class TestOnlyEmailPasscodeController @Inject()(
                                                  cc: AuthenticatedControllerComponents,
                                                  testOnlyEmailPasscodeConnector: TestOnlyEmailPasscodeConnector,
                                                  emailVerificationService: EmailVerificationService
-                                               )(implicit ec: ExecutionContext) extends FrontendController(cc) with I18nSupport with Logging {
+                                               )(implicit ec: ExecutionContext) extends FrontendController(cc) with I18nSupport {
 
   def testOnlyGetPasscodes(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      logger.info("REQUEST: " + request)
       testOnlyEmailPasscodeConnector.getTestOnlyPasscode().flatMap {
         case Right(response) => Future.successful(Ok(response))
         case Left(error) => throw error

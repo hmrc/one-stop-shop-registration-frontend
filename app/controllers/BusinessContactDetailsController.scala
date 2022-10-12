@@ -59,9 +59,9 @@ class BusinessContactDetailsController @Inject()(
       val messages = messagesApi.preferred(request)
 
       val continueUrl = if (mode == CheckMode) {
-        routes.CheckYourAnswersController.onPageLoad().url
+        config.emailVerificationContinueCheckModeUrl
       } else {
-        routes.BankDetailsController.onPageLoad(NormalMode).url
+        config.emailVerificationContinueUrl
       }
 
       form.bindFromRequest().fold(
@@ -92,7 +92,7 @@ class BusinessContactDetailsController @Inject()(
                     for {
                       updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                       _ <- cc.sessionRepository.set(updatedAnswers)
-                    } yield Redirect(validResponse.redirectUri)
+                    } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
                   case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
                 }
           }
