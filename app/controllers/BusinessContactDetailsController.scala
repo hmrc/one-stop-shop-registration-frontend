@@ -92,7 +92,7 @@ class BusinessContactDetailsController @Inject()(
                     for {
                       updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                       _ <- cc.sessionRepository.set(updatedAnswers)
-                    } yield Redirect(validResponse.redirectUri)
+                    } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
                   case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
                 }
           }

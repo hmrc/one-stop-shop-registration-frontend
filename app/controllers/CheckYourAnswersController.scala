@@ -25,7 +25,7 @@ import logging.Logging
 import models.NormalMode
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.domain.Registration
-import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT}
+import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.responses.ConflictFound
 import pages.{CheckYourAnswersPage, SavedProgressPage}
