@@ -71,24 +71,24 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       value equals genericMatch
     }
 
-    "call searchUkVrn for matchType=FixedEstablishmentActiveNETP and return same match data" in {
+    "call searchUkVrn for exclusionStatusCode=None and return none" in {
 
       val vrn = Vrn("333333333")
 
       val expectedResponse = coreValidationResponses.copy(matches = Seq(Match(matchType = MatchType.FixedEstablishmentActiveNETP,
-        traderId = "333333333", intermediary = None, exclusionStatusCode = Some(2), memberState = "EE", exclusionDecisionDate = None,
+        traderId = "333333333", intermediary = None, exclusionStatusCode = None, memberState = "EE", exclusionDecisionDate = None,
         exclusionEffectiveDate = None, nonCompliantReturns = None, nonCompliantPayments = None)))
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue.get
+      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
 
-      value equals genericMatch
+      value mustBe None
     }
 
-    "call searchUkVrn for matchType=TraderIdActiveNETP and return same match data" in {
+    "call searchUkVrn for exclusionStatusCode = 3 and return same match data" in {
 
       val vrn = Vrn("333333333")
 
@@ -102,10 +102,10 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
 
       val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue.get
 
-      value equals genericMatch
+      value mustBe expectedResponse.matches.head
     }
 
-    "call searchUkVrn for matchType=FixedEstablishmentActiveNETP with exclusion code -1 and will return no match data" in {
+    "call searchUkVrn for exclusion code -1 and will return no match data" in {
 
       val vrn = Vrn("333333333")
 
@@ -121,7 +121,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       value mustBe None
     }
 
-    "call searchUkVrn for matchType=FixedEstablishmentActiveNETP with exclusion code 6 and will return no match data" in {
+    "call searchUkVrn for exclusion code 6 and will return no match data" in {
 
       val vrn = Vrn("333333333")
 

@@ -18,7 +18,7 @@ package services
 
 import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
-import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
+import models.core.{CoreRegistrationRequest, Match, SourceType}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -31,23 +31,17 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
+
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.exists(_.matchType == MatchType.FixedEstablishmentActiveNETP) =>
-        coreRegistrationResponse.matches.find(_.matchType == MatchType.FixedEstablishmentActiveNETP) match {
+      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.find(_.exclusionStatusCode.nonEmpty) match {
+        case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(-1) || activeMatch.exclusionStatusCode.contains(6) =>
+          None
 
-          case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(-1) || activeMatch.exclusionStatusCode.contains(6) =>
-            None
+        case Some(activeMatch) => Some(activeMatch)
 
-          case Some(activeMatch) => Some(activeMatch)
-
-          case None => None
-        }
-
-      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
-        coreRegistrationResponse.matches.headOption
-
-      case _ => None
+        case None => None
+      }
     }
   }
 
