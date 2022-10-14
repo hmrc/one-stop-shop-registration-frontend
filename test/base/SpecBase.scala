@@ -118,6 +118,7 @@ trait SpecBase
         bind[CheckRegistrationFilter].toInstance(new FakeCheckRegistrationFilter()),
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
         bind[CheckEmailVerificationFilter].toInstance(new FakeCheckEmailVerificationFilter()),
+        bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
         bind[Clock].toInstance(clockToBind)
       )
   }

@@ -355,8 +355,8 @@ hasFixedEstablishment.change.hidden = fixed establishment
 checkEuVatDetailsAnswers.title = Check your answers for {0}
 checkEuVatDetailsAnswers.heading = Check your answers for {0}
 
-alreadyRegistered.title = {0} is already registered
-alreadyRegistered.heading = {0} is already registered
+alreadyRegistered.title = This account is already registered for the One Stop Shop scheme
+alreadyRegistered.heading = This account is already registered for the One Stop Shop scheme
 alreadyRegistered.confirmation = Check your email for the confirmation.
 alreadyRegistered.reference = Your reference number is your UK VAT registration number, {0}.
 alreadyRegistered.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
@@ -373,6 +373,7 @@ alreadyRegistered.p1 = We will contact you if we need to check any information.
 alreadyRegistered.p2 = We will contact you about how to use the new service to submit your first return and make payment by {0}.
 alreadyRegistered.feedback.link.text = What did you think of this service?
 alreadyRegistered.feedback.30seconds = (takes 30 seconds)
+alreadyRegistered.continue = Continue to your account
 
 addPreviousRegistration.title.singular = You added one deregistration
 addPreviousRegistration.heading.singular = You added one deregistration
@@ -614,3 +615,8 @@ problemWithAccount.title = There is a problem with your account
 problemWithAccount.heading = There is a problem with your account
 problemWithAccount.contact = Contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a> to restore your account.
 
+alreadyRegisteredOtherCountry.title = This account is already registered on a One Stop Shop scheme in {0}
+alreadyRegisteredOtherCountry.heading = This account is already registered on a One Stop Shop scheme in {0}
+alreadyRegisteredOtherCountry.register = You can only register on one OSS Union scheme at a time.
+alreadyRegisteredOtherCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+alreadyRegisteredOtherCountry.returnBTA = <a class="govuk-link" href="/business-account">Return to Business Tax Account</a>
