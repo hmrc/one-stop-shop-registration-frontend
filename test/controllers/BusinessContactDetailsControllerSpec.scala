@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import forms.BusinessContactDetailsFormProvider
 import models.responses.UnexpectedResponseStatus
 import models.NormalMode
@@ -159,11 +160,12 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           FakeRequest(POST, businessContactDetailsRoute)
             .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
+        val config = application.injector.instanceOf[FrontendAppConfig]
         val result = route(application, request).value
         val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual emailVerificationResponse.redirectUri
+        redirectLocation(result).value mustEqual config.emailVerificationUrl + emailVerificationResponse.redirectUri
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         verify(mockEmailVerificationService, times(1))
           .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
