@@ -49,7 +49,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
         val application =
-          applicationBuilder(userAnswers = Some(basicUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .build()
 
@@ -71,13 +71,72 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
       }
     }
 
+    "must return OK and the correct view for a GET where Commencement Date is different to the Date of First sale" in {
+
+      val registrationDiff =
+        registration copy (dateOfFirstSale = Some(LocalDate.now().minusDays(1)))
+
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDiff))
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[AlreadyRegisteredView]
+        val config = application.injector.instanceOf[FrontendAppConfig]
+
+        status(result) mustEqual OK
+
+        val expectedContent =
+          view(
+            config.feedbackUrl(request),
+          )(request, messages(application)).toString
+
+        contentAsString(result) mustEqual expectedContent
+      }
+    }
+
+    "must return OK and the correct view for a GET where the Date of First sale is not present" in {
+
+      val registrationDOFSEmpty = registration copy (dateOfFirstSale = None)
+
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDOFSEmpty))
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AlreadyRegisteredController.onPageLoad().url)
+        val result = route(application, request).value
+        val view = application.injector.instanceOf[AlreadyRegisteredView]
+        val config = application.injector.instanceOf[FrontendAppConfig]
+
+        status(result) mustEqual OK
+
+        val expectedContent =
+          view(
+            config.feedbackUrl(request)
+          )(request, messages(application)).toString
+
+        contentAsString(result) mustEqual expectedContent
+      }
+    }
+
     "when the connector does not find an existing registration" - {
 
       "must redirect the user to the Problem With Account page" in {
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
         val application =
-          applicationBuilder(userAnswers = Some(basicUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .build()
 

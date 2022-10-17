@@ -43,6 +43,7 @@ class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector,
     for {
       registration <- connector.getRegistration()
     } yield {
+
       if(registration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
         request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
           migrationService

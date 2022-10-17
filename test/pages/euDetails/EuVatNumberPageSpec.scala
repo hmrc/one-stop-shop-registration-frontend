@@ -37,58 +37,80 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Has Fixed Establishment for the same index" in {
+      "to Has Fixed Establishment for the same index if the user is not part of vat group" in {
 
         EuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+      }
+
+      "to Add Eu Details for the same index if the user is part of vat group" in {
+
+        EuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
       }
     }
 
     "must navigate in Check mode" - {
 
-      "when Has Fixed Establishment has not been answered" - {
+      "when user is not part of Vat Group" - {
+        "when Has Fixed Establishment has not been answered" - {
 
-        "to Has Fixed Establishment" in {
+          "to Has Fixed Establishment" in {
 
-          EuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers)
-            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index))
+            EuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers)
+              .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index))
+          }
+        }
+
+        "when Has Fixed Establishment has been answered" - {
+
+          "to wherever Has Fixed Establishment would navigate to" in {
+
+            val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
+            val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
+
+            EuVatNumberPage(index).navigate(CheckMode, answers)
+              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
+          }
         }
       }
 
-      "when Has Fixed Establishment has been answered" - {
+      "to Add Eu Details for the same index if the user is part of vat group" in {
 
-        "to wherever Has Fixed Establishment would navigate to" in {
-
-          val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
-          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
-
-          EuVatNumberPage(index).navigate(CheckMode, answers)
-            .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
-        }
+        EuVatNumberPage(index).navigate(CheckMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(CheckMode))
       }
     }
 
     "must navigate in Check Loop mode" - {
 
-      "when Has Fixed Establishment has not been answered" - {
+      "when user is not part of Vat Group" - {
+        "when Has Fixed Establishment has not been answered" - {
 
-        "to Has Fixed Establishment" in {
+          "to Has Fixed Establishment" in {
 
-          EuVatNumberPage(index).navigate(CheckLoopMode, emptyUserAnswers)
-            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index))
+            EuVatNumberPage(index).navigate(CheckLoopMode, emptyUserAnswers)
+              .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index))
+          }
+        }
+
+        "when Has Fixed Establishment has been answered" - {
+
+          "to wherever Has Fixed Establishment would navigate to" in {
+
+            val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
+            val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
+
+            EuVatNumberPage(index).navigate(CheckLoopMode, answers)
+              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
+          }
         }
       }
 
-      "when Has Fixed Establishment has been answered" - {
+      "to Add Eu Details for the same index if the user is part of vat group" in {
 
-        "to wherever Has Fixed Establishment would navigate to" in {
-
-          val hasFixedEstablishmentAnswer = arbitrary[Boolean].sample.value
-          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), hasFixedEstablishmentAnswer).success.value
-
-          EuVatNumberPage(index).navigate(CheckLoopMode, answers)
-            .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
-        }
+        EuVatNumberPage(index).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(NormalMode))
       }
     }
   }

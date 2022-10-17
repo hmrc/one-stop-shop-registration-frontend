@@ -41,7 +41,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val previousEuVatNumberRoute = routes.PreviousEuVatNumberController.onPageLoad(NormalMode, index).url
 
-  private val baseAnswers = basicUserAnswers.set(PreviousEuCountryPage(index), country).success.value
+  private val baseAnswers = basicUserAnswersWithVatInfo.set(PreviousEuCountryPage(index), country).success.value
 
 
   "PreviousEuVatNumber Controller" - {
@@ -141,7 +141,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, previousEuVatNumberRoute)
