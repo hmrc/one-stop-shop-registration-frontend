@@ -543,6 +543,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "the user is redirected to the Error Submitting Registration page and their answers are saved" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+          val savedAnswers = basicUserAnswersWithVatInfo.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(routes.ErrorSubmittingRegistrationController.onPageLoad().url))
@@ -572,6 +573,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "the user is redirected to the Journey Recovery page when saving answers fails" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+          val savedAnswers = basicUserAnswersWithVatInfo.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
