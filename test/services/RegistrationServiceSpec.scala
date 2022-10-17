@@ -59,9 +59,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(DateOfFirstSalePage, arbitraryDate).success.value
       .set(hasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
-      .set(PartOfVatGroupPage, false).success.value
-      .set(UkVatEffectiveDatePage, LocalDate.now).success.value
-      .set(BusinessAddressInUkPage, true).success.value
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
       .set(VatRegisteredPage(Index(0)), true).success.value
@@ -119,8 +116,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val vatInfo = VatCustomerInfo(
         registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(false),
-        organisationName = Some("bar")
+        partOfVatGroup = false,
+        organisationName = "bar"
       )
 
       val userAnswers =
@@ -139,36 +136,6 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       registration mustEqual Valid(expectedRegistration)
     }
 
-    "must return a Registration when user answers are provided and we have not full VAT information on the user and is not part of vat group" in {
-
-      val regDate = LocalDate.of(2000, 1, 1)
-      val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
-      val vatInfo = VatCustomerInfo(
-        registrationDate = Some(regDate),
-        address = address,
-        partOfVatGroup = Some(false),
-        organisationName = None
-      )
-
-      val userAnswers =
-        answers.copy(vatInfo = Some(vatInfo))
-          .remove(UkVatEffectiveDatePage).success.value
-          .remove(UkAddressPage).success.value
-          .remove(PartOfVatGroupPage).success.value
-
-      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-      val expectedRegistration =
-        RegistrationData.registration.copy(
-          dateOfFirstSale       = Some(arbitraryDate),
-          vatDetails            = VatDetails(regDate, address, false, VatDetailSource.Mixed),
-          registeredCompanyName = "foo",
-          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
-        )
-
-      registration mustEqual Valid(expectedRegistration)
-    }
-
     "must return a Registration when user answers are provided and PreviouslyRegisteredPage is false and user is not part of vat group" in {
 
       val regDate = LocalDate.of(2000, 1, 1)
@@ -176,8 +143,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val vatInfo = VatCustomerInfo(
         registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(false),
-        organisationName = Some("bar")
+        partOfVatGroup = false,
+        organisationName = "bar"
       )
 
       val userAnswers =
@@ -230,8 +197,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val vatInfo = VatCustomerInfo(
         registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(false),
-        organisationName = Some("bar")
+        partOfVatGroup = false,
+        organisationName = "bar"
       )
 
       val userAnswers =
@@ -260,8 +227,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val vatInfo = VatCustomerInfo(
         registrationDate = regDate,
         address = address,
-        partOfVatGroup = Some(false),
-        organisationName = Some("bar")
+        partOfVatGroup = false,
+        organisationName = "bar"
       )
 
       val userAnswers =
@@ -745,8 +712,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val vatInfo = VatCustomerInfo(
           registrationDate = regDate,
           address = address,
-          partOfVatGroup = Some(false),
-          organisationName = Some("bar")
+          partOfVatGroup = false,
+          organisationName = "bar"
         )
 
         val userAnswers =

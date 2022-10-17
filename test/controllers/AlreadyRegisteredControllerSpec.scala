@@ -61,30 +61,12 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
           val result = route(application, request).value
           val view = application.injector.instanceOf[AlreadyRegisteredView]
           val config = application.injector.instanceOf[FrontendAppConfig]
-          val dateService = application.injector.instanceOf[DateService]
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val vatReturnEndDate = dateService.getVatReturnEndDate(registration.commencementDate)
-          val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-          val isDOFSDifferentToCommencementDate =
-            dateService.isDOFSDifferentToCommencementDate(
-              registration.dateOfFirstSale,
-              registration.commencementDate
-            )
 
           status(result) mustEqual OK
 
           val expectedContent =
             view(
-              registration.registeredCompanyName,
-              vrn,
-              config.feedbackUrl(request),
-              registration.commencementDate.format(dateFormatter),
-              vatReturnEndDate.format(dateFormatter),
-              vatReturnDeadline.format(dateFormatter),
-              lastDayOfCalendarQuarter.format(dateFormatter),
-              dateService.startOfCurrentQuarter.format(dateFormatter),
-              dateService.startOfNextQuarter.format(dateFormatter),
-              isDOFSDifferentToCommencementDate
+              config.feedbackUrl(request)
             )(request, messages(application)).toString
 
           contentAsString(result) mustEqual expectedContent
@@ -111,30 +93,12 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
         val view = application.injector.instanceOf[AlreadyRegisteredView]
         val config = application.injector.instanceOf[FrontendAppConfig]
-        val dateService = application.injector.instanceOf[DateService]
-        val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-        val vatReturnEndDate = dateService.getVatReturnEndDate(registrationDiff.commencementDate)
-        val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-        val isDOFSDifferentToCommencementDate =
-          dateService.isDOFSDifferentToCommencementDate(
-            registrationDiff.dateOfFirstSale,
-            registrationDiff.commencementDate
-          )
 
         status(result) mustEqual OK
 
         val expectedContent =
           view(
-            registrationDiff.registeredCompanyName,
-            vrn,
             config.feedbackUrl(request),
-            registrationDiff.commencementDate.format(dateFormatter),
-            vatReturnEndDate.format(dateFormatter),
-            vatReturnDeadline.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            dateService.startOfCurrentQuarter.format(dateFormatter),
-            dateService.startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate
           )(request, messages(application)).toString
 
         contentAsString(result) mustEqual expectedContent
@@ -157,25 +121,15 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
         val result = route(application, request).value
         val view = application.injector.instanceOf[AlreadyRegisteredView]
         val config = application.injector.instanceOf[FrontendAppConfig]
-        val dateService = application.injector.instanceOf[DateService]
-        val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-        val vatReturnEndDate = dateService.getVatReturnEndDate(registrationDOFSEmpty.commencementDate)
-        val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-        val isDOFSDifferentToCommencementDate =
-          dateService.isDOFSDifferentToCommencementDate(
-            registrationDOFSEmpty.dateOfFirstSale,
-            registrationDOFSEmpty.commencementDate
-          )
 
-          status(result) mustEqual OK
+        status(result) mustEqual OK
 
-          val expectedContent =
-            view(
-              config.feedbackUrl(request)
-            )(request, messages(application)).toString
+        val expectedContent =
+          view(
+            config.feedbackUrl(request)
+          )(request, messages(application)).toString
 
-          contentAsString(result) mustEqual expectedContent
-        }
+        contentAsString(result) mustEqual expectedContent
       }
     }
 

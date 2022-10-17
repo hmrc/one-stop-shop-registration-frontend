@@ -263,12 +263,6 @@ POST       /planned-first-sale                                        controller
 GET        /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
 POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
-
-GET        /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /change-eu-send-goods-trading-name/:index                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
-
 POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
 GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()
 GET        /cannot-register-ni-protocol                               controllers.NiProtocolRejectionController.onPageLoad()
@@ -284,8 +278,6 @@ GET        /no-saved-registration                                      controlle
 GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
 
 GET        /already-registered-other-country                           controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
-
-POST       /external-entry                                            controllers.external.ExternalController.onExternal()
 
 GET        /eu-send-goods/:index                                      controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST       /eu-send-goods/:index                                      controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)

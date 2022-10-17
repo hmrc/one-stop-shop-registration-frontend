@@ -47,11 +47,6 @@ class EuSendGoodsControllerSpec extends SpecBase with MockitoSugar {
   private val answers = emptyUserAnswers .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), country).success.value
 
-  private val country = arbitraryCountry.arbitrary.sample.value
-
-  private val answers = emptyUserAnswers .set(TaxRegisteredInEuPage, true).success.value
-    .set(EuCountryPage(Index(0)), country).success.value
-
   "EuSendGoods Controller" - {
 
     "must return OK and the correct view for a GET" in {

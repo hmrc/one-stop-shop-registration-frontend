@@ -43,7 +43,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
   }
 
   private val mockEmailVerificationService = mock[EmailVerificationService]
-  private val validEmailAddressUserAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+  private val validEmailAddressUserAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
   ".filter" - {
 
@@ -55,7 +55,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
       running(app) {
 
-        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswers)
+        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswersWithVatInfo)
         val controller = new Harness(mockEmailVerificationService)
 
         val result = controller.callFilter(request).futureValue

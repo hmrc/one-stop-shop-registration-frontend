@@ -55,9 +55,9 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  val arbitraryDate: LocalDate        = datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31)).sample.value
-  val arbitraryStartDate: LocalDate   = datesBetween(LocalDate.of(2021, 7, 1), LocalDate.now()).sample.value
-  val arbitraryInstant: Instant       = arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant
+  val arbitraryDate: LocalDate = datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31)).sample.value
+  val arbitraryStartDate: LocalDate = datesBetween(LocalDate.of(2021, 7, 1), LocalDate.now()).sample.value
+  val arbitraryInstant: Instant = arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant
   val stubClockAtArbitraryDate: Clock = Clock.fixed(arbitraryInstant, ZoneId.systemDefault)
 
   val userAnswersId: String = "12345-credId"
@@ -65,17 +65,9 @@ trait SpecBase
 
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
-      registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
-      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-      partOfVatGroup   = Some(false),
-      organisationName = Some("Company name")
-    )
-
-  val partialVatCustomerInfo: VatCustomerInfo =
-    VatCustomerInfo(
-      registrationDate = LocalDate.now(stubClockAtArbitraryDate),,
-      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-      partOfVatGroup   = true,
+      registrationDate = LocalDate.now(stubClockAtArbitraryDate),
+      address = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup = false,
       organisationName = "Company name"
     )
 
@@ -95,11 +87,11 @@ trait SpecBase
     email = Some(verifyEmail)
   )
 
-  val testCredentials: Credentials             = Credentials(userAnswersId, "GGW")
-  val emptyUserAnswers: UserAnswers            = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
+  val testCredentials: Credentials = Credentials(userAnswersId, "GGW")
+  val emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, lastUpdated = arbitraryInstant)
   val basicUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value copy (vatInfo = Some(vatCustomerInfo))
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
-  val  completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
+  val completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
     .set(HasTradingNamePage, false).success.value
     .set(HasMadeSalesPage, false).success.value
     .set(IsPlanningFirstEligibleSalePage, true).success.value
@@ -133,7 +125,7 @@ trait SpecBase
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) ={
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) = {
     Seq(
       new HasTradingNameSummary().row(answers),
       HasMadeSalesSummary.row(answers),

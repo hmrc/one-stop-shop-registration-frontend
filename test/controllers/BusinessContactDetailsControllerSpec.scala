@@ -102,7 +102,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(
             bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
             bind[EmailVerificationService].toInstance(mockEmailVerificationService)
@@ -115,7 +115,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
@@ -198,7 +198,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         Future.successful(Left(UnexpectedResponseStatus(httpStatus, "error")))
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(
             bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
             bind[EmailVerificationService].toInstance(mockEmailVerificationService)
