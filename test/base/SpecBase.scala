@@ -39,7 +39,7 @@ import services.DateService
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 import viewmodels.checkAnswers._
-import viewmodels.checkAnswers.euDetails.TaxRegisteredInEuSummary
+import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
@@ -66,8 +66,8 @@ trait SpecBase
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
       registrationDate = LocalDate.now(stubClockAtArbitraryDate),
-      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-      partOfVatGroup   = true,
+      address = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup = false,
       organisationName = "Company name"
     )
 
@@ -126,13 +126,14 @@ trait SpecBase
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) ={
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) = {
     Seq(
       new HasTradingNameSummary().row(answers),
       HasMadeSalesSummary.row(answers),
       IsPlanningFirstEligibleSaleSummary.row(answers),
       new CommencementDateSummary(dateService).row(answers),
       TaxRegisteredInEuSummary.row(answers),
+      EuDetailsSummary.checkAnswersRow(answers),
       PreviouslyRegisteredSummary.row(answers),
       IsOnlineMarketplaceSummary.row(answers),
       HasWebsiteSummary.row(answers),

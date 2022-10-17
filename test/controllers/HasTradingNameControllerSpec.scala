@@ -39,7 +39,7 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val hasTradingNameRoute = routes.HasTradingNameController.onPageLoad(NormalMode).url
 
-  private val baseUserAnswers = basicUserAnswers.copy(vatInfo = Some(vatCustomerInfo))
+  private val baseUserAnswers = basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo))
 
   "HasTradingName Controller" - {
 
@@ -143,21 +143,6 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, hasTradingNameRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if Registered Company Name has not been answered" +
-      "and we don't have the user's company in their VAT details" in {
-
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasTradingNameRoute)

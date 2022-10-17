@@ -35,59 +35,81 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Has Fixed Establishment" in {
+      "to Fixed Establishment Trading Name when Has Fixed Establishment is true" in {
 
-        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value)
+          .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index))
+      }
+
+      "to Eu Send Goods Trading Name when Has Fixed Establishment is false" in {
+
+        EuTaxReferencePage(index).navigate(NormalMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value)
+          .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index))
       }
     }
 
     "must navigate in Check mode" - {
 
-      "when Has Fixed Establishment has not been answered" - {
+      "to Fixed Establishment Trading Name when Has Fixed Establishment is true and it has not been answered" in {
 
-        "to Has Fixed Establishment" in {
-
-          EuTaxReferencePage(index).navigate(CheckMode, emptyUserAnswers)
-            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index))
-        }
+        EuTaxReferencePage(index).navigate(CheckMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value)
+          .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index))
       }
 
-      "when Has Fixed Establishment has been answered" - {
+      "to wherever Fixed Establishment Trading Name navigates when Has Fixed Establishment is true and it has been answered" in {
+        val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value
+          .set(FixedEstablishmentTradingNamePage(index), "foo").success.value
 
-        "to wherever Has Fixed Establishment would navigate to" in {
+        EuTaxReferencePage(index).navigate(CheckMode, answers)
+          .mustEqual(FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers))
+      }
 
-          val answers = emptyUserAnswers
-            .set(EuTaxReferencePage(index), "123").success.value
-            .set(HasFixedEstablishmentPage(index), true).success.value
+      "to Eu Send Goods Trading Name when Has Fixed Establishment is false and it has not been answered" in {
 
-          EuTaxReferencePage(index).navigate(CheckMode, answers)
-            .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
-        }
+        EuTaxReferencePage(index).navigate(CheckMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value)
+          .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, index))
+      }
+
+      "to wherever Eu Send Goods Trading Name navigates when Has Fixed Establishment is false and it has been answered" in {
+        val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
+          .set(EuSendGoodsTradingNamePage(index), "foo").success.value
+        
+        EuTaxReferencePage(index).navigate(CheckMode, answers)
+          .mustEqual(EuSendGoodsTradingNamePage(index).navigate(CheckMode, answers))
       }
     }
 
     "must navigate in Check Loop mode" - {
 
-      "when Has Fixed Establishment has not been answered" - {
 
-        "to Has Fixed Establishment" in {
+      "to Fixed Establishment Trading Name when Has Fixed Establishment is true and it has not been answered" in {
 
-          EuTaxReferencePage(index).navigate(CheckLoopMode, emptyUserAnswers)
-            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index))
-        }
+        EuTaxReferencePage(index).navigate(CheckLoopMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value)
+          .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index))
       }
 
-      "when Has Fixed Establishment has been answered" - {
+      "to wherever Fixed Establishment Trading Name navigates when Has Fixed Establishment is true and it has been answered" in {
+        val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value
+          .set(FixedEstablishmentTradingNamePage(index), "foo").success.value
 
-        "to wherever Has Fixed Establishment would navigate to" in {
-
-          val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), true).success.value
-
-          EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
-            .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
-        }
+        EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
+          .mustEqual(FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers))
       }
+
+      "to Eu Send Goods Trading Name when Has Fixed Establishment is false and it has not been answered" in {
+
+        EuTaxReferencePage(index).navigate(CheckLoopMode, emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value)
+          .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, index))
+      }
+
+      "to wherever Eu Send Goods Trading Name navigates when Has Fixed Establishment is false and it has been answered" in {
+        val answers = emptyUserAnswers.set(HasFixedEstablishmentPage(index), false).success.value
+          .set(EuSendGoodsTradingNamePage(index), "foo").success.value
+
+        EuTaxReferencePage(index).navigate(CheckLoopMode, answers)
+          .mustEqual(EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, answers))
+      }
+
     }
   }
 }

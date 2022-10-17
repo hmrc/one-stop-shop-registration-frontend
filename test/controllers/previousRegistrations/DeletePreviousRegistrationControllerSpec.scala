@@ -44,7 +44,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
   private lazy val deletePreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url
 
   private val baseUserAnswers =
-    basicUserAnswers
+    basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(index), previousRegistration.previousEuCountry).success.value
       .set(PreviousEuVatNumberPage(index), previousRegistration.previousEuVatNumber).success.value
 
@@ -154,7 +154,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
     "must redirect to Journey Recovery for a GET if no EU VAT details exist" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, deletePreviousRegistrationRoute)

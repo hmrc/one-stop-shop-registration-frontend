@@ -43,12 +43,12 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
   private def addPreviousRegistrationRoutePost(prompt: Boolean) = routes.AddPreviousRegistrationController.onSubmit(NormalMode, prompt).url
 
   private val baseAnswers =
-    basicUserAnswers
+    basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(PreviousEuVatNumberPage(Index(0)), "foo").success.value
 
   private val incompleteAnswers =
-    basicUserAnswers
+    basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
 
   "AddPreviousRegistration Controller" - {
@@ -152,7 +152,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, addPreviousRegistrationRoute)

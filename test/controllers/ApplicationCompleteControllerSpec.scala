@@ -338,7 +338,7 @@ class ApplicationCompleteControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .configure("features.enrolments-enabled" -> "false")
           .build()
 
