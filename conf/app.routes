@@ -258,23 +258,27 @@ POST        /sales-on-marketplaces                                    controller
 
 GET         /answers-deleted                                          controllers.AnswersDeletedController.onPageLoad
 
-GET        /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
-POST       /planned-first-sale                                        controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
-GET        /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
-POST       /check-planned-first-sale                                  controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
+GET         /planned-first-sale                                       controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
+POST        /planned-first-sale                                       controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
+GET         /check-planned-first-sale                                 controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-planned-first-sale                                 controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
-POST       /external-entry                                            controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
-GET        /no-welsh-service                                          controllers.external.NoMoreWelshController.onPageLoad()
-GET        /cannot-register-ni-protocol                               controllers.NiProtocolRejectionController.onPageLoad()
+POST        /external-entry                                           controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
+GET         /no-welsh-service                                         controllers.external.NoMoreWelshController.onPageLoad()
+GET         /cannot-register-ni-protocol                              controllers.NiProtocolRejectionController.onPageLoad()
 
-GET        /progress-saved                                            controllers.SavedProgressController.onPageLoad(continueUrl: String)
+GET         /progress-saved                                           controllers.SavedProgressController.onPageLoad(continueUrl: String)
 
-GET        /continue-registration                                      controllers.ContinueRegistrationController.onPageLoad()
-POST       /continue-registration                                      controllers.ContinueRegistrationController.onSubmit()
-GET        /registration-service-error                                 controllers.VatApiDownController.onPageLoad()
+GET         /continue-registration                                    controllers.ContinueRegistrationController.onPageLoad()
+POST        /continue-registration                                    controllers.ContinueRegistrationController.onSubmit()
+GET         /registration-service-error                               controllers.VatApiDownController.onPageLoad()
 
-GET        /error-submitting-registration                              controllers.ErrorSubmittingRegistrationController.onPageLoad()
-GET        /no-saved-registration                                      controllers.NoRegistrationInProgressController.onPageLoad()
-GET        /account-restore-error                                      controllers.ProblemWithAccountController.onPageLoad()
+GET         /error-submitting-registration                            controllers.ErrorSubmittingRegistrationController.onPageLoad()
+GET         /no-saved-registration                                    controllers.NoRegistrationInProgressController.onPageLoad()
+GET         /account-restore-error                                    controllers.ProblemWithAccountController.onPageLoad()
 
-GET        /already-registered-other-country                           controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
+GET         /already-registered-other-country                         controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
+
+GET         /email-verification-codes-and-emails-exceeded             controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
+
+GET         /email-verification-codes-exceeded                        controllers.EmailVerificationCodesExceededController.onPageLoad()
