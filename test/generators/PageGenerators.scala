@@ -19,10 +19,19 @@ package generators
 import models.Index
 import org.scalacheck.Arbitrary
 import pages.{euDetails, _}
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails._
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage] =
+    Arbitrary(euDetails.EuSendGoodsPage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsTradingNamePage: Arbitrary[EuSendGoodsTradingNamePage] =
+    Arbitrary(EuSendGoodsTradingNamePage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsAddressPage: Arbitrary[EuSendGoodsAddressPage.type] =
+    Arbitrary(EuSendGoodsAddressPage)
 
   implicit lazy val arbitraryIsPlanningFirstEligibleSalePage: Arbitrary[IsPlanningFirstEligibleSalePage.type] =
     Arbitrary(IsPlanningFirstEligibleSalePage)

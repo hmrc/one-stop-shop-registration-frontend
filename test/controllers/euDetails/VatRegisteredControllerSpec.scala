@@ -41,7 +41,7 @@ class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val vatRegisteredRoute = routes.VatRegisteredController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
 
   "VatRegistered Controller" - {
 
@@ -140,7 +140,7 @@ class VatRegisteredControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, vatRegisteredRoute)

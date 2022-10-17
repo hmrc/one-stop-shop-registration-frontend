@@ -5,6 +5,7 @@ site.remove = Remove
 site.remove.hidden = Remove tax details for {0}
 site.change = Change
 site.change.hidden = Change tax details for {0}
+change.euVatNumber.hidden = Change VAT registration number for {0}
 site.deregistered.hidden = Change if you have deregistered from the VAT One Stop Shop for goods in {0}
 site.no = No
 site.yes = Yes
@@ -191,8 +192,8 @@ addTradingName.remove.hidden = Remove {0}
 addTradingName.addAnother = Add another trading name?
 addTradingName.addAnother.hint = You can add up to 10 trading names.
 
-website.title = Enter a website address
-website.heading = Enter a website address
+website.title = Enter a website you use to sell your goods
+website.heading = Enter a website you use to sell your goods
 website.checkYourAnswersLabel = Website address
 website.error.required = Enter a website address
 website.error.length = Website address must be 250 characters or less
@@ -312,8 +313,8 @@ useOtherAccount.p2.1 = You need to
 useOtherAccount.p2.link.text = sign in with a different Government Gateway user ID
 useOtherAccount.p2.2 = if you want to register for a business with a different VAT registration number.
 
-fixedEstablishmentAddress.title = Enter your fixed establishment address in {0}
-fixedEstablishmentAddress.heading = Enter your fixed establishment address in {0}
+fixedEstablishmentAddress.title = What is the fixed establishment address in {0}?
+fixedEstablishmentAddress.heading = What is the fixed establishment address in {0}?
 fixedEstablishmentAddress.line1 = Address line 1
 fixedEstablishmentAddress.line2 = Address line 2 (optional)
 fixedEstablishmentAddress.townOrCity = Town or city
@@ -382,8 +383,8 @@ addPreviousRegistration.remove.hidden = Remove deregistration in {0}
 addPreviousRegistration.addAnother = Add another deregistration?
 addPreviousRegistration.addAnother.hint = You must tell us about all deregistrations from the Union scheme in EU countries.
 
-previousEuCountry.title = Select an EU country where you are no longer registered for the Union scheme
-previousEuCountry.heading = Select an EU country where you are no longer registered for the Union scheme
+previousEuCountry.title = Enter an EU country where you are no longer registered for the Union scheme
+previousEuCountry.heading = Enter an EU country where you are no longer registered for the Union scheme
 previousEuCountry.error.required = Select an EU country
 previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
@@ -425,8 +426,8 @@ bankDetails.error.accountName.invalid = Name on the account must only include le
 bankDetails.error.bic.invalid = Enter a real BIC
 bankDetails.change.hidden = your bank account details
 
-euTaxReference.title = What is your business''s tax identification number in {0}?
-euTaxReference.heading = What is your business''s tax identification number in {0}?
+euTaxReference.title = What is your business tax identification number in {0}?
+euTaxReference.heading = What is your business tax identification number in {0}?
 euTaxReference.checkYourAnswersLabel = Tax identification number
 euTaxReference.error.required = Enter your business''s tax identification number in {0}
 euTaxReference.error.length = Tax identification number must be 20 characters or less
@@ -449,11 +450,15 @@ sellsGoodsFromNi.title = Will your business sell goods from Northern Ireland to 
 sellsGoodsFromNi.heading = Will your business sell goods from Northern Ireland to consumers in the EU?
 sellsGoodsFromNi.error.required = Select yes if your business will sell goods from Northern Ireland to consumers in the EU
 
-taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries
+taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.heading = Is your business registered for VAT or other taxes in EU countries?
 taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in other EU countries
 taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
 taxRegisteredInEu.change.hidden = if registered for tax in other EU countries
+
+taxRegisteredInEu.vatOnly.title = Is your business registered for VAT in EU countries?
+taxRegisteredInEu.vatOnly.heading = Is your business registered for VAT in EU countries?
+taxRegisteredInEu.vatOnly.error.required = Select yes if your business is registered for VAT in EU countries
 
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details
@@ -564,6 +569,48 @@ error.resolve_missing_answers = Resolve missing answers
 
 site.back.BTA = Return to Business Tax Account
 
+euSendGoods.title = Does your business send goods from {0}?
+euSendGoods.heading = Does your business send goods from {0}?
+euSendGoods.checkYourAnswersLabel = Sends goods
+euSendGoods.error.required = Select yes if you send goods from {0}
+euSendGoods.change.hidden = Sends goods
+
+euSendGoodsTradingName.title = What is the trading name of the business you send goods from in {0}?
+euSendGoodsTradingName.heading = What is the trading name of the business you send goods from in {0}?
+euSendGoodsTradingName.checkYourAnswersLabel = Trading name
+euSendGoodsTradingName.error.required = Enter your trading name in {0}
+euSendGoodsTradingName.error.length = Trading name must be 40 characters or less
+euSendGoodsTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsTradingName.change.hidden = trading name
+
+
+
+euSendGoodsAddress.title = What is the address of {0}?
+euSendGoodsAddress.heading = What is the address of {0}?
+euSendGoodsAddress.checkYourAnswersLabel = Address
+
+euSendGoodsAddress.line1 = Address line 1
+euSendGoodsAddress.line2 = Address line 2 (optional)
+euSendGoodsAddress.townOrCity = Town or city
+euSendGoodsAddress.stateOrRegion = Region or state (optional)
+euSendGoodsAddress.postCode = Postcode (optional)
+euSendGoodsAddress.error.line1.required = Enter address line 1
+euSendGoodsAddress.error.townOrCity.required = Enter the town or city
+euSendGoodsAddress.error.line1.length = Address line 1 must be 35 characters or less
+euSendGoodsAddress.error.line1.format = Address line 1 must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.line2.length = Address line 2 must be 35 characters or less
+euSendGoodsAddress.error.line2.format = Address line 2 must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.townOrCity.length = Town or city must be 35 characters or less
+euSendGoodsAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.stateOrRegion.length = State or region must be 35 characters or less
+euSendGoodsAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.postCode.length = Postcode must be 40 characters or less
+euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
+
+euSendGoodsAddress.change.hidden = EuSendGoodsAddress
+
+
+
 noMoreWelsh.title = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.heading = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.submit = Yn eich blaen
@@ -616,6 +663,29 @@ alreadyRegisteredOtherCountry.heading = This account is already registered on a 
 alreadyRegisteredOtherCountry.register = You can only register on one OSS Union scheme at a time.
 alreadyRegisteredOtherCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 alreadyRegisteredOtherCountry.returnBTA = <a class="govuk-link" href="/business-account">Return to Business Tax Account</a>
+
+euSendGoodsAddress.title = What is the address of {0}?
+euSendGoodsAddress.heading = What is the address of {0}?
+euSendGoodsAddress.checkYourAnswersLabel = Address
+
+euSendGoodsAddress.line1 = Address line 1
+euSendGoodsAddress.line2 = Address line 2 (optional)
+euSendGoodsAddress.townOrCity = Town or city
+euSendGoodsAddress.stateOrRegion = Region or state (optional)
+euSendGoodsAddress.postCode = Postcode (optional)
+euSendGoodsAddress.error.line1.required = Enter address line 1
+euSendGoodsAddress.error.townOrCity.required = Enter the town or city
+euSendGoodsAddress.error.line1.length = Address line 1 must be 35 characters or less
+euSendGoodsAddress.error.line1.format = Address line 1 must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.line2.length = Address line 2 must be 35 characters or less
+euSendGoodsAddress.error.line2.format = Address line 2 must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.townOrCity.length = Town or city must be 35 characters or less
+euSendGoodsAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.stateOrRegion.length = State or region must be 35 characters or less
+euSendGoodsAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces and apostrophes
+euSendGoodsAddress.error.postCode.length = Postcode must be 50 characters or less
+euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
+euSendGoodsAddress.change.hidden = EuSendGoodsAddress
 
 emailVerificationCodesAndEmailsExceeded.title = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.heading = You''ve tried too many email addresses

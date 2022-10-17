@@ -526,7 +526,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -536,7 +536,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -556,7 +556,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(routes.ErrorSubmittingRegistrationController.onPageLoad().url))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -567,7 +567,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER
@@ -585,7 +585,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -596,7 +596,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER

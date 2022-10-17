@@ -40,7 +40,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
 
   private lazy val fixedEstablishmentTradingNameRoute = routes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index).url
 
-  private val baseUserAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
 
   "FixedEstablishmentTradingName Controller" - {
 
@@ -139,7 +139,7 @@ class FixedEstablishmentTradingNameControllerSpec extends SpecBase with MockitoS
 
     "must redirect to Journey Recovery for a GET user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, fixedEstablishmentTradingNameRoute)
