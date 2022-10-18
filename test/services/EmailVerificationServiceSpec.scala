@@ -20,6 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import connectors.EmailVerificationConnector
 import models.NormalMode
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.emailVerification.{EmailStatus, EmailVerificationResponse, VerificationStatus}
 import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any
@@ -94,52 +95,92 @@ class EmailVerificationServiceSpec extends SpecBase {
 
   ".isEmailVerified" - {
 
-    "must return true if email is verified" in {
+    "must return Verified if email is verified" in {
 
-      val verifiedEmail = EmailStatus(emailAddress = contactDetails.emailAddress, verified = true, locked = false)
+      val verifiedEmail: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = true, locked = false)
       val verificationStatus: VerificationStatus = VerificationStatus(Seq(verifiedEmail))
 
       when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
 
       val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
 
-      result mustBe true
+      result mustBe Verified
 
     }
 
-    "must return false if email is not verified" in {
+    "must return Not Verified if email is not verified" in {
 
-      val verifiedEmail = EmailStatus(emailAddress = contactDetails.emailAddress, verified = false, locked = false)
-      val verificationStatus: VerificationStatus = VerificationStatus(Seq(verifiedEmail))
+      val unverifiedEmail: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = false, locked = false)
+      val verificationStatus: VerificationStatus = VerificationStatus(Seq(unverifiedEmail))
 
       when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
 
       val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
 
-      result mustBe false
+      result mustBe NotVerified
 
     }
 
-    "must return false if verification not found" in {
+    "must return Not Verified if there is no verification status received" in {
 
       when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(None))
 
       val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
 
-      result mustBe false
+      result mustBe NotVerified
 
     }
 
-    "must return false when an error is received" in {
+    "must return Locked Passcode For Single Email if email is not verified and locked for a single email" in {
 
-      val errorCode = Gen.oneOf(BAD_REQUEST, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_GATEWAY).sample.value
+      val locked: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = false, locked = true)
+      val verificationStatus: VerificationStatus = VerificationStatus(Seq(locked))
 
-      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn
-        Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
 
-      val result = Future.successful(false).futureValue
+      val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
 
-      result mustBe false
+      result mustBe LockedPasscodeForSingleEmail
+
+    }
+
+    "must return Locked Passcode For Single Email if email is not verified and locked for a single email with multiple email address attempts" in {
+
+      val locked: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = false, locked = true)
+      val verificationStatus: VerificationStatus = VerificationStatus(
+        Seq(locked, locked, locked, locked, locked, locked, locked, locked, locked)
+      )
+
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
+
+      val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
+
+      result mustBe LockedPasscodeForSingleEmail
+
+    }
+
+    "must return Locked Too Many Locked Emails if if email is not verified and locked due to maximum email address attempts" in {
+
+      val locked: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = false, locked = true)
+      val verificationStatus: VerificationStatus = VerificationStatus(
+        Seq(locked, locked, locked, locked, locked, locked, locked, locked, locked, locked)
+      )
+
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
+
+      val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
+
+      result mustBe LockedTooManyLockedEmails
+
+    }
+
+    "must return Not Verified for a Left(UnexpectedResponseStatus)" in {
+
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Left(UnexpectedResponseStatus(BAD_REQUEST, "error")))
+
+      val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
+
+      result mustBe NotVerified
 
     }
 

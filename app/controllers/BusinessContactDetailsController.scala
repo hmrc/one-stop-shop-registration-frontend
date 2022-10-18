@@ -19,6 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.{CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -79,13 +80,25 @@ class BusinessContactDetailsController @Inject()(
           )
 
           emailVerificationService.isEmailVerified(value.emailAddress, request.userId).flatMap {
-            case true =>
+            case Verified =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
 
-            case false =>
+            case LockedPasscodeForSingleEmail =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(routes.EmailVerificationCodesExceededController.onPageLoad().url)
+
+            case LockedTooManyLockedEmails =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url)
+
+            case NotVerified =>
               emailVerificationRequest
                 .flatMap {
                   case Right(validResponse) =>

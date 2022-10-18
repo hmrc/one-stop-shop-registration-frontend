@@ -18,6 +18,7 @@ package controllers.actions
 
 import base.SpecBase
 import models.NormalMode
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.{eq => eqTo}
@@ -74,7 +75,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
         when(mockEmailVerificationService.isEmailVerified(
           eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
-          Future.successful(true)
+          Future.successful(Verified)
 
         val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
         val controller = new Harness(mockEmailVerificationService)
@@ -85,7 +86,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
       }
     }
 
-    "must redirect when an email address is not verified" in {
+    "must redirect to Business Contact Details page when an email address is not verified" in {
 
       val app = applicationBuilder(None)
         .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
@@ -95,7 +96,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
         when(mockEmailVerificationService.isEmailVerified(
           eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
-          Future.successful(false)
+          Future.successful(NotVerified)
 
 
         val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
@@ -104,6 +105,50 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
         val result = controller.callFilter(request).futureValue
 
         result mustBe Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+      }
+    }
+
+    "must redirect to Email Verification Codes Exceeded page when verification attempts on a single email are exceeded" in {
+
+      val app = applicationBuilder(None)
+        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+        .build()
+
+      running(app) {
+
+        when(mockEmailVerificationService.isEmailVerified(
+          eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
+          Future.successful(LockedPasscodeForSingleEmail)
+
+
+        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
+        val controller = new Harness(mockEmailVerificationService)
+
+        val result = controller.callFilter(request).futureValue
+
+        result mustBe Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
+      }
+    }
+
+    "must redirect to Email Verification Codes and Emails Exceeded page when verification attempts on maximum email addresses are exceeded" in {
+
+      val app = applicationBuilder(None)
+        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+        .build()
+
+      running(app) {
+
+        when(mockEmailVerificationService.isEmailVerified(
+          eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
+          Future.successful(LockedTooManyLockedEmails)
+
+
+        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
+        val controller = new Harness(mockEmailVerificationService)
+
+        val result = controller.callFilter(request).futureValue
+
+        result mustBe Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
       }
     }
   }
