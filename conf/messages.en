@@ -383,8 +383,8 @@ addPreviousRegistration.remove.hidden = Remove deregistration in {0}
 addPreviousRegistration.addAnother = Add another deregistration?
 addPreviousRegistration.addAnother.hint = You must tell us about all deregistrations from the Union scheme in EU countries.
 
-previousEuCountry.title = Enter an EU country where you are no longer registered for the Union scheme
-previousEuCountry.heading = Enter an EU country where you are no longer registered for the Union scheme
+previousEuCountry.title = Which country did your business register in?
+previousEuCountry.heading = Which country did your business register in?
 previousEuCountry.error.required = Select an EU country
 previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
@@ -393,8 +393,9 @@ previousEuVatNumber.heading = What was your VAT registration number for {0}?
 previousEuVatNumber.error.required = Enter your VAT registration number for {0}
 previousEuVatNumber.error.invalid = Enter a VAT registration number in the correct format
 
-previouslyRegistered.title = Has your business deregistered from the One Stop Shop Union scheme in an EU country?
-previouslyRegistered.heading = Has your business deregistered from the One Stop Shop Union scheme in an EU country?
+previouslyRegistered.title = Has your business ever registered for a One Stop Shop scheme in an EU country?
+previouslyRegistered.heading = Has your business ever registered for a One Stop Shop scheme in an EU country?
+previouslyRegistered.hint = This includes Import One Stop Shop (IOSS).
 previouslyRegistered.checkYourAnswersLabel = Deregistered from One Stop Shop Union scheme in EU countries
 previouslyRegistered.error.required = Select yes if your business has deregistered from the One Stop Shop Union scheme in an EU country
 previouslyRegistered.change.hidden = if deregistered from One Stop Shop Union scheme in EU countries
