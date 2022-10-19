@@ -1,0 +1,32 @@
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+
+@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("previousScheme.title"))) {
+
+    @formHelper(action = controllers.previousRegistrations.routes.PreviousSchemeController.onSubmit(mode, index), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("previousScheme.heading")).asPageHeading(),
+                items  = PreviousScheme.options
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}
