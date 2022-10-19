@@ -36,11 +36,12 @@ class EmailVerificationService @Inject()(
                                         )(implicit ec: ExecutionContext) extends Logging {
 
 
-  def createEmailVerificationRequest(mode: Mode,
-                                     credId: String,
-                                     emailAddress: String,
-                                     pageTitle: Option[String],
-                                     continueUrl: String
+  def createEmailVerificationRequest(
+                                      mode: Mode,
+                                      credId: String,
+                                      emailAddress: String,
+                                      pageTitle: Option[String],
+                                      continueUrl: String
                                     )(implicit hc: HeaderCarrier): Future[ReturnEmailVerificationResponse] = {
     validateEmailConnector.verifyEmail(
       EmailVerificationRequest(
@@ -73,12 +74,13 @@ class EmailVerificationService @Inject()(
           verificationStatus.emails.exists(_.verified)) match {
           case (true, true, false) =>
             PasscodeAttemptsStatus.LockedTooManyLockedEmails
-          case (false, true, false) =>
+
+          case (false, true, false) if verificationStatus.emails.exists(_.emailAddress == emailAddress) =>
             PasscodeAttemptsStatus.LockedPasscodeForSingleEmail
-          case (false, false, false) =>
-            PasscodeAttemptsStatus.NotVerified
+
           case (false, false, true) if verificationStatus.emails.exists(_.emailAddress == emailAddress) =>
             PasscodeAttemptsStatus.Verified
+
           case _ => NotVerified
         }
 

@@ -17,7 +17,7 @@
 package controllers.actions
 
 import models.NormalMode
-import models.emailVerification.PasscodeAttemptsStatus.{Verified, LockedPasscodeForSingleEmail, LockedTooManyLockedEmails}
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, Verified}
 import models.requests.AuthenticatedDataRequest
 import pages.BusinessContactDetailsPage
 import play.api.mvc.Results.Redirect
