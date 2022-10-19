@@ -20,9 +20,12 @@ import models.Index
 import org.scalacheck.Arbitrary
 import pages.{euDetails, _}
 import pages.euDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage, PreviousSchemePage}
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryPreviousSchemePagePage: Arbitrary[PreviousSchemePage.type] =
+    Arbitrary(PreviousSchemePage)
 
   implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage] =
     Arbitrary(euDetails.EuSendGoodsPage(Index(0)))

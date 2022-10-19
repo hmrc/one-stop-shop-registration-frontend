@@ -21,10 +21,18 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
-import play.api.libs.json.{JsValue, Json}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage, PreviousSchemePage}
+import play.api.libs.json.{Json, JsValue}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
+
+  implicit lazy val arbitraryPreviousSchemePageUserAnswersEntry: Arbitrary[(PreviousSchemePage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[PreviousSchemePage.type]
+        value <- arbitrary[PreviousScheme].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryEuSendGoodsUserAnswersEntry: Arbitrary[(EuSendGoodsPage, JsValue)] =
     Arbitrary {

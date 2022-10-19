@@ -396,9 +396,19 @@ previousEuVatNumber.error.invalid = Enter a VAT registration number in the corre
 previouslyRegistered.title = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.heading = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.hint = This includes Import One Stop Shop (IOSS).
-previouslyRegistered.checkYourAnswersLabel = Deregistered from One Stop Shop Union scheme in EU countries
-previouslyRegistered.error.required = Select yes if your business has deregistered from the One Stop Shop Union scheme in an EU country
-previouslyRegistered.change.hidden = if deregistered from One Stop Shop Union scheme in EU countries
+previouslyRegistered.checkYourAnswersLabel = Registered for other One Stop Shop schemes in the EU
+previouslyRegistered.error.required = Select yes if your business has ever registered for a One Stop Shop scheme in an EU countr
+previouslyRegistered.change.hidden = if your business has ever registered for a One Stop Shop scheme in an EU country
+
+previousScheme.title = Which scheme did your business register for?
+previousScheme.heading = Which scheme did your business register for?
+previousScheme.ossu = One Stop Shop Union
+previousScheme.ossnu = One Stop Shop non-Union
+previousScheme.iosswoi = Import One Stop Shop without intermediary
+previousScheme.iosswi = Import One Stop Shop with intermediary
+previousScheme.checkYourAnswersLabel = Previous Scheme
+previousScheme.error.required = Select which scheme did your business register for
+previousScheme.change.hidden = which scheme did your business register for
 
 deletePreviousRegistration.title = Are you sure you need to remove the deregistration for {0}?
 deletePreviousRegistration.heading = Are you sure you need to remove the deregistration for {0}?
