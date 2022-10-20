@@ -38,4 +38,31 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
       case _ => None
     }
   }
+
+  def searchEuTaxId(euTaxReference: String, countryCode: String)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
+
+    val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUTraderId.toString, None, euTaxReference, None, countryCode)
+
+    connector.validateCoreRegistration(coreRegistrationRequest).map {
+
+      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
+        coreRegistrationResponse.matches.headOption
+
+      case _ => None
+    }
+  }
+
+  def searchEuVrn(euVrn: String, countryCode: String)
+                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
+    val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, euVrn, None, countryCode)
+
+    connector.validateCoreRegistration(coreRegistrationRequest).map {
+
+      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
+        coreRegistrationResponse.matches.headOption
+
+      case _ => None
+    }
+  }
 }
