@@ -325,3 +325,7 @@ GET        /check-eu-send-goods-address/:index                        controller
 POST       /check-eu-send-goods-address/:index                        controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET        /first-check-eu-send-goods-address/:index                  controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST       /first-check-eu-send-goods-address/:index                  controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET        /fixed-establishment-vrn-already-registered                controllers.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()
+
+GET        /excluded-vrn                                              controllers.ExcludedVRNController.onPageLoad()
