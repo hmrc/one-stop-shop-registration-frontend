@@ -19,6 +19,7 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.EuTaxReferenceFormProvider
 import models.{Country, Index, NormalMode}
+import models.core.{Match, MatchType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,6 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import services.CoreRegistrationValidationService
 import views.html.euDetails.EuTaxReferenceView
 
 import scala.concurrent.Future
@@ -41,13 +43,33 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euTaxReferenceRoute = routes.EuTaxReferenceController.onPageLoad(NormalMode, index).url
 
+  private lazy val euTaxReferenceSubmitRoute = routes.EuTaxReferenceController.onSubmit(NormalMode, index).url
+
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
+
+  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+  private val genericMatch = Match(
+    MatchType.FixedEstablishmentActiveNETP,
+    "333333333",
+    None,
+    "DE",
+    None,
+    None,
+    None,
+    None,
+    None
+  )
 
   "EuTaxReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+        .configure(
+          "features.other-country-reg-validation-enabled" -> false
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, euTaxReferenceRoute)
@@ -65,7 +87,11 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = baseUserAnswers.set(EuTaxReferencePage(index), "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .configure(
+          "features.other-country-reg-validation-enabled" -> false
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, euTaxReferenceRoute)
@@ -88,6 +114,9 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> false
+          )
           .build()
 
       running(application) {
@@ -165,6 +194,150 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "when other country registration validation toggle is true" - {
+
+      "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when the user is registered elsewhere" in {
+
+        val taxReferenceNumber: String = "333333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(genericMatch))
+
+          val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
+            .withFormUrlEncodedBody(("value", taxReferenceNumber))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad().url
+        }
+      }
+
+      "must redirect to ExcludedVRNController page when the vat number is excluded for match FixedEstablishmentQuarantinedNETP " in {
+
+        val taxReferenceNumber: String = "333333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
+            .withFormUrlEncodedBody(("value", taxReferenceNumber))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
+        }
+      }
+
+      "must redirect to ExcludedVRNController page when the vat number is excluded for match with exclusion code " in {
+
+        val taxReferenceNumber: String = "333333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP, exclusionStatusCode = Some(2))
+
+          when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
+            .withFormUrlEncodedBody(("value", taxReferenceNumber))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
+        }
+      }
+
+      "must redirect to the next page when valid data is submitted" in {
+
+        val taxReferenceNumber: String = "333333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
+            .withFormUrlEncodedBody(("value", taxReferenceNumber))
+
+          val result = route(application, request).value
+
+          val expectedAnswers = baseUserAnswers.set(EuTaxReferencePage(index), taxReferenceNumber).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual EuTaxReferencePage(index).navigate(NormalMode, expectedAnswers).url
+        }
+      }
+    }
+
+    "when other country registration validation toggle is false" - {
+
+      "must save the answer and redirect to the next page when valid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> false
+          )
+          .build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
+            .withFormUrlEncodedBody(("value", "333333333"))
+
+          val result = route(application, request).value
+
+          val expectedAnswers = baseUserAnswers.set(EuTaxReferencePage(index), "333333333").success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual EuTaxReferencePage(index).navigate(NormalMode, expectedAnswers).url
+        }
       }
     }
   }

@@ -1,0 +1,17 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("fixedEstablishmentVRNAlreadyRegistered.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("fixedEstablishmentVRNAlreadyRegistered.heading")</h1>
+
+    <p class="govuk-body">@messages("fixedEstablishmentVRNAlreadyRegistered.paragraph")</p>
+
+    <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.contactUs"))</p>
+
+    <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.returnToRegistration"))</p>
+}

@@ -85,4 +85,68 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       value mustBe None
     }
   }
+
+  "coreRegistrationValidationService.searchEuTaxId" - {
+
+    "call searchEuTaxId with correct Tax reference number and must return match data" in {
+
+      val taxRefNo: String = "333333333"
+      val countrycode: String = "DE"
+
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countrycode).futureValue.get
+
+      value equals genericMatch
+    }
+
+    "must return None when no match found" in {
+
+      val taxRefNo: String = "333333333"
+      val countrycode: String = "DE"
+
+      val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countrycode).futureValue
+
+      value mustBe None
+    }
+  }
+
+  "coreRegistrationValidationService.searchEuVrn" - {
+
+    "call searchEuTaxId with correct EU VRN and must return match data" in {
+
+      val euVrn: String = "333333333"
+      val countrycode: String = "DE"
+
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countrycode).futureValue.get
+
+      value equals genericMatch
+    }
+
+    "must return None when no match found" in {
+
+      val euVrn: String = "333333333"
+      val countryCode: String = "DE"
+
+      val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue
+
+      value mustBe None
+    }
+  }
 }

@@ -19,6 +19,7 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.EuVatNumberFormProvider
 import models.{Country, CountryWithValidationDetails, Index, NormalMode}
+import models.core.{Match, MatchType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,6 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import services.CoreRegistrationValidationService
 import views.html.euDetails.EuVatNumberView
 
 import scala.concurrent.Future
@@ -42,7 +44,23 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euVatNumberRoute = routes.EuVatNumberController.onPageLoad(NormalMode, index).url
 
+  private lazy val euVatNumberSubmitRoute = routes.EuVatNumberController.onSubmit(NormalMode, index).url
+
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
+
+  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+  private val genericMatch = Match(
+    MatchType.FixedEstablishmentActiveNETP,
+    "333333333",
+    None,
+    "DE",
+    None,
+    None,
+    None,
+    None,
+    None
+  )
 
   "EuVatNumber Controller" - {
 
@@ -166,6 +184,156 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "when other country registration validation toggle is true" - {
+
+      "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when the user is registered elsewhere" in {
+
+        val euVrn: String = "12345678"
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseUserAnswers))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+        running(application) {
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(genericMatch))
+
+          val request =
+            FakeRequest(POST, euVatNumberSubmitRoute)
+              .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad().url
+        }
+      }
+
+      "must redirect to ExcludedVRNController page when the vat number is excluded for match FixedEstablishmentQuarantinedNETP " in {
+
+        val euVrn: String = "12345678"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
+        }
+      }
+
+      "must redirect to ExcludedVRNController page when the vat number is excluded for match with exclusion code " in {
+
+        val euVrn: String = "12345678"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP, exclusionStatusCode = Some(2))
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
+        }
+      }
+
+      "must redirect to the next page when valid data is submitted" in {
+
+        val euVrn: String = "12345678"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), euVrn).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        }
+      }
+    }
+
+    "when other country registration validation toggle is false" - {
+
+      "must save the answer and redirect to the next page when valid data is submitted" in {
+
+        val euVrn: String = "12345678"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> false
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), euVrn).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        }
       }
     }
   }
