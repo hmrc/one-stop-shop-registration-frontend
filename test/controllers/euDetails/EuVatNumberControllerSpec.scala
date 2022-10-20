@@ -107,6 +107,9 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> false
+          )
           .build()
 
       running(application) {
