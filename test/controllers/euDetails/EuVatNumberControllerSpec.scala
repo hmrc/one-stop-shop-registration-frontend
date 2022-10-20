@@ -310,7 +310,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "when other country registration validation toggle is false" - {
 
-      "must save the answer and redirect to the next page when valid data is submitted" in {
+      "redirect to the next page when valid data is submitted" in {
 
         val euVrn: String = "12345678"
 
