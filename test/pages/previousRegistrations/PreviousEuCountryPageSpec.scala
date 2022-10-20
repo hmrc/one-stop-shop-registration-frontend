@@ -38,7 +38,7 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
       "to Previous EU VAT Number for the same index" in {
 
         PreviousEuCountryPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index))
+          .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(NormalMode, index))
       }
     }
 
@@ -47,14 +47,14 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
       "to Previous EU VAT number for the same index where the VAT number hasn't already been answered" in {
 
         PreviousEuCountryPage(index).navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index))
+          .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(CheckMode, index))
       }
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
         val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
         PreviousEuCountryPage(index).navigate(CheckMode, answers)
-          .mustEqual(prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index))
+          .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(CheckMode, index))
       }
     }
   }
