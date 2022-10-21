@@ -257,7 +257,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockEmailVerificationService.isEmailVerified(
         eqTo(emailVerificationRequest.email.get.address),
-        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(NotVerified) //TODO Invalid Email -> NotVerified???
+        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(NotVerified)
       when(mockEmailVerificationService.createEmailVerificationRequest(
         eqTo(NormalMode),
         eqTo(emailVerificationRequest.credId),
