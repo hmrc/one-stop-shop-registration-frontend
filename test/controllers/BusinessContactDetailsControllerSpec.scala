@@ -22,9 +22,10 @@ import forms.BusinessContactDetailsFormProvider
 import models.responses.UnexpectedResponseStatus
 import models.NormalMode
 import models.emailVerification.EmailVerificationResponse
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -99,7 +100,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockEmailVerificationService.isEmailVerified(
         eqTo(emailVerificationRequest.email.get.address),
-        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(true)
+        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(Verified)
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswers))
@@ -132,14 +133,14 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
       }
     }
 
-    "must save the answer and redirect to the next page if email is not verified and valid data is submitted" in {
+    "must save the answer and redirect to the Business Contact Details page if email is not verified and valid data is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockEmailVerificationService.isEmailVerified(
         eqTo(emailVerificationRequest.email.get.address),
-        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(false)
+        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(NotVerified)
       when(mockEmailVerificationService.createEmailVerificationRequest(
         eqTo(NormalMode),
         eqTo(emailVerificationRequest.credId),
@@ -179,6 +180,74 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
       }
     }
 
+    "must save the answer and redirect to the Email Verification Codes Exceeded page if valid data is submitted but verification attempts on a single email are exceeded" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockEmailVerificationService.isEmailVerified(
+        eqTo(emailVerificationRequest.email.get.address),
+        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(LockedPasscodeForSingleEmail)
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
+          .overrides(
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, businessContactDetailsRoute)
+            .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
+
+        val result = route(application, request).value
+        val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EmailVerificationCodesExceededController.onPageLoad().url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        verify(mockEmailVerificationService, times(1))
+          .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
+        verifyNoMoreInteractions(mockEmailVerificationService)
+      }
+    }
+
+    "must save the answer and redirect to the Email Verification Codes and Emails Exceeded page if valid data is submitted but verification attempts on maximum emails are exceeded" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockEmailVerificationService.isEmailVerified(
+        eqTo(emailVerificationRequest.email.get.address),
+        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(LockedTooManyLockedEmails)
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswers))
+          .overrides(
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, businessContactDetailsRoute)
+            .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
+
+        val result = route(application, request).value
+        val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        verify(mockEmailVerificationService, times(1))
+          .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
+        verifyNoMoreInteractions(mockEmailVerificationService)
+      }
+    }
+
     "must not save the answer and redirect to the current page when invalid email is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -188,7 +257,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockEmailVerificationService.isEmailVerified(
         eqTo(emailVerificationRequest.email.get.address),
-        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(false)
+        eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(NotVerified)
       when(mockEmailVerificationService.createEmailVerificationRequest(
         eqTo(NormalMode),
         eqTo(emailVerificationRequest.credId),

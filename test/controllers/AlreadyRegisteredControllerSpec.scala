@@ -19,7 +19,6 @@ package controllers
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import formats.Format.dateFormatter
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -28,11 +27,9 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.DateService
 import testutils.RegistrationData.registration
 import views.html.AlreadyRegisteredView
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {

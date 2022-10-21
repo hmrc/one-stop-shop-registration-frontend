@@ -17,6 +17,7 @@
 package controllers.actions
 
 import models.NormalMode
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, Verified}
 import models.requests.AuthenticatedDataRequest
 import pages.BusinessContactDetailsPage
 import play.api.mvc.Results.Redirect
@@ -40,9 +41,15 @@ class CheckEmailVerificationFilterImpl @Inject()(
     request.userAnswers.get(BusinessContactDetailsPage) match {
       case Some(contactDetails) =>
         emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).map {
-          case true =>
+          case Verified =>
             None
-          case false =>
+          case LockedTooManyLockedEmails =>
+            Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
+
+          case LockedPasscodeForSingleEmail =>
+            Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
+
+          case _ =>
             Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
         }
       case None => Future.successful(None)

@@ -19,11 +19,14 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
-import models.{CheckMode, Mode, NormalMode}
+import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
+import models.requests.AuthenticatedDataRequest
+import models.{BusinessContactDetails, CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.EmailVerificationService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BusinessContactDetailsView
 
@@ -70,33 +73,55 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          lazy val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
-            mode,
-            request.userId,
-            value.emailAddress,
-            Some(messages("service.name")),
-            continueUrl
-          )
+          verifyEmailAndSaveAnswers(mode, request, messages, continueUrl, value)
+        }
+      )
+  }
 
-          emailVerificationService.isEmailVerified(value.emailAddress, request.userId).flatMap {
-            case true =>
+  private def verifyEmailAndSaveAnswers(
+                                         mode: Mode,
+                                         request: AuthenticatedDataRequest[AnyContent],
+                                         messages: Messages,
+                                         continueUrl: String,
+                                         value: BusinessContactDetails)
+                                       (implicit hc: HeaderCarrier): Future[Result] = {
+    lazy val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
+      mode,
+      request.userId,
+      value.emailAddress,
+      Some(messages("service.name")),
+      continueUrl
+    )
+
+    emailVerificationService.isEmailVerified(value.emailAddress, request.userId).flatMap {
+      case Verified =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+          _ <- cc.sessionRepository.set(updatedAnswers)
+        } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
+
+      case LockedPasscodeForSingleEmail =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+          _ <- cc.sessionRepository.set(updatedAnswers)
+        } yield Redirect(routes.EmailVerificationCodesExceededController.onPageLoad().url)
+
+      case LockedTooManyLockedEmails =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+          _ <- cc.sessionRepository.set(updatedAnswers)
+        } yield Redirect(routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url)
+
+      case NotVerified =>
+        emailVerificationRequest
+          .flatMap {
+            case Right(validResponse) =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
-
-            case false =>
-              emailVerificationRequest
-                .flatMap {
-                  case Right(validResponse) =>
-                    for {
-                      updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
-                      _ <- cc.sessionRepository.set(updatedAnswers)
-                    } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
-                  case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
-                }
+              } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
+            case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
           }
-        }
-      )
+    }
   }
 }

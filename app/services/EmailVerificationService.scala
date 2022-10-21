@@ -16,12 +16,13 @@
 
 package services
 
-import config.FrontendAppConfig
+import config.{Constants, FrontendAppConfig}
 import connectors.EmailVerificationConnector
 import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationResponse, ReturnVerificationStatus}
 import controllers.routes
 import logging.Logging
-import models.emailVerification.{EmailStatus, EmailVerificationRequest, VerifyEmail}
+import models.emailVerification.PasscodeAttemptsStatus.NotVerified
+import models.emailVerification.{EmailVerificationRequest, PasscodeAttemptsStatus, VerifyEmail}
 import models.{Mode, NormalMode}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,11 +36,12 @@ class EmailVerificationService @Inject()(
                                         )(implicit ec: ExecutionContext) extends Logging {
 
 
-  def createEmailVerificationRequest(mode: Mode,
-                                     credId: String,
-                                     emailAddress: String,
-                                     pageTitle: Option[String],
-                                     continueUrl: String
+  def createEmailVerificationRequest(
+                                      mode: Mode,
+                                      credId: String,
+                                      emailAddress: String,
+                                      pageTitle: Option[String],
+                                      continueUrl: String
                                     )(implicit hc: HeaderCarrier): Future[ReturnEmailVerificationResponse] = {
     validateEmailConnector.verifyEmail(
       EmailVerificationRequest(
@@ -64,18 +66,32 @@ class EmailVerificationService @Inject()(
     validateEmailConnector.getStatus(credId)
   }
 
-  def isEmailVerified(emailAddress: String, credId: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def isEmailVerified(emailAddress: String, credId: String)(implicit hc: HeaderCarrier): Future[PasscodeAttemptsStatus] = {
     getStatus(credId).map {
       case Right(Some(verificationStatus)) =>
-        verificationStatus.emails.exists {
-          case emailStatus@EmailStatus(_, true, _) if emailStatus.emailAddress == emailAddress => true
-          case _ => false
+        (verificationStatus.emails.count(_.locked) >= Constants.emailVerificationMaxEmails,
+          verificationStatus.emails.exists(_.locked),
+          verificationStatus.emails.exists(_.verified)) match {
+          case (true, true, false) =>
+            logger.info("Locked - too many email address verifications attempted")
+            PasscodeAttemptsStatus.LockedTooManyLockedEmails
+
+          case (false, true, false) if verificationStatus.emails.exists(_.emailAddress == emailAddress) =>
+            logger.info("Locked - Too many verification attempts on this email address")
+            PasscodeAttemptsStatus.LockedPasscodeForSingleEmail
+
+          case (false, false, true) if verificationStatus.emails.exists(_.emailAddress == emailAddress) =>
+            logger.info("Email address verified")
+            PasscodeAttemptsStatus.Verified
+
+          case _ =>
+            logger.info("Email address not verified")
+            NotVerified
         }
-      case Right(None) =>
-        false
-      case Left(error) =>
-        logger.error(s"There was an error retrieving verification status", error.body)
-        false
+
+      case _ =>
+        logger.error("Received an error retrieving verification status")
+        NotVerified
     }
   }
 

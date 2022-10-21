@@ -17,7 +17,7 @@
 package connectors
 
 import config.Service
-import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationReads, ReturnEmailVerificationResponse, ReturnVerificationStatusReads, ReturnVerificationStatus}
+import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationReads, ReturnEmailVerificationResponse, ReturnVerificationStatus, ReturnVerificationStatusReads}
 import logging.Logging
 import models.emailVerification.EmailVerificationRequest
 import models.responses.UnexpectedResponseStatus

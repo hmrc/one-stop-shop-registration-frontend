@@ -1,0 +1,16 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("emailVerificationCodesAndEmailsExceeded.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("emailVerificationCodesAndEmailsExceeded.heading")</h1>
+
+    <p class="govuk-body">@messages("emailVerificationCodesAndEmailsExceeded.paragraph")</p>
+
+    <p class="govuk-body">@Html(messages("emailVerificationCodesAndEmailsExceeded.returnBTA"))</p>
+
+}
