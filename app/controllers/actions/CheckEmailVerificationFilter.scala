@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import logging.Logging
 import models.NormalMode
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, Verified}
 import models.requests.AuthenticatedDataRequest
@@ -32,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CheckEmailVerificationFilterImpl @Inject()(
                                                   emailVerificationService: EmailVerificationService
                                                 )(implicit val executionContext: ExecutionContext)
-  extends CheckEmailVerificationFilter {
+  extends CheckEmailVerificationFilter with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
@@ -42,14 +43,18 @@ class CheckEmailVerificationFilterImpl @Inject()(
       case Some(contactDetails) =>
         emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).map {
           case Verified =>
+            logger.info("CheckEmailVerificationFilter - Verified")
             None
           case LockedTooManyLockedEmails =>
+            logger.info("CheckEmailVerificationFilter - LockedTooManyLockedEmails")
             Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
 
           case LockedPasscodeForSingleEmail =>
+            logger.info("CheckEmailVerificationFilter - LockedPasscodeForSingleEmail")
             Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
 
           case _ =>
+            logger.info("CheckEmailVerificationFilter - Not Verified")
             Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
         }
       case None => Future.successful(None)

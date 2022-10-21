@@ -12,5 +12,6 @@
     </root>
 
     <logger name="application.controllers.actions.AuthenticatedIdentifierAction" level="${logger.controllers.actions.AuthenticatedIdentifierAction:-INFO}"/>
-    <logger name="application.services.EmailVerificationService" level="${services.EmailVerificationService:-INFO}"/>
+    <logger name="application.services.EmailVerificationService" level="${logger.services.EmailVerificationService:-INFO}"/>
+    <logger name="application.controllers.actions.CheckEmailVerificationFilter" level="${logger.controllers.actions.CheckEmailVerificationFilter-INFO}"/>
 </configuration>
