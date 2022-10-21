@@ -17,14 +17,16 @@
 package controllers
 
 import config.FrontendAppConfig
+import connectors.{SaveForLaterConnector, SavedUserAnswers}
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
+import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.{BusinessContactDetails, CheckMode, Mode, NormalMode}
-import pages.BusinessContactDetailsPage
+import pages.{BusinessContactDetailsPage, SavedProgressPage}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import services.EmailVerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -36,11 +38,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
+                                                  saveForLaterConnector: SaveForLaterConnector,
                                                   emailVerificationService: EmailVerificationService,
                                                   formProvider: BusinessContactDetailsFormProvider,
                                                   config: FrontendAppConfig,
                                                   view: BusinessContactDetailsView
-                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with Logging {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -73,12 +77,12 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          verifyEmailAndSaveAnswers(mode, request, messages, continueUrl, value)
+          verifyEmailAndRedirect(mode, request, messages, continueUrl, value)
         }
       )
   }
 
-  private def verifyEmailAndSaveAnswers(
+  private def verifyEmailAndRedirect(
                                          mode: Mode,
                                          request: AuthenticatedDataRequest[AnyContent],
                                          messages: Messages,
@@ -122,6 +126,27 @@ class BusinessContactDetailsController @Inject()(
               } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
             case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
           }
+    }
+  }
+
+  private def saveAnswers(mode: Mode, redirectLocation: Call)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    Future.fromTry(request.userAnswers.set(SavedProgressPage, routes.BusinessContactDetailsController.onPageLoad(mode).url)).flatMap {
+      updatedAnswers =>
+        val s4LRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
+        saveForLaterConnector.submit(s4LRequest).flatMap {
+          case Right(Some(_: SavedUserAnswers)) =>
+            for {
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield {
+              Redirect(redirectLocation)
+            }
+          case Left(e) =>
+            logger.error(s"Unexpected result on submit: ${e.toString}")
+            Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          case Right(None) =>
+            logger.error(s"Unexpected result on submit")
+            Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        }
     }
   }
 }
