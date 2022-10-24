@@ -18,7 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import controllers.routes
-import models.core.Match
+import models.core.MatchType
 import models.requests.AuthenticatedIdentifierRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
@@ -42,7 +42,12 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistratio
     if (appConfig.otherCountryRegistrationValidationEnabled) {
       service.searchUkVrn(request.vrn).map {
 
-        case Some(Match(_, _, _, memberState, _, _, _, _, _)) => Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(memberState)))
+        case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
+          Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
+
+        case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(4) || activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
+          activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
+          Some(Redirect(routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate.getOrElse(""))))
 
         case _ => None
       }

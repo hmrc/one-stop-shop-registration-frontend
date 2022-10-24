@@ -21,20 +21,21 @@ import models.GetCountryFromCode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.AlreadyRegisteredOtherCountryView
+import views.html.OtherCountryExcludedAndQuarantinedView
 
 import javax.inject.Inject
 
-class AlreadyRegisteredOtherCountryController @Inject()(
+class OtherCountryExcludedAndQuarantinedController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: AlreadyRegisteredOtherCountryView
+                                       view: OtherCountryExcludedAndQuarantinedView
                                      ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(countryCode: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      Ok(view(GetCountryFromCode.getCountryName(countryCode)))
+      println("######## " + GetCountryFromCode.getCountryName(countryCode) + " DATE:::: " +exclusionDate)
+      Ok(view(GetCountryFromCode.getCountryName(countryCode), exclusionDate))
   }
 }
