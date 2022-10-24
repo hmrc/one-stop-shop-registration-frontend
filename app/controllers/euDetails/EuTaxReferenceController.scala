@@ -19,9 +19,9 @@ package controllers.euDetails
 import config.FrontendAppConfig
 import controllers.actions._
 import forms.euDetails.EuTaxReferenceFormProvider
-import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
-import models.core.{Match, MatchType}
+import models.core.MatchType
+import models.requests.AuthenticatedDataRequest
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -74,13 +74,11 @@ class EuTaxReferenceController @Inject()(
               if (appConfig.otherCountryRegistrationValidationEnabled) {
                 coreRegistrationValidationService.searchEuTaxId(value, country.code).flatMap {
 
-                  case Some(Match(MatchType.FixedEstablishmentActiveNETP, _, _, _, _, _, _, _, _)) =>
+                  case Some(activeMatch) if activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
                     Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()))
 
-                  case Some(Match(MatchType.FixedEstablishmentQuarantinedNETP, _, _, _, _, _, _, _, _)) =>
-                    Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
-
-                  case Some(Match(_, _, _, _, Some(_), _, _, _, _)) =>
+                  case Some(activeMatch) if activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP ||
+                    activeMatch.exclusionStatusCode.isDefined =>
                     Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
                   case _ => for {
