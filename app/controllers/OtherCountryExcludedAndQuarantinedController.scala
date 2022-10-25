@@ -35,7 +35,6 @@ class OtherCountryExcludedAndQuarantinedController @Inject()(
 
   def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      println("######## " + GetCountryFromCode.getCountryName(countryCode) + " DATE:::: " +exclusionDate)
       Ok(view(GetCountryFromCode.getCountryName(countryCode), exclusionDate))
   }
 }

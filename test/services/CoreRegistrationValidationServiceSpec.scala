@@ -58,7 +58,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
 
   "coreRegistrationValidationService.searchUkVrn" - {
 
-    "call searchUkVrn for matchType=FixedEstablishmentActiveNETP and return match data" in {
+    "call searchUkVrn for any matchType and return match data" in {
 
       val vrn = Vrn("333333333")
 
@@ -69,72 +69,6 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue.get
 
       value equals genericMatch
-    }
-
-    "call searchUkVrn for exclusionStatusCode=None and return none" in {
-
-      val vrn = Vrn("333333333")
-
-      val expectedResponse = coreValidationResponses.copy(matches = Seq(Match(matchType = MatchType.FixedEstablishmentActiveNETP,
-        traderId = "333333333", intermediary = None, exclusionStatusCode = None, memberState = "EE", exclusionDecisionDate = None,
-        exclusionEffectiveDate = None, nonCompliantReturns = None, nonCompliantPayments = None)))
-
-      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
-
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
-
-      value mustBe None
-    }
-
-    "call searchUkVrn for exclusionStatusCode = 3 and return same match data" in {
-
-      val vrn = Vrn("333333333")
-
-      val expectedResponse = coreValidationResponses.copy(matches = Seq(Match(matchType = MatchType.TraderIdActiveNETP,
-        traderId = "333333333", intermediary = None, exclusionStatusCode = Some(3), memberState = "EE", exclusionDecisionDate = None,
-        exclusionEffectiveDate = None, nonCompliantReturns = None, nonCompliantPayments = None)))
-
-      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
-
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue.get
-
-      value mustBe expectedResponse.matches.head
-    }
-
-    "call searchUkVrn for exclusion code -1 and will return no match data" in {
-
-      val vrn = Vrn("333333333")
-
-      val expectedResponse = coreValidationResponses.copy(matches = Seq(Match(matchType = MatchType.FixedEstablishmentActiveNETP,
-        traderId = "333333333", intermediary = None, exclusionStatusCode = Some(-1), memberState = "EE", exclusionDecisionDate = None,
-        exclusionEffectiveDate = None, nonCompliantReturns = None, nonCompliantPayments = None)))
-      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
-
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
-
-      value mustBe None
-    }
-
-    "call searchUkVrn for exclusion code 6 and will return no match data" in {
-
-      val vrn = Vrn("333333333")
-
-      val expectedResponse = coreValidationResponses.copy(matches = Seq(Match(matchType = MatchType.FixedEstablishmentActiveNETP,
-        traderId = "333333333", intermediary = None, exclusionStatusCode = Some(6), memberState = "EE", exclusionDecisionDate = None,
-        exclusionEffectiveDate = None, nonCompliantReturns = None, nonCompliantPayments = None)))
-      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
-
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
-
-      value mustBe None
     }
 
     "must return None when no active match found" in {
