@@ -282,3 +282,5 @@ GET         /already-registered-other-country                         controller
 GET         /email-verification-codes-and-emails-exceeded             controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
 
 GET         /email-verification-codes-exceeded                        controllers.EmailVerificationCodesExceededController.onPageLoad()
+
+GET        /other-country-excluded-and-quarantined                    controllers.OtherCountryExcludedAndQuarantinedController.onPageLoad(countryCode: String, exclusionDate: String)

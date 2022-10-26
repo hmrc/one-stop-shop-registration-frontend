@@ -268,6 +268,8 @@ object Country {
 
   val internationalCountries: Seq[Country] =
     allCountries.filterNot(_.code == "GB")
+
+  def getCountryName(countryCode: String): String = euCountries.filter(_.code == countryCode).map(_.name).head
 }
 
 object CountryWithValidationDetails {

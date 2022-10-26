@@ -1,0 +1,17 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(memberState: String, exclusionDate: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("otherCountryExcludedAndQuarantined.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("otherCountryExcludedAndQuarantined.heading")</h1>
+
+    <p class="govuk-body">@messages("otherCountryExcludedAndQuarantined.blocked.message",memberState, exclusionDate)</p>
+
+    <p class="govuk-body">@Html(messages("otherCountryExcludedAndQuarantined.contact"))</p>
+
+    <p class="govuk-body">@Html(messages("otherCountryExcludedAndQuarantined.returnBTA"))</p>
+}

@@ -34,15 +34,10 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.find(_.exclusionStatusCode.nonEmpty) match {
-        case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(-1) || activeMatch.exclusionStatusCode.contains(6) =>
-          None
+      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
+        coreRegistrationResponse.matches.headOption
 
-        case Some(activeMatch) => Some(activeMatch)
-
-        case None => None
-      }
+      case _ => None
     }
   }
-
 }
