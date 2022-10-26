@@ -16,7 +16,6 @@
 
 package models
 
-import models.Country.euCountries
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import viewmodels.govuk.select._
@@ -269,6 +268,8 @@ object Country {
 
   val internationalCountries: Seq[Country] =
     allCountries.filterNot(_.code == "GB")
+
+  def getCountryName(countryCode: String): String = euCountries.filter(_.code == countryCode).map(_.name).head
 }
 
 object CountryWithValidationDetails {
@@ -332,9 +333,4 @@ object CountryWithValidationDetails {
   private val swedenVatNumberRegex = """^[0-9]{12}$"""
   private val sloveniaVatNumberRegex = """^[0-9]{8}$"""
   private val slovakiaVatNumberRegex = """^[0-9]{10}$"""
-}
-
-object GetCountryFromCode {
-
-  def getCountryName(countryCode: String): String = euCountries.filter(_.code == countryCode).map(_.name).head
 }

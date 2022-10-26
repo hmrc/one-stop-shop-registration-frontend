@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import models.GetCountryFromCode
+import models.Country
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -35,6 +35,6 @@ class OtherCountryExcludedAndQuarantinedController @Inject()(
 
   def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      Ok(view(GetCountryFromCode.getCountryName(countryCode), exclusionDate))
+      Ok(view(Country.getCountryName(countryCode), exclusionDate))
   }
 }
