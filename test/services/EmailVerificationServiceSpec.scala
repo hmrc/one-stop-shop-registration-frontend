@@ -108,6 +108,20 @@ class EmailVerificationServiceSpec extends SpecBase {
 
     }
 
+    "must return Verified if email is verified and there are other locked emails" in {
+
+      val lockedEmail: EmailStatus = EmailStatus(emailAddress = "test@test.co.uk", verified = false, locked = true)
+      val verifiedEmail: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = true, locked = false)
+      val verificationStatus: VerificationStatus = VerificationStatus(Seq(lockedEmail, verifiedEmail))
+
+      when(mockEmailVerificationConnector.getStatus(userAnswersId)) thenReturn Future.successful(Right(Some(verificationStatus)))
+
+      val result = emailVerificationService.isEmailVerified(contactDetails.emailAddress, userAnswersId).futureValue
+
+      result mustBe Verified
+
+    }
+
     "must return Not Verified if email is not verified" in {
 
       val unverifiedEmail: EmailStatus = EmailStatus(emailAddress = contactDetails.emailAddress, verified = false, locked = false)
