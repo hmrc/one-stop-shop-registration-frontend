@@ -20,7 +20,6 @@ import config.FrontendAppConfig
 import controllers.actions._
 import forms.euDetails.EuTaxReferenceFormProvider
 import models.{Country, Index, Mode}
-import models.core.MatchType
 import models.requests.AuthenticatedDataRequest
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -74,11 +73,10 @@ class EuTaxReferenceController @Inject()(
               if (appConfig.otherCountryRegistrationValidationEnabled) {
                 coreRegistrationValidationService.searchEuTaxId(value, country.code).flatMap {
 
-                  case Some(activeMatch) if activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
+                  case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()))
 
-                  case Some(activeMatch) if activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP ||
-                    activeMatch.exclusionStatusCode.isDefined =>
+                  case Some(activeMatch) if coreRegistrationValidationService.isExcludedTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
                   case _ => for {
