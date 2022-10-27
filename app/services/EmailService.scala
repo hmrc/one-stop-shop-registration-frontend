@@ -35,22 +35,23 @@ class EmailService@Inject()(
    frontendAppConfig: FrontendAppConfig
  )(implicit executionContext: ExecutionContext) {
 
+  private val redirectLink = frontendAppConfig.ossCompleteReturnUrl
+
   def sendConfirmationEmail(
    businessName: String,
    commencementDate: LocalDate,
    emailAddress: String
   )(implicit hc: HeaderCarrier, messages: Messages): Future[EmailSendingResult] = {
 
-    val firstReturnPeriod = periodService.getFirstReturnPeriod(commencementDate)
-    val nextPeriod = periodService.getNextPeriod(firstReturnPeriod)
-    val firstDayOfNextCalendarQuarter = nextPeriod.firstDay
-    val redirectLink = frontendAppConfig.ossCompleteReturnUrl
+    val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
+    val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
+    val firstDayOfNextPeriod = nextPeriod.firstDay
 
     val emailParameters =
         EmailParameters(
           businessName,
-          firstReturnPeriod.displayShortText,
-          format(firstDayOfNextCalendarQuarter),
+          periodOfFirstReturn.displayShortText,
+          format(firstDayOfNextPeriod),
           format(commencementDate),
           redirectLink
         )
