@@ -25,9 +25,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
+import pages._
 import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages._
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -38,9 +38,9 @@ import play.api.test.FakeRequest
 import services.DateService
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
+import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.TaxRegisteredInEuSummary
 import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
-import viewmodels.checkAnswers._
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 

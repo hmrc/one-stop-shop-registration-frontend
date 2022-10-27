@@ -279,12 +279,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           running(application) {
             when(emailService.sendConfirmationEmail(
-              eqTo(registration.contactDetails.fullName),
               eqTo(registration.registeredCompanyName),
               eqTo(registration.commencementDate),
-              eqTo(registration.contactDetails.emailAddress),
-              eqTo(registration.dateOfFirstSale)
-            )(any())) thenReturn Future.successful(EMAIL_ACCEPTED)
+              eqTo(registration.contactDetails.emailAddress)
+            )(any(), any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
@@ -296,7 +294,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any(), any())(any())
+              .sendConfirmationEmail(any(), any(), any())(any(), any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
