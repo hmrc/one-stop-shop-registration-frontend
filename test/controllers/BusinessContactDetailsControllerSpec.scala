@@ -197,7 +197,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           Future.successful(Redirect(routes.EmailVerificationCodesExceededController.onPageLoad()))
 
         val application =
-          applicationBuilder(userAnswers = Some(basicUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[EmailVerificationService].toInstance(mockEmailVerificationService),
               bind[SaveForLaterService].toInstance(mockSaveForLaterService)
@@ -233,7 +233,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           Future.successful(Redirect(routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad()))
 
         val application =
-          applicationBuilder(userAnswers = Some(basicUserAnswers))
+          applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[EmailVerificationService].toInstance(mockEmailVerificationService),
               bind[SaveForLaterService].toInstance(mockSaveForLaterService)
