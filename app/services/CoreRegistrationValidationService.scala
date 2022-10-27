@@ -18,7 +18,7 @@ package services
 
 import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
-import models.core.{CoreRegistrationRequest, Match, SourceType}
+import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -48,8 +48,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
-        coreRegistrationResponse.matches.headOption
+      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
 
       case _ => None
     }
@@ -57,14 +56,25 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
   def searchEuVrn(euVrn: String, countryCode: String)
                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
+
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, euVrn, None, countryCode)
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
-        coreRegistrationResponse.matches.headOption
+      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
 
       case _ => None
     }
   }
+
+  def isActiveTrader(activeMatch: Match): Boolean = {
+    activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP ||
+      activeMatch.matchType == MatchType.TraderIdActiveNETP || activeMatch.matchType == MatchType.OtherMSNETPActiveNETP
+  }
+
+  def isExcludedTrader(activeMatch: Match): Boolean = {
+    activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP ||
+      activeMatch.matchType == MatchType.TraderIdQuarantinedNETP || activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP
+  }
+
 }

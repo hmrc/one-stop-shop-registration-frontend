@@ -52,7 +52,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val genericMatch = Match(
     MatchType.FixedEstablishmentActiveNETP,
-    "333333333",
+    "33333333",
     None,
     "DE",
     None,
@@ -192,9 +192,9 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "when other country registration validation toggle is true" - {
 
-      "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when the user is registered elsewhere" in {
+      "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when matchType=FixedEstablishmentActiveNETP" in {
 
-        val euVrn: String = "12345678"
+        val euVrn: String = "33333333"
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -210,6 +210,74 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(genericMatch))
 
+          when(mockCoreRegistrationValidationService.isActiveTrader(genericMatch)) thenReturn true
+
+          val request =
+            FakeRequest(POST, euVatNumberSubmitRoute)
+              .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad().url
+        }
+      }
+
+      "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when matchType=TraderIdActiveNETP" in {
+
+        val euVrn: String = "33333333"
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseUserAnswers))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
+
+          val request =
+            FakeRequest(POST, euVatNumberSubmitRoute)
+              .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad().url
+        }
+      }
+
+      "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when matchType=OtherMSNETPActiveNETP" in {
+
+        val euVrn: String = "33333333"
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseUserAnswers))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
+
           val request =
             FakeRequest(POST, euVatNumberSubmitRoute)
               .withFormUrlEncodedBody(("value", euVrn))
@@ -223,7 +291,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to ExcludedVRNController page when the vat number is excluded for match FixedEstablishmentQuarantinedNETP " in {
 
-        val euVrn: String = "12345678"
+        val euVrn: String = "33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -240,34 +308,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
-            .withFormUrlEncodedBody(("value", euVrn))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
-        }
-      }
-
-      "must redirect to ExcludedVRNController page when the vat number is excluded for match with exclusion code " in {
-
-        val euVrn: String = "12345678"
-
-        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
-          .configure(
-            "features.other-country-reg-validation-enabled" -> true
-          )
-          .overrides(
-            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
-          ).build()
-
-        running(application) {
-
-          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP, exclusionStatusCode = Some(2))
-
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
-            Future.successful(Option(expectedResponse))
+          when(mockCoreRegistrationValidationService.isExcludedTrader(expectedResponse)) thenReturn true
 
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))
@@ -279,9 +320,9 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must redirect to the next page when valid data is submitted" in {
+      "must redirect to ExcludedVRNController page when the vat number is excluded for match TraderIdQuarantinedNETP " in {
 
-        val euVrn: String = "12345678"
+        val euVrn: String = "33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -293,10 +334,136 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
 
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
+
+          when(mockCoreRegistrationValidationService.isExcludedTrader(expectedResponse)) thenReturn true
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
+        }
+      }
+
+      "must redirect to ExcludedVRNController page when the vat number is excluded for match OtherMSNETPQuarantinedNETP " in {
+
+        val euVrn: String = "33333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          when(mockCoreRegistrationValidationService.isExcludedTrader(expectedResponse)) thenReturn true
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.ExcludedVRNController.onPageLoad().url
+        }
+      }
+
+      "must redirect to the next page when there is no active trader" in {
+
+        val euVrn: String = "33333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.TransferringMSID)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn false
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), euVrn).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        }
+      }
+
+      "must redirect to the next page when there is no excluded trader" in {
+
+        val euVrn: String = "33333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.TransferringMSID)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          when(mockCoreRegistrationValidationService.isExcludedTrader(expectedResponse)) thenReturn false
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), euVrn).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        }
+      }
+
+      "must redirect to the next page when no active match found" in {
+
+        val euVrn: String = "33333333"
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+          ).build()
+
+        running(application) {
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+            Future.successful(None)
 
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))
@@ -315,7 +482,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "redirect to the next page when valid data is submitted" in {
 
-        val euVrn: String = "12345678"
+        val euVrn: String = "33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
