@@ -58,8 +58,6 @@ class PeriodService @Inject()(clock: Clock) {
 
     val periodsAvailable = getPeriodsUntilDate(firstPeriod, LocalDate.now(clock).plusMonths(6))
 
-    println(periodsAvailable)
-
     periodsAvailable.find{
       period =>
         period.firstDay.isEqual(dayInPeriod) ||
