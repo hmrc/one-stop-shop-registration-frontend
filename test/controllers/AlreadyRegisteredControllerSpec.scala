@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import testutils.RegistrationData.registration
 import views.html.AlreadyRegisteredView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
