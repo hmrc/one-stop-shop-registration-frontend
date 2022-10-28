@@ -90,7 +90,7 @@ class EmailVerificationService @Inject()(
         }
 
       case _ =>
-        logger.error("Received an error retrieving verification status")
+        logger.warn("Received an unexpected verification status")
         NotVerified
     }
   }
