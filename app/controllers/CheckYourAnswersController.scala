@@ -140,6 +140,7 @@ class CheckYourAnswersController @Inject()(
       }
     } else {
       emailService.sendConfirmationEmail(
+        registration.contactDetails.fullName,
         registration.registeredCompanyName,
         registration.commencementDate,
         registration.contactDetails.emailAddress

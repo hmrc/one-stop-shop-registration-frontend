@@ -19,6 +19,7 @@ package models.emails
 import play.api.libs.json.{Json, Reads, Writes}
 
 case class EmailParameters(
+  recipientName_line1: String,
   businessName:String,
   periodOfFirstReturn: String,
   firstDayOfNextPeriod: String,

@@ -52,6 +52,7 @@ class EmailServiceSpec extends SpecBase {
   "EmailService.sendConfirmationEmail" - {
 
     "call sendConfirmationEmail with oss_registration_confirmation with the correct parameters" in {
+      val maxLengthContactName = 105
       val maxLengthBusiness = 160
       val commencementDate = LocalDate.of(2022, 10, 1)
       val firstDayOfNextPeriod = LocalDate.of(2023, 1, 1)
@@ -59,9 +60,10 @@ class EmailServiceSpec extends SpecBase {
 
       forAll(
         validEmails,
+        safeInputsWithMaxLength(maxLengthContactName),
         safeInputsWithMaxLength(maxLengthBusiness)
       ) {
-        (email: String, businessName: String) =>
+        (email: String, businessName: String, contactName: String) =>
 
           val expectedCommencementDate = commencementDate.format(formatter)
 
@@ -71,6 +73,7 @@ class EmailServiceSpec extends SpecBase {
             List(email),
             "oss_registration_confirmation",
             EmailParameters(
+              contactName,
               businessName,
               "October to December 2022",
               formattedFirstDayOfNextPeriod,
@@ -84,6 +87,7 @@ class EmailServiceSpec extends SpecBase {
           when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
           emailService.sendConfirmationEmail(
+            contactName,
             businessName,
             commencementDate,
             email

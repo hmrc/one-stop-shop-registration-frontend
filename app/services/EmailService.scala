@@ -38,6 +38,7 @@ class EmailService@Inject()(
   private val redirectLink = frontendAppConfig.ossCompleteReturnUrl
 
   def sendConfirmationEmail(
+   recipientName_line1: String,
    businessName: String,
    commencementDate: LocalDate,
    emailAddress: String
@@ -49,6 +50,7 @@ class EmailService@Inject()(
 
     val emailParameters =
         EmailParameters(
+          recipientName_line1,
           businessName,
           periodOfFirstReturn.displayShortText,
           format(firstDayOfNextPeriod),
