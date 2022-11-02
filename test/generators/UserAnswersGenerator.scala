@@ -22,13 +22,14 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage, PreviousSchemePage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviousIossSchemePage, PreviouslyRegisteredPage, PreviousSchemePage}
 import play.api.libs.json.{Json, JsValue}
 
 trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[_], JsValue)]] =
+    arbitrary[(PreviousIossSchemePage.type, JsValue)] ::
 //    arbitrary[(PreviousSchemePage, JsValue)] ::
     arbitrary[(EuSendGoodsPage, JsValue)] ::
     arbitrary[(EuSendGoodsTradingNamePage, JsValue)] ::
