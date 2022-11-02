@@ -180,6 +180,16 @@ POST        /previous-oss                                             controller
 GET         /check-previous-oss                                       controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-previous-oss                                       controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)
 
+GET         /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode)
+POST        /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode)
+GET         /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode)
+
+GET         /previous-ioss-number                                     controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = NormalMode)
+POST        /previous-ioss-number                                     controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = NormalMode)
+GET         /check-previous-ioss-number                               controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-previous-ioss-number                               controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = CheckMode)
+
 GET         /remove-deregistration/:index                             controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-deregistration/:index                             controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-remove-deregistration/:index                       controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
@@ -306,11 +316,6 @@ POST        /first-check-eu-send-goods-address/:index                 controller
 GET         /email-verification-codes-and-emails-exceeded             controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
 
 GET         /email-verification-codes-exceeded                        controllers.EmailVerificationCodesExceededController.onPageLoad()
-
-GET         /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode)
-POST        /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode)
-GET         /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode)
 
 GET         /other-country-excluded-and-quarantined                   controllers.OtherCountryExcludedAndQuarantinedController.onPageLoad(countryCode: String, exclusionDate: String)
 
