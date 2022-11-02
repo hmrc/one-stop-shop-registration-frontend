@@ -33,7 +33,20 @@ object PreviousScheme extends Enumerable.Implicits {
     OSSU, OSSNU, IOSSWOI, IOSSWI
   )
 
+  val iossValues: Seq[PreviousScheme] = Seq(
+    IOSSWOI, IOSSWI
+  )
+
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
+    case (value, index) =>
+      RadioItem(
+        content = Text(messages(s"previousScheme.${value.toString}")),
+        value   = Some(value.toString),
+        id      = Some(s"value_$index")
+      )
+  }
+
+  def iossOptions(implicit messages: Messages): Seq[RadioItem] = iossValues.zipWithIndex.map {
     case (value, index) =>
       RadioItem(
         content = Text(messages(s"previousScheme.${value.toString}")),

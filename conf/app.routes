@@ -160,10 +160,10 @@ POST        /add-deregistration                                       controller
 GET         /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
 
-GET         /previous-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /previous-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-previous-country/:index                        controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-previous-country/:index                        controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /previous-country/:index                                  controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-country/:index                                  controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-previous-country/:index                            controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-previous-country/:index                            controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /previous-oss-scheme-number/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /previous-oss-eu-vat-number/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -306,6 +306,11 @@ POST        /first-check-eu-send-goods-address/:index                 controller
 GET         /email-verification-codes-and-emails-exceeded             controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
 
 GET         /email-verification-codes-exceeded                        controllers.EmailVerificationCodesExceededController.onPageLoad()
+
+GET         /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode)
+POST        /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode)
+GET         /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode)
 
 GET         /other-country-excluded-and-quarantined                   controllers.OtherCountryExcludedAndQuarantinedController.onPageLoad(countryCode: String, exclusionDate: String)
 
