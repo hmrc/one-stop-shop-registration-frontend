@@ -17,13 +17,18 @@
 package services
 
 import base.SpecBase
+import config.FrontendAppConfig
 import connectors.EmailConnector
+import models.Period
+import models.Quarter.{Q1, Q4}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.emails.{EmailToSendRequest, RegistrationConfirmationEmailPre10thParameters, RegistrationConfirmationEmailPost10thParameters}
+import models.emails.{EmailParameters, EmailToSendRequest}
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import play.api.i18n.Messages
+import play.api.test.Helpers
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -33,148 +38,63 @@ import scala.concurrent.Future
 
 class EmailServiceSpec extends SpecBase {
 
+  implicit val messages: Messages = Helpers.stubMessages(
+    Helpers.stubMessagesApi(Map("en" -> Map("site.to" -> "to"))))
+  private val config = mock[FrontendAppConfig]
+    when(config.ossCompleteReturnUrl) thenReturn("url")
   private val connector = mock[EmailConnector]
-  private val dateService = new DateService(stubClockAtArbitraryDate)
-  private val emailService = new EmailService(connector, dateService)
+  private val periodService = mock[PeriodService]
+  private val emailService = new EmailService(connector, periodService, config)
   private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "EmailService.sendConfirmationEmail" - {
 
-    "call sendConfirmationEmail with oss_registration_confirmation_pre_10th_of_month with the correct parameters" in {
-      val maxLengthBusiness = 160
+    "call sendConfirmationEmail with oss_registration_confirmation with the correct parameters" in {
       val maxLengthContactName = 105
-      val commencementDate = LocalDate.of(2010, 1, 1)
-      val lastDayOfCalendarQuarterForPeriod = dateService.getVatReturnEndDate(commencementDate)
-      val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
-      val startDate = commencementDate
+      val maxLengthBusiness = 160
+      val commencementDate = LocalDate.of(2022, 10, 1)
+      val firstDayOfNextPeriod = LocalDate.of(2023, 1, 1)
+      val redirectLink = config.ossCompleteReturnUrl
 
       forAll(
         validEmails,
-        safeInputsWithMaxLength(maxLengthBusiness),
         safeInputsWithMaxLength(maxLengthContactName),
+        safeInputsWithMaxLength(maxLengthBusiness)
       ) {
         (email: String, businessName: String, contactName: String) =>
-          val expectedDate = commencementDate.format(formatter)
-          val formattedLastDayOfCalendarQuarterForPeriod = lastDayOfCalendarQuarterForPeriod.format(formatter)
-          val formattedLastDayOfMonthAfterCalendarQuarterForPeriod = lastDayOfMonthAfterCalendarQuarterForPeriod.format(formatter)
+
+          val expectedCommencementDate = commencementDate.format(formatter)
+
+          val formattedFirstDayOfNextPeriod = firstDayOfNextPeriod.format(formatter)
 
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
-            "oss_registration_confirmation_pre_10th_of_month",
-            RegistrationConfirmationEmailPre10thParameters(
+            "oss_registration_confirmation",
+            EmailParameters(
               contactName,
               businessName,
-              expectedDate,
-              formattedLastDayOfCalendarQuarterForPeriod,
-              formattedLastDayOfMonthAfterCalendarQuarterForPeriod)
+              "October to December 2022",
+              formattedFirstDayOfNextPeriod,
+              expectedCommencementDate,
+              redirectLink
+            )
           )
 
           when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
+          when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
+          when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
           emailService.sendConfirmationEmail(
             contactName,
             businessName,
             commencementDate,
-            email,
-            Some(startDate)
+            email
           ).futureValue mustBe EMAIL_ACCEPTED
-
           verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
       }
     }
 
-    "call sendConfirmationEmail with oss_registration_confirmation_post_10th_of_month with the correct parameters" in {
-
-      val maxLengthBusiness = 160
-      val maxLengthContactName = 105
-      val commencementDate = LocalDate.of(2010, 1, 1)
-      val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
-      val lastDayOfMonthAfterNextCalendarQuarter = dateService.lastDayOfMonthAfterNextCalendarQuarter
-      val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
-      val startDate = commencementDate.plusDays(1)
-
-      forAll(
-        validEmails,
-        safeInputsWithMaxLength(maxLengthBusiness),
-        safeInputsWithMaxLength(maxLengthContactName),
-      ) {
-        (email: String, businessName: String, contactName: String) =>
-          val expectedDate = commencementDate.format(formatter)
-          val formattedLastDateOfCalendarQuarter = lastDayOfCalendarQuarter.format(formatter)
-          val formattedLastDayOfMonthAfterCalendarQuarter = lastDayOfNextCalendarQuarter.format(formatter)
-          val formattedFirstDayOfNextCalendarQuarter = firstDayOfNextCalendarQuarter.format(formatter)
-          val formattedLastDayOfMonthAfterNextCalendarQuarter = lastDayOfMonthAfterNextCalendarQuarter.format(formatter)
-
-          val expectedEmailToSendRequest = EmailToSendRequest(
-            List(email),
-            "oss_registration_confirmation_post_10th_of_month",
-            RegistrationConfirmationEmailPost10thParameters(
-              contactName,
-              businessName,
-              expectedDate,
-              formattedLastDateOfCalendarQuarter,
-              formattedLastDayOfMonthAfterNextCalendarQuarter,
-              formattedFirstDayOfNextCalendarQuarter,
-              formattedLastDayOfMonthAfterCalendarQuarter)
-          )
-
-          when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
-
-          emailService.sendConfirmationEmail(
-            contactName,
-            businessName,
-            commencementDate,
-            email,
-            Some(startDate)
-          ).futureValue mustBe EMAIL_ACCEPTED
-
-          verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
-      }
-    }
-
-    "call sendConfirmationEmail with oss_registration_confirmation_pre_10th_of_month with the correct parameters when no date of first sale" in {
-      val maxLengthBusiness = 160
-      val maxLengthContactName = 105
-      val commencementDate = LocalDate.of(2010, 1, 1)
-      val lastDayOfCalendarQuarterForPeriod = dateService.getVatReturnEndDate(commencementDate)
-      val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
-
-      forAll(
-        validEmails,
-        safeInputsWithMaxLength(maxLengthBusiness),
-        safeInputsWithMaxLength(maxLengthContactName),
-      ) {
-        (email: String, businessName: String, contactName: String) =>
-          val expectedDate = commencementDate.format(formatter)
-          val formattedLastDayOfCalendarQuarterForPeriod = lastDayOfCalendarQuarterForPeriod.format(formatter)
-          val formattedLastDayOfMonthAfterCalendarQuarterForPeriod = lastDayOfMonthAfterCalendarQuarterForPeriod.format(formatter)
-
-          val expectedEmailToSendRequest = EmailToSendRequest(
-            List(email),
-            "oss_registration_confirmation_pre_10th_of_month",
-            RegistrationConfirmationEmailPre10thParameters(
-              contactName,
-              businessName,
-              expectedDate,
-              formattedLastDayOfCalendarQuarterForPeriod,
-              formattedLastDayOfMonthAfterCalendarQuarterForPeriod)
-          )
-
-          when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
-
-          emailService.sendConfirmationEmail(
-            contactName,
-            businessName,
-            commencementDate,
-            email,
-            None
-          ).futureValue mustBe EMAIL_ACCEPTED
-
-          verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
-      }
-    }
   }
 }

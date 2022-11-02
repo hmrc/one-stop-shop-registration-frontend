@@ -29,7 +29,7 @@ import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.responses.ConflictFound
 import pages.{CheckYourAnswersPage, SavedProgressPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
 import services._
@@ -126,7 +126,10 @@ class CheckYourAnswersController @Inject()(
       }
   }
 
-  private def sendEmailConfirmation(request: AuthenticatedDataRequest[AnyContent], registration: Registration)(implicit hc: HeaderCarrier) = {
+  private def sendEmailConfirmation(
+                                     request: AuthenticatedDataRequest[AnyContent],
+                                     registration: Registration
+                                   )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
     if (frontendAppConfig.enrolmentsEnabled) {
       val emailSent = false
       for {
@@ -140,8 +143,7 @@ class CheckYourAnswersController @Inject()(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
         registration.commencementDate,
-        registration.contactDetails.emailAddress,
-        registration.dateOfFirstSale
+        registration.contactDetails.emailAddress
       ) flatMap {
         emailConfirmationResult =>
           val emailSent = EMAIL_ACCEPTED == emailConfirmationResult

@@ -23,8 +23,7 @@ object Constants {
   val maxTradingNames: Int = 10
   val maxWebsites: Int = 10
 
-  val registrationConfirmationPre10thTemplateId = "oss_registration_confirmation_pre_10th_of_month"
-  val registrationConfirmationPost10thTemplateId = "oss_registration_confirmation_post_10th_of_month"
+  val registrationConfirmationTemplateId = "oss_registration_confirmation"
 
   val schemeStartDate: LocalDate = LocalDate.of(2021, 7, 1)
 

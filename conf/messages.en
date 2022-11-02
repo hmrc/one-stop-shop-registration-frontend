@@ -15,6 +15,7 @@ site.signIn = Sign in
 site.govuk = GOV.UK
 site.submit = Register
 site.tryAgain = Try again
+site.to = to
 
 date.day = Day
 date.month = Month

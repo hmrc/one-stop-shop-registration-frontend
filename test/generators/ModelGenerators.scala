@@ -199,4 +199,12 @@ trait ModelGenerators {
         now         = Instant.now
       } yield SavedUserAnswers(vrn, data, None, now)
     }
+
+  implicit val arbitraryPeriod: Arbitrary[Period] =
+    Arbitrary {
+      for {
+        year <- Gen.choose(2022, 2099)
+        quarter <- Gen.oneOf(Quarter.values)
+      } yield Period(year, quarter)
+    }
 }

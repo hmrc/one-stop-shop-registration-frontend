@@ -16,9 +16,11 @@
 
 package services
 
-import config.Constants.{registrationConfirmationPost10thTemplateId, registrationConfirmationPre10thTemplateId}
+import config.Constants.registrationConfirmationTemplateId
+import config.FrontendAppConfig
 import connectors.EmailConnector
-import models.emails.{EmailSendingResult, EmailToSendRequest, RegistrationConfirmationEmailPre10thParameters, RegistrationConfirmationEmailPost10thParameters}
+import models.emails.{EmailParameters, EmailSendingResult, EmailToSendRequest}
+import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
@@ -29,53 +31,37 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EmailService@Inject()(
    emailConnector: EmailConnector,
-   dateService: DateService
+   periodService: PeriodService,
+   frontendAppConfig: FrontendAppConfig
  )(implicit executionContext: ExecutionContext) {
+
+  private val redirectLink = frontendAppConfig.ossCompleteReturnUrl
 
   def sendConfirmationEmail(
    recipientName_line1: String,
    businessName: String,
    commencementDate: LocalDate,
-   emailAddress: String,
-   startDate: Option[LocalDate]
-  )(implicit hc: HeaderCarrier): Future[EmailSendingResult] = {
+   emailAddress: String
+  )(implicit hc: HeaderCarrier, messages: Messages): Future[EmailSendingResult] = {
 
-    val showPre10thTemplate = if(startDate.isDefined) commencementDate == startDate.get else true
-    val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-    val lastDayOfCalendarQuarterForPeriod = dateService.getVatReturnEndDate(commencementDate)
-    val lastDayOfMonthAfterCalendarQuarterForPeriod = dateService.getVatReturnDeadline(lastDayOfCalendarQuarterForPeriod)
-    val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
-    val lastDayOfNextCalendarQuarter = dateService.lastDayOfNextCalendarQuarter
-    val lastDayOfMonthAfterNextCalendarQuarter = dateService.lastDayOfMonthAfterNextCalendarQuarter
+    val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
+    val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
+    val firstDayOfNextPeriod = nextPeriod.firstDay
 
     val emailParameters =
-      if(showPre10thTemplate) {
-        RegistrationConfirmationEmailPre10thParameters(
+        EmailParameters(
           recipientName_line1,
           businessName,
+          periodOfFirstReturn.displayShortText,
+          format(firstDayOfNextPeriod),
           format(commencementDate),
-          format(lastDayOfCalendarQuarterForPeriod),
-          format(lastDayOfMonthAfterCalendarQuarterForPeriod)
-        )} else {
-        RegistrationConfirmationEmailPost10thParameters(
-          recipientName_line1,
-          businessName,
-          format(commencementDate),
-          format(lastDayOfCalendarQuarter),
-          format(lastDayOfMonthAfterNextCalendarQuarter) ,
-          format(firstDayOfNextCalendarQuarter),
-          format(lastDayOfNextCalendarQuarter)
+          redirectLink
         )
-      }
 
     emailConnector.send(
       EmailToSendRequest(
         List(emailAddress),
-        if (showPre10thTemplate) {
-          registrationConfirmationPre10thTemplateId
-        } else {
-          registrationConfirmationPost10thTemplateId
-        },
+          registrationConfirmationTemplateId,
         emailParameters
       )
     )
