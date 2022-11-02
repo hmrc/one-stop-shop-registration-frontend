@@ -709,6 +709,13 @@ euSendGoodsAddress.error.postCode.length = Postcode must be 50 characters or les
 euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
 euSendGoodsAddress.change.hidden = EuSendGoodsAddress
 
+previousIossNumber.title = previousIossNumber
+previousIossNumber.heading = previousIossNumber
+previousIossNumber.checkYourAnswersLabel = previousIossNumber
+previousIossNumber.error.required = Enter previousIossNumber
+previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
+previousIossNumber.change.hidden = PreviousIossNumber
+
 emailVerificationCodesAndEmailsExceeded.title = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.heading = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.paragraph = We''ve saved your progress and you can try again in 24 hours.
