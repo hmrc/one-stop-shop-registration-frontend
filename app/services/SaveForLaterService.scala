@@ -17,57 +17,45 @@
 package services
 
 import connectors.{SaveForLaterConnector, SavedUserAnswers}
+import controllers.routes
 import logging.Logging
-import models.SessionData
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import pages.SavedProgressPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Call, Result}
-import repositories.SessionRepository
+import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SaveForLaterService @Inject()(
-                                     sessionRepository: SessionRepository,
+                                     sessionRepository: AuthenticatedUserAnswersRepository,
                                      saveForLaterConnector: SaveForLaterConnector
-                                   )(implicit val ec: ExecutionContext, implicit val hc: HeaderCarrier) extends Logging {
-
+                                   ) extends Logging {
 
   def saveAnswers(
-                   sessionId: String,
                    redirectLocation: Call,
-                   originLocation: Call,
-                   errorLocation: Call
-                 )(implicit request: AuthenticatedDataRequest[_]): Future[Result] = {
+                   originLocation: Call
+                 )(implicit request: AuthenticatedDataRequest[_], ec: ExecutionContext, hc: HeaderCarrier): Future[Result] = {
     Future.fromTry(request.userAnswers.set(SavedProgressPage, originLocation.url)).flatMap {
       updatedAnswers =>
-//        val sessionId = request.queryString
-//          .get("k")
-//          .flatMap(_.headOption)
-//          .orElse(hc.sessionId.map(_.value))
-//          .map(sessionId => sessionId)
         val save4LaterRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
         saveForLaterConnector.submit(save4LaterRequest).flatMap {
           case Right(Some(_: SavedUserAnswers)) =>
             for {
-              sessionData <- sessionRepository.get(sessionId)
-              updatedSessionData = sessionData.headOption.fold(SessionData(request.userId))(_.copy(userId = request.userId))
-              _ <- sessionRepository.set(updatedSessionData)
+              _ <- sessionRepository.set(updatedAnswers)
             } yield {
               Redirect(redirectLocation)
             }
           case Right(None) =>
             logger.error(s"Unexpected result on submit")
-            Future.successful(Redirect(errorLocation))
+            Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           case Left(e) =>
             logger.error(s"Unexpected result on submit: ${e.toString}")
-            Future.successful(Redirect(errorLocation))
+            Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         }
     }
-
   }
-
 
 }

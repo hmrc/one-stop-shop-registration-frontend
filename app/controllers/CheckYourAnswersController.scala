@@ -19,16 +19,16 @@ package controllers
 import cats.data.Validated.{Invalid, Valid}
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
+import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.NormalMode
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
+import models.requests.AuthenticatedDataRequest
 import models.responses.ConflictFound
-import pages.{CheckYourAnswersPage, SavedProgressPage}
+import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
@@ -46,17 +46,17 @@ import views.html.CheckYourAnswersView
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
-  override val messagesApi: MessagesApi,
-  cc: AuthenticatedControllerComponents,
-  registrationConnector: RegistrationConnector,
-  registrationService: RegistrationService,
-  auditService: AuditService,
-  view: CheckYourAnswersView,
-  emailService: EmailService,
-  dateService: DateService,
-  saveForLaterConnector: SaveForLaterConnector,
-  frontendAppConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
+                                            override val messagesApi: MessagesApi,
+                                            cc: AuthenticatedControllerComponents,
+                                            registrationConnector: RegistrationConnector,
+                                            registrationService: RegistrationService,
+                                            auditService: AuditService,
+                                            view: CheckYourAnswersView,
+                                            emailService: EmailService,
+                                            dateService: DateService,
+                                            saveForLaterService: SaveForLaterService,
+                                            frontendAppConfig: FrontendAppConfig
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -107,12 +107,15 @@ class CheckYourAnswersController @Inject()(
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
-              saveAnswers(routes.ErrorSubmittingRegistrationController.onPageLoad())
+              saveForLaterService.saveAnswers(
+                routes.ErrorSubmittingRegistrationController.onPageLoad(),
+                routes.CheckYourAnswersController.onPageLoad()
+              )
           }
 
         case Invalid(errors) =>
           getFirstValidationErrorRedirect.map(
-            errorRedirect => if(incompletePrompt) {
+            errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {
               Redirect(routes.CheckYourAnswersController.onPageLoad()).toFuture
@@ -121,7 +124,10 @@ class CheckYourAnswersController @Inject()(
             val errorList = errors.toChain.toList
             val errorMessages = errorList.map(_.errorMessage).mkString("\n")
             logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-            saveAnswers(routes.ErrorSubmittingRegistrationController.onPageLoad())
+            saveForLaterService.saveAnswers(
+              routes.ErrorSubmittingRegistrationController.onPageLoad(),
+              routes.CheckYourAnswersController.onPageLoad()
+            )
           }
       }
   }
@@ -157,24 +163,4 @@ class CheckYourAnswersController @Inject()(
     }
   }
 
-  private def saveAnswers(redirectLocation: Call)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
-      Future.fromTry(request.userAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url)).flatMap {
-        updatedAnswers =>
-          val s4LRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
-          saveForLaterConnector.submit(s4LRequest).flatMap {
-            case Right(Some(_: SavedUserAnswers)) =>
-              for {
-                _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield {
-                Redirect(redirectLocation)
-              }
-            case Left(e) =>
-              logger.error(s"Unexpected result on submit: ${e.toString}")
-              Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-            case Right(None) =>
-              logger.error(s"Unexpected result on submit")
-              Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          }
-      }
-  }
 }

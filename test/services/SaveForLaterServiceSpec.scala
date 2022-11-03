@@ -23,28 +23,31 @@ import models.NormalMode
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
 import models.responses.NotFound
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
-import org.mockito.Mockito.when
+import org.mockito.Mockito
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.AnyContent
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
+import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SaveForLaterServiceSpec extends SpecBase {
+class SaveForLaterServiceSpec extends SpecBase with BeforeAndAfterEach {
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
   val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
-  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswers)
+  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
 
   private val mockSaveForLaterConnector = mock[SaveForLaterConnector]
-  private val saveForLaterService = new SaveForLaterService(mockSaveForLaterConnector)
+  private val mockUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
+  private val saveForLaterService = new SaveForLaterService(mockUserAnswersRepository, mockSaveForLaterConnector)
   private val redirectLocation = routes.BankDetailsController.onPageLoad(NormalMode)
   private val originLocation = routes.BusinessContactDetailsController.onPageLoad(NormalMode)
   private val errorLocation = routes.JourneyRecoveryController.onPageLoad()
@@ -54,37 +57,53 @@ class SaveForLaterServiceSpec extends SpecBase {
   private val savedUserAnswers: SavedUserAnswers = SavedUserAnswers(
     saveForLaterRequest.vrn,
     JsObject(Seq("saveForLaterRequest" -> Json.toJson(saveForLaterRequest.data))),
-    None,
+    Some(vatCustomerInfo),
     instantDate
   )
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockSaveForLaterConnector)
+    Mockito.reset(mockUserAnswersRepository)
+  }
 
   ".saveAnswers" - {
 
     "must Redirect to redirect location when answers are submitted successfully" in {
 
-      when(mockSaveForLaterConnector.submit(eqTo(saveForLaterRequest))(any())) thenReturn Future.successful(Right(Some(savedUserAnswers)))
+      when(mockSaveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Right(Some(savedUserAnswers)))
+      when(mockUserAnswersRepository.set(any())) thenReturn Future.successful(true)
 
-      val result = saveForLaterService.saveAnswers(basicUserAnswers, saveForLaterRequest, redirectLocation, originLocation, errorLocation)(request)
+      val result = saveForLaterService.saveAnswers(redirectLocation, originLocation)
 
       result.futureValue mustBe Redirect(redirectLocation)
+
+      verify(mockSaveForLaterConnector, times(1)).submit(any())(any())
+      verify(mockUserAnswersRepository, times(1)).set(any())
     }
 
     "must Redirect to error location when there is an unexpected result on submit" in {
 
-      when(mockSaveForLaterConnector.submit(eqTo(saveForLaterRequest))(any())) thenReturn Future.successful(Right(None))
+      when(mockSaveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Right(None))
+      when(mockUserAnswersRepository.set(any())) thenReturn Future.successful(false)
 
-      val result = saveForLaterService.saveAnswers(basicUserAnswers, saveForLaterRequest, redirectLocation, originLocation, errorLocation)(request)
+      val result = saveForLaterService.saveAnswers(redirectLocation, originLocation)
 
       result.futureValue mustBe Redirect(errorLocation)
+
+      verify(mockSaveForLaterConnector, times(1)).submit(any())(any())
+      verifyNoInteractions(mockUserAnswersRepository)
     }
 
     "must Redirect to error location when an Unexpected Response Status is received" in {
 
-      when(mockSaveForLaterConnector.submit(eqTo(saveForLaterRequest))(any())) thenReturn Future.successful(Left(NotFound))
+      when(mockSaveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Left(NotFound))
+      when(mockUserAnswersRepository.set(any())) thenReturn Future.successful(false)
 
-      val result = saveForLaterService.saveAnswers(basicUserAnswers, saveForLaterRequest, redirectLocation, originLocation, errorLocation)(request)
+      val result = saveForLaterService.saveAnswers(redirectLocation, originLocation)
 
       result.futureValue mustBe Redirect(errorLocation)
+
+      verify(mockSaveForLaterConnector, times(1)).submit(any())(any())
+      verifyNoInteractions(mockUserAnswersRepository)
     }
   }
 
