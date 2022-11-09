@@ -71,7 +71,7 @@ class AddPreviousRegistrationController @Inject()(
               if(incompletePromptShown) {
                 firstIndexedIncompleteDeregisteredCountry(incomplete.map(_.previousEuCountry)) match {
                   case Some(incompleteCountry) =>
-                      Future.successful(Redirect(routes.PreviousEuVatNumberController.onPageLoad(mode, Index(incompleteCountry._2))))
+                      Future.successful(Redirect(routes.PreviousOssNumberController.onPageLoad(mode, Index(incompleteCountry._2))))
                   case None =>
                     Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }

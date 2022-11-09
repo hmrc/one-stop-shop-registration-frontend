@@ -23,7 +23,7 @@ import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviouslyRegisteredPage}
 import queries._
 import uk.gov.hmrc.domain.Vrn
 
@@ -157,11 +157,11 @@ class RegistrationService @Inject()(dateService: DateService) {
   private def processPreviousRegistration(answers: UserAnswers, index: Index): ValidationResult[PreviousRegistration] =
     answers.get(PreviousEuCountryPage(index)) match {
       case Some(country) =>
-        answers.get(PreviousEuVatNumberPage(index)) match {
+        answers.get(PreviousOssNumberPage(index)) match {
           case Some(vatNumber) =>
             PreviousRegistration(country, vatNumber).validNec
           case None =>
-            DataMissingError(PreviousEuVatNumberPage(index)).invalidNec
+            DataMissingError(PreviousOssNumberPage(index)).invalidNec
         }
       case None =>
         DataMissingError(PreviousEuCountryPage(index)).invalidNec

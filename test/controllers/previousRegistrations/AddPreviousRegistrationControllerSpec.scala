@@ -23,7 +23,7 @@ import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -45,7 +45,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
   private val baseAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
-      .set(PreviousEuVatNumberPage(Index(0)), "foo").success.value
+      .set(PreviousOssNumberPage(Index(0)), "foo").success.value
 
   private val incompleteAnswers =
     basicUserAnswersWithVatInfo
@@ -208,7 +208,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PreviousEuVatNumberController.onPageLoad(NormalMode, Index(0)).url
+        redirectLocation(result).value mustEqual routes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0)).url
       }
     }
   }

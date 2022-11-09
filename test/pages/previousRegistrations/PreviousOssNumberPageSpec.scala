@@ -21,23 +21,23 @@ import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
-class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
+class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
   "PreviousEuVatNumberPage" - {
 
-    beRetrievable[String](PreviousEuVatNumberPage(index))
+    beRetrievable[String](PreviousOssNumberPage(index))
 
-    beSettable[String](PreviousEuVatNumberPage(index))
+    beSettable[String](PreviousOssNumberPage(index))
 
-    beRemovable[String](PreviousEuVatNumberPage(index))
+    beRemovable[String](PreviousOssNumberPage(index))
 
     "must navigate in Normal mode" - {
 
       "to Add Previous Registration" in {
 
-        PreviousEuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers)
+        PreviousOssNumberPage(index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
       }
     }
@@ -46,8 +46,8 @@ class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
-        PreviousEuVatNumberPage(index).navigate(CheckMode, answers)
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index), "123").success.value
+        PreviousOssNumberPage(index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
       }
     }

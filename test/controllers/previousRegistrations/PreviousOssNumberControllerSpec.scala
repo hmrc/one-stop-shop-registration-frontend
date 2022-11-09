@@ -17,8 +17,8 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import forms.previousRegistrations.PreviousEuCountryFormProvider
-import models.{Country, Index, NormalMode}
+import forms.previousRegistrations.PreviousOssNumberFormProvider
+import models.{Country, CountryWithValidationDetails, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,55 +27,56 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import views.html.previousRegistrations.PreviousEuCountryView
+import views.html.previousRegistrations.PreviousOssNumberView
 
 import scala.concurrent.Future
 
-class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
+class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private val formProvider = new PreviousEuCountryFormProvider()
-  private val form = formProvider(index, Seq.empty)
+  private val country = Country("SI", "Slovenia")
+  private val countryWithValidation = CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == "SI").value
+  private val formProvider = new PreviousOssNumberFormProvider()
+  private val form = formProvider(country)
 
-  private lazy val previousEuCountryRoute = routes.PreviousEuCountryController.onPageLoad(NormalMode, index).url
+  private lazy val previousEuVatNumberRoute = routes.PreviousOssNumberController.onPageLoad(NormalMode, index).url
 
-  private val country = Country.euCountries.head
+  private val baseAnswers = basicUserAnswersWithVatInfo.set(PreviousEuCountryPage(index), country).success.value
 
-  "PreviousEuCountry Controller" - {
+
+  "PreviousEuVatNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuCountryRoute)
+        val request = FakeRequest(GET, previousEuVatNumberRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[PreviousEuCountryView]
+        val view = application.injector.instanceOf[PreviousOssNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = basicUserAnswersWithVatInfo
-        .set(PreviousEuCountryPage(index), country).success.value
-        .set(PreviousOssNumberPage(index), "test").success.value
+      val userAnswers = baseAnswers.set(PreviousOssNumberPage(index), "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuCountryRoute)
+        val request = FakeRequest(GET, previousEuVatNumberRoute)
 
-        val view = application.injector.instanceOf[PreviousEuCountryView]
+        val view = application.injector.instanceOf[PreviousOssNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(country), NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -86,65 +87,41 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuCountryRoute)
-            .withFormUrlEncodedBody(("value", country.code))
+          FakeRequest(POST, previousEuVatNumberRoute)
+            .withFormUrlEncodedBody(("value", "12345678"))
 
         val result = route(application, request).value
-        val expectedAnswer = basicUserAnswersWithVatInfo.set(PreviousEuCountryPage(index), country).success.value
+        val expectedAnswers = baseAnswers.set(PreviousOssNumberPage(index), "12345678").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousEuCountryPage(index).navigate(NormalMode, expectedAnswer).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswer))
+        redirectLocation(result).value mustEqual PreviousOssNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuCountryRoute)
+          FakeRequest(POST, previousEuVatNumberRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[PreviousEuCountryView]
+        val view = application.injector.instanceOf[PreviousOssNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted and the question has been answered" in {
-
-      val userAnswers = basicUserAnswersWithVatInfo
-        .set(PreviousEuCountryPage(index), country).success.value
-        .set(PreviousOssNumberPage(index), "test").success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, previousEuCountryRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[PreviousEuCountryView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -153,7 +130,21 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuCountryRoute)
+        val request = FakeRequest(GET, previousEuVatNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if user answers are empty" in {
+
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, previousEuVatNumberRoute)
 
         val result = route(application, request).value
 
@@ -168,8 +159,8 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuCountryRoute)
-            .withFormUrlEncodedBody(("value", country.code))
+          FakeRequest(POST, previousEuVatNumberRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 

@@ -165,10 +165,10 @@ POST        /previous-country/:index                                  controller
 GET         /check-previous-country/:index                            controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-previous-country/:index                            controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /previous-oss-scheme-number/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /previous-oss-eu-vat-number/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /previous-oss-scheme-number/:index                        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-oss-eu-vat-number/:index                        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /previous-scheme/:index                                   controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /previous-scheme/:index                                   controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = NormalMode, index: Index)

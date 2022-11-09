@@ -52,7 +52,7 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index), "123").success.value
         PreviousEuCountryPage(index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(CheckMode, index))
       }

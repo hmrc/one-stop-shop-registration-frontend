@@ -22,13 +22,13 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PreviousEuVatNumberFormProvider @Inject() extends Mappings with EuVatNumberConstraints{
+class PreviousOssNumberFormProvider @Inject() extends Mappings with EuVatNumberConstraints{
 
   def apply(country: Country): Form[String] =
     Form(
-      "value" -> text("previousEuVatNumber.error.required", Seq(country.name))
+      "value" -> text("previousOssNumber.error.required", Seq(country.name))
         .verifying(
-          validateEuVatNumber(country.code, "previousEuVatNumber.error.invalid")
+          validateEuVatNumber(country.code, "previousOssNumber.error.invalid")
         )
         .transform[String](_.toUpperCase, value => value)
     )

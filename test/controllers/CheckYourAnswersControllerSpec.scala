@@ -421,7 +421,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual
-                controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(0)).url
+                controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, Index(0)).url
 
             }
 
