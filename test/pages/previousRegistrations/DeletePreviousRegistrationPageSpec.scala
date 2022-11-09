@@ -33,7 +33,7 @@ class DeletePreviousRegistrationPageSpec extends SpecBase {
           val answers =
             emptyUserAnswers
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousOssNumberPage(Index(0)), "FR123").success.value
 
           DeletePreviousRegistrationPage(Index(0)).navigate(NormalMode, answers)
             .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
@@ -60,7 +60,7 @@ class DeletePreviousRegistrationPageSpec extends SpecBase {
           val answers =
             emptyUserAnswers
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousOssNumberPage(Index(0)), "FR123").success.value
 
           DeletePreviousRegistrationPage(Index(0)).navigate(CheckMode, answers)
             .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))

@@ -17,66 +17,60 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import forms.previousRegistrations.PreviousEuVatNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, NormalMode}
+import forms.previousRegistrations.PreviousIossNumberFormProvider
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
+import pages.previousRegistrations.PreviousIossNumberPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import views.html.previousRegistrations.PreviousEuVatNumberView
+import views.html.previousRegistrations.PreviousIossNumberView
 
 import scala.concurrent.Future
 
-class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
+class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  private val index = Index(0)
-  private val country = Country("SI", "Slovenia")
-  private val countryWithValidation = CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == "SI").value
-  private val formProvider = new PreviousEuVatNumberFormProvider()
-  private val form = formProvider(country)
+  private val formProvider = new PreviousIossNumberFormProvider()
+  private val form = formProvider()
 
-  private lazy val previousEuVatNumberRoute = routes.PreviousEuVatNumberController.onPageLoad(NormalMode, index).url
+  private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode).url
 
-  private val baseAnswers = basicUserAnswersWithVatInfo.set(PreviousEuCountryPage(index), country).success.value
-
-
-  "PreviousEuVatNumber Controller" - {
+  "PreviousIossNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousIossNumberRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[PreviousEuVatNumberView]
+        val view = application.injector.instanceOf[PreviousIossNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(PreviousEuVatNumberPage(index), "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId).set(PreviousIossNumberPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousIossNumberRoute)
 
-        val view = application.injector.instanceOf[PreviousEuVatNumberView]
+        val view = application.injector.instanceOf[PreviousIossNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -87,41 +81,41 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(baseAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "12345678"))
+          FakeRequest(POST, previousIossNumberRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousEuVatNumberPage(index), "12345678").success.value
+        val expectedAnswers = emptyUserAnswers.set(PreviousIossNumberPage, "answer").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousEuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual PreviousIossNumberPage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuVatNumberRoute)
+          FakeRequest(POST, previousIossNumberRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[PreviousEuVatNumberView]
+        val view = application.injector.instanceOf[PreviousIossNumberView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -130,21 +124,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if user answers are empty" in {
-
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousIossNumberRoute)
 
         val result = route(application, request).value
 
@@ -159,7 +139,7 @@ class PreviousEuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuVatNumberRoute)
+          FakeRequest(POST, previousIossNumberRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value

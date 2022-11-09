@@ -22,7 +22,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviouslyRegisteredPage}
 import play.api.libs.json.{Json, JsValue}
 
 trait UserAnswersGenerator extends TryValues {
@@ -44,7 +44,7 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(EuTaxReferencePage, JsValue)] ::
     arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::
-    arbitrary[(PreviousEuVatNumberPage, JsValue)] ::
+    arbitrary[(PreviousOssNumberPage, JsValue)] ::
     arbitrary[(PreviousEuCountryPage, JsValue)] ::
     arbitrary[(AddPreviousRegistrationPage.type, JsValue)] ::
     arbitrary[(HasFixedEstablishmentPage, JsValue)] ::

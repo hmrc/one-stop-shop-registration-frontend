@@ -21,7 +21,7 @@ import models.Country
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
-class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
+class PreviousOssNumberFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "previousEuVatNumber.error.required"
   val invalidKey = "previousEuVatNumber.error.invalid"
@@ -31,7 +31,7 @@ class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
 
   val country: Country = arbitrary[Country].sample.value
 
-  val formProvider: PreviousEuVatNumberFormProvider = new PreviousEuVatNumberFormProvider()
+  val formProvider: PreviousOssNumberFormProvider = new PreviousOssNumberFormProvider()
   val form = formProvider(country)
   val countriesAndValidVatNumbers = Seq(
     (Country("AT", "Austria"), Seq("U23456789") ),

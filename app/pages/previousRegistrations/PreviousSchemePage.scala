@@ -29,8 +29,8 @@ case class PreviousSchemePage(index: Index) extends QuestionPage[PreviousScheme]
   override def toString: String = "previousScheme"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    prevRegRoutes.PreviousEuVatNumberController.onPageLoad(NormalMode, index)
+    prevRegRoutes.PreviousOssNumberController.onPageLoad(NormalMode, index)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    prevRegRoutes.PreviousEuVatNumberController.onPageLoad(CheckMode, index)
+    prevRegRoutes.PreviousOssNumberController.onPageLoad(CheckMode, index)
 }

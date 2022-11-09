@@ -17,23 +17,23 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
-import forms.previousRegistrations.PreviousEuVatNumberFormProvider
+import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.requests.AuthenticatedDataRequest
 import models.{Country, CountryWithValidationDetails, Index, Mode}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.previousRegistrations.PreviousEuVatNumberView
+import views.html.previousRegistrations.PreviousOssNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PreviousEuVatNumberController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        cc: AuthenticatedControllerComponents,
-                                        formProvider: PreviousEuVatNumberFormProvider,
-                                        view: PreviousEuVatNumberView
+class PreviousOssNumberController @Inject()(
+                                             override val messagesApi: MessagesApi,
+                                             cc: AuthenticatedControllerComponents,
+                                             formProvider: PreviousOssNumberFormProvider,
+                                             view: PreviousOssNumberView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -45,7 +45,7 @@ class PreviousEuVatNumberController @Inject()(
 
           val form = formProvider(country)
 
-          val preparedForm = request.userAnswers.get(PreviousEuVatNumberPage(index)) match {
+          val preparedForm = request.userAnswers.get(PreviousOssNumberPage(index)) match {
             case None => form
             case Some(value) => form.fill(value)
           }
@@ -72,9 +72,9 @@ class PreviousEuVatNumberController @Inject()(
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousEuVatNumberPage(index), value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(index), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(PreviousEuVatNumberPage(index).navigate(mode, updatedAnswers))
+              } yield Redirect(PreviousOssNumberPage(index).navigate(mode, updatedAnswers))
           )
       }
 

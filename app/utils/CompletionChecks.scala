@@ -179,7 +179,7 @@ trait CompletionChecks {
     _.previousEuCountry
   )).map(
     incompleteCountry =>
-      Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+      Redirect(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
   )
 
   private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {

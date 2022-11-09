@@ -25,7 +25,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviouslyRegisteredPage}
 import queries.{AllEuDetailsRawQuery, AllPreviousRegistrationsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
@@ -102,7 +102,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(AllWebsites, List("website1", "website2")).success.value
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
-      .set(PreviousEuVatNumberPage(Index(0)), "DE123").success.value
+      .set(PreviousOssNumberPage(Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
       .set(BusinessBasedInNiPage, true).success.value
@@ -485,10 +485,10 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "but there is a previous registration without a VAT number" in {
 
-          val userAnswers = answers.remove(PreviousEuVatNumberPage(Index(0))).success.value
+          val userAnswers = answers.remove(PreviousOssNumberPage(Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-          result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousEuVatNumberPage(Index(0)))))
+          result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousOssNumberPage(Index(0)))))
         }
       }
 

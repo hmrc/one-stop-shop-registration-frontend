@@ -46,7 +46,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(index), previousRegistration.previousEuCountry).success.value
-      .set(PreviousEuVatNumberPage(index), previousRegistration.previousEuVatNumber).success.value
+      .set(PreviousOssNumberPage(index), previousRegistration.previousEuVatNumber).success.value
 
   "DeletePreviousRegistration Controller" - {
 
