@@ -17,15 +17,17 @@
 package controllers
 
 import config.FrontendAppConfig
+import connectors.SaveForLaterConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
+import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
 import models.{BusinessContactDetails, CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.EmailVerificationService
+import services.{EmailVerificationService, SaveForLaterService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.BusinessContactDetailsView
@@ -36,11 +38,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
+                                                  saveForLaterConnector: SaveForLaterConnector,
+                                                  saveForLaterService: SaveForLaterService,
                                                   emailVerificationService: EmailVerificationService,
                                                   formProvider: BusinessContactDetailsFormProvider,
                                                   config: FrontendAppConfig,
                                                   view: BusinessContactDetailsView
-                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with Logging {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -73,18 +78,17 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          verifyEmailAndSaveAnswers(mode, request, messages, continueUrl, value)
+          verifyEmailAndRedirect(mode, messages, continueUrl, value)
         }
       )
   }
 
-  private def verifyEmailAndSaveAnswers(
-                                         mode: Mode,
-                                         request: AuthenticatedDataRequest[AnyContent],
-                                         messages: Messages,
-                                         continueUrl: String,
-                                         value: BusinessContactDetails)
-                                       (implicit hc: HeaderCarrier): Future[Result] = {
+  private def verifyEmailAndRedirect(
+                                      mode: Mode,
+                                      messages: Messages,
+                                      continueUrl: String,
+                                      value: BusinessContactDetails
+                                    )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     lazy val emailVerificationRequest = emailVerificationService.createEmailVerificationRequest(
       mode,
       request.userId,
@@ -101,16 +105,16 @@ class BusinessContactDetailsController @Inject()(
         } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
 
       case LockedPasscodeForSingleEmail =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
-          _ <- cc.sessionRepository.set(updatedAnswers)
-        } yield Redirect(routes.EmailVerificationCodesExceededController.onPageLoad().url)
+        saveForLaterService.saveAnswers(
+          routes.EmailVerificationCodesExceededController.onPageLoad(),
+          routes.BusinessContactDetailsController.onPageLoad(mode)
+        )
 
       case LockedTooManyLockedEmails =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
-          _ <- cc.sessionRepository.set(updatedAnswers)
-        } yield Redirect(routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url)
+        saveForLaterService.saveAnswers(
+          routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad(),
+          routes.BusinessContactDetailsController.onPageLoad(mode)
+        )
 
       case NotVerified =>
         emailVerificationRequest
@@ -124,4 +128,5 @@ class BusinessContactDetailsController @Inject()(
           }
     }
   }
+
 }

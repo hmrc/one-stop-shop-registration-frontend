@@ -19,33 +19,34 @@ package controllers
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
-import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
+import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
+import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito.{doNothing, times, verify, verifyNoInteractions, when}
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
+import pages._
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
-import pages._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
+import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import queries.EmailConfirmationQuery
 import repositories.AuthenticatedUserAnswersRepository
-import services.{AuditService, DateService, EmailService, RegistrationService}
+import services._
 import testutils.RegistrationData
 import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-import java.time.{Instant, LocalDate}
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -54,7 +55,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
   private val registrationService = mock[RegistrationService]
   private val registrationConnector = mock[RegistrationConnector]
-  private val saveForLaterConnector = mock[SaveForLaterConnector]
+  private val saveForLaterService = mock[SaveForLaterService]
   private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
   private val dateService = mock[DateService]
@@ -68,7 +69,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       auditService,
       emailService,
       dateService,
-      saveForLaterConnector
+      saveForLaterService
     )
   }
 
@@ -542,17 +543,16 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "the user is redirected to the Error Submitting Registration page and their answers are saved" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
-          val savedAnswers = basicUserAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
-          when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, basicUserAnswers.data, None, Instant.now))))
+          when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(routes.ErrorSubmittingRegistrationController.onPageLoad().url))
           doNothing().when(auditService).audit(any())(any(), any())
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[SaveForLaterConnector].toInstance(saveForLaterConnector),
+              bind[SaveForLaterService].toInstance(saveForLaterService),
               bind[AuditService].toInstance(auditService)
             ).build()
 
@@ -565,24 +565,23 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.ErrorSubmittingRegistrationController.onPageLoad().url
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-            verify(saveForLaterConnector, times(1)).submit(eqTo(SaveForLaterRequest(savedAnswers, vrn)))(any())
+            verify(saveForLaterService, times(1)).saveAnswers(any(), any())(any(), any(), any())
           }
         }
 
         "the user is redirected to the Journey Recovery page when saving answers fails" in {
 
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
-          val savedAnswers = basicUserAnswers.set(SavedProgressPage, routes.CheckYourAnswersController.onPageLoad().url).success.value
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Valid(registration)
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
-          when(saveForLaterConnector.submit(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(123, "error")))
+          when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
           doNothing().when(auditService).audit(any())(any(), any())
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswers))
             .overrides(
               bind[RegistrationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[SaveForLaterConnector].toInstance(saveForLaterConnector),
+              bind[SaveForLaterService].toInstance(saveForLaterService),
               bind[AuditService].toInstance(auditService)
             ).build()
 
@@ -595,11 +594,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-            verify(saveForLaterConnector, times(1)).submit(eqTo(SaveForLaterRequest(savedAnswers, vrn)))(any())
+            verify(saveForLaterService, times(1)).saveAnswers(any(), any())(any(), any(), any())
           }
         }
       }
-
     }
   }
 }
