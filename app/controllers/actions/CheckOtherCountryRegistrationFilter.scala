@@ -23,21 +23,18 @@ import models.requests.AuthenticatedIdentifierRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
 import services.CoreRegistrationValidationService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistrationValidationService,
-                                                        appConfig: FrontendAppConfig
-                                                       )
-                                                       (implicit val executionContext: ExecutionContext)
+class CheckOtherCountryRegistrationFilterImpl @Inject()(
+                                                         service: CoreRegistrationValidationService,
+                                                         appConfig: FrontendAppConfig
+                                                       )(implicit val executionContext: ExecutionContext)
   extends CheckOtherCountryRegistrationFilter {
 
+  private val exclusionStatusCode = 4
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.otherCountryRegistrationValidationEnabled) {
       service.searchUkVrn(request.vrn).map {
@@ -45,9 +42,13 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(service: CoreRegistratio
         case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
           Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
 
-        case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(4) || activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
-          activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
-          Some(Redirect(routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate.getOrElse(""))))
+        case Some(activeMatch)
+          if activeMatch.exclusionStatusCode.contains(exclusionStatusCode) ||
+            activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
+            activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
+              Some(Redirect(
+                routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate.getOrElse(""))
+              ))
 
         case _ => None
       }

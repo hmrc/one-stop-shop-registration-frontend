@@ -16,25 +16,61 @@
 
 package connectors
 
-import config.Service
+import config.FrontendAppConfig
 import connectors.ValidateCoreRegistrationHttpParser.{ValidateCoreRegistrationReads, ValidateCoreRegistrationResponse}
-import models.core.CoreRegistrationRequest
-import play.api.Configuration
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
+import logging.Logging
+import models.core.{CoreRegistrationRequest, EisErrorResponse, ErrorDetail}
+import models.responses.EisError
+import play.api.http.HeaderNames.AUTHORIZATION
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
 
+import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ValidateCoreRegistrationConnector @Inject()(config: Configuration, httpClient: HttpClient)
-                                                 (implicit ec: ExecutionContext) extends HttpErrorFunctions {
+class ValidateCoreRegistrationConnector @Inject()(
+                                                   frontendAppConfig: FrontendAppConfig,
+                                                   httpClient: HttpClient
+                                                 )(implicit ec: ExecutionContext) extends HttpErrorFunctions with Logging {
 
-  private val baseUrl = config.get[Service]("microservice.services.core-validation")
+  private implicit val emptyHc: HeaderCarrier = HeaderCarrier()
 
-  def validateCoreRegistration(coreRegistrationRequest: CoreRegistrationRequest)(implicit hc: HeaderCarrier):
+  private val baseUrl = frontendAppConfig.coreValidationUrl
+  private def headers(correlationId: String): Seq[(String, String)] = frontendAppConfig.eisHeaders(correlationId)
 
-  Future[ValidateCoreRegistrationResponse] = {
+  def validateCoreRegistration(
+                                coreRegistrationRequest: CoreRegistrationRequest
+                              ): Future[ValidateCoreRegistrationResponse] = {
+    val correlationId: String = UUID.randomUUID().toString
+    val headersWithCorrelationId = headers(correlationId)
+
+    val headersWithoutAuth = headersWithCorrelationId.filterNot {
+      case (key, _) => key.matches(AUTHORIZATION)
+    }
+
+    logger.info(s"Sending request to EIS with headers $headersWithoutAuth")
+
     val url = s"$baseUrl/validateCoreRegistration"
-    httpClient.POST[CoreRegistrationRequest,ValidateCoreRegistrationResponse](url, coreRegistrationRequest)
+    httpClient.POST[CoreRegistrationRequest, ValidateCoreRegistrationResponse](
+      url,
+      coreRegistrationRequest,
+      headers = headersWithCorrelationId
+    ).recover {
+      case e: HttpException =>
+        val selfGeneratedRandomUUID = UUID.randomUUID()
+        logger.error(
+          s"Unexpected error response from EIS $url, received status ${e.responseCode}," +
+            s"body of response was: ${e.message} with self-generated CorrelationId $selfGeneratedRandomUUID"
+        )
+        Left(EisError(
+          EisErrorResponse(
+            ErrorDetail(
+              Some(s"UNEXPECTED_${e.responseCode.toString}"), Some(e.message), Some("EIS"), Instant.now(), selfGeneratedRandomUUID
+            )
+          )
+        ))
+    }
   }
 
 }

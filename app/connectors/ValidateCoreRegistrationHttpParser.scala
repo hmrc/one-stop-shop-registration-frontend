@@ -17,11 +17,14 @@
 package connectors
 
 import logging.Logging
-import models.core.CoreRegistrationValidationResult
-import models.responses.{ErrorResponse, InvalidJson, UnexpectedResponseStatus}
+import models.core.{CoreRegistrationValidationResult, EisErrorResponse, ErrorDetail}
+import models.responses.{EisError, ErrorResponse, InvalidJson, UnexpectedResponseStatus}
 import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+
+import java.time.Instant
+import java.util.UUID
 
 object ValidateCoreRegistrationHttpParser extends Logging {
 
@@ -38,8 +41,26 @@ object ValidateCoreRegistrationHttpParser extends Logging {
         }
 
         case status =>
-          logger.error(s"Received UnexpectedResponseStatus with status code $status with body ${response.body}")
-          Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
+          logger.info(s"Response received from EIS ${response.status} with body ${response.body}")
+          if (response.body.isEmpty) {
+            val uuid = UUID.randomUUID()
+            logger.error(s"Response received from EIS ${response.status} with empty body and self-generated correlationId $uuid")
+            Left(
+              EisError(
+                EisErrorResponse(
+                  ErrorDetail(Some(status.toString), Some("The response body was empty"), None, Instant.now(), uuid)
+                )))
+          } else {
+            response.json.validateOpt[EisErrorResponse] match {
+              case JsSuccess(Some(eisErrorResponse), _) =>
+                logger.error(s"There was an error from EIS when submitting a validation with status $status and $eisErrorResponse")
+                Left(EisError(eisErrorResponse))
+
+              case _ =>
+                logger.error(s"Received UnexpectedResponseStatus with status code $status with body ${response.body}")
+                Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
+            }
+          }
       }
     }
   }

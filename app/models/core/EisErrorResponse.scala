@@ -21,13 +21,13 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.Instant
 import java.util.UUID
 
-case class EISErrorResponse(
+case class EisErrorResponse(
                              errorDetail: ErrorDetail
                            )
 
-object EISErrorResponse {
+object EisErrorResponse {
 
-  implicit val format: OFormat[EISErrorResponse] = Json.format[EISErrorResponse]
+  implicit val format: OFormat[EisErrorResponse] = Json.format[EisErrorResponse]
 
 }
 

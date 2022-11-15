@@ -24,7 +24,7 @@ import play.api.libs.json.{JsSuccess, Json}
 import java.time.Instant
 import java.util.UUID
 
-class EISErrorResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
+class EisErrorResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
 
   private val randomTimestamp = Instant.now()
   private val randomUUID = UUID.randomUUID()
@@ -35,8 +35,8 @@ class EISErrorResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
 
       "with all optional fields present" in {
 
-        val eISErrorResponse: EISErrorResponse =
-          EISErrorResponse(
+        val eisErrorResponse: EisErrorResponse =
+          EisErrorResponse(
             errorDetail = ErrorDetail(
               errorCode = Some("400"),
               errorMessage = Some("Invalid message : BEFORE TRANSFORMATION"),
@@ -56,13 +56,13 @@ class EISErrorResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
           )
         )
 
-        Json.toJson(eISErrorResponse) mustEqual expectedJson
-        expectedJson.validate[EISErrorResponse] mustEqual JsSuccess(eISErrorResponse)
+        Json.toJson(eisErrorResponse) mustEqual expectedJson
+        expectedJson.validate[EisErrorResponse] mustEqual JsSuccess(eisErrorResponse)
       }
 
       "with all optional fields missing" in {
-        val eISErrorResponse: EISErrorResponse =
-          EISErrorResponse(
+        val eISErrorResponse: EisErrorResponse =
+          EisErrorResponse(
             errorDetail = ErrorDetail(
               errorCode = None,
               errorMessage = None,
@@ -80,7 +80,7 @@ class EISErrorResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
         )
 
         Json.toJson(eISErrorResponse) mustEqual expectedJson
-        expectedJson.validate[EISErrorResponse] mustEqual JsSuccess(eISErrorResponse)
+        expectedJson.validate[EisErrorResponse] mustEqual JsSuccess(eISErrorResponse)
       }
 
     }

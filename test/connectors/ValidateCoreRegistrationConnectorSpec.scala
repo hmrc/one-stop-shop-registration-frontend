@@ -18,30 +18,35 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, ok, post, urlEqualTo}
-import models.core.{CoreRegistrationRequest, CoreRegistrationValidationResult, Match, MatchType, SourceType}
-import models.responses.UnexpectedResponseStatus
+import models.core._
+import models.responses.{EisError, UnexpectedResponseStatus}
 import org.scalacheck.Gen
+import org.scalatest.concurrent.PatienceConfiguration.Timeout
+import org.scalatest.time.{Seconds, Span}
 import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testutils.WireMockHelper
-import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
+import java.util.UUID
 
 class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper {
 
-  implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+  private val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
+
+  private val randomUUID = UUID.randomUUID()
+  private val timestamp = Instant.now
 
   def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/validateCoreRegistration"
 
   private def application: Application =
     applicationBuilder()
       .configure("microservice.services.core-validation.port" -> server.port)
+      .configure("microservice.services.core-validation.authorizationToken" -> "auth-token")
       .build()
 
-  val validCoreRegistrationResponse: CoreRegistrationValidationResult =
+  private val validCoreRegistrationResponse: CoreRegistrationValidationResult =
     CoreRegistrationValidationResult(
       searchId = "12345678",
       searchIdIntermediary = Some("12345678"),
@@ -66,10 +71,6 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
     "must return Right(CoreRegistrationValidationResult) when the server returns OK for a recognised payload" in {
 
-      val vrn = Vrn("111111111")
-
-      val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
-
       val validateCoreRegistration = validCoreRegistrationResponse
 
       val responseJson = Json.prettyPrint(Json.toJson(validateCoreRegistration))
@@ -88,11 +89,51 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       }
     }
 
-    "must return Left(UnexpectedStatus) when the server returns another error code" in {
+    "must return an expected response when the server returns a parsable error" in {
 
-      val vrn = Vrn("111111111")
+      val status = Gen.oneOf(
+        BAD_REQUEST,
+        NOT_FOUND,
+        METHOD_NOT_ALLOWED,
+        NOT_ACCEPTABLE,
+        UNSUPPORTED_MEDIA_TYPE,
+        INTERNAL_SERVER_ERROR,
+        BAD_GATEWAY,
+        SERVICE_UNAVAILABLE
+      ).sample.value
 
-      val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
+      val errorResponseJson =
+        s"""{"errorDetail": {
+           |    "errorCode": "$status",
+           |    "errorMessage": "Error",
+           |    "source": "EIS",
+           |    "timestamp": "$timestamp",
+           |    "correlationId": "$randomUUID"
+           |}}""".stripMargin
+
+
+      server.stubFor(
+        post(urlEqualTo(s"$getValidateCoreRegistrationUrl"))
+          .willReturn(aResponse()
+            .withStatus(status)
+            .withBody(errorResponseJson)
+          )
+      )
+
+      running(application) {
+
+        val connector = application.injector.instanceOf[ValidateCoreRegistrationConnector]
+
+        val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
+
+        val expectedResponse = EisError(EisErrorResponse(ErrorDetail(Some(s"$status"), Some("Error"), Some("EIS"), timestamp, randomUUID)))
+
+        result mustBe Left(expectedResponse)
+
+      }
+    }
+
+    "must return an expected response when the server returns with an empty body" in {
 
       val status = Gen.oneOf(
         BAD_REQUEST,
@@ -112,6 +153,49 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       )
 
       running(application) {
+
+        val connector = application.injector.instanceOf[ValidateCoreRegistrationConnector]
+
+        val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
+
+        val errorResponse = result.left.get.asInstanceOf[EisError].eISErrorResponse.errorDetail
+
+        val expectedResponse = EisError(
+          EisErrorResponse(
+            ErrorDetail(
+              Some(s"$status"),
+              Some("The response body was empty"),
+              None,
+              errorResponse.timestamp,
+              errorResponse.correlationId
+            )
+          ))
+
+        result mustBe Left(expectedResponse)
+      }
+    }
+
+    "must return Left(UnexpectedStatus) when the server returns another error code" in {
+
+      val status = Gen.oneOf(
+        BAD_REQUEST,
+        NOT_FOUND,
+        METHOD_NOT_ALLOWED,
+        NOT_ACCEPTABLE,
+        UNSUPPORTED_MEDIA_TYPE,
+        INTERNAL_SERVER_ERROR,
+        BAD_GATEWAY,
+        SERVICE_UNAVAILABLE
+      ).sample.value
+
+      server.stubFor(
+        post(urlEqualTo(s"$getValidateCoreRegistrationUrl"))
+          .willReturn(aResponse()
+            .withStatus(status)
+            .withBody("{}"))
+      )
+
+      running(application) {
         val connector = application.injector.instanceOf[ValidateCoreRegistrationConnector]
 
         val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
@@ -120,6 +204,40 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
           UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
       }
     }
+
+    "must return an Eis Error when the server returns an Http Exception" in {
+
+      val timeout = 30
+
+      val status = Gen.oneOf(
+        BAD_REQUEST,
+        NOT_FOUND,
+        METHOD_NOT_ALLOWED,
+        NOT_ACCEPTABLE,
+        UNSUPPORTED_MEDIA_TYPE,
+        INTERNAL_SERVER_ERROR,
+        BAD_GATEWAY,
+        SERVICE_UNAVAILABLE
+      ).sample.value
+
+      server.stubFor(
+        post(urlEqualTo(s"$getValidateCoreRegistrationUrl"))
+          .willReturn(aResponse()
+            .withStatus(status))
+      )
+
+      running(application) {
+
+        val connector = application.injector.instanceOf[ValidateCoreRegistrationConnector]
+
+        whenReady(connector.validateCoreRegistration(coreRegistrationRequest), Timeout(Span(timeout, Seconds))) {
+          exp =>
+            exp.isLeft mustBe true
+            exp.left.get mustBe a[EisError]
+        }
+      }
+    }
+
   }
 
 }
