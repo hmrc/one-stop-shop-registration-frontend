@@ -17,9 +17,9 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
-import forms.previousRegistrations.PreviousSchemeFormProvider
+import forms.previousRegistrations.{PreviousSchemeFormProvider, PreviousSchemeTypeFormProvider}
 import models.{Index, Mode}
-import pages.previousRegistrations.PreviousSchemePage
+import pages.previousRegistrations.{PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class PreviousSchemeController @Inject()(
                                               override val messagesApi: MessagesApi,
                                               cc: AuthenticatedControllerComponents,
-                                              formProvider: PreviousSchemeFormProvider,
+                                              formProvider: PreviousSchemeTypeFormProvider,
                                               view: PreviousSchemeView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -41,7 +41,7 @@ class PreviousSchemeController @Inject()(
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(PreviousSchemePage(index)) match {
+      val preparedForm = request.userAnswers.get(PreviousSchemeTypePage(index)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -58,9 +58,9 @@ class PreviousSchemeController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousSchemePage(index), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousSchemeTypePage(index), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(PreviousSchemePage(index).navigate(mode, updatedAnswers))
+          } yield Redirect(PreviousSchemeTypePage(index).navigate(mode, updatedAnswers))
       )
   }
 }

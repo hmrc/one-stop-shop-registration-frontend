@@ -17,10 +17,9 @@
         }
 
         @govukRadios(
-            RadiosViewModel(
+            RadiosViewModel.yesNo(
                 field  = form("value"),
                 legend = LegendViewModel(messages("previousIossScheme.heading")).asPageHeading(),
-                items  = PreviousScheme.iossOptions
             )
         )
 

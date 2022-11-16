@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 class PreviousIossSchemeFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[PreviousScheme] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> enumerable[PreviousScheme]("previousIossScheme.error.required")
+      "value" -> boolean("previousIossScheme.error.required")
     )
 }

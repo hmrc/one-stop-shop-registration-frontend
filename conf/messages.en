@@ -388,10 +388,10 @@ previousEuCountry.heading = Which country did your business register in?
 previousEuCountry.error.required = Select an EU country
 previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
-previousEuVatNumber.title = What was your VAT registration number for {0}?
-previousEuVatNumber.heading = What was your VAT registration number for {0}?
-previousEuVatNumber.error.required = Enter your VAT registration number for {0}
-previousEuVatNumber.error.invalid = Enter a VAT registration number in the correct format
+previousOssNumber.title = Enter your registration number for {0}?
+previousOssNumber.heading = Enter your registration number for {0}?
+previousOssNumber.error.required = Enter your registration number for {0}
+previousOssNumber.error.invalid = Enter a VAT registration number in the correct format
 
 previouslyRegistered.title = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.heading = Has your business ever registered for a One Stop Shop scheme in an EU country?
@@ -406,6 +406,8 @@ previousScheme.ossu = One Stop Shop Union
 previousScheme.ossnu = One Stop Shop non-Union
 previousScheme.iosswoi = Import One Stop Shop without intermediary
 previousScheme.iosswi = Import One Stop Shop with intermediary
+previousScheme.oss = One Stop Shop
+previousScheme.ioss = Import One Stop Shop
 previousScheme.checkYourAnswersLabel = Previous Scheme
 previousScheme.error.required = Select which scheme did your business register for
 previousScheme.change.hidden = which scheme did your business register for
@@ -415,6 +417,13 @@ previousIossScheme.heading = Was this with intermediary?
 previousIossScheme.checkYourAnswersLabel = previousIossScheme
 previousIossScheme.error.required = Select yes if this was with intermediary
 previousIossScheme.change.hidden = if this was with intermediary
+
+previousIossNumber.title = previousIossNumber
+previousIossNumber.heading = previousIossNumber
+previousIossNumber.checkYourAnswersLabel = previousIossNumber
+previousIossNumber.error.required = Enter previousIossNumber
+previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
+previousIossNumber.change.hidden = PreviousIossNumber
 
 deletePreviousRegistration.title = Are you sure you need to remove the deregistration for {0}?
 deletePreviousRegistration.heading = Are you sure you need to remove the deregistration for {0}?
@@ -703,13 +712,6 @@ euSendGoodsAddress.error.stateOrRegion.format = State or region must only includ
 euSendGoodsAddress.error.postCode.length = Postcode must be 50 characters or less
 euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
 euSendGoodsAddress.change.hidden = EuSendGoodsAddress
-
-previousIossNumber.title = previousIossNumber
-previousIossNumber.heading = previousIossNumber
-previousIossNumber.checkYourAnswersLabel = previousIossNumber
-previousIossNumber.error.required = Enter previousIossNumber
-previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
-previousIossNumber.change.hidden = PreviousIossNumber
 
 emailVerificationCodesAndEmailsExceeded.title = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.heading = You''ve tried too many email addresses

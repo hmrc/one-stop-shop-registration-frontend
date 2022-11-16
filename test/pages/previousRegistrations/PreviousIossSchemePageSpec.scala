@@ -17,10 +17,12 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import models.PreviousScheme
+import models.{Index, NormalMode, PreviousScheme}
 import pages.behaviours.PageBehaviours
 
 class PreviousIossSchemePageSpec extends SpecBase with PageBehaviours {
+
+  private val index = Index(0)
 
   "PreviousIossSchemePage" - {
 
@@ -29,5 +31,20 @@ class PreviousIossSchemePageSpec extends SpecBase with PageBehaviours {
     beSettable[PreviousScheme](PreviousIossSchemePage)
 
     beRemovable[PreviousScheme](PreviousIossSchemePage)
+
+    "must navigate in Normal mode" - {
+
+      "to IOSS scheme number with intermediary when true" in {
+
+        PreviousIossSchemePage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index))
+      }
+
+      "to IOSS scheme number without intermediary when false" in {
+
+        PreviousIossSchemePage(index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index))
+      }
+    }
   }
 }
