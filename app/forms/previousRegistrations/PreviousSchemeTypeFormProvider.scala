@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package pages.previousRegistrations
+package forms.previousRegistrations
 
-import models.{Index, UserAnswers}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import forms.mappings.Mappings
+import models.{PreviousScheme, PreviousSchemeType}
+import play.api.data.Form
 
-case class PreviousIossSchemePage(index: Index) extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class PreviousSchemeTypeFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "previousIossScheme"
-
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = super.navigateInNormalMode(answers)
-
+  def apply(): Form[PreviousSchemeType] =
+    Form(
+      "value" -> enumerable[PreviousSchemeType]("previousSchemePage.error.required")
+    )
 }

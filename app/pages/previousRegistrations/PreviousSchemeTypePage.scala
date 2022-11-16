@@ -16,17 +16,24 @@
 
 package pages.previousRegistrations
 
-import models.{Index, UserAnswers}
+import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.{CheckMode, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class PreviousIossSchemePage(index: Index) extends QuestionPage[Boolean] {
+case class PreviousSchemeTypePage(index: Index) extends QuestionPage[PreviousSchemeType] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ toString
 
-  override def toString: String = "previousIossScheme"
+  override def toString: String = "previousSchemeType"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = super.navigateInNormalMode(answers)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    if(answers.get(this).contains(PreviousSchemeType.OSS)) {
+      prevRegRoutes.PreviousOssNumberController.onPageLoad(NormalMode, index)
+    } else {
+      prevRegRoutes.PreviousIossSchemeController.onPageLoad(NormalMode)
+    }
+  }
 
 }
