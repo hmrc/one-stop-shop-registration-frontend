@@ -40,7 +40,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
   }
 
   def searchEuTaxId(euTaxReference: String, countryCode: String)
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
+                   (implicit ec: ExecutionContext): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUTraderId.toString, None, euTaxReference, None, countryCode)
 
@@ -53,7 +53,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
   }
 
   def searchEuVrn(euVrn: String, countryCode: String)
-                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
+                 (implicit ec: ExecutionContext): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, euVrn, None, countryCode)
 
