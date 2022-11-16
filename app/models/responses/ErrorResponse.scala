@@ -16,6 +16,8 @@
 
 package models.responses
 
+import models.core.EisErrorResponse
+
 sealed trait ErrorResponse {
   val body: String
 }
@@ -30,6 +32,15 @@ case object NotFound extends ErrorResponse {
 
 case object ConflictFound extends ErrorResponse {
   override val body = "Conflict"
+}
+
+case class EisError(eISErrorResponse: EisErrorResponse) extends ErrorResponse {
+  override val body: String =
+    s"${eISErrorResponse.errorDetail.timestamp} " +
+    s"${eISErrorResponse.errorDetail.correlationId} " +
+    s"${eISErrorResponse.errorDetail.errorCode} " +
+    s"${eISErrorResponse.errorDetail.errorMessage} " +
+    s"${eISErrorResponse.errorDetail.source}"
 }
 
 case class UnexpectedResponseStatus(status: Int, body: String) extends ErrorResponse

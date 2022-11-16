@@ -62,7 +62,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
 
       val vrn = Vrn("333333333")
 
-      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
+      when(connector.validateCoreRegistration(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
@@ -76,7 +76,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val vrn = Vrn("333333333")
 
       val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
-      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
+      when(connector.validateCoreRegistration(any())) thenReturn Future.successful(Right(expectedResponse))
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 

@@ -20,15 +20,13 @@ import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
 import models.core.{CoreRegistrationRequest, Match, SourceType}
 import uk.gov.hmrc.domain.Vrn
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistrationConnector) extends Logging {
 
-  def searchUkVrn(vrn: Vrn)
-                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Match]] = {
+  def searchUkVrn(vrn: Vrn)(implicit ec: ExecutionContext): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 

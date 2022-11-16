@@ -77,7 +77,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(genericMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(genericMatch))
 
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -107,7 +107,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
 
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -136,7 +136,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
           running(app) {
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some("10/10/2022"))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -166,7 +166,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
           running(app) {
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some("10/10/2022"))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -197,7 +197,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
               exclusionEffectiveDate = Some("10/10/2022"), exclusionStatusCode = Some(4))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -225,7 +225,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
       running(app) {
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(None)
 
         val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
         val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
