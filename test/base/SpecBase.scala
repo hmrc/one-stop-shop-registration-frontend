@@ -126,7 +126,16 @@ trait SpecBase
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) ={
+  def getCYAVatRegistrationDetailsSummaryList(answers: UserAnswers)(implicit msgs: Messages) = {
+    Seq(
+      VatRegistrationDetailsSummary.rowBusinessName(answers),
+      VatRegistrationDetailsSummary.rowPartOfVatUkGroup(answers),
+      VatRegistrationDetailsSummary.rowUkVatRegistrationDate(answers),
+      VatRegistrationDetailsSummary.rowBusinessAddress(answers)
+    ).flatten
+  }
+
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) = {
     Seq(
       new HasTradingNameSummary().row(answers),
       HasMadeSalesSummary.row(answers),

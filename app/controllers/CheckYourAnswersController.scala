@@ -62,6 +62,15 @@ class CheckYourAnswersController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail() {
     implicit request =>
+      val vatRegistrationDetailsList = SummaryListViewModel(
+        rows = Seq(
+          VatRegistrationDetailsSummary.rowBusinessName(request.userAnswers),
+          VatRegistrationDetailsSummary.rowPartOfVatUkGroup(request.userAnswers),
+          VatRegistrationDetailsSummary.rowUkVatRegistrationDate(request.userAnswers),
+          VatRegistrationDetailsSummary.rowBusinessAddress(request.userAnswers)
+        ).flatten
+      )
+
       val list = SummaryListViewModel(
         rows = Seq(
           new HasTradingNameSummary().row(request.userAnswers),
@@ -87,7 +96,7 @@ class CheckYourAnswersController @Inject()(
       )
 
       val isValid = validate()
-      Ok(view(list, isValid))
+      Ok(view(vatRegistrationDetailsList, list, isValid))
   }
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData().async {

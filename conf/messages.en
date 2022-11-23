@@ -46,6 +46,7 @@ error.summary.title = There is a problem
 
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
+checkYourAnswers.details.Heading = One Stop Shop details
 checkYourAnswers.info = By registering for this scheme, you confirm that the information you are providing is correct and complete.
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
@@ -637,3 +638,10 @@ otherCountryExcludedAndQuarantined.heading = You cannot register for the One Sto
 otherCountryExcludedAndQuarantined.blocked.message = {0} has blocked your account from One Stop Shop services until {1}.
 otherCountryExcludedAndQuarantined.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 otherCountryExcludedAndQuarantined.returnBTA = <a class="govuk-link" href="/business-account">Return to your BTA account</a>
+
+vatRegistrationDetails.checkYourAnswers.heading = VAT registration details
+vatRegistrationDetails.checkYourAnswers.organisationName = Business name
+vatRegistrationDetails.checkYourAnswers.partOfVatUkGroup = Part of a VAT UK group
+vatRegistrationDetails.checkYourAnswers.vatRegistrationDate = UK VAT registration date
+vatRegistrationDetails.checkYourAnswers.businessAddress = Business address
+vatRegistrationDetails.checkYourAnswers.manageVatBTA = <a class="govuk-link" href="/business-account">Manage your VAT registration in your BTA account</a>
