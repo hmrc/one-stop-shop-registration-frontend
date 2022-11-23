@@ -20,12 +20,14 @@ sm --start ONE_STOP_SHOP_ALL -r
 ```
 
 ### To run the application locally execute the following:
+
+The service needs to run in testOnly mode in order to access the testOnly get-passcodes endpoint which will generate a passcode for email verification.
 ```
 sm --stop ONE_STOP_SHOP_REGISTRATION_FRONTEND
 ```
 and 
 ```
-sbt 'run 10200'
+sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes
 ```
 
 ### Running correct version of mongo
@@ -76,7 +78,25 @@ To successfully register go through the journey providing the answers as follows
   ![image](https://user-images.githubusercontent.com/48218839/145986873-fbae18cd-ce3d-46fa-aa10-c9d51aa0cabc.png)
 
   7.
-  ![image](https://user-images.githubusercontent.com/48218839/145987158-977dac92-15bb-40e5-84b1-835f836b020f.png)
+  After clicking continue on the Contact details page, you will see the email verification page.
+  ![image](https://user-images.githubusercontent.com/36073378/203574815-a6fdba3a-59aa-41a7-827f-58b5382af95c.png)
+
+Open a new tab and paste this url:
+  8. 
+  ```
+  /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-passcodes
+  ```
+
+  This will generate a passcode to enter into the email verification page.
+  ![image](https://user-images.githubusercontent.com/36073378/203574977-a8298624-bc88-4090-8e8f-4b9d2be0abf4.png)
+
+Once you have pasted/entered the passcode into the input box on the email verification page and clicked continue and the email verification is successful,
+you will need to change the port in the url back to 10200 in order to redirect to the bank details page.
+  9.
+  ![image](https://user-images.githubusercontent.com/36073378/203573868-4809d4c5-8728-4b2f-bcce-3d8ad8f0e2c3.png)
+
+  10.
+  ![image](https://user-images.githubusercontent.com/36073378/203574605-b3a54885-bf3f-45e0-b58c-9c2d7b0cfa4d.png)
 
 Unit and Integration Tests
 ------------
