@@ -148,14 +148,14 @@ businessContactDetails.error.emailAddress.invalid = Enter an email address in th
 businessContactDetails.fullName.change.hidden = Full name
 businessContactDetails.change.hidden = your business contact details
 
-euVatDetails.checkYourAnswersLabel = EU tax details
-euVatDetails.change.hidden = EU tax registration details
+euVatDetails.checkYourAnswersLabel = EU tax details added
+euVatDetails.change.hidden = EU tax registration details added
 
 websites.checkYourAnswersLabel = Website addresses
 websites.change.hidden = website addresses
 
-tradingNames.checkYourAnswersLabel = UK trading names
-tradingNames.change.hidden = UK trading names
+tradingNames.checkYourAnswersLabel = Other trading names
+tradingNames.change.hidden = Other trading names
 
 notInControlOfMovingGoods.title = You cannot register
 notInControlOfMovingGoods.heading = You cannot register
@@ -457,9 +457,9 @@ sellsGoodsFromNi.error.required = Select yes if your business will sell goods fr
 
 taxRegisteredInEu.title = Is your business registered for VAT or other taxes in EU countries
 taxRegisteredInEu.heading = Is your business registered for VAT or other taxes in EU countries?
-taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in EU countries
+taxRegisteredInEu.checkYourAnswersLabel = Registered for tax in other EU countries
 taxRegisteredInEu.error.required = Select yes if your business is registered for VAT or other taxes in EU countries
-taxRegisteredInEu.change.hidden = if registered for tax in EU countries
+taxRegisteredInEu.change.hidden = if registered for tax in other EU countries
 
 updateVatDetails.title = Update your VAT details
 updateVatDetails.heading = Update your VAT details

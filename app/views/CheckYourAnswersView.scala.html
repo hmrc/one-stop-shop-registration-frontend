@@ -39,9 +39,15 @@
 
         <h2 class="govuk-heading-m">@messages("vatRegistrationDetails.checkYourAnswers.heading")</h2>
 
-        @govukSummaryList(vatRegistrationDetailsList)
+        @govukSummaryList(
+            SummaryListViewModel(
+                vatRegistrationDetailsList.rows
+            ).withCssClass("govuk-body govuk-!-margin-bottom-9")
+        )
 
-        <p class="govuk-body">@Html(messages("vatRegistrationDetails.checkYourAnswers.manageVatBTA"))</p>
+        <p class="govuk-body govuk-!-margin-bottom-9">
+            @Html(messages("vatRegistrationDetails.checkYourAnswers.manageVatBTA"))
+        </p>
 
         <h2 class="govuk-heading-m">@messages("checkYourAnswers.details.Heading")</h2>
 
