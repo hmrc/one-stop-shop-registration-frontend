@@ -32,7 +32,7 @@ case class PreviousSchemeTypePage(index: Index) extends QuestionPage[PreviousSch
     if(answers.get(this).contains(PreviousSchemeType.OSS)) {
       prevRegRoutes.PreviousOssNumberController.onPageLoad(NormalMode, index)
     } else {
-      prevRegRoutes.PreviousIossSchemeController.onPageLoad(NormalMode)
+      prevRegRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, index)
     }
   }
 

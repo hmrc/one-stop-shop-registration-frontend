@@ -17,16 +17,16 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import models.{CheckMode, UserAnswers}
-import pages.previousRegistrations.PreviousSchemePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.govuk.summarylist._
+import viewmodels.implicits._
 
 object PreviousSchemeSummary {
 
-/* TODO
  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllPreviousRegistrationsQuery).map {
       answer =>
@@ -40,10 +40,7 @@ object PreviousSchemeSummary {
         SummaryListRowViewModel(
           key = "previousScheme.checkYourAnswersLabel",
           value = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("previousScheme.change.hidden"))
-          )
+          actions = Seq()
         )
-    }*/
+    }
 }

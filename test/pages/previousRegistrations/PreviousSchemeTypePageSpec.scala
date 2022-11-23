@@ -36,14 +36,18 @@ class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
 
       "to OSS scheme number when OSS is selected" in {
 
-        PreviousOssNumberPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(NormalMode))
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index), PreviousSchemeType.OSS).success.value
+
+        PreviousSchemeTypePage(index).navigate(NormalMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(NormalMode, index))
       }
 
       "to IOSS scheme when IOSS is selected" in {
 
-        PreviousOssNumberPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(NormalMode))
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index), PreviousSchemeType.IOSS).success.value
+
+        PreviousSchemeTypePage(index).navigate(NormalMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(NormalMode, index))
       }
     }
   }

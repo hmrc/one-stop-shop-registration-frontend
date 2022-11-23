@@ -166,9 +166,9 @@ GET         /check-previous-country/:index                            controller
 POST        /check-previous-country/:index                            controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /previous-oss-scheme-number/:index                        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /previous-oss-eu-vat-number/:index                        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+POST        /previous-oss-scheme-number/:index                        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-deregistered-scheme-number/:index                  controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-deregistered-scheme-number/:index                  controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /previous-scheme/:index                                   controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /previous-scheme/:index                                   controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -180,15 +180,20 @@ POST        /previous-oss                                             controller
 GET         /check-previous-oss                                       controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-previous-oss                                       controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)
 
-GET         /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode)
-POST        /previous-ioss-scheme                                     controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode)
-GET         /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-previous-ioss-scheme                               controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode)
+GET         /previous-ioss-scheme/:index                              controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-ioss-scheme/:index                              controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-previous-ioss-scheme/:index                        controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-previous-ioss-scheme/:index                        controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode, index: Index)
 
-GET         /previous-ioss-number                                     controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = NormalMode)
-POST        /previous-ioss-number                                     controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = NormalMode)
-GET         /check-previous-ioss-number                               controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-previous-ioss-number                               controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = CheckMode)
+GET         /previous-ioss-number/:index                              controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-ioss-number/:index                              controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-previous-ioss-number/:index                        controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-previous-ioss-number/:index                        controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /previous-scheme-answer/:index                            controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-scheme-answer/:index                            controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-previous-scheme-answer/:index                      controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-previous-scheme-answer/:index                      controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
 
 GET         /remove-deregistration/:index                             controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-deregistration/:index                             controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)

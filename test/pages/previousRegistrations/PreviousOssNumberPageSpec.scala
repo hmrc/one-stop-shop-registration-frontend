@@ -38,7 +38,7 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
       "to Add Previous Registration" in {
 
         PreviousOssNumberPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
+          .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index))
       }
     }
 
@@ -48,7 +48,7 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswers.set(PreviousOssNumberPage(index), "123").success.value
         PreviousOssNumberPage(index).navigate(CheckMode, answers)
-          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
+          .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index))
       }
     }
   }

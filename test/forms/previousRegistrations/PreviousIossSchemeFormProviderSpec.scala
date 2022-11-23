@@ -16,11 +16,11 @@
 
 package forms.previousRegistrations
 
-import forms.behaviours.OptionFieldBehaviours
+import forms.behaviours.BooleanFieldBehaviours
 import models.PreviousScheme
 import play.api.data.FormError
 
-class PreviousIossSchemeFormProviderSpec extends OptionFieldBehaviours {
+class PreviousIossSchemeFormProviderSpec extends BooleanFieldBehaviours {
 
   val form = new PreviousIossSchemeFormProvider()()
 
@@ -29,11 +29,10 @@ class PreviousIossSchemeFormProviderSpec extends OptionFieldBehaviours {
     val fieldName = "value"
     val requiredKey = "previousIossScheme.error.required"
 
-    behave like optionsField[PreviousScheme](
+    behave like booleanField(
       form,
       fieldName,
-      validValues  = PreviousScheme.iossValues,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, "error.boolean")
     )
 
     behave like mandatoryField(

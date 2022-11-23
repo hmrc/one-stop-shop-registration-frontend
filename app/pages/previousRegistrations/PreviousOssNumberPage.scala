@@ -29,8 +29,8 @@ case class PreviousOssNumberPage(index: Index) extends QuestionPage[String] {
   override def toString: String = "previousOssNumber"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode)
+    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode)
+    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index)
 }
