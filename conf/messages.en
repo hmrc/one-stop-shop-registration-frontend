@@ -423,10 +423,10 @@ previousIossScheme.checkYourAnswersLabel = previousIossScheme
 previousIossScheme.error.required = Select yes if this was with intermediary
 previousIossScheme.change.hidden = if this was with intermediary
 
-previousIossNumber.title = previousIossNumber
-previousIossNumber.heading = previousIossNumber
-previousIossNumber.checkYourAnswersLabel = previousIossNumber
-previousIossNumber.error.required = Enter previousIossNumber
+previousIossNumber.title = Enter your IOSS registration numbers for {0}
+previousIossNumber.heading = Enter your IOSS registration numbers for {0}
+previousIossNumber.checkYourAnswersLabel = Registration number
+previousIossNumber.error.required = Enter your IOSS registration number
 previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
 previousIossNumber.change.hidden = PreviousIossNumber
 

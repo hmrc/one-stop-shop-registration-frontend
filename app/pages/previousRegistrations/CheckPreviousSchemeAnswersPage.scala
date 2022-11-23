@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package pages.previousRegistrations
 
-import base.SpecBase
-import models.Index
-import pages.behaviours.PageBehaviours
-import pages.previousRegistrations.PreviousIossNumberPage
+import models.{CheckMode, Index, NormalMode, UserAnswers}
+import pages.Page
+import play.api.mvc.Call
 
-class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
+case object CheckPreviousSchemeAnswersPage extends Page {
 
-  private val index = Index(0)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, Index(0)) //TODO index
 
-  "PreviousIossNumberPage" - {
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(CheckMode, Index(0))
 
-    beRetrievable[String](PreviousIossNumberPage(index))
-
-    beSettable[String](PreviousIossNumberPage(index))
-
-    beRemovable[String](PreviousIossNumberPage(index))
-  }
 }

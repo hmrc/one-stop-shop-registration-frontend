@@ -39,7 +39,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new PreviousOssNumberFormProvider()
   private val form = formProvider(country)
 
-  private lazy val previousEuVatNumberRoute = routes.PreviousOssNumberController.onPageLoad(NormalMode, index).url
+  private lazy val previousOssNumberRoute = routes.PreviousOssNumberController.onPageLoad(NormalMode, index).url
 
   private val baseAnswers = basicUserAnswersWithVatInfo.set(PreviousEuCountryPage(index), country).success.value
 
@@ -51,7 +51,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousOssNumberRoute)
 
         val result = route(application, request).value
 
@@ -69,7 +69,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousOssNumberRoute)
 
         val view = application.injector.instanceOf[PreviousOssNumberView]
 
@@ -93,7 +93,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuVatNumberRoute)
+          FakeRequest(POST, previousOssNumberRoute)
             .withFormUrlEncodedBody(("value", "12345678"))
 
         val result = route(application, request).value
@@ -111,7 +111,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuVatNumberRoute)
+          FakeRequest(POST, previousOssNumberRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -130,7 +130,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousOssNumberRoute)
 
         val result = route(application, request).value
 
@@ -144,7 +144,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
-        val request = FakeRequest(GET, previousEuVatNumberRoute)
+        val request = FakeRequest(GET, previousOssNumberRoute)
 
         val result = route(application, request).value
 
@@ -159,7 +159,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, previousEuVatNumberRoute)
+          FakeRequest(POST, previousOssNumberRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value

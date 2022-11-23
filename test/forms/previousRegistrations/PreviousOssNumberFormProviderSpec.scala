@@ -23,8 +23,8 @@ import play.api.data.FormError
 
 class PreviousOssNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "previousEuVatNumber.error.required"
-  val invalidKey = "previousEuVatNumber.error.invalid"
+  val requiredKey = "previousOssNumber.error.required"
+  val invalidKey = "previousOssNumber.error.invalid"
   val validData = "DE+854123"
   val validLowerCaseData = "de+854123"
   val maxLength = 12

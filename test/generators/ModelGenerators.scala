@@ -30,9 +30,14 @@ import java.time.Instant
 
 trait ModelGenerators {
 
-  implicit lazy val arbitraryPreviousSchemePage: Arbitrary[PreviousScheme] =
+  implicit lazy val arbitraryPreviousScheme: Arbitrary[PreviousScheme] =
     Arbitrary {
       Gen.oneOf(PreviousScheme.values.toSeq)
+    }
+
+  implicit lazy val arbitraryPreviousSchemeType: Arbitrary[PreviousSchemeType] =
+    Arbitrary {
+      Gen.oneOf(PreviousSchemeType.values.toSeq)
     }
 
   implicit lazy val arbitrarySalesChannels: Arbitrary[SalesChannels] =

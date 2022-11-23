@@ -24,17 +24,17 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCount
 
 trait PageGenerators {
 
-  implicit lazy val arbitraryPreviousIossNumberPage: Arbitrary[PreviousIossNumberPage.type] =
-    Arbitrary(PreviousIossNumberPage)
+  implicit lazy val arbitraryPreviousIossNumberPage: Arbitrary[PreviousIossNumberPage] =
+    Arbitrary(PreviousIossNumberPage(Index(0)))
 
-  implicit lazy val arbitraryPreviousIossSchemePage: Arbitrary[PreviousIossSchemePage.type] =
-    Arbitrary(PreviousIossSchemePage)
+  implicit lazy val arbitraryPreviousIossSchemePage: Arbitrary[PreviousIossSchemePage] =
+    Arbitrary(PreviousIossSchemePage(Index(0)))
 
-  implicit lazy val arbitraryPreviousSchemePage: Arbitrary[PreviousSchemePage.type] =
-    Arbitrary(PreviousSchemePage)
+  implicit lazy val arbitraryPreviousSchemePage: Arbitrary[PreviousSchemePage] =
+    Arbitrary(PreviousSchemePage(Index(0)))
 
-  implicit lazy val arbitraryPreviousSchemeTypePage: Arbitrary[PreviousSchemeTypePage.type] =
-    Arbitrary(PreviousSchemeTypePage)
+  implicit lazy val arbitraryPreviousSchemeTypePage: Arbitrary[PreviousSchemeTypePage] =
+    Arbitrary(PreviousSchemeTypePage(Index(0)))
 
   implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage] =
     Arbitrary(euDetails.EuSendGoodsPage(Index(0)))

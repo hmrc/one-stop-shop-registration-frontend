@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import pages.previousRegistrations.PreviousIossNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -26,15 +26,15 @@ import viewmodels.implicits._
 
 object PreviousIossNumberSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PreviousIossNumberPage).map {
+  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(PreviousIossNumberPage(index)).map {
       answer =>
 
         SummaryListRowViewModel(
           key     = "previousIossNumber.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, index).url)
               .withVisuallyHiddenText(messages("previousIossNumber.change.hidden"))
           )
         )

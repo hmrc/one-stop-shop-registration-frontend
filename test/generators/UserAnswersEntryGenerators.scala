@@ -21,32 +21,40 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviouslyRegisteredPage, PreviousSchemePage}
+import pages.previousRegistrations._
 import play.api.libs.json.{Json, JsValue}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
-  implicit lazy val arbitraryPreviousIossNumberUserAnswersEntry: Arbitrary[(PreviousIossNumberPage.type, JsValue)] =
+  implicit lazy val arbitraryPreviousIossNumberUserAnswersEntry: Arbitrary[(PreviousIossNumberPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[PreviousIossNumberPage.type]
+        page  <- arbitrary[PreviousIossNumberPage]
         value <- arbitrary[String].suchThat(_.nonEmpty).map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryPreviousIossSchemeUserAnswersEntry: Arbitrary[(PreviousIossSchemePage.type, JsValue)] =
+  implicit lazy val arbitraryPreviousIossSchemeUserAnswersEntry: Arbitrary[(PreviousIossSchemePage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[PreviousIossSchemePage.type]
-        value <- arbitrary[PreviousScheme].suchThat(PreviousScheme.iossValues.contains).map(Json.toJson(_))
+        page  <- arbitrary[PreviousIossSchemePage]
+        value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryPreviousSchemePageUserAnswersEntry: Arbitrary[(PreviousSchemePage.type, JsValue)] =
+  implicit lazy val arbitraryPreviousSchemePageUserAnswersEntry: Arbitrary[(PreviousSchemePage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[PreviousSchemePage.type]
+        page  <- arbitrary[PreviousSchemePage]
         value <- arbitrary[PreviousScheme].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryPreviousSchemeTypePageUserAnswersEntry: Arbitrary[(PreviousSchemeTypePage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[PreviousSchemeTypePage]
+        value <- arbitrary[PreviousSchemeType].map(Json.toJson(_))
       } yield (page, value)
     }
 
