@@ -151,8 +151,8 @@ businessContactDetails.change.hidden = your business contact details
 euVatDetails.checkYourAnswersLabel = EU tax details added
 euVatDetails.change.hidden = EU tax registration details added
 
-websites.checkYourAnswersLabel = Website addresses
-websites.change.hidden = website addresses
+websites.checkYourAnswersLabel = Trading websites
+websites.change.hidden = Trading websites
 
 tradingNames.checkYourAnswersLabel = Other trading names
 tradingNames.change.hidden = Other trading names
@@ -641,7 +641,7 @@ otherCountryExcludedAndQuarantined.returnBTA = <a class="govuk-link" href="/busi
 
 vatRegistrationDetails.checkYourAnswers.heading = VAT registration details
 vatRegistrationDetails.checkYourAnswers.organisationName = Business name
-vatRegistrationDetails.checkYourAnswers.partOfVatUkGroup = Part of a VAT UK group
+vatRegistrationDetails.checkYourAnswers.partOfVatGroup = Part of a VAT group
 vatRegistrationDetails.checkYourAnswers.vatRegistrationDate = UK VAT registration date
 vatRegistrationDetails.checkYourAnswers.businessAddress = Business address
 vatRegistrationDetails.checkYourAnswers.manageVatBTA = <a class="govuk-link" href="/business-account">Manage your VAT registration in your BTA account</a>

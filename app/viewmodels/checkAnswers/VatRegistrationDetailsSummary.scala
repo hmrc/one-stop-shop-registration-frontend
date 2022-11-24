@@ -46,7 +46,7 @@ object VatRegistrationDetailsSummary {
         val value = if (answer.partOfVatGroup) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key = "vatRegistrationDetails.checkYourAnswers.partOfVatUkGroup",
+          key = "vatRegistrationDetails.checkYourAnswers.partOfVatGroup",
           value = ValueViewModel(value)
         )
     }
