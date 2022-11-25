@@ -26,28 +26,28 @@ class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
 
   "PreviousSchemePage" - {
 
-    beRetrievable[PreviousSchemeType](PreviousSchemeTypePage(index))
+    beRetrievable[PreviousSchemeType](PreviousSchemeTypePage(index, index))
 
-    beSettable[PreviousSchemeType](PreviousSchemeTypePage(index))
+    beSettable[PreviousSchemeType](PreviousSchemeTypePage(index, index))
 
-    beRemovable[PreviousSchemeType](PreviousSchemeTypePage(index))
+    beRemovable[PreviousSchemeType](PreviousSchemeTypePage(index, index))
 
     "must navigate in Normal mode" - {
 
       "to OSS scheme number when OSS is selected" in {
 
-        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index), PreviousSchemeType.OSS).success.value
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.OSS).success.value
 
-        PreviousSchemeTypePage(index).navigate(NormalMode, answers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(NormalMode, index))
+        PreviousSchemeTypePage(index, index).navigate(NormalMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(NormalMode, index, index))
       }
 
       "to IOSS scheme when IOSS is selected" in {
 
-        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index), PreviousSchemeType.IOSS).success.value
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.IOSS).success.value
 
-        PreviousSchemeTypePage(index).navigate(NormalMode, answers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(NormalMode, index))
+        PreviousSchemeTypePage(index, index).navigate(NormalMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(NormalMode, index, index))
       }
     }
   }

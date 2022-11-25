@@ -42,7 +42,7 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
             emptyUserAnswers
               .set(PreviouslyRegisteredPage, true).success.value
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(PreviousOssNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousOssNumberPage(Index(0), Index(0)), "FR123").success.value
               .set(AddPreviousRegistrationPage, true).success.value
 
           AddPreviousRegistrationPage.navigate(NormalMode, answers)
@@ -56,7 +56,7 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
           val answers = emptyUserAnswers
             .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-            .set(PreviousOssNumberPage(Index(0)), "FR123").success.value
+            .set(PreviousOssNumberPage(Index(0), Index(0)), "FR123").success.value
             .set(PreviouslyRegisteredPage, true).success.value
             .set(AddPreviousRegistrationPage, false).success.value
 
@@ -85,9 +85,9 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
           val answers =
             emptyUserAnswers
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(PreviousOssNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousOssNumberPage(Index(0), Index(0)), "FR123").success.value
               .set(PreviousEuCountryPage(Index(1)), Country("ES", "Spain")).success.value
-              .set(PreviousOssNumberPage(Index(1)), "ES123").success.value
+              .set(PreviousOssNumberPage(Index(1), Index(0)), "ES123").success.value
               .set(AddPreviousRegistrationPage, true).success.value
 
           AddPreviousRegistrationPage.navigate(CheckMode, answers)
@@ -101,9 +101,9 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
           val answers = emptyUserAnswers
             .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-            .set(PreviousOssNumberPage(Index(0)), "FR123").success.value
+            .set(PreviousOssNumberPage(Index(0), Index(0)), "FR123").success.value
             .set(PreviousEuCountryPage(Index(1)), Country("ES", "Spain")).success.value
-            .set(PreviousOssNumberPage(Index(1)), "ES123").success.value
+            .set(PreviousOssNumberPage(Index(1), Index(0)), "ES123").success.value
             .set(AddPreviousRegistrationPage, false).success.value
 
           AddPreviousRegistrationPage.navigate(CheckMode, answers)

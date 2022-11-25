@@ -21,11 +21,11 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class PreviousIossNumberPage(index: Index) extends QuestionPage[String] {
+case class PreviousIossNumberPage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ toString
+  override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
 
-  override def toString: String = "previousIossNumber"
+  override def toString: String = "previousSchemeNumber"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = super.navigateInNormalMode(answers)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = super.navigateInNormalMode(answers) // TODO
 }

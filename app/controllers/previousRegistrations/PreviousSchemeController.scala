@@ -17,9 +17,9 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
-import forms.previousRegistrations.{PreviousSchemeFormProvider, PreviousSchemeTypeFormProvider}
+import forms.previousRegistrations.PreviousSchemeTypeFormProvider
 import models.{Index, Mode}
-import pages.previousRegistrations.{PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations.PreviousSchemeTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,29 +38,29 @@ class PreviousSchemeController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(PreviousSchemeTypePage(index)) match {
+      val preparedForm = request.userAnswers.get(PreviousSchemeTypePage(countryIndex, schemeIndex)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, index))
+      Ok(view(preparedForm, mode, countryIndex, schemeIndex))
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+          Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousSchemeTypePage(index), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousSchemeTypePage(countryIndex, schemeIndex), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(PreviousSchemeTypePage(index).navigate(mode, updatedAnswers))
+          } yield Redirect(PreviousSchemeTypePage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
       )
   }
 }

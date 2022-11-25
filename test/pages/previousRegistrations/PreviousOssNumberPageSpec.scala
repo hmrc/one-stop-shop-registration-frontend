@@ -27,17 +27,17 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
   "PreviousEuVatNumberPage" - {
 
-    beRetrievable[String](PreviousOssNumberPage(index))
+    beRetrievable[String](PreviousOssNumberPage(index, index))
 
-    beSettable[String](PreviousOssNumberPage(index))
+    beSettable[String](PreviousOssNumberPage(index, index))
 
-    beRemovable[String](PreviousOssNumberPage(index))
+    beRemovable[String](PreviousOssNumberPage(index, index))
 
     "must navigate in Normal mode" - {
 
       "to Add Previous Registration" in {
 
-        PreviousOssNumberPage(index).navigate(NormalMode, emptyUserAnswers)
+        PreviousOssNumberPage(index, index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index))
       }
     }
@@ -46,8 +46,8 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index), "123").success.value
-        PreviousOssNumberPage(index).navigate(CheckMode, answers)
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), "123").success.value
+        PreviousOssNumberPage(index, index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index))
       }
     }

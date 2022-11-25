@@ -26,18 +26,18 @@ class PreviousIossSchemePageSpec extends SpecBase with PageBehaviours {
 
   "PreviousIossSchemePage" - {
 
-    beRetrievable[Boolean](PreviousIossSchemePage(index))
+    beRetrievable[Boolean](PreviousIossSchemePage(index, index))
 
-    beSettable[Boolean](PreviousIossSchemePage(index))
+    beSettable[Boolean](PreviousIossSchemePage(index, index))
 
-    beRemovable[Boolean](PreviousIossSchemePage(index))
+    beRemovable[Boolean](PreviousIossSchemePage(index, index))
 
     "must navigate in Normal mode" - {
 
       "to IOSS scheme number" in {
 
-        PreviousIossSchemePage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index))
+        PreviousIossSchemePage(index, index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index))
       }
 
     }

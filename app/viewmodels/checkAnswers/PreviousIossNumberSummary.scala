@@ -26,15 +26,15 @@ import viewmodels.implicits._
 
 object PreviousIossNumberSummary  {
 
-  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PreviousIossNumberPage(index)).map {
+  def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(PreviousIossNumberPage(countryIndex, schemeIndex)).map {
       answer =>
 
         SummaryListRowViewModel(
           key     = "previousIossNumber.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, index).url)
+            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex).url)
               .withVisuallyHiddenText(messages("previousIossNumber.change.hidden"))
           )
         )

@@ -17,15 +17,29 @@
 package pages.previousRegistrations
 
 import models.{CheckMode, Index, NormalMode, UserAnswers}
-import pages.Page
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import queries.previousRegistration.DeriveNumberOfPreviousSchemes
 
-case object CheckPreviousSchemeAnswersPage extends Page {
+case class CheckPreviousSchemeAnswersPage(index: Index) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "CheckPreviousSchemeAnswers"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, Index(0)) //TODO index
+    (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
+      case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(NormalMode, Index(size))
+      case (Some(false), _) => controllers.routes.IsOnlineMarketplaceController.onPageLoad(NormalMode)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(CheckMode, Index(0))
+    (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
+      case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(CheckMode, Index(size))
+      case (Some(false), _) => controllers.routes.CheckYourAnswersController.onPageLoad()
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 
 }

@@ -45,7 +45,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
   private val baseAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
-      .set(PreviousOssNumberPage(Index(0)), "foo").success.value
+      .set(PreviousOssNumberPage(Index(0), Index(0)), "foo").success.value
 
   private val incompleteAnswers =
     basicUserAnswersWithVatInfo
@@ -208,7 +208,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0)).url
+        redirectLocation(result).value mustEqual routes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
   }

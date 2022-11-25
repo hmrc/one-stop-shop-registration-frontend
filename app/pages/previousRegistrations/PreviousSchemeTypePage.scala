@@ -22,17 +22,17 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class PreviousSchemeTypePage(index: Index) extends QuestionPage[PreviousSchemeType] {
+case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[PreviousSchemeType] {
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ toString
+  override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
 
   override def toString: String = "previousSchemeType"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = {
     if(answers.get(this).contains(PreviousSchemeType.OSS)) {
-      prevRegRoutes.PreviousOssNumberController.onPageLoad(NormalMode, index)
+      prevRegRoutes.PreviousOssNumberController.onPageLoad(NormalMode, countryIndex, schemeIndex)
     } else {
-      prevRegRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, index)
+      prevRegRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, countryIndex, schemeIndex)
     }
   }
 

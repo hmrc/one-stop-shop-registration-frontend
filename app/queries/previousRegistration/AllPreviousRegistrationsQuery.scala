@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package queries
+package queries.previousRegistration
 
 import models.previousRegistrations.PreviousRegistrationDetails
 import play.api.libs.json.JsPath
+import queries.{Gettable, Settable}
 
 case object AllPreviousRegistrationsQuery extends Gettable[List[PreviousRegistrationDetails]] with Settable[List[PreviousRegistrationDetails]] {
 

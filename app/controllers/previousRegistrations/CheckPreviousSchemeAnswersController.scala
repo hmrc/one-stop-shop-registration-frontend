@@ -46,8 +46,8 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
           val list = SummaryListViewModel(
             rows = Seq(
-              PreviousSchemeSummary.row(request.userAnswers),
-              PreviousSchemeNumberSummary.row(request.userAnswers)
+              PreviousSchemeSummary.row(request.userAnswers, index),
+              PreviousSchemeNumberSummary.row(request.userAnswers, index)
             ).flatten
           )
 
@@ -60,7 +60,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
     implicit request =>
       val incomplete = getIncompleteEuDetails(index)
       if(incomplete.isEmpty) {
-        Redirect(CheckPreviousSchemeAnswersPage.navigate(mode, request.userAnswers))
+        Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, request.userAnswers))
       } else {
         Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, index))
       }

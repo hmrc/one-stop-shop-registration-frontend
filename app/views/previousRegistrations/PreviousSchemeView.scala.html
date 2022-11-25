@@ -7,11 +7,11 @@
 )
 
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("previousScheme.title"))) {
 
-    @formHelper(action = controllers.previousRegistrations.routes.PreviousSchemeController.onSubmit(mode, index), 'autoComplete -> "off") {
+    @formHelper(action = controllers.previousRegistrations.routes.PreviousSchemeController.onSubmit(mode, countryIndex, schemeIndex), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

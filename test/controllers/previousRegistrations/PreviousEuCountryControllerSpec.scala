@@ -63,7 +63,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = basicUserAnswersWithVatInfo
         .set(PreviousEuCountryPage(index), country).success.value
-        .set(PreviousOssNumberPage(index), "test").success.value
+        .set(PreviousOssNumberPage(index, index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -128,7 +128,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = basicUserAnswersWithVatInfo
         .set(PreviousEuCountryPage(index), country).success.value
-        .set(PreviousOssNumberPage(index), "test").success.value
+        .set(PreviousOssNumberPage(index, index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
