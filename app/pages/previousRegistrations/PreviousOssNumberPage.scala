@@ -22,15 +22,15 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class PreviousOssNumberPage(index: Index) extends QuestionPage[String] {
+case class PreviousOssNumberPage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ toString
+  override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
 
-  override def toString: String = "previousOssNumber"
+  override def toString: String = "previousSchemeNumber"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index)
+    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index)
+    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, countryIndex)
 }

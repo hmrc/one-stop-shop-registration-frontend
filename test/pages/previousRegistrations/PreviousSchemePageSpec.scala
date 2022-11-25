@@ -26,10 +26,10 @@ class PreviousSchemePageSpec extends SpecBase with PageBehaviours {
 
   "PreviousSchemePage" - {
 
-    beRetrievable[PreviousScheme](PreviousSchemePage(index))
+    beRetrievable[PreviousScheme](PreviousSchemePage(index, index))
 
-    beSettable[PreviousScheme](PreviousSchemePage(index))
+    beSettable[PreviousScheme](PreviousSchemePage(index, index))
 
-    beRemovable[PreviousScheme](PreviousSchemePage(index))
+    beRemovable[PreviousScheme](PreviousSchemePage(index, index))
   }
 }

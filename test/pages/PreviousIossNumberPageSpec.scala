@@ -27,10 +27,10 @@ class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
 
   "PreviousIossNumberPage" - {
 
-    beRetrievable[String](PreviousIossNumberPage(index))
+    beRetrievable[String](PreviousIossNumberPage(index, index))
 
-    beSettable[String](PreviousIossNumberPage(index))
+    beSettable[String](PreviousIossNumberPage(index, index))
 
-    beRemovable[String](PreviousIossNumberPage(index))
+    beRemovable[String](PreviousIossNumberPage(index, index))
   }
 }

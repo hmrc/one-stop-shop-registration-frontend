@@ -16,10 +16,10 @@
 
 package viewmodels.checkAnswers.previousRegistrations
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.AllPreviousRegistrationsQuery
+import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousSchemesForCountryQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
@@ -27,8 +27,8 @@ import viewmodels.implicits._
 
 object PreviousSchemeSummary {
 
- def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllPreviousRegistrationsQuery).map {
+ def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllPreviousSchemesForCountryQuery(index)).map {
       answer =>
 
         val value = ValueViewModel(

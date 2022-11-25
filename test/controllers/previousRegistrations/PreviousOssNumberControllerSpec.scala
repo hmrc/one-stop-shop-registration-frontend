@@ -39,7 +39,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new PreviousOssNumberFormProvider()
   private val form = formProvider(country)
 
-  private lazy val previousOssNumberRoute = routes.PreviousOssNumberController.onPageLoad(NormalMode, index).url
+  private lazy val previousOssNumberRoute = routes.PreviousOssNumberController.onPageLoad(NormalMode, index, index).url
 
   private val baseAnswers = basicUserAnswersWithVatInfo.set(PreviousEuCountryPage(index), country).success.value
 
@@ -58,13 +58,13 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousOssNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(PreviousOssNumberPage(index), "answer").success.value
+      val userAnswers = baseAnswers.set(PreviousOssNumberPage(index, index), "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -76,7 +76,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 
@@ -97,10 +97,10 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "12345678"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousOssNumberPage(index), "12345678").success.value
+        val expectedAnswers = baseAnswers.set(PreviousOssNumberPage(index, index), "12345678").success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousOssNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -121,7 +121,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, countryWithValidation)(request, messages(application)).toString
       }
     }
 

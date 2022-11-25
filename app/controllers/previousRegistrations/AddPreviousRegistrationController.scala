@@ -24,7 +24,7 @@ import models.{Country, Index, Mode}
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.DeriveNumberOfPreviousRegistrations
+import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
@@ -71,7 +71,7 @@ class AddPreviousRegistrationController @Inject()(
               if(incompletePromptShown) {
                 firstIndexedIncompleteDeregisteredCountry(incomplete.map(_.previousEuCountry)) match {
                   case Some(incompleteCountry) =>
-                      Future.successful(Redirect(routes.PreviousOssNumberController.onPageLoad(mode, Index(incompleteCountry._2))))
+                      Future.successful(Redirect(routes.PreviousOssNumberController.onPageLoad(mode, Index(incompleteCountry._2), Index(0)))) // TODO incomplete checks
                   case None =>
                     Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }

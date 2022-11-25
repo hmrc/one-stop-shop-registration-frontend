@@ -29,8 +29,8 @@ case class PreviousEuCountryPage(index: Index) extends QuestionPage[Country] {
   override def toString: String = "previousEuCountry"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    prevRegRoutes.PreviousSchemeController.onPageLoad(NormalMode, index)
+    prevRegRoutes.PreviousSchemeController.onPageLoad(NormalMode, index, Index(0))
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    prevRegRoutes.PreviousSchemeController.onPageLoad(CheckMode, index)
+    prevRegRoutes.PreviousSchemeController.onPageLoad(CheckMode, index, Index(0))
 }

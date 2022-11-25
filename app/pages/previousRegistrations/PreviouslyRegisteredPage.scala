@@ -22,7 +22,7 @@ import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import queries.{AllPreviousRegistrationsQuery, DeriveNumberOfPreviousRegistrations}
+import queries.previousRegistration.{AllPreviousRegistrationsQuery, DeriveNumberOfPreviousRegistrations}
 
 import scala.util.Try
 

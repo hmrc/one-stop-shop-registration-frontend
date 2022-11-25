@@ -38,27 +38,27 @@ class PreviousOssNumberController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(index) {
+      getCountry(countryIndex) {
         country =>
 
           val form = formProvider(country)
 
-          val preparedForm = request.userAnswers.get(PreviousOssNumberPage(index)) match {
+          val preparedForm = request.userAnswers.get(PreviousOssNumberPage(countryIndex, schemeIndex)) match {
             case None => form
             case Some(value) => form.fill(value)
           }
           CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
             case countryWithValidationDetails =>
-              Future.successful(Ok(view(preparedForm, mode, index, countryWithValidationDetails)))
+              Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, countryWithValidationDetails)))
           }
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(index) {
+      getCountry(countryIndex) {
         country =>
 
           val form = formProvider(country)
@@ -67,14 +67,14 @@ class PreviousOssNumberController @Inject()(
             formWithErrors =>
               CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
                 case countryWithValidationDetails =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, index, countryWithValidationDetails)))
+                  Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, countryWithValidationDetails)))
               },
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(index), value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(countryIndex, schemeIndex), value))
                 _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(PreviousOssNumberPage(index).navigate(mode, updatedAnswers))
+              } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
           )
       }
 

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package queries
+package queries.previousRegistration
 
 import play.api.libs.json.{JsArray, JsPath}
+import queries.{Gettable, Settable}
 
 case object AllPreviousRegistrationsRawQuery extends Gettable[JsArray] with Settable[JsArray] {
 

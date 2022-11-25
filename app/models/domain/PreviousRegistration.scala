@@ -16,12 +16,19 @@
 
 package models.domain
 
-import models.Country
+import models.{Country, PreviousScheme}
 import play.api.libs.json.{Json, OFormat}
 
-case class PreviousRegistration(country: Country, vatNumber: String)
+case class PreviousRegistration(country: Country, previousSchemes: Seq[PreviousSchemeDetails])
 
 object PreviousRegistration {
 
   implicit val format: OFormat[PreviousRegistration] = Json.format[PreviousRegistration]
+}
+
+case class PreviousSchemeDetails(previousScheme: PreviousScheme, previousSchemeNumber: String)
+
+object PreviousSchemeDetails {
+
+  implicit val format: OFormat[PreviousSchemeDetails] = Json.format[PreviousSchemeDetails]
 }

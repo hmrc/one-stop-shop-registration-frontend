@@ -34,7 +34,7 @@ import scala.concurrent.Future
 class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
-  private lazy val previousSchemePageRoute = controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, index).url
+  private lazy val previousSchemePageRoute = controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, index, index).url
 
   private val formProvider = new PreviousSchemeFormProvider()
   private val form = formProvider()
@@ -53,13 +53,13 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousSchemeView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, index)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(PreviousSchemePage(index), PreviousScheme.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(PreviousSchemePage(index, index), PreviousScheme.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -71,7 +71,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(PreviousScheme.values.head), NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(PreviousScheme.values.head), NormalMode, index, index)(request, messages(application)).toString
       }
     }
 
@@ -92,10 +92,10 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", PreviousScheme.values.head.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(PreviousSchemePage(index), PreviousScheme.values.head).success.value
+        val expectedAnswers = emptyUserAnswers.set(PreviousSchemePage(index, index), PreviousScheme.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousSchemePage(index).navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual PreviousSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -116,7 +116,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index)(request, messages(application)).toString
       }
     }
 

@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package pages.previousRegistrations
+package queries.previousRegistration
 
-import models.{Index, PreviousScheme}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.Index
+import play.api.libs.json.{JsArray, JsPath}
+import queries.{Gettable, Settable}
 
-case class PreviousSchemePage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[PreviousScheme] {
+case class AllPreviousSchemesRawQuery(index: Index) extends Gettable[JsArray] with Settable[JsArray] {
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
-
-  override def toString: String = "previousScheme"
-
+  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ "previousSchemesDetails"
 }

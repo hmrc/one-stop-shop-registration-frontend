@@ -45,16 +45,8 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
     basicUserAnswersWithVatInfo
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(index), country).success.value
-      .set(PreviousSchemeTypePage(index), PreviousSchemeType.values.head).success.value
-      .set(PreviousOssNumberPage(index), "123456789").success.value
-
-/*  private val answersNotRegisteredNoEstablishment = baseUserAnswers.set(EuCountryPage(index), country).success.value
-    .set(EuTaxReferencePage(index), "123456").success.value
-    .set(VatRegisteredPage(index), false).success.value
-    .set(HasFixedEstablishmentPage(index), false).success.value
-    .set(EuSendGoodsPage(index), true).success.value
-    .set(EuSendGoodsTradingNamePage(index), "Some company name").success.value
-    .set(EuSendGoodsAddressPage(index), arbitraryInternationalAddress.arbitrary.sample.value).success.value*/
+      .set(PreviousSchemeTypePage(index, index), PreviousSchemeType.values.head).success.value
+      .set(PreviousOssNumberPage(index, index), "123456789").success.value
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
@@ -73,8 +65,8 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
         val list = SummaryListViewModel(
           Seq(
-            PreviousSchemeSummary.row(baseUserAnswers),
-            PreviousSchemeNumberSummary.row(baseUserAnswers)
+            PreviousSchemeSummary.row(baseUserAnswers, index),
+            PreviousSchemeNumberSummary.row(baseUserAnswers, index)
           ).flatten
         )
 
@@ -112,7 +104,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual CheckPreviousSchemeAnswersPage.navigate(NormalMode, baseUserAnswers).url
+          redirectLocation(result).value mustEqual CheckPreviousSchemeAnswersPage(index).navigate(NormalMode, baseUserAnswers).url
         }
       }
 

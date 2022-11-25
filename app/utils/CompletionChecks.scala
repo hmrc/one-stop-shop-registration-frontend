@@ -25,7 +25,8 @@ import pages.previousRegistrations.PreviouslyRegisteredPage
 import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
-import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
 
 import scala.concurrent.Future
 
@@ -179,7 +180,7 @@ trait CompletionChecks {
     _.previousEuCountry
   )).map(
     incompleteCountry =>
-      Redirect(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+      Redirect(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2), Index(0))) // TODO index
   )
 
   private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {

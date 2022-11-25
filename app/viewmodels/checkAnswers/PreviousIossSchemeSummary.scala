@@ -27,8 +27,8 @@ import viewmodels.implicits._
 
 object PreviousIossSchemeSummary  {
 
-  def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PreviousIossSchemePage(index)).map {
+  def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(PreviousIossSchemePage(countryIndex, schemeIndex)).map {
       answer =>
 
         val value = ValueViewModel(
@@ -41,8 +41,10 @@ object PreviousIossSchemeSummary  {
           key     = "previousIossScheme.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(CheckMode, index).url)
-              .withVisuallyHiddenText(messages("previousIossScheme.change.hidden"))
+            ActionItemViewModel(
+              "site.change",
+              controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(CheckMode, countryIndex, schemeIndex).url
+            ).withVisuallyHiddenText(messages("previousIossScheme.change.hidden"))
           )
         )
     }

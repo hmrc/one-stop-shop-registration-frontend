@@ -21,10 +21,19 @@ import play.api.libs.json.{Json, OFormat}
 
 case class PreviousRegistrationDetails(
                                         previousEuCountry: Country,
-                                        previousEuVatNumber: String
+                                        previousSchemesDetails: List[PreviousSchemeDetails]
                                       )
 
 object PreviousRegistrationDetails {
 
   implicit val format: OFormat[PreviousRegistrationDetails] = Json.format[PreviousRegistrationDetails]
+}
+
+case class PreviousSchemeDetails(
+                                  previousScheme: String,
+                                  previousSchemeNumber: String
+                                )
+
+object PreviousSchemeDetails {
+  implicit val format: OFormat[PreviousSchemeDetails] = Json.format[PreviousSchemeDetails]
 }

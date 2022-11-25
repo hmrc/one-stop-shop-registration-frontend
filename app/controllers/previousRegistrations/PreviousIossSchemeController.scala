@@ -38,29 +38,29 @@ class PreviousIossSchemeController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(PreviousIossSchemePage(index)) match {
+      val preparedForm = request.userAnswers.get(PreviousIossSchemePage(countryIndex, schemeIndex)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(form, mode, index))
+      Ok(view(preparedForm, mode, countryIndex, schemeIndex))
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+          Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossSchemePage(index), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossSchemePage(countryIndex, schemeIndex), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(PreviousIossSchemePage(index).navigate(mode, updatedAnswers))
+          } yield Redirect(PreviousIossSchemePage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
       )
   }
 }

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package pages.previousRegistrations
+package queries.previousRegistration
 
-import models.{Index, PreviousScheme}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.Index
+import play.api.libs.json.{JsObject, JsPath}
+import queries.Derivable
 
-case class PreviousSchemePage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[PreviousScheme] {
+case class DeriveNumberOfPreviousSchemes(index: Index) extends Derivable[List[JsObject], Int] {
+  override val derive: List[JsObject] => Int = _.size
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
-
-  override def toString: String = "previousScheme"
-
+  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ "previousSchemeDetails"
 }
