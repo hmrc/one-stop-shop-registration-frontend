@@ -170,16 +170,14 @@ applicationComplete.CurrentQuarter = If your eligible sales in any 12-month peri
 applicationComplete.nextQuarter.heading = {0} onwards
 applicationComplete.next = What happens next
 applicationComplete.link.BTA = Manage your One Stop Shop returns in your account.
-applicationComplete.confirmation = We have sent a confirmation of your registration to <br><span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-applicationComplete.vatRate = You must charge VAT at the rate for the EU country where you send your goods.
-applicationComplete.list = Each calendar quarter, you should use this service to:
-applicationComplete.list.p1 = complete a single VAT return for all eligible sales of goods to consumers in the EU
-applicationComplete.list.p2 = pay HMRC the total VAT due on eligible sales
-applicationComplete.commencementDate = Your first return period will be {0} to {1}.
-applicationComplete.contactWithEmail = We''ll only contact you by email.
-applicationComplete.contactWithBTA = We''ll only contact you by email or through your <a class="govuk-link" href="/business-account">business tax account</a>.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
+applicationComplete.useService.text = You can now use this service to fill out quarterly returns for goods sold to consumers in the EU.
+applicationComplete.payVat.text = You can also pay any One Stop Shop VAT that you owe.
+applicationComplete.returns.text = You can begin your {0} return on {1}. Include any sales from {2}.
+applicationComplete.registration.text = We''ve received your registration for <span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
+applicationComplete.contact.text = We’ll contact you if we need to check any information.
+applicationComplete.readInformation = Read more information about <a class="govuk-link" href="https://www.gov.uk/guidance/completing-a-one-stop-shop-vat-return">how to complete an OSS return.</a>
 
 deleteTradingName.title = Are you sure you want to remove {0}?
 deleteTradingName.heading = Are you sure you want to remove {0}?
