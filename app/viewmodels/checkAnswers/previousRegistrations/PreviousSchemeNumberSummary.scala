@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import models.{CheckMode, Index, UserAnswers}
+import pages.previousRegistrations.PreviousOssNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.AllPreviousRegistrationsQuery
@@ -27,19 +28,13 @@ import viewmodels.implicits._
 
 object PreviousSchemeNumberSummary {
 
- def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllPreviousRegistrationsQuery).map {
+ def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(PreviousOssNumberPage(countryIndex, schemeIndex)).map {
       answer =>
-
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"previousSchemeNumber.$answer"))
-          )
-        )
 
         SummaryListRowViewModel(
           key = "previousSchemeNumber.checkYourAnswersLabel",
-          value = value,
+          value = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq()
         )
     }

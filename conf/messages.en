@@ -406,24 +406,34 @@ previousScheme.ossu = One Stop Shop Union
 previousScheme.ossnu = One Stop Shop non-Union
 previousScheme.iosswoi = Import One Stop Shop without intermediary
 previousScheme.iosswi = Import One Stop Shop with intermediary
-previousScheme.oss = One Stop Shop
-previousScheme.ioss = Import One Stop Shop
+previousScheme.oss = One Stop Shop (OSS)
+previousScheme.ioss = Import One Stop Shop (IOSS)
 previousScheme.checkYourAnswersLabel = Previous Scheme
 previousScheme.error.required = Select which scheme did your business register for
 previousScheme.change.hidden = which scheme did your business register for
 
-previousIossScheme.title = Was this with intermediary?
-previousIossScheme.heading = Was this with intermediary?
+previousIossScheme.title = Did you use an intermediary?
+previousIossScheme.heading = Did you use an intermediary?
 previousIossScheme.checkYourAnswersLabel = previousIossScheme
+previousIossScheme.hint = An intermediary is someone you can appoint to administer and pay IOSS VAT.
 previousIossScheme.error.required = Select yes if this was with intermediary
 previousIossScheme.change.hidden = if this was with intermediary
 
-previousIossNumber.title = Enter your IOSS registration numbers for {0}
-previousIossNumber.heading = Enter your IOSS registration numbers for {0}
+previousIossNumber.title = Enter your IOSS registration number for {0}
+previousIossNumber.titleWithIntermediary = Enter your IOSS registration numbers for {0}
+previousIossNumber.heading = Enter your IOSS registration number for {0}
+previousIossNumber.headingWithIntermediary = Enter your IOSS registration numbers for {0}
+previousIossNumber.iossNumber = IOSS number
+previousIossNumber.iossNumber.hint = This will start with IM
+previousIossNumber.intermediaryNumber = Intermediary identification number
+previousIossNumber.intermediaryNumber.hint = This will start with IN
+previousIossNumber.intermediaryNumber.checkYourAnswersLabel = Intermediary number
 previousIossNumber.checkYourAnswersLabel = Registration number
 previousIossNumber.error.required = Enter your IOSS registration number
 previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
 previousIossNumber.change.hidden = PreviousIossNumber
+
+previousSchemeNumber.checkYourAnswersLabel = Registration number
 
 deletePreviousRegistration.title = Are you sure you need to remove the deregistration for {0}?
 deletePreviousRegistration.heading = Are you sure you need to remove the deregistration for {0}?

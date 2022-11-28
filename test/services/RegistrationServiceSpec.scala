@@ -25,7 +25,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage}
 import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
 import queries.previousRegistration.AllPreviousRegistrationsRawQuery
 import testutils.RegistrationData
@@ -103,6 +103,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(AllWebsites, List("website1", "website2")).success.value
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+      .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), "DE123").success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
@@ -493,7 +494,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         }
       }
 
-      "when Tax Registered in EU is missing" - {
+      "when Tax Registered in EU is missing" in {
 
         val userAnswers = answers.remove(TaxRegisteredInEuPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)

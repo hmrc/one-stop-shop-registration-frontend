@@ -18,8 +18,8 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossSchemeFormProvider
-import models.{Index, Mode}
-import pages.previousRegistrations.PreviousIossSchemePage
+import models.{Index, Mode, PreviousScheme}
+import pages.previousRegistrations.{PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -56,11 +56,23 @@ class PreviousIossSchemeController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex))),
 
-        value =>
+        value => {
+          println("1")
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossSchemePage(countryIndex, schemeIndex), value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(PreviousIossSchemePage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
+            updatedAnswersWithPreviousScheme <- Future.fromTry(updatedAnswers.set(
+              PreviousSchemePage(countryIndex, schemeIndex),
+              if (value) {
+                println("2")
+                PreviousScheme.IOSSWI
+              } else {
+                println("3")
+                PreviousScheme.IOSSWOI
+              }
+            ))
+            _ <- cc.sessionRepository.set(updatedAnswersWithPreviousScheme)
+          } yield Redirect(PreviousIossSchemePage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithPreviousScheme))
+        }
       )
   }
 }

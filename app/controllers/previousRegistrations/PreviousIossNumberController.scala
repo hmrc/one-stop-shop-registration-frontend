@@ -18,11 +18,13 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossNumberFormProvider
-import models.{Index, Mode}
-import pages.previousRegistrations.PreviousIossNumberPage
+import logging.Logging
+import models.{Country, Index, Mode}
+import models.requests.AuthenticatedDataRequest
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage}
 import views.html.previousRegistrations.PreviousIossNumberView
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -33,34 +35,61 @@ class PreviousIossNumberController @Inject()(
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: PreviousIossNumberFormProvider,
                                         view: PreviousIossNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountry(countryIndex) { country =>
+        getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
 
-      val preparedForm = request.userAnswers.get(PreviousIossNumberPage(countryIndex, schemeIndex)) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val preparedForm = request.userAnswers.get(PreviousIossNumberPage(countryIndex, schemeIndex)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary)))
+        }
       }
-
-      Ok(view(preparedForm, mode, countryIndex, schemeIndex))
   }
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      getCountry(countryIndex) { country =>
+        getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex))),
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossNumberPage(countryIndex, schemeIndex), value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(PreviousIossNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
-      )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossNumberPage(countryIndex, schemeIndex), value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(PreviousIossNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
+          )
+        }
+      }
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(PreviousEuCountryPage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+  private def getHasIntermediary(countryIndex: Index, schemeIndex: Index)
+                        (block: Boolean => Future[Result])
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(PreviousIossSchemePage(countryIndex, schemeIndex)).map {
+      hasIntermediary =>
+        block(hasIntermediary)
+    }.getOrElse{
+      logger.error("Failed to get intermediary")
+      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 }

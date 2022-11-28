@@ -93,7 +93,7 @@ trait CompletionChecks {
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
     request.userAnswers
       .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
-      _.filter(_.previousEuVatNumber.isEmpty)
+      _.filter(_.previousSchemesDetails.exists(_.previousSchemeNumber.isEmpty))
     ).getOrElse(List.empty)
   }
 
@@ -141,8 +141,11 @@ trait CompletionChecks {
 
   def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
-      case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
-      case false => true
+      case true =>
+        val checker = request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery)
+        checker.isDefined
+      case false =>
+        true
     }
   }
 
@@ -180,7 +183,7 @@ trait CompletionChecks {
     _.previousEuCountry
   )).map(
     incompleteCountry =>
-      Redirect(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2), Index(0))) // TODO index
+      Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
   )
 
   private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {

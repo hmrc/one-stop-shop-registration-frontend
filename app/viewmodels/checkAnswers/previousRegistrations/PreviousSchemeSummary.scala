@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import models.{CheckMode, Index, UserAnswers}
+import pages.previousRegistrations.PreviousSchemePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousSchemesForCountryQuery}
@@ -27,8 +28,8 @@ import viewmodels.implicits._
 
 object PreviousSchemeSummary {
 
- def row(answers: UserAnswers, index: Index)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllPreviousSchemesForCountryQuery(index)).map {
+ def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(PreviousSchemePage(countryIndex, schemeIndex)).map {
       answer =>
 
         val value = ValueViewModel(

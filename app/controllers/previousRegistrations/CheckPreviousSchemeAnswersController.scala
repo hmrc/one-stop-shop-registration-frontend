@@ -22,6 +22,7 @@ import models.requests.AuthenticatedDataRequest
 import pages.previousRegistrations.{CheckPreviousSchemeAnswersPage, PreviousEuCountryPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.previousRegistration.AllPreviousSchemesForCountryQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import viewmodels.checkAnswers.previousRegistrations._
@@ -43,15 +44,20 @@ class CheckPreviousSchemeAnswersController @Inject()(
     implicit request =>
       getCountry(index) {
         country =>
+          request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
 
-          val list = SummaryListViewModel(
-            rows = Seq(
-              PreviousSchemeSummary.row(request.userAnswers, index),
-              PreviousSchemeNumberSummary.row(request.userAnswers, index)
-            ).flatten
-          )
+            val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
+              SummaryListViewModel(
+                rows = Seq(
+                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex)),
+                  PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
+                ).flatten
+              )
+            }
 
-          Future.successful(Ok(view(list, mode, index, country)))
+            Future.successful(Ok(view(lists, mode, index, country)))
+
+          }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
       }
   }
