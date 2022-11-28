@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class PreviousRegistrationDetails(
                                         previousEuCountry: Country,
-                                        previousSchemesDetails: List[PreviousSchemeDetails]
+                                        previousSchemesDetails: Seq[PreviousSchemeDetails]
                                       )
 
 object PreviousRegistrationDetails {

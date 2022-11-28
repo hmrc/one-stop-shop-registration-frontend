@@ -24,7 +24,7 @@ import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode}
+import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -32,7 +32,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -403,6 +403,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val answers = completeUserAnswers
               .set(PreviouslyRegisteredPage, true).success.value
               .set(PreviousEuCountryPage(Index(0)), country).success.value
+              .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
               .overrides(bind[RegistrationService].toInstance(registrationService)).build()
@@ -413,7 +414,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual
-                controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, Index(0), Index(0)).url
+                controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, Index(0)).url
 
             }
 

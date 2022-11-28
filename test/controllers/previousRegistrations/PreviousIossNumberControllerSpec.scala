@@ -18,11 +18,11 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossNumberFormProvider
-import models.{Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.PreviousIossNumberPage
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -37,13 +37,16 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider()
   private val index = Index(0)
 
+  private val country = Country.euCountries.head
+  private val baseAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
+
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
 
   "PreviousIossNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, previousIossNumberRoute)
@@ -82,7 +85,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -92,7 +95,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(PreviousIossNumberPage(index, index), "answer").success.value
+        val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), "answer").success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual PreviousIossNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
@@ -102,7 +105,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =

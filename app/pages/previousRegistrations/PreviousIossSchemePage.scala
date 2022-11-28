@@ -21,12 +21,11 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-// TODO this shouldn't set a boolean in previousScheme needs to map to a SchemeType
 case class PreviousIossSchemePage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
 
-  override def toString: String = "previousScheme"
+  override def toString: String = "withIntermediary"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, countryIndex, schemeIndex)

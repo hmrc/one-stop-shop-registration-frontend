@@ -17,33 +17,36 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import forms.previousRegistrations.PreviousSchemeFormProvider
-import models.{Index, NormalMode, PreviousScheme, UserAnswers}
+import forms.previousRegistrations.{PreviousSchemeFormProvider, PreviousSchemeTypeFormProvider}
+import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.PreviousSchemePage
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.previousRegistrations.PreviousSchemeView
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
   private lazy val previousSchemePageRoute = controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, index, index).url
 
-  private val formProvider = new PreviousSchemeFormProvider()
+  private val formProvider = new PreviousSchemeTypeFormProvider()
   private val form = formProvider()
+
+  private val country = Country.euCountries.head
+  private val baseAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
 
   "PreviousSchemePage Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, previousSchemePageRoute)
@@ -52,6 +55,11 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[PreviousSchemeView]
 
+        val test = status(result)
+        val content = contentAsString(result)
+
+        test
+
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, index, index)(request, messages(application)).toString
       }
@@ -59,7 +67,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(PreviousSchemePage(index, index), PreviousScheme.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(PreviousSchemeTypePage(index, index), PreviousSchemeType.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -71,7 +79,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(PreviousScheme.values.head), NormalMode, index, index)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(PreviousSchemeType.values.head), NormalMode, index, index)(request, messages(application)).toString
       }
     }
 
@@ -82,27 +90,27 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, previousSchemePageRoute)
-            .withFormUrlEncodedBody(("value", PreviousScheme.values.head.toString))
+            .withFormUrlEncodedBody(("value", PreviousSchemeType.values.head.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(PreviousSchemePage(index, index), PreviousScheme.values.head).success.value
+        val expectedAnswers = baseAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual PreviousSchemeTypePage(index, index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -141,7 +149,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousSchemePageRoute)
-            .withFormUrlEncodedBody(("value", PreviousScheme.values.head.toString))
+            .withFormUrlEncodedBody(("value", PreviousSchemeType.values.head.toString))
 
         val result = route(application, request).value
 

@@ -18,12 +18,12 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
-import models.{Country, Index, NormalMode}
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
+import models.{Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -45,11 +45,13 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
   private val baseAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+      .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), "foo").success.value
 
   private val incompleteAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+      .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
 
   "AddPreviousRegistration Controller" - {
 
@@ -85,7 +87,19 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, NormalMode)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true, Seq(PreviousRegistrationDetailsWithOptionalVatNumber(Country.euCountries.head, None)))(request, implicitly).toString
+        contentAsString(result) mustEqual
+          view(
+            form,
+            NormalMode,
+            list,
+            canAddCountries = true,
+            Seq(
+              PreviousRegistrationDetailsWithOptionalVatNumber(
+                Country.euCountries.head,
+                Seq(SchemeDetailsWithOptionalVatNumber(PreviousScheme.OSSU.toString, None))
+              )
+            )
+          )(request, implicitly).toString
       }
     }
 

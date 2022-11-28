@@ -172,8 +172,8 @@ POST        /check-previous-country/:index                                      
 
 GET         /previous-oss-scheme-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 POST        /previous-oss-scheme-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
-GET         /check-deregistered-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
-POST        /check-deregistered-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+GET         /check-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+POST        /check-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 
 GET         /previous-scheme/:countryIndex/:schemeIndex                         controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 POST        /previous-scheme/:countryIndex/:schemeIndex                         controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)

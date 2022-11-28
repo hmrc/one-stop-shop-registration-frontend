@@ -19,8 +19,8 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.requests.AuthenticatedDataRequest
-import models.{Country, CountryWithValidationDetails, Index, Mode}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage}
+import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,7 +34,7 @@ class PreviousOssNumberController @Inject()(
                                              cc: AuthenticatedControllerComponents,
                                              formProvider: PreviousOssNumberFormProvider,
                                              view: PreviousOssNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -73,8 +73,15 @@ class PreviousOssNumberController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(countryIndex, schemeIndex), value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
+                updatedAnswersWithScheme <- Future.fromTry(updatedAnswers.set(PreviousSchemePage(countryIndex, schemeIndex),
+                  if (value.startsWith("EU")) {
+                    PreviousScheme.OSSNU
+                  } else {
+                    PreviousScheme.OSSU
+                  }
+                ))
+                _ <- cc.sessionRepository.set(updatedAnswersWithScheme)
+              } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
           )
       }
 

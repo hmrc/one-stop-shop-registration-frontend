@@ -19,7 +19,7 @@ package models.domain
 import models.{Country, PreviousScheme}
 import play.api.libs.json.{Json, OFormat}
 
-case class PreviousRegistration(country: Country, previousSchemes: Seq[PreviousSchemeDetails])
+case class PreviousRegistration(country: Country, previousSchemesDetails: Seq[PreviousSchemeDetails])
 
 object PreviousRegistration {
 

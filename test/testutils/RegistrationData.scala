@@ -92,7 +92,7 @@ object RegistrationData extends Generators with EitherValues {
       previousRegistrations = Seq(
         PreviousRegistration(
           country = Country("DE", "Germany"),
-          previousSchemes = Seq(
+          previousSchemesDetails = Seq(
             PreviousSchemeDetails(
               previousScheme = PreviousScheme.OSSU,
               previousSchemeNumber = "DE123"

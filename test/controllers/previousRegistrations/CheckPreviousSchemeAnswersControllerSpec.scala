@@ -17,13 +17,13 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import models.{Country, Index, NormalMode, PreviousSchemeType}
+import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{CheckPreviousSchemeAnswersPage, PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemeTypePage}
+import pages.previousRegistrations.{CheckPreviousSchemeAnswersPage, PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -45,7 +45,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
     basicUserAnswersWithVatInfo
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(index), country).success.value
-      .set(PreviousSchemeTypePage(index, index), PreviousSchemeType.values.head).success.value
+      .set(PreviousSchemePage(index, index), PreviousScheme.values.head).success.value
       .set(PreviousOssNumberPage(index, index), "123456789").success.value
 
   override def beforeEach(): Unit = {
@@ -63,15 +63,15 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
-        val list = SummaryListViewModel(
+        val lists = Seq(SummaryListViewModel(
           Seq(
             PreviousSchemeSummary.row(baseUserAnswers, index),
-            PreviousSchemeNumberSummary.row(baseUserAnswers, index)
+            PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
           ).flatten
-        )
+        ))
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(lists, NormalMode, index, country)(request, messages(application)).toString
       }
     }
 
