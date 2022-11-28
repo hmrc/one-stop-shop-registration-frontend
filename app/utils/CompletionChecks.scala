@@ -18,7 +18,7 @@ package utils
 
 import models.{CheckMode, Country, Index}
 import models.euDetails.EuOptionalDetails
-import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
@@ -26,7 +26,7 @@ import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebs
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
-import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
+import queries.previousRegistration.{AllPreviousRegistrationsWithOptionalVatNumberQuery, AllPreviousSchemesForCountryQuery, AllPreviousSchemesForCountryWithOptionalVatNumberQuery}
 
 import scala.concurrent.Future
 
@@ -97,6 +97,13 @@ trait CompletionChecks {
     ).getOrElse(List.empty)
   }
 
+  def getIncompletePreviousSchemesDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[SchemeDetailsWithOptionalVatNumber] = {
+    request.userAnswers
+      .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).flatMap(
+      _.find(_.previousSchemeNumber.isEmpty)
+    )
+  }
+
   def firstIndexedIncompleteDeregisteredCountry(incompleteCountries: Seq[Country])
                                                (implicit request: AuthenticatedDataRequest[AnyContent]): Option[(PreviousRegistrationDetailsWithOptionalVatNumber, Int)] = {
     request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery)
@@ -141,11 +148,8 @@ trait CompletionChecks {
 
   def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
-      case true =>
-        val checker = request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery)
-        checker.isDefined
-      case false =>
-        true
+      case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
+      case false => true
     }
   }
 

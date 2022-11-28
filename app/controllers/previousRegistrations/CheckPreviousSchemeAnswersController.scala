@@ -17,6 +17,7 @@
 package controllers.previousRegistrations
 
 import controllers.actions.AuthenticatedControllerComponents
+import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
 import models.{Country, Index, Mode}
 import models.requests.AuthenticatedDataRequest
 import pages.previousRegistrations.{CheckPreviousSchemeAnswersPage, PreviousEuCountryPage}
@@ -30,14 +31,16 @@ import viewmodels.govuk.summarylist._
 import views.html.previousRegistrations.CheckPreviousSchemeAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckPreviousSchemeAnswersController @Inject()(
                                                  override val messagesApi: MessagesApi,
                                                  cc: AuthenticatedControllerComponents,
+                                                 formProvider: CheckPreviousSchemeAnswersFormProvider,
                                                  view: CheckPreviousSchemeAnswersView
-                                               ) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
+  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
@@ -45,6 +48,8 @@ class CheckPreviousSchemeAnswersController @Inject()(
       getCountry(index) {
         country =>
           request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
+
+            val canAddScheme = true // TODO
 
             val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
               SummaryListViewModel(
@@ -55,20 +60,49 @@ class CheckPreviousSchemeAnswersController @Inject()(
               )
             }
 
-            Future.successful(Ok(view(lists, mode, index, country)))
+            Future.successful(Ok(view(form, mode, lists, index, country, canAddScheme)))
 
           }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      val incomplete = getIncompleteEuDetails(index)
+      /* TODO handle incomplete
+      val incomplete = getIncompletePreviousSchemesDetails(index)
       if(incomplete.isEmpty) {
         Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, request.userAnswers))
       } else {
         Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, index))
+      }*/
+
+      getCountry(index) { country =>
+
+        val canAddScheme = true // TODO
+
+        request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
+
+          val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
+            SummaryListViewModel(
+              rows = Seq(
+                PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex)),
+                PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
+              ).flatten
+            )
+          }
+
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, lists, index, country, canAddScheme))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckPreviousSchemeAnswersPage(index), value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, updatedAnswers))
+          )
+        }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
       }
   }
 
