@@ -93,14 +93,14 @@ trait CompletionChecks {
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
     request.userAnswers
       .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
-      _.filter(_.previousSchemesDetails.exists(_.previousSchemeNumber.isEmpty))
+      _.filter(_.previousSchemesDetails.exists(_.previousSchemeNumbers.isEmpty))
     ).getOrElse(List.empty)
   }
 
   def getIncompletePreviousSchemesDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[SchemeDetailsWithOptionalVatNumber] = {
     request.userAnswers
       .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).flatMap(
-      _.find(_.previousSchemeNumber.isEmpty)
+      _.find(_.previousSchemeNumbers.isEmpty)
     )
   }
 

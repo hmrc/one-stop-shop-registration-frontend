@@ -16,16 +16,18 @@
 
 package pages.previousRegistrations
 
-import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, Index, NormalMode, UserAnswers}
-import play.api.mvc.Call
+import models.Index
+import models.previousRegistrations.PreviousSchemeNumbers
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class PreviousOssNumberPage(countryIndex: Index, schemeIndex: Index)
-  extends PreviousSchemeNumbersPage {
+trait PreviousSchemeNumbersPage extends QuestionPage[PreviousSchemeNumbers] {
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)
+  def countryIndex: Index
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, countryIndex)
+  def schemeIndex: Index
+
+  override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
+
+  override def toString: String = "previousSchemeNumbers"
 }

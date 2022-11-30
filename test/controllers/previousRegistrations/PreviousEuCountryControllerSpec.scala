@@ -19,6 +19,7 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.PreviousEuCountryFormProvider
 import models.{Country, Index, NormalMode}
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -63,7 +64,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = basicUserAnswersWithVatInfo
         .set(PreviousEuCountryPage(index), country).success.value
-        .set(PreviousOssNumberPage(index, index), "test").success.value
+        .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("test", None)).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -128,7 +129,7 @@ class PreviousEuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = basicUserAnswersWithVatInfo
         .set(PreviousEuCountryPage(index), country).success.value
-        .set(PreviousOssNumberPage(index, index), "test").success.value
+        .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("test", None)).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

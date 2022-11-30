@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import models.{Index, UserAnswers}
-import pages.previousRegistrations.{PreviousIossNumberPage, PreviousOssNumberPage}
+import pages.previousRegistrations.PreviousIossNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -40,4 +40,3 @@ object PreviousIntermediaryNumberSummary {
 
     }
 }
-*/

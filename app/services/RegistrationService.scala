@@ -21,6 +21,7 @@ import cats.implicits._
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage}
@@ -180,7 +181,7 @@ class RegistrationService @Inject()(dateService: DateService) {
         DataMissingError(PreviousSchemePage(countryIndex, schemeIndex)).invalidNec
     }
 
-  private def getPreviousSchemeNumber(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[String] =
+  private def getPreviousSchemeNumber(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[PreviousSchemeNumbers] =
     answers.get(PreviousOssNumberPage(countryIndex, schemeIndex)) match {
       case Some(vatNumber) =>
         vatNumber.validNec

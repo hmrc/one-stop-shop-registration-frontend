@@ -21,6 +21,7 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import models._
 import models.domain._
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
@@ -104,7 +105,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
-      .set(PreviousOssNumberPage(Index(0), Index(0)), "DE123").success.value
+      .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
       .set(BusinessBasedInNiPage, true).success.value

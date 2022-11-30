@@ -18,12 +18,11 @@ package models.previousRegistrations
 
 import play.api.libs.json.{Json, OFormat}
 
-case class IossSchemeDetails(
-                              previousScheme: String,
+case class PreviousSchemeNumbers(
                               previousSchemeNumber: String,
                               previousIntermediaryNumber: Option[String]
                             )
 
-object IossSchemeDetails {
-  implicit val format: OFormat[IossSchemeDetails] = Json.format[IossSchemeDetails]
+object PreviousSchemeNumbers {
+  implicit val format: OFormat[PreviousSchemeNumbers] = Json.format[PreviousSchemeNumbers]
 }
