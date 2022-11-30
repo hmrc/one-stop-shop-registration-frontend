@@ -29,16 +29,16 @@ case class CheckPreviousSchemeAnswersPage(index: Index) extends QuestionPage[Boo
   override def toString: String = "CheckPreviousSchemeAnswers"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
-      case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _) => controllers.routes.IsOnlineMarketplaceController.onPageLoad(NormalMode)
+    (answers.get(CheckPreviousSchemeAnswersPage(index)), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
+      case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, index, Index(size))
+      case (Some(false), _) => controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(NormalMode)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
-      case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(CheckMode, Index(size))
-      case (Some(false), _) => controllers.routes.CheckYourAnswersController.onPageLoad()
+    (answers.get(CheckPreviousSchemeAnswersPage(index)), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
+      case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(CheckMode, index, Index(size))
+      case (Some(false), _) => controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(CheckMode)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 

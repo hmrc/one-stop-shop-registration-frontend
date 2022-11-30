@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package queries.previousRegistration
+package models.previousRegistrations
 
-import models.Index
-import play.api.libs.json.{JsObject, JsPath}
-import queries.Derivable
+import play.api.libs.json.{Json, OFormat}
 
-case class DeriveNumberOfPreviousSchemes(index: Index) extends Derivable[List[JsObject], Int] {
-  override val derive: List[JsObject] => Int = _.size
+case class IossSchemeDetails(
+                              previousScheme: String,
+                              previousSchemeNumber: String,
+                              previousIntermediaryNumber: Option[String]
+                            )
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ "previousSchemesDetails"
+object IossSchemeDetails {
+  implicit val format: OFormat[IossSchemeDetails] = Json.format[IossSchemeDetails]
 }

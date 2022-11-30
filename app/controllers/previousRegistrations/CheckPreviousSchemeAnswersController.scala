@@ -55,7 +55,8 @@ class CheckPreviousSchemeAnswersController @Inject()(
               SummaryListViewModel(
                 rows = Seq(
                   PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex)),
-                  PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
+                  PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
+                  PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
                 ).flatten
               )
             }
@@ -87,7 +88,8 @@ class CheckPreviousSchemeAnswersController @Inject()(
             SummaryListViewModel(
               rows = Seq(
                 PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex)),
-                PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
+                PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
+                PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
               ).flatten
             )
           }

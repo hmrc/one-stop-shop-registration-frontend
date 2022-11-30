@@ -17,6 +17,7 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
 import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -36,6 +37,9 @@ import views.html.previousRegistrations.CheckPreviousSchemeAnswersView
 import scala.concurrent.Future
 
 class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
+
+  private val formProvider = new CheckPreviousSchemeAnswersFormProvider()
+  private val form = formProvider()
 
   private val index                 = Index(0)
   private val country               = Country.euCountries.head
@@ -65,13 +69,13 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
         val lists = Seq(SummaryListViewModel(
           Seq(
-            PreviousSchemeSummary.row(baseUserAnswers, index),
+            PreviousSchemeSummary.row(baseUserAnswers, index, index),
             PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
           ).flatten
         ))
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(lists, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
       }
     }
 
