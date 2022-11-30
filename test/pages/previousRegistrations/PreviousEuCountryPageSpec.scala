@@ -19,6 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, Country, Index, NormalMode}
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
 
 class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
@@ -52,7 +53,7 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), "123").success.value
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
         PreviousEuCountryPage(index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(CheckMode, index, index))
       }

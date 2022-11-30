@@ -32,10 +32,20 @@ object PreviousRegistrationDetailsWithOptionalVatNumber {
 
 case class SchemeDetailsWithOptionalVatNumber(
                                                previousScheme: String,
-                                               previousSchemeNumber: Option[String]
+                                               previousSchemeNumbers: Option[SchemeNumbersWithOptionalVatNumber]
                                              )
 
 object SchemeDetailsWithOptionalVatNumber {
 
   implicit val format: OFormat[SchemeDetailsWithOptionalVatNumber] = Json.format[SchemeDetailsWithOptionalVatNumber]
+}
+
+case class SchemeNumbersWithOptionalVatNumber(
+                                               previousSchemeNumber: Option[String],
+                                               previousIntermediaryNumber: Option[String]
+                                             )
+
+object SchemeNumbersWithOptionalVatNumber {
+
+  implicit val format: OFormat[SchemeNumbersWithOptionalVatNumber] = Json.format[SchemeNumbersWithOptionalVatNumber]
 }

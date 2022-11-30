@@ -19,6 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, Index, NormalMode}
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
 
 class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
@@ -27,11 +28,11 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
   "PreviousEuVatNumberPage" - {
 
-    beRetrievable[String](PreviousOssNumberPage(index, index))
+    beRetrievable[PreviousSchemeNumbers](PreviousOssNumberPage(index, index))
 
-    beSettable[String](PreviousOssNumberPage(index, index))
+    beSettable[PreviousSchemeNumbers](PreviousOssNumberPage(index, index))
 
-    beRemovable[String](PreviousOssNumberPage(index, index))
+    beRemovable[PreviousSchemeNumbers](PreviousOssNumberPage(index, index))
 
     "must navigate in Normal mode" - {
 
@@ -46,7 +47,7 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), "123").success.value
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
         PreviousOssNumberPage(index, index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index))
       }

@@ -1,0 +1,19 @@
+{
+  "registeredForOssInEu": false,
+  "previousRegistrations": [
+    {
+      "previousEuCountry": {
+        "code": "AT",
+        "name": "Austria"
+      },
+      "previousSchemesDetails": [
+        {
+          "previousScheme": "ossu",
+          "previousSchemeNumbers": {
+            "previousSchemeNumber": "VAT Number"
+          }
+        }
+      ]
+    }
+  ]
+}

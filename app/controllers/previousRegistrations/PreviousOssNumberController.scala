@@ -18,8 +18,9 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.requests.AuthenticatedDataRequest
 import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
+import models.previousRegistrations.PreviousSchemeNumbers
+import models.requests.AuthenticatedDataRequest
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -47,7 +48,7 @@ class PreviousOssNumberController @Inject()(
 
           val preparedForm = request.userAnswers.get(PreviousOssNumberPage(countryIndex, schemeIndex)) match {
             case None => form
-            case Some(value) => form.fill(value)
+            case Some(value) => form.fill(value.previousSchemeNumber)
           }
           CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
             case countryWithValidationDetails =>
@@ -72,7 +73,7 @@ class PreviousOssNumberController @Inject()(
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(countryIndex, schemeIndex), value))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(countryIndex, schemeIndex), PreviousSchemeNumbers(value, None)))
                 updatedAnswersWithScheme <- Future.fromTry(updatedAnswers.set(PreviousSchemePage(countryIndex, schemeIndex),
                   if (value.startsWith("EU")) {
                     PreviousScheme.OSSNU

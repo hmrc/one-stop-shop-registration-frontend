@@ -18,20 +18,20 @@ package pages
 
 import base.SpecBase
 import models.Index
-import models.previousRegistrations.IossSchemeDetails
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
-import pages.previousRegistrations.PreviousIossNumberPage
+import pages.previousRegistrations.{PreviousIossNumberPage, PreviousSchemeNumbersPage}
 
 class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
-/*  "PreviousIossNumberPage" - {
+  "PreviousIossNumberPage" - {
 
-    beRetrievable[IossSchemeDetails](PreviousIossNumberPage(index, index))
+    beRetrievable[PreviousSchemeNumbers](PreviousIossNumberPage(index, index))
 
-    beSettable[IossSchemeDetails](PreviousIossNumberPage(index, index))
+    beSettable[PreviousSchemeNumbers](PreviousIossNumberPage(index, index))
 
-    beRemovable[IossSchemeDetails](PreviousIossNumberPage(index, index))
-  }*/
+    beRemovable[PreviousSchemeNumbers](PreviousIossNumberPage(index, index))
+  }
 }

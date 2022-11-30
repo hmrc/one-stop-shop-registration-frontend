@@ -18,13 +18,14 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
-import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
-import org.mockito.ArgumentMatchers.any
+import models.{Country, Index, NormalMode, PreviousScheme}
+import models.previousRegistrations.PreviousSchemeNumbers
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{CheckPreviousSchemeAnswersPage, PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -50,13 +51,13 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(index), country).success.value
       .set(PreviousSchemePage(index, index), PreviousScheme.values.head).success.value
-      .set(PreviousOssNumberPage(index, index), "123456789").success.value
+      .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123456789", None)).success.value
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
   }
 
-  "CheckEuVatDetailsAnswersController" - {
+  "CheckPreviousSchemeAnswersController" - {
 
     "must return OK and the correct view for a GET when answers are complete" in {
 
@@ -94,21 +95,56 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
     "on a POST" - {
 
-      "must redirect to the next page when answers are complete" in {
+      "must save the answer and redirect to the next page when valid data is submitted" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
         running(application) {
-          val request = FakeRequest(POST, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onSubmit(NormalMode, index).url)
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onSubmit(NormalMode, index).url)
+              .withFormUrlEncodedBody(("value", "true"))
+
           val result = route(application, request).value
+          val expectedAnswers = baseUserAnswers.set(CheckPreviousSchemeAnswersPage(index), true).success.value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual CheckPreviousSchemeAnswersPage(index).navigate(NormalMode, baseUserAnswers).url
+          redirectLocation(result).value mustEqual CheckPreviousSchemeAnswersPage(index).navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
+      }
+
+      "must return a Bad Request and errors when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onSubmit(NormalMode, index).url)
+              .withFormUrlEncodedBody(("value", ""))
+
+          val boundForm = form.bind(Map("value" -> ""))
+
+          val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
+          implicit val msgs: Messages = messages(application)
+
+          val list = Seq(SummaryListViewModel(
+            Seq(
+              PreviousSchemeSummary.row(baseUserAnswers, index, index),
+              PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
+            ).flatten
+          ))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(boundForm, NormalMode, list, index, country, canAddScheme = true)(request, implicitly).toString
         }
       }
 

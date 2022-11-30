@@ -147,7 +147,9 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |    },
                    |    "previousSchemesDetails": [ {
                    |      "previousScheme": "ossu",
-                   |      "previousSchemeNumber": "DE123"
+                   |      "previousSchemeNumbers": {
+                   |        "previousSchemeNumber": "DE123"
+                   |      }
                    |    } ]
                    |  } ],
                    |  "bankDetails" : {

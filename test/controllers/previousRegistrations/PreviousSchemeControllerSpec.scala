@@ -17,19 +17,19 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import forms.previousRegistrations.{PreviousSchemeFormProvider, PreviousSchemeTypeFormProvider}
-import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
+import forms.previousRegistrations.PreviousSchemeTypeFormProvider
+import models.{Country, Index, NormalMode, PreviousSchemeType, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemeTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.previousRegistrations.PreviousSchemeView
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
 
@@ -54,11 +54,6 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[PreviousSchemeView]
-
-        val test = status(result)
-        val content = contentAsString(result)
-
-        test
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, index, index)(request, messages(application)).toString

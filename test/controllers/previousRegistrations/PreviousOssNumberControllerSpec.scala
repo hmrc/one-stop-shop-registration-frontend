@@ -18,11 +18,12 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, NormalMode}
+import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme}
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -64,7 +65,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(PreviousOssNumberPage(index, index), "answer").success.value
+      val userAnswers = baseAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -80,29 +81,61 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" - {
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+      "when the ID starts with EU it sets to non-union" in {
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(baseAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, previousOssNumberRoute)
-            .withFormUrlEncodedBody(("value", "12345678"))
+        running(application) {
+          val request =
+            FakeRequest(POST, previousOssNumberRoute)
+              .withFormUrlEncodedBody(("value", "EU345678"))
 
-        val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousOssNumberPage(index, index), "12345678").success.value
+          val result = route(application, request).value
+          val expectedAnswers = baseAnswers
+            .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("EU345678", None)).success.value
+            .set(PreviousSchemePage(index, index), PreviousScheme.OSSNU).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
       }
+
+      "when the ID doesn't start with EU it to union" in {
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousOssNumberRoute)
+              .withFormUrlEncodedBody(("value", "12345678"))
+
+          val result = route(application, request).value
+          val expectedAnswers = baseAnswers
+            .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("12345678", None)).success.value
+            .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
+      }
+
+
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {

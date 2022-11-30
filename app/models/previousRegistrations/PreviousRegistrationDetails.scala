@@ -31,7 +31,7 @@ object PreviousRegistrationDetails {
 
 case class PreviousSchemeDetails(
                                   previousScheme: String,
-                                  previousSchemeNumber: String
+                                  previousSchemeNumbers: PreviousSchemeNumbers
                                 )
 
 object PreviousSchemeDetails {

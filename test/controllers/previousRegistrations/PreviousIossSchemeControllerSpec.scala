@@ -18,11 +18,11 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossSchemeFormProvider
-import models.{Country, Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode, PreviousScheme, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossSchemePage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -78,28 +78,59 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must save the answer and redirect to the next page when valid data is submitted" - {
+      "and also sets previous scheme as with intermediary when true" in {
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(baseAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, previousIossSchemeRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+        running(application) {
+          val request =
+            FakeRequest(POST, previousIossSchemeRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-        val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousIossSchemePage(index, index), true).success.value
+          val result = route(application, request).value
+          val expectedAnswers = baseAnswers
+            .set(PreviousIossSchemePage(index, index), true).success.value
+            .set(PreviousSchemePage(index, index), PreviousScheme.IOSSWI).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
+      }
+
+      "and also sets previous scheme as without intermediary when false" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousIossSchemeRoute)
+              .withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+          val expectedAnswers = baseAnswers
+            .set(PreviousIossSchemePage(index, index), false).success.value
+            .set(PreviousSchemePage(index, index), PreviousScheme.IOSSWOI).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
       }
     }
 

@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, PreviousSchemeNumbers, SchemeDetailsWithOptionalVatNumber}
 import models.{Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -46,7 +46,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
-      .set(PreviousOssNumberPage(Index(0), Index(0)), "foo").success.value
+      .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("foo", None)).success.value
 
   private val incompleteAnswers =
     basicUserAnswersWithVatInfo

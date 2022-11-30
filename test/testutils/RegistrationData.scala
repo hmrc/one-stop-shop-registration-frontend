@@ -19,6 +19,7 @@ package testutils
 import generators.Generators
 import models.domain._
 import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, PreviousScheme}
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
 
@@ -95,7 +96,7 @@ object RegistrationData extends Generators with EitherValues {
           previousSchemesDetails = Seq(
             PreviousSchemeDetails(
               previousScheme = PreviousScheme.OSSU,
-              previousSchemeNumber = "DE123"
+              previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
             )
           )
         )

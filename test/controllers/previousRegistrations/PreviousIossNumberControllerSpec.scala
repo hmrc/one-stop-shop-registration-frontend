@@ -19,11 +19,11 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossNumberFormProvider
 import models.{Country, Index, NormalMode, UserAnswers}
-import models.previousRegistrations.IossSchemeDetails
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -39,7 +39,9 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
   private val index = Index(0)
 
   private val country = Country.euCountries.head
-  private val baseAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
+  private val baseAnswers = emptyUserAnswers
+    .set(PreviousEuCountryPage(index), country).success.value
+    .set(PreviousIossSchemePage(index, index), false).success.value
 
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
 
@@ -63,7 +65,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(PreviousIossNumberPage(index, index), IossSchemeDetails("previousScheme", "answer", None)).success.value
+      val userAnswers = baseAnswers
+        .set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,7 +78,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IossSchemeDetails("previousScheme", "answer", None)), NormalMode, index, index, country, hasIntermediary = false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(PreviousSchemeNumbers("answer", None)), NormalMode, index, index, country, hasIntermediary = false)(request, messages(application)).toString
       }
     }
 
@@ -93,10 +96,10 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousIossNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), IossSchemeDetails("previousScheme", "answer", None)).success.value
+        val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual PreviousIossNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
@@ -111,9 +114,9 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousIossNumberRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("previousSchemeNumber", ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("previousSchemeNumber" -> ""))
 
         val view = application.injector.instanceOf[PreviousIossNumberView]
 
@@ -145,7 +148,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousIossNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
 
         val result = route(application, request).value
 

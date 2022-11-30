@@ -22,15 +22,16 @@ import play.api.data.FormError
 
 class PreviousIossNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "previousIossNumber.error.required"
-  val lengthKey = "previousIossNumber.error.length"
   val maxLength = 100
 
   val form = new PreviousIossNumberFormProvider()()
 
-  ".value" - {
+  ".previousSchemeNumber" - {
 
-    val fieldName = "value"
+    val requiredKey = "previousIossNumber.error.schemeNumber.required"
+    val lengthKey = "previousIossNumber.error.schemeNumber.length"
+
+    val fieldName = "previousSchemeNumber"
 
     behave like fieldThatBindsValidData(
       form,
@@ -49,6 +50,26 @@ class PreviousIossNumberFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+
+  ".intermediaryNumber" - {
+
+    val lengthKey = "previousIossNumber.error.intermediaryNumber.length"
+
+    val fieldName = "intermediaryNumber"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
   }
 }

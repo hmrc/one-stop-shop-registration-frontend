@@ -16,12 +16,10 @@
 
 package viewmodels.checkAnswers.previousRegistrations
 
-import models.{CheckMode, Index, UserAnswers}
+import models.{Index, UserAnswers}
 import pages.previousRegistrations.PreviousOssNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.previousRegistration.AllPreviousRegistrationsQuery
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -34,7 +32,7 @@ object PreviousSchemeNumberSummary {
 
         SummaryListRowViewModel(
           key = "previousSchemeNumber.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(answer).toString),
+          value = ValueViewModel(HtmlFormat.escape(answer.previousSchemeNumber).toString),
           actions = Seq()
         )
     }

@@ -57,16 +57,13 @@ class PreviousIossSchemeController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex))),
 
         value => {
-          println("1")
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossSchemePage(countryIndex, schemeIndex), value))
             updatedAnswersWithPreviousScheme <- Future.fromTry(updatedAnswers.set(
               PreviousSchemePage(countryIndex, schemeIndex),
               if (value) {
-                println("2")
                 PreviousScheme.IOSSWI
               } else {
-                println("3")
                 PreviousScheme.IOSSWOI
               }
             ))
