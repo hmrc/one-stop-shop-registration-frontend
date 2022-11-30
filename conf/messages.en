@@ -434,7 +434,9 @@ previousIossNumber.intermediaryNumber = Intermediary identification number
 previousIossNumber.intermediaryNumber.hint = This will start with IN
 previousIossNumber.intermediaryNumber.checkYourAnswersLabel = Intermediary number
 previousIossNumber.checkYourAnswersLabel = Registration number
-previousIossNumber.error.required = Enter your IOSS registration number
+previousIossNumber.error.previousScheme.required = Enter your scheme number
+previousIossNumber.error.schemeNumber.required = Enter your IOSS registration number
+previousIossNumber.error.intermediaryNumber.required = Enter your intermediary number
 previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
 previousIossNumber.change.hidden = PreviousIossNumber
 

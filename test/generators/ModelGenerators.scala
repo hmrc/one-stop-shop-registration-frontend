@@ -20,6 +20,7 @@ import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
+import models.previousRegistrations.IossSchemeDetails
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
@@ -39,6 +40,13 @@ trait ModelGenerators {
     Arbitrary {
       Gen.oneOf(PreviousSchemeType.values.toSeq)
     }
+
+/*
+  implicit lazy val arbitraryPreviousIossSchemeDetails: Arbitrary[IossSchemeDetails] =
+    Arbitrary {
+      IossSchemeDetails(PreviousScheme.IOSSWI.toString, "12345667", Some("test"))
+    }
+*/
 
   implicit lazy val arbitrarySalesChannels: Arbitrary[SalesChannels] =
     Arbitrary {

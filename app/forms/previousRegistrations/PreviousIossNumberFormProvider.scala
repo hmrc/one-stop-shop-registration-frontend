@@ -17,15 +17,21 @@
 package forms.previousRegistrations
 
 import forms.mappings.Mappings
+import models.previousRegistrations.IossSchemeDetails
 import play.api.data.Form
+import play.api.data.Forms._
 
 import javax.inject.Inject
 
 class PreviousIossNumberFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[IossSchemeDetails] =
     Form(
-      "value" -> text("previousIossNumber.error.required")
-        .verifying(maxLength(100, "previousIossNumber.error.length"))
+      mapping(
+        "previousScheme" -> text("previousIossNumber.error.previousScheme.required"),
+        "previousSchemeNumber" -> text("previousIossNumber.error.schemeNumber.required")
+          .verifying(maxLength(100, "previousIossNumber.error.length")),
+        "intermediaryNumber" -> optional(text("previousIossNumber.error.intermediaryNumber.required"))
+      )(IossSchemeDetails.apply)(IossSchemeDetails.unapply)
     )
 }

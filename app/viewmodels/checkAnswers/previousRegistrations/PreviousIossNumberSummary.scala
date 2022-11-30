@@ -14,37 +14,28 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.previousRegistrations
 
 import models.{CheckMode, Index, UserAnswers}
-import pages.previousRegistrations.PreviousIossSchemePage
+import pages.previousRegistrations.PreviousIossNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object PreviousIossSchemeSummary  {
+object PreviousIossNumberSummary {
 
   def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PreviousIossSchemePage(countryIndex, schemeIndex)).map {
+    answers.get(PreviousIossNumberPage(countryIndex, schemeIndex)).map {
       answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"previousIossScheme.$answer"))
-          )
-        )
-
         SummaryListRowViewModel(
-          key     = "previousIossScheme.checkYourAnswersLabel",
-          value   = value,
+          key = "previousIossNumber.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlFormat.escape(answer.previousSchemeNumber).toString),
           actions = Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(CheckMode, countryIndex, schemeIndex).url
-            ).withVisuallyHiddenText(messages("previousIossScheme.change.hidden"))
+            ActionItemViewModel("site.change", controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex).url)
+              .withVisuallyHiddenText(messages("previousIossNumber.change.hidden"))
           )
         )
     }

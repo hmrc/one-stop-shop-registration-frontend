@@ -26,11 +26,15 @@
 
         @if(hasIntermediary) {
             <h1 class="govuk-heading-xl">@messages("previousIossNumber.headingWithIntermediary", country.name)</h1>
+
+            <input type="hidden" name="previousScheme" id="previousScheme" value="@PreviousScheme.IOSSWI"/>
+        } else {
+            <input type="hidden" name="previousScheme" id="previousScheme" value="@PreviousScheme.IOSSWOI"/>
         }
 
         @govukInput(
             InputViewModel(
-                field = form("value"),
+                field = form("previousSchemeNumber"),
                 label =
                     if(hasIntermediary) {
                         LabelViewModel(messages("previousIossNumber.iossNumber", country.name)).withCssClass("govuk-label--m")
@@ -47,7 +51,7 @@
 
             @govukInput(
                 InputViewModel(
-                    field = form("intermediary-value"),
+                    field = form("intermediaryNumber"),
                     label = LabelViewModel(messages("previousIossNumber.intermediaryNumber", country.name)).withCssClass("govuk-label--m")
                 )
                 .withWidth(Full)
