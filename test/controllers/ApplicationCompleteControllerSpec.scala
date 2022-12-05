@@ -31,10 +31,10 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
-import services.PeriodService
+import services.{DateService, PeriodService}
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate, ZoneId}
 
 
 class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
@@ -222,13 +222,19 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view when Date Of First Sale is the same to the Commencement Date" in {
 
+        val todayInstant = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
+
+        val stubClockForToday = Clock.fixed(todayInstant, ZoneId.systemDefault)
+
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(EmailConfirmationQuery, true).success.value
 
+        val dateService = new DateService(stubClockForToday)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
@@ -263,15 +269,22 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view when Date Of First Sale is different to the Commencement Date" in {
 
+        val aug11thInstant =
+          LocalDate.of(2021,8,11).atStartOfDay(ZoneId.systemDefault).toInstant
+
+        val stubClockFor11Aug = Clock.fixed(aug11thInstant, ZoneId.systemDefault)
+
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
+        val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
