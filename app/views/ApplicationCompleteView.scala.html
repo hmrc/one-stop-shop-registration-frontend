@@ -25,10 +25,6 @@
     vrn: Vrn,
     feedbackLink: String,
     commencementDate: String,
-    lastDayOfCalendarQuarter: String,
-    startOfCurrentQuarter: String,
-    startOfNextQuarter: String,
-    isDOFSDifferentToCommencementDate: Boolean,
     externalUrl: Option[String] = None,
     organisationName: String,
     periodOfFirstReturn: String,
@@ -50,16 +46,6 @@
         <div class="govuk-body">@messages("applicationComplete.payVat.text")</div>
 
         <div class="govuk-body">@messages("applicationComplete.returns.text", periodOfFirstReturn, firstDayOfNextPeriod, commencementDate)</div>
-
-        @if(isDOFSDifferentToCommencementDate){
-            <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
-
-            <h2 class="govuk-heading-m">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</h2>
-
-            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter")</div>
-
-            <h2 class="govuk-heading-m">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</h2>
-        }
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
 

@@ -42,7 +42,7 @@ class ApplicationCompleteController @Inject()(
   frontendAppConfig: FrontendAppConfig,
   dateService: DateService,
   sessionRepository: SessionRepository,
-  periodService: PeriodService,
+  periodService: PeriodService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -55,9 +55,6 @@ class ApplicationCompleteController @Inject()(
             organisationName <- getOrganisationName(request.userAnswers)
             commencementDate <- getStartDate(request.userAnswers)
           } yield {
-            val dateOfFirstSale = request.userAnswers.get(DateOfFirstSalePage)
-            val isDOFSDifferentToCommencementDate =
-              dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
             val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
             val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
             val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
@@ -68,10 +65,6 @@ class ApplicationCompleteController @Inject()(
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
                   commencementDate.format(dateFormatter),
-                  dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-                  dateService.startOfCurrentQuarter.format(dateFormatter),
-                  dateService.startOfNextQuarter.format(dateFormatter),
-                  isDOFSDifferentToCommencementDate,
                   savedUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,
@@ -84,10 +77,6 @@ class ApplicationCompleteController @Inject()(
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
                   commencementDate.format(dateFormatter),
-                  dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-                  dateService.startOfCurrentQuarter.format(dateFormatter),
-                  dateService.startOfNextQuarter.format(dateFormatter),
-                  isDOFSDifferentToCommencementDate,
                   savedUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,

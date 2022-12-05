@@ -164,10 +164,6 @@ notInControlOfMovingGoods.p2 = The online marketplaces will be responsible for p
 applicationComplete.title = You are registered for the One Stop Shop Union scheme
 applicationComplete.heading = You are registered for the One Stop Shop Union scheme
 applicationComplete.reference = Your reference number is <span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-applicationComplete.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
-applicationComplete.CurrentQuarter.heading = Between {0} and {1}
-applicationComplete.CurrentQuarter = If your eligible sales in any 12-month period goes over £8,818 (10,000 euros), you need to register for and pay VAT in each EU country where you made those sales.
-applicationComplete.nextQuarter.heading = {0} onwards
 applicationComplete.next = What happens next
 applicationComplete.link.BTA = Manage your One Stop Shop returns in your account.
 applicationComplete.feedback.link.text = What did you think of this service?

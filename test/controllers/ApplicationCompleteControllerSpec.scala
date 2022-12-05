@@ -31,10 +31,10 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
-import services.{DateService, PeriodService}
+import services.PeriodService
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
-import java.time.{Clock, LocalDate, ZoneId}
+import java.time.LocalDate
 
 
 class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
@@ -60,7 +60,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
     "when the scheme has started" - {
 
-      "must return OK and the correct view for a GET with email confirmation and no enrolments" in {
+      "must return OK and the correct view for a GET with no enrolments" in {
 
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
@@ -82,12 +82,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
-          val dateService = application.injector.instanceOf[DateService]
           val commencementDate = LocalDate.now()
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-          val startOfNextQuarter = dateService.startOfNextQuarter
-          val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -97,10 +92,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             vrn,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            startOfCurrentQuarter.format(dateFormatter),
-            startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate,
             None,
             "Company name",
             periodOfFirstReturn.displayShortText,
@@ -109,7 +100,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must return OK and the correct view for a GET with email confirmation and enrolments enabled" in {
+      "must return OK and the correct view for a GET with enrolments enabled" in {
 
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
@@ -131,12 +122,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteWithEnrolmentView]
-          val dateService = application.injector.instanceOf[DateService]
           val commencementDate = LocalDate.now()
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-          val startOfNextQuarter = dateService.startOfNextQuarter
-          val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -146,10 +132,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             vrn,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            startOfCurrentQuarter.format(dateFormatter),
-            startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate,
             None,
             "Company name",
             periodOfFirstReturn.displayShortText,
@@ -179,12 +161,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val dateService = application.injector.instanceOf[DateService]
           val commencementDate = LocalDate.now()
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-          val startOfNextQuarter = dateService.startOfNextQuarter
-          val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -195,10 +172,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             vrn,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            startOfCurrentQuarter.format(dateFormatter),
-            startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate,
             None,
             "Company name",
             periodOfFirstReturn.displayShortText,
@@ -228,12 +201,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val dateService = application.injector.instanceOf[DateService]
           val commencementDate = LocalDate.now()
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-          val startOfNextQuarter = dateService.startOfNextQuarter
-          val isDOFSDifferentToCommencementDate = dateService.isDOFSDifferentToCommencementDate(None, commencementDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -244,10 +212,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             vrn,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            startOfCurrentQuarter.format(dateFormatter),
-            startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate,
             None,
             "Company name",
             periodOfFirstReturn.displayShortText,
@@ -258,19 +222,13 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view when Date Of First Sale is the same to the Commencement Date" in {
 
-        val todayInstant = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
-
-        val stubClockForToday = Clock.fixed(todayInstant, ZoneId.systemDefault)
-
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(EmailConfirmationQuery, true).success.value
 
-        val dateService = new DateService(stubClockForToday)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
-            .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
@@ -284,13 +242,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
-          val dateOfFirstSale = LocalDate.now()
           val commencementDate = LocalDate.now()
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-          val startOfNextQuarter = dateService.startOfNextQuarter
-          val isDOFSDifferentToCommencementDate =
-            dateService.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale),commencementDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -301,10 +253,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             vrn,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            startOfCurrentQuarter.format(dateFormatter),
-            startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate,
             None,
             "Company name",
             periodOfFirstReturn.displayShortText,
@@ -315,22 +263,15 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view when Date Of First Sale is different to the Commencement Date" in {
 
-        val aug11thInstant =
-          LocalDate.of(2021,8,11).atStartOfDay(ZoneId.systemDefault).toInstant
-
-        val stubClockFor11Aug = Clock.fixed(aug11thInstant, ZoneId.systemDefault)
-
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
-            .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
@@ -341,13 +282,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
-          val dateOfFirstSale = LocalDate.of(2021, 7, 1)
           val commencementDate = LocalDate.of(2021, 10, 1)
-          val lastDayOfCalendarQuarter = dateService.lastDayOfCalendarQuarter
-          val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-          val startOfNextQuarter = dateService.startOfNextQuarter
-          val isDOFSDifferentToCommencementDate =
-            dateService.isDOFSDifferentToCommencementDate(Some(dateOfFirstSale),commencementDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -358,10 +293,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             vrn,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
-            lastDayOfCalendarQuarter.format(dateFormatter),
-            startOfCurrentQuarter.format(dateFormatter),
-            startOfNextQuarter.format(dateFormatter),
-            isDOFSDifferentToCommencementDate,
             None,
             "Company name",
             periodOfFirstReturn.displayShortText,
