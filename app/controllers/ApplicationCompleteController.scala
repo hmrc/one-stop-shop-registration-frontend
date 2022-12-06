@@ -30,7 +30,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -68,7 +67,7 @@ class ApplicationCompleteController @Inject()(
                   savedUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,
-                  format(firstDayOfNextPeriod)
+                  firstDayOfNextPeriod.format(dateFormatter)
                 )
               )
             } else {
@@ -80,7 +79,7 @@ class ApplicationCompleteController @Inject()(
                   savedUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,
-                  format(firstDayOfNextPeriod)
+                  firstDayOfNextPeriod.format(dateFormatter)
                 )
               )
             }
@@ -100,10 +99,4 @@ class ApplicationCompleteController @Inject()(
       case Some(vatInfo) => Some(vatInfo.organisationName)
       case _             => None
     }
-
-  private def format(date: LocalDate) = {
-    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-    date.format(formatter)
-  }
-
 }
