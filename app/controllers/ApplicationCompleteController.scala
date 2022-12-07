@@ -20,14 +20,12 @@ import config.FrontendAppConfig
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers
-import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
+import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.twirl.api.HtmlFormat
-import queries.EmailConfirmationQuery
 import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
-import services.DateService
+import services.{DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
@@ -42,7 +40,8 @@ class ApplicationCompleteController @Inject()(
   viewEnrolments: ApplicationCompleteWithEnrolmentView,
   frontendAppConfig: FrontendAppConfig,
   dateService: DateService,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  periodService: PeriodService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -52,48 +51,35 @@ class ApplicationCompleteController @Inject()(
       sessionRepository.get(request.userId).map {
         sessionData =>
           {for {
-            contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)
-            showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
+            organisationName <- getOrganisationName(request.userAnswers)
             commencementDate <- getStartDate(request.userAnswers)
           } yield {
-            val dateOfFirstSale = request.userAnswers.get(DateOfFirstSalePage)
-            val vatReturnEndDate = dateService.getVatReturnEndDate(commencementDate)
-            val vatReturnDeadline = dateService.getVatReturnDeadline(vatReturnEndDate)
-            val isDOFSDifferentToCommencementDate =
-              dateService.isDOFSDifferentToCommencementDate(dateOfFirstSale, commencementDate)
             val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
+            val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
+            val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
+            val firstDayOfNextPeriod = nextPeriod.firstDay
             if(frontendAppConfig.enrolmentsEnabled) {
               Ok(
                 viewEnrolments(
-                  HtmlFormat.escape(contactDetails.emailAddress).toString,
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
-                  showEmailConfirmation,
                   commencementDate.format(dateFormatter),
-                  vatReturnEndDate.format(dateFormatter),
-                  vatReturnDeadline.format(dateFormatter),
-                  dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-                  dateService.startOfCurrentQuarter.format(dateFormatter),
-                  dateService.startOfNextQuarter.format(dateFormatter),
-                  isDOFSDifferentToCommencementDate,
-                  savedUrl
+                  savedUrl,
+                  organisationName,
+                  periodOfFirstReturn.displayShortText,
+                  firstDayOfNextPeriod.format(dateFormatter)
                 )
               )
             } else {
               Ok(
                 view(
-                  HtmlFormat.escape(contactDetails.emailAddress).toString,
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
-                  showEmailConfirmation,
                   commencementDate.format(dateFormatter),
-                  vatReturnEndDate.format(dateFormatter),
-                  vatReturnDeadline.format(dateFormatter),
-                  dateService.lastDayOfCalendarQuarter.format(dateFormatter),
-                  dateService.startOfCurrentQuarter.format(dateFormatter),
-                  dateService.startOfNextQuarter.format(dateFormatter),
-                  isDOFSDifferentToCommencementDate,
-                  savedUrl
+                  savedUrl,
+                  organisationName,
+                  periodOfFirstReturn.displayShortText,
+                  firstDayOfNextPeriod.format(dateFormatter)
                 )
               )
             }
@@ -106,5 +92,11 @@ class ApplicationCompleteController @Inject()(
     answers.get(DateOfFirstSalePage) match {
       case Some(startDate) => Some(dateService.startDateBasedOnFirstSale(startDate))
       case None            => Some(LocalDate.now())
+    }
+
+  private def getOrganisationName(answers: UserAnswers): Option[String] =
+    answers.vatInfo match {
+      case Some(vatInfo) => Some(vatInfo.organisationName)
+      case _             => None
     }
 }

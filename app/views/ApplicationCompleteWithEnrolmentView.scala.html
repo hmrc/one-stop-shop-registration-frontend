@@ -22,18 +22,13 @@
 )
 
 @(
-    email: String,
     vrn: Vrn,
     feedbackLink: String,
-    showEmailConfirmation: Boolean,
     commencementDate: String,
-    vatReturnEndDate: String,
-    vatReturnDeadline: String,
-    lastDayOfCalendarQuarter: String,
-    startOfCurrentQuarter: String,
-    startOfNextQuarter: String,
-    isDOFSDifferentToCommencementDate: Boolean,
-    externalUrl: Option[String] = None
+    externalUrl: Option[String] = None,
+    organisationName: String,
+    periodOfFirstReturn: String,
+    firstDayOfNextPeriod: String
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.enrolment.title")),  showBackLink = false) {
@@ -42,42 +37,26 @@
             <h1 class="govuk-panel__title">@messages("applicationComplete.enrolment.heading")</h1>
         </div>
 
-        @if(showEmailConfirmation) {
-            <div class="govuk-body">
-                @Html(messages("applicationComplete.enrolment.confirmation", email))
-            </div>
-        }
+        <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
 
         <div class="govuk-body">@Html(messages("applicationComplete.reference", vrn.vrn))</div>
 
-        @if(isDOFSDifferentToCommencementDate){
-            <div class="govuk-body">@messages("applicationComplete.youRegisteredAfterThe10th")</div>
+        <div class="govuk-body">@messages("applicationComplete.useService.text")</div>
 
-            <h2 class="govuk-heading-m">@messages("applicationComplete.CurrentQuarter.heading", startOfCurrentQuarter, lastDayOfCalendarQuarter)</h2>
+        <div class="govuk-body">@messages("applicationComplete.payVat.text")</div>
 
-            <div class="govuk-body">@messages("applicationComplete.CurrentQuarter")</div>
-
-            <h2 class="govuk-heading-m">@messages("applicationComplete.nextQuarter.heading", startOfNextQuarter)</h2>
-        }
-
-        <p class="govuk-body">@messages("applicationComplete.list")
-            <ul class="govuk-list govuk-list--bullet">
-                <li>@messages("applicationComplete.list.p1")</li>
-                <li>@messages("applicationComplete.list.p2")</li>
-            </ul>
-        </p>
-
-        <p class="govuk-body">@messages("applicationComplete.vatRate")</p>
+        <div class="govuk-body">@messages("applicationComplete.returns.text", periodOfFirstReturn, firstDayOfNextPeriod, commencementDate)</div>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
+
         @externalUrl.map(
         url => Html(
         s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("applicationComplete.link.BTA") + "</a></p>"
         ))
 
-        <p class="govuk-body">@messages("applicationComplete.commencementDate", commencementDate, vatReturnEndDate)</p>
+        <p class="govuk-body">@messages("applicationComplete.contact.text")</p>
 
-        <p class="govuk-body">@Html(messages("applicationComplete.contactWithBTA"))</p>
+        <p class="govuk-body">@Html(messages("applicationComplete.readInformation"))</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
