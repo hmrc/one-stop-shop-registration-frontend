@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import models.{Index, NormalMode, PreviousSchemeType}
+import models.{CheckMode, Index, NormalMode, PreviousSchemeType}
 import pages.behaviours.PageBehaviours
 
 class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
@@ -48,6 +48,25 @@ class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
 
         PreviousSchemeTypePage(index, index).navigate(NormalMode, answers)
           .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(NormalMode, index, index))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to OSS scheme number when OSS is selected" in {
+
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.OSS).success.value
+
+        PreviousSchemeTypePage(index, index).navigate(CheckMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(CheckMode, index, index))
+      }
+
+      "to IOSS scheme when IOSS is selected" in {
+
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.IOSS).success.value
+
+        PreviousSchemeTypePage(index, index).navigate(CheckMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(CheckMode, index, index))
       }
     }
   }
