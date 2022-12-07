@@ -35,5 +35,12 @@ case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) exten
       prevRegRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, countryIndex, schemeIndex)
     }
   }
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    if(answers.get(this).contains(PreviousSchemeType.OSS)) {
+      prevRegRoutes.PreviousOssNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex)
+    } else {
+      prevRegRoutes.PreviousIossSchemeController.onPageLoad(CheckMode, countryIndex, schemeIndex)
+    }
+  }
 
 }
