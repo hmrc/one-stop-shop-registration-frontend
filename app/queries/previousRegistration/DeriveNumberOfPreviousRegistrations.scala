@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package queries
+package queries.previousRegistration
 
-import play.api.libs.json.{JsArray, JsPath}
+import play.api.libs.json.{JsObject, JsPath}
+import queries.Derivable
 
-case object AllPreviousRegistrationsRawQuery extends Gettable[JsArray] with Settable[JsArray] {
+case object DeriveNumberOfPreviousRegistrations extends Derivable[List[JsObject], Int] {
+  override val derive: List[JsObject] => Int = _.size
 
   override def path: JsPath = JsPath \ "previousRegistrations"
 }

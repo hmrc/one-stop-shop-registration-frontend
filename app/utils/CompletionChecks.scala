@@ -18,14 +18,15 @@ package utils
 
 import models.{CheckMode, Country, Index}
 import models.euDetails.EuOptionalDetails
-import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
-import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import queries.previousRegistration.{AllPreviousRegistrationsWithOptionalVatNumberQuery, AllPreviousSchemesForCountryQuery, AllPreviousSchemesForCountryWithOptionalVatNumberQuery}
 
 import scala.concurrent.Future
 
@@ -92,8 +93,15 @@ trait CompletionChecks {
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
     request.userAnswers
       .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
-      _.filter(_.previousEuVatNumber.isEmpty)
+      _.filter(_.previousSchemesDetails.exists(_.previousSchemeNumbers.isEmpty))
     ).getOrElse(List.empty)
+  }
+
+  def getIncompletePreviousSchemesDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[SchemeDetailsWithOptionalVatNumber] = {
+    request.userAnswers
+      .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).flatMap(
+      _.find(_.previousSchemeNumbers.isEmpty)
+    )
   }
 
   def firstIndexedIncompleteDeregisteredCountry(incompleteCountries: Seq[Country])
@@ -179,7 +187,7 @@ trait CompletionChecks {
     _.previousEuCountry
   )).map(
     incompleteCountry =>
-      Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+      Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
   )
 
   private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {

@@ -21,11 +21,31 @@ import play.api.libs.json.{Json, OFormat}
 
 case class PreviousRegistrationDetailsWithOptionalVatNumber(
                                         previousEuCountry: Country,
-                                        previousEuVatNumber: Option[String]
+                                        previousSchemesDetails: Seq[SchemeDetailsWithOptionalVatNumber]
                                       )
 
 
 object PreviousRegistrationDetailsWithOptionalVatNumber {
 
   implicit val format: OFormat[PreviousRegistrationDetailsWithOptionalVatNumber] = Json.format[PreviousRegistrationDetailsWithOptionalVatNumber]
+}
+
+case class SchemeDetailsWithOptionalVatNumber(
+                                               previousScheme: String,
+                                               previousSchemeNumbers: Option[SchemeNumbersWithOptionalVatNumber]
+                                             )
+
+object SchemeDetailsWithOptionalVatNumber {
+
+  implicit val format: OFormat[SchemeDetailsWithOptionalVatNumber] = Json.format[SchemeDetailsWithOptionalVatNumber]
+}
+
+case class SchemeNumbersWithOptionalVatNumber(
+                                               previousSchemeNumber: Option[String],
+                                               previousIntermediaryNumber: Option[String]
+                                             )
+
+object SchemeNumbersWithOptionalVatNumber {
+
+  implicit val format: OFormat[SchemeNumbersWithOptionalVatNumber] = Json.format[SchemeNumbersWithOptionalVatNumber]
 }

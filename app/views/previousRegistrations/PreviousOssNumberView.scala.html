@@ -9,11 +9,11 @@
     button: ButtonGroup
 )
 
-@(form: Form[_], mode: Mode, index: Index, countryWithValidationDetails: CountryWithValidationDetails)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, countryWithValidationDetails: CountryWithValidationDetails)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("previousEuVatNumber.title", countryWithValidationDetails.country.name))) {
+@layout(pageTitle = title(form, messages("previousOssNumber.title", countryWithValidationDetails.country.name))) {
 
-    @formHelper(action = controllers.previousRegistrations.routes.PreviousEuVatNumberController.onSubmit(mode, index)) {
+    @formHelper(action = controllers.previousRegistrations.routes.PreviousOssNumberController.onSubmit(mode, countryIndex, schemeIndex)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -22,12 +22,12 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("previousEuVatNumber.heading", countryWithValidationDetails.country.name)).asPageHeading()
+                label = LabelViewModel(messages("previousOssNumber.heading", countryWithValidationDetails.country.name)).asPageHeading()
             )
             .withWidth(Full)
             .withHint(HintViewModel(messages("euVatNumber.hint", countryWithValidationDetails.messageInput, countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))))
         )
 
-        @button("site.continue",  controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(mode, index).url)
+        @button("site.continue",  controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(mode, countryIndex, schemeIndex).url)
     }
 }

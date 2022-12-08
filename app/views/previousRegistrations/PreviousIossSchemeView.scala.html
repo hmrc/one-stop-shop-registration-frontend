@@ -1,0 +1,30 @@
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("previousIossScheme.title"))) {
+
+    @formHelper(action = controllers.previousRegistrations.routes.PreviousIossSchemeController.onSubmit(mode, countryIndex, schemeIndex), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field  = form("value"),
+                legend = LegendViewModel(messages("previousIossScheme.heading")).asPageHeading(),
+            ).withHint(HintViewModel(messages("previousIossScheme.hint")))
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

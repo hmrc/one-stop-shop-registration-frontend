@@ -22,7 +22,7 @@ import models.{Index, Mode}
 import pages.previousRegistrations.PreviousEuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.AllPreviousRegistrationsQuery
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousEuCountryView
 

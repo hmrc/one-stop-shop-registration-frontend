@@ -19,26 +19,27 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, Index, NormalMode}
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
 
-class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
+class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
 
   private val index = Index(0)
 
   "PreviousEuVatNumberPage" - {
 
-    beRetrievable[String](PreviousEuVatNumberPage(index))
+    beRetrievable[PreviousSchemeNumbers](PreviousOssNumberPage(index, index))
 
-    beSettable[String](PreviousEuVatNumberPage(index))
+    beSettable[PreviousSchemeNumbers](PreviousOssNumberPage(index, index))
 
-    beRemovable[String](PreviousEuVatNumberPage(index))
+    beRemovable[PreviousSchemeNumbers](PreviousOssNumberPage(index, index))
 
     "must navigate in Normal mode" - {
 
       "to Add Previous Registration" in {
 
-        PreviousEuVatNumberPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
+        PreviousOssNumberPage(index, index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index))
       }
     }
 
@@ -46,9 +47,9 @@ class PreviousEuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
-        val answers = emptyUserAnswers.set(PreviousEuVatNumberPage(index), "123").success.value
-        PreviousEuVatNumberPage(index).navigate(CheckMode, answers)
-          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
+        PreviousOssNumberPage(index, index).navigate(CheckMode, answers)
+          .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index))
       }
     }
   }

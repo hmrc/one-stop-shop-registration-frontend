@@ -67,7 +67,7 @@
 
                     @button("site.continue",  controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(mode).url)
 
-}
+                }
             } else {
                 <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
                 <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.map(_.previousEuCountry.name).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.previousEuCountry.name} else {incompleteCountries.head.previousEuCountry.name})</p>

@@ -21,17 +21,17 @@ import models.Country
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
-class PreviousEuVatNumberFormProviderSpec extends StringFieldBehaviours {
+class PreviousOssNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "previousEuVatNumber.error.required"
-  val invalidKey = "previousEuVatNumber.error.invalid"
+  val requiredKey = "previousOssNumber.error.required"
+  val invalidKey = "previousOssNumber.error.invalid"
   val validData = "DE+854123"
   val validLowerCaseData = "de+854123"
   val maxLength = 12
 
   val country: Country = arbitrary[Country].sample.value
 
-  val formProvider: PreviousEuVatNumberFormProvider = new PreviousEuVatNumberFormProvider()
+  val formProvider: PreviousOssNumberFormProvider = new PreviousOssNumberFormProvider()
   val form = formProvider(country)
   val countriesAndValidVatNumbers = Seq(
     (Country("AT", "Austria"), Seq("U23456789") ),

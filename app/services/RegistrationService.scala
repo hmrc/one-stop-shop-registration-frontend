@@ -21,10 +21,12 @@ import cats.implicits._
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage}
 import queries._
+import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, AllPreviousSchemesRawQuery}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -154,18 +156,59 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
   }
 
-  private def processPreviousRegistration(answers: UserAnswers, index: Index): ValidationResult[PreviousRegistration] =
-    answers.get(PreviousEuCountryPage(index)) match {
+  private def processPreviousRegistration(answers: UserAnswers, index: Index): ValidationResult[PreviousRegistration] = {
+    (
+      getPreviousCountry(answers, index),
+      getPreviousSchemes(answers, index)
+    ).mapN((previousCountry, previousSchemes) =>
+      PreviousRegistration(previousCountry, previousSchemes)
+    )
+  }
+
+  private def getPreviousCountry(answers: UserAnswers, countryIndex: Index): ValidationResult[Country] =
+    answers.get(PreviousEuCountryPage(countryIndex)) match {
       case Some(country) =>
-        answers.get(PreviousEuVatNumberPage(index)) match {
-          case Some(vatNumber) =>
-            PreviousRegistration(country, vatNumber).validNec
-          case None =>
-            DataMissingError(PreviousEuVatNumberPage(index)).invalidNec
-        }
+        country.validNec
       case None =>
-        DataMissingError(PreviousEuCountryPage(index)).invalidNec
+        DataMissingError(PreviousEuCountryPage(countryIndex)).invalidNec
     }
+
+  private def getPreviousScheme(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[PreviousScheme] =
+    answers.get(PreviousSchemePage(countryIndex, schemeIndex)) match {
+      case Some(scheme) =>
+        scheme.validNec
+      case None =>
+        DataMissingError(PreviousSchemePage(countryIndex, schemeIndex)).invalidNec
+    }
+
+  private def getPreviousSchemeNumber(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[PreviousSchemeNumbers] =
+    answers.get(PreviousOssNumberPage(countryIndex, schemeIndex)) match {
+      case Some(vatNumber) =>
+        vatNumber.validNec
+      case None =>
+        DataMissingError(PreviousOssNumberPage(countryIndex, schemeIndex)).invalidNec
+    }
+
+  private def getPreviousSchemes(answers: UserAnswers, countryIndex: Index): ValidationResult[List[PreviousSchemeDetails]] = {
+    answers.get(AllPreviousSchemesRawQuery(countryIndex)) match {
+      case None =>
+        DataMissingError(AllPreviousSchemesRawQuery(countryIndex)).invalidNec
+      case Some(previousSchemes) =>
+        previousSchemes.value.zipWithIndex.map {
+          case (_, index) =>
+            processPreviousSchemes(answers, countryIndex, Index(index))
+        }.toList.sequence
+    }
+  }
+
+  private def processPreviousSchemes(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[PreviousSchemeDetails] = {
+    (
+      getPreviousScheme(answers, countryIndex, schemeIndex),
+      getPreviousSchemeNumber(answers, countryIndex, schemeIndex)
+    ).mapN((previousScheme, previousSchemeNumber) =>
+      PreviousSchemeDetails(previousScheme, previousSchemeNumber)
+    )
+  }
 
   private def getEuTaxRegistrations(answers: UserAnswers): ValidationResult[List[EuTaxRegistration]] = {
     answers.get(TaxRegisteredInEuPage) match {

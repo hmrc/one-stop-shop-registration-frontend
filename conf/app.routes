@@ -1,331 +1,329 @@
 # microservice specific routes
 
-->          /hmrc-frontend                                            hmrcfrontend.Routes
-
-GET         /                                                         controllers.IndexController.onPageLoad
-
-GET         /assets/*file                                             controllers.Assets.versioned(path="/public", file: Asset)
-
-GET         /language/:lang                                           controllers.LanguageSwitchController.switchToLanguage(lang: String)
-
-GET         /refresh-session                                          controllers.KeepAliveController.keepAliveAuthenticated
-GET         /refresh-session-unauthenticated                          controllers.KeepAliveController.keepAliveUnauthenticated
-
-GET         /there-is-a-problem                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
-
-GET         /start-again                                              controllers.JourneyRecoveryController.onMissingAnswers()
-
-GET         /check-answers                                            controllers.CheckYourAnswersController.onPageLoad
-POST        /check-answers/:incompletePrompt                          controllers.CheckYourAnswersController.onSubmit(incompletePrompt: Boolean)
-
-GET         /unauthorised                                             controllers.UnauthorisedController.onPageLoad
-
-GET         /have-uk-trading-name                                     controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /have-uk-trading-name                                     controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET         /check-have-uk-trading-name                               controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-have-uk-trading-name                               controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
-
-GET         /uk-trading-name/:index                                   controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /uk-trading-name/:index                                   controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-uk-trading-name/:index                             controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-uk-trading-name/:index                             controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /eu-vat-number/:index                                     controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-vat-number/:index                                     controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-vat-number/:index                               controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-vat-number/:index                               controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-vat-number/:index                         controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-vat-number/:index                         controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /eu-tax/:index                                            controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-tax/:index                                            controllers.euDetails.EuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-tax/:index                                      controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-tax/:index                                      controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-tax/:index                                controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-tax/:index                                controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /eu-vat/:index                                            controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-vat/:index                                            controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-vat/:index                                      controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-vat/:index                                      controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-vat/:index                                controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-vat/:index                                controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /add-tax-details                                          controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-tax-details                                          controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
-GET         /check-add-tax-details                                    controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-tax-details                                    controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
-
-GET         /remove-tax-details/:index                                controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /remove-tax-details/:index                                controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-remove-tax-details/:index                          controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-remove-tax-details/:index                          controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /business-contact-details                                 controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /business-contact-details                                 controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /check-business-contact-details                           controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-business-contact-details                           controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
-
-GET         /successful                                               controllers.ApplicationCompleteController.onPageLoad()
-
-GET         /remove-uk-trading-name/:index                            controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /remove-uk-trading-name/:index                            controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-remove-uk-trading-name/:index                      controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-remove-uk-trading-name/:index                      controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /add-uk-trading-name                                      controllers.AddTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-uk-trading-name                                      controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET         /check-add-uk-trading-name                                controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-uk-trading-name                                controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)
-
-GET         /website-address/:index                                   controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /website-address/:index                                   controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-website-address/:index                             controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-website-address/:index                             controllers.WebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /add-website-address                                      controllers.AddWebsiteController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-website-address                                      controllers.AddWebsiteController.onSubmit(mode: Mode = NormalMode)
-GET         /check-add-website-address                                controllers.AddWebsiteController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-website-address                                controllers.AddWebsiteController.onSubmit(mode: Mode = CheckMode)
-
-GET         /remove-website-address/:index                            controllers.DeleteWebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /remove-website-address/:index                            controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-remove-website-address/:index                      controllers.DeleteWebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-remove-website-address/:index                      controllers.DeleteWebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /identity-complete                                        controllers.auth.IdentityVerificationController.handleIvFailure(continueURL: String, journeyId: Option[String])
-GET         /identity-problem                                         controllers.auth.IdentityVerificationController.identityError(continueUrl: String)
-GET         /iv/error                                                 controllers.auth.IvReturnController.error
-GET         /iv/incomplete                                            controllers.auth.IvReturnController.incomplete
-GET         /iv/insufficient-evidence                                 controllers.auth.IvReturnController.insufficientEvidence
-GET         /iv/locked-out                                            controllers.auth.IvReturnController.lockedOut
-GET         /iv/precondition-failed                                   controllers.auth.IvReturnController.preconditionFailed
-GET         /iv/technical-issue                                       controllers.auth.IvReturnController.technicalIssue
-GET         /iv/timeout                                               controllers.auth.IvReturnController.timeout
-GET         /iv/user-aborted                                          controllers.auth.IvReturnController.userAborted(continueUrl: String)
-GET         /iv/insufficient-evidence-sources                         controllers.auth.IvReturnController.notEnoughEvidenceSources
-GET         /iv/failed-matching                                       controllers.auth.IvReturnController.failedMatching(continueUrl: String)
-GET         /iv/failed-identity-verification                          controllers.auth.IvReturnController.failed(continueUrl: String)
-
-GET         /account/register                                         controllers.auth.AuthController.redirectToRegister(continueUrl: String)
-GET         /account/login                                            controllers.auth.AuthController.redirectToLogin(continueUrl: String)
-GET         /account/sign-out-survey                                  controllers.auth.AuthController.signOut
-GET         /account/sign-out                                         controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                                       controllers.auth.SignedOutController.onPageLoad
-GET         /cannot-use-agent                                         controllers.auth.AuthController.unsupportedAffinityGroup()
-GET         /account/provider-unsupported                             controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
-GET         /account/credential-unsupported                           controllers.auth.AuthController.insufficientEnrolments()
-GET         /account/role-unsupported                                 controllers.auth.AuthController.unsupportedCredentialRole
-
-GET         /on-sign-in                                               controllers.auth.AuthController.onSignIn
-GET         /continue-on-sign-in                                      controllers.auth.AuthController.continueOnSignIn
-
-GET         /confirm-vat-details                                      controllers.CheckVatDetailsController.onPageLoad
-POST        /confirm-vat-details                                      controllers.CheckVatDetailsController.onSubmit
-
-GET         /register-different-business                              controllers.UseOtherAccountController.onPageLoad
-
-GET         /eu-fixed-establishment-address/:index                    controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-fixed-establishment-address/:index                    controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-fixed-establishment-address/:index              controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-fixed-establishment-address/:index              controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-fixed-establishment-address/:index        controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-fixed-establishment-address/:index        controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /eu-trading-name/:index                                   controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-trading-name/:index                                   controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-trading-name/:index                             controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-trading-name/:index                             controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-trading-name/:index                       controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-trading-name/:index                       controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /eu-fixed-establishment/:index                            controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-fixed-establishment/:index                            controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-fixed-establishment/:index                      controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-fixed-establishment/:index                      controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-fixed-establishment/:index                controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-fixed-establishment/:index                controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /check-tax-details/:index                                 controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index, incompletePromptShown: Boolean)
-GET         /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /change-check-tax-details/:index                          controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index, incompletePromptShown: Boolean)
-GET         /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-tax-details/:index                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index, incompletePromptShown: Boolean)
-
-GET         /already-registered                                       controllers.AlreadyRegisteredController.onPageLoad()
-
-GET         /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
-POST        /add-deregistration                                       controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
-GET         /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-add-deregistration                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
-
-GET         /deregistered-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /deregistered-country/:index                              controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-deregistered-country/:index                        controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-deregistered-country/:index                        controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /deregistered-eu-vat-number/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /deregistered-eu-vat-number/:index                        controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousEuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-deregistered-eu-vat-number/:index                  controllers.previousRegistrations.PreviousEuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /deregistered                                             controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = NormalMode)
-POST        /deregistered                                             controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = NormalMode)
-GET         /check-deregistered                                       controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-deregistered                                       controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)
-
-
-GET         /remove-deregistration/:index                             controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /remove-deregistration/:index                             controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-remove-deregistration/:index                       controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-remove-deregistration/:index                       controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = CheckMode, index: Index)
-
-GET         /bank-details                                             controllers.BankDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /bank-details                                             controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /check-bank-details                                       controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-bank-details                                       controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
-
-GET         /eu-tax-number/:index                                     controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-tax-number/:index                                     controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-tax-number/:index                               controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-tax-number/:index                               controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-tax-number/:index                         controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-tax-number/:index                         controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET         /give-website-address                                     controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
-POST        /give-website-address                                     controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
-GET         /check-give-website-address                               controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-give-website-address                               controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
-
-GET         /sell-from-northern-ireland                               controllers.SellsGoodsFromNiController.onPageLoad
-POST        /sell-from-northern-ireland                               controllers.SellsGoodsFromNiController.onSubmit
-GET         /check-sell-from-northern-ireland                         controllers.SellsGoodsFromNiController.onPageLoad
-POST        /check-sell-from-northern-ireland                         controllers.SellsGoodsFromNiController.onSubmit
-
-GET         /tax-in-eu                                                controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
-POST        /tax-in-eu                                                controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
-GET         /check-tax-in-eu                                          controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-tax-in-eu                                          controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
-
-GET         /update-vat-details                                       controllers.UpdateVatDetailsController.onPageLoad()
-
-GET         /do-not-sell-from-northern-ireland                        controllers.NotSellingGoodsFromNiController.onPageLoad()
-
-GET         /start-date                                               controllers.CommencementDateController.onPageLoad(mode: Mode = NormalMode)
-POST        /start-date                                               controllers.CommencementDateController.onSubmit(mode: Mode = NormalMode)
-GET         /check-start-date                                         controllers.CommencementDateController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-start-date                                         controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
-
-GET         /register-later                                           controllers.RegisterLaterController.onPageLoad()
-
-GET         /already-eu-registered                                    controllers.RegisteredForOssInEuController.onPageLoad()
-POST        /already-eu-registered                                    controllers.RegisteredForOssInEuController.onSubmit()
-
-GET         /return-later-already-eu-registered                       controllers.CannotRegisterAlreadyRegisteredController.onPageLoad()
-
-GET         /date-of-first-sale                                       controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = NormalMode)
-POST        /date-of-first-sale                                       controllers.DateOfFirstSaleController.onSubmit(mode: Mode = NormalMode)
-GET         /check-date-of-first-sale                                 controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-date-of-first-sale                                 controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
-
-GET         /already-made-sales                                       controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
-POST        /already-made-sales                                       controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
-GET         /check-already-made-sales                                 controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-already-made-sales                                 controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
-
-GET         /online-marketplace                                       controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
-POST        /online-marketplace                                       controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
-GET         /check-online-marketplace                                 controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-online-marketplace                                 controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
-
-GET         /northern-ireland-business                                controllers.BusinessBasedInNiController.onPageLoad
-POST        /northern-ireland-business                                controllers.BusinessBasedInNiController.onSubmit
-
-GET         /northern-ireland-fixed-establishment                     controllers.HasFixedEstablishmentInNiController.onPageLoad
-POST        /northern-ireland-fixed-establishment                     controllers.HasFixedEstablishmentInNiController.onSubmit
-
-GET         /business-pay                                             controllers.LiableForVatOnAllSalesController.onPageLoad()
-POST        /business-pay                                             controllers.LiableForVatOnAllSalesController.onSubmit()
-
-GET         /do-not-pay-sales-on-marketplace                          controllers.LiableForVatOnDirectSalesController.onPageLoad()
-POST        /do-not-pay-sales-on-marketplace                          controllers.LiableForVatOnDirectSalesController.onSubmit()
-
-GET         /cannot-use-no-vat                                        controllers.NotLiableForVatController.onPageLoad()
-
-GET         /sales-on-marketplaces                                    controllers.SalesChannelsController.onPageLoad
-POST        /sales-on-marketplaces                                    controllers.SalesChannelsController.onSubmit
-
-GET         /answers-deleted                                          controllers.AnswersDeletedController.onPageLoad
-
-GET         /planned-first-sale                                       controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
-POST        /planned-first-sale                                       controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
-GET         /check-planned-first-sale                                 controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-planned-first-sale                                 controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
-
-POST        /external-entry                                           controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
-GET         /no-welsh-service                                         controllers.external.NoMoreWelshController.onPageLoad()
-GET         /cannot-register-ni-protocol                              controllers.NiProtocolRejectionController.onPageLoad()
-
-GET         /progress-saved                                           controllers.SavedProgressController.onPageLoad(continueUrl: String)
-
-GET         /continue-registration                                    controllers.ContinueRegistrationController.onPageLoad()
-POST        /continue-registration                                    controllers.ContinueRegistrationController.onSubmit()
-GET         /registration-service-error                               controllers.VatApiDownController.onPageLoad()
-
-GET         /error-submitting-registration                            controllers.ErrorSubmittingRegistrationController.onPageLoad()
-GET         /no-saved-registration                                    controllers.NoRegistrationInProgressController.onPageLoad()
-GET         /account-restore-error                                    controllers.ProblemWithAccountController.onPageLoad()
-
-GET         /already-registered-other-country                         controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
-
-GET        /eu-send-goods/:index                                      controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods/:index                                      controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /check-eu-send-goods/:index                                controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /check-eu-send-goods/:index                                controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET        /first-check-eu-send-goods/:index                          controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST       /first-check-eu-send-goods/:index                          controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET        /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /check-eu-send-goods-trading-name/:index                   controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /check-eu-send-goods-trading-name/:index                   controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET        /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST       /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET        /eu-send-goods-address/:index                              controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods-address/:index                              controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /check-eu-send-goods-address/:index                        controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /check-eu-send-goods-address/:index                        controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET        /first-check-eu-send-goods-address/:index                  controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST       /first-check-eu-send-goods-address/:index                  controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-GET         /email-verification-codes-and-emails-exceeded             controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
-
-GET         /email-verification-codes-exceeded                        controllers.EmailVerificationCodesExceededController.onPageLoad()
-
-GET        /other-country-excluded-and-quarantined                    controllers.OtherCountryExcludedAndQuarantinedController.onPageLoad(countryCode: String, exclusionDate: String)
-
-GET        /eu-send-goods/:index                                      controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods/:index                                      controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /check-eu-send-goods/:index                                controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /check-eu-send-goods/:index                                controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET        /first-check-eu-send-goods/:index                          controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST       /first-check-eu-send-goods/:index                          controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET        /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods-trading-name/:index                         controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /check-eu-send-goods-trading-name/:index                   controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /check-eu-send-goods-trading-name/:index                   controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET        /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST       /first-check-eu-send-goods-trading-name/:index             controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET        /eu-send-goods-address/:index                              controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST       /eu-send-goods-address/:index                              controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET        /check-eu-send-goods-address/:index                        controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST       /check-eu-send-goods-address/:index                        controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET        /first-check-eu-send-goods-address/:index                  controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST       /first-check-eu-send-goods-address/:index                  controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
-GET        /fixed-establishment-vrn-already-registered                controllers.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()
-
-GET        /excluded-vrn                                              controllers.ExcludedVRNController.onPageLoad()
+->          /hmrc-frontend                                                      hmrcfrontend.Routes
+
+GET         /                                                                   controllers.IndexController.onPageLoad
+
+GET         /assets/*file                                                       controllers.Assets.versioned(path="/public", file: Asset)
+
+GET         /language/:lang                                                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
+
+GET         /refresh-session                                                    controllers.KeepAliveController.keepAliveAuthenticated
+GET         /refresh-session-unauthenticated                                    controllers.KeepAliveController.keepAliveUnauthenticated
+
+GET         /there-is-a-problem                                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+
+GET         /start-again                                                        controllers.JourneyRecoveryController.onMissingAnswers()
+
+GET         /check-answers                                                      controllers.CheckYourAnswersController.onPageLoad
+POST        /check-answers/:incompletePrompt                                    controllers.CheckYourAnswersController.onSubmit(incompletePrompt: Boolean)
+
+GET         /unauthorised                                                       controllers.UnauthorisedController.onPageLoad
+
+GET         /have-uk-trading-name                                               controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /have-uk-trading-name                                               controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /check-have-uk-trading-name                                         controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-have-uk-trading-name                                         controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /uk-trading-name/:index                                             controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /uk-trading-name/:index                                             controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-uk-trading-name/:index                                       controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-uk-trading-name/:index                                       controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /eu-vat-number/:index                                               controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-vat-number/:index                                               controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-vat-number/:index                                         controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-vat-number/:index                                         controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-vat-number/:index                                   controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-vat-number/:index                                   controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /eu-tax/:index                                                      controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-tax/:index                                                      controllers.euDetails.EuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-tax/:index                                                controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-tax/:index                                                controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-tax/:index                                          controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-tax/:index                                          controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /eu-vat/:index                                                      controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-vat/:index                                                      controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-vat/:index                                                controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-vat/:index                                                controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-vat/:index                                          controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-vat/:index                                          controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /add-tax-details                                                    controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-tax-details                                                    controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
+GET         /check-add-tax-details                                              controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-add-tax-details                                              controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
+
+GET         /remove-tax-details/:index                                          controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /remove-tax-details/:index                                          controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /business-contact-details                                           controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /business-contact-details                                           controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /check-business-contact-details                                     controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-business-contact-details                                     controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET         /successful                                                         controllers.ApplicationCompleteController.onPageLoad()
+
+GET         /remove-uk-trading-name/:index                                      controllers.DeleteTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /remove-uk-trading-name/:index                                      controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /add-uk-trading-name                                                controllers.AddTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-uk-trading-name                                                controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET         /check-add-uk-trading-name                                          controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-add-uk-trading-name                                          controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /website-address/:index                                             controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /website-address/:index                                             controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-website-address/:index                                       controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-website-address/:index                                       controllers.WebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /add-website-address                                                controllers.AddWebsiteController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-website-address                                                controllers.AddWebsiteController.onSubmit(mode: Mode = NormalMode)
+GET         /check-add-website-address                                          controllers.AddWebsiteController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-add-website-address                                          controllers.AddWebsiteController.onSubmit(mode: Mode = CheckMode)
+
+GET         /remove-website-address/:index                                      controllers.DeleteWebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /remove-website-address/:index                                      controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-remove-website-address/:index                                controllers.DeleteWebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-remove-website-address/:index                                controllers.DeleteWebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /identity-complete                                                  controllers.auth.IdentityVerificationController.handleIvFailure(continueURL: String, journeyId: Option[String])
+GET         /identity-problem                                                   controllers.auth.IdentityVerificationController.identityError(continueUrl: String)
+GET         /iv/error                                                           controllers.auth.IvReturnController.error
+GET         /iv/incomplete                                                      controllers.auth.IvReturnController.incomplete
+GET         /iv/insufficient-evidence                                           controllers.auth.IvReturnController.insufficientEvidence
+GET         /iv/locked-out                                                      controllers.auth.IvReturnController.lockedOut
+GET         /iv/precondition-failed                                             controllers.auth.IvReturnController.preconditionFailed
+GET         /iv/technical-issue                                                 controllers.auth.IvReturnController.technicalIssue
+GET         /iv/timeout                                                         controllers.auth.IvReturnController.timeout
+GET         /iv/user-aborted                                                    controllers.auth.IvReturnController.userAborted(continueUrl: String)
+GET         /iv/insufficient-evidence-sources                                   controllers.auth.IvReturnController.notEnoughEvidenceSources
+GET         /iv/failed-matching                                                 controllers.auth.IvReturnController.failedMatching(continueUrl: String)
+GET         /iv/failed-identity-verification                                    controllers.auth.IvReturnController.failed(continueUrl: String)
+
+GET         /account/register                                                   controllers.auth.AuthController.redirectToRegister(continueUrl: String)
+GET         /account/login                                                      controllers.auth.AuthController.redirectToLogin(continueUrl: String)
+GET         /account/sign-out-survey                                            controllers.auth.AuthController.signOut
+GET         /account/sign-out                                                   controllers.auth.AuthController.signOutNoSurvey
+GET         /account/signed-out                                                 controllers.auth.SignedOutController.onPageLoad
+GET         /cannot-use-agent                                                   controllers.auth.AuthController.unsupportedAffinityGroup()
+GET         /account/provider-unsupported                                       controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
+GET         /account/credential-unsupported                                     controllers.auth.AuthController.insufficientEnrolments()
+GET         /account/role-unsupported                                           controllers.auth.AuthController.unsupportedCredentialRole
+
+GET         /on-sign-in                                                         controllers.auth.AuthController.onSignIn
+GET         /continue-on-sign-in                                                controllers.auth.AuthController.continueOnSignIn
+
+GET         /confirm-vat-details                                                controllers.CheckVatDetailsController.onPageLoad
+POST        /confirm-vat-details                                                controllers.CheckVatDetailsController.onSubmit
+
+GET         /register-different-business                                        controllers.UseOtherAccountController.onPageLoad
+
+GET         /eu-fixed-establishment-address/:index                              controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-fixed-establishment-address/:index                              controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-fixed-establishment-address/:index                        controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-fixed-establishment-address/:index                        controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-fixed-establishment-address/:index                  controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-fixed-establishment-address/:index                  controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /eu-trading-name/:index                                             controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-trading-name/:index                                             controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-trading-name/:index                                       controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-trading-name/:index                                       controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /eu-fixed-establishment/:index                                      controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-fixed-establishment/:index                                      controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-fixed-establishment/:index                                controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-fixed-establishment/:index                                controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-fixed-establishment/:index                          controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-fixed-establishment/:index                          controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /check-tax-details/:index                                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /check-tax-details/:index                                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index, incompletePromptShown: Boolean)
+GET         /change-check-tax-details/:index                                    controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /change-check-tax-details/:index                                    controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index, incompletePromptShown: Boolean)
+GET         /first-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index, incompletePromptShown: Boolean)
+
+GET         /already-registered                                                 controllers.AlreadyRegisteredController.onPageLoad()
+
+GET         /add-deregistration                                                 controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = NormalMode)
+POST        /add-deregistration                                                 controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
+GET         /check-add-deregistration                                           controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-add-deregistration                                           controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
+
+GET         /previous-oss                                                       controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = NormalMode)
+POST        /previous-oss                                                       controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = NormalMode)
+GET         /check-previous-oss                                                 controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-previous-oss                                                 controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)
+
+GET         /previous-country/:index                                            controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-country/:index                                            controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-previous-country/:index                                      controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-previous-country/:index                                      controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /previous-oss-scheme-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+POST        /previous-oss-scheme-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+GET         /check-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+POST        /check-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+
+GET         /previous-scheme/:countryIndex/:schemeIndex                         controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+POST        /previous-scheme/:countryIndex/:schemeIndex                         controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+GET         /check-previous-scheme/:countryIndex/:schemeIndex                   controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+POST        /check-previous-scheme/:countryIndex/:schemeIndex                   controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+
+GET         /previous-ioss-scheme/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+POST        /previous-ioss-scheme/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+GET         /check-previous-ioss-scheme/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+POST        /check-previous-ioss-scheme/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+
+GET         /previous-ioss-number/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+POST        /previous-ioss-number/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
+GET         /check-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+POST        /check-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+
+GET         /previous-scheme-answer/:index                                      controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /previous-scheme-answer/:index                                      controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-previous-scheme-answer/:index                                controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-previous-scheme-answer/:index                                controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /remove-deregistration/:index                                       controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /remove-deregistration/:index                                       controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-remove-deregistration/:index                                 controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-remove-deregistration/:index                                 controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = CheckMode, index: Index)
+
+GET         /bank-details                                                       controllers.BankDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /bank-details                                                       controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /check-bank-details                                                 controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-bank-details                                                 controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET         /eu-tax-number/:index                                               controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-tax-number/:index                                               controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-tax-number/:index                                         controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-tax-number/:index                                         controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /give-website-address                                               controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
+POST        /give-website-address                                               controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
+GET         /check-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
+
+GET         /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onPageLoad
+POST        /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onSubmit
+GET         /check-sell-from-northern-ireland                                   controllers.SellsGoodsFromNiController.onPageLoad
+POST        /check-sell-from-northern-ireland                                   controllers.SellsGoodsFromNiController.onSubmit
+
+GET         /tax-in-eu                                                          controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
+POST        /tax-in-eu                                                          controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
+GET         /check-tax-in-eu                                                    controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-tax-in-eu                                                    controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+
+GET         /update-vat-details                                                 controllers.UpdateVatDetailsController.onPageLoad()
+
+GET         /do-not-sell-from-northern-ireland                                  controllers.NotSellingGoodsFromNiController.onPageLoad()
+
+GET         /start-date                                                         controllers.CommencementDateController.onPageLoad(mode: Mode = NormalMode)
+POST        /start-date                                                         controllers.CommencementDateController.onSubmit(mode: Mode = NormalMode)
+GET         /check-start-date                                                   controllers.CommencementDateController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-start-date                                                   controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
+
+GET         /register-later                                                     controllers.RegisterLaterController.onPageLoad()
+
+GET         /already-eu-registered                                              controllers.RegisteredForOssInEuController.onPageLoad()
+POST        /already-eu-registered                                              controllers.RegisteredForOssInEuController.onSubmit()
+
+GET         /return-later-already-eu-registered                                 controllers.CannotRegisterAlreadyRegisteredController.onPageLoad()
+
+GET         /date-of-first-sale                                                 controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = NormalMode)
+POST        /date-of-first-sale                                                 controllers.DateOfFirstSaleController.onSubmit(mode: Mode = NormalMode)
+GET         /check-date-of-first-sale                                           controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-date-of-first-sale                                           controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
+
+GET         /already-made-sales                                                 controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
+POST        /already-made-sales                                                 controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
+GET         /check-already-made-sales                                           controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-already-made-sales                                           controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
+
+GET         /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
+POST        /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
+GET         /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
+
+GET         /northern-ireland-business                                          controllers.BusinessBasedInNiController.onPageLoad
+POST        /northern-ireland-business                                          controllers.BusinessBasedInNiController.onSubmit
+
+GET         /northern-ireland-fixed-establishment                               controllers.HasFixedEstablishmentInNiController.onPageLoad
+POST        /northern-ireland-fixed-establishment                               controllers.HasFixedEstablishmentInNiController.onSubmit
+
+GET         /business-pay                                                       controllers.LiableForVatOnAllSalesController.onPageLoad()
+POST        /business-pay                                                       controllers.LiableForVatOnAllSalesController.onSubmit()
+
+GET         /do-not-pay-sales-on-marketplace                                    controllers.LiableForVatOnDirectSalesController.onPageLoad()
+POST        /do-not-pay-sales-on-marketplace                                    controllers.LiableForVatOnDirectSalesController.onSubmit()
+
+GET         /cannot-use-no-vat                                                  controllers.NotLiableForVatController.onPageLoad()
+
+GET         /sales-on-marketplaces                                              controllers.SalesChannelsController.onPageLoad
+POST        /sales-on-marketplaces                                              controllers.SalesChannelsController.onSubmit
+
+GET         /answers-deleted                                                    controllers.AnswersDeletedController.onPageLoad
+
+GET         /planned-first-sale                                                 controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
+POST        /planned-first-sale                                                 controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
+GET         /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
+
+POST        /external-entry                                                     controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
+GET         /no-welsh-service                                                   controllers.external.NoMoreWelshController.onPageLoad()
+GET         /cannot-register-ni-protocol                                        controllers.NiProtocolRejectionController.onPageLoad()
+
+GET         /progress-saved                                                     controllers.SavedProgressController.onPageLoad(continueUrl: String)
+
+GET         /continue-registration                                              controllers.ContinueRegistrationController.onPageLoad()
+POST        /continue-registration                                              controllers.ContinueRegistrationController.onSubmit()
+GET         /registration-service-error                                         controllers.VatApiDownController.onPageLoad()
+
+GET         /error-submitting-registration                                      controllers.ErrorSubmittingRegistrationController.onPageLoad()
+GET         /no-saved-registration                                              controllers.NoRegistrationInProgressController.onPageLoad()
+GET         /account-restore-error                                              controllers.ProblemWithAccountController.onPageLoad()
+
+GET         /already-registered-other-country                                   controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
+
+GET         /eu-send-goods/:index                                               controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-send-goods/:index                                               controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-send-goods/:index                                         controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-send-goods/:index                                         controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-send-goods/:index                                   controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-send-goods/:index                                   controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /eu-send-goods-trading-name/:index                                  controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-send-goods-trading-name/:index                                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-send-goods-trading-name/:index                            controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-send-goods-trading-name/:index                            controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-send-goods-trading-name/:index                      controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-send-goods-trading-name/:index                      controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
+GET         /eu-send-goods-address/:index                                       controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
+POST        /eu-send-goods-address/:index                                       controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
+GET         /check-eu-send-goods-address/:index                                 controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckMode, index: Index)
+POST        /check-eu-send-goods-address/:index                                 controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /first-check-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
+POST        /first-check-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /email-verification-codes-and-emails-exceeded                       controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
+
+GET         /email-verification-codes-exceeded                                  controllers.EmailVerificationCodesExceededController.onPageLoad()
+
+GET         /other-country-excluded-and-quarantined                             controllers.OtherCountryExcludedAndQuarantinedController.onPageLoad(countryCode: String, exclusionDate: String)
+
+GET         /fixed-establishment-vrn-already-registered                         controllers.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()
+
+GET         /excluded-vrn                                                       controllers.ExcludedVRNController.onPageLoad()

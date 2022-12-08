@@ -18,8 +18,8 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
-import models.previousRegistrations.PreviousRegistrationDetails
-import models.{Country, Index, NormalMode}
+import models.previousRegistrations.{PreviousRegistrationDetails, PreviousSchemeDetails, PreviousSchemeNumbers}
+import models.{Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -40,13 +40,16 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
   private val index = Index(0)
   private val country = Country.euCountries.head
-  private val previousRegistration = PreviousRegistrationDetails(country, "VAT Number")
+  private val previousSchemeNumbers = PreviousSchemeNumbers("VAT Number", None)
+  private val previousScheme = PreviousSchemeDetails("ossu", previousSchemeNumbers)
+  private val previousRegistration = PreviousRegistrationDetails(country, List(previousScheme))
   private lazy val deletePreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(index), previousRegistration.previousEuCountry).success.value
-      .set(PreviousEuVatNumberPage(index), previousRegistration.previousEuVatNumber).success.value
+      .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+      .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
 
   "DeletePreviousRegistration Controller" - {
 
