@@ -16,6 +16,7 @@
 
 package controllers.previousRegistrations
 
+import config.Constants
 import controllers.actions.AuthenticatedControllerComponents
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
 import models.{Country, Index, Mode}
@@ -34,11 +35,11 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckPreviousSchemeAnswersController @Inject()(
-                                                 override val messagesApi: MessagesApi,
-                                                 cc: AuthenticatedControllerComponents,
-                                                 formProvider: CheckPreviousSchemeAnswersFormProvider,
-                                                 view: CheckPreviousSchemeAnswersView
-                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                                      override val messagesApi: MessagesApi,
+                                                      cc: AuthenticatedControllerComponents,
+                                                      formProvider: CheckPreviousSchemeAnswersFormProvider,
+                                                      view: CheckPreviousSchemeAnswersView
+                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -49,7 +50,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
         country =>
           request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
 
-            val canAddScheme = true // TODO
+            val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
             val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
               SummaryListViewModel(
@@ -80,9 +81,9 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
       getCountry(index) { country =>
 
-        val canAddScheme = true // TODO
-
         request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
+
+          val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
           val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
             SummaryListViewModel(

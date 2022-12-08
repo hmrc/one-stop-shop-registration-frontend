@@ -48,7 +48,7 @@
                 )
             )
         } else {
-            <p class="govuk-body">@messages("checkPreviousSchemeAnswers.maximumReached")</p>
+            <p class="govuk-body">@messages("checkPreviousSchemeAnswers.maximumReached", country.name)</p>
             <input type="hidden" name="value" id="value" value="false"/>
         }
 
