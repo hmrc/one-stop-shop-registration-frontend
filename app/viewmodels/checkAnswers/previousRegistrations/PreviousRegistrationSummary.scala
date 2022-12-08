@@ -34,7 +34,7 @@ object PreviousRegistrationSummary {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-          changeUrl = routes.PreviousEuCountryController.onPageLoad(mode, Index(index)).url,
+          changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
           removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
         )
     }
@@ -45,7 +45,7 @@ object PreviousRegistrationSummary {
 
         val value = previousRegistrations.map {
           details =>
-            HtmlFormat.escape(details.previousEuCountry.name)// TODO check + " - " + HtmlFormat.escape(details.previousEuVatNumber)
+            HtmlFormat.escape(details.previousEuCountry.name)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
