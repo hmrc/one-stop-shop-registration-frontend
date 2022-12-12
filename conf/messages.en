@@ -395,6 +395,7 @@ previousEuCountry.error.duplicate = You selected this EU country already. Select
 
 previousOssNumber.title = Enter your registration number for {0}?
 previousOssNumber.heading = Enter your registration number for {0}?
+previousOssNumber.hint = This will start with DE or EU, for example {0}{1}
 previousOssNumber.error.required = Enter your registration number for {0}
 previousOssNumber.error.invalid = Enter a VAT registration number in the correct format
 
