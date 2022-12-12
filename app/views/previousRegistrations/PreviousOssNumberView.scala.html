@@ -25,7 +25,7 @@
                 label = LabelViewModel(messages("previousOssNumber.heading", countryWithValidationDetails.country.name)).asPageHeading()
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("euVatNumber.hint", countryWithValidationDetails.messageInput, countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))))
+            .withHint(HintViewModel(messages("previousOssNumber.hint",  countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn)))
         )
 
         @button("site.continue",  controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(mode, countryIndex, schemeIndex).url)
