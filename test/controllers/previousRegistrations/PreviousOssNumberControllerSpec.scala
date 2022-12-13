@@ -96,11 +96,11 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         running(application) {
           val request =
             FakeRequest(POST, previousOssNumberRoute)
-              .withFormUrlEncodedBody(("value", "EU345678"))
+              .withFormUrlEncodedBody(("value", "EU123456789"))
 
           val result = route(application, request).value
           val expectedAnswers = baseAnswers
-            .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("EU345678", None)).success.value
+            .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("EU123456789", None)).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.OSSNU).success.value
 
           status(result) mustEqual SEE_OTHER
@@ -122,11 +122,11 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         running(application) {
           val request =
             FakeRequest(POST, previousOssNumberRoute)
-              .withFormUrlEncodedBody(("value", "12345678"))
+              .withFormUrlEncodedBody(("value", "SI12345678"))
 
           val result = route(application, request).value
           val expectedAnswers = baseAnswers
-            .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("12345678", None)).success.value
+            .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("SI12345678", None)).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
 
           status(result) mustEqual SEE_OTHER

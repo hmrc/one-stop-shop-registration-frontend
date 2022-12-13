@@ -115,10 +115,10 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, euVatNumberRoute)
-            .withFormUrlEncodedBody(("value", "12345678"))
+            .withFormUrlEncodedBody(("value", "SI12345678"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), "12345678").success.value
+        val expectedAnswers = baseUserAnswers.set(EuVatNumberPage(index), "SI12345678").success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
@@ -194,7 +194,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when matchType=FixedEstablishmentActiveNETP" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -225,7 +225,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when matchType=TraderIdActiveNETP" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -258,7 +258,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to FixedEstablishmentVRNAlreadyRegisteredController page when matchType=OtherMSNETPActiveNETP" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -291,7 +291,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to ExcludedVRNController page when the vat number is excluded for match FixedEstablishmentQuarantinedNETP " in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -322,7 +322,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to ExcludedVRNController page when the vat number is excluded for match TraderIdQuarantinedNETP " in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -353,7 +353,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to ExcludedVRNController page when the vat number is excluded for match OtherMSNETPQuarantinedNETP " in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -384,7 +384,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to the next page when there is no active trader" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -417,7 +417,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to the next page when there is no excluded trader" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -450,7 +450,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to the next page when no active match found" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
@@ -482,7 +482,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "redirect to the next page when valid data is submitted" in {
 
-        val euVrn: String = "33333333"
+        val euVrn: String = "SI33333333"
 
         val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
           .configure(
