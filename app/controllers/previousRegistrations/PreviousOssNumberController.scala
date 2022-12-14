@@ -45,9 +45,7 @@ class PreviousOssNumberController @Inject()(
       getCountry(countryIndex) {
         country =>
 
-          val currentPreviousScheme = request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex))
-          val otherSelectedScheme = checkPreviousSchemeForCountry(countryIndex)
-          val previousSchemeHintText = getPreviousSchemeHintText(currentPreviousScheme, otherSelectedScheme)
+          val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
 
           val form = formProvider(country)
 
@@ -67,9 +65,7 @@ class PreviousOssNumberController @Inject()(
       getCountry(countryIndex) {
         country =>
 
-          val currentPreviousScheme = request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex))
-          val otherSelectedScheme = checkPreviousSchemeForCountry(countryIndex)
-          val previousSchemeHintText = getPreviousSchemeHintText(currentPreviousScheme, otherSelectedScheme)
+          val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
 
           val form = formProvider(country)
 
@@ -105,6 +101,14 @@ class PreviousOssNumberController @Inject()(
         block(country)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
+  private def determinePreviousSchemeHintText(countryIndex: Index,
+                                              schemeIndex: Index
+                                             )(implicit request: AuthenticatedDataRequest[AnyContent]): PreviousSchemeHintText = {
+
+    getPreviousSchemeHintText(request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex)),
+      checkPreviousSchemeForCountry(countryIndex))
+  }
+
   private def checkPreviousSchemeForCountry(index: Index)
                                            (implicit request: AuthenticatedDataRequest[AnyContent]): Option[PreviousScheme] = {
     request.userAnswers
@@ -116,20 +120,21 @@ class PreviousOssNumberController @Inject()(
     }
   }
 
-  private def getPreviousSchemeHintText(currentPreviousScheme: Option[PreviousScheme], otherSelectedScheme: Option[PreviousScheme]): PreviousSchemeHintText = {
+  private def getPreviousSchemeHintText(currentPreviousScheme: Option[PreviousScheme],
+                                        otherSelectedScheme: Option[PreviousScheme]): PreviousSchemeHintText = {
     currentPreviousScheme match {
       case Some(value) => value match {
         case PreviousScheme.OSSNU => PreviousSchemeHintText.OssNonUnion
         case PreviousScheme.OSSU => PreviousSchemeHintText.OssUnion
+        case _ => PreviousSchemeHintText.Both
       }
-      case None => {
-        otherSelectedScheme match {
-          case Some(value) => value match {
-            case PreviousScheme.OSSNU => PreviousSchemeHintText.OssUnion
-            case PreviousScheme.OSSU => PreviousSchemeHintText.OssNonUnion
-          }
-          case None => PreviousSchemeHintText.Both
+      case None => otherSelectedScheme match {
+        case Some(value) => value match {
+          case PreviousScheme.OSSNU => PreviousSchemeHintText.OssUnion
+          case PreviousScheme.OSSU => PreviousSchemeHintText.OssNonUnion
+          case _ => PreviousSchemeHintText.Both
         }
+        case None => PreviousSchemeHintText.Both
       }
     }
 

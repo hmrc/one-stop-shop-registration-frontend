@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
+import models.{CheckMode, Index, NormalMode, PreviousSchemeType, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
