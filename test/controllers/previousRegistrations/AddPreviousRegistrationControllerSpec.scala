@@ -96,7 +96,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
             Seq(
               PreviousRegistrationDetailsWithOptionalVatNumber(
                 Country.euCountries.head,
-                Seq(SchemeDetailsWithOptionalVatNumber(PreviousScheme.OSSU.toString, None))
+                Seq(SchemeDetailsWithOptionalVatNumber(Some(PreviousScheme.OSSU), None))
               )
             )
           )(request, implicitly).toString
