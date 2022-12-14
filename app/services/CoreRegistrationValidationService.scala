@@ -19,14 +19,15 @@ package services
 import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
 import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
+import models.PreviousScheme
 import uk.gov.hmrc.domain.Vrn
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistrationConnector) extends Logging {
+class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistrationConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def searchUkVrn(vrn: Vrn)(implicit ec: ExecutionContext): Future[Option[Match]] = {
+  def searchUkVrn(vrn: Vrn): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 
@@ -39,8 +40,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 
-  def searchEuTaxId(euTaxReference: String, countryCode: String)
-                   (implicit ec: ExecutionContext): Future[Option[Match]] = {
+  def searchEuTaxId(euTaxReference: String, countryCode: String): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUTraderId.toString, None, euTaxReference, None, countryCode)
 
@@ -52,8 +52,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 
-  def searchEuVrn(euVrn: String, countryCode: String)
-                 (implicit ec: ExecutionContext): Future[Option[Match]] = {
+  def searchEuVrn(euVrn: String, countryCode: String): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, euVrn, None, countryCode)
 
@@ -65,14 +64,52 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 
+  def searchScheme(searchNumber: String, previousScheme: PreviousScheme, intermediaryNumber: Option[String], countryCode: String): Future[Option[Match]] = {
+
+    if (previousScheme == PreviousScheme.OSSNU) {
+      Future.successful(None)
+    } else {
+
+      val sourceType = previousScheme match {
+        case PreviousScheme.OSSU => SourceType.EUVATNumber
+        case PreviousScheme.OSSNU => SourceType.EUVATNumber
+        case PreviousScheme.IOSSWOI => SourceType.EUTraderId
+        case PreviousScheme.IOSSWI => SourceType.EUTraderId
+      }
+
+      val coreRegistrationRequest = CoreRegistrationRequest(
+        sourceType.toString,
+        Some(convertScheme(previousScheme)),
+        searchNumber,
+        intermediaryNumber,
+        countryCode)
+
+      connector.validateCoreRegistration(coreRegistrationRequest).map {
+        case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
+        case _ => None
+      }
+
+    }
+
+  }
+
   def isActiveTrader(activeMatch: Match): Boolean = {
     activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP ||
       activeMatch.matchType == MatchType.TraderIdActiveNETP || activeMatch.matchType == MatchType.OtherMSNETPActiveNETP
   }
 
-  def isExcludedTrader(activeMatch: Match): Boolean = {
+  def isQuarantinedTrader(activeMatch: Match): Boolean = {
     activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP ||
       activeMatch.matchType == MatchType.TraderIdQuarantinedNETP || activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP
+  }
+
+  private def convertScheme(previousScheme: PreviousScheme): String = {
+    previousScheme match {
+      case PreviousScheme.OSSU => "OSS"
+      case PreviousScheme.OSSNU => "OSS"
+      case PreviousScheme.IOSSWOI => "IOSS"
+      case PreviousScheme.IOSSWI => "IOSS"
+    }
   }
 
 }
