@@ -16,7 +16,7 @@
 
 package models.previousRegistrations
 
-import models.Country
+import models.{Country, PreviousScheme}
 import play.api.libs.json.{Json, OFormat}
 
 case class PreviousRegistrationDetailsWithOptionalVatNumber(
@@ -31,7 +31,7 @@ object PreviousRegistrationDetailsWithOptionalVatNumber {
 }
 
 case class SchemeDetailsWithOptionalVatNumber(
-                                               previousScheme: String,
+                                               previousScheme: Option[PreviousScheme],
                                                previousSchemeNumbers: Option[SchemeNumbersWithOptionalVatNumber]
                                              )
 

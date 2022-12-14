@@ -18,12 +18,13 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.previousRegistrations.{PreviousSchemeNumbers, PreviousSchemeHintText}
 import models.requests.AuthenticatedDataRequest
+import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousOssNumberView
 
@@ -44,6 +45,10 @@ class PreviousOssNumberController @Inject()(
       getCountry(countryIndex) {
         country =>
 
+          val currentPreviousScheme = request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex))
+          val otherSelectedScheme = checkPreviousSchemeForCountry(countryIndex)
+          val previousSchemeHintText = getPreviousSchemeHintText(currentPreviousScheme, otherSelectedScheme)
+
           val form = formProvider(country)
 
           val preparedForm = request.userAnswers.get(PreviousOssNumberPage(countryIndex, schemeIndex)) match {
@@ -52,7 +57,7 @@ class PreviousOssNumberController @Inject()(
           }
           CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
             case countryWithValidationDetails =>
-              Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, countryWithValidationDetails)))
+              Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, countryWithValidationDetails, previousSchemeHintText)))
           }
       }
   }
@@ -62,13 +67,17 @@ class PreviousOssNumberController @Inject()(
       getCountry(countryIndex) {
         country =>
 
+          val currentPreviousScheme = request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex))
+          val otherSelectedScheme = checkPreviousSchemeForCountry(countryIndex)
+          val previousSchemeHintText = getPreviousSchemeHintText(currentPreviousScheme, otherSelectedScheme)
+
           val form = formProvider(country)
 
           form.bindFromRequest().fold(
             formWithErrors =>
               CountryWithValidationDetails.euCountriesWithVRNValidationRules.filter(_.country.code == country.code).head match {
                 case countryWithValidationDetails =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, countryWithValidationDetails)))
+                  Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, countryWithValidationDetails, previousSchemeHintText)))
               },
 
             value =>
@@ -95,4 +104,35 @@ class PreviousOssNumberController @Inject()(
       country =>
         block(country)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+  private def checkPreviousSchemeForCountry(index: Index)
+                                           (implicit request: AuthenticatedDataRequest[AnyContent]): Option[PreviousScheme] = {
+    request.userAnswers
+      .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)) match {
+      case Some(previousSchemesDetails) =>
+        previousSchemesDetails.flatMap(_.previousScheme).headOption
+      case None =>
+        None
+    }
+  }
+
+  private def getPreviousSchemeHintText(currentPreviousScheme: Option[PreviousScheme], otherSelectedScheme: Option[PreviousScheme]): PreviousSchemeHintText = {
+    currentPreviousScheme match {
+      case Some(value) => value match {
+        case PreviousScheme.OSSNU => PreviousSchemeHintText.OssNonUnion
+        case PreviousScheme.OSSU => PreviousSchemeHintText.OssUnion
+      }
+      case None => {
+        otherSelectedScheme match {
+          case Some(value) => value match {
+            case PreviousScheme.OSSNU => PreviousSchemeHintText.OssUnion
+            case PreviousScheme.OSSU => PreviousSchemeHintText.OssNonUnion
+          }
+          case None => PreviousSchemeHintText.Both
+        }
+      }
+    }
+
+  }
 }
+
