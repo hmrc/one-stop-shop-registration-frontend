@@ -19,6 +19,7 @@ package services
 import base.SpecBase
 import connectors.ValidateCoreRegistrationConnector
 import models.core.{CoreRegistrationValidationResult, Match, MatchType}
+import models.PreviousScheme
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -150,6 +151,56 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
     }
   }
 
+  "coreRegistrationValidationService.searchScheme" - {
+
+    "call searchScheme with correct ioss number and must return match data" in {
+
+      val iossNumber: String = "333333333"
+      val countryCode: String = "DE"
+      val previousScheme: PreviousScheme = PreviousScheme.OSSU
+
+      when(connector.validateCoreRegistration(any())) thenReturn Future.successful(Right(coreValidationResponses))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue.get
+
+      value equals genericMatch
+    }
+
+    "call searchScheme with correct ioss number with intermediary and must return match data" in {
+
+      val iossNumber: String = "IM333222111"
+      val intermediaryNumber: String = "IN555444222"
+      val countryCode: String = "DE"
+      val previousScheme: PreviousScheme = PreviousScheme.OSSU
+
+      when(connector.validateCoreRegistration(any())) thenReturn Future.successful(Right(coreValidationResponses))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, Some(intermediaryNumber), countryCode).futureValue.get
+
+      value equals genericMatch
+    }
+
+    "must return None when no match found" in {
+
+      val iossNumber: String = "333333333"
+      val countryCode: String = "DE"
+      val previousScheme: PreviousScheme = PreviousScheme.OSSU
+
+      val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
+      when(connector.validateCoreRegistration(any())) thenReturn Future.successful(Right(expectedResponse))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue
+
+      value mustBe None
+    }
+  }
+
   "coreRegistrationValidationService.isActiveTrader" - {
 
     "call isActiveTrader with matchType = FixedEstablishmentActiveNETP and must return true" in {
@@ -199,7 +250,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
-      val response = coreRegistrationValidationService.isExcludedTrader(newMatch)
+      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
       response equals true
     }
@@ -209,7 +260,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
       val newMatch = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
-      val response = coreRegistrationValidationService.isExcludedTrader(newMatch)
+      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
       response equals true
     }
@@ -219,7 +270,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
       val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
-      val response = coreRegistrationValidationService.isExcludedTrader(newMatch)
+      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
       response equals true
     }
@@ -229,7 +280,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentActiveNETP)
-      val response = coreRegistrationValidationService.isExcludedTrader(newMatch)
+      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
       response equals false
     }

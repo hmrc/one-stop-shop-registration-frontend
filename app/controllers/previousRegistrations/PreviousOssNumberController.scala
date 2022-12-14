@@ -25,6 +25,7 @@ import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
+import services.CoreRegistrationValidationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousOssNumberView
 
@@ -34,6 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class PreviousOssNumberController @Inject()(
                                              override val messagesApi: MessagesApi,
                                              cc: AuthenticatedControllerComponents,
+                                             coreRegistrationValidationService: CoreRegistrationValidationService,
                                              formProvider: PreviousOssNumberFormProvider,
                                              view: PreviousOssNumberView
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -76,18 +78,37 @@ class PreviousOssNumberController @Inject()(
                   Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, countryWithValidationDetails, previousSchemeHintText)))
               },
 
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(countryIndex, schemeIndex), PreviousSchemeNumbers(value, None)))
-                updatedAnswersWithScheme <- Future.fromTry(updatedAnswers.set(PreviousSchemePage(countryIndex, schemeIndex),
-                  if (value.startsWith("EU")) {
-                    PreviousScheme.OSSNU
-                  } else {
-                    PreviousScheme.OSSU
-                  }
-                ))
-                _ <- cc.sessionRepository.set(updatedAnswersWithScheme)
-              } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
+            value => {
+              val previousScheme = if (value.startsWith("EU")) {
+                PreviousScheme.OSSNU
+              } else {
+                PreviousScheme.OSSU
+              }
+
+              coreRegistrationValidationService.searchScheme(
+                searchNumber = value,
+                previousScheme = previousScheme,
+                intermediaryNumber = None,
+                countryCode = country.code
+              ).flatMap {
+                case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
+                  Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad()))
+                case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
+                  Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad()))
+                case matchValue =>
+                  for {
+                    updatedAnswers <- Future.fromTry(request.userAnswers.set(
+                      PreviousOssNumberPage(countryIndex, schemeIndex),
+                      PreviousSchemeNumbers(value, None)
+                    ))
+                    updatedAnswersWithScheme <- Future.fromTry(updatedAnswers.set(
+                      PreviousSchemePage(countryIndex, schemeIndex),
+                      previousScheme
+                    ))
+                    _ <- cc.sessionRepository.set(updatedAnswersWithScheme)
+                  } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
+              }
+            }
           )
       }
 
@@ -140,4 +161,3 @@ class PreviousOssNumberController @Inject()(
 
   }
 }
-

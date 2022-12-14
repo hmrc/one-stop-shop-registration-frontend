@@ -76,7 +76,7 @@ class EuTaxReferenceController @Inject()(
                   case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()))
 
-                  case Some(activeMatch) if coreRegistrationValidationService.isExcludedTrader(activeMatch) =>
+                  case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
                   case _ => for {

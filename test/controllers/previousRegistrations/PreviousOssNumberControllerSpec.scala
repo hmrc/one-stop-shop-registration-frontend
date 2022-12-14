@@ -19,6 +19,7 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme}
+import models.core.{Match, MatchType}
 import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -28,6 +29,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import services.CoreRegistrationValidationService
 import views.html.previousRegistrations.PreviousOssNumberView
 
 import scala.concurrent.Future
@@ -136,6 +138,76 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       }
 
 
+    }
+
+    "when other country validation is enabled" - {
+      val genericMatch = Match(
+        MatchType.TraderIdActiveNETP,
+        "IM0987654321",
+        None,
+        "DE",
+        None,
+        None,
+        None,
+        None,
+        None
+      )
+
+      "Redirect to scheme still active when active OSS found" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(Some(genericMatch))
+        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousOssNumberRoute)
+              .withFormUrlEncodedBody(("value", "12345678"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad().url
+        }
+      }
+
+      "Redirect to scheme quarantined when quarantined OSS found" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn
+          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
+        when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousOssNumberRoute)
+              .withFormUrlEncodedBody(("value", "12345678"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad().url
+        }
+      }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
