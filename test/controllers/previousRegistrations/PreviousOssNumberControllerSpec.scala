@@ -19,7 +19,7 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -59,7 +59,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousOssNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, index, countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
 
@@ -77,7 +77,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, index, countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
 
@@ -109,7 +109,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "when the ID doesn't start with EU it to union" in {
+      "when the ID doesn't start with EU it sets to union" in {
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -154,7 +154,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, countryWithValidation)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
 

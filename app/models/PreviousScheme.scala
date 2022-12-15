@@ -25,8 +25,11 @@ sealed trait PreviousScheme
 object PreviousScheme extends Enumerable.Implicits {
 
   case object OSSU extends WithName("ossu") with PreviousScheme
+
   case object OSSNU extends WithName("ossnu") with PreviousScheme
+
   case object IOSSWOI extends WithName("iosswoi") with PreviousScheme
+
   case object IOSSWI extends WithName("iosswi") with PreviousScheme
 
   val values: Seq[PreviousScheme] = Seq(
@@ -41,8 +44,8 @@ object PreviousScheme extends Enumerable.Implicits {
     case (value, index) =>
       RadioItem(
         content = Text(messages(s"previousScheme.${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
+        value = Some(value.toString),
+        id = Some(s"value_$index")
       )
   }
 
@@ -50,8 +53,8 @@ object PreviousScheme extends Enumerable.Implicits {
     case (value, index) =>
       RadioItem(
         content = Text(messages(s"previousScheme.${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
+        value = Some(value.toString),
+        id = Some(s"value_$index")
       )
   }
 

@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package queries.previousRegistration
+package models.previousRegistrations
 
-import models.previousRegistrations.SchemeDetailsWithOptionalVatNumber
-import models.Index
-import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
+import models.Enumerable
+import models.WithName
 
-case class AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index: Index) extends Gettable[List[SchemeDetailsWithOptionalVatNumber]]
-  with Settable[List[SchemeDetailsWithOptionalVatNumber]] {
+sealed trait PreviousSchemeHintText
 
-  override def path: JsPath = JsPath \ "previousRegistrations" \ index.position \ "previousSchemesDetails"
+object PreviousSchemeHintText extends Enumerable.Implicits {
+
+  case object OssUnion extends WithName("OssUnion") with PreviousSchemeHintText
+
+  case object OssNonUnion extends WithName("OssNonUnion") with PreviousSchemeHintText
+
+  case object Both extends WithName("Both") with PreviousSchemeHintText
 }
