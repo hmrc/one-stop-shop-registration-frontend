@@ -16,11 +16,10 @@
 
 package viewmodels.checkAnswers.previousRegistrations
 
-import models.{CheckMode, Index, UserAnswers}
+import models.{Index, UserAnswers}
 import pages.previousRegistrations.PreviousSchemePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousSchemesForCountryQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
