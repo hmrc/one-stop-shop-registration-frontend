@@ -78,7 +78,14 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          verifyEmailAndRedirect(mode, messages, continueUrl, value)
+          if (config.emailVerificationEnabled) {
+            verifyEmailAndRedirect(mode, messages, continueUrl, value)
+          } else {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield Redirect(BusinessContactDetailsPage.navigate(mode, updatedAnswers))
+          }
         }
       )
   }
