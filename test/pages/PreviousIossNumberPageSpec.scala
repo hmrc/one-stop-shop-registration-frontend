@@ -20,7 +20,7 @@ import base.SpecBase
 import models.Index
 import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
-import pages.previousRegistrations.{PreviousIossNumberPage, PreviousSchemeNumbersPage}
+import pages.previousRegistrations.PreviousIossNumberPage
 
 class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
 

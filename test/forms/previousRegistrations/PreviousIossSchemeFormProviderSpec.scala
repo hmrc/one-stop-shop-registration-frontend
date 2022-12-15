@@ -17,7 +17,6 @@
 package forms.previousRegistrations
 
 import forms.behaviours.BooleanFieldBehaviours
-import models.PreviousScheme
 import play.api.data.FormError
 
 class PreviousIossSchemeFormProviderSpec extends BooleanFieldBehaviours {
