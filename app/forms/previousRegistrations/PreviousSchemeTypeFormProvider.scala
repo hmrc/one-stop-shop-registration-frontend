@@ -17,7 +17,7 @@
 package forms.previousRegistrations
 
 import forms.mappings.Mappings
-import models.{PreviousScheme, PreviousSchemeType}
+import models.PreviousSchemeType
 import play.api.data.Form
 
 import javax.inject.Inject

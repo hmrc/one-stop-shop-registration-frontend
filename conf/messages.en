@@ -749,7 +749,7 @@ emailVerificationCodesExceeded.returnContactDetails = <a class="govuk-link" href
 
 otherCountryExcludedAndQuarantined.title = You cannot register for the One Stop Shop scheme
 otherCountryExcludedAndQuarantined.heading = You cannot register for the One Stop Shop scheme
-otherCountryExcludedAndQuarantined.blocked.message = {0} has blocked your account from One Stop Shop services until {1}.
+otherCountryExcludedAndQuarantined.blocked.message = {0} has blocked your account from One Stop Shop services until <br> {1}.
 otherCountryExcludedAndQuarantined.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 otherCountryExcludedAndQuarantined.returnBTA = <a class="govuk-link" href="/business-account">Return to your BTA account</a>
 

@@ -16,13 +16,16 @@
 
 package controllers
 
+import config.Constants.addQuarantineYears
 import controllers.actions._
+import formats.Format.dateFormatter
 import models.Country
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.OtherCountryExcludedAndQuarantinedView
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class OtherCountryExcludedAndQuarantinedController @Inject()(
@@ -35,6 +38,9 @@ class OtherCountryExcludedAndQuarantinedController @Inject()(
 
   def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      Ok(view(Country.getCountryName(countryCode), exclusionDate))
+
+      val exclusionDateFormatted = LocalDate.parse(exclusionDate).plusYears(addQuarantineYears).format(dateFormatter)
+
+      Ok(view(Country.getCountryName(countryCode), exclusionDateFormatted))
   }
 }
