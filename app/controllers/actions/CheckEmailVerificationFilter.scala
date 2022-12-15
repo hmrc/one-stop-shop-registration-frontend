@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import config.FrontendAppConfig
 import logging.Logging
 import models.NormalMode
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, Verified}
@@ -31,6 +32,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckEmailVerificationFilterImpl @Inject()(
+                                                  frontendAppConfig: FrontendAppConfig,
                                                   emailVerificationService: EmailVerificationService
                                                 )(implicit val executionContext: ExecutionContext)
   extends CheckEmailVerificationFilter with Logging {
@@ -39,25 +41,29 @@ class CheckEmailVerificationFilterImpl @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    request.userAnswers.get(BusinessContactDetailsPage) match {
-      case Some(contactDetails) =>
-        emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).map {
-          case Verified =>
-            logger.info("CheckEmailVerificationFilter - Verified")
-            None
-          case LockedTooManyLockedEmails =>
-            logger.info("CheckEmailVerificationFilter - LockedTooManyLockedEmails")
-            Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
+    if (frontendAppConfig.emailVerificationEnabled) {
+      request.userAnswers.get(BusinessContactDetailsPage) match {
+        case Some(contactDetails) =>
+          emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).map {
+            case Verified =>
+              logger.info("CheckEmailVerificationFilter - Verified")
+              None
+            case LockedTooManyLockedEmails =>
+              logger.info("CheckEmailVerificationFilter - LockedTooManyLockedEmails")
+              Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
 
-          case LockedPasscodeForSingleEmail =>
-            logger.info("CheckEmailVerificationFilter - LockedPasscodeForSingleEmail")
-            Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
+            case LockedPasscodeForSingleEmail =>
+              logger.info("CheckEmailVerificationFilter - LockedPasscodeForSingleEmail")
+              Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
 
-          case _ =>
-            logger.info("CheckEmailVerificationFilter - Not Verified")
-            Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
-        }
-      case None => Future.successful(None)
+            case _ =>
+              logger.info("CheckEmailVerificationFilter - Not Verified")
+              Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+          }
+        case None => Future.successful(None)
+      }
+    } else {
+      Future.successful(None)
     }
   }
 }

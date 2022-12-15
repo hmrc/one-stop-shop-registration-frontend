@@ -100,4 +100,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
     AUTHORIZATION -> s"Bearer $authorizationToken"
   )
 
+  val emailVerificationEnabled: Boolean = configuration.get[Boolean]("features.email-verification-enabled")
+
 }

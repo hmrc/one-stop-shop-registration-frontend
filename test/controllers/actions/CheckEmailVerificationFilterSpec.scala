@@ -17,6 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.NormalMode
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
@@ -38,8 +39,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with EitherValues {
 
-  class Harness(emailVerificationService: EmailVerificationService)
-    extends CheckEmailVerificationFilterImpl(emailVerificationService) {
+  class Harness(frontendAppConfig: FrontendAppConfig, emailVerificationService: EmailVerificationService)
+    extends CheckEmailVerificationFilterImpl(frontendAppConfig, emailVerificationService) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -48,111 +49,141 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
   ".filter" - {
 
-    "must return None if no email address is present" in {
+    "when email verification enabled" - {
 
-      val app = applicationBuilder(None)
-        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
-        .build()
+      "must return None if no email address is present" in {
 
-      running(app) {
+        val app = applicationBuilder(None)
+          .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+          .build()
 
-        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswers)
-        val controller = new Harness(mockEmailVerificationService)
+        running(app) {
 
-        val result = controller.callFilter(request).futureValue
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswers)
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
 
-        result must not be defined
+          val result = controller.callFilter(request).futureValue
+
+          result must not be defined
+        }
+      }
+
+      "must return None when an email address is verified" in {
+
+        val app = applicationBuilder(None)
+          .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+          .build()
+
+        running(app) {
+
+          when(mockEmailVerificationService.isEmailVerified(
+            eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
+            Future.successful(Verified)
+
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
+
+          val result = controller.callFilter(request).futureValue
+
+          result must not be defined
+        }
+      }
+
+      "must redirect to Business Contact Details page when an email address is not verified" in {
+
+        val app = applicationBuilder(None)
+          .configure("features.email-verification-enabled" -> "true")
+          .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+          .build()
+
+        running(app) {
+
+          when(mockEmailVerificationService.isEmailVerified(
+            eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
+            Future.successful(NotVerified)
+
+
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
+
+          val result = controller.callFilter(request).futureValue
+
+          result mustBe Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+        }
+      }
+
+      "must redirect to Email Verification Codes Exceeded page when verification attempts on a single email are exceeded" in {
+
+        val app = applicationBuilder(None)
+          .configure("features.email-verification-enabled" -> "true")
+          .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+          .build()
+
+        running(app) {
+
+          when(mockEmailVerificationService.isEmailVerified(
+            eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
+            Future.successful(LockedPasscodeForSingleEmail)
+
+
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
+
+          val result = controller.callFilter(request).futureValue
+
+          result mustBe Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
+        }
+      }
+
+      "must redirect to Email Verification Codes and Emails Exceeded page when verification attempts on maximum email addresses are exceeded" in {
+
+        val app = applicationBuilder(None)
+          .configure("features.email-verification-enabled" -> "true")
+          .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+          .build()
+
+        running(app) {
+
+          when(mockEmailVerificationService.isEmailVerified(
+            eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
+            Future.successful(LockedTooManyLockedEmails)
+
+
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
+
+          val result = controller.callFilter(request).futureValue
+
+          result mustBe Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
+        }
       }
     }
 
-    "must return None when an email address is verified" in {
+    "when email verification disabled" - {
 
-      val app = applicationBuilder(None)
-        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
-        .build()
+      "must return None if no email address is present" in {
 
-      running(app) {
+        val app = applicationBuilder(None)
+          .configure("features.email-verification-enabled" -> "false")
+          .build()
 
-        when(mockEmailVerificationService.isEmailVerified(
-          eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
-          Future.successful(Verified)
+        running(app) {
 
-        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
-        val controller = new Harness(mockEmailVerificationService)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswers)
+          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
 
-        val result = controller.callFilter(request).futureValue
+          val result = controller.callFilter(request).futureValue
 
-        result must not be defined
-      }
-    }
-
-    "must redirect to Business Contact Details page when an email address is not verified" in {
-
-      val app = applicationBuilder(None)
-        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
-        .build()
-
-      running(app) {
-
-        when(mockEmailVerificationService.isEmailVerified(
-          eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
-          Future.successful(NotVerified)
-
-
-        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
-        val controller = new Harness(mockEmailVerificationService)
-
-        val result = controller.callFilter(request).futureValue
-
-        result mustBe Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
-      }
-    }
-
-    "must redirect to Email Verification Codes Exceeded page when verification attempts on a single email are exceeded" in {
-
-      val app = applicationBuilder(None)
-        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
-        .build()
-
-      running(app) {
-
-        when(mockEmailVerificationService.isEmailVerified(
-          eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
-          Future.successful(LockedPasscodeForSingleEmail)
-
-
-        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
-        val controller = new Harness(mockEmailVerificationService)
-
-        val result = controller.callFilter(request).futureValue
-
-        result mustBe Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
-      }
-    }
-
-    "must redirect to Email Verification Codes and Emails Exceeded page when verification attempts on maximum email addresses are exceeded" in {
-
-      val app = applicationBuilder(None)
-        .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
-        .build()
-
-      running(app) {
-
-        when(mockEmailVerificationService.isEmailVerified(
-          eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
-          Future.successful(LockedTooManyLockedEmails)
-
-
-        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, validEmailAddressUserAnswers)
-        val controller = new Harness(mockEmailVerificationService)
-
-        val result = controller.callFilter(request).futureValue
-
-        result mustBe Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
+          result must not be defined
+        }
       }
     }
   }
-
-
 
 }
