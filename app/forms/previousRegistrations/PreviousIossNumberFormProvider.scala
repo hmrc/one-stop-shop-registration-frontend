@@ -16,22 +16,23 @@
 
 package forms.previousRegistrations
 
-import forms.mappings.Mappings
+import forms.mappings.{IntermediaryNumberConstraints, IossNumberConstraints, Mappings}
 import models.previousRegistrations.PreviousSchemeNumbers
+import models.Country
 import play.api.data.Form
 import play.api.data.Forms._
 
 import javax.inject.Inject
 
-class PreviousIossNumberFormProvider @Inject() extends Mappings {
+class PreviousIossNumberFormProvider @Inject() extends Mappings with IossNumberConstraints with IntermediaryNumberConstraints {
 
-  def apply(): Form[PreviousSchemeNumbers] =
+  def apply(country: Country): Form[PreviousSchemeNumbers] =
     Form(
       mapping(
         "previousSchemeNumber" -> text("previousIossNumber.error.schemeNumber.required")
-          .verifying(maxLength(100, "previousIossNumber.error.schemeNumber.length")),
+          .verifying(validateIossRegistrationNumber(country.code, "previousIossNumber.error.invalid")),
         "intermediaryNumber" -> optional(text("previousIossNumber.error.intermediaryNumber.required")
-          .verifying(maxLength(100, "previousIossNumber.error.intermediaryNumber.length"))
+          .verifying(validateIntermediaryIdentificationNumber(country.code, "previousIntermediaryNumber.error.invalid"))
         )
       )(PreviousSchemeNumbers.apply)(PreviousSchemeNumbers.unapply)
     )
