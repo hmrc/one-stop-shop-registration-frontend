@@ -396,7 +396,7 @@ previousEuCountry.error.duplicate = You selected this EU country already. Select
 previousOssNumber.title = Enter your registration number for {0}?
 previousOssNumber.heading = Enter your registration number for {0}?
 previousOssNumber.error.required = Enter your registration number for {0}
-previousOssNumber.error.invalid = Enter registration number in the correct format
+previousOssNumber.error.invalid = Enter a registration number in the correct format
 
 previouslyRegistered.title = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.heading = Has your business ever registered for a One Stop Shop scheme in an EU country?
