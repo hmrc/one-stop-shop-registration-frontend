@@ -43,12 +43,14 @@ class PreviousIossNumberController @Inject()(
                                               view: PreviousIossNumberView
                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(countryIndex) { country =>
+
+        val form = formProvider(country)
+
         getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
 
           val preparedForm = request.userAnswers.get(PreviousIossNumberPage(countryIndex, schemeIndex)) match {
@@ -64,6 +66,9 @@ class PreviousIossNumberController @Inject()(
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getCountry(countryIndex) { country =>
+
+        val form = formProvider(country)
+
         getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
           getPreviousScheme(countryIndex, schemeIndex) { previousScheme =>
 

@@ -437,6 +437,8 @@ previousIossNumber.error.schemeNumber.required = Enter your IOSS registration nu
 previousIossNumber.error.intermediaryNumber.required = Enter your intermediary number
 previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
 previousIossNumber.change.hidden = PreviousIossNumber
+previousIossNumber.error.invalid = Enter a valid IOSS registration number
+previousIntermediaryNumber.error.invalid = Enter a valid intermediary identification number
 
 previousSchemeNumber.checkYourAnswersLabel = Registration number
 

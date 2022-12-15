@@ -334,3 +334,4 @@ object CountryWithValidationDetails {
   private val sloveniaVatNumberRegex = """^SI[0-9]{8}$"""
   private val slovakiaVatNumberRegex = """^SK[0-9]{10}$"""
 }
+
