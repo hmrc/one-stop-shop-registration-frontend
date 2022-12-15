@@ -16,60 +16,26 @@
 
 package forms
 
-import forms.behaviours.StringFieldBehaviours
-import forms.previousRegistrations.PreviousIossNumberFormProvider
+import forms.behaviours.OptionFieldBehaviours
+import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
+import models.Country
 import play.api.data.FormError
 
-class PreviousIossNumberFormProviderSpec extends StringFieldBehaviours {
+class PreviousIossNumberFormProviderSpec extends OptionFieldBehaviours {
 
-  val maxLength = 100
-
-  val form = new PreviousIossNumberFormProvider()()
+  private val country = Country.euCountries.head
+  val form = new PreviousIossRegistrationNumberFormProvider()(country)
 
   ".previousSchemeNumber" - {
 
     val requiredKey = "previousIossNumber.error.schemeNumber.required"
-    val lengthKey = "previousIossNumber.error.schemeNumber.length"
 
     val fieldName = "previousSchemeNumber"
-
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
-    )
-  }
-
-  ".intermediaryNumber" - {
-
-    val lengthKey = "previousIossNumber.error.intermediaryNumber.length"
-
-    val fieldName = "intermediaryNumber"
-
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
   }
 }

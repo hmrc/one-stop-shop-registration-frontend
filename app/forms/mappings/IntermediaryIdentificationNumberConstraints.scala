@@ -19,7 +19,7 @@ package forms.mappings
 import models.previousRegistrations.IntermediaryIdentificationNumberValidation
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
-trait IntermediaryNumberConstraints {
+trait IntermediaryIdentificationNumberConstraints {
 
   def validateIntermediaryIdentificationNumber(countryCode: String, errorKey: String): Constraint[String] = {
     Constraint {

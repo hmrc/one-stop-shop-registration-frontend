@@ -17,9 +17,8 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import forms.previousRegistrations.PreviousIossNumberFormProvider
+import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import models.{Country, Index, NormalMode, PreviousScheme, UserAnswers}
-import models.core.{Match, MatchType}
 import models.previousRegistrations.PreviousSchemeNumbers
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -37,8 +36,8 @@ import scala.concurrent.Future
 
 class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new PreviousIossNumberFormProvider()
-  private val form = formProvider()
+  private val formProvider = new PreviousIossRegistrationNumberFormProvider()
+
   private val index = Index(0)
 
   private val country = Country.euCountries.head
@@ -48,6 +47,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
     .set(PreviousIossSchemePage(index, index), false).success.value
 
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
+
+  private val form = formProvider(country)
 
   "PreviousIossNumber Controller" - {
 
@@ -103,10 +104,10 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, previousIossNumberRoute)
-            .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
+            .withFormUrlEncodedBody(("previousSchemeNumber", "IM0401234567"))
 
         val result = route(application, request).value
-        val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
+        val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("IM0401234567", None)).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual PreviousIossNumberPage(index, index).navigate(NormalMode, expectedAnswers).url

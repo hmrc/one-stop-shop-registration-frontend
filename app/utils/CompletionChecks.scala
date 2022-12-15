@@ -19,14 +19,17 @@ package utils
 import models.euDetails.EuOptionalDetails
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
+import pages._
 import models.{CheckMode, Country, Index}
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages._
+import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.Results.Redirect
 import queries.previousRegistration.{AllPreviousRegistrationsWithOptionalVatNumberQuery, AllPreviousSchemesForCountryWithOptionalVatNumberQuery}
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import queries.previousRegistration.{AllPreviousRegistrationsWithOptionalVatNumberQuery, AllPreviousSchemesForCountryWithOptionalVatNumberQuery}
 
 import scala.concurrent.Future
 
