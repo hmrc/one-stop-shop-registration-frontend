@@ -20,11 +20,11 @@ import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
+import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._

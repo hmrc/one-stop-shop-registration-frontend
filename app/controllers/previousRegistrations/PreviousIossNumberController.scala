@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import config.FrontendAppConfig
 import controllers.actions._
-import forms.previousRegistrations.PreviousIossNumberFormProvider
+import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
 import models.{Country, Index, Mode, PreviousScheme}
 import models.previousRegistrations.PreviousSchemeNumbers
@@ -38,10 +38,10 @@ class PreviousIossNumberController @Inject()(
                                               override val messagesApi: MessagesApi,
                                               cc: AuthenticatedControllerComponents,
                                               coreRegistrationValidationService: CoreRegistrationValidationService,
-                                              formProvider: PreviousIossNumberFormProvider,
+                                              formProvider: PreviousIossRegistrationNumberFormProvider,
                                               appConfig: FrontendAppConfig,
                                               view: PreviousIossNumberView
-                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 

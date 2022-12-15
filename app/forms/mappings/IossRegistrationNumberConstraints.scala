@@ -19,7 +19,7 @@ package forms.mappings
 import models.previousRegistrations.IossRegistrationNumberValidation
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
-trait IossNumberConstraints {
+trait IossRegistrationNumberConstraints {
 
   def validateIossRegistrationNumber(countryCode: String, errorKey: String): Constraint[String] = {
     Constraint {

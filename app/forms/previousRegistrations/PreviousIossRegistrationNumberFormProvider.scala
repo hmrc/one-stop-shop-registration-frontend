@@ -16,7 +16,7 @@
 
 package forms.previousRegistrations
 
-import forms.mappings.{IntermediaryNumberConstraints, IossNumberConstraints, Mappings}
+import forms.mappings.{IntermediaryIdentificationNumberConstraints, IossRegistrationNumberConstraints, Mappings}
 import models.previousRegistrations.PreviousSchemeNumbers
 import models.Country
 import play.api.data.Form
@@ -24,7 +24,7 @@ import play.api.data.Forms._
 
 import javax.inject.Inject
 
-class PreviousIossNumberFormProvider @Inject() extends Mappings with IossNumberConstraints with IntermediaryNumberConstraints {
+class PreviousIossRegistrationNumberFormProvider @Inject() extends Mappings with IossRegistrationNumberConstraints with IntermediaryIdentificationNumberConstraints {
 
   def apply(country: Country): Form[PreviousSchemeNumbers] =
     Form(
