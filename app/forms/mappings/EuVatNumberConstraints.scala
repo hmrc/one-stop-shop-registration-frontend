@@ -51,7 +51,7 @@ trait EuVatNumberConstraints {
   def validateEuVatNumberOrEu(countryCode: String, errorKey: String): Constraint[String] = {
     Constraint {
       input =>
-        if(input.startsWith("EU") || input.startsWith("eu")) {
+        if(checkEuRegistrationNumber(input)) {
           Valid
         } else if (matchesCountryRegex(input, countryCode)) {
             Valid
@@ -61,5 +61,8 @@ trait EuVatNumberConstraints {
     }
   }
 
-
+  private def checkEuRegistrationNumber(input: String): Boolean = {
+    val regex = """^(?i)EU[0-9]{9}$"""
+    input.matches(regex)
+  }
 }
