@@ -459,6 +459,18 @@ checkPreviousSchemeAnswers.remove.hidden = Remove {0}
 checkPreviousSchemeAnswers.addAnother = Add another scheme registration from {0}?
 checkPreviousSchemeAnswers.maximumReached = You have added details for every scheme in {0}
 
+schemeStillActive.title = You cannot use this registration number
+schemeStillActive.heading = You cannot use this registration number
+schemeStillActive.paragraph = This One Stop Shop registration in {0} is still active. You can only have one active OSS account.
+schemeStillActive.paragraph.deregister = Deregister from the OSS service in {0} and try again.
+schemeStillActive.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+schemeStillActive.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
+
+schemeQuarantined.title = You cannot use this registration number
+schemeQuarantined.heading = You cannot use this registration number
+schemeQuarantined.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+schemeQuarantined.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
+
 bankDetails.title = Enter your bank or building society account details
 bankDetails.heading = Enter your bank or building society account details
 bankDetails.hint = EU member states will only use these if they need to repay you.
@@ -783,7 +795,7 @@ fixedEstablishmentVRNAlreadyRegistered.title = You cannot register using this VA
 fixedEstablishmentVRNAlreadyRegistered.heading = You cannot register using this VAT number
 fixedEstablishmentVRNAlreadyRegistered.paragraph = This fixed establishment is already registered on a One Stop Shop service.
 fixedEstablishmentVRNAlreadyRegistered.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
-fixedEstablishmentVRNAlreadyRegistered.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>.
+fixedEstablishmentVRNAlreadyRegistered.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
 
 excludedVRN.title = You cannot register using this VAT number
 excludedVRN.heading = You cannot register using this VAT number
