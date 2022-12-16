@@ -31,16 +31,38 @@ trait EuVatNumberConstraints {
     }
 
   def validateEuVatNumber(countryCode: String, errorKey: String): Constraint[String] = {
-    val regex = getCountryVatRegex(countryCode)
+
     Constraint {
       input =>
-        if (input.matches(regex)) {
+        if (matchesCountryRegex(input, countryCode)) {
           Valid
+        } else {
+          Invalid(errorKey)
+        }
+
+    }
+  }
+
+  private def matchesCountryRegex(input: String, countryCode: String): Boolean = {
+    val regex = getCountryVatRegex(countryCode)
+    input.matches(regex)
+  }
+
+  def validateEuVatNumberOrEu(countryCode: String, errorKey: String): Constraint[String] = {
+    Constraint {
+      input =>
+        if(checkEuRegistrationNumber(input)) {
+          Valid
+        } else if (matchesCountryRegex(input, countryCode)) {
+            Valid
         } else {
           Invalid(errorKey)
         }
     }
   }
 
-
+  private def checkEuRegistrationNumber(input: String): Boolean = {
+    val regex = """^(?i)EU[0-9]{9}$"""
+    input.matches(regex)
+  }
 }

@@ -28,16 +28,40 @@ case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
 
   override def toString: String = "euVatNumber"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
+    if (isPartOfVatGroup) {
+      euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
+    }
+    else {
+      euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
+    }
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
-    case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
-    case None    => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
   }
 
-  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
-    case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
-    case None    => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
+    if (isPartOfVatGroup) {
+      euRoutes.AddEuDetailsController.onPageLoad(CheckMode)
+    }
+    else {
+      answers.get(HasFixedEstablishmentPage(index)) match {
+        case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
+        case None => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
+      }
+    }
+  }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
+    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
+    if (isPartOfVatGroup) {
+      euRoutes.AddEuDetailsController.onPageLoad(NormalMode)
+    }
+    else {
+      answers.get(HasFixedEstablishmentPage(index)) match {
+        case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
+        case None => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
+      }
+    }
   }
 }

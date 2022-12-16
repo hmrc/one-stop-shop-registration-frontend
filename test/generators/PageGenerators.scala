@@ -18,11 +18,32 @@ package generators
 
 import models.Index
 import org.scalacheck.Arbitrary
-import pages.{euDetails, _}
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
+import pages._
+import pages.euDetails._
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemeNumbersPage, PreviousSchemePage, PreviousSchemeTypePage}
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryPreviousIossNumberPage: Arbitrary[PreviousSchemeNumbersPage] =
+    Arbitrary(PreviousIossNumberPage(Index(0), Index(0)))
+
+  implicit lazy val arbitraryPreviousIossSchemePage: Arbitrary[PreviousIossSchemePage] =
+    Arbitrary(PreviousIossSchemePage(Index(0), Index(0)))
+
+  implicit lazy val arbitraryPreviousSchemePage: Arbitrary[PreviousSchemePage] =
+    Arbitrary(PreviousSchemePage(Index(0), Index(0)))
+
+  implicit lazy val arbitraryPreviousSchemeTypePage: Arbitrary[PreviousSchemeTypePage] =
+    Arbitrary(PreviousSchemeTypePage(Index(0), Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage] =
+    Arbitrary(euDetails.EuSendGoodsPage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsTradingNamePage: Arbitrary[EuSendGoodsTradingNamePage] =
+    Arbitrary(EuSendGoodsTradingNamePage(Index(0)))
+
+  implicit lazy val arbitraryEuSendGoodsAddressPage: Arbitrary[EuSendGoodsAddressPage.type] =
+    Arbitrary(EuSendGoodsAddressPage)
 
   implicit lazy val arbitraryIsPlanningFirstEligibleSalePage: Arbitrary[IsPlanningFirstEligibleSalePage.type] =
     Arbitrary(IsPlanningFirstEligibleSalePage)
@@ -63,8 +84,8 @@ trait PageGenerators {
   implicit lazy val arbitraryPreviouslyRegisteredPage: Arbitrary[PreviouslyRegisteredPage.type] =
     Arbitrary(PreviouslyRegisteredPage)
 
-  implicit lazy val arbitraryPreviousEuVatNumberPage: Arbitrary[PreviousEuVatNumberPage] =
-    Arbitrary(PreviousEuVatNumberPage(Index(0)))
+  implicit lazy val arbitraryPreviousEuVatNumberPage: Arbitrary[PreviousOssNumberPage] =
+    Arbitrary(PreviousOssNumberPage(Index(0), Index(0)))
 
   implicit lazy val arbitraryPreviousEuCountryPage: Arbitrary[PreviousEuCountryPage] =
     Arbitrary(PreviousEuCountryPage(Index(0)))

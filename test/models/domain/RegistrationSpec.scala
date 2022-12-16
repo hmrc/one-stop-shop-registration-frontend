@@ -145,7 +145,12 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |      "code" : "DE",
                    |      "name" : "Germany"
                    |    },
-                   |    "vatNumber" : "DE123"
+                   |    "previousSchemesDetails": [ {
+                   |      "previousScheme": "ossu",
+                   |      "previousSchemeNumbers": {
+                   |        "previousSchemeNumber": "DE123"
+                   |      }
+                   |    } ]
                    |  } ],
                    |  "bankDetails" : {
                    |    "accountName" : "Account name",

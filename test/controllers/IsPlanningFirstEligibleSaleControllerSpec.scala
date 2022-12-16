@@ -47,7 +47,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, isPlanningFirstEligibleSaleRoute)
@@ -86,7 +86,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -96,7 +96,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(IsPlanningFirstEligibleSalePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual IsPlanningFirstEligibleSalePage.navigate(NormalMode, expectedAnswers).url
@@ -106,7 +106,7 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =

@@ -39,7 +39,7 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
-          applicationBuilder(Some(basicUserAnswers))
+          applicationBuilder(Some(basicUserAnswersWithVatInfo))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
@@ -50,7 +50,7 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          verify(mockSessionRepository, times(1)).keepAlive(basicUserAnswers.id)
+          verify(mockSessionRepository, times(1)).keepAlive(basicUserAnswersWithVatInfo.id)
         }
       }
     }
@@ -90,7 +90,7 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
 
         val application =
-          applicationBuilder(Some(basicUserAnswers))
+          applicationBuilder(Some(basicUserAnswersWithVatInfo))
             .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
@@ -101,7 +101,7 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          verify(mockSessionRepository, times(1)).keepAlive(basicUserAnswers.id)
+          verify(mockSessionRepository, times(1)).keepAlive(basicUserAnswersWithVatInfo.id)
         }
       }
     }

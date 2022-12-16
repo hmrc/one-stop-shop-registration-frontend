@@ -19,7 +19,8 @@ package generators
 import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, FixedEstablishment}
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
@@ -29,6 +30,21 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.Instant
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryPreviousScheme: Arbitrary[PreviousScheme] =
+    Arbitrary {
+      Gen.oneOf(PreviousScheme.values.toSeq)
+    }
+
+  implicit lazy val arbitraryPreviousSchemeType: Arbitrary[PreviousSchemeType] =
+    Arbitrary {
+      Gen.oneOf(PreviousSchemeType.values.toSeq)
+    }
+
+  implicit lazy val arbitraryPreviousIossSchemeDetails: Arbitrary[PreviousSchemeNumbers] =
+    Arbitrary {
+      PreviousSchemeNumbers("12345667", Some("test"))
+    }
 
   implicit lazy val arbitrarySalesChannels: Arbitrary[SalesChannels] =
     Arbitrary {
@@ -116,12 +132,12 @@ trait ModelGenerators {
       } yield BankDetails(accountName, bic, iban)
     }
 
-  implicit lazy val arbitraryFixedEstablishment: Arbitrary[FixedEstablishment] =
+  implicit lazy val arbitraryFixedEstablishment: Arbitrary[TradeDetails] =
     Arbitrary {
       for {
         tradingName <- arbitrary[String]
         address     <- arbitrary[InternationalAddress]
-      } yield FixedEstablishment(tradingName, address)
+      } yield TradeDetails(tradingName, address)
     }
 
   implicit lazy val arbitraryCountry: Arbitrary[Country] =

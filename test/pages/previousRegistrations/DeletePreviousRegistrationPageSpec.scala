@@ -19,6 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, Country, Index, NormalMode}
+import models.previousRegistrations.PreviousSchemeNumbers
 
 class DeletePreviousRegistrationPageSpec extends SpecBase {
 
@@ -33,7 +34,7 @@ class DeletePreviousRegistrationPageSpec extends SpecBase {
           val answers =
             emptyUserAnswers
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("FR123", None)).success.value
 
           DeletePreviousRegistrationPage(Index(0)).navigate(NormalMode, answers)
             .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode))
@@ -60,7 +61,7 @@ class DeletePreviousRegistrationPageSpec extends SpecBase {
           val answers =
             emptyUserAnswers
               .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-              .set(PreviousEuVatNumberPage(Index(0)), "FR123").success.value
+              .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("FR123", None)).success.value
 
           DeletePreviousRegistrationPage(Index(0)).navigate(CheckMode, answers)
             .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))

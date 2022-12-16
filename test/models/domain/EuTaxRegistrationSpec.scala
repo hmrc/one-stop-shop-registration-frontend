@@ -17,7 +17,7 @@
 package models.domain
 
 import generators.Generators
-import models.Country
+import models.{Country, InternationalAddress}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -28,10 +28,10 @@ class EuTaxRegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
   "must serialise and deserialise from / to an EU VAT Registration" in {
 
-    forAll(arbitrary[Country], arbitrary[EuTaxIdentifier]) {
-      case (country, vatNumber) =>
+    forAll(arbitrary[Country], arbitrary[EuTaxIdentifier], arbitrary[String], arbitrary[InternationalAddress]) {
+      case (country, vatNumber, tradingName, address) =>
 
-        val euVatRegistration = RegistrationWithoutFixedEstablishment(country, vatNumber)
+        val euVatRegistration = RegistrationWithoutFixedEstablishmentWithTradeDetails(country, vatNumber, TradeDetails(tradingName, address))
 
         val json = Json.toJson(euVatRegistration)
         json.validate[EuTaxRegistration] mustEqual JsSuccess(euVatRegistration)
@@ -40,7 +40,7 @@ class EuTaxRegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
   "must serialise and deserialise from / to a Registration with Fixed Establishment" in {
 
-    forAll(arbitrary[Country], arbitrary[FixedEstablishment], arbitrary[EuTaxIdentifier]) {
+    forAll(arbitrary[Country], arbitrary[TradeDetails], arbitrary[EuTaxIdentifier]) {
       case (country, fixedEstablishment, taxRef) =>
 
         val euRegistration = RegistrationWithFixedEstablishment(country, taxRef, fixedEstablishment)

@@ -41,7 +41,7 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, businessBasedInNiRoute)
@@ -57,7 +57,7 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view and return OK and the correct view for a GET when the question has already been answered" in {
 
-      val answers = basicUserAnswers.set(BusinessBasedInNiPage, true).success.value
+      val answers = basicUserAnswersWithVatInfo.set(BusinessBasedInNiPage, true).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -78,7 +78,7 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
       when(sessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(bind[UnauthenticatedUserAnswersRepository].toInstance(sessionRepository))
           .build()
 
@@ -89,7 +89,7 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val expectedAnswers = basicUserAnswers.set(BusinessBasedInNiPage, true).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessBasedInNiPage, true).success.value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual BusinessBasedInNiPage.navigate(true).url
         verify(sessionRepository, times(1)).set(eqTo(expectedAnswers))
@@ -98,7 +98,7 @@ class BusinessBasedInNiControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =
