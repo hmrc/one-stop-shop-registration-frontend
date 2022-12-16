@@ -141,6 +141,9 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
             .build()
 
         running(application) {
@@ -171,6 +174,9 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
             .build()
 
         running(application) {

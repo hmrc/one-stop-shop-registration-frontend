@@ -166,12 +166,15 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
             .build()
 
         running(application) {
           val request =
             FakeRequest(POST, previousOssNumberRoute)
-              .withFormUrlEncodedBody(("value", "12345678"))
+              .withFormUrlEncodedBody(("value", "SI12345678"))
 
           val result = route(application, request).value
 
@@ -195,12 +198,15 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
             .build()
 
         running(application) {
           val request =
             FakeRequest(POST, previousOssNumberRoute)
-              .withFormUrlEncodedBody(("value", "12345678"))
+              .withFormUrlEncodedBody(("value", "SI12345678"))
 
           val result = route(application, request).value
 
