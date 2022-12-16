@@ -111,7 +111,7 @@ class PreviousOssNumberController @Inject()(
   }
 
   private def saveAndRedirect(countryIndex: Index, schemeIndex: Index, registrationNumber: String, previousScheme: PreviousScheme, mode: Mode)
-                             (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.set(
         PreviousOssNumberPage(countryIndex, schemeIndex),

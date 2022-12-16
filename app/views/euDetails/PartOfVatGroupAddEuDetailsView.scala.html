@@ -24,6 +24,7 @@
     govukRadios: GovukRadios,
     govukButton: GovukButton,
     govukSummaryList: GovukSummaryList,
+    govukWarningText: GovukWarningText
 )
 
 @(form: Form[_], mode: Mode, list: SummaryList, canAddCountries: Boolean, incompleteCountries: Seq[EuOptionalDetails] = List.empty)(implicit request: Request[_], messages: Messages)
@@ -36,13 +37,10 @@
             }
 
             @if(!incompleteCountries.isEmpty) {
-            <div class="govuk-warning-text">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-warning-text__assistive">Warning</span>
-                    @messages("error.missing_answers")
-                </strong>
-            </div>
+                @govukWarningText(WarningText(
+                    iconFallbackText = messages("site.warning"),
+                    content = Text(messages("error.missing_answers"))
+                ))
             }
 
             <h1 class="govuk-heading-xl">@messages("addEuDetails.heading" + messageSuffix, list.rows.size)</h1>

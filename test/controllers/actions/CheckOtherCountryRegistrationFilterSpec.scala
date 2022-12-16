@@ -20,7 +20,6 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.core.{Match, MatchType}
 import models.requests.AuthenticatedIdentifierRequest
-import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach

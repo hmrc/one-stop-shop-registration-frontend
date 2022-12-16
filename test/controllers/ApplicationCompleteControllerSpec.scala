@@ -48,8 +48,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
       BusinessContactDetailsPage.toString -> Json.obj(
         "fullName" -> "value 1",
         "telephoneNumber" -> "value 2",
-        "emailAddress" -> "test@test.com",
-        "websiteAddress" -> "value 4",
+        "emailAddress" -> "test@test.com"
       ),
       DateOfFirstSalePage.toString -> Json.toJson(arbitraryStartDate)
     ),

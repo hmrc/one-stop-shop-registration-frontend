@@ -99,7 +99,7 @@ class PreviousIossNumberController @Inject()(
   }
 
   private def saveAndRedirect(countryIndex: Index, schemeIndex: Index, previousSchemeNumbers: PreviousSchemeNumbers, mode: Mode)
-                             (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousIossNumberPage(countryIndex, schemeIndex), previousSchemeNumbers))
       _ <- cc.sessionRepository.set(updatedAnswers)
