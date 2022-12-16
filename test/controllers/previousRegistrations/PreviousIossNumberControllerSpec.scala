@@ -154,7 +154,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
               .withFormUrlEncodedBody(("previousSchemeNumber", "IM0401234567"))
 
           val result = route(application, request).value
-          val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
+          val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("IM0401234567", None)).success.value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual PreviousIossNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
