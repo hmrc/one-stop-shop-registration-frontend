@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
-import models.{Country, Index, NormalMode, PreviousScheme, UserAnswers}
+import models.{Country, Index, NormalMode, PreviousScheme}
 import models.previousRegistrations.PreviousSchemeNumbers
 import models.{Country, Index, NormalMode}
 import models.core.{Match, MatchType}

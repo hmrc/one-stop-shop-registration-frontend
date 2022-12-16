@@ -61,7 +61,6 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
           val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswersWithVatInfo)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-          val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(frontendAppConfig, mockEmailVerificationService)
 
           val result = controller.callFilter(request).futureValue
