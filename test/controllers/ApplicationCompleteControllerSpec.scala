@@ -316,7 +316,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
 
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        val application = applicationBuilder(userAnswers = None)
           .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()

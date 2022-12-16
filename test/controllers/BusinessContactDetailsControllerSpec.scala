@@ -326,7 +326,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "false")
               .overrides(
                 bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
@@ -339,7 +339,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
             val result = route(application, request).value
-            val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+            val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
