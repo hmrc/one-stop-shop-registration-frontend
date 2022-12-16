@@ -95,7 +95,7 @@ ukVatRegisteredPostcode.change.hidden = the postcode where your business is regi
 
 euVatNumber.title = What is your VAT registration number for {0}?
 euVatNumber.heading = What is your VAT registration number for {0}?
-euVatNumber.hint = This will start with {0}, for example {0}{1}
+euVatNumber.hint = This will start with {0}, for example {0}{1}{2}
 euVatNumber.checkYourAnswersLabel = VAT registration number
 euVatNumber.error.required = Enter your VAT registration number for {0}
 euVatNumber.error.invalid = Enter a registration number in the correct format
@@ -390,8 +390,8 @@ previousEuCountry.error.duplicate = You selected this EU country already. Select
 
 previousOssNumber.title = Enter your registration number for {0}?
 previousOssNumber.heading = Enter your registration number for {0}?
-previousOssNumber.hint.default = This will start with {0} or EU, for example {0}{1}
-previousOssNumber.hint.union = This will start with {0}, for example {0}{1}
+previousOssNumber.hint.default = This will start with {0} or EU, for example {0}{1}{2}
+previousOssNumber.hint.union = This will start with {0}, for example {0}{1}{2}
 previousOssNumber.hint.nonunion = This will start with EU, for example EU{0}
 previousOssNumber.error.required = Enter your registration number for {0}
 previousOssNumber.error.invalid = Enter a registration number in the correct format
