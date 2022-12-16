@@ -16,16 +16,20 @@
 
 package utils
 
-import models.{CheckMode, Country, Index}
 import models.euDetails.EuOptionalDetails
-import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
+import pages._
+import models.{CheckMode, Country, Index}
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsPlanningFirstEligibleSalePage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
-import queries.{AllEuOptionalDetailsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import play.api.mvc.Results.Redirect
+import queries.previousRegistration.{AllPreviousRegistrationsWithOptionalVatNumberQuery, AllPreviousSchemesForCountryWithOptionalVatNumberQuery}
+import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
+import queries.previousRegistration.{AllPreviousRegistrationsWithOptionalVatNumberQuery, AllPreviousSchemesForCountryWithOptionalVatNumberQuery}
 
 import scala.concurrent.Future
 
@@ -55,27 +59,36 @@ trait CompletionChecks {
 
 
   def getIncompleteEuDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[EuOptionalDetails] = {
+    val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
     request.userAnswers
       .get(EuOptionalDetailsQuery(index))
       .find(details =>
-        details.vatRegistered.isEmpty ||
+        (isPartOfVatGroup.contains(true) && details.euVatNumber.isEmpty) ||
+        (isPartOfVatGroup.contains(false) && (details.vatRegistered.isEmpty ||
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
-            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty))
+            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
+          (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
+          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
+            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))))
       )
-
   }
 
   def getAllIncompleteEuDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[EuOptionalDetails] = {
+    val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
     request.userAnswers
       .get(AllEuOptionalDetailsQuery).map(
       _.filter(details =>
-        details.vatRegistered.isEmpty ||
+        (isPartOfVatGroup.contains(true) && details.euVatNumber.isEmpty) ||
+          (isPartOfVatGroup.contains(false) && (details.vatRegistered.isEmpty ||
           details.hasFixedEstablishment.isEmpty ||
           (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
           (details.hasFixedEstablishment.contains(true) &&
-            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty))
+            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
+            (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
+          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
+            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))))
       )
     ).getOrElse(List.empty)
   }
@@ -83,8 +96,15 @@ trait CompletionChecks {
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
     request.userAnswers
       .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
-      _.filter(_.previousEuVatNumber.isEmpty)
+      _.filter(_.previousSchemesDetails.exists(_.previousSchemeNumbers.isEmpty))
     ).getOrElse(List.empty)
+  }
+
+  def getIncompletePreviousSchemesDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[SchemeDetailsWithOptionalVatNumber] = {
+    request.userAnswers
+      .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).flatMap(
+      _.find(_.previousSchemeNumbers.isEmpty)
+    )
   }
 
   def firstIndexedIncompleteDeregisteredCountry(incompleteCountries: Seq[Country])
@@ -170,7 +190,7 @@ trait CompletionChecks {
     _.previousEuCountry
   )).map(
     incompleteCountry =>
-      Redirect(controllers.previousRegistrations.routes.PreviousEuVatNumberController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+      Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
   )
 
   private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {

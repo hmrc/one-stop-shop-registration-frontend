@@ -41,7 +41,7 @@
                 label = LabelViewModel(messages("euVatNumber.heading", countryWithValidationDetails.country.name)).asPageHeading()
             )
             .withWidth(Fixed10)
-            .withHint(HintViewModel(messages("euVatNumber.hint", countryWithValidationDetails.messageInput, countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))))
+            .withHint(HintViewModel(messages("euVatNumber.hint", countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))))
         )
 
         @button("site.continue",  controllers.euDetails.routes.EuVatNumberController.onPageLoad(mode, index).url)

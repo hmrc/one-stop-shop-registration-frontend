@@ -22,7 +22,7 @@ import models.{CheckVatDetails, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.CheckVatDetailsPage
+import pages.{CheckVatDetailsPage, RegisteredForOssInEuPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -145,7 +145,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no VAT data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value)).build()
 
       running(application) {
         val request = FakeRequest(GET, checkVatDetailsRoute)
@@ -175,7 +175,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no VAT data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value)).build()
 
       running(application) {
         val request =

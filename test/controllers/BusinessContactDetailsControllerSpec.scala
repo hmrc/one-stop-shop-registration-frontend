@@ -47,7 +47,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
   private val form = formProvider()
 
   private lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
-  private val userAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+
+  private val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
   private val mockEmailVerificationService = mock[EmailVerificationService]
   private val mockSaveForLaterService = mock[SaveForLaterService]
@@ -67,7 +68,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
       "must return OK and the correct view for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
         running(application) {
           val request = FakeRequest(GET, businessContactDetailsRoute)
@@ -111,22 +112,23 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             eqTo(emailVerificationRequest.email.get.address),
             eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(Verified)
 
-          val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .configure("features.email-verification-enabled" -> "true")
               .configure("features.email-verification-enabled" -> "true")
               .overrides(
-                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-              )
-              .build()
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+          )
+          .build()
 
           running(application) {
             val request =
               FakeRequest(POST, businessContactDetailsRoute)
                 .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
-            val result = route(application, request).value
-            val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+        val result = route(application, request).value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
@@ -158,23 +160,24 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             eqTo(emailVerificationRequest.pageTitle),
             eqTo(emailVerificationRequest.continueUrl))(any())) thenReturn Future.successful(Right(emailVerificationResponse))
 
-          val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .configure("features.email-verification-enabled" -> "true")
               .configure("features.email-verification-enabled" -> "true")
               .overrides(
-                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-              )
-              .build()
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+          )
+          .build()
 
           running(application) {
             val request =
               FakeRequest(POST, businessContactDetailsRoute)
                 .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
-            val config = application.injector.instanceOf[FrontendAppConfig]
-            val result = route(application, request).value
-            val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+        val config = application.injector.instanceOf[FrontendAppConfig]
+        val result = route(application, request).value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual config.emailVerificationUrl + emailVerificationResponse.redirectUri
@@ -200,7 +203,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             Future.successful(Redirect(routes.EmailVerificationCodesExceededController.onPageLoad()))
 
           val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .configure("features.email-verification-enabled" -> "true")
               .configure("features.email-verification-enabled" -> "true")
               .overrides(
                 bind[EmailVerificationService].toInstance(mockEmailVerificationService),
@@ -237,7 +241,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             Future.successful(Redirect(routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad()))
 
           val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .configure("features.email-verification-enabled" -> "true")
               .configure("features.email-verification-enabled" -> "true")
               .overrides(
                 bind[EmailVerificationService].toInstance(mockEmailVerificationService),
@@ -283,14 +288,15 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             eqTo(emailVerificationRequest.continueUrl))(any())) thenReturn
             Future.successful(Left(UnexpectedResponseStatus(httpStatus, "error")))
 
-          val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .configure("features.email-verification-enabled" -> "true")
               .configure("features.email-verification-enabled" -> "true")
               .overrides(
-                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-              )
-              .build()
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+          )
+          .build()
 
           running(application) {
             val request =
@@ -325,7 +331,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
           val application =
-            applicationBuilder(userAnswers = Some(basicUserAnswers))
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "false")
               .overrides(
                 bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
@@ -338,7 +344,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
             val result = route(application, request).value
-            val expectedAnswers = basicUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
+            val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
@@ -350,7 +356,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
       "must return a Bad Request and errors when invalid data is submitted" in {
 
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
         running(application) {
           val request =

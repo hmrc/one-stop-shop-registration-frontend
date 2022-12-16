@@ -17,9 +17,13 @@
 package controllers
 
 import base.SpecBase
+import config.Constants.addQuarantineYears
+import formats.Format.dateFormatter
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.OtherCountryExcludedAndQuarantinedView
+
+import java.time.LocalDate
 
 class OtherCountryExcludedAndQuarantinedControllerSpec extends SpecBase {
 
@@ -29,7 +33,8 @@ class OtherCountryExcludedAndQuarantinedControllerSpec extends SpecBase {
 
       val countryCode: String = "NL"
       val countryName: String = "Netherlands"
-      val effectiveDecisionDate = "10/10/2022"
+      val effectiveDecisionDate = "2022-10-10"
+      val formattedEffectiveDecisionDate = LocalDate.parse(effectiveDecisionDate).plusYears(addQuarantineYears).format(dateFormatter)
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -41,7 +46,7 @@ class OtherCountryExcludedAndQuarantinedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[OtherCountryExcludedAndQuarantinedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(countryName, effectiveDecisionDate)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(countryName, formattedEffectiveDecisionDate)(request, messages(application)).toString
       }
     }
   }
