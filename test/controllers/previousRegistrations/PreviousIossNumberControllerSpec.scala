@@ -151,7 +151,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         running(application) {
           val request =
             FakeRequest(POST, previousIossNumberRoute)
-              .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
+              .withFormUrlEncodedBody(("previousSchemeNumber", "IM0401234567"))
 
           val result = route(application, request).value
           val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
@@ -184,7 +184,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         running(application) {
           val request =
             FakeRequest(POST, previousIossNumberRoute)
-              .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
+              .withFormUrlEncodedBody(("previousSchemeNumber", "IM0401234567"))
 
           val result = route(application, request).value
 
