@@ -18,16 +18,19 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossNumberFormProvider
+import models.{Country, Index, NormalMode, PreviousScheme, UserAnswers}
+import models.core.{Match, MatchType}
 import models.previousRegistrations.PreviousSchemeNumbers
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import services.CoreRegistrationValidationService
 import views.html.previousRegistrations.PreviousIossNumberView
 
 import scala.concurrent.Future
@@ -41,6 +44,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
   private val country = Country.euCountries.head
   private val baseAnswers = emptyUserAnswers
     .set(PreviousEuCountryPage(index), country).success.value
+    .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
     .set(PreviousIossSchemePage(index, index), false).success.value
 
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
@@ -85,12 +89,15 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+      val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(None)
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
       running(application) {
@@ -107,9 +114,93 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "when other country validation is enabled" - {
+
+      val genericMatch = Match(
+        MatchType.FixedEstablishmentActiveNETP,
+        "IM0987654321",
+        None,
+        "DE",
+        None,
+        None,
+        None,
+        None,
+        None
+      )
+
+      "continue normally when active IOSS found" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(Some(genericMatch))
+        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousIossNumberRoute)
+              .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
+
+          val result = route(application, request).value
+          val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("answer", None)).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual PreviousIossNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+        }
+
+      }
+
+      "Redirect to scheme quarantined when quarantined IOSS found" in {
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
+        when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousIossNumberRoute)
+              .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad().url
+        }
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
+      val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(None)
+
+      val application = applicationBuilder(userAnswers = Some(baseAnswers))
+        .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+        .build()
 
       running(application) {
         val request =

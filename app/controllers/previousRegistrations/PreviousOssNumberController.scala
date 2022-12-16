@@ -16,15 +16,18 @@
 
 package controllers.previousRegistrations
 
+import config.FrontendAppConfig
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.previousRegistrations.{PreviousSchemeNumbers, PreviousSchemeHintText}
+import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
 import models.requests.AuthenticatedDataRequest
 import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
+import services.CoreRegistrationValidationService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousOssNumberView
 
@@ -34,7 +37,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class PreviousOssNumberController @Inject()(
                                              override val messagesApi: MessagesApi,
                                              cc: AuthenticatedControllerComponents,
+                                             coreRegistrationValidationService: CoreRegistrationValidationService,
                                              formProvider: PreviousOssNumberFormProvider,
+                                             appConfig: FrontendAppConfig,
                                              view: PreviousOssNumberView
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -66,7 +71,6 @@ class PreviousOssNumberController @Inject()(
         country =>
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
-
           val form = formProvider(country)
 
           form.bindFromRequest().fold(
@@ -76,21 +80,49 @@ class PreviousOssNumberController @Inject()(
                   Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, countryWithValidationDetails, previousSchemeHintText)))
               },
 
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviousOssNumberPage(countryIndex, schemeIndex), PreviousSchemeNumbers(value, None)))
-                updatedAnswersWithScheme <- Future.fromTry(updatedAnswers.set(PreviousSchemePage(countryIndex, schemeIndex),
-                  if (value.startsWith("EU")) {
-                    PreviousScheme.OSSNU
-                  } else {
-                    PreviousScheme.OSSU
-                  }
-                ))
-                _ <- cc.sessionRepository.set(updatedAnswersWithScheme)
-              } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
+            value => {
+              val previousScheme = if (value.startsWith("EU")) {
+                PreviousScheme.OSSNU
+              } else {
+                PreviousScheme.OSSU
+              }
+
+              if (appConfig.otherCountryRegistrationValidationEnabled) {
+
+                coreRegistrationValidationService.searchScheme(
+                  searchNumber = value,
+                  previousScheme = previousScheme,
+                  intermediaryNumber = None,
+                  countryCode = country.code
+                ).flatMap {
+                  case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
+                    Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad()))
+                  case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
+                    Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad()))
+                  case _ =>
+                    saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+                }
+              } else {
+                saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+              }
+            }
           )
       }
+  }
 
+  private def saveAndRedirect(countryIndex: Index, schemeIndex: Index, registrationNumber: String, previousScheme: PreviousScheme, mode: Mode)
+                             (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.set(
+        PreviousOssNumberPage(countryIndex, schemeIndex),
+        PreviousSchemeNumbers(registrationNumber, None)
+      ))
+      updatedAnswersWithScheme <- Future.fromTry(updatedAnswers.set(
+        PreviousSchemePage(countryIndex, schemeIndex),
+        previousScheme
+      ))
+      _ <- cc.sessionRepository.set(updatedAnswersWithScheme)
+    } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
   }
 
   private def getCountry(index: Index)
@@ -140,4 +172,3 @@ class PreviousOssNumberController @Inject()(
 
   }
 }
-
