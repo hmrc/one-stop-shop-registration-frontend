@@ -14,23 +14,55 @@
  * limitations under the License.
  */
 
-package forms
+package forms.previousRegistrations
 
 import forms.behaviours.OptionFieldBehaviours
-import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import models.Country
 import play.api.data.FormError
 
-class PreviousIossNumberFormProviderSpec extends OptionFieldBehaviours {
+class PreviousIossRegistrationNumberFormProviderSpec extends OptionFieldBehaviours {
 
   private val country = Country.euCountries.head
-  val form = new PreviousIossRegistrationNumberFormProvider()(country)
+
 
   ".previousSchemeNumber" - {
 
     val requiredKey = "previousIossNumber.error.schemeNumber.required"
 
     val fieldName = "previousSchemeNumber"
+
+    val form = new PreviousIossRegistrationNumberFormProvider()(country, false)
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+
+  ".previousIntermediaryNumber as optional field" - {
+
+    val requiredKey = "previousIntermediaryNumber.error.invalid"
+
+    val fieldName = "previousIntermediaryNumber"
+
+    val form = new PreviousIossRegistrationNumberFormProvider()(country, false)
+
+    behave like optionsField(
+      form,
+      fieldName,
+      Seq("IN0401234567"),
+      invalidError = FormError(fieldName, requiredKey)
+    )
+  }
+
+  ".previousIntermediaryNumber as mandatory field" - {
+
+    val requiredKey = "previousIossNumber.error.intermediaryNumber.required"
+
+    val fieldName = "previousIntermediaryNumber"
+
+    val form = new PreviousIossRegistrationNumberFormProvider()(country, true)
 
     behave like mandatoryField(
       form,
