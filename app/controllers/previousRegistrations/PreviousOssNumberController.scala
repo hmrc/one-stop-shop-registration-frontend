@@ -19,15 +19,14 @@ package controllers.previousRegistrations
 import config.FrontendAppConfig
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
+import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
 import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
 import models.requests.AuthenticatedDataRequest
-import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import services.CoreRegistrationValidationService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousOssNumberView
 
