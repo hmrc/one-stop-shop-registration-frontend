@@ -52,6 +52,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val form = formProvider(country, hasIntermediary)
 
+  private val ossHintText = "This will start with IM040 followed by 7 numbers"
+
   "PreviousIossNumber Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -66,7 +68,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousIossNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, index, country, hasIntermediary = false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, index, country,
+          hasIntermediary = false, ossHintText, "")(request, messages(application)).toString
       }
     }
 
@@ -85,7 +88,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(PreviousSchemeNumbers("answer", None)), NormalMode, index, index, country, hasIntermediary = false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(PreviousSchemeNumbers("answer", None)),
+          NormalMode, index, index, country, hasIntermediary = false, ossHintText, "")(request, messages(application)).toString
       }
     }
 
@@ -169,7 +173,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn
+          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
         when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
         when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
 
@@ -217,7 +222,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, country, hasIntermediary = false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, country,
+          hasIntermediary = false, ossHintText, "")(request, messages(application)).toString
       }
     }
 
