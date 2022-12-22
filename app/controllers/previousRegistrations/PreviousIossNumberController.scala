@@ -21,7 +21,7 @@ import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
 import models.{Country, Index, Mode, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation, PreviousSchemeNumbers}
 import models.requests.AuthenticatedDataRequest
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -39,8 +39,10 @@ class PreviousIossNumberController @Inject()(
                                               coreRegistrationValidationService: CoreRegistrationValidationService,
                                               formProvider: PreviousIossRegistrationNumberFormProvider,
                                               appConfig: FrontendAppConfig,
-                                              view: PreviousIossNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                              view: PreviousIossNumberView,
+                                              iossHintText: String,
+                                              intermediaryHintText: String
+                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -57,7 +59,7 @@ class PreviousIossNumberController @Inject()(
             case Some(value) => form.fill(value)
           }
 
-          Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary)))
+          Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
         }
       }
   }
@@ -73,7 +75,7 @@ class PreviousIossNumberController @Inject()(
 
             form.bindFromRequest().fold(
               formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary))),
+                Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
 
               value =>
                 if (appConfig.otherCountryRegistrationValidationEnabled) {
@@ -134,4 +136,16 @@ class PreviousIossNumberController @Inject()(
       logger.error("Failed to get previous scheme")
       Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
+
+  private def getIossHintText(country: Country): String = {
+    IossRegistrationNumberValidation.euCountriesWithIOSSValidationRules.filter(_.country == country).head match {
+      case countryWithIossValidation => countryWithIossValidation.messageInput
+    }
+  }
+
+  private def getIntermediaryHintText(country: Country): String = {
+    IntermediaryIdentificationNumberValidation.euCountriesWithIntermediaryValidationRules.filter(_.country == country).head match {
+      case countryWithIntermediaryValidation => countryWithIntermediaryValidation.messageInput
+    }
+  }
 }

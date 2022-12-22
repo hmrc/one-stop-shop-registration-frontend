@@ -8,7 +8,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, country: Country, hasIntermediary: Boolean)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, country: Country, hasIntermediary: Boolean, iossHintText: String, intermediaryHintText: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle =
     if(hasIntermediary) {
@@ -43,7 +43,7 @@
                     }
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("previousIossNumber.iossNumber.hint")))
+            .withHint(HintViewModel(messages("previousIossNumber.iossNumber.hint", iossHintText)))
 
         )
 
@@ -55,7 +55,7 @@
                     label = LabelViewModel(messages("previousIossNumber.intermediaryNumber", country.name)).withCssClass("govuk-label--m")
                 )
                 .withWidth(Full)
-                .withHint(HintViewModel(messages("previousIossNumber.intermediaryNumber.hint")))
+                .withHint(HintViewModel(messages("previousIossNumber.intermediaryNumber.hint", intermediaryHintText)))
             )
         }
 
