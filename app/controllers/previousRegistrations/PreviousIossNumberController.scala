@@ -48,9 +48,9 @@ class PreviousIossNumberController @Inject()(
     implicit request =>
       getCountry(countryIndex) { country =>
 
-        val form = formProvider(country)
-
         getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
+
+          val form = formProvider(country, hasIntermediary)
 
           val preparedForm = request.userAnswers.get(PreviousIossNumberPage(countryIndex, schemeIndex)) match {
             case None => form
@@ -66,10 +66,10 @@ class PreviousIossNumberController @Inject()(
     implicit request =>
       getCountry(countryIndex) { country =>
 
-        val form = formProvider(country)
-
         getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
           getPreviousScheme(countryIndex, schemeIndex) { previousScheme =>
+
+            val form = formProvider(country, hasIntermediary)
 
             form.bindFromRequest().fold(
               formWithErrors =>

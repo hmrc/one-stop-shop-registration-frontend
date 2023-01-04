@@ -20,7 +20,6 @@ import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.FixedEstablishmentVRNAlreadyRegisteredView
 import views.html.previousRegistrations.SchemeQuarantinedView
 
 import javax.inject.Inject

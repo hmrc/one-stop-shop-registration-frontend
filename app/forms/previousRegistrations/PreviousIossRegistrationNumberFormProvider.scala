@@ -21,19 +21,25 @@ import models.previousRegistrations.PreviousSchemeNumbers
 import models.Country
 import play.api.data.Form
 import play.api.data.Forms._
+import uk.gov.voa.play.form.ConditionalMappings.mandatory
 
 import javax.inject.Inject
 
-class PreviousIossRegistrationNumberFormProvider @Inject() extends Mappings with IossRegistrationNumberConstraints with IntermediaryIdentificationNumberConstraints {
+class PreviousIossRegistrationNumberFormProvider @Inject() extends Mappings with IossRegistrationNumberConstraints
+  with IntermediaryIdentificationNumberConstraints {
 
-  def apply(country: Country): Form[PreviousSchemeNumbers] =
+  def apply(country: Country, hasIntermediary: Boolean): Form[PreviousSchemeNumbers] =
     Form(
       mapping(
         "previousSchemeNumber" -> text("previousIossNumber.error.schemeNumber.required")
           .verifying(validateIossRegistrationNumber(country.code, "previousIossNumber.error.invalid")),
-        "intermediaryNumber" -> optional(text("previousIossNumber.error.intermediaryNumber.required")
-          .verifying(validateIntermediaryIdentificationNumber(country.code, "previousIntermediaryNumber.error.invalid"))
-        )
+        if(hasIntermediary) {
+          "previousIntermediaryNumber" -> mandatory(text("previousIossNumber.error.intermediaryNumber.required")
+            .verifying(validateIntermediaryIdentificationNumber(country.code, "previousIntermediaryNumber.error.invalid")))
+        } else {
+          "previousIntermediaryNumber" -> optional(text("previousIossNumber.error.intermediaryNumber.required")
+            .verifying(validateIntermediaryIdentificationNumber(country.code, "previousIntermediaryNumber.error.invalid")))
+        }
       )(PreviousSchemeNumbers.apply)(PreviousSchemeNumbers.unapply)
     )
 }

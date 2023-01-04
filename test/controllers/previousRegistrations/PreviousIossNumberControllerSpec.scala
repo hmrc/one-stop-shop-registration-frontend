@@ -19,9 +19,8 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import models.{Country, Index, NormalMode, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
-import models.{Country, Index, NormalMode}
 import models.core.{Match, MatchType}
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -49,7 +48,9 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
 
-  private val form = formProvider(country)
+  private val hasIntermediary: Boolean = false
+
+  private val form = formProvider(country, hasIntermediary)
 
   "PreviousIossNumber Controller" - {
 
