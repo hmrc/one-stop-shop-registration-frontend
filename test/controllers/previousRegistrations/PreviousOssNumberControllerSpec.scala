@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,6 +155,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
       "Redirect to scheme still active when active OSS found" in {
 
+        val countryCode = genericMatch.memberState
+
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
@@ -179,7 +181,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(countryCode).url
         }
       }
 

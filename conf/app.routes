@@ -190,7 +190,7 @@ POST        /previous-ioss-number/:countryIndex/:schemeIndex                    
 GET         /check-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 POST        /check-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 
-GET         /scheme-still-active                                                controllers.previousRegistrations.SchemeStillActiveController.onPageLoad()
+GET         /scheme-still-active                                                controllers.previousRegistrations.SchemeStillActiveController.onPageLoad(countryCode: String)
 GET         /scheme-quarantined                                                 controllers.previousRegistrations.SchemeQuarantinedController.onPageLoad()
 
 GET         /previous-scheme-answer/:index                                      controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)

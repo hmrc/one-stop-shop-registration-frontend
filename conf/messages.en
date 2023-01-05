@@ -463,8 +463,9 @@ schemeStillActive.paragraph.deregister = Deregister from the OSS service in {0} 
 schemeStillActive.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 schemeStillActive.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
 
-schemeQuarantined.title = You cannot use this registration number
-schemeQuarantined.heading = You cannot use this registration number
+schemeQuarantined.title = Your account is quarantined
+schemeQuarantined.heading = Your account is quarantined
+schemeQuarantined.paragraph = You cannot use this registration number
 schemeQuarantined.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 schemeQuarantined.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
 
