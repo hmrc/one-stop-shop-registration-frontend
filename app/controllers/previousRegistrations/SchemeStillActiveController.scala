@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
+import models.Country
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -32,8 +33,9 @@ class SchemeStillActiveController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onPageLoad(countryCode: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      Ok(view())
+
+      Ok(view(Country.getCountryName(countryCode)))
   }
 }

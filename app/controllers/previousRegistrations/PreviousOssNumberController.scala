@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ class PreviousOssNumberController @Inject()(
                   countryCode = country.code
                 ).flatMap {
                   case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
-                    Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad()))
+                    Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(activeMatch.memberState)))
                   case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad()))
                   case _ =>

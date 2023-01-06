@@ -3,13 +3,15 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(country: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("schemeStillActive.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("schemeStillActive.heading")</h1>
 
-    <p class="govuk-body">@messages("schemeStillActive.paragraph")</p>
+    <p class="govuk-body">@messages("schemeStillActive.paragraph", country)</p>
+
+    <p class="govuk-body">@messages("schemeStillActive.paragraph.deregister", country)</p>
 
     <p class="govuk-body">@Html(messages("schemeStillActive.contactUs"))</p>
 
