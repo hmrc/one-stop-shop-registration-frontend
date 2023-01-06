@@ -20,9 +20,12 @@ import models.Index
 import org.scalacheck.Arbitrary
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemeNumbersPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, DeletePreviousSchemePage, PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviousOssNumberPage, PreviousSchemeNumbersPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryDeletePreviousSchemePage: Arbitrary[DeletePreviousSchemePage.type] =
+    Arbitrary(DeletePreviousSchemePage)
 
   implicit lazy val arbitraryPreviousIossNumberPage: Arbitrary[PreviousSchemeNumbersPage] =
     Arbitrary(PreviousIossNumberPage(Index(0), Index(0)))
