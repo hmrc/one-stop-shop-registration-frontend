@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.previousRegistrations
 
+import controllers.routes
 import models.{Index, UserAnswers}
 import pages.previousRegistrations.PreviousSchemePage
 import play.api.i18n.Messages
@@ -40,7 +41,10 @@ object PreviousSchemeSummary {
         SummaryListRowViewModel(
           key = "previousScheme.checkYourAnswersLabel",
           value = value,
-          actions = Seq()
+          actions = Seq(
+            ActionItemViewModel("site.remove", routes.JourneyRecoveryController.onPageLoad().url)
+              .withVisuallyHiddenText(messages("site.remove.hidden"))
+          )
         )
     }
 }

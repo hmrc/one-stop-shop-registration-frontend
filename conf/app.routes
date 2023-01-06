@@ -330,3 +330,11 @@ GET         /other-country-excluded-and-quarantined                             
 GET         /fixed-establishment-vrn-already-registered                         controllers.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()
 
 GET         /excluded-vrn                                                       controllers.ExcludedVRNController.onPageLoad()
+
+GET         /remove-previous-scheme                                             controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = NormalMode)
+
+POST        /remove-previous-scheme                                             controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = NormalMode)
+
+GET         /check-remove-previous-scheme                                       controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = CheckMode)
+
+POST        /check-remove-previous-scheme                                       controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = CheckMode)
