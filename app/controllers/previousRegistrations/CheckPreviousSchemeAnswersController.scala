@@ -55,7 +55,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
             val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
               SummaryListViewModel(
                 rows = Seq(
-                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex)),
+                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), mode),
                   PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
                   PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
                 ).flatten
@@ -88,7 +88,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
           val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
             SummaryListViewModel(
               rows = Seq(
-                PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex)),
+                PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), mode),
                 PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
                 PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
               ).flatten
