@@ -42,7 +42,7 @@ object PreviousSchemeSummary {
           key = "previousScheme.checkYourAnswersLabel",
           value = value,
           actions = Seq(
-            ActionItemViewModel("site.remove", routes.DeletePreviousSchemeController.onPageLoad(mode).url)
+            ActionItemViewModel("site.remove", routes.DeletePreviousSchemeController.onPageLoad(mode, schemeIndex).url)
               .withVisuallyHiddenText(messages("site.remove.hidden"))
           )
         )
