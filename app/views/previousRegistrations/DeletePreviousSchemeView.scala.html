@@ -6,9 +6,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, index: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("deletePreviousScheme.title"))) {
+@layout(pageTitle = title(form, messages("deletePreviousScheme.title", country.name))) {
 
     @formHelper(action = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onSubmit(mode, index), 'autoComplete -> "off") {
 
@@ -19,8 +19,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("deletePreviousScheme.heading")).asPageHeading()
-            ).withHint(HintViewModel(messages("deletePreviousScheme.paragraph")))
+                legend = LegendViewModel(messages("deletePreviousScheme.heading", country.name)).asPageHeading()
+            ).withHint(HintViewModel(messages("deletePreviousScheme.paragraph", country.name)))
         )
 
         @govukButton(

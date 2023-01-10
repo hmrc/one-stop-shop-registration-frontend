@@ -18,10 +18,11 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousSchemeFormProvider
-import models.{Index, Mode}
-import pages.previousRegistrations.DeletePreviousSchemePage
+import models.requests.AuthenticatedDataRequest
+import models.{Country, Index, Mode}
+import pages.previousRegistrations.{DeletePreviousSchemePage, PreviousEuCountryPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.DeletePreviousSchemeView
 
@@ -29,38 +30,55 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DeletePreviousSchemeController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: DeletePreviousSchemeFormProvider,
-                                         view: DeletePreviousSchemeView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                override val messagesApi: MessagesApi,
+                                                cc: AuthenticatedControllerComponents,
+                                                formProvider: DeletePreviousSchemeFormProvider,
+                                                view: DeletePreviousSchemeView
+                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(DeletePreviousSchemePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      getCountry(index) {
+        country =>
 
-      Ok(view(preparedForm, mode, index))
+          val preparedForm = request.userAnswers.get(DeletePreviousSchemePage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+
+          Future.successful(Ok(view(preparedForm, mode, index, country)))
+      }
   }
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, index))),
+      getCountry(index) {
+        country =>
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeletePreviousSchemePage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(DeletePreviousSchemePage.navigate(mode, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(DeletePreviousSchemePage, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(DeletePreviousSchemePage.navigate(mode, updatedAnswers))
+          )
+      }
   }
+
+  private def getCountry(index: Index)
+                        (block: Country => Future[Result])
+                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+    request.userAnswers.get(PreviousEuCountryPage(index)).map {
+      country =>
+        block(country)
+    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
