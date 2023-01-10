@@ -810,5 +810,5 @@ deletePreviousScheme.title = Remove this scheme for {0}?
 deletePreviousScheme.heading = Remove this scheme for {0}?
 deletePreviousScheme.paragraph = This will remove {0} from your previous registrations.
 deletePreviousScheme.checkYourAnswersLabel = deletePreviousScheme
-deletePreviousScheme.error.required = Select yes if deletePreviousScheme
+deletePreviousScheme.error.required = Select yes if you want to remove this scheme for {0}
 deletePreviousScheme.change.hidden = DeletePreviousScheme

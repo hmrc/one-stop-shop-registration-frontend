@@ -36,7 +36,7 @@ class DeletePreviousSchemeController @Inject()(
                                                 view: DeletePreviousSchemeView
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
+
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
@@ -44,6 +44,8 @@ class DeletePreviousSchemeController @Inject()(
 
       getCountry(index) {
         country =>
+
+          val form = formProvider(country)
 
           val preparedForm = request.userAnswers.get(DeletePreviousSchemePage) match {
             case None => form
@@ -60,6 +62,8 @@ class DeletePreviousSchemeController @Inject()(
 
       getCountry(index) {
         country =>
+
+          val form = formProvider(country)
 
           form.bindFromRequest().fold(
             formWithErrors =>
