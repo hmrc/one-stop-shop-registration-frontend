@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.previousRegistrations.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.previousRegistrations.DeletePreviousSchemePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -35,10 +34,7 @@ object DeletePreviousSchemeSummary  {
         SummaryListRowViewModel(
           key     = "deletePreviousScheme.checkYourAnswersLabel",
           value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.DeletePreviousSchemeController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("deletePreviousScheme.change.hidden"))
-          )
+          actions = Seq.empty
         )
     }
 }
