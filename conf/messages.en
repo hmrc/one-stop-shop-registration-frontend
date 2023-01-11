@@ -414,8 +414,8 @@ previousScheme.ioss = Import One Stop Shop (IOSS)
 previousScheme.checkYourAnswersLabel = Previous Scheme
 previousScheme.error.required = Select which scheme did your business register for
 previousScheme.change.hidden = which scheme did your business register for
-previousScheme.oss.exceed.error = Cannot have more than 2 OSS registrations in {0}
-previousScheme.ioss.exceed.error = Cannot have more than one IOSS registration in {0}
+previousScheme.oss.exceed.error = Cannot select another OSS registration for {0}
+previousScheme.ioss.exceed.error = Cannot select another IOSS registration for {0}
 
 previousIossScheme.title = Did you use an intermediary?
 previousIossScheme.heading = Did you use an intermediary?
