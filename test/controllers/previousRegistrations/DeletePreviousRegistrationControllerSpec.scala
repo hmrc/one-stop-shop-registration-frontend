@@ -97,7 +97,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
     }
 
 
-    "must not delete a record and redirect to the next page when the user answers Yes" in {
+    "must not delete a record and redirect to the next page when the user answers No" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 

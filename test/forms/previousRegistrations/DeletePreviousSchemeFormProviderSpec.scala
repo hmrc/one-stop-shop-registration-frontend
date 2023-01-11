@@ -17,14 +17,16 @@
 package forms.previousRegistrations
 
 import forms.behaviours.BooleanFieldBehaviours
+import models.Country
 import play.api.data.FormError
+import org.scalacheck.Arbitrary.arbitrary
 
 class DeletePreviousSchemeFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "deletePreviousScheme.error.required"
-  val invalidKey = "error.boolean"
-
-  val form = new DeletePreviousSchemeFormProvider()()
+  private val requiredKey = "deletePreviousScheme.error.required"
+  private val invalidKey = "error.boolean"
+  private val country: Country = arbitrary[Country].sample.value
+  val form = new DeletePreviousSchemeFormProvider()(country)
 
   ".value" - {
 
@@ -33,13 +35,13 @@ class DeletePreviousSchemeFormProviderSpec extends BooleanFieldBehaviours {
     behave like booleanField(
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      invalidError = FormError(fieldName, invalidKey, Seq(country.name))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

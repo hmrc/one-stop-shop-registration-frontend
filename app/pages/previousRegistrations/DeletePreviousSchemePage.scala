@@ -16,12 +16,40 @@
 
 package pages.previousRegistrations
 
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import queries.previousRegistration.{DeriveNumberOfPreviousRegistrations, DeriveNumberOfPreviousSchemes}
+import controllers.previousRegistrations.{routes => prevRegRoutes}
 
-case object DeletePreviousSchemePage extends QuestionPage[Boolean] {
+case class DeletePreviousSchemePage(countryIndex: Index) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "deletePreviousScheme"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    (answers.get(DeriveNumberOfPreviousRegistrations), answers.get(DeriveNumberOfPreviousSchemes(countryIndex))) match {
+      case (_, Some(numberOfSchemes)) if numberOfSchemes > 0 =>
+        prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)
+      case (Some(numberOfCountries), _) if numberOfCountries > 0 =>
+        prevRegRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode)
+      case _ =>
+        prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+    }
+  }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+   (answers.get(DeriveNumberOfPreviousRegistrations), answers.get(DeriveNumberOfPreviousSchemes(countryIndex))) match {
+        case (_, Some(numberOfSchemes)) if numberOfSchemes > 0 =>
+          prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, countryIndex)
+        case (Some(numberOfCountries), _) if numberOfCountries > 0 =>
+          prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode)
+        case _ =>
+          prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode)
+      }
+  }
+
 }
+
