@@ -19,10 +19,10 @@ package forms.mappings
 import models.{PreviousScheme, PreviousSchemeType}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
-trait SchemeConstraint {
+trait PreviousRegistrationSchemeConstraint {
 
-  def validateRegistrationSchemes(countryName: String, existingAnswers: Seq[PreviousScheme],
-                              errorKeyOss: String, errorKeyIoss: String): Constraint[PreviousSchemeType] = {
+  def validatePreviousRegistrationSchemes(countryName: String, existingAnswers: Seq[PreviousScheme],
+                                          errorKeyOss: String, errorKeyIoss: String): Constraint[PreviousSchemeType] = {
 
     Constraint {
       input =>
