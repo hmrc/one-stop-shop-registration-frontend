@@ -400,7 +400,7 @@ previouslyRegistered.title = Has your business ever registered for a One Stop Sh
 previouslyRegistered.heading = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.hint = This includes Import One Stop Shop (IOSS).
 previouslyRegistered.checkYourAnswersLabel = Registered for other One Stop Shop schemes in the EU
-previouslyRegistered.error.required = Select yes if your business has ever registered for a One Stop Shop scheme in an EU countr
+previouslyRegistered.error.required = Select yes if your business has ever registered for a One Stop Shop scheme in an EU country
 previouslyRegistered.change.hidden = if your business has ever registered for a One Stop Shop scheme in an EU country
 
 previousScheme.title = Which scheme did your business register for?
@@ -414,6 +414,8 @@ previousScheme.ioss = Import One Stop Shop (IOSS)
 previousScheme.checkYourAnswersLabel = Previous Scheme
 previousScheme.error.required = Select which scheme did your business register for
 previousScheme.change.hidden = which scheme did your business register for
+previousScheme.oss.exceed.error = Cannot have more than 2 OSS registrations in {0}
+previousScheme.ioss.exceed.error = Cannot have more than one IOSS registration in {0}
 
 previousIossScheme.title = Did you use an intermediary?
 previousIossScheme.heading = Did you use an intermediary?

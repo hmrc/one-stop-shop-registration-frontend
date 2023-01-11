@@ -16,16 +16,20 @@
 
 package forms.previousRegistrations
 
-import forms.mappings.Mappings
-import models.PreviousSchemeType
+import forms.mappings.{Mappings, SchemeConstraint}
+import models.{PreviousScheme, PreviousSchemeType}
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class PreviousSchemeTypeFormProvider @Inject() extends Mappings {
+class PreviousSchemeTypeFormProvider @Inject() extends Mappings with SchemeConstraint {
 
-  def apply(): Form[PreviousSchemeType] =
+  def apply(countryName: String, existingAnswers: Seq[PreviousScheme]): Form[PreviousSchemeType] = {
     Form(
-      "value" -> enumerable[PreviousSchemeType]("previousSchemePage.error.required")
+      "value" -> enumerable[PreviousSchemeType]("previousScheme.error.required")
+        .verifying(validateRegistrationSchemes(countryName, existingAnswers,
+          "previousScheme.oss.exceed.error", "previousScheme.ioss.exceed.error"))
     )
+  }
+
 }
