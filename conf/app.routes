@@ -331,10 +331,10 @@ GET         /fixed-establishment-vrn-already-registered                         
 
 GET         /excluded-vrn                                                       controllers.ExcludedVRNController.onPageLoad()
 
-GET         /remove-previous-scheme/:index                                      controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = NormalMode, index: Index)
+GET         /remove-previous-scheme/:countryIndex/:schemeIndex                  controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 
-POST        /remove-previous-scheme/:index                                      controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = NormalMode, index: Index)
+POST        /remove-previous-scheme/:countryIndex/:schemeIndex                  controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 
-GET         /check-remove-previous-scheme/:index                                controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = CheckMode, index: Index)
+GET         /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 
-POST        /check-remove-previous-scheme/:index                                controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = CheckMode, index: Index)
+POST        /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)

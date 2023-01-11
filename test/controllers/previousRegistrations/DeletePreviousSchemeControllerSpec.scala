@@ -18,31 +18,57 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.DeletePreviousSchemeFormProvider
-import models.{NormalMode, UserAnswers}
+import models.previousRegistrations.{PreviousRegistrationDetails, PreviousSchemeDetails, PreviousSchemeNumbers}
+import models.{Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.DeletePreviousSchemePage
+import pages.previousRegistrations.{DeletePreviousSchemePage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.previousRegistration.PreviousSchemeForCountryQuery
 import repositories.AuthenticatedUserAnswersRepository
+import viewmodels.checkAnswers.previousRegistrations.{DeletePreviousSchemeSummary, PreviousSchemeNumberSummary}
+import viewmodels.govuk.SummaryListFluency
 import views.html.previousRegistrations.DeletePreviousSchemeView
 
 import scala.concurrent.Future
 
-class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
+class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency {
 
+  private val country: Country = arbitrary[Country].sample.value
   private val formProvider = new DeletePreviousSchemeFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(country)
+  private val index = Index(0)
+  private val index1 = Index(1)
+  private val previousSchemeNumbers = PreviousSchemeNumbers("012345678", None)
+  private val previousScheme = PreviousSchemeDetails("ossu", previousSchemeNumbers)
+  private val previousRegistration = PreviousRegistrationDetails(country, Seq(previousScheme))
 
-  private lazy val deletePreviousSchemeRoute = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onPageLoad(NormalMode).url
+  private val baseUserAnswers =
+    basicUserAnswersWithVatInfo
+      .set(PreviousEuCountryPage(index), previousRegistration.previousEuCountry).success.value
+      .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+      .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
+
+  private lazy val deletePreviousSchemeRoute = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onPageLoad(NormalMode, index, index).url
 
   "DeletePreviousScheme Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
+
+      implicit val msgs: Messages = messages(application)
+      val list = SummaryListViewModel(
+        Seq(
+          DeletePreviousSchemeSummary.row(baseUserAnswers, index, index),
+          PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
+        ).flatten
+      )
 
       running(application) {
         val request = FakeRequest(GET, deletePreviousSchemeRoute)
@@ -52,15 +78,23 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[DeletePreviousSchemeView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(DeletePreviousSchemePage, true).success.value
+      val userAnswers = baseUserAnswers.copy().set(DeletePreviousSchemePage(index), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      implicit val msgs: Messages = messages(application)
+      val list = SummaryListViewModel(
+        Seq(
+          DeletePreviousSchemeSummary.row(baseUserAnswers, index, index),
+          PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
+        ).flatten
+      )
 
       running(application) {
         val request = FakeRequest(GET, deletePreviousSchemeRoute)
@@ -70,18 +104,18 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must delete a scheme and redirect to the next page when user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,17 +125,77 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(DeletePreviousSchemePage, true).success.value
+        val expectedAnswers = baseUserAnswers.remove(PreviousSchemeForCountryQuery(index, index)).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeletePreviousSchemePage.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual DeletePreviousSchemePage(index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    //TODO when last scheme in country must delete country also.
+//    "must delete the country and scheme and redirect to the next page when user answers Yes" in {
+//
+//      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+//
+//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+//
+//      val application =
+//        applicationBuilder(userAnswers = Some(
+//          baseUserAnswers
+//          .set(PreviousSchemePage(index, index1), PreviousScheme.OSSU).success.value
+//          .set(PreviousOssNumberPage(index, index1), previousSchemeNumbers).success.value)
+//        )
+//          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+//          .build()
+//
+//      running(application) {
+//        val request =
+//          FakeRequest(POST, deletePreviousSchemeRoute)
+//            .withFormUrlEncodedBody(("value", "true"))
+//
+//        val result = route(application, request).value
+//        val expectedAnswers = baseUserAnswers.remove(PreviousSchemeForCountryQuery(index, index1)).success.value
+//
+//        status(result) mustEqual SEE_OTHER
+//        redirectLocation(result).value mustEqual DeletePreviousSchemePage(index, index1).navigate(NormalMode, expectedAnswers).url
+//        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+//      }
+//    }
+
+    "must not delete a scheme and redirect to the next page when user answers No" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deletePreviousSchemeRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DeletePreviousSchemePage(index).navigate(NormalMode, baseUserAnswers).url
+        verifyNoInteractions(mockSessionRepository)
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
+
+      implicit val msgs: Messages = messages(application)
+      val list = SummaryListViewModel(
+        Seq(
+          DeletePreviousSchemeSummary.row(baseUserAnswers, index, index),
+          PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
+        ).flatten
+      )
 
       running(application) {
         val request =
@@ -115,7 +209,7 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
       }
     }
 
