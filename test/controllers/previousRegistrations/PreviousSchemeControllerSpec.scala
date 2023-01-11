@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousSchemeTypeFormProvider
-import models.{Country, Index, NormalMode, PreviousSchemeType, UserAnswers}
+import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,11 +36,11 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
   private val index = Index(0)
   private lazy val previousSchemePageRoute = controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(NormalMode, index, index).url
 
-  private val formProvider = new PreviousSchemeTypeFormProvider()
-  private val form = formProvider()
-
   private val country = Country.euCountries.head
   private val baseAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
+
+  private val formProvider = new PreviousSchemeTypeFormProvider()
+  private val form = formProvider(country.name, PreviousScheme.values)
 
   "PreviousSchemePage Controller" - {
 
@@ -62,7 +62,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(PreviousSchemeTypePage(index, index), PreviousSchemeType.values.head).success.value
+      val userAnswers = baseAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
