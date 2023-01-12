@@ -86,7 +86,7 @@ class PreviousOssNumberController @Inject()(
                 PreviousScheme.OSSU
               }
 
-              if (appConfig.otherCountryRegistrationValidationEnabled) {
+              if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
 
                 coreRegistrationValidationService.searchScheme(
                   searchNumber = value,
