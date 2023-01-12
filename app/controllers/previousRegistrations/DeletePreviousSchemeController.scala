@@ -16,6 +16,7 @@
 
 package controllers.previousRegistrations
 
+import config.Constants.lastSchemeForCountry
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousSchemeFormProvider
 import models.requests.AuthenticatedDataRequest
@@ -44,7 +45,7 @@ class DeletePreviousSchemeController @Inject()(
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      val isLastPreviousScheme = request.userAnswers.get(DeriveNumberOfPreviousSchemes(countryIndex)).get == 1
+      val isLastPreviousScheme = request.userAnswers.get(DeriveNumberOfPreviousSchemes(countryIndex)).get == lastSchemeForCountry
 
       getCountry(countryIndex) {
         country =>
@@ -72,7 +73,7 @@ class DeletePreviousSchemeController @Inject()(
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      val isLastPreviousScheme = request.userAnswers.get(DeriveNumberOfPreviousSchemes(countryIndex)).get == 1
+      val isLastPreviousScheme = request.userAnswers.get(DeriveNumberOfPreviousSchemes(countryIndex)).get == lastSchemeForCountry
 
       getCountry(countryIndex) {
         country =>
