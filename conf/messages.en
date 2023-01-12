@@ -411,7 +411,7 @@ previousScheme.iosswoi = Import One Stop Shop without intermediary
 previousScheme.iosswi = Import One Stop Shop with intermediary
 previousScheme.oss = One Stop Shop (OSS)
 previousScheme.ioss = Import One Stop Shop (IOSS)
-previousScheme.checkYourAnswersLabel = Previous Scheme
+previousScheme.checkYourAnswersLabel = Scheme
 previousScheme.error.required = Select which scheme did your business register for
 previousScheme.change.hidden = which scheme did your business register for
 previousScheme.oss.exceed.error = Cannot select another OSS registration for {0}
@@ -811,6 +811,5 @@ excludedVRN.contactUs = If you believe this is an error, contact us at <a class=
 deletePreviousScheme.title = Remove this scheme for {0}?
 deletePreviousScheme.heading = Remove this scheme for {0}?
 deletePreviousScheme.paragraph = This will remove {0} from your previous registrations.
-deletePreviousScheme.checkYourAnswersLabel = deletePreviousScheme
 deletePreviousScheme.error.required = Select yes if you want to remove this scheme for {0}
-deletePreviousScheme.change.hidden = DeletePreviousScheme
+
