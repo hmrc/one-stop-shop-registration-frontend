@@ -28,9 +28,9 @@ trait PreviousRegistrationSchemeConstraint {
       input =>
         input match {
           case PreviousSchemeType.OSS if existingAnswers.count(value => value == PreviousScheme.OSSU
-            || value == PreviousScheme.OSSNU) == 2 => Invalid(errorKeyOss, countryName)
+            || value == PreviousScheme.OSSNU) > 1 => Invalid(errorKeyOss, countryName)
           case PreviousSchemeType.IOSS if existingAnswers.count(value => value == PreviousScheme.IOSSWOI
-            || value == PreviousScheme.IOSSWI) == 1 => Invalid(errorKeyIoss, countryName)
+            || value == PreviousScheme.IOSSWI) > 0 => Invalid(errorKeyIoss, countryName)
           case _ => Valid
         }
     }
