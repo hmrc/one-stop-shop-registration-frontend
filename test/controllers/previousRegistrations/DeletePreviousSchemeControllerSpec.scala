@@ -51,8 +51,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(index), previousRegistration.previousEuCountry).success.value
-      .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
-      .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
+        .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+        .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
 
   private lazy val deletePreviousSchemeRoute = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onPageLoad(NormalMode, index, index).url
 
@@ -132,36 +132,6 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
-
-    //TODO when last scheme in country must delete country also.
-//    "must delete the country and scheme and redirect to the next page when user answers Yes" in {
-//
-//      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-//
-//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-//
-//      val application =
-//        applicationBuilder(userAnswers = Some(
-//          baseUserAnswers
-//          .set(PreviousSchemePage(index, index1), PreviousScheme.OSSU).success.value
-//          .set(PreviousOssNumberPage(index, index1), previousSchemeNumbers).success.value)
-//        )
-//          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-//          .build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, deletePreviousSchemeRoute)
-//            .withFormUrlEncodedBody(("value", "true"))
-//
-//        val result = route(application, request).value
-//        val expectedAnswers = baseUserAnswers.remove(PreviousSchemeForCountryQuery(index, index1)).success.value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual DeletePreviousSchemePage(index, index1).navigate(NormalMode, expectedAnswers).url
-//        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-//      }
-//    }
 
     "must not delete a scheme and redirect to the next page when user answers No" in {
 
