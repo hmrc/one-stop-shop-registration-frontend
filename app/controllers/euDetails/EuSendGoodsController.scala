@@ -16,14 +16,13 @@
 
 package controllers.euDetails
 
+import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuSendGoodsFormProvider
-import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
+import models.{Index, Mode}
 import pages.euDetails
-import pages.euDetails.EuCountryPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.EuSendGoodsView
 
@@ -35,7 +34,7 @@ class EuSendGoodsController @Inject()(
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: EuSendGoodsFormProvider,
                                          view: EuSendGoodsView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -71,12 +70,5 @@ class EuSendGoodsController @Inject()(
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
 }
+

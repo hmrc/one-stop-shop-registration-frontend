@@ -17,13 +17,13 @@
 package controllers.previousRegistrations
 
 import config.Constants
+import controllers.GetCountry
 import controllers.actions.AuthenticatedControllerComponents
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
-import models.{Country, Index, Mode}
-import models.requests.AuthenticatedDataRequest
-import pages.previousRegistrations.{CheckPreviousSchemeAnswersPage, PreviousEuCountryPage}
+import models.{Index, Mode}
+import pages.previousRegistrations.CheckPreviousSchemeAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.AllPreviousSchemesForCountryQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
@@ -39,14 +39,14 @@ class CheckPreviousSchemeAnswersController @Inject()(
                                                       cc: AuthenticatedControllerComponents,
                                                       formProvider: CheckPreviousSchemeAnswersFormProvider,
                                                       view: CheckPreviousSchemeAnswersView
-                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport with GetCountry {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(index) {
+      getPreviousCountry(index) {
         country =>
           request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
 
@@ -79,7 +79,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
         Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, index))
       }*/
 
-      getCountry(index) { country =>
+      getPreviousCountry(index) { country =>
 
         request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
 
@@ -109,11 +109,5 @@ class CheckPreviousSchemeAnswersController @Inject()(
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousEuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+
