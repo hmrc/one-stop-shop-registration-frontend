@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package queries
+package queries.previousRegistration
 
 import models.Index
-import models.previousRegistrations.PreviousRegistrationDetails
+import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import play.api.libs.json.JsPath
+import queries.{Gettable, Settable}
 
-case class PreviousRegistrationQuery(index: Index) extends Gettable[PreviousRegistrationDetails] with Settable[PreviousRegistrationDetails] {
+case class PreviousRegistrationWithOptionalVatNumberQuery(index: Index) extends Gettable[PreviousRegistrationDetailsWithOptionalVatNumber] with Settable[PreviousRegistrationDetailsWithOptionalVatNumber] {
 
   override def path: JsPath = JsPath \ "previousRegistrations" \ index.position
 }

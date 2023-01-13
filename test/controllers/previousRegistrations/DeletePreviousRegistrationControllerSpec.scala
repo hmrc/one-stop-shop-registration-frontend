@@ -27,7 +27,7 @@ import pages.previousRegistrations._
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.PreviousRegistrationQuery
+import queries.previousRegistration.PreviousRegistrationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
