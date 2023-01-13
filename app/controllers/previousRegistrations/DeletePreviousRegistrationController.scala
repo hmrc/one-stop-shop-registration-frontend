@@ -24,7 +24,7 @@ import models.{Index, Mode}
 import pages.previousRegistrations.DeletePreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{PreviousRegistrationQuery, PreviousRegistrationWithOptionalVatNumberQuery}
+import queries.previousRegistration
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
@@ -61,7 +61,7 @@ class DeletePreviousRegistrationController @Inject()(
             value =>
               if (value) {
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(PreviousRegistrationQuery(index)))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(previousRegistration.PreviousRegistrationQuery(index)))
                   _              <- cc.sessionRepository.set(updatedAnswers)
                 } yield Redirect(DeletePreviousRegistrationPage(index).navigate(mode, updatedAnswers))
               } else {
@@ -75,7 +75,7 @@ class DeletePreviousRegistrationController @Inject()(
   private def getPreviousRegistration(index: Index)
                              (block: PreviousRegistrationDetailsWithOptionalVatNumber => Future[Result])
                              (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousRegistrationWithOptionalVatNumberQuery(index)).map {
+    request.userAnswers.get(previousRegistration.PreviousRegistrationWithOptionalVatNumberQuery(index)).map {
       details =>
         block(details)
     }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))

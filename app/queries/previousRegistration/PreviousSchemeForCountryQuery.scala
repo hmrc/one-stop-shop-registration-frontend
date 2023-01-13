@@ -19,7 +19,7 @@ package queries.previousRegistration
 import models.previousRegistrations.PreviousSchemeDetails
 import models.{Index, UserAnswers}
 import play.api.libs.json.JsPath
-import queries.{Gettable, PreviousRegistrationQuery, Settable}
+import queries.{Gettable, Settable}
 
 import scala.util.Try
 
