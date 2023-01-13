@@ -27,7 +27,7 @@ import pages.previousRegistrations._
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.PreviousRegistrationQuery
+import queries.previousRegistration.PreviousRegistrationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
@@ -97,7 +97,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
     }
 
 
-    "must not delete a record and redirect to the next page when the user answers Yes" in {
+    "must not delete a record and redirect to the next page when the user answers No" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 

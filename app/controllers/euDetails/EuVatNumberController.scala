@@ -17,13 +17,13 @@
 package controllers.euDetails
 
 import config.FrontendAppConfig
+import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuVatNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, Mode}
-import models.requests.AuthenticatedDataRequest
-import pages.euDetails.{EuCountryPage, EuVatNumberPage}
+import models.{CountryWithValidationDetails, Index, Mode}
+import pages.euDetails.EuVatNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.CoreRegistrationValidationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.EuVatNumberView
@@ -38,7 +38,7 @@ class EuVatNumberController @Inject()(
                                        coreRegistrationValidationService: CoreRegistrationValidationService,
                                        appConfig: FrontendAppConfig,
                                        view: EuVatNumberView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -102,11 +102,5 @@ class EuVatNumberController @Inject()(
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+

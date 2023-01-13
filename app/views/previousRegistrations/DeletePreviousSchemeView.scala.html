@@ -1,0 +1,39 @@
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, country: Country, list: SummaryList, isLastPreviousScheme: Boolean)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("deletePreviousScheme.title", country.name))) {
+
+    @formHelper(action = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onSubmit(mode, countryIndex, schemeIndex), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 class="govuk-heading-xl">@messages("deletePreviousScheme.heading", country.name)</h1>
+
+        @if(isLastPreviousScheme) {
+            <p class="govuk-body">@messages("deletePreviousScheme.paragraph", country.name)</p>
+        }
+
+        @govukSummaryList(list)
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                        field = form("value"),
+                        legend = LegendViewModel(messages(""))
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

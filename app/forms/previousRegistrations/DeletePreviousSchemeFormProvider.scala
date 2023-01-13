@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package config
+package forms.previousRegistrations
 
-import java.time.LocalDate
+import forms.mappings.Mappings
+import models.Country
+import play.api.data.Form
 
-object Constants {
+import javax.inject.Inject
 
-  val maxTradingNames: Int = 10
-  val maxWebsites: Int = 10
-  val maxSchemes: Int = 3
-  val addQuarantineYears: Int = 2
-  val lastSchemeForCountry: Int = 1
+class DeletePreviousSchemeFormProvider @Inject() extends Mappings {
 
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
-
-  val schemeStartDate: LocalDate = LocalDate.of(2021, 7, 1)
-
-  val tradingNameReservedWords = Set("limited", "ltd", "llp", "plc")
-
-  val emailVerificationMaxEmails: Int = 10
+  def apply(country: Country): Form[Boolean] =
+    Form(
+      "value" -> boolean("deletePreviousScheme.error.required", args = Seq(country.name))
+    )
 }
