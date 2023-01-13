@@ -16,14 +16,13 @@
 
 package controllers.euDetails
 
+import controllers.GetCountry
 import controllers.actions.AuthenticatedControllerComponents
 import models.euDetails.EuOptionalDetails
-import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
-import pages.euDetails
+import models.{Index, Mode}
 import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import viewmodels.checkAnswers.euDetails._
@@ -37,7 +36,7 @@ class CheckEuDetailsAnswersController @Inject()(
                                                  override val messagesApi: MessagesApi,
                                                  cc: AuthenticatedControllerComponents,
                                                  view: CheckEuDetailsAnswersView
-                                               ) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                               ) extends FrontendBaseController with CompletionChecks with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -85,11 +84,5 @@ class CheckEuDetailsAnswersController @Inject()(
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(euDetails.EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+

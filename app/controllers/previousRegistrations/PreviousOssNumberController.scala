@@ -17,12 +17,13 @@
 package controllers.previousRegistrations
 
 import config.FrontendAppConfig
+import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme}
 import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
 import models.requests.AuthenticatedDataRequest
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
+import models.{CountryWithValidationDetails, Index, Mode, PreviousScheme}
+import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
@@ -40,13 +41,13 @@ class PreviousOssNumberController @Inject()(
                                              formProvider: PreviousOssNumberFormProvider,
                                              appConfig: FrontendAppConfig,
                                              view: PreviousOssNumberView
-                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(countryIndex) {
+      getPreviousCountry(countryIndex) {
         country =>
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
@@ -66,7 +67,7 @@ class PreviousOssNumberController @Inject()(
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(countryIndex) {
+      getPreviousCountry(countryIndex) {
         country =>
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
@@ -123,14 +124,6 @@ class PreviousOssNumberController @Inject()(
       _ <- cc.sessionRepository.set(updatedAnswersWithScheme)
     } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
   }
-
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousEuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
   private def determinePreviousSchemeHintText(countryIndex: Index,
                                               schemeIndex: Index

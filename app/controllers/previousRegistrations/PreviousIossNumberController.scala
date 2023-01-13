@@ -17,13 +17,14 @@
 package controllers.previousRegistrations
 
 import config.FrontendAppConfig
+import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
-import models.{Country, Index, Mode, PreviousScheme}
 import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation, PreviousSchemeNumbers}
 import models.requests.AuthenticatedDataRequest
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
+import models.{Country, Index, Mode, PreviousScheme}
+import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.CoreRegistrationValidationService
@@ -42,13 +43,13 @@ class PreviousIossNumberController @Inject()(
                                               view: PreviousIossNumberView,
                                               iossHintText: String,
                                               intermediaryHintText: String
-                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(countryIndex) { country =>
+      getPreviousCountry(countryIndex) { country =>
 
         getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
 
@@ -66,7 +67,7 @@ class PreviousIossNumberController @Inject()(
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(countryIndex) { country =>
+      getPreviousCountry(countryIndex) { country =>
 
         getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
           getPreviousScheme(countryIndex, schemeIndex) { previousScheme =>
@@ -106,14 +107,6 @@ class PreviousIossNumberController @Inject()(
       _ <- cc.sessionRepository.set(updatedAnswers)
     } yield Redirect(PreviousIossNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
   }
-
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousEuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
   private def getHasIntermediary(countryIndex: Index, schemeIndex: Index)
                                 (block: Boolean => Future[Result])
