@@ -41,13 +41,14 @@ class CheckPreviousSchemeAnswersController @Inject()(
                                                       view: CheckPreviousSchemeAnswersView
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport with GetCountry {
 
-  private val form = formProvider()
+
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       getPreviousCountry(index) {
         country =>
+
           request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
 
             val canAddScheme = previousSchemes.size < Constants.maxSchemes
@@ -61,6 +62,8 @@ class CheckPreviousSchemeAnswersController @Inject()(
                 ).flatten
               )
             }
+
+            val form = formProvider(country)
 
             Future.successful(Ok(view(form, mode, lists, index, country, canAddScheme)))
 
@@ -94,6 +97,8 @@ class CheckPreviousSchemeAnswersController @Inject()(
               ).flatten
             )
           }
+
+          val form = formProvider(country)
 
           form.bindFromRequest().fold(
             formWithErrors =>

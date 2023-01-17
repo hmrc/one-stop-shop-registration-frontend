@@ -30,6 +30,9 @@
 
 @layout(pageTitle = titleNoForm(messages("checkPreviousSchemeAnswers.title", country.name))) {
 
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummaryViewModel(form))
+    }
 
     <h1 class="govuk-heading-xl">@messages("checkPreviousSchemeAnswers.heading", country.name)</h1>
 
