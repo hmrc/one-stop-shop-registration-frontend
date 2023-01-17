@@ -17,12 +17,15 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import logging.Logging
 import models.{CheckMode, Index, NormalMode, PreviousSchemeType, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[PreviousSchemeType] {
+import scala.util.Try
+
+case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) extends QuestionPage[PreviousSchemeType] with Logging {
 
   override def path: JsPath = JsPath \ "previousRegistrations" \ countryIndex.position \ "previousSchemesDetails" \ schemeIndex.position \ toString
 
@@ -42,5 +45,19 @@ case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) exten
       prevRegRoutes.PreviousIossSchemeController.onPageLoad(CheckMode, countryIndex, schemeIndex)
     }
   }
+
+  //TODO userAnswers.remove() on previousSchemeNumbers, previousScheme and withIntermediary
+  override def cleanup(value: Option[PreviousSchemeType], userAnswers: UserAnswers): Try[UserAnswers] = {
+
+        logger.info("VALUE: " + value)
+        logger.info("USERANSWERS BEFORE: " + userAnswers)
+    for {
+      updatedAnswers <- userAnswers.remove(PreviousIossNumberPage(countryIndex, schemeIndex))
+      updateAnswers2 <- updatedAnswers.remove(PreviousIossSchemePage(countryIndex, schemeIndex))
+      updateAnswers3 <- updateAnswers2.remove(PreviousSchemePage(countryIndex, schemeIndex))
+
+    } yield updateAnswers3
+  }
+
 
 }
