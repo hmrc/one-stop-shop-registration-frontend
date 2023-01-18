@@ -17,7 +17,7 @@
 package connectors
 
 import logging.Logging
-import models.core.{CoreRegistrationValidationResult, EisErrorResponse, ErrorDetail}
+import models.core.{CoreRegistrationValidationResult, EisErrorResponse}
 import models.responses.{EisError, ErrorResponse, InvalidJson, UnexpectedResponseStatus}
 import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsSuccess}
@@ -47,9 +47,8 @@ object ValidateCoreRegistrationHttpParser extends Logging {
             logger.error(s"Response received from EIS ${response.status} with empty body and self-generated correlationId $uuid")
             Left(
               EisError(
-                EisErrorResponse(
-                  ErrorDetail(Some(status.toString), Some("The response body was empty"), None, Instant.now(), uuid)
-                )))
+                EisErrorResponse(Instant.now(), status.toString, "The response body was empty")
+              ))
           } else {
             response.json.validateOpt[EisErrorResponse] match {
               case JsSuccess(Some(eisErrorResponse), _) =>
