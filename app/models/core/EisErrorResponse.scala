@@ -19,28 +19,15 @@ package models.core
 import play.api.libs.json.{Json, OFormat}
 
 import java.time.Instant
-import java.util.UUID
 
 case class EisErrorResponse(
-                             errorDetail: ErrorDetail
+                             timestamp: Instant,
+                             error: String,
+                             errorMessage: String
                            )
 
 object EisErrorResponse {
 
   implicit val format: OFormat[EisErrorResponse] = Json.format[EisErrorResponse]
-
-}
-
-case class ErrorDetail(
-                        errorCode: Option[String],
-                        errorMessage: Option[String],
-                        source: Option[String],
-                        timestamp: Instant,
-                        correlationId: UUID
-                      )
-
-object ErrorDetail {
-
-  implicit val format: OFormat[ErrorDetail] = Json.format[ErrorDetail]
 
 }
