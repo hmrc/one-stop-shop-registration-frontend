@@ -16,6 +16,7 @@
 
 package forms.mappings
 
+import config.Constants.{maxIossSchemes, maxOssSchemes}
 import models.{Index, PreviousScheme, PreviousSchemeType}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
@@ -31,14 +32,14 @@ trait PreviousRegistrationSchemeConstraint {
             existingAnswers = existingAnswers,
             schemeIndex = schemeIndex,
             allowedSchemes = Seq(PreviousScheme.OSSU, PreviousScheme.OSSNU),
-            amountOfSchemesAllowed = 2
+            amountOfSchemesAllowed = maxOssSchemes
           ) =>
             Invalid(errorKeyOss, countryName)
           case PreviousSchemeType.IOSS if isEditingOrLessThanAllowedAmount(
             existingAnswers = existingAnswers,
             schemeIndex = schemeIndex,
             allowedSchemes = Seq(PreviousScheme.IOSSWI, PreviousScheme.IOSSWOI),
-            amountOfSchemesAllowed = 1
+            amountOfSchemesAllowed = maxIossSchemes
           ) =>
             Invalid(errorKeyIoss, countryName)
           case _ => Valid
