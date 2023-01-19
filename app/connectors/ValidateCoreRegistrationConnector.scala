@@ -52,7 +52,7 @@ class ValidateCoreRegistrationConnector @Inject()(
 
     logger.info(s"Sending request to EIS with headers $headersWithoutAuth")
 
-    val url = s"$baseUrl/validateCoreRegistration"
+    val url = s"$baseUrl"
     httpClient.POST[CoreRegistrationRequest, ValidateCoreRegistrationResponse](
       url,
       coreRegistrationRequest,
