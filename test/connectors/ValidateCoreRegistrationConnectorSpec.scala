@@ -36,7 +36,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
   private val timestamp = Instant.now
 
-  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/validateCoreRegistration"
+  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/vec/ossregistration/regvalidation/v1"
 
   private def application: Application =
     applicationBuilder()
