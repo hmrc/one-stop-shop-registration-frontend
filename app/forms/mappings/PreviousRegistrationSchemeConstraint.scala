@@ -16,23 +16,47 @@
 
 package forms.mappings
 
-import models.{PreviousScheme, PreviousSchemeType}
+import config.Constants.{maxIossSchemes, maxOssSchemes}
+import models.{Index, PreviousScheme, PreviousSchemeType}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
 trait PreviousRegistrationSchemeConstraint {
 
   def validatePreviousRegistrationSchemes(countryName: String, existingAnswers: Seq[PreviousScheme],
-                                          errorKeyOss: String, errorKeyIoss: String): Constraint[PreviousSchemeType] = {
+                                          errorKeyOss: String, errorKeyIoss: String, schemeIndex: Index): Constraint[PreviousSchemeType] = {
 
     Constraint {
       input =>
         input match {
-          case PreviousSchemeType.OSS if existingAnswers.count(value => value == PreviousScheme.OSSU
-            || value == PreviousScheme.OSSNU) > 1 => Invalid(errorKeyOss, countryName)
-          case PreviousSchemeType.IOSS if existingAnswers.count(value => value == PreviousScheme.IOSSWOI
-            || value == PreviousScheme.IOSSWI) > 0 => Invalid(errorKeyIoss, countryName)
+          case PreviousSchemeType.OSS if isEditingOrLessThanAllowedAmount(
+            existingAnswers = existingAnswers,
+            schemeIndex = schemeIndex,
+            allowedSchemes = Seq(PreviousScheme.OSSU, PreviousScheme.OSSNU),
+            amountOfSchemesAllowed = maxOssSchemes
+          ) =>
+            Invalid(errorKeyOss, countryName)
+          case PreviousSchemeType.IOSS if isEditingOrLessThanAllowedAmount(
+            existingAnswers = existingAnswers,
+            schemeIndex = schemeIndex,
+            allowedSchemes = Seq(PreviousScheme.IOSSWI, PreviousScheme.IOSSWOI),
+            amountOfSchemesAllowed = maxIossSchemes
+          ) =>
+            Invalid(errorKeyIoss, countryName)
           case _ => Valid
         }
+    }
+  }
+
+  private def isEditingOrLessThanAllowedAmount(existingAnswers: Seq[PreviousScheme],
+                                               schemeIndex: Index,
+                                               allowedSchemes: Seq[PreviousScheme],
+                                               amountOfSchemesAllowed: Int): Boolean = {
+    val currentOssCount = existingAnswers.count(value => allowedSchemes.contains(value))
+
+    if (schemeIndex.position < currentOssCount) {
+      false
+    } else {
+      currentOssCount >= amountOfSchemesAllowed
     }
   }
 

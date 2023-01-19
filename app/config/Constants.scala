@@ -25,6 +25,8 @@ object Constants {
   val maxSchemes: Int = 3
   val addQuarantineYears: Int = 2
   val lastSchemeForCountry: Int = 1
+  val maxOssSchemes: Int = 2
+  val maxIossSchemes: Int = 1
 
   val registrationConfirmationTemplateId = "oss_registration_confirmation"
 

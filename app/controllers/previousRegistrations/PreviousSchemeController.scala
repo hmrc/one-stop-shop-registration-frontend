@@ -48,10 +48,10 @@ class PreviousSchemeController @Inject()(
             case Some(previousSchemesDetails) =>
 
               val previousSchemes = previousSchemesDetails.flatMap(_.previousScheme)
-              formProvider(country.name, previousSchemes)
+              formProvider(country.name, previousSchemes, schemeIndex)
 
             case None =>
-              formProvider(country.name, Seq.empty)
+              formProvider(country.name, Seq.empty, schemeIndex)
           }
 
           val preparedForm = request.userAnswers.get(PreviousSchemeTypePage(countryIndex, schemeIndex)) match {
@@ -71,10 +71,10 @@ class PreviousSchemeController @Inject()(
             case Some(previousSchemesDetails) =>
 
               val previousSchemes = previousSchemesDetails.flatMap(_.previousScheme)
-              formProvider(country.name, previousSchemes)
+              formProvider(country.name, previousSchemes, schemeIndex)
 
             case None =>
-              formProvider(country.name, Seq.empty)
+              formProvider(country.name, Seq.empty, schemeIndex)
           }
 
           form.bindFromRequest().fold(

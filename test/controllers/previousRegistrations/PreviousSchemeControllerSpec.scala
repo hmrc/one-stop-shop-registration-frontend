@@ -40,7 +40,7 @@ class PreviousSchemeControllerSpec extends SpecBase with MockitoSugar {
   private val baseAnswers = emptyUserAnswers.set(PreviousEuCountryPage(index), country).success.value
 
   private val formProvider = new PreviousSchemeTypeFormProvider()
-  private val form = formProvider(country.name, PreviousScheme.values)
+  private val form = formProvider(country.name, PreviousScheme.values, index)
 
   "PreviousSchemePage Controller" - {
 
