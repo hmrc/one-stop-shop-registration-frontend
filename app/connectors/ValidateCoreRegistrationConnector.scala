@@ -19,7 +19,7 @@ package connectors
 import config.FrontendAppConfig
 import connectors.ValidateCoreRegistrationHttpParser.{ValidateCoreRegistrationReads, ValidateCoreRegistrationResponse}
 import logging.Logging
-import models.core.{CoreRegistrationRequest, EisErrorResponse, ErrorDetail}
+import models.core.{CoreRegistrationRequest, EisErrorResponse}
 import models.responses.EisError
 import play.api.http.HeaderNames.AUTHORIZATION
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
@@ -37,6 +37,7 @@ class ValidateCoreRegistrationConnector @Inject()(
   private implicit val emptyHc: HeaderCarrier = HeaderCarrier()
 
   private val baseUrl = frontendAppConfig.coreValidationUrl
+
   private def headers(correlationId: String): Seq[(String, String)] = frontendAppConfig.eisHeaders(correlationId)
 
   def validateCoreRegistration(
@@ -64,12 +65,9 @@ class ValidateCoreRegistrationConnector @Inject()(
             s"body of response was: ${e.message} with self-generated CorrelationId $selfGeneratedRandomUUID"
         )
         Left(EisError(
-          EisErrorResponse(
-            ErrorDetail(
-              Some(s"UNEXPECTED_${e.responseCode.toString}"), Some(e.message), Some("EIS"), Instant.now(), selfGeneratedRandomUUID
-            )
-          )
-        ))
+          EisErrorResponse(Instant.now(), s"UNEXPECTED_${e.responseCode.toString}", e.message)
+        )
+        )
     }
   }
 

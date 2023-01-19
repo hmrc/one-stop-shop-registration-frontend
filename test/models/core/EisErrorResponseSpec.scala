@@ -22,66 +22,30 @@ import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.{JsSuccess, Json}
 
 import java.time.Instant
-import java.util.UUID
 
 class EisErrorResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
 
   private val randomTimestamp = Instant.now()
-  private val randomUUID = UUID.randomUUID()
 
   "EISErrorResponse" - {
 
-    "must serialise and deserialise to and from a EISErrorResponse" - {
+    "must serialise and deserialise valid EISErrorResponse" in {
 
-      "with all optional fields present" in {
-
-        val eisErrorResponse: EisErrorResponse =
-          EisErrorResponse(
-            errorDetail = ErrorDetail(
-              errorCode = Some("400"),
-              errorMessage = Some("Invalid message : BEFORE TRANSFORMATION"),
-              source = Some("EIS"),
-              timestamp = randomTimestamp,
-              correlationId = randomUUID
-            )
-          )
-
-        val expectedJson = Json.obj(
-          "errorDetail" -> Json.obj(
-            "errorCode" -> "400",
-            "errorMessage" -> "Invalid message : BEFORE TRANSFORMATION",
-            "source" -> "EIS",
-            "timestamp" -> randomTimestamp,
-            "correlationId" -> randomUUID
-          )
+      val eisErrorResponse: EisErrorResponse =
+        EisErrorResponse(
+          timestamp = randomTimestamp,
+          error = "OSS_001",
+          errorMessage = "Invalid input"
         )
 
-        Json.toJson(eisErrorResponse) mustEqual expectedJson
-        expectedJson.validate[EisErrorResponse] mustEqual JsSuccess(eisErrorResponse)
-      }
+      val expectedJson = Json.obj(
+        "timestamp" -> randomTimestamp,
+        "error" -> "OSS_001",
+        "errorMessage" -> "Invalid input"
+      )
 
-      "with all optional fields missing" in {
-        val eISErrorResponse: EisErrorResponse =
-          EisErrorResponse(
-            errorDetail = ErrorDetail(
-              errorCode = None,
-              errorMessage = None,
-              source = None,
-              timestamp = randomTimestamp,
-              correlationId = randomUUID
-            )
-          )
-
-        val expectedJson = Json.obj(
-          "errorDetail" -> Json.obj(
-            "timestamp" -> randomTimestamp,
-            "correlationId" -> randomUUID
-          )
-        )
-
-        Json.toJson(eISErrorResponse) mustEqual expectedJson
-        expectedJson.validate[EisErrorResponse] mustEqual JsSuccess(eISErrorResponse)
-      }
+      Json.toJson(eisErrorResponse) mustEqual expectedJson
+      expectedJson.validate[EisErrorResponse] mustEqual JsSuccess(eisErrorResponse)
 
     }
   }
