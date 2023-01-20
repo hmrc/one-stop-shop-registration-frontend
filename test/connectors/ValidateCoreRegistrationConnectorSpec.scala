@@ -27,10 +27,13 @@ import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testutils.WireMockHelper
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Instant, LocalDate}
 
 class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper {
+
+  implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
   private val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 

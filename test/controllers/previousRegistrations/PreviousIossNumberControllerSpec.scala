@@ -99,7 +99,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(None)
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(None)
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -141,7 +141,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(Some(genericMatch))
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(Some(genericMatch))
         when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
 
         val application =
@@ -173,7 +173,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
         when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
         when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
@@ -204,7 +204,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(None)
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(None)
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers))
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
