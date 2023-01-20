@@ -36,12 +36,11 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
   private val timestamp = Instant.now
 
-  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/vec/ossregistration/regvalidation/v1"
+  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration/validate-core-registration"
 
   private def application: Application =
     applicationBuilder()
       .configure("microservice.services.core-validation.port" -> server.port)
-      .configure("microservice.services.core-validation.authorizationToken" -> "auth-token")
       .build()
 
   private val validCoreRegistrationResponse: CoreRegistrationValidationResult =
