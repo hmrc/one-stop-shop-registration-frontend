@@ -27,9 +27,9 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistrationConnector)
-                                                 (implicit ec: ExecutionContext, hc: HeaderCarrier) extends Logging {
+                                                 (implicit ec: ExecutionContext) extends Logging {
 
-  def searchUkVrn(vrn: Vrn): Future[Option[Match]] = {
+  def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 
@@ -42,7 +42,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 
-  def searchEuTaxId(euTaxReference: String, countryCode: String): Future[Option[Match]] = {
+  def searchEuTaxId(euTaxReference: String, countryCode: String)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUTraderId.toString, None, euTaxReference, None, countryCode)
 
@@ -54,7 +54,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 
-  def searchEuVrn(euVrn: String, countryCode: String): Future[Option[Match]] = {
+  def searchEuVrn(euVrn: String, countryCode: String)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
 
     val convertedEuVrn = convertTaxIdentifierForTransfer(euVrn, countryCode)
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, convertedEuVrn, None, countryCode)
@@ -67,7 +67,8 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 
-  def searchScheme(searchNumber: String, previousScheme: PreviousScheme, intermediaryNumber: Option[String], countryCode: String): Future[Option[Match]] = {
+  def searchScheme(searchNumber: String, previousScheme: PreviousScheme, intermediaryNumber: Option[String], countryCode: String)
+                  (implicit hc: HeaderCarrier): Future[Option[Match]] = {
 
     if (previousScheme == PreviousScheme.OSSNU) {
       Future.successful(None)
