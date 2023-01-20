@@ -88,18 +88,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
 
   val coreValidationUrl: Service = configuration.get[Service]("microservice.services.core-validation")
 
-  private val XCorrelationId = "X-Correlation-Id"
-  private val authorizationToken: String = configuration.get[String]("microservice.services.core-validation.authorizationToken")
-
-  def eisHeaders(correlationId: String): Seq[(String, String)] = Seq(
-    XCorrelationId -> correlationId,
-    X_FORWARDED_HOST -> "MDTP",
-    CONTENT_TYPE -> MimeTypes.JSON,
-    ACCEPT -> MimeTypes.JSON,
-    DATE -> Format.eisDateTimeFormatter.format(LocalDateTime.now(clock)),
-    AUTHORIZATION -> s"Bearer $authorizationToken"
-  )
-
   val emailVerificationEnabled: Boolean = configuration.get[Boolean]("features.email-verification-enabled")
 
 }
