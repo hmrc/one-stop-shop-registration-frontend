@@ -62,7 +62,8 @@ class ValidateCoreRegistrationConnector @Inject()(
         val selfGeneratedRandomUUID = UUID.randomUUID()
         logger.error(
           s"Unexpected error response from EIS $url, received status ${e.responseCode}," +
-            s"body of response was: ${e.message} with self-generated CorrelationId $selfGeneratedRandomUUID"
+            s"body of response was: ${e.message} with self-generated CorrelationId $selfGeneratedRandomUUID " +
+            s"and original correlation ID we tried to pass $correlationId"
         )
         Left(EisError(
           EisErrorResponse(Instant.now(), s"UNEXPECTED_${e.responseCode.toString}", e.message)

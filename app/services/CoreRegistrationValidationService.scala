@@ -19,7 +19,7 @@ package services
 import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
 import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
-import models.PreviousScheme
+import models.{CountryWithValidationDetails, PreviousScheme}
 import uk.gov.hmrc.domain.Vrn
 
 import javax.inject.Inject
@@ -54,7 +54,8 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
   def searchEuVrn(euVrn: String, countryCode: String): Future[Option[Match]] = {
 
-    val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, euVrn, None, countryCode)
+    val convertedEuVrn = convertTaxIdentifierForTransfer(euVrn, countryCode)
+    val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, convertedEuVrn, None, countryCode)
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
@@ -111,5 +112,22 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
       case PreviousScheme.IOSSWI => "IOSS"
     }
   }
+
+  private def convertTaxIdentifierForTransfer(identifier: String, countryCode: String): String = {
+
+    CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == countryCode) match {
+      case Some(countryValidationDetails) =>
+        if (identifier.matches(countryValidationDetails.vrnRegex)) {
+          identifier.substring(2)
+        } else {
+          identifier
+        }
+
+      case _ =>
+        logger.error("Error occurred while getting country code regex, unable to convert identifier")
+        throw new IllegalStateException("Error occurred while getting country code regex, unable to convert identifier")
+    }
+  }
+
 
 }
