@@ -34,13 +34,11 @@ class ValidateCoreRegistrationConnector @Inject()(
                                                    httpClient: HttpClient
                                                  )(implicit ec: ExecutionContext) extends HttpErrorFunctions with Logging {
 
-  private implicit val emptyHc: HeaderCarrier = HeaderCarrier()
-
   private val baseUrl = frontendAppConfig.coreValidationUrl
 
   def validateCoreRegistration(
                                 coreRegistrationRequest: CoreRegistrationRequest
-                              ): Future[ValidateCoreRegistrationResponse] = {
+                              )(implicit hc: HeaderCarrier): Future[ValidateCoreRegistrationResponse] = {
 
     val url = s"$baseUrl/validate-core-registration"
     httpClient.POST[CoreRegistrationRequest, ValidateCoreRegistrationResponse](
