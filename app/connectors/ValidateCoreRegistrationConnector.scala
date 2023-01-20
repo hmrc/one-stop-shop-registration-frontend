@@ -38,37 +38,22 @@ class ValidateCoreRegistrationConnector @Inject()(
 
   private val baseUrl = frontendAppConfig.coreValidationUrl
 
-  private def headers(correlationId: String): Seq[(String, String)] = frontendAppConfig.eisHeaders(correlationId)
-
   def validateCoreRegistration(
                                 coreRegistrationRequest: CoreRegistrationRequest
                               ): Future[ValidateCoreRegistrationResponse] = {
-    val correlationId: String = UUID.randomUUID().toString
-    val headersWithCorrelationId = headers(correlationId)
 
-    val headersWithoutAuth = headersWithCorrelationId.filterNot {
-      case (key, _) => key.matches(AUTHORIZATION)
-    }
-
-    logger.info(s"Sending request to EIS with headers $headersWithoutAuth")
-
-    val url = s"$baseUrl"
+    val url = s"$baseUrl/validate-core-registration"
     httpClient.POST[CoreRegistrationRequest, ValidateCoreRegistrationResponse](
       url,
-      coreRegistrationRequest,
-      headers = headersWithCorrelationId
+      coreRegistrationRequest
     ).recover {
       case e: HttpException =>
-        val selfGeneratedRandomUUID = UUID.randomUUID()
         logger.error(
-          s"Unexpected error response from EIS $url, received status ${e.responseCode}," +
-            s"body of response was: ${e.message} with self-generated CorrelationId $selfGeneratedRandomUUID " +
-            s"and original correlation ID we tried to pass $correlationId"
+          s"Unexpected error response from backend"
         )
         Left(EisError(
           EisErrorResponse(Instant.now(), s"UNEXPECTED_${e.responseCode.toString}", e.message)
-        )
-        )
+        ))
     }
   }
 
