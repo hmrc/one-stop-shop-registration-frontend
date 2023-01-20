@@ -161,7 +161,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn Future.successful(Some(genericMatch))
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(Some(genericMatch))
         when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
 
         val application =
@@ -182,7 +182,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(countryCode).url
-          verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())(any())
         }
       }
 
@@ -192,7 +192,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
         when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
         when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
@@ -215,7 +215,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad().url
-          verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())(any())
         }
       }
 
@@ -225,7 +225,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())) thenReturn
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
         when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
         when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
@@ -251,7 +251,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
-          verify(mockCoreRegistrationValidationService, times(0)).searchScheme(any(), any(), any(), any())
+          verify(mockCoreRegistrationValidationService, times(0)).searchScheme(any(), any(), any(), any())(any())
         }
 
       }
