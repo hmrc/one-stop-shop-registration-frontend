@@ -18,7 +18,6 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
 import pages.behaviours.PageBehaviours
@@ -48,16 +47,16 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Previously Registered" in {
+        "to Is Online Marketplace" in {
 
           val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
 
           TaxRegisteredInEuPage.navigate(NormalMode, answers)
-            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+            .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
         }
       }
 
-      "when the answer is emoty" - {
+      "when the answer is empty" - {
 
         "to Previously Registered" in {
 

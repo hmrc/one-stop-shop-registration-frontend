@@ -29,13 +29,13 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
   override def toString: String = "isPlanningFirstEligibleSale"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
-    case Some(true)  => routes.CommencementDateController.onPageLoad(NormalMode)
+    case Some(true)  => controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     case Some(false) => routes.RegisterLaterController.onPageLoad()
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
-    case Some(true)  => routes.CommencementDateController.onPageLoad(CheckMode)
+    case Some(true)  => controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)
     case Some(false) => routes.RegisterLaterController.onPageLoad()
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }

@@ -53,7 +53,7 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Is Online Markterplace" in {
+        "to Commencement Date" in {
 
           val answers = emptyUserAnswers
             .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
@@ -62,7 +62,7 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
             .set(AddPreviousRegistrationPage, false).success.value
 
           AddPreviousRegistrationPage.navigate(NormalMode, answers)
-            .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
+            .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
         }
       }
 

@@ -17,12 +17,12 @@
 package pages
 
 import base.SpecBase
-import controllers.routes
+import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, NormalMode}
-
-import java.time.LocalDate
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
+
+import java.time.LocalDate
 
 class DateOfFirstSalePageSpec extends SpecBase with PageBehaviours {
 
@@ -41,19 +41,19 @@ class DateOfFirstSalePageSpec extends SpecBase with PageBehaviours {
 
   "must navigate in Normal Mode" - {
 
-    "to Commencement Date" in {
+    "to Previously Registered" in {
 
       DateOfFirstSalePage.navigate(NormalMode, emptyUserAnswers)
-        .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+        .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
     }
   }
 
   "must navigate in Check Mode" - {
 
-    "to Commencement Date" in {
+    "to Previously Registered" in {
 
       DateOfFirstSalePage.navigate(CheckMode, emptyUserAnswers)
-        .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+        .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode))
     }
   }
 }

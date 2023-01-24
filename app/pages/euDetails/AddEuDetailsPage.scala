@@ -17,7 +17,6 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
@@ -34,7 +33,7 @@ case object AddEuDetailsPage extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(NormalMode, Index(size))
-      case (Some(false), _)         => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
+      case (Some(false), _)         => routes.IsOnlineMarketplaceController.onPageLoad(NormalMode)
       case _                        => routes.JourneyRecoveryController.onPageLoad()
     }
 
