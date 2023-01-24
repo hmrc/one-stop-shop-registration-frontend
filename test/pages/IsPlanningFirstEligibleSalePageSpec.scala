@@ -33,11 +33,11 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Commencement Date page when true is submitted" in {
+      "to Previously Registered page when true is submitted" in {
 
         IsPlanningFirstEligibleSalePage.navigate(
           NormalMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
-        ).mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
+        ).mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(NormalMode))
       }
 
       "to Register Later page when false is submitted" in {
@@ -56,11 +56,11 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Check mode" - {
 
-      "to Commencement Date page when true is submitted" in {
+      "to Previously Registered page when true is submitted" in {
 
         IsPlanningFirstEligibleSalePage.navigate(
           CheckMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
-        ).mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+        ).mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode))
       }
 
       "to Register Later page when false is submitted" in {
