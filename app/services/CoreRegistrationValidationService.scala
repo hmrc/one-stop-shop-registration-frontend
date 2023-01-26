@@ -81,12 +81,19 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
         case PreviousScheme.IOSSWI => SourceType.EUTraderId
       }
 
+      val convertedSearchNumber = if(sourceType == PreviousScheme.OSSU) {
+        convertTaxIdentifierForTransfer(searchNumber, countryCode)
+      } else {
+        searchNumber
+      }
+
       val coreRegistrationRequest = CoreRegistrationRequest(
         sourceType.toString,
         Some(convertScheme(previousScheme)),
-        searchNumber,
+        convertedSearchNumber,
         intermediaryNumber,
-        countryCode)
+        countryCode
+      )
 
       connector.validateCoreRegistration(coreRegistrationRequest).map {
         case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
