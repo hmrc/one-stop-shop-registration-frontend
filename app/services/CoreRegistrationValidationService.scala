@@ -81,7 +81,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
         case PreviousScheme.IOSSWI => SourceType.EUTraderId
       }
 
-      val convertedSearchNumber = if(sourceType == PreviousScheme.OSSU) {
+      val convertedSearchNumber = if(sourceType == SourceType.EUVATNumber) {
         convertTaxIdentifierForTransfer(searchNumber, countryCode)
       } else {
         searchNumber
