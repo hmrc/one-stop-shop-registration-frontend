@@ -99,6 +99,8 @@ class PreviousOssNumberController @Inject()(
                     Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(activeMatch.memberState)))
                   case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad()))
+//                  case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(6) =>
+                    //create private method below to set commencement date as exclusionEffectiveDate
                   case _ =>
                     saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
                 }
