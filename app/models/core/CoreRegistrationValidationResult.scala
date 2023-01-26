@@ -18,6 +18,7 @@ package models.core
 
 import play.api.libs.json.{Json, OFormat}
 
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 case class CoreRegistrationValidationResult(
@@ -40,8 +41,8 @@ case class Match(
                     intermediary: Option[String],
                     memberState: String,
                     exclusionStatusCode: Option[Int],
-                    exclusionDecisionDate: Option[String],
-                    exclusionEffectiveDate: Option[String],
+                    exclusionDecisionDate: Option[LocalDate],
+                    exclusionEffectiveDate: Option[LocalDate],
                     nonCompliantReturns: Option[Int],
                     nonCompliantPayments: Option[Int]
                   )
