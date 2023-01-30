@@ -59,8 +59,8 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
           intermediary = Some("IN4819283759"),
           memberState = "DE",
           exclusionStatusCode = Some(3),
-          exclusionDecisionDate = Some(LocalDate.now().format(Match.dateFormatter)),
-          exclusionEffectiveDate = Some(LocalDate.now().format(Match.dateFormatter)),
+          exclusionDecisionDate = Some(LocalDate.now()),
+          exclusionEffectiveDate = Some(LocalDate.now()),
           nonCompliantReturns = Some(0),
           nonCompliantPayments = Some(0)
         )
