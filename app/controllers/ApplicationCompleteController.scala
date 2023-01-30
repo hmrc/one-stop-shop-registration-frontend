@@ -21,7 +21,6 @@ import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers
 import models.core.{Match, MatchType}
-import models.requests.{AuthenticatedDataRequest, AuthenticatedIdentifierRequest}
 import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

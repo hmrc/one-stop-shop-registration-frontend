@@ -18,6 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import controllers.routes
+import logging.Logging
 import models.core.MatchType
 import models.requests.AuthenticatedIdentifierRequest
 import play.api.mvc.{ActionFilter, Result}
@@ -33,7 +34,7 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
                                                          service: CoreRegistrationValidationService,
                                                          appConfig: FrontendAppConfig
                                                        )(implicit val executionContext: ExecutionContext)
-  extends CheckOtherCountryRegistrationFilter {
+  extends CheckOtherCountryRegistrationFilter with Logging {
 
   private val exclusionStatusCode = 4
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
@@ -51,7 +52,12 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
             activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
             activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
               Some(Redirect(
-                routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate.getOrElse(""))
+                routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
+                  case Some(date) => date.toString
+                  case _ =>
+                    logger.error("Must have an Exclusion Effective Date")
+                    throw new IllegalStateException("Missing an exclusion effective date")
+                })
               ))
 
         case _ => None
