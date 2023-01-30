@@ -74,13 +74,6 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      /* TODO handle incomplete
-      val incomplete = getIncompletePreviousSchemesDetails(index)
-      if(incomplete.isEmpty) {
-        Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, request.userAnswers))
-      } else {
-        Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, index))
-      }*/
 
       getPreviousCountry(index) { country =>
 
