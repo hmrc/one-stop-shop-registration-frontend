@@ -17,16 +17,13 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import formats.Format
 import play.api.Configuration
-import play.api.http.HeaderNames.{ACCEPT, CONTENT_TYPE, DATE, X_FORWARDED_HOST, AUTHORIZATION}
-import play.api.http.MimeTypes
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 import java.net.URI
-import java.time.{Clock, LocalDateTime}
+import java.time.Clock
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
