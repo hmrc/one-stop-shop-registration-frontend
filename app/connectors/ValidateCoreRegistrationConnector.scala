@@ -21,11 +21,9 @@ import connectors.ValidateCoreRegistrationHttpParser.{ValidateCoreRegistrationRe
 import logging.Logging
 import models.core.{CoreRegistrationRequest, EisErrorResponse}
 import models.responses.EisError
-import play.api.http.HeaderNames.AUTHORIZATION
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
 
 import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

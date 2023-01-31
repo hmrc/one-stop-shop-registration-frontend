@@ -229,7 +229,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
               exclusionEffectiveDate = None, exclusionStatusCode = Some(4))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
