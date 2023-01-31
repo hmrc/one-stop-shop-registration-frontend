@@ -235,9 +235,12 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
-            val result = intercept[IllegalStateException](controller.callFilter(request).futureValue)
+            val result = controller.callFilter(request).failed
 
-            result.getMessage must include("Missing an exclusion effective date.")
+            whenReady(result) { exp =>
+              exp mustBe a[IllegalStateException]
+              exp.getMessage must include(s"MatchType ${expectedMatch.matchType} didn't include an expected exclusion effective date")
+            }
 
           }
         }
