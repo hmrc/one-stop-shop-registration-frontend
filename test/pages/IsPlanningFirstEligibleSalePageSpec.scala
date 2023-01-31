@@ -18,6 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
+import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -37,7 +38,7 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
 
         IsPlanningFirstEligibleSalePage.navigate(
           NormalMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
-        ).mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+        ).mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
       }
 
       "to Register Later page when false is submitted" in {
@@ -60,7 +61,7 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
 
         IsPlanningFirstEligibleSalePage.navigate(
           CheckMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
-        ).mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode))
+        ).mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode))
       }
 
       "to Register Later page when false is submitted" in {
