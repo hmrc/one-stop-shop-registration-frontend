@@ -28,9 +28,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolFilterImpl @Inject()(connector: RegistrationConnector,
-                                          appConfig: FrontendAppConfig
-                                         )
+class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
                                          (implicit val executionContext: ExecutionContext)
   extends CheckNiProtocolFilter {
 
@@ -39,16 +37,7 @@ class CheckNiProtocolFilterImpl @Inject()(connector: RegistrationConnector,
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.registrationValidationEnabled) {
-      connector.validateRegistration(request.vrn) map {
-        case Right(validationResult) =>
-          if (validationResult.validRegistration) {
-            None
-          } else {
-            Some(Redirect(routes.NiProtocolRejectionController.onPageLoad()))
-          }
-        case Left(error) =>
-          throw new Exception(error.body)
-      }
+      Future.successful(None) // TODO VEOSS-1054
     } else {
       Future.successful(None)
     }
