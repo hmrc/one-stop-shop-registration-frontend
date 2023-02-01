@@ -16,7 +16,7 @@
 
 package pages.previousRegistrations
 
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -29,5 +29,8 @@ case class PreviousIossSchemePage(countryIndex: Index, schemeIndex: Index) exten
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, countryIndex, schemeIndex)
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex)
 
 }
