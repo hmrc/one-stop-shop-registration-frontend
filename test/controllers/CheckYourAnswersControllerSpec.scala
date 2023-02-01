@@ -241,6 +241,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val answers = completeUserAnswers
             .set(PreviouslyRegisteredPage, true).success.value
             .set(PreviousEuCountryPage(Index(0)), country).success.value
+            .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
             .build()
@@ -256,7 +257,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
           }
-
         }
       }
     }

@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class PreviousRegistrationDetailsWithOptionalVatNumber(
                                         previousEuCountry: Country,
-                                        previousSchemesDetails: Seq[SchemeDetailsWithOptionalVatNumber]
+                                        previousSchemesDetails: Option[List[SchemeDetailsWithOptionalVatNumber]]
                                       )
 
 
