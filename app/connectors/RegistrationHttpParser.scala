@@ -26,7 +26,6 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 object RegistrationHttpParser extends Logging {
 
   type RegistrationResultResponse = Either[ErrorResponse, Unit]
-  type ValidateRegistrationResponse = Either[ErrorResponse, RegistrationValidationResult]
 
   implicit object RegistrationResponseReads extends HttpReads[RegistrationResultResponse] {
     override def read(method: String, url: String, response: HttpResponse): RegistrationResultResponse =
@@ -35,27 +34,6 @@ object RegistrationHttpParser extends Logging {
         case CONFLICT => Left(ConflictFound)
         case status => Left(UnexpectedResponseStatus(response.status, s"Unexpected response, status $status returned"))
       }
-  }
-
-  implicit object ValidateRegistrationReads extends HttpReads[ValidateRegistrationResponse] {
-    override def read(method: String, url: String, response: HttpResponse): ValidateRegistrationResponse = {
-      response.status match {
-        case OK => response.json.validate[RegistrationValidationResult] match {
-          case JsSuccess(validateRegistration, _) => Right(validateRegistration)
-          case JsError(errors) =>
-            logger.warn(s"Failed trying to parse JSON $errors. Json was ${response.json}", errors)
-            Left(InvalidJson)
-        }
-
-        case NOT_FOUND =>
-          logger.warn(s"Received NotFound")
-          Left(NotFound)
-
-        case status =>
-          logger.warn("Received unexpected error from return statuses")
-          Left(UnexpectedResponseStatus(response.status, s"Unexpected response, status $status returned"))
-      }
-    }
   }
 
 }
