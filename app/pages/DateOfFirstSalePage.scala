@@ -16,12 +16,12 @@
 
 package pages
 
-import controllers.routes
+import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{CheckMode, NormalMode, UserAnswers}
-
-import java.time.LocalDate
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+
+import java.time.LocalDate
 
 case object DateOfFirstSalePage extends QuestionPage[LocalDate] {
 
@@ -30,8 +30,8 @@ case object DateOfFirstSalePage extends QuestionPage[LocalDate] {
   override def toString: String = "dateOfFirstSale"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.CommencementDateController.onPageLoad(NormalMode)
+    prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    routes.CommencementDateController.onPageLoad(CheckMode)
+    prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode)
 }

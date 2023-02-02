@@ -18,10 +18,11 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import controllers.routes
+import logging.Logging
 import models.core.MatchType
 import models.requests.AuthenticatedIdentifierRequest
-import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Result}
 import services.CoreRegistrationValidationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -33,9 +34,10 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
                                                          service: CoreRegistrationValidationService,
                                                          appConfig: FrontendAppConfig
                                                        )(implicit val executionContext: ExecutionContext)
-  extends CheckOtherCountryRegistrationFilter {
+  extends CheckOtherCountryRegistrationFilter with Logging {
 
   private val exclusionStatusCode = 4
+
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -50,9 +52,15 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
           if activeMatch.exclusionStatusCode.contains(exclusionStatusCode) ||
             activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
             activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
-              Some(Redirect(
-                routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate.getOrElse(""))
-              ))
+          Some(Redirect(
+            routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
+              case Some(date) => date.toString
+              case _ =>
+                val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
+                logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
+                throw e
+            })
+          ))
 
         case _ => None
       }

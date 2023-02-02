@@ -43,8 +43,8 @@ class CoreRegistrationValidationResultSpec extends AnyFreeSpec with Matchers wit
               Some("444444444"),
               "DE",
               Some(3),
-              Some(LocalDate.now().format(Match.dateFormatter)),
-              Some(LocalDate.now().format(Match.dateFormatter)),
+              Some(LocalDate.now()),
+              Some(LocalDate.now()),
               Some(1),
               Some(2)
             ))
@@ -62,8 +62,8 @@ class CoreRegistrationValidationResultSpec extends AnyFreeSpec with Matchers wit
               "intermediary" -> "444444444",
               "memberState" -> "DE",
               "exclusionStatusCode" -> 3,
-              "exclusionDecisionDate" -> s"${LocalDate.now().format(Match.dateFormatter)}",
-              "exclusionEffectiveDate" -> s"${LocalDate.now().format(Match.dateFormatter)}",
+              "exclusionDecisionDate" -> s"${LocalDate.now()}",
+              "exclusionEffectiveDate" -> s"${LocalDate.now()}",
               "nonCompliantReturns" -> 1,
               "nonCompliantPayments" -> 2
             ))
