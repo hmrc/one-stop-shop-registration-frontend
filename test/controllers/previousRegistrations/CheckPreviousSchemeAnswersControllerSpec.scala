@@ -39,11 +39,11 @@ import scala.concurrent.Future
 
 class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
 
-  private val formProvider = new CheckPreviousSchemeAnswersFormProvider()
-  private val form = formProvider()
 
   private val index                 = Index(0)
   private val country               = Country.euCountries.head
+  private val formProvider = new CheckPreviousSchemeAnswersFormProvider()
+  private val form = formProvider(country)
   private val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
   private val baseUserAnswers =
