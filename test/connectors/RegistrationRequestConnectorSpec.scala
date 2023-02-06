@@ -24,7 +24,6 @@ import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testutils.{RegistrationData, WireMockHelper}
-import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
 class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
@@ -32,8 +31,6 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
   private val registration = RegistrationData.registration
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
-
-  private def getValidateRegistrationUrl(vrn: Vrn) = s"/one-stop-shop-registration/registration/validate/${vrn.value}"
 
   private def application: Application =
     applicationBuilder()
@@ -53,7 +50,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.submitRegistration(registration).futureValue
 
-        result mustEqual Right(())
+        result mustBe Right(())
       }
     }
 
@@ -68,7 +65,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.submitRegistration(registration).futureValue
 
-        result mustEqual Left(ConflictFound)
+        result mustBe Left(ConflictFound)
       }
     }
 
@@ -83,7 +80,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.submitRegistration(registration).futureValue
 
-        result mustEqual Left(UnexpectedResponseStatus(123, "Unexpected response, status 123 returned"))
+        result mustBe Left(UnexpectedResponseStatus(123, "Unexpected response, status 123 returned"))
       }
     }
   }
@@ -103,7 +100,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getRegistration().futureValue
 
-        result.value mustEqual RegistrationData.registration
+        result.value mustBe RegistrationData.registration
       }
     }
 
@@ -140,7 +137,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getVatCustomerInfo().futureValue
 
-        result mustEqual Right(vatInfo)
+        result mustBe Right(vatInfo)
       }
     }
 
@@ -155,7 +152,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getVatCustomerInfo().futureValue
 
-        result mustEqual Left(InvalidJson)
+        result mustBe Left(InvalidJson)
       }
     }
 
@@ -168,7 +165,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getVatCustomerInfo().futureValue
 
-        result mustEqual Left(NotFound)
+        result mustBe Left(NotFound)
       }
     }
 
@@ -183,7 +180,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getVatCustomerInfo().futureValue
 
-        result mustEqual Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
+        result mustBe Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
       }
     }
   }

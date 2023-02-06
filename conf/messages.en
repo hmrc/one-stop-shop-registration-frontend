@@ -814,3 +814,18 @@ deletePreviousScheme.heading = Remove this scheme for {0}?
 deletePreviousScheme.paragraph = This will remove {0} from your previous registrations.
 deletePreviousScheme.error.required = Select yes if you want to remove this scheme for {0}
 
+
+sellsGoodsToEUConsumers.title = sellsGoodsToEUConsumers
+sellsGoodsToEUConsumers.heading = sellsGoodsToEUConsumers
+sellsGoodsToEUConsumers.checkYourAnswersLabel = sellsGoodsToEUConsumers
+sellsGoodsToEUConsumers.error.required = Select yes if sellsGoodsToEUConsumers
+sellsGoodsToEUConsumers.change.hidden = SellsGoodsToEUConsumers
+
+sellsGoodsToEUConsumerMethod.title = sellsGoodsToEUConsumerMethod
+sellsGoodsToEUConsumerMethod.heading = sellsGoodsToEUConsumerMethod
+sellsGoodsToEUConsumerMethod.checkYourAnswersLabel = sellsGoodsToEUConsumerMethod
+sellsGoodsToEUConsumerMethod.error.required = Select yes if sellsGoodsToEUConsumerMethod
+sellsGoodsToEUConsumerMethod.change.hidden = SellsGoodsToEUConsumerMethod
+
+cannotAddCountry.title = cannotAddCountry
+cannotAddCountry.heading = cannotAddCountry
