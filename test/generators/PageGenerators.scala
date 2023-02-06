@@ -24,6 +24,12 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, DeletePreviousS
 
 trait PageGenerators {
 
+  implicit lazy val arbitrarySellsGoodsToEUConsumerMethodPage: Arbitrary[SellsGoodsToEUConsumerMethodPage.type] =
+    Arbitrary(SellsGoodsToEUConsumerMethodPage)
+
+  implicit lazy val arbitrarySellsGoodsToEUConsumersPage: Arbitrary[SellsGoodsToEUConsumersPage.type] =
+    Arbitrary(SellsGoodsToEUConsumersPage)
+
   implicit lazy val arbitraryDeletePreviousSchemePage: Arbitrary[DeletePreviousSchemePage.type] =
     Arbitrary(DeletePreviousSchemePage)
 

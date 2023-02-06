@@ -338,3 +338,21 @@ POST        /remove-previous-scheme/:countryIndex/:schemeIndex                  
 GET         /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 
 POST        /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+
+GET         /sells-goods-to-eu-consumers                                        controllers.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = NormalMode)
+
+POST        /sells-goods-to-eu-consumers                                        controllers.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = NormalMode)
+
+GET         /check-sells-goods-to-eu-consumers                                  controllers.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = CheckMode)
+
+POST        /check-sells-goods-to-eu-consumers                                  controllers.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckMode)
+
+GET         /sells-goods-to-eu-consumer-method                                  controllers.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = NormalMode)
+
+POST        /sells-goods-to-eu-consumer-method                                  controllers.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = NormalMode)
+
+GET         /check-sells-goods-to-eu-consumer-method                            controllers.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckMode)
+
+POST        /check-sells-goods-to-eu-consumer-method                            controllers.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckMode)
+
+GET         /no-fixed-establishments-required                                   controllers.CannotAddCountryController.onPageLoad()

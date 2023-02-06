@@ -17,10 +17,7 @@
 package controllers.actions
 
 import config.FrontendAppConfig
-import connectors.RegistrationConnector
-import controllers.routes
 import models.requests.AuthenticatedIdentifierRequest
-import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter

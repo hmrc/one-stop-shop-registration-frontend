@@ -17,10 +17,8 @@
 package connectors
 
 import logging.Logging
-import models.RegistrationValidationResult
-import models.responses.{ConflictFound, ErrorResponse, InvalidJson, NotFound, UnexpectedResponseStatus}
-import play.api.http.Status.{CONFLICT, CREATED, NOT_FOUND, OK}
-import play.api.libs.json.{JsError, JsSuccess}
+import models.responses.{ConflictFound, ErrorResponse, UnexpectedResponseStatus}
+import play.api.http.Status.{CONFLICT, CREATED}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object RegistrationHttpParser extends Logging {
