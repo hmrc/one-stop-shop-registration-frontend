@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package pages.euDetails
 
-import play.api.libs.json.JsPath
+import base.SpecBase
+import models.euDetails.RegistrationType
+import pages.behaviours.PageBehaviours
 
-case object SellsGoodsToEUConsumersPage extends QuestionPage[Boolean] {
+class RegistrationTypeSpec extends SpecBase with PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "RegistrationTypePage" - {
 
-  override def toString: String = "sellsGoodsToEUConsumers"
+    beRetrievable[RegistrationType](RegistrationTypePage)
+
+    beSettable[RegistrationType](RegistrationTypePage)
+
+    beRemovable[RegistrationType](RegistrationTypePage)
+  }
 }

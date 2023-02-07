@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.euDetails
 
 import controllers.actions._
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.CannotAddCountryView
+import views.html.euDetails.CannotAddCountryView
+
+import javax.inject.Inject
 
 class CannotAddCountryController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -33,6 +34,7 @@ class CannotAddCountryController @Inject()(
 
   def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
+      //TODO cleanup method???
       Ok(view())
   }
 }

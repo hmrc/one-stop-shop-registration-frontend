@@ -649,12 +649,9 @@ euSendGoodsTradingName.error.length = Trading name must be 40 characters or less
 euSendGoodsTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 euSendGoodsTradingName.change.hidden = trading name
 
-
-
 euSendGoodsAddress.title = What is the address of {0}?
 euSendGoodsAddress.heading = What is the address of {0}?
 euSendGoodsAddress.checkYourAnswersLabel = Address
-
 euSendGoodsAddress.line1 = Address line 1
 euSendGoodsAddress.line2 = Address line 2 (optional)
 euSendGoodsAddress.townOrCity = Town or city
@@ -672,10 +669,7 @@ euSendGoodsAddress.error.stateOrRegion.length = State or region must be 35 chara
 euSendGoodsAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces and apostrophes
 euSendGoodsAddress.error.postCode.length = Postcode must be 40 characters or less
 euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
-
 euSendGoodsAddress.change.hidden = EuSendGoodsAddress
-
-
 
 noMoreWelsh.title = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
 noMoreWelsh.heading = Mae gweddill y gwasanaeth hwn yn Saesneg yn unig ar hyn o bryd
@@ -814,18 +808,27 @@ deletePreviousScheme.heading = Remove this scheme for {0}?
 deletePreviousScheme.paragraph = This will remove {0} from your previous registrations.
 deletePreviousScheme.error.required = Select yes if you want to remove this scheme for {0}
 
+sellsGoodsToEUConsumers.title = Does your business sell goods from {0} to consumers in the EU?
+sellsGoodsToEUConsumers.heading = Does your business sell goods from {0} to consumers in the EU?
+sellsGoodsToEUConsumers.checkYourAnswersLabel = sells goods to EU consumers
+sellsGoodsToEUConsumers.error.required = Select yes if your business sells goods from {0} to consumers in the EU
+sellsGoodsToEUConsumers.change.hidden = Sells goods to EU consumers
 
-sellsGoodsToEUConsumers.title = sellsGoodsToEUConsumers
-sellsGoodsToEUConsumers.heading = sellsGoodsToEUConsumers
-sellsGoodsToEUConsumers.checkYourAnswersLabel = sellsGoodsToEUConsumers
-sellsGoodsToEUConsumers.error.required = Select yes if sellsGoodsToEUConsumers
-sellsGoodsToEUConsumers.change.hidden = SellsGoodsToEUConsumers
+sellsGoodsToEUConsumerMethod.title = How does your business sell goods in {0}?
+sellsGoodsToEUConsumerMethod.heading = How does your business sell goods in {0}?
+sellsGoodsToEUConsumerMethod.checkYourAnswersLabel = How your business sells goods
+sellsGoodsToEUConsumerMethod.error.required = Select how your business sells goods in {0}
+sellsGoodsToEUConsumerMethod.change.hidden = How your business sells goods to EU consumers
 
-sellsGoodsToEUConsumerMethod.title = sellsGoodsToEUConsumerMethod
-sellsGoodsToEUConsumerMethod.heading = sellsGoodsToEUConsumerMethod
-sellsGoodsToEUConsumerMethod.checkYourAnswersLabel = sellsGoodsToEUConsumerMethod
-sellsGoodsToEUConsumerMethod.error.required = Select yes if sellsGoodsToEUConsumerMethod
-sellsGoodsToEUConsumerMethod.change.hidden = SellsGoodsToEUConsumerMethod
+cannotAddCountry.title = You cannot add this country
+cannotAddCountry.heading = You cannot add this country
+cannotAddCountry.paragraph = You do not need to tell us about fixed establishments.
 
-cannotAddCountry.title = cannotAddCountry
-cannotAddCountry.heading = cannotAddCountry
+registrationType.title = What sort of registration do you have in {0}?
+registrationType.heading = What sort of registration do you have in {0}?
+registrationType.vatNumber = VAT number
+registrationType.taxId = Tax ID number
+registrationType.neither = Neither
+registrationType.checkYourAnswersLabel = Registration type
+registrationType.error.required = Select a registration type
+registrationType.change.hidden = Your registration type

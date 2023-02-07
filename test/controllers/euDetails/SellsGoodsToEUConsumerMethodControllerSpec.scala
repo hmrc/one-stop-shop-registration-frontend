@@ -14,35 +14,42 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.euDetails
 
 import base.SpecBase
-import forms.SellsGoodsToEUConsumerMethodFormProvider
-import models.{NormalMode, UserAnswers}
+import forms.euDetails.SellsGoodsToEUConsumerMethodFormProvider
+import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SellsGoodsToEUConsumerMethodPage
+import pages.euDetails.{EuCountryPage, SellsGoodsToEUConsumerMethodPage, SellsGoodsToEUConsumersPage, TaxRegisteredInEuPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import views.html.SellsGoodsToEUConsumerMethodView
+import views.html.euDetails.SellsGoodsToEUConsumerMethodView
 
 import scala.concurrent.Future
 
 class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new SellsGoodsToEUConsumerMethodFormProvider()
-  private val form = formProvider()
+  private val country: Country = Country.euCountries.head
+  private val form = formProvider(country)
 
-  private lazy val sellsGoodsToEUConsumerMethodRoute = routes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode).url
+  private val countryIndex: Index = Index(0)
+
+  private lazy val sellsGoodsToEUConsumerMethodRoute = routes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode, countryIndex).url
+
+  private val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+    .set(EuCountryPage(Index(0)), country).success.value
+    .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
 
   "SellsGoodsToEUConsumerMethod Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, sellsGoodsToEUConsumerMethodRoute)
@@ -52,13 +59,13 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[SellsGoodsToEUConsumerMethodView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SellsGoodsToEUConsumerMethodPage, true).success.value
+      val userAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -70,7 +77,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -81,7 +88,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(answers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,17 +98,17 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(SellsGoodsToEUConsumerMethodPage, true).success.value
+        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request =
@@ -115,7 +122,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -129,7 +136,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -145,7 +152,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

@@ -1,0 +1,31 @@
+@import components.ButtonGroup
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    button: ButtonGroup
+)
+
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("registrationType.title"))) {
+
+    @formHelper(action = routes.RegistrationTypeController.onSubmit(mode), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("registrationType.heading")).asPageHeading(),
+                items  = RegistrationType.options
+            )
+        )
+
+        @button("site.continue", controllers.euDetails.routes.RegistrationTypeController.onPageLoad(mode).url)
+    }
+}

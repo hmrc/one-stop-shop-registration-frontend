@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package forms
+package forms.euDetails
 
 import forms.behaviours.BooleanFieldBehaviours
+import models.Country
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
-class SellsGoodsToEUConsumersFormProviderSpec extends BooleanFieldBehaviours {
+class SellsGoodsToEUConsumerMethodFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "sellsGoodsToEUConsumers.error.required"
+  val requiredKey = "sellsGoodsToEUConsumerMethod.error.required"
   val invalidKey = "error.boolean"
-
-  val form = new SellsGoodsToEUConsumersFormProvider()()
+  val country: Country = arbitrary[Country].sample.value
+  val form = new SellsGoodsToEUConsumerMethodFormProvider()(country)
 
   ".value" - {
 
@@ -33,13 +35,13 @@ class SellsGoodsToEUConsumersFormProviderSpec extends BooleanFieldBehaviours {
     behave like booleanField(
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      invalidError = FormError(fieldName, invalidKey, Seq(country.name))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

@@ -24,11 +24,14 @@ import pages.previousRegistrations.{AddPreviousRegistrationPage, DeletePreviousS
 
 trait PageGenerators {
 
-  implicit lazy val arbitrarySellsGoodsToEUConsumerMethodPage: Arbitrary[SellsGoodsToEUConsumerMethodPage.type] =
-    Arbitrary(SellsGoodsToEUConsumerMethodPage)
+  implicit lazy val arbitraryRegistrationTypePage: Arbitrary[RegistrationTypePage.type] =
+    Arbitrary(RegistrationTypePage)
 
-  implicit lazy val arbitrarySellsGoodsToEUConsumersPage: Arbitrary[SellsGoodsToEUConsumersPage.type] =
-    Arbitrary(SellsGoodsToEUConsumersPage)
+  implicit lazy val arbitrarySellsGoodsToEUConsumerMethodPage: Arbitrary[SellsGoodsToEUConsumerMethodPage] =
+    Arbitrary(SellsGoodsToEUConsumerMethodPage(Index(0)))
+
+  implicit lazy val arbitrarySellsGoodsToEUConsumersPage: Arbitrary[SellsGoodsToEUConsumersPage] =
+    Arbitrary(SellsGoodsToEUConsumersPage(Index(0)))
 
   implicit lazy val arbitraryDeletePreviousSchemePage: Arbitrary[DeletePreviousSchemePage.type] =
     Arbitrary(DeletePreviousSchemePage)

@@ -31,7 +31,7 @@ case class EuCountryPage(index: Index) extends QuestionPage[Country] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call = {
     val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
     if (isPartOfVatGroup) {
-      euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
+      euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, index)
     } else {
       euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
     }

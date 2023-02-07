@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package forms.euDetails
+
+import forms.mappings.Mappings
+import models.Country
+import play.api.data.Form
 
 import javax.inject.Inject
 
-import forms.mappings.Mappings
-import play.api.data.Form
+class SellsGoodsToEUConsumerMethodFormProvider @Inject() extends Mappings {
 
-class SellsGoodsToEUConsumersFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
+  def apply(country: Country): Form[Boolean] =
     Form(
-      "value" -> boolean("sellsGoodsToEUConsumers.error.required")
+      "value" -> boolean("sellsGoodsToEUConsumerMethod.error.required", args = Seq(country.name))
     )
 }

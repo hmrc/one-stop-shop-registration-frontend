@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.euDetails
 
 import controllers.actions._
-import forms.SellsGoodsToEUConsumerMethodFormProvider
-import javax.inject.Inject
+import forms.euDetails.RegistrationTypeFormProvider
 import models.Mode
-import pages.SellsGoodsToEUConsumerMethodPage
+import pages.euDetails.RegistrationTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.SellsGoodsToEUConsumerMethodView
+import views.html.RegistrationTypeView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SellsGoodsToEUConsumerMethodController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: SellsGoodsToEUConsumerMethodFormProvider,
-                                         view: SellsGoodsToEUConsumerMethodView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class RegistrationTypeController @Inject()(
+                                       override val messagesApi: MessagesApi,
+                                       cc: AuthenticatedControllerComponents,
+                                       formProvider: RegistrationTypeFormProvider,
+                                       view: RegistrationTypeView
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -41,7 +41,7 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(SellsGoodsToEUConsumerMethodPage) match {
+      val preparedForm = request.userAnswers.get(RegistrationTypePage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -58,9 +58,9 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SellsGoodsToEUConsumerMethodPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationTypePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(SellsGoodsToEUConsumerMethodPage.navigate(mode, updatedAnswers))
+          } yield Redirect(RegistrationTypePage.navigate(mode, updatedAnswers))
       )
   }
 }

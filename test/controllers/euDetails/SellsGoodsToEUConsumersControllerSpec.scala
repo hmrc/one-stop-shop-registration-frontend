@@ -14,35 +14,41 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.euDetails
 
 import base.SpecBase
-import forms.SellsGoodsToEUConsumersFormProvider
-import models.{NormalMode, UserAnswers}
+import forms.euDetails.SellsGoodsToEUConsumersFormProvider
+import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SellsGoodsToEUConsumersPage
+import pages.euDetails.{EuCountryPage, SellsGoodsToEUConsumersPage, TaxRegisteredInEuPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import views.html.SellsGoodsToEUConsumersView
+import views.html.euDetails.SellsGoodsToEUConsumersView
 
 import scala.concurrent.Future
 
 class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new SellsGoodsToEUConsumersFormProvider()
-  private val form = formProvider()
+  private val countryIndex = Index(0)
 
-  private lazy val sellsGoodsToEUConsumersRoute = routes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode).url
+  private val country = Country.euCountries.head
+  private val formProvider = new SellsGoodsToEUConsumersFormProvider()
+  private val form = formProvider(country)
+
+  private lazy val sellsGoodsToEUConsumersRoute = routes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, countryIndex).url
+
+  private val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+    .set(EuCountryPage(Index(0)), country).success.value
 
   "SellsGoodsToEUConsumers Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, sellsGoodsToEUConsumersRoute)
@@ -52,13 +58,13 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[SellsGoodsToEUConsumersView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SellsGoodsToEUConsumersPage, true).success.value
+      val userAnswers = answers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -70,7 +76,7 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -81,7 +87,7 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(answers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,17 +97,17 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage, true).success.value
+        val expectedAnswers = answers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SellsGoodsToEUConsumersPage.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual SellsGoodsToEUConsumersPage(countryIndex).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request =
@@ -115,7 +121,7 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -129,7 +135,7 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -145,7 +151,7 @@ class SellsGoodsToEUConsumersControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
