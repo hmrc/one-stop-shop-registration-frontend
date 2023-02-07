@@ -18,12 +18,12 @@ package controllers.euDetails
 
 import controllers.actions._
 import forms.euDetails.RegistrationTypeFormProvider
-import models.Mode
+import models.{Index, Mode}
 import pages.euDetails.RegistrationTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.RegistrationTypeView
+import views.html.euDetails.RegistrationTypeView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,32 +35,33 @@ class RegistrationTypeController @Inject()(
                                        view: RegistrationTypeView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(RegistrationTypePage) match {
+      val form = formProvider()
+      val preparedForm = request.userAnswers.get(RegistrationTypePage(countryIndex)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, countryIndex))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
+      val form = formProvider()
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, countryIndex))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationTypePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationTypePage(countryIndex), value))
             _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(RegistrationTypePage.navigate(mode, updatedAnswers))
+          } yield Redirect(RegistrationTypePage(countryIndex).navigate(mode, updatedAnswers))
       )
   }
 }

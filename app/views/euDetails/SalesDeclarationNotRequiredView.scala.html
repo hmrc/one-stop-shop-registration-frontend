@@ -1,0 +1,19 @@
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(mode: Mode, countryIndex: Index)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("salesDeclarationNotRequired.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("salesDeclarationNotRequired.heading")</h1>
+
+    <p class="govuk-body">@messages("salesDeclarationNotRequired.paragraph")</p>
+
+    @govukButton(
+        ButtonViewModel(
+            messages("site.continue"))
+                .asLink(controllers.euDetails.routes.VatRegisteredController.onPageLoad(mode, countryIndex).url)
+    )
+}

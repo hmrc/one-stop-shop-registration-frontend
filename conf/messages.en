@@ -108,10 +108,10 @@ euCountry.checkYourAnswersLabel = Country of tax registration
 euCountry.error.required = Select an EU country where your business is registered for tax
 euCountry.error.duplicate = You selected this country already. Select a different one.
 
-vatRegistered.title = Is your business registered for VAT in {0}?
-vatRegistered.heading = Is your business registered for VAT in {0}?
+vatRegistered.title = Do you have a VAT number for {0}?
+vatRegistered.heading = Do you have a VAT number for {0}?
 vatRegistered.checkYourAnswersLabel = VAT registered
-vatRegistered.error.required = Select yes if your business is registered for VAT in {0}
+vatRegistered.error.required = Select yes if you have a VAT number for {0}
 vatRegistered.change.hidden = if VAT registered
 
 addEuDetails.title.singular = You added tax details for one EU country
@@ -816,6 +816,8 @@ sellsGoodsToEUConsumers.change.hidden = Sells goods to EU consumers
 
 sellsGoodsToEUConsumerMethod.title = How does your business sell goods in {0}?
 sellsGoodsToEUConsumerMethod.heading = How does your business sell goods in {0}?
+sellsGoodsToEUConsumerMethod.fixedEstablishment = Fixed establishment
+sellsGoodsToEUConsumerMethod.dispatchWarehouse = Dispatch warehouse
 sellsGoodsToEUConsumerMethod.checkYourAnswersLabel = How your business sells goods
 sellsGoodsToEUConsumerMethod.error.required = Select how your business sells goods in {0}
 sellsGoodsToEUConsumerMethod.change.hidden = How your business sells goods to EU consumers
@@ -832,3 +834,7 @@ registrationType.neither = Neither
 registrationType.checkYourAnswersLabel = Registration type
 registrationType.error.required = Select a registration type
 registrationType.change.hidden = Your registration type
+
+salesDeclarationNotRequired.title = Do not tell us about sales of services on your returns
+salesDeclarationNotRequired.heading = Do not tell us about sales of services on your returns
+salesDeclarationNotRequired.paragraph = You must still tell us about countries where your business is registered.

@@ -17,7 +17,9 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{Index, NormalMode}
+import models.Index
+import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EUConsumerSalesMethod.{FixedEstablishment, DispatchWarehouse}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours {
@@ -26,32 +28,26 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
 
   "SellsGoodsToEUConsumerMethodPage" - {
 
-    beRetrievable[Boolean](SellsGoodsToEUConsumerMethodPage(countryIndex))
+    beRetrievable[EUConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
 
-    beSettable[Boolean](SellsGoodsToEUConsumerMethodPage(countryIndex))
+    beSettable[EUConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
 
-    beRemovable[Boolean](SellsGoodsToEUConsumerMethodPage(countryIndex))
+    beRemovable[EUConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
 
-    "must navigate in Normal Mode" - {
+    "must navigate" - {
 
       "to Cannot Add Country when user answers Fixed Establishment" in {
 
-        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), true).success.value
-
-        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(FixedEstablishment)
           .mustEqual(controllers.euDetails.routes.CannotAddCountryController.onPageLoad())
       }
 
-      "to Cannot Add Country when user answers Dispatch Warehouse" in {
-
+      "to ??? when user answers Dispatch Warehouse" in {
         //TODO
+//        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(DispatchWarehouse)
+//          .mustEqual(???)
       }
 
-    }
-
-    "must navigate in Check Mode" - {
-
-      //TODO
     }
   }
 }

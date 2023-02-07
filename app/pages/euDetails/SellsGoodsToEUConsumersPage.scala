@@ -16,8 +16,8 @@
 
 package pages.euDetails
 
-import models.{Index, NormalMode, UserAnswers}
 import controllers.euDetails.{routes => euRoutes}
+import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -33,11 +33,21 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(true) =>
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode, countryIndex)
       case Some(false) =>
-        ???
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   }
 
-  //TODO navigateInCheckMode
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(true) =>
+        euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex)
+      case Some(false) =>
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
 }
+

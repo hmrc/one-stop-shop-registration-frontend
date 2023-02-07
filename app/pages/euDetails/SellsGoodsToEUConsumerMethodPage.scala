@@ -16,26 +16,25 @@
 
 package pages.euDetails
 
-import models.{Index, UserAnswers}
+import models.Index
+import models.euDetails.EUConsumerSalesMethod
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends QuestionPage[Boolean] {
+case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends QuestionPage[EUConsumerSalesMethod] {
 
   override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
 
   override def toString: String = "sellsGoodsToEUConsumerMethod"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
-    answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex)) match {
-      case Some(true) =>
+  def navigate(answers: EUConsumerSalesMethod): Call = answers match {
+      case EUConsumerSalesMethod.FixedEstablishment =>
         controllers.euDetails.routes.CannotAddCountryController.onPageLoad()
-      case Some(false) =>
+      case EUConsumerSalesMethod.DispatchWarehouse =>
         ???
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
-  }
 
-  //TODO navigateInCheckMode
+  //TODO cleanup???
 }
