@@ -19,7 +19,7 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.RegistrationTypeFormProvider
 import models.euDetails.{EUConsumerSalesMethod, RegistrationType}
-import models.{Country, Index, NormalMode, UserAnswers}
+import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -40,7 +40,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
 
   private val country = Country.euCountries.head
   private val formProvider = new RegistrationTypeFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(country)
 
   private val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(countryIndex), country).success.value
@@ -61,13 +61,13 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[RegistrationTypeView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, countryIndex)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(RegistrationTypePage(countryIndex), RegistrationType.values.head).success.value
+      val userAnswers = answers.set(RegistrationTypePage(countryIndex), RegistrationType.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,7 +79,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(RegistrationType.values.head), NormalMode, countryIndex)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(RegistrationType.values.head), NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -103,7 +103,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
         val expectedAnswers = answers.set(RegistrationTypePage(countryIndex), RegistrationType.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual RegistrationTypePage(countryIndex).navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual RegistrationTypePage(countryIndex).navigate(RegistrationType.values.head).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -124,7 +124,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, countryIndex)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 

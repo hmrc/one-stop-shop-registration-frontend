@@ -38,6 +38,7 @@ class TaxRegisteredInEuController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
+  //TODO Do we need the additional view anymore?
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
       val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)

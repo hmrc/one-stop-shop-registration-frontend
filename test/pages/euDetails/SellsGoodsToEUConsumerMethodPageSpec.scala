@@ -17,9 +17,10 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.Index
+import controllers.euDetails.routes
+import models.{Index, NormalMode}
 import models.euDetails.EUConsumerSalesMethod
-import models.euDetails.EUConsumerSalesMethod.{FixedEstablishment, DispatchWarehouse}
+import models.euDetails.EUConsumerSalesMethod.{DispatchWarehouse, FixedEstablishment}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours {
@@ -39,13 +40,13 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
       "to Cannot Add Country when user answers Fixed Establishment" in {
 
         SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(FixedEstablishment)
-          .mustEqual(controllers.euDetails.routes.CannotAddCountryController.onPageLoad())
+          .mustEqual(routes.CannotAddCountryController.onPageLoad())
       }
 
-      "to ??? when user answers Dispatch Warehouse" in {
-        //TODO
-//        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(DispatchWarehouse)
-//          .mustEqual(???)
+      "to Registration Type when user answers Dispatch Warehouse" in {
+
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(DispatchWarehouse)
+          .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
       }
 
     }

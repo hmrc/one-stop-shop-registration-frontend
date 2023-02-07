@@ -17,12 +17,16 @@
 package forms.euDetails
 
 import forms.behaviours.OptionFieldBehaviours
+import models.Country
 import models.euDetails.RegistrationType
+import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
 class RegistrationTypeFormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new RegistrationTypeFormProvider()()
+  val country: Country = arbitrary[Country].sample.value
+
+  val form = new RegistrationTypeFormProvider()(country)
 
   ".value" - {
 
@@ -32,14 +36,14 @@ class RegistrationTypeFormProviderSpec extends OptionFieldBehaviours {
     behave like optionsField[RegistrationType](
       form,
       fieldName,
-      validValues  = RegistrationType.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      validValues = RegistrationType.values,
+      invalidError = FormError(fieldName, "error.invalid", Seq(country.name))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(country.name))
     )
   }
 }

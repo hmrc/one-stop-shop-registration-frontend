@@ -30,12 +30,12 @@ import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 
 class CommencementDateController @Inject()(
-   override val messagesApi: MessagesApi,
-   cc: AuthenticatedControllerComponents,
-   view: CommencementDateView,
-   dateService: DateService,
-   clock: Clock
-) extends FrontendBaseController with I18nSupport {
+                                            override val messagesApi: MessagesApi,
+                                            cc: AuthenticatedControllerComponents,
+                                            view: CommencementDateView,
+                                            dateService: DateService,
+                                            clock: Clock
+                                          ) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
