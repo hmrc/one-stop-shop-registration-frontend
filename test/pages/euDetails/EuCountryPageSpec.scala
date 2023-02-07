@@ -45,10 +45,10 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
           .mustEqual(euRoutes.VatRegisteredController.onPageLoad(NormalMode, index))
       }
 
-      "to Eu Vat Number for the same index when user is part of vat group" in {
+      "to Sells Goods to EU Consumer for the same index when user is part of vat group" in {
 
         EuCountryPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
-          .mustEqual(euRoutes.EuVatNumberController.onPageLoad(NormalMode, index))
+          .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, index))
       }
     }
 

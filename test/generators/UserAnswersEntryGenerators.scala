@@ -17,27 +17,36 @@
 package generators
 
 import models._
+import models.euDetails.RegistrationType
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations._
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
-  implicit lazy val arbitrarySellsGoodsToEUConsumerMethodUserAnswersEntry: Arbitrary[(SellsGoodsToEUConsumerMethodPage.type, JsValue)] =
+  implicit lazy val arbitraryRegistrationTypeUserAnswersEntry: Arbitrary[(RegistrationTypePage.type, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[SellsGoodsToEUConsumerMethodPage.type]
+        page  <- arbitrary[RegistrationTypePage.type]
+        value <- arbitrary[RegistrationType].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitrarySellsGoodsToEUConsumerMethodUserAnswersEntry: Arbitrary[(SellsGoodsToEUConsumerMethodPage, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[SellsGoodsToEUConsumerMethodPage]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
 
-  implicit lazy val arbitrarySellsGoodsToEUConsumersUserAnswersEntry: Arbitrary[(SellsGoodsToEUConsumersPage.type, JsValue)] =
+  implicit lazy val arbitrarySellsGoodsToEUConsumersUserAnswersEntry: Arbitrary[(SellsGoodsToEUConsumersPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[SellsGoodsToEUConsumersPage.type]
+        page  <- arbitrary[SellsGoodsToEUConsumersPage]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.euDetails
 
 import base.SpecBase
+import pages.euDetails.TaxRegisteredInEuPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.CannotAddCountryView
+import views.html.euDetails.CannotAddCountryView
 
 class CannotAddCountryControllerSpec extends SpecBase {
 
@@ -27,7 +28,9 @@ class CannotAddCountryControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.CannotAddCountryController.onPageLoad().url)

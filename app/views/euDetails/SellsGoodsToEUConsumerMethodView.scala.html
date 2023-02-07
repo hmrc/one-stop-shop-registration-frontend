@@ -1,0 +1,30 @@
+@import components.ButtonGroup
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    button: ButtonGroup
+)
+
+@(form: Form[_], mode: Mode, countryIndex: Index, country: Country)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("sellsGoodsToEUConsumerMethod.title", country.name))) {
+
+    @formHelper(action = controllers.euDetails.routes.SellsGoodsToEUConsumerMethodController.onSubmit(mode, countryIndex), 'autoComplete -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("sellsGoodsToEUConsumerMethod.heading", country.name)).asPageHeading()
+            )
+        )
+
+        @button("site.continue", controllers.euDetails.routes.SellsGoodsToEUConsumerMethodController.onPageLoad(mode, countryIndex).url)
+    }
+}

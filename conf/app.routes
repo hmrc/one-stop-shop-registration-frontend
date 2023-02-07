@@ -332,27 +332,23 @@ GET         /fixed-establishment-vrn-already-registered                         
 GET         /excluded-vrn                                                       controllers.ExcludedVRNController.onPageLoad()
 
 GET         /remove-previous-scheme/:countryIndex/:schemeIndex                  controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
-
 POST        /remove-previous-scheme/:countryIndex/:schemeIndex                  controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
-
 GET         /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
-
 POST        /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 
-GET         /sells-goods-to-eu-consumers                                        controllers.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = NormalMode)
+GET         /sells-goods-to-eu-consumers/:countryIndex                          controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+POST        /sells-goods-to-eu-consumers/:countryIndex                          controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 
-POST        /sells-goods-to-eu-consumers                                        controllers.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = NormalMode)
+GET         /sells-goods-to-eu-consumer-method/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+POST        /sells-goods-to-eu-consumer-method/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 
-GET         /check-sells-goods-to-eu-consumers                                  controllers.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = CheckMode)
+GET         /no-fixed-establishments-required                                   controllers.euDetails.CannotAddCountryController.onPageLoad()
 
-POST        /check-sells-goods-to-eu-consumers                                  controllers.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckMode)
-
-GET         /sells-goods-to-eu-consumer-method                                  controllers.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = NormalMode)
-
-POST        /sells-goods-to-eu-consumer-method                                  controllers.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = NormalMode)
-
-GET         /check-sells-goods-to-eu-consumer-method                            controllers.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckMode)
-
-POST        /check-sells-goods-to-eu-consumer-method                            controllers.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckMode)
-
-GET         /no-fixed-establishments-required                                   controllers.CannotAddCountryController.onPageLoad()
+GET         /registration-type                                                  controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
+POST        /registration-type                                                  controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
+GET         /check-registration-type                                            controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-registration-type                                            controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)

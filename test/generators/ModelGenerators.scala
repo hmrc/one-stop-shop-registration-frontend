@@ -20,6 +20,7 @@ import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
+import models.euDetails.RegistrationType
 import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
@@ -30,6 +31,11 @@ import uk.gov.hmrc.domain.Vrn
 import java.time.Instant
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryRegistrationType: Arbitrary[RegistrationType] =
+    Arbitrary {
+      Gen.oneOf(RegistrationType.values.toSeq)
+    }
 
   implicit lazy val arbitraryPreviousScheme: Arbitrary[PreviousScheme] =
     Arbitrary {

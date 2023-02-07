@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package forms.euDetails
+
+import forms.mappings.Mappings
+import models.euDetails.RegistrationType
+import play.api.data.Form
 
 import javax.inject.Inject
 
-import forms.mappings.Mappings
-import play.api.data.Form
+class RegistrationTypeFormProvider @Inject() extends Mappings {
 
-class SellsGoodsToEUConsumerMethodFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
+  def apply(): Form[RegistrationType] =
     Form(
-      "value" -> boolean("sellsGoodsToEUConsumerMethod.error.required")
+      "value" -> enumerable[RegistrationType]("registrationType.error.required")
     )
 }

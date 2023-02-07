@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package forms
+package forms.euDetails
 
-import forms.behaviours.BooleanFieldBehaviours
+import forms.behaviours.OptionFieldBehaviours
+import models.euDetails.RegistrationType
 import play.api.data.FormError
 
-class SellsGoodsToEUConsumerMethodFormProviderSpec extends BooleanFieldBehaviours {
+class RegistrationTypeFormProviderSpec extends OptionFieldBehaviours {
 
-  val requiredKey = "sellsGoodsToEUConsumerMethod.error.required"
-  val invalidKey = "error.boolean"
-
-  val form = new SellsGoodsToEUConsumerMethodFormProvider()()
+  val form = new RegistrationTypeFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
+    val requiredKey = "registrationType.error.required"
 
-    behave like booleanField(
+    behave like optionsField[RegistrationType](
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      validValues  = RegistrationType.values,
+      invalidError = FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(
