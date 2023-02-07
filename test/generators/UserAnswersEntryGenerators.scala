@@ -17,7 +17,7 @@
 package generators
 
 import models._
-import models.euDetails.RegistrationType
+import models.euDetails.{EUConsumerSalesMethod, RegistrationType}
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
@@ -27,10 +27,10 @@ import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
 
-  implicit lazy val arbitraryRegistrationTypeUserAnswersEntry: Arbitrary[(RegistrationTypePage.type, JsValue)] =
+  implicit lazy val arbitraryRegistrationTypeUserAnswersEntry: Arbitrary[(RegistrationTypePage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[RegistrationTypePage.type]
+        page  <- arbitrary[RegistrationTypePage]
         value <- arbitrary[RegistrationType].map(Json.toJson(_))
       } yield (page, value)
     }
@@ -39,7 +39,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[SellsGoodsToEUConsumerMethodPage]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
+        value <- arbitrary[EUConsumerSalesMethod].map(Json.toJson(_))
       } yield (page, value)
     }
 

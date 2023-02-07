@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Index, UserAnswers}
 import pages.euDetails.RegistrationTypePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,8 +28,8 @@ import viewmodels.implicits._
 
 object RegistrationTypeSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(RegistrationTypePage).map {
+  def row(answers: UserAnswers, countryIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(RegistrationTypePage(countryIndex)).map {
       answer =>
 
         val value = ValueViewModel(
@@ -42,7 +42,7 @@ object RegistrationTypeSummary  {
           key     = "registrationType.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.RegistrationTypeController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", controllers.euDetails.routes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url)
               .withVisuallyHiddenText(messages("registrationType.change.hidden"))
           )
         )

@@ -17,17 +17,45 @@
 package pages.euDetails
 
 import base.SpecBase
+import controllers.euDetails.routes
+import models.{Index, NormalMode}
 import models.euDetails.RegistrationType
+import models.euDetails.RegistrationType.{Neither, TaxId, VatNumber}
 import pages.behaviours.PageBehaviours
 
-class RegistrationTypeSpec extends SpecBase with PageBehaviours {
+class RegistrationTypePageSpec extends SpecBase with PageBehaviours {
+
+  private val countryIndex: Index = Index(0)
 
   "RegistrationTypePage" - {
 
-    beRetrievable[RegistrationType](RegistrationTypePage)
+    beRetrievable[RegistrationType](RegistrationTypePage(countryIndex))
 
-    beSettable[RegistrationType](RegistrationTypePage)
+    beSettable[RegistrationType](RegistrationTypePage(countryIndex))
 
-    beRemovable[RegistrationType](RegistrationTypePage)
+    beRemovable[RegistrationType](RegistrationTypePage(countryIndex))
+
+    "must navigate" - {
+
+      "to EU VAT number when the answer is Vat number" in {
+
+        RegistrationTypePage(countryIndex).navigate(VatNumber) mustEqual routes.EuVatNumberController.onPageLoad(NormalMode, countryIndex)
+      }
+
+      "to EU Tax Reference when the answer Tax Id" in {
+
+        RegistrationTypePage(countryIndex).navigate(TaxId) mustEqual routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
+      }
+
+      "to Trading Name Of Business You Sell Goods From when the answer is Neither" in {
+        //TODO
+        RegistrationTypePage(countryIndex).navigate(Neither) mustEqual ???
+      }
+
+      "to Journey Recovery when the answer is None" in {
+        //TODO
+        RegistrationTypePage(countryIndex).navigate(Neither) mustEqual ???
+      }
+    }
   }
 }

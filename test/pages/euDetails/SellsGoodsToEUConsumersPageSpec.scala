@@ -16,9 +16,9 @@
 
 package pages.euDetails
 
-import controllers.euDetails.{routes => euRoutes}
 import base.SpecBase
-import models.{Index, NormalMode}
+import controllers.euDetails.{routes => euRoutes}
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
@@ -43,17 +43,35 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode, countryIndex))
       }
 
-      "to No Sales of Services Info when answer is No" in {
+      "to Sales Declaration Not Required when answer is No" in {
 
-        //TODO
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(NormalMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex))
       }
 
     }
 
     "must navigate in Check Mode" - {
 
-      //TODO
+      "to Sells Goods To EU Consumer Method when answer is Yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex))
+      }
+
+      "to Sales Declaration Not Required when answer is No" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex))
+      }
 
     }
   }
+
 }

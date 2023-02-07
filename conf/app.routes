@@ -348,7 +348,9 @@ POST        /check-sells-goods-to-eu-consumer-method/:countryIndex              
 
 GET         /no-fixed-establishments-required                                   controllers.euDetails.CannotAddCountryController.onPageLoad()
 
-GET         /registration-type                                                  controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
-POST        /registration-type                                                  controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
-GET         /check-registration-type                                            controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-registration-type                                            controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
+GET         /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+POST        /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+
+GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)

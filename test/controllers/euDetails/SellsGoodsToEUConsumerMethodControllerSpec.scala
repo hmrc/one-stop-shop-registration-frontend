@@ -18,6 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.SellsGoodsToEUConsumerMethodFormProvider
+import models.euDetails.EUConsumerSalesMethod
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -65,7 +66,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), true).success.value
+      val userAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -77,7 +78,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, countryIndex, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(EUConsumerSalesMethod.FixedEstablishment), NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -98,7 +99,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), true).success.value
+        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, expectedAnswers).url

@@ -8,11 +8,11 @@
     button: ButtonGroup
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, countryIndex: Index)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("registrationType.title"))) {
 
-    @formHelper(action = routes.RegistrationTypeController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = controllers.euDetails.routes.RegistrationTypeController.onSubmit(mode, countryIndex), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
@@ -26,6 +26,6 @@
             )
         )
 
-        @button("site.continue", controllers.euDetails.routes.RegistrationTypeController.onPageLoad(mode).url)
+        @button("site.continue", controllers.euDetails.routes.RegistrationTypeController.onPageLoad(mode, countryIndex).url)
     }
 }
