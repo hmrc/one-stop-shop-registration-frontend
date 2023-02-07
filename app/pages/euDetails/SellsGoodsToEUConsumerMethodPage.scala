@@ -16,7 +16,8 @@
 
 package pages.euDetails
 
-import models.Index
+import models.{Index, NormalMode}
+import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.EUConsumerSalesMethod
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -30,11 +31,11 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
 
   def navigate(answers: EUConsumerSalesMethod): Call = answers match {
       case EUConsumerSalesMethod.FixedEstablishment =>
-        controllers.euDetails.routes.CannotAddCountryController.onPageLoad()
+        euRoutes.CannotAddCountryController.onPageLoad()
       case EUConsumerSalesMethod.DispatchWarehouse =>
-        ???
+        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
-  //TODO cleanup???
+  //TODO cleanup if fixed establishment selected?
 }

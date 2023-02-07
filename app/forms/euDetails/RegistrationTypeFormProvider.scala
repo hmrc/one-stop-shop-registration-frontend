@@ -17,6 +17,7 @@
 package forms.euDetails
 
 import forms.mappings.Mappings
+import models.Country
 import models.euDetails.RegistrationType
 import play.api.data.Form
 
@@ -24,8 +25,8 @@ import javax.inject.Inject
 
 class RegistrationTypeFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[RegistrationType] =
+  def apply(country: Country): Form[RegistrationType] =
     Form(
-      "value" -> enumerable[RegistrationType]("registrationType.error.required")
+      "value" -> enumerable[RegistrationType]("registrationType.error.required", args = Seq(country.name))
     )
 }

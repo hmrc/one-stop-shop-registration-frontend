@@ -16,6 +16,7 @@
 
 package controllers.euDetails
 
+import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.RegistrationTypeFormProvider
 import models.{Index, Mode}
@@ -29,39 +30,49 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationTypeController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
-                                       formProvider: RegistrationTypeFormProvider,
-                                       view: RegistrationTypeView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                            override val messagesApi: MessagesApi,
+                                            cc: AuthenticatedControllerComponents,
+                                            formProvider: RegistrationTypeFormProvider,
+                                            view: RegistrationTypeView
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      val form = formProvider()
-      val preparedForm = request.userAnswers.get(RegistrationTypePage(countryIndex)) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      getCountry(countryIndex) {
 
-      Ok(view(preparedForm, mode, countryIndex))
+        country =>
+
+          val form = formProvider(country)
+          val preparedForm = request.userAnswers.get(RegistrationTypePage(countryIndex)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Future.successful(Ok(view(preparedForm, mode, countryIndex, country)))
+      }
   }
 
   def onSubmit(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
-      val form = formProvider()
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, countryIndex))),
+      getCountry(countryIndex) {
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationTypePage(countryIndex), value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(RegistrationTypePage(countryIndex).navigate(mode, updatedAnswers))
-      )
+        country =>
+
+        val form = formProvider(country)
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, country))),
+
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationTypePage(countryIndex), value))
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield Redirect(RegistrationTypePage(countryIndex).navigate(value))
+        )
+      }
   }
 }

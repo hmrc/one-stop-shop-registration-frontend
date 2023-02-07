@@ -30,11 +30,11 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SellsGoodsToEUConsumerMethodController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: SellsGoodsToEUConsumerMethodFormProvider,
-                                         view: SellsGoodsToEUConsumerMethodView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
+                                                        override val messagesApi: MessagesApi,
+                                                        cc: AuthenticatedControllerComponents,
+                                                        formProvider: SellsGoodsToEUConsumerMethodFormProvider,
+                                                        view: SellsGoodsToEUConsumerMethodView
+                                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -45,13 +45,13 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
 
         country =>
 
-        val form = formProvider(country)
-        val preparedForm = request.userAnswers.get(SellsGoodsToEUConsumerMethodPage(countryIndex)) match {
-          case None => form
-          case Some(value) => form.fill(value)
-        }
+          val form = formProvider(country)
+          val preparedForm = request.userAnswers.get(SellsGoodsToEUConsumerMethodPage(countryIndex)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
 
-        Future.successful(Ok(view(preparedForm, mode, countryIndex, country)))
+          Future.successful(Ok(view(preparedForm, mode, countryIndex, country)))
       }
   }
 
@@ -62,17 +62,17 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
 
         country =>
 
-        val form = formProvider(country)
-        form.bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, country))),
+          val form = formProvider(country)
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, country))),
 
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), value))
-              _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield Redirect(SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(mode, updatedAnswers))
-        )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(value))
+          )
       }
   }
 }

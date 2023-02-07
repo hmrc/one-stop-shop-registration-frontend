@@ -96,13 +96,13 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
       running(application) {
         val request =
           FakeRequest(POST, sellsGoodsToEUConsumerMethodRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value", EUConsumerSalesMethod.values.head.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(EUConsumerSalesMethod.values.head).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }

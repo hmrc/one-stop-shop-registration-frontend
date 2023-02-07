@@ -32,12 +32,9 @@ case class RegistrationTypePage(countryIndex: Index) extends QuestionPage[Regist
   def navigate(answer: RegistrationType): Call = answer match {
     case RegistrationType.VatNumber =>
       routes.EuVatNumberController.onPageLoad(NormalMode, countryIndex)
-    case RegistrationType.TaxId =>
+    case _ =>
       routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
-    case RegistrationType.Neither =>
-      //TODO
-      ???
-    case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+
   }
 
 }

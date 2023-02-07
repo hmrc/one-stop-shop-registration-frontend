@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.euDetails.routes
 import models.{Index, NormalMode}
 import models.euDetails.RegistrationType
-import models.euDetails.RegistrationType.{Neither, TaxId, VatNumber}
+import models.euDetails.RegistrationType.{TaxId, VatNumber}
 import pages.behaviours.PageBehaviours
 
 class RegistrationTypePageSpec extends SpecBase with PageBehaviours {
@@ -46,16 +46,7 @@ class RegistrationTypePageSpec extends SpecBase with PageBehaviours {
 
         RegistrationTypePage(countryIndex).navigate(TaxId) mustEqual routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
       }
-
-      "to Trading Name Of Business You Sell Goods From when the answer is Neither" in {
-        //TODO
-        RegistrationTypePage(countryIndex).navigate(Neither) mustEqual ???
-      }
-
-      "to Journey Recovery when the answer is None" in {
-        //TODO
-        RegistrationTypePage(countryIndex).navigate(Neither) mustEqual ???
-      }
     }
   }
 }
+

@@ -8,9 +8,9 @@
     button: ButtonGroup
 )
 
-@(form: Form[_], mode: Mode, countryIndex: Index)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, countryIndex: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("registrationType.title"))) {
+@layout(pageTitle = title(form, messages("registrationType.title", country.name))) {
 
     @formHelper(action = controllers.euDetails.routes.RegistrationTypeController.onSubmit(mode, countryIndex), 'autoComplete -> "off") {
 
@@ -21,7 +21,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("registrationType.heading")).asPageHeading(),
+                legend = LegendViewModel(messages("registrationType.heading", country.name)).asPageHeading(),
                 items  = RegistrationType.options
             )
         )
