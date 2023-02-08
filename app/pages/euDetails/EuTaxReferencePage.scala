@@ -18,55 +18,65 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
+import models.euDetails.EUConsumerSalesMethod
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class EuTaxReferencePage(index: Index) extends QuestionPage[String] {
+case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
 
   override def toString: String = "euTaxReference"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
-    answers.get(HasFixedEstablishmentPage(index)) match {
-      case Some(true) => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, index)
-      case Some(false) => euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, index)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
+      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+        euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex)
+      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
-  }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    answers.get(HasFixedEstablishmentPage(index)) match {
-      case Some(true) =>
-        if(answers.get(FixedEstablishmentTradingNamePage(index)).isEmpty) {
-          euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, index)
-        } else {
-          FixedEstablishmentTradingNamePage(index).navigate(CheckMode, answers)
+    (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
         }
-      case Some(false) =>
-        if(answers.get(EuSendGoodsTradingNamePage(index)).isEmpty) {
-          euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, index)
-        } else {
-          EuSendGoodsTradingNamePage(index).navigate(CheckMode, answers)
+      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
+          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckMode, answers)
+          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex)
+        }
+      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
         }
       case _ => routes.JourneyRecoveryController.onPageLoad()
-  }
+    }
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
-    answers.get(HasFixedEstablishmentPage(index)) match {
-      case Some(true) =>
-        if(answers.get(FixedEstablishmentTradingNamePage(index)).isEmpty) {
-          euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, index)
-        } else {
-          FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)
+    (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
         }
-      case Some(false) =>
-        if(answers.get(EuSendGoodsTradingNamePage(index)).isEmpty) {
-          euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, index)
-        } else {
-          EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, answers)
+      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
+          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
+          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
+        }
+      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) =>EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
         }
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }

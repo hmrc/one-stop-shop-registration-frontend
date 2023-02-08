@@ -16,7 +16,7 @@
 
 package pages.euDetails
 
-import models.{Index, NormalMode}
+import models.{Index, Mode, NormalMode, UserAnswers}
 import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.EUConsumerSalesMethod
 import pages.QuestionPage
@@ -29,13 +29,26 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
 
   override def toString: String = "sellsGoodsToEUConsumerMethod"
 
-  def navigate(answers: EUConsumerSalesMethod): Call = answers match {
-      case EUConsumerSalesMethod.FixedEstablishment =>
-        euRoutes.CannotAddCountryController.onPageLoad()
-      case EUConsumerSalesMethod.DispatchWarehouse =>
-        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+  override def navigate(mode: Mode, answers: UserAnswers): Call = {
+    val partOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
+    if (partOfVatGroup) {
+      answers.get(this) match {
+        case Some(EUConsumerSalesMethod.FixedEstablishment) =>
+          euRoutes.CannotAddCountryController.onPageLoad()
+        case Some(EUConsumerSalesMethod.DispatchWarehouse) =>
+          euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
+    } else {
+      answers.get(this) match {
+        case Some(EUConsumerSalesMethod.FixedEstablishment) =>
+          euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+        case Some(EUConsumerSalesMethod.DispatchWarehouse) =>
+          euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
     }
+  }
 
   //TODO cleanup if fixed establishment selected?
 }

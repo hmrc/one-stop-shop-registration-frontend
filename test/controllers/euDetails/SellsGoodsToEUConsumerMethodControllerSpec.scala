@@ -43,7 +43,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
   private lazy val sellsGoodsToEUConsumerMethodRoute = routes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode, countryIndex).url
 
   private val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
-    .set(EuCountryPage(Index(0)), country).success.value
+    .set(EuCountryPage(countryIndex), country).success.value
     .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
 
   "SellsGoodsToEUConsumerMethod Controller" - {
@@ -102,7 +102,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(EUConsumerSalesMethod.values.head).url
+        redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }

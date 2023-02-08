@@ -48,12 +48,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Has Fixed Establishment for the same index" in {
+        "to Check EU Details Answers for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index))
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
         }
       }
 

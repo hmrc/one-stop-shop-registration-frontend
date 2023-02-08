@@ -274,8 +274,6 @@ object Country {
 
 object CountryWithValidationDetails {
 
-
-
   lazy val euCountriesWithVRNValidationRules: Seq[CountryWithValidationDetails] = Seq(
     CountryWithValidationDetails(Country("AT", "Austria"),austriaVatNumberRegex, "the 9 characters", "U12345678"),
     CountryWithValidationDetails(Country("BE", "Belgium"), belgiumVatNumberRegex, "the 10 numbers", "0123456789"),
