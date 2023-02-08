@@ -71,7 +71,7 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(value))
+              } yield Redirect(SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(mode, updatedAnswers))
           )
       }
   }

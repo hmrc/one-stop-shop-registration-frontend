@@ -18,9 +18,8 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.routes
-import models.{Index, NormalMode}
 import models.euDetails.EUConsumerSalesMethod
-import models.euDetails.EUConsumerSalesMethod.{DispatchWarehouse, FixedEstablishment}
+import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours {
@@ -37,15 +36,45 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
 
     "must navigate" - {
 
-      "to Cannot Add Country when user answers Fixed Establishment" in {
+      "when user is part of VAT group" - {
 
-        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(FixedEstablishment)
-          .mustEqual(routes.CannotAddCountryController.onPageLoad())
+        "to Cannot Add Country when user answers Fixed Establishment" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+
+          SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
+            .mustEqual(routes.CannotAddCountryController.onPageLoad())
+        }
+
+        "to Registration Type when user answers Dispatch Warehouse" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+
+          SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
+            .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
+        }
+      }
+
+      "when user is not part of VAT group" - {
+
+        "to Registration Type when user answers Fixed Establishment" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+
+          SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
+            .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
+        }
       }
 
       "to Registration Type when user answers Dispatch Warehouse" in {
 
-        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(DispatchWarehouse)
+        val answers = emptyUserAnswers
+          .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
           .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
       }
 
