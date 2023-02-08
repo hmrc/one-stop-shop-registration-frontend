@@ -30,8 +30,8 @@ object PreviousRegistrationDetails {
 }
 
 case class PreviousSchemeDetails(
-                                  previousScheme: Option[String],
-                                  previousSchemeNumbers: Option[PreviousSchemeNumbers]
+                                  previousScheme: String,
+                                  previousSchemeNumbers: PreviousSchemeNumbers
                                 )
 
 object PreviousSchemeDetails {
