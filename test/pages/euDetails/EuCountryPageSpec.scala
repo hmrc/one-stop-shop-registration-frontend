@@ -27,83 +27,48 @@ import pages.euDetails
 
 class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckPropertyChecks {
 
-  private val index = Index(0)
+  private val countryIndex = Index(0)
 
   "EuCountryPage" - {
 
-    beRetrievable[Country](EuCountryPage(index))
+    beRetrievable[Country](EuCountryPage(countryIndex))
 
-    beSettable[Country](euDetails.EuCountryPage(index))
+    beSettable[Country](euDetails.EuCountryPage(countryIndex))
 
-    beRemovable[Country](euDetails.EuCountryPage(index))
+    beRemovable[Country](euDetails.EuCountryPage(countryIndex))
 
     "must navigate in Normal mode" - {
 
-      "to Vat Registered for the same index when user is not part of vat group" in {
+      "to Sells Goods to EU Consumer for the same index" in {
 
-        EuCountryPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(euRoutes.VatRegisteredController.onPageLoad(NormalMode, index))
-      }
-
-      "to Sells Goods to EU Consumer for the same index when user is part of vat group" in {
-
-        EuCountryPage(index).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
-          .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, index))
+        EuCountryPage(countryIndex).navigate(NormalMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
+          .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, countryIndex))
       }
     }
 
     "must navigate in Check mode" - {
 
-      "when user is not part of vat group" - {
-        "when Vat Registered has not been answered" - {
+      "when Eu Vat Number has not been answered" - {
 
-          "to Vat Registered for the same index" in {
+        "to Eu Vat Number for the same index" in {
 
-            EuCountryPage(index).navigate(CheckMode, emptyUserAnswers)
-              .mustEqual(euRoutes.VatRegisteredController.onPageLoad(CheckMode, index))
-          }
-        }
-
-        "when Vat Registered has been answered" - {
-
-          "to wherever Vat Registered would navigate to in Check mode" in {
-
-            forAll(arbitrary[UserAnswers]) {
-              baseAnswers =>
-
-                val answers = baseAnswers
-                  .set(VatRegisteredPage(Index(0)), true).success.value
-
-                EuCountryPage(index).navigate(CheckMode, answers)
-                  .mustEqual(VatRegisteredPage(Index(0)).navigate(CheckMode, answers))
-            }
-          }
+          EuCountryPage(countryIndex).navigate(CheckMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
+            .mustEqual(euRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex))
         }
       }
 
-      "when user is part of vat group" - {
-        "when Eu Vat Number has not been answered" - {
+      "when Eu Vat Number has been answered" - {
 
-          "to Eu Vat Number for the same index" in {
+        "to wherever Eu Vat Number would navigate to in Check mode" in {
 
-            EuCountryPage(index).navigate(CheckMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
-              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(CheckMode, index))
-          }
-        }
+          forAll(arbitrary[UserAnswers]) {
+            baseAnswers =>
 
-        "when Eu Vat Number has been answered" - {
+              val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+                .set(EuVatNumberPage(Index(0)), "1234567").success.value
 
-          "to wherever Eu Vat Number would navigate to in Check mode" in {
-
-            forAll(arbitrary[UserAnswers]) {
-              baseAnswers =>
-
-                val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-                  .set(EuVatNumberPage(Index(0)), "1234567").success.value
-
-                EuCountryPage(index).navigate(CheckMode, answers)
-                  .mustEqual(EuVatNumberPage(Index(0)).navigate(CheckMode, answers))
-            }
+              EuCountryPage(countryIndex).navigate(CheckMode, answers)
+                .mustEqual(EuVatNumberPage(Index(0)).navigate(CheckMode, answers))
           }
         }
       }
@@ -111,56 +76,27 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
 
     "must navigate in Check Loop mode" - {
 
-      "when the user is not a part of vat group" - {
-        "when Vat Registered has not been answered" - {
+      "when Eu Vat Number has not been answered" - {
 
-          "to Vat Registered for the same index" in {
+        "to Eu Vat Number for the same index" in {
 
-            EuCountryPage(index).navigate(CheckLoopMode, emptyUserAnswers)
-              .mustEqual(euRoutes.VatRegisteredController.onPageLoad(CheckLoopMode, index))
-          }
-        }
-
-        "when Vat Registered has been answered" - {
-
-          "to wherever Vat Registered would navigate to in Check Loop mode" in {
-
-            forAll(arbitrary[UserAnswers]) {
-              baseAnswers =>
-
-                val answers = baseAnswers
-                  .set(VatRegisteredPage(Index(0)), true).success.value
-
-                EuCountryPage(index).navigate(CheckLoopMode, answers)
-                  .mustEqual(VatRegisteredPage(Index(0)).navigate(CheckLoopMode, answers))
-            }
-          }
+          EuCountryPage(countryIndex).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
+            .mustEqual(euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, countryIndex))
         }
       }
 
-      "when the user is a part of vat group" - {
-        "when Eu Vat Number has not been answered" - {
+      "when Eu Vat Number has been answered" - {
 
-          "to Eu Vat Number for the same index" in {
+        "to wherever Eu Vat Number would navigate to in Check Loop mode" in {
 
-            EuCountryPage(index).navigate(CheckLoopMode, emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))
-              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index))
-          }
-        }
+          forAll(arbitrary[UserAnswers]) {
+            baseAnswers =>
 
-        "when Eu Vat Number has been answered" - {
+              val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+                .set(EuVatNumberPage(Index(0)), "1234567").success.value
 
-          "to wherever Eu Vat Number would navigate to in Check Loop mode" in {
-
-            forAll(arbitrary[UserAnswers]) {
-              baseAnswers =>
-
-                val answers = baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-                  .set(EuVatNumberPage(Index(0)), "1234567").success.value
-
-                EuCountryPage(index).navigate(CheckLoopMode, answers)
-                  .mustEqual(EuVatNumberPage(Index(0)).navigate(CheckLoopMode, answers))
-            }
+              EuCountryPage(countryIndex).navigate(CheckLoopMode, answers)
+                .mustEqual(EuVatNumberPage(Index(0)).navigate(CheckLoopMode, answers))
           }
         }
       }

@@ -23,53 +23,42 @@ import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.euDetails.{TaxRegisteredInEuView, VatRegisteredInEuView}
+import views.html.euDetails.TaxRegisteredInEuView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaxRegisteredInEuController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: TaxRegisteredInEuFormProvider,
-                                         view: TaxRegisteredInEuView,
-                                         vatOnlyView: VatRegisteredInEuView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                             override val messagesApi: MessagesApi,
+                                             cc: AuthenticatedControllerComponents,
+                                             formProvider: TaxRegisteredInEuFormProvider,
+                                             view: TaxRegisteredInEuView
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  //TODO Do we need the additional view anymore?
+  private val form = formProvider()
+
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
-      val form = formProvider(vatOnly)
+
       val preparedForm = request.userAnswers.get(TaxRegisteredInEuPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
-      if(vatOnly){
-        Ok(vatOnlyView(preparedForm, mode))
-      } else {
-        Ok(view(preparedForm, mode))
-      }
+      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
-      val form = formProvider(vatOnly)
       form.bindFromRequest().fold(
         formWithErrors =>
-          if(vatOnly){
-            Future.successful(BadRequest(vatOnlyView(formWithErrors, mode)))
-          } else {
-            Future.successful(BadRequest(view(formWithErrors, mode)))
-          },
+          Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
+            _ <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(TaxRegisteredInEuPage.navigate(mode, updatedAnswers))
       )
   }

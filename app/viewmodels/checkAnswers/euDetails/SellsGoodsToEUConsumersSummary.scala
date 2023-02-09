@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.euDetails
 
-import models.{CheckMode, UserAnswers}
+import controllers.euDetails.routes
+import models.{CheckMode, Index, UserAnswers}
 import pages.euDetails.SellsGoodsToEUConsumersPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,19 +26,19 @@ import viewmodels.implicits._
 
 object SellsGoodsToEUConsumersSummary {
 
-//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-//    answers.get(SellsGoodsToEUConsumersPage).map {
-//      answer =>
-//
-//        val value = if (answer) "site.yes" else "site.no"
-//
-//        SummaryListRowViewModel(
-//          key = "sellsGoodsToEUConsumers.checkYourAnswersLabel",
-//          value = ValueViewModel(value),
-//          actions = Seq(
-//                        ActionItemViewModel("site.change", controllers.euDetails.routes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode).url)
-//                          .withVisuallyHiddenText(messages("sellsGoodsToEUConsumers.change.hidden"))
-//          )
-//        )
-//    }
+  def row(answers: UserAnswers, countryIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)).map {
+      answer =>
+
+        val value = if (answer) "site.yes" else "site.no"
+
+        SummaryListRowViewModel(
+          key = "sellsGoodsToEUConsumers.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex).url)
+              .withVisuallyHiddenText(messages("sellsGoodsToEUConsumers.change.hidden"))
+          )
+        )
+    }
 }

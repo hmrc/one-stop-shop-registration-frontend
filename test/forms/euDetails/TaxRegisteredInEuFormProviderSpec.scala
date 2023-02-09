@@ -24,7 +24,7 @@ class TaxRegisteredInEuFormProviderSpec extends BooleanFieldBehaviours {
   val requiredKey = "taxRegisteredInEu.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new TaxRegisteredInEuFormProvider()(false)
+  val form = new TaxRegisteredInEuFormProvider()()
 
   ".value" - {
 
