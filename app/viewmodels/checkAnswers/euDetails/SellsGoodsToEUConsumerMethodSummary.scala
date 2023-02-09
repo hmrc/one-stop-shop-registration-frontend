@@ -16,29 +16,35 @@
 
 package viewmodels.checkAnswers.euDetails
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
+import controllers.euDetails.routes
+import models.{CheckMode, Index, UserAnswers}
 import pages.euDetails.SellsGoodsToEUConsumerMethodPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object SellsGoodsToEUConsumerMethodSummary {
 
-//  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-//    answers.get(SellsGoodsToEUConsumerMethodPage).map {
-//      answer =>
-//
-//        val value = if (answer) "site.yes" else "site.no"
-//
-//        SummaryListRowViewModel(
-//          key = "sellsGoodsToEUConsumerMethod.checkYourAnswersLabel",
-//          value = ValueViewModel(value),
-//          actions = Seq(
-//            ActionItemViewModel("site.change", routes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode).url)
-//              .withVisuallyHiddenText(messages("sellsGoodsToEUConsumerMethod.change.hidden"))
-//          )
-//        )
-//    }
+  def row(answers: UserAnswers, countryIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex)).map {
+      answer =>
+
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"sellsGoodsToEUConsumerMethod.$answer"))
+          )
+        )
+
+        SummaryListRowViewModel(
+          key = "sellsGoodsToEUConsumerMethod.checkYourAnswersLabel",
+          value = value,
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex).url)
+              .withVisuallyHiddenText(messages("sellsGoodsToEUConsumerMethod.change.hidden"))
+          )
+        )
+    }
 }

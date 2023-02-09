@@ -22,49 +22,27 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class EuCountryPage(index: Index) extends QuestionPage[Country] {
+case class EuCountryPage(countryIndex: Index) extends QuestionPage[Country] {
 
-  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
 
   override def toString: String = "euCountry"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = {
-    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
-    if (isPartOfVatGroup) {
-      euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, index)
-    } else {
-      euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
-    }
-
+    euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, countryIndex)
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = {
-    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
-    if (isPartOfVatGroup) {
-      answers.get(EuVatNumberPage(index)) match {
-        case Some(_) => EuVatNumberPage(index).navigate(CheckMode, answers)
-        case None => euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
-      }
-    } else {
-      answers.get(VatRegisteredPage(index)) match {
-        case Some(_) => VatRegisteredPage(index).navigate(CheckMode, answers)
-        case None => euRoutes.VatRegisteredController.onPageLoad(CheckMode, index)
-      }
+    answers.get(EuVatNumberPage(countryIndex)) match {
+      case Some(_) => EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
+      case None => euRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex)
     }
   }
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
-    val isPartOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
-    if (isPartOfVatGroup) {
-      answers.get(EuVatNumberPage(index)) match {
-        case Some(_) => EuVatNumberPage(index).navigate(CheckLoopMode, answers)
-        case None => euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
-      }
-    } else {
-      answers.get(VatRegisteredPage(index)) match {
-        case Some(_) => VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-        case None => euRoutes.VatRegisteredController.onPageLoad(CheckLoopMode, index)
-      }
+    answers.get(EuVatNumberPage(countryIndex)) match {
+      case Some(_) => EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
+      case None => euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, countryIndex)
     }
   }
 }

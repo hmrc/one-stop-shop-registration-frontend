@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.euDetails
 
-import controllers.routes
+import controllers.euDetails.routes
 import models.{CheckMode, Index, UserAnswers}
 import pages.euDetails.RegistrationTypePage
 import play.api.i18n.Messages
@@ -26,7 +26,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object RegistrationTypeSummary  {
+object RegistrationTypeSummary {
 
   def row(answers: UserAnswers, countryIndex: Index)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RegistrationTypePage(countryIndex)).map {
@@ -39,10 +39,10 @@ object RegistrationTypeSummary  {
         )
 
         SummaryListRowViewModel(
-          key     = "registrationType.checkYourAnswersLabel",
-          value   = value,
+          key = "registrationType.checkYourAnswersLabel",
+          value = value,
           actions = Seq(
-            ActionItemViewModel("site.change", controllers.euDetails.routes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url)
+            ActionItemViewModel("site.change", routes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url)
               .withVisuallyHiddenText(messages("registrationType.change.hidden"))
           )
         )

@@ -27,20 +27,20 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import views.html.euDetails.{TaxRegisteredInEuView, VatRegisteredInEuView}
+import views.html.euDetails.TaxRegisteredInEuView
 
 import scala.concurrent.Future
 
 class TaxRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new TaxRegisteredInEuFormProvider()
-  private val form = formProvider(false)
+  private val form = formProvider()
 
   private lazy val taxRegisteredInEuRoute = routes.TaxRegisteredInEuController.onPageLoad(NormalMode).url
 
   "TaxRegisteredInEu Controller" - {
 
-    "must return OK and the correct view for a GET when user is not part of vat group" in {
+    "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
@@ -50,22 +50,6 @@ class TaxRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[TaxRegisteredInEuView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must return OK and the correct view for a GET when user is part of vat group" in {
-      val form = formProvider(true)
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))).build()
-
-      running(application) {
-        val request = FakeRequest(GET, taxRegisteredInEuRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[VatRegisteredInEuView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -115,7 +99,7 @@ class TaxRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted and user is not part of vat group" in {
+    "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
@@ -127,26 +111,6 @@ class TaxRegisteredInEuControllerSpec extends SpecBase with MockitoSugar {
         val boundForm = form.bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[TaxRegisteredInEuView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted and user is part of vat group" in {
-      val form = formProvider(true)
-      val application = applicationBuilder(userAnswers =Some(basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true))))).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, taxRegisteredInEuRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[VatRegisteredInEuView]
 
         val result = route(application, request).value
 

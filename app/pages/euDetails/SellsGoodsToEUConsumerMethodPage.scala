@@ -16,9 +16,9 @@
 
 package pages.euDetails
 
-import models.{Index, Mode, NormalMode, UserAnswers}
 import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.EUConsumerSalesMethod
+import models.{Index, Mode, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -30,23 +30,16 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
   override def toString: String = "sellsGoodsToEUConsumerMethod"
 
   override def navigate(mode: Mode, answers: UserAnswers): Call = {
-    val partOfVatGroup = answers.vatInfo.exists(_.partOfVatGroup)
-    if (partOfVatGroup) {
-      answers.get(this) match {
-        case Some(EUConsumerSalesMethod.FixedEstablishment) =>
-          euRoutes.CannotAddCountryController.onPageLoad()
-        case Some(EUConsumerSalesMethod.DispatchWarehouse) =>
-          euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
-        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-      }
-    } else {
-      answers.get(this) match {
-        case Some(EUConsumerSalesMethod.FixedEstablishment) =>
-          euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
-        case Some(EUConsumerSalesMethod.DispatchWarehouse) =>
-          euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
-        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-      }
+    (answers.vatInfo.exists(_.partOfVatGroup), answers.get(this)) match {
+      case (true, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+        euRoutes.CannotAddCountryController.onPageLoad()
+      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
 

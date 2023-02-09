@@ -648,8 +648,8 @@ euSendGoodsTradingName.error.length = Trading name must be 40 characters or less
 euSendGoodsTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 euSendGoodsTradingName.change.hidden = trading name
 
-euSendGoodsAddress.title = What is the address of {0}?
-euSendGoodsAddress.heading = What is the address of {0}?
+euSendGoodsAddress.title = What is the address of {0} in {1}?
+euSendGoodsAddress.heading = What is the address of {0} in {1}?
 euSendGoodsAddress.checkYourAnswersLabel = Address
 euSendGoodsAddress.line1 = Address line 1
 euSendGoodsAddress.line2 = Address line 2 (optional)
@@ -723,29 +723,6 @@ alreadyRegisteredOtherCountry.register = You can only register on one OSS Union 
 alreadyRegisteredOtherCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 alreadyRegisteredOtherCountry.returnBTA = <a class="govuk-link" href="/business-account">Return to Business Tax Account</a>
 
-euSendGoodsAddress.title = What is the address of {0}?
-euSendGoodsAddress.heading = What is the address of {0}?
-euSendGoodsAddress.checkYourAnswersLabel = Address
-
-euSendGoodsAddress.line1 = Address line 1
-euSendGoodsAddress.line2 = Address line 2 (optional)
-euSendGoodsAddress.townOrCity = Town or city
-euSendGoodsAddress.stateOrRegion = Region or state (optional)
-euSendGoodsAddress.postCode = Postcode (optional)
-euSendGoodsAddress.error.line1.required = Enter address line 1
-euSendGoodsAddress.error.townOrCity.required = Enter the town or city
-euSendGoodsAddress.error.line1.length = Address line 1 must be 35 characters or less
-euSendGoodsAddress.error.line1.format = Address line 1 must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.line2.length = Address line 2 must be 35 characters or less
-euSendGoodsAddress.error.line2.format = Address line 2 must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.townOrCity.length = Town or city must be 35 characters or less
-euSendGoodsAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.stateOrRegion.length = State or region must be 35 characters or less
-euSendGoodsAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.postCode.length = Postcode must be 50 characters or less
-euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
-euSendGoodsAddress.change.hidden = EuSendGoodsAddress
-
 emailVerificationCodesAndEmailsExceeded.title = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.heading = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.paragraph = We''ve saved your progress and you can try again in 24 hours.
@@ -768,29 +745,6 @@ vatRegistrationDetails.checkYourAnswers.partOfVatGroup = Part of a VAT group
 vatRegistrationDetails.checkYourAnswers.vatRegistrationDate = UK VAT registration date
 vatRegistrationDetails.checkYourAnswers.businessAddress = Business address
 vatRegistrationDetails.checkYourAnswers.manageVatBTA = <a class="govuk-link" href="/business-account">Manage your VAT registration in your BTA account</a>
-
-euSendGoodsAddress.title = What is the address of {0}?
-euSendGoodsAddress.heading = What is the address of {0}?
-euSendGoodsAddress.checkYourAnswersLabel = Address
-
-euSendGoodsAddress.line1 = Address line 1
-euSendGoodsAddress.line2 = Address line 2 (optional)
-euSendGoodsAddress.townOrCity = Town or city
-euSendGoodsAddress.stateOrRegion = Region or state (optional)
-euSendGoodsAddress.postCode = Postcode (optional)
-euSendGoodsAddress.error.line1.required = Enter address line 1
-euSendGoodsAddress.error.townOrCity.required = Enter the town or city
-euSendGoodsAddress.error.line1.length = Address line 1 must be 35 characters or less
-euSendGoodsAddress.error.line1.format = Address line 1 must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.line2.length = Address line 2 must be 35 characters or less
-euSendGoodsAddress.error.line2.format = Address line 2 must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.townOrCity.length = Town or city must be 35 characters or less
-euSendGoodsAddress.error.townOrCity.format = Town or city must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.stateOrRegion.length = State or region must be 35 characters or less
-euSendGoodsAddress.error.stateOrRegion.format = State or region must only include letters, numbers, hyphens, spaces and apostrophes
-euSendGoodsAddress.error.postCode.length = Postcode must be 50 characters or less
-euSendGoodsAddress.error.postCode.invalid = Postcode must only include letters, numbers and spaces
-euSendGoodsAddress.change.hidden = EuSendGoodsAddress
 
 fixedEstablishmentVRNAlreadyRegistered.title = You cannot register using this VAT number
 fixedEstablishmentVRNAlreadyRegistered.heading = You cannot register using this VAT number

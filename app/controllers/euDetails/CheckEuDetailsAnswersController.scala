@@ -40,46 +40,47 @@ class CheckEuDetailsAnswersController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(index) {
+      getCountry(countryIndex) {
         country =>
 
           val list = SummaryListViewModel(
             rows = Seq(
-              VatRegisteredSummary.row(request.userAnswers, index, mode),
-              EuVatNumberSummary.row(request.userAnswers, index, mode),
-              EuTaxReferenceSummary.row(request.userAnswers, index, mode),
-              HasFixedEstablishmentSummary.row(request.userAnswers, index, mode),
-              FixedEstablishmentTradingNameSummary.row(request.userAnswers, index, mode),
-              FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode),
-              EuSendGoodsSummary.row(request.userAnswers, index, mode),
-              EuSendGoodsTradingNameSummary.row(request.userAnswers, index, mode),
-              EuSendGoodsAddressSummary.row(request.userAnswers, index, mode)
+              VatRegisteredSummary.row(request.userAnswers, countryIndex, mode),
+              SellsGoodsToEUConsumersSummary.row(request.userAnswers, countryIndex),
+              SellsGoodsToEUConsumerMethodSummary.row(request.userAnswers, countryIndex),
+              RegistrationTypeSummary.row(request.userAnswers, countryIndex),
+              EuVatNumberSummary.row(request.userAnswers, countryIndex, mode),
+              EuTaxReferenceSummary.row(request.userAnswers, countryIndex, mode),
+              FixedEstablishmentTradingNameSummary.row(request.userAnswers, countryIndex, mode),
+              FixedEstablishmentAddressSummary.row(request.userAnswers, countryIndex, mode),
+              EuSendGoodsTradingNameSummary.row(request.userAnswers, countryIndex, mode),
+              EuSendGoodsAddressSummary.row(request.userAnswers, countryIndex, mode)
             ).flatten
           )
 
           Future.successful(withCompleteDataModel[EuOptionalDetails](
-            index,
+            countryIndex,
             data = getIncompleteEuDetails _,
             onFailure = (incomplete: Option[EuOptionalDetails]) => {
-              Ok(view(list, mode, index, country, incomplete.isDefined))
+              Ok(view(list, mode, countryIndex, country, incomplete.isDefined))
             }) {
-            Ok(view(list, mode, index, country))
+            Ok(view(list, mode, countryIndex, country))
           })
       }
   }
 
-  def onSubmit(mode: Mode, index: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, countryIndex: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      val incomplete = getIncompleteEuDetails(index)
+      val incomplete = getIncompleteEuDetails(countryIndex)
       if(incomplete.isEmpty) {
         Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
       } else {
         if(!incompletePromptShown) {
-          Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, index))
+          Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, countryIndex))
         } else{
-          Redirect(routes.EuCountryController.onPageLoad(mode, index))
+          Redirect(routes.EuCountryController.onPageLoad(mode, countryIndex))
         }
       }
   }
