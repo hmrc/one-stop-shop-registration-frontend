@@ -18,12 +18,12 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
-import models.euDetails.EuOptionalDetails
+import models.euDetails.{EUConsumerSalesMethod, EuOptionalDetails, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, RegistrationTypePage, SellsGoodsToEUConsumerMethodPage, SellsGoodsToEUConsumersPage, TaxRegisteredInEuPage, VatRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -38,25 +38,26 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new AddEuDetailsFormProvider()
   private val form = formProvider()
-  private val index = Index(0)
-  private val country               = Country.euCountries.head
+  private val countryIndex = Index(0)
+  private val country = Country.euCountries.head
 
   private lazy val addEuVatDetailsRoute = routes.AddEuDetailsController.onPageLoad(NormalMode).url
   private def addEuVatDetailsPostRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
   private val baseAnswers =
     basicUserAnswersWithVatInfo
-      .set(EuCountryPage(index), country).success.value
-      .set(VatRegisteredPage(index), false).success.value
-      .set(HasFixedEstablishmentPage(index), false).success.value
-      .set(EuSendGoodsPage(index), true).success.value
-      .set(EuTaxReferencePage(index), "123456").success.value
-      .set(EuSendGoodsTradingNamePage(index), "Some name").success.value
-      .set(EuSendGoodsAddressPage(index), arbitraryInternationalAddress.arbitrary.sample.value).success.value
+      .set(TaxRegisteredInEuPage, true).success.value
+      .set(EuCountryPage(countryIndex), country).success.value
+      .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
+      .set(EuTaxReferencePage(countryIndex), "12345678").success.value
+      .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+      .set(EuSendGoodsAddressPage(countryIndex), arbitraryInternationalAddress.arbitrary.sample.value).success.value
 
   private val incompleteAnswers =
     basicUserAnswersWithVatInfo
-      .set(EuCountryPage(index), country).success.value
-      .set(VatRegisteredPage(index), true).success.value
+      .set(EuCountryPage(countryIndex), country).success.value
+      .set(VatRegisteredPage(countryIndex), true).success.value
 
   "AddEuDetails Controller" - {
 
@@ -81,7 +82,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET when answers are complete and user is part of Vat Group" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-        .set(EuVatNumberPage(index), "12345").success.value
+        .set(EuVatNumberPage(countryIndex), "12345").success.value
       )).build()
 
       running(application) {
@@ -91,7 +92,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(index), "12345").success.value, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "12345").success.value, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -188,7 +189,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted and user is part of vat group" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-        .set(EuVatNumberPage(index), "12345").success.value
+        .set(EuVatNumberPage(countryIndex), "12345").success.value
       )).build()
 
       running(application) {
@@ -200,7 +201,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(index), "12345").success.value, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "12345").success.value, NormalMode)
 
         val result = route(application, request).value
 
@@ -281,7 +282,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url
+        redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex).url
       }
     }
   }

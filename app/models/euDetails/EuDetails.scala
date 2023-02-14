@@ -19,18 +19,19 @@ package models.euDetails
 import models.{Country, InternationalAddress}
 import play.api.libs.json.{Json, OFormat}
 
-case class EuDetails(//TODO - add new/remove redundant
-                         euCountry: Country,
-                         vatRegistered: Boolean,
-                         euVatNumber: Option[String],
-                         hasFixedEstablishment: Boolean,
-                         euTaxReference: Option[String],
-                         fixedEstablishmentTradingName: Option[String],
-                         fixedEstablishmentAddress: Option[InternationalAddress],
-                         euSendGoods: Option[Boolean],
-                         euSendGoodsTradingName: Option[String],
-                         euSendGoodsAddress: Option[InternationalAddress]
-                       )
+case class EuDetails(
+                      euCountry: Country,
+                      sellsGoodsToEUConsumers: Boolean,
+                      sellsGoodsToEUConsumerMethod: EUConsumerSalesMethod,
+                      registrationType: RegistrationType,
+                      vatRegistered: Boolean,
+                      euVatNumber: Option[String],
+                      euTaxReference: Option[String],
+                      fixedEstablishmentTradingName: Option[String],
+                      fixedEstablishmentAddress: Option[InternationalAddress],
+                      euSendGoodsTradingName: Option[String],
+                      euSendGoodsAddress: Option[InternationalAddress]
+                    )
 
 object EuDetails {
 

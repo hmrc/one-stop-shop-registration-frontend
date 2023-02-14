@@ -99,7 +99,6 @@ trait CompletionChecks {
   }
 
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
-
     request.userAnswers
       .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
       _.filter(scheme =>
