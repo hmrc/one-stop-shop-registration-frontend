@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         LocalDate.now,
         true,
-      "foo"
+        "foo",
+        Some(true)
     ))
     )
       .set(BusinessBasedInNiPage, true).success.value
@@ -102,7 +103,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         registrationDate = regDate,
         address = address,
         partOfVatGroup = true,
-        organisationName = "bar"
+        organisationName = "bar",
+        singleMarketIndicator = Some(true)
       )
 
       val userAnswers =
@@ -129,7 +131,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         registrationDate = regDate,
         address = address,
         partOfVatGroup = true,
-        organisationName = "bar"
+        organisationName = "bar",
+        singleMarketIndicator = Some(true)
       )
 
       val userAnswers =
@@ -183,7 +186,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         registrationDate = regDate,
         address = address,
         partOfVatGroup = true,
-        organisationName = "bar"
+        organisationName = "bar",
+        singleMarketIndicator = Some(true)
       )
 
       val userAnswers =
@@ -213,7 +217,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         registrationDate = regDate,
         address = address,
         partOfVatGroup = true,
-        organisationName = "bar"
+        organisationName = "bar",
+        singleMarketIndicator = Some(true)
       )
 
       val userAnswers =
@@ -564,7 +569,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           registrationDate = regDate,
           address = address,
           partOfVatGroup = true,
-          organisationName = "bar"
+          organisationName = "bar",
+          singleMarketIndicator = Some(true)
         )
 
         val userAnswers =

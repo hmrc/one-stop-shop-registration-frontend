@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package controllers.actions
 
-import models.requests.AuthenticatedIdentifierRequest
+import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Result
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeCheckNiProtocolFilter() extends CheckNiProtocolFilter {
 
-  override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
     Future.successful(None)
   }
 

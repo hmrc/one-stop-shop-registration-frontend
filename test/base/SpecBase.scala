@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,11 @@ trait SpecBase
 
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
-      registrationDate = LocalDate.now(stubClockAtArbitraryDate),
-      address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-      partOfVatGroup   = true,
-      organisationName = "Company name"
+      registrationDate      = LocalDate.now(stubClockAtArbitraryDate),
+      address               = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+      partOfVatGroup        = true,
+      organisationName      = "Company name",
+      singleMarketIndicator =  Some(true)
     )
 
   val verifyEmail: VerifyEmail = VerifyEmail(
