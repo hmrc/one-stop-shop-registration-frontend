@@ -19,7 +19,7 @@ package models.euDetails
 import models.{Country, InternationalAddress}
 import play.api.libs.json.{Json, OFormat}
 
-case class EuDetails(
+case class EuDetails(//TODO - add new/remove redundant
                          euCountry: Country,
                          vatRegistered: Boolean,
                          euVatNumber: Option[String],

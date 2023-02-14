@@ -321,6 +321,7 @@ GET         /check-eu-send-goods-address/:index                                 
 POST        /check-eu-send-goods-address/:index                                 controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+
 GET         /email-verification-codes-and-emails-exceeded                       controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
 
 GET         /email-verification-codes-exceeded                                  controllers.EmailVerificationCodesExceededController.onPageLoad()
@@ -346,7 +347,8 @@ POST        /sells-goods-to-eu-consumer-method/:countryIndex                    
 GET         /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
 POST        /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 
-GET         /no-fixed-establishments-required                                   controllers.euDetails.CannotAddCountryController.onPageLoad()
+GET         /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+POST        /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
 
 GET         /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)

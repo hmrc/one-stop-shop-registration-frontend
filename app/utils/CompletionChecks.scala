@@ -16,13 +16,13 @@
 
 package utils
 
-import models.{CheckMode, Country, Index, Mode, PreviousSchemeType}
-import models.euDetails.EuOptionalDetails
+import models._
+import models.euDetails._
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
 import pages._
 import pages.euDetails.TaxRegisteredInEuPage
-import pages.previousRegistrations.{PreviouslyRegisteredPage, PreviousSchemeTypePage}
+import pages.previousRegistrations._
 import play.api.mvc.{AnyContent, Result}
 import play.api.mvc.Results.Redirect
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites, EuOptionalDetailsQuery}
@@ -60,16 +60,7 @@ trait CompletionChecks {
     request.userAnswers
       .get(EuOptionalDetailsQuery(index))
       .find(details =>
-        (isPartOfVatGroup.contains(true) && details.euVatNumber.isEmpty) ||
-        (isPartOfVatGroup.contains(false) && (details.vatRegistered.isEmpty ||
-          details.hasFixedEstablishment.isEmpty ||
-          (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
-          (details.hasFixedEstablishment.contains(true) &&
-            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
-          (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
-          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
-            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))))
-      )
+        partOfVatGroup(isPartOfVatGroup, details) || notPartOfVatGroup(isPartOfVatGroup, details))
   }
 
   def getAllIncompleteEuDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[EuOptionalDetails] = {
@@ -77,17 +68,34 @@ trait CompletionChecks {
     request.userAnswers
       .get(AllEuOptionalDetailsQuery).map(
       _.filter(details =>
-        (isPartOfVatGroup.contains(true) && details.euVatNumber.isEmpty) ||
-          (isPartOfVatGroup.contains(false) && (details.vatRegistered.isEmpty ||
-          details.hasFixedEstablishment.isEmpty ||
-          (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty) ||
-          (details.hasFixedEstablishment.contains(true) &&
-            (details.fixedEstablishmentTradingName.isEmpty || details.fixedEstablishmentAddress.isEmpty)) ||
-            (details.hasFixedEstablishment.contains(false) && details.euSendGoods.isEmpty) ||
-          (details.euSendGoods.contains(true) && (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty ||
-            (details.euTaxReference.isEmpty && details.euVatNumber.isEmpty)))))
+        partOfVatGroup(isPartOfVatGroup, details) ||
+        notPartOfVatGroup(isPartOfVatGroup, details)
       )
     ).getOrElse(List.empty)
+  }
+
+  private def partOfVatGroup(isPartOfVatGroup: Option[Boolean], details: EuOptionalDetails): Boolean = {
+    isPartOfVatGroup.contains(true) && notSellingToEuConsumers(details) || sellsToEuConsumers(details)
+  }
+
+  private def notPartOfVatGroup(isPartOfVatGroup: Option[Boolean], details: EuOptionalDetails): Boolean = {
+    isPartOfVatGroup.contains(false) && notSellingToEuConsumers(details) || sellsToEuConsumers(details)
+  }
+
+  private def notSellingToEuConsumers(details: EuOptionalDetails): Boolean = {
+    details.sellsGoodsToEUConsumers.isEmpty ||
+      (details.sellsGoodsToEUConsumers.contains(false) && details.vatRegistered.isEmpty) ||
+      (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty)
+  }
+
+  private def sellsToEuConsumers(details: EuOptionalDetails): Boolean = {
+    (details.sellsGoodsToEUConsumers.contains(true) && details.sellsGoodsToEUConsumerMethod.isEmpty) ||
+      (details.sellsGoodsToEUConsumerMethod.contains(EUConsumerSalesMethod.DispatchWarehouse) && details.registrationType.isEmpty) ||
+      (details.registrationType.contains(RegistrationType.VatNumber) && details.euVatNumber.isEmpty) ||
+      (details.registrationType.contains(RegistrationType.TaxId) && details.euTaxReference.isEmpty) ||
+      (details.sellsGoodsToEUConsumerMethod.contains(EUConsumerSalesMethod.DispatchWarehouse) &&
+        (details.registrationType.contains(RegistrationType.TaxId) || details.registrationType.contains(RegistrationType.VatNumber)) &&
+        (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty))
   }
 
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
@@ -172,14 +180,14 @@ trait CompletionChecks {
 
   private def incompleteEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) =
     firstIndexedIncompleteEuDetails(getAllIncompleteEuDetails().map(
-    _.euCountry
-  )).map(
-    incompleteCountry =>
-      Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
-  )
+      _.euCountry
+    )).map(
+      incompleteCountry =>
+        Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+    )
 
-   def incompletePreviousRegistrationRedirect(mode: Mode)
-                                         (implicit request: AuthenticatedDataRequest[AnyContent]) =
+  def incompletePreviousRegistrationRedirect(mode: Mode)
+                                            (implicit request: AuthenticatedDataRequest[AnyContent]) =
     firstIndexedIncompleteDeregisteredCountry(getAllIncompleteDeregisteredDetails().map(_.previousEuCountry)) match {
       case Some(incompleteCountry) if incompleteCountry._1.previousSchemesDetails.isDefined =>
         incompleteCountry._1.previousSchemesDetails.getOrElse(List.empty).zipWithIndex.find(_._1.previousSchemeNumbers.isEmpty) match {
@@ -207,34 +215,33 @@ trait CompletionChecks {
           mode, Index(incompleteCountry._2), Index(incompleteCountry._2))))
 
       case None => None
-
     }
 
-  private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isTradingNamesValid) {
+  private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if (!isTradingNamesValid) {
     Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def incompleteEligibleSalesRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isAlreadyMadeSalesValid) {
+  private def incompleteEligibleSalesRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if (!isAlreadyMadeSalesValid) {
     Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def incompleteWebsiteUrlsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!hasWebsiteValid) {
+  private def incompleteWebsiteUrlsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if (!hasWebsiteValid) {
     Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def emptyEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isEuDetailsPopulated)  {
+  private def emptyEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if (!isEuDetailsPopulated) {
     Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def emptyDeregisteredRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if(!isDeregisteredPopulated)  {
+  private def emptyDeregisteredRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]) = if (!isDeregisteredPopulated) {
     Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)))
   } else {
     None
