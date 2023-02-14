@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.DeleteEuDetailsFormProvider
-import models.euDetails.EuDetails
+import models.euDetails.{EUConsumerSalesMethod, EuDetails, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
@@ -35,20 +35,26 @@ import scala.concurrent.Future
 
 class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val index = Index(0)
+  private val countryIndex = Index(0)
   private val country = Country.euCountries.head
-  private val euVatDetails = EuDetails(country, true, Some("12345678"), false, None, None, None, None, None, None)
-  private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, index).url
+  private val euVatDetails =
+    EuDetails(
+      country, sellsGoodsToEUConsumers = true, EUConsumerSalesMethod.DispatchWarehouse, RegistrationType.TaxId, vatRegistered = false, None, Some("12345678"), None, None, None, None)
+  private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
 
   private val formProvider = new DeleteEuDetailsFormProvider()
   private val form = formProvider(euVatDetails.euCountry.name)
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
-      .set(EuCountryPage(index), euVatDetails.euCountry).success.value
-      .set(VatRegisteredPage(index), true).success.value
-      .set(EuVatNumberPage(index), "VAT Number").success.value
-      .set(HasFixedEstablishmentPage(index), euVatDetails.hasFixedEstablishment).success.value
+      .set(TaxRegisteredInEuPage, true).success.value
+      .set(EuCountryPage(countryIndex), country).success.value
+      .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+      .set(EuVatNumberPage(countryIndex), "12345678").success.value
+      .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+      .set(EuSendGoodsAddressPage(countryIndex), arbitraryInternationalAddress.arbitrary.sample.value).success.value
 
   "DeleteEuVatDetails Controller" - {
 
@@ -64,7 +70,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[DeleteEuDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, euVatDetails.euCountry.name)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, countryIndex, euVatDetails.euCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -93,8 +99,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-
-    "must not delete a record and redirect to the next page when the user answers Yes" in {
+    "must not delete a record and redirect to the next page when the user answers No" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -134,7 +139,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, euVatDetails.euCountry.name)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, countryIndex, euVatDetails.euCountry.name)(request, messages(application)).toString
       }
     }
 

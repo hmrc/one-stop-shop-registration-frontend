@@ -54,23 +54,16 @@ trait CompletionChecks {
     }
   }
 
-  //TODO - Remove println
   def getIncompleteEuDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[EuOptionalDetails] = {
     val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
-    println("EuOptionalDetailsQuery: " + request.userAnswers.get(EuOptionalDetailsQuery(index))
-      .find(details => details.euVatNumber.isDefined))
     request.userAnswers
       .get(EuOptionalDetailsQuery(index))
       .find(details =>
         partOfVatGroup(isPartOfVatGroup, details) || notPartOfVatGroup(isPartOfVatGroup, details))
   }
 
-  //TODO - Remove println
   def getAllIncompleteEuDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[EuOptionalDetails] = {
     val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
-    println("AllEuOptionalDetailsQuery: " + request.userAnswers.get(AllEuOptionalDetailsQuery).map(_.filter(
-      details => details.euVatNumber.isDefined
-    )))
     request.userAnswers
       .get(AllEuOptionalDetailsQuery).map(
       _.filter(details =>

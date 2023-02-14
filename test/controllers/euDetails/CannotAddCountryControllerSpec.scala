@@ -17,31 +17,116 @@
 package controllers.euDetails
 
 import base.SpecBase
-import pages.euDetails.TaxRegisteredInEuPage
+import models.euDetails.{EUConsumerSalesMethod, RegistrationType}
+import models.{Country, Index, NormalMode}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.euDetails._
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.EuDetailsQuery
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.euDetails.CannotAddCountryView
 
+import scala.concurrent.Future
+
 class CannotAddCountryControllerSpec extends SpecBase {
+
+  private val countryIndex: Index = Index(0)
+  private val countryIndex1: Index = Index(1)
+  private val country = Country.euCountries.head
+
+  private lazy val cannotAddCountryRoute = routes.CannotAddCountryController.onSubmit(countryIndex).url
+
+  private val answers =
+    basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+      .set(TaxRegisteredInEuPage, true).success.value
+      .set(EuCountryPage(countryIndex), country).success.value
+      .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
 
   "CannotAddCountry Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
-
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CannotAddCountryController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.CannotAddCountryController.onPageLoad(countryIndex).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CannotAddCountryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(NormalMode, countryIndex)(request, messages(application)).toString
       }
     }
+
+    "must delete a record and redirect to the next page when the user submits" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, cannotAddCountryRoute)
+
+        val result = route(application, request).value
+        val expectedAnswers = answers.remove(EuDetailsQuery(countryIndex)).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(NormalMode).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must delete a record and redirect to the next page when the user submits and another record exists" in {
+
+      val answers =
+        basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+          .set(TaxRegisteredInEuPage, true).success.value
+            .set(EuCountryPage(countryIndex), country).success.value
+            .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+            .set(EuVatNumberPage(countryIndex), "ATU12345678").success.value
+            .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+            .set(EuSendGoodsAddressPage(countryIndex), arbitraryInternationalAddress.arbitrary.sample.value).success.value
+          .set(AddEuDetailsPage, true).success.value
+            .set(EuCountryPage(countryIndex1), country).success.value
+            .set(SellsGoodsToEUConsumersPage(countryIndex1), true).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex1), EUConsumerSalesMethod.FixedEstablishment).success.value
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, cannotAddCountryRoute)
+
+        val result = route(application, request).value
+        val expectedAnswers = answers.remove(EuDetailsQuery(countryIndex)).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.euDetails.routes.AddEuDetailsController.onPageLoad(NormalMode).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
   }
 }

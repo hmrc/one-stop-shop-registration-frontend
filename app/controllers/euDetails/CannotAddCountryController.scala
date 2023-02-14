@@ -17,10 +17,11 @@
 package controllers.euDetails
 
 import controllers.actions._
+import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.EuDetailsQuery
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.{DeriveNumberOfEuRegistrations, EuDetailsQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.CannotAddCountryView
 
@@ -48,8 +49,17 @@ class CannotAddCountryController @Inject()(
         updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuDetailsQuery(countryIndex)))
         _ <- cc.sessionRepository.set(updatedAnswers)
       } yield {
-        Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(mode).url)
+        determineRedirect(mode)
       }
+  }
+
+  private def determineRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Result = {
+    request.userAnswers.get(DeriveNumberOfEuRegistrations) match {
+      case Some(n) if n > 1 =>
+        Redirect(controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
+      case _ =>
+        Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(mode).url)
+    }
   }
 
 }
