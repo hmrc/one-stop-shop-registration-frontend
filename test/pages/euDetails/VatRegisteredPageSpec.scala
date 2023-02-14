@@ -99,29 +99,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and Has Fixed Establishment has not been answered" - {
+        "to Check EU Details Answers" in {
 
-          "to Has Fixed Establishment" in {
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
-            val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
-
-            VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index))
-          }
-        }
-
-        "and Has Fixed Establishment has been answered" - {
-
-          "to wherever Has Fixed Establishment navigates to" in {
-
-            val answers =
-              emptyUserAnswers
-                .set(VatRegisteredPage(index), false).success.value
-                .set(HasFixedEstablishmentPage(index), true).success.value
-
-            VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckMode, answers))
-          }
+          VatRegisteredPage(index).navigate(CheckMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index))
         }
       }
 
@@ -167,30 +150,13 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and Has Fixed Establishment has not been answered" - {
-
-          "to Has Fixed Establishment" in {
+          "to Check EU Details Answers" in {
 
             val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
             VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index))
+              .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index))
           }
-        }
-
-        "and Has Fixed Establishment has been answered" - {
-
-          "to wherever Has Fixed Establishment navigates to" in {
-
-            val answers =
-              emptyUserAnswers
-                .set(VatRegisteredPage(index), false).success.value
-                .set(HasFixedEstablishmentPage(index), true).success.value
-
-            VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers))
-          }
-        }
       }
 
       "when the answer is empty" - {

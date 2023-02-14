@@ -763,7 +763,7 @@ deletePreviousScheme.error.required = Select yes if you want to remove this sche
 
 sellsGoodsToEUConsumers.title = Does your business sell goods from {0} to consumers in the EU?
 sellsGoodsToEUConsumers.heading = Does your business sell goods from {0} to consumers in the EU?
-sellsGoodsToEUConsumers.checkYourAnswersLabel = sells goods to EU consumers
+sellsGoodsToEUConsumers.checkYourAnswersLabel = Sells goods to EU consumers
 sellsGoodsToEUConsumers.error.required = Select yes if your business sells goods from {0} to consumers in the EU
 sellsGoodsToEUConsumers.change.hidden = Sells goods to EU consumers
 

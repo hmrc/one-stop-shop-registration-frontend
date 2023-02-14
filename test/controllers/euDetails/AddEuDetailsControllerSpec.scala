@@ -113,7 +113,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true,
-          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None, None, None, None))
+          Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None, None, None, None, None))
         )(request, implicitly).toString
       }
     }

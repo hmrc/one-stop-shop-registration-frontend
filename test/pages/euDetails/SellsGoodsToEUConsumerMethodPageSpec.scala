@@ -44,7 +44,7 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
             .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
 
           SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
-            .mustEqual(routes.CannotAddCountryController.onPageLoad())
+            .mustEqual(routes.CannotAddCountryController.onPageLoad(countryIndex))
         }
 
         "to Registration Type when user answers Dispatch Warehouse" in {

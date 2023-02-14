@@ -17,24 +17,39 @@
 package controllers.euDetails
 
 import controllers.actions._
+import models.{Index, Mode}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.EuDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.CannotAddCountryView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class CannotAddCountryController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
-                                       view: CannotAddCountryView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                            override val messagesApi: MessagesApi,
+                                            cc: AuthenticatedControllerComponents,
+                                            view: CannotAddCountryView
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      //TODO cleanup method???
-      Ok(view())
+
+      Ok(view(mode, countryIndex))
   }
+
+  def onSubmit(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+    implicit request =>
+
+      for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuDetailsQuery(countryIndex)))
+        _ <- cc.sessionRepository.set(updatedAnswers)
+      } yield {
+        Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(mode).url)
+      }
+  }
+
 }
