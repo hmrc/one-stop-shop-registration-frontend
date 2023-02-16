@@ -17,13 +17,13 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{Index, Mode, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends QuestionPage[EUConsumerSalesMethod] {
+case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends QuestionPage[EuConsumerSalesMethod] {
 
   override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
 
@@ -31,13 +31,13 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
 
   override def navigate(mode: Mode, answers: UserAnswers): Call = {
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(this)) match {
-      case (true, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (true, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         euRoutes.CannotAddCountryController.onPageLoad(countryIndex)
-      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
-      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
-      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }

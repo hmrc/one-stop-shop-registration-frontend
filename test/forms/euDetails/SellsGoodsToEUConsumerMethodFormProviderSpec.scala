@@ -18,7 +18,7 @@ package forms.euDetails
 
 import forms.behaviours.OptionFieldBehaviours
 import models.Country
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.data.FormError
 
@@ -32,10 +32,10 @@ class SellsGoodsToEUConsumerMethodFormProviderSpec extends OptionFieldBehaviours
 
     val fieldName = "value"
 
-    behave like optionsField[EUConsumerSalesMethod](
+    behave like optionsField[EuConsumerSalesMethod](
       form,
       fieldName,
-      validValues = EUConsumerSalesMethod.values,
+      validValues = EuConsumerSalesMethod.values,
       invalidError = FormError(fieldName, "error.invalid", Seq(country.name))
 
     )

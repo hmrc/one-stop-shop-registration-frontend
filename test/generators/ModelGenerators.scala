@@ -20,7 +20,7 @@ import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
-import models.euDetails.{EUConsumerSalesMethod, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
@@ -37,9 +37,9 @@ trait ModelGenerators {
       Gen.oneOf(RegistrationType.values.toSeq)
     }
 
-  implicit lazy val arbitraryEUConsumerSalesMethod: Arbitrary[EUConsumerSalesMethod] =
+  implicit lazy val arbitraryEUConsumerSalesMethod: Arbitrary[EuConsumerSalesMethod] =
     Arbitrary {
-      Gen.oneOf(EUConsumerSalesMethod.values.toSeq)
+      Gen.oneOf(EuConsumerSalesMethod.values.toSeq)
     }
 
   implicit lazy val arbitraryPreviousScheme: Arbitrary[PreviousScheme] =

@@ -17,7 +17,7 @@
 package controllers.euDetails
 
 import base.SpecBase
-import models.euDetails.{EUConsumerSalesMethod, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -45,7 +45,7 @@ class CannotAddCountryControllerSpec extends SpecBase {
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(countryIndex), country).success.value
       .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
   "CannotAddCountry Controller" - {
 
@@ -96,7 +96,7 @@ class CannotAddCountryControllerSpec extends SpecBase {
           .set(TaxRegisteredInEuPage, true).success.value
             .set(EuCountryPage(countryIndex), country).success.value
             .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
             .set(EuVatNumberPage(countryIndex), "ATU12345678").success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
@@ -104,7 +104,7 @@ class CannotAddCountryControllerSpec extends SpecBase {
           .set(AddEuDetailsPage, true).success.value
             .set(EuCountryPage(countryIndex1), country).success.value
             .set(SellsGoodsToEUConsumersPage(countryIndex1), true).success.value
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex1), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex1), EuConsumerSalesMethod.FixedEstablishment).success.value
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 

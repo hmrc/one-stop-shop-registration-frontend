@@ -18,7 +18,7 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -32,28 +32,28 @@ case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] 
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
-      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
-      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex)
-      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
-      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
         }
-      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
           case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckMode, answers)
           case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex)
         }
-      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
@@ -63,17 +63,17 @@ case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] 
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
-      case (true, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
         }
-      case (false, Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
           case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
           case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
         }
-      case (false, Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) =>EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)

@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.DeleteEuDetailsFormProvider
-import models.euDetails.{EUConsumerSalesMethod, EuDetails, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
@@ -39,7 +39,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val country = Country.euCountries.head
   private val euVatDetails =
     EuDetails(
-      country, sellsGoodsToEUConsumers = true, EUConsumerSalesMethod.DispatchWarehouse, RegistrationType.TaxId, vatRegistered = false, None, Some("12345678"), None, None, None, None)
+      country, sellsGoodsToEUConsumers = true, EuConsumerSalesMethod.DispatchWarehouse, RegistrationType.TaxId, vatRegistered = false, None, Some("12345678"), None, None, None, None)
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
 
   private val formProvider = new DeleteEuDetailsFormProvider()
@@ -50,7 +50,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(countryIndex), country).success.value
       .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
       .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
       .set(EuVatNumberPage(countryIndex), "12345678").success.value
       .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value

@@ -24,35 +24,35 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class EUConsumerSalesMethodSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class EuConsumerSalesMethodSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
   "EUConsumerSalesMethod" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(EUConsumerSalesMethod.values.toSeq)
+      val gen = Gen.oneOf(EuConsumerSalesMethod.values.toSeq)
 
       forAll(gen) {
         euConsumerSalesMethod =>
 
-          JsString(euConsumerSalesMethod.toString).validate[EUConsumerSalesMethod].asOpt.value mustEqual euConsumerSalesMethod
+          JsString(euConsumerSalesMethod.toString).validate[EuConsumerSalesMethod].asOpt.value mustEqual euConsumerSalesMethod
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!EUConsumerSalesMethod.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!EuConsumerSalesMethod.values.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValue =>
 
-          JsString(invalidValue).validate[EUConsumerSalesMethod] mustEqual JsError("error.invalid")
+          JsString(invalidValue).validate[EuConsumerSalesMethod] mustEqual JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(EUConsumerSalesMethod.values.toSeq)
+      val gen = Gen.oneOf(EuConsumerSalesMethod.values.toSeq)
 
       forAll(gen) {
         euConsumerSalesMethod =>

@@ -54,7 +54,6 @@ trait CompletionChecks {
     }
   }
 
-
   def getIncompleteEuDetails(index: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[EuOptionalDetails] = {
     val isPartOfVatGroup = request.userAnswers.vatInfo.map(_.partOfVatGroup)
     request.userAnswers
@@ -90,10 +89,10 @@ trait CompletionChecks {
 
   private def sellsToEuConsumers(details: EuOptionalDetails): Boolean = {
     (details.sellsGoodsToEUConsumers.contains(true) && details.sellsGoodsToEUConsumerMethod.isEmpty) ||
-      (details.sellsGoodsToEUConsumerMethod.contains(EUConsumerSalesMethod.DispatchWarehouse) && details.registrationType.isEmpty) ||
+      (details.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.DispatchWarehouse) && details.registrationType.isEmpty) ||
       (details.registrationType.contains(RegistrationType.VatNumber) && details.euVatNumber.isEmpty) ||
       (details.registrationType.contains(RegistrationType.TaxId) && details.euTaxReference.isEmpty) ||
-      (details.sellsGoodsToEUConsumerMethod.contains(EUConsumerSalesMethod.DispatchWarehouse) &&
+      (details.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.DispatchWarehouse) &&
         (details.registrationType.contains(RegistrationType.TaxId) || details.registrationType.contains(RegistrationType.VatNumber)) &&
         (details.euSendGoodsTradingName.isEmpty || details.euSendGoodsAddress.isEmpty))
   }

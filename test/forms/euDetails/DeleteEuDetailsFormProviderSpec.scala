@@ -18,7 +18,7 @@ package forms.euDetails
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.Country
-import models.euDetails.{EUConsumerSalesMethod, EuDetails, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
 import play.api.data.FormError
 
 class DeleteEuDetailsFormProviderSpec extends BooleanFieldBehaviours {
@@ -29,7 +29,7 @@ class DeleteEuDetailsFormProviderSpec extends BooleanFieldBehaviours {
   private val country = Country.euCountries.head
   private val euVatDetails =
     EuDetails(
-      country, sellsGoodsToEUConsumers = true, EUConsumerSalesMethod.DispatchWarehouse, RegistrationType.TaxId, vatRegistered = false, None, Some("12345678"), None, None, None, None)
+      country, sellsGoodsToEUConsumers = true, EuConsumerSalesMethod.DispatchWarehouse, RegistrationType.TaxId, vatRegistered = false, None, Some("12345678"), None, None, None, None)
   val form = new DeleteEuDetailsFormProvider()(euVatDetails.euCountry.name)
 
   ".value" - {
