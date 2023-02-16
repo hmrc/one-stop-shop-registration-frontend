@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.RegistrationTypeFormProvider
-import models.euDetails.{EUConsumerSalesMethod, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -45,7 +45,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
   private val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(countryIndex), country).success.value
     .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-    .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+    .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
   "RegistrationType Controller" - {
 

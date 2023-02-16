@@ -55,15 +55,9 @@ object RegistrationData extends Generators with EitherValues {
             Country("FR", "France")
           ))
         ),
-        RegistrationWithFixedEstablishment(
-          Country("ES", "Spain"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, "ES123456789"),
-          TradeDetails("Spanish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain")))
-        ),
-        RegistrationWithFixedEstablishment(
+        EuVatRegistration(
           Country("DE", "Germany"),
-          EuTaxIdentifier(EuTaxIdentifierType.Other, "DE123456789"),
-          TradeDetails("German trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany")))
+          vatNumber = "DE123456789"
         ),
         RegistrationWithoutFixedEstablishmentWithTradeDetails(
           Country("IE", "Ireland"),
@@ -82,10 +76,16 @@ object RegistrationData extends Generators with EitherValues {
         RegistrationWithoutTaxId(
           Country("CR", "Croatia")
         ),
-        RegistrationWithoutFixedEstablishment(
-          Country("PL", "Poland"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, "PL123456789")
-        )
+        RegistrationWithFixedEstablishment(
+          Country("ES", "Spain"),
+          EuTaxIdentifier(EuTaxIdentifierType.Vat, "ES123456789"),
+          TradeDetails("Spanish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain")))
+        ),
+        RegistrationWithFixedEstablishment(
+          Country("DK", "Denmark"),
+          EuTaxIdentifier(EuTaxIdentifierType.Other, "DK123456789"),
+          TradeDetails("Danish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark")))
+        ),
       ),
       contactDetails = createBusinessContactDetails(),
       websites = Seq("website1", "website2"),

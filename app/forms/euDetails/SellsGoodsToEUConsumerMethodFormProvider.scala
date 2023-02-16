@@ -18,15 +18,15 @@ package forms.euDetails
 
 import forms.mappings.Mappings
 import models.Country
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class SellsGoodsToEUConsumerMethodFormProvider @Inject() extends Mappings {
 
-  def apply(country: Country): Form[EUConsumerSalesMethod] =
+  def apply(country: Country): Form[EuConsumerSalesMethod] =
     Form(
-      "value" -> enumerable[EUConsumerSalesMethod]("sellsGoodsToEUConsumerMethod.error.required", args = Seq(country.name))
+      "value" -> enumerable[EuConsumerSalesMethod]("sellsGoodsToEUConsumerMethod.error.required", args = Seq(country.name))
     )
 }

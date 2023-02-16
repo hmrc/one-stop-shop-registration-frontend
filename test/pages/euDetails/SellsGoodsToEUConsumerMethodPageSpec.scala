@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.routes
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -28,11 +28,11 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
 
   "SellsGoodsToEUConsumerMethodPage" - {
 
-    beRetrievable[EUConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
+    beRetrievable[EuConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
 
-    beSettable[EUConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
+    beSettable[EuConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
 
-    beRemovable[EUConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
+    beRemovable[EuConsumerSalesMethod](SellsGoodsToEUConsumerMethodPage(countryIndex))
 
     "must navigate" - {
 
@@ -41,7 +41,7 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
         "to Cannot Add Country when user answers Fixed Establishment" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
           SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
             .mustEqual(routes.CannotAddCountryController.onPageLoad(countryIndex))
@@ -50,7 +50,7 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
         "to Registration Type when user answers Dispatch Warehouse" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
             .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
@@ -62,7 +62,7 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
         "to Registration Type when user answers Fixed Establishment" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
             .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
@@ -72,7 +72,7 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
       "to Registration Type when user answers Dispatch Warehouse" in {
 
         val answers = emptyUserAnswers
-          .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+          .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
         SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
           .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))

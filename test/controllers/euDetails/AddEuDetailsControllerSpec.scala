@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
-import models.euDetails.{EUConsumerSalesMethod, EuOptionalDetails, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -48,7 +48,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(countryIndex), country).success.value
       .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
       .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
       .set(EuTaxReferencePage(countryIndex), "12345678").success.value
       .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value

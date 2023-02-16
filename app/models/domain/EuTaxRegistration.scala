@@ -26,7 +26,6 @@ object EuTaxRegistration {
   implicit val reads: Reads[EuTaxRegistration] =
     RegistrationWithFixedEstablishment.format.widen[EuTaxRegistration] orElse
     RegistrationWithoutFixedEstablishmentWithTradeDetails.format.widen[EuTaxRegistration] orElse
-      RegistrationWithoutFixedEstablishment.format.widen[EuTaxRegistration] orElse
       EuVatRegistration.format.widen[EuTaxRegistration] orElse
       RegistrationWithoutTaxId.format.widen[EuTaxRegistration]
 
@@ -35,7 +34,6 @@ object EuTaxRegistration {
     case v: EuVatRegistration                     => Json.toJson(v)(EuVatRegistration.format)
     case fe: RegistrationWithFixedEstablishment   => Json.toJson(fe)(RegistrationWithFixedEstablishment.format)
     case fe: RegistrationWithoutFixedEstablishmentWithTradeDetails   => Json.toJson(fe)(RegistrationWithoutFixedEstablishmentWithTradeDetails.format)
-    case fe: RegistrationWithoutFixedEstablishment   => Json.toJson(fe)(RegistrationWithoutFixedEstablishment.format)
     case w: RegistrationWithoutTaxId => Json.toJson(w)(RegistrationWithoutTaxId.format)
   }
 }
@@ -72,18 +70,6 @@ object RegistrationWithoutFixedEstablishmentWithTradeDetails {
 
   implicit val format: OFormat[RegistrationWithoutFixedEstablishmentWithTradeDetails] =
     Json.format[RegistrationWithoutFixedEstablishmentWithTradeDetails]
-}
-
-
-final case class RegistrationWithoutFixedEstablishment(
-                                           country: Country,
-                                           taxIdentifier: EuTaxIdentifier
-                                         ) extends EuTaxRegistration
-
-object RegistrationWithoutFixedEstablishment {
-
-  implicit val format: OFormat[RegistrationWithoutFixedEstablishment] =
-    Json.format[RegistrationWithoutFixedEstablishment]
 }
 
 final case class RegistrationWithoutTaxId(country: Country) extends EuTaxRegistration

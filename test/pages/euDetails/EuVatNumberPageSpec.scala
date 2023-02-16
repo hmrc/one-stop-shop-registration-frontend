@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
@@ -58,7 +58,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
             EuVatNumberPage(countryIndex).navigate(NormalMode, answers)
               .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex))
@@ -68,7 +68,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
             EuVatNumberPage(countryIndex).navigate(NormalMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex))
@@ -99,7 +99,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
             EuVatNumberPage(countryIndex).navigate(NormalMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex))
@@ -133,7 +133,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
               .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -143,7 +143,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
               .set(FixedEstablishmentTradingNamePage(countryIndex), "Foo").success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
@@ -154,7 +154,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -164,7 +164,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
               .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
@@ -196,7 +196,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -206,7 +206,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
               .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
@@ -242,7 +242,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
               .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, countryIndex))
@@ -252,7 +252,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
               .set(FixedEstablishmentTradingNamePage(countryIndex), "Foo").success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
@@ -263,7 +263,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex))
@@ -273,7 +273,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
               .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
@@ -305,7 +305,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex))
@@ -315,7 +315,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
               .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
 
             EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)

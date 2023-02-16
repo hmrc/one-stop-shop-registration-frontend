@@ -22,7 +22,7 @@ import play.api.libs.json.{Json, OFormat}
 case class EuDetails(
                       euCountry: Country,
                       sellsGoodsToEUConsumers: Boolean,
-                      sellsGoodsToEUConsumerMethod: EUConsumerSalesMethod,
+                      sellsGoodsToEUConsumerMethod: EuConsumerSalesMethod,
                       registrationType: RegistrationType,
                       vatRegistered: Boolean,
                       euVatNumber: Option[String],

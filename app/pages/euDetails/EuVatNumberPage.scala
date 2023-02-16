@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -33,13 +33,13 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
     (answers.vatInfo.exists(_.partOfVatGroup),
       answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
       answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
-      case (true, Some(true), Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
       case (_, Some(false), _) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex)
-      case (false, Some(true), Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex)
-      case (false, Some(true), Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
@@ -49,17 +49,17 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
     (answers.vatInfo.exists(_.partOfVatGroup),
       answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
       answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
-      case (true, Some(true), Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
         }
-      case (false, Some(true), Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
           case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckMode, answers)
           case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex)
         }
-      case (false, Some(true), Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
@@ -74,17 +74,17 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
     (answers.vatInfo.exists(_.partOfVatGroup),
       answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
       answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
-      case (true, Some(true), Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
         }
-      case (false, Some(true), Some(EUConsumerSalesMethod.FixedEstablishment)) =>
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
           case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
           case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
         }
-      case (false, Some(true), Some(EUConsumerSalesMethod.DispatchWarehouse)) =>
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)

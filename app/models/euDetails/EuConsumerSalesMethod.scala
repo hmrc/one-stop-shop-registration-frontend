@@ -21,14 +21,14 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed trait EUConsumerSalesMethod
+sealed trait EuConsumerSalesMethod
 
-object EUConsumerSalesMethod extends Enumerable.Implicits {
+object EuConsumerSalesMethod extends Enumerable.Implicits {
 
-  case object FixedEstablishment extends WithName("fixedEstablishment") with EUConsumerSalesMethod
-  case object DispatchWarehouse extends WithName("dispatchWarehouse") with EUConsumerSalesMethod
+  case object FixedEstablishment extends WithName("fixedEstablishment") with EuConsumerSalesMethod
+  case object DispatchWarehouse extends WithName("dispatchWarehouse") with EuConsumerSalesMethod
 
-  val values: Seq[EUConsumerSalesMethod] = Seq(
+  val values: Seq[EuConsumerSalesMethod] = Seq(
     FixedEstablishment, DispatchWarehouse
   )
 
@@ -41,6 +41,6 @@ object EUConsumerSalesMethod extends Enumerable.Implicits {
       )
   }
 
-  implicit val enumerable: Enumerable[EUConsumerSalesMethod] =
+  implicit val enumerable: Enumerable[EuConsumerSalesMethod] =
     Enumerable(values.map(v => v.toString -> v): _*)
 }

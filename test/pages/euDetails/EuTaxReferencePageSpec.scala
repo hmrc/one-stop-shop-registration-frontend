@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -41,7 +41,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
           EuTaxReferencePage(countryIndex).navigate(NormalMode, answers)
             .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex))
@@ -50,7 +50,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           EuTaxReferencePage(countryIndex).navigate(NormalMode, answers)
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex))
@@ -63,7 +63,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           EuTaxReferencePage(countryIndex).navigate(NormalMode, answers)
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex))
@@ -78,7 +78,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
             .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -87,7 +87,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to wherever Fixed Establishment Trading Name navigates when Sells Goods To EU Consumer Method is Fixed Establishment and it has been answered" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
             .set(FixedEstablishmentTradingNamePage(countryIndex), "foo").success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
@@ -97,7 +97,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -105,7 +105,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
         "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
@@ -118,7 +118,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -127,7 +127,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
@@ -146,7 +146,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
             .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, countryIndex))
@@ -155,7 +155,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to wherever Fixed Establishment Trading Name navigates when Sells Goods To EU Consumer Method is Fixed Establishment and it has been answered" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
             .set(FixedEstablishmentTradingNamePage(countryIndex), "foo").success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
@@ -165,7 +165,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
 
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex))
@@ -173,7 +173,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
         "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
           val answers = emptyUserAnswers
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
@@ -186,7 +186,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
@@ -195,7 +195,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
 
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
 
           EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)

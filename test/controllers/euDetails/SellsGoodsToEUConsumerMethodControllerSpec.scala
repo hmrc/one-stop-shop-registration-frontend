@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.SellsGoodsToEUConsumerMethodFormProvider
-import models.euDetails.EUConsumerSalesMethod
+import models.euDetails.EuConsumerSalesMethod
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -66,7 +66,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.FixedEstablishment).success.value
+      val userAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -78,7 +78,7 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(EUConsumerSalesMethod.FixedEstablishment), NormalMode, countryIndex, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(EuConsumerSalesMethod.FixedEstablishment), NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -96,10 +96,10 @@ class SellsGoodsToEUConsumerMethodControllerSpec extends SpecBase with MockitoSu
       running(application) {
         val request =
           FakeRequest(POST, sellsGoodsToEUConsumerMethodRoute)
-            .withFormUrlEncodedBody(("value", EUConsumerSalesMethod.values.head.toString))
+            .withFormUrlEncodedBody(("value", EuConsumerSalesMethod.values.head.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EUConsumerSalesMethod.values.head).success.value
+        val expectedAnswers = answers.set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, expectedAnswers).url

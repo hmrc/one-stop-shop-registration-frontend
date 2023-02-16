@@ -21,41 +21,42 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import models._
 import models.domain._
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage}
-import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
 import queries.previousRegistration.AllPreviousRegistrationsRawQuery
+import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
 import java.time.{Clock, LocalDate, ZoneId}
 
 class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  private val iban  = RegistrationData.iban
-  private val bic   = RegistrationData.bic
+  private val iban = RegistrationData.iban
+  private val bic = RegistrationData.bic
 
   private def getStubClock(date: LocalDate) =
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
 
   private def getDateService(date: LocalDate) = new DateService(getStubClock(date))
-  
+
   private def getRegistrationService(today: LocalDate) =
     new RegistrationService(getDateService(today))
 
   private val hasTradingNamePage = HasTradingNamePage
 
-  private val answers =
+  private val answersPartOfVatGroup =
     UserAnswers("id",
       vatInfo = Some(VatCustomerInfo(
         DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         LocalDate.now,
-        false,
-      "foo"
-    ))
+        partOfVatGroup = true,
+        "foo"
+      ))
     )
       .set(BusinessBasedInNiPage, true).success.value
       .set(DateOfFirstSalePage, arbitraryDate).success.value
@@ -63,40 +64,26 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(AllTradingNames, List("single", "double")).success.value
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-      .set(VatRegisteredPage(Index(0)), true).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(Index(0)), EuConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(RegistrationTypePage(Index(0)), RegistrationType.VatNumber).success.value
       .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-      .set(HasFixedEstablishmentPage(Index(0)), false).success.value
-      .set(pages.euDetails.EuSendGoodsPage(Index(0)), true).success.value
       .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
       .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
-      .set(EuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+      .set(EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(1)), false).success.value
       .set(VatRegisteredPage(Index(1)), true).success.value
-      .set(EuVatNumberPage(Index(1)), "ES123456789").success.value
-      .set(HasFixedEstablishmentPage(Index(1)), true).success.value
-      .set(FixedEstablishmentTradingNamePage(Index(1)), "Spanish trading name").success.value
-      .set(FixedEstablishmentAddressPage(Index(1)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
-      .set(EuCountryPage(Index(2)), Country("DE", "Germany")).success.value
-      .set(VatRegisteredPage(Index(2)), false).success.value
-      .set(HasFixedEstablishmentPage(Index(2)), true).success.value
-      .set(EuTaxReferencePage(Index(2)), "DE123456789").success.value
-      .set(FixedEstablishmentTradingNamePage(Index(2)), "German trading name").success.value
-      .set(FixedEstablishmentAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany"))).success.value
-      .set(EuCountryPage(Index(3)), Country("IE", "Ireland")).success.value
+      .set(EuVatNumberPage(Index(1)), "DE123456789").success.value
+      .set(EuCountryPage(Index(2)), Country("IE", "Ireland")).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(2)), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(Index(2)), EuConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(RegistrationTypePage(Index(2)), RegistrationType.TaxId).success.value
+      .set(EuTaxReferencePage(Index(2)), "IE123456789").success.value
+      .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
+      .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
+      .set(EuCountryPage(Index(3)), Country("CR", "Croatia")).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
-      .set(EuTaxReferencePage(Index(3)), "IE123456789").success.value
-      .set(HasFixedEstablishmentPage(Index(3)), false).success.value
-      .set(pages.euDetails.EuSendGoodsPage(Index(3)), true).success.value
-      .set(EuSendGoodsTradingNamePage(Index(3)), "Irish trading name").success.value
-      .set(EuSendGoodsAddressPage(Index(3)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
-      .set(EuCountryPage(Index(4)), Country("CR", "Croatia")).success.value
-      .set(VatRegisteredPage(Index(4)), false).success.value
-      .set(HasFixedEstablishmentPage(Index(4)), false).success.value
-      .set(pages.euDetails.EuSendGoodsPage(Index(4)), false).success.value
-      .set(EuCountryPage(Index(5)), Country("PL", "Poland")).success.value
-      .set(VatRegisteredPage(Index(5)), true).success.value
-      .set(EuVatNumberPage(Index(5)), "PL123456789").success.value
-      .set(HasFixedEstablishmentPage(Index(5)), false).success.value
-      .set(pages.euDetails.EuSendGoodsPage(Index(5)), false).success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
@@ -109,6 +96,31 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
       .set(BusinessBasedInNiPage, true).success.value
+
+  private val answersNotPartOfVatGroup =
+    answersPartOfVatGroup.copy(vatInfo =
+      Some(VatCustomerInfo(
+        DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+        LocalDate.now,
+        partOfVatGroup = false,
+        "foo")
+      )
+    )
+      .set(EuCountryPage(Index(4)), Country("ES", "Spain")).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(4)), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(Index(4)), EuConsumerSalesMethod.FixedEstablishment).success.value
+      .set(RegistrationTypePage(Index(4)), RegistrationType.VatNumber).success.value
+      .set(EuVatNumberPage(Index(4)), "ES123456789").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(4)), "Spanish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
+      .set(EuCountryPage(Index(5)), Country("DK", "Denmark")).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(5)), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(Index(5)), EuConsumerSalesMethod.FixedEstablishment).success.value
+      .set(RegistrationTypePage(Index(5)), RegistrationType.TaxId).success.value
+      .set(EuTaxReferencePage(Index(5)), "DK123456789").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(5)), "Danish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(5)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
+
 
   "fromUserAnswers" - {
 
@@ -124,16 +136,16 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       )
 
       val userAnswers =
-        answers.copy(vatInfo = Some(vatInfo))
+        answersNotPartOfVatGroup.copy(vatInfo = Some(vatInfo))
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
       val expectedRegistration =
         RegistrationData.registration.copy(
-          dateOfFirstSale       = Some(arbitraryDate),
-          vatDetails            = VatDetails(regDate, address, false, VatDetailSource.Etmp),
+          dateOfFirstSale = Some(arbitraryDate),
+          vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
         )
 
       registration mustEqual Valid(expectedRegistration)
@@ -151,17 +163,17 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       )
 
       val userAnswers =
-        answers.copy(vatInfo = Some(vatInfo))
+        answersNotPartOfVatGroup.copy(vatInfo = Some(vatInfo))
           .set(PreviouslyRegisteredPage, false).success.value
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
       val expectedRegistration =
         RegistrationData.registration.copy(
-          dateOfFirstSale       = Some(arbitraryDate),
-          vatDetails            = VatDetails(regDate, address, false, VatDetailSource.Etmp),
+          dateOfFirstSale = Some(arbitraryDate),
+          vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
           previousRegistrations = Seq.empty
         )
 
@@ -171,7 +183,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
     "must return a Registration when no trading names, EU countries or websites were provided" in {
 
       val userAnswers =
-        answers
+        answersNotPartOfVatGroup
           .set(hasTradingNamePage, false).success.value
           .remove(AllTradingNames).success.value
           .set(TaxRegisteredInEuPage, false).success.value
@@ -181,11 +193,11 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       val expectedRegistration =
         RegistrationData.registration copy(
-          dateOfFirstSale  = Some(arbitraryDate),
-          tradingNames     = Seq.empty,
-          euRegistrations  = Seq.empty,
-          vatDetails       = RegistrationData.registration.vatDetails,
-          websites         = Seq.empty,
+          dateOfFirstSale = Some(arbitraryDate),
+          tradingNames = Seq.empty,
+          euRegistrations = Seq.empty,
+          vatDetails = RegistrationData.registration.vatDetails,
+          websites = Seq.empty,
           commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
         )
 
@@ -205,7 +217,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       )
 
       val userAnswers =
-        answers.copy(vatInfo = Some(vatInfo))
+        answersNotPartOfVatGroup.copy(vatInfo = Some(vatInfo))
           .set(BusinessBasedInNiPage, false).success.value
           .set(HasFixedEstablishmentInNiPage, true).success.value
 
@@ -213,10 +225,10 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       val expectedRegistration =
         RegistrationData.registration.copy(
-          dateOfFirstSale       = Some(arbitraryDate),
-          vatDetails            = VatDetails(regDate, address, false, VatDetailSource.Etmp),
+          dateOfFirstSale = Some(arbitraryDate),
+          vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
           niPresence = Some(FixedEstablishmentInNi)
         )
 
@@ -235,7 +247,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       )
 
       val userAnswers =
-        answers.copy(vatInfo = Some(vatInfo))
+        answersNotPartOfVatGroup.copy(vatInfo = Some(vatInfo))
           .set(BusinessBasedInNiPage, false).success.value
           .set(HasFixedEstablishmentInNiPage, false).success.value
           .set(SalesChannelsPage, SalesChannels.OnlineMarketplaces).success.value
@@ -244,10 +256,10 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       val expectedRegistration =
         RegistrationData.registration.copy(
-          dateOfFirstSale       = Some(arbitraryDate),
-          vatDetails            = VatDetails(regDate, address, false, VatDetailSource.Etmp),
+          dateOfFirstSale = Some(arbitraryDate),
+          vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate      = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
           niPresence = Some(NoPresence(SalesChannels.OnlineMarketplaces))
         )
 
@@ -263,6 +275,8 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           .set(AllTradingNames, List("single", "double")).success.value
           .set(TaxRegisteredInEuPage, true).success.value
           .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+          .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
+          .set(VatRegisteredPage(Index(0)), true).success.value
           .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
           .set(
             BusinessContactDetailsPage,
@@ -292,7 +306,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           )
         )
       }
-        result mustEqual Valid(expectedRegistration)
+      result mustEqual Valid(expectedRegistration)
 
     }
 
@@ -300,13 +314,13 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Business Based in NI is missing" in {
 
-        val userAnswers = answers.remove(BusinessBasedInNiPage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(BusinessBasedInNiPage).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy (
-            dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails,
-            niPresence       = None,
+          RegistrationData.registration copy(
+            dateOfFirstSale = Some(arbitraryDate),
+            vatDetails = RegistrationData.registration.vatDetails,
+            niPresence = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 
@@ -318,15 +332,15 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       "when Business Based in NI is false and Has Fixed Establishment in NI is missing" in {
 
         val userAnswers =
-          answers
+          answersNotPartOfVatGroup
             .set(BusinessBasedInNiPage, false).success.value
             .remove(HasFixedEstablishmentInNiPage).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy (
-            dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails,
-            niPresence       = None,
+          RegistrationData.registration copy(
+            dateOfFirstSale = Some(arbitraryDate),
+            vatDetails = RegistrationData.registration.vatDetails,
+            niPresence = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 
@@ -338,16 +352,16 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       "when Has Fixed Establishment in NI is false and Sales Channels is missing" in {
 
         val userAnswers =
-          answers
+          answersNotPartOfVatGroup
             .set(BusinessBasedInNiPage, false).success.value
             .set(HasFixedEstablishmentInNiPage, false).success.value
             .remove(SalesChannelsPage).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy (
-            dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails,
-            niPresence       = None,
+          RegistrationData.registration copy(
+            dateOfFirstSale = Some(arbitraryDate),
+            vatDetails = RegistrationData.registration.vatDetails,
+            niPresence = None,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 
@@ -358,12 +372,12 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Date Of First Sale is missing and Is Planning First Eligible Sale is true" in {
 
-        val userAnswers = answers
+        val userAnswers = answersNotPartOfVatGroup
           .remove(DateOfFirstSalePage).success.value
           .set(IsPlanningFirstEligibleSalePage, true).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy (
+          RegistrationData.registration copy(
             vatDetails = RegistrationData.registration.vatDetails,
             dateOfFirstSale = None
           )
@@ -378,7 +392,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Vat Customer Info is missing" in {
 
-        val userAnswers = answers.copy(vatInfo = None)
+        val userAnswers = answersNotPartOfVatGroup.copy(vatInfo = None)
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(CheckVatDetailsPage), DataMissingError(CheckVatDetailsPage)))
@@ -386,7 +400,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Has Trading Name is missing" in {
 
-        val userAnswers = answers.remove(hasTradingNamePage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(hasTradingNamePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result.isInvalid mustBe true
@@ -394,16 +408,15 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Has Trading Name is true, but there are no trading names" in {
 
-        val userAnswers = answers.remove(AllTradingNames).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(AllTradingNames).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllTradingNames)))
       }
 
-
       "when both Date of First Sale and Is Planning First Eligible Sale are missing" in {
 
-        val userAnswers = answers
+        val userAnswers = answersNotPartOfVatGroup
           .remove(DateOfFirstSalePage).success.value
           .remove(IsPlanningFirstEligibleSalePage).success.value
 
@@ -414,7 +427,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Contact Details are missing" in {
 
-        val userAnswers = answers.remove(BusinessContactDetailsPage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(BusinessContactDetailsPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BusinessContactDetailsPage)))
@@ -422,7 +435,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Bank Details are missing" in {
 
-        val userAnswers = answers.remove(BankDetailsPage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(BankDetailsPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BankDetailsPage)))
@@ -430,7 +443,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Has Website is missing" in {
 
-        val userAnswers = answers.remove(HasWebsitePage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(HasWebsitePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
@@ -439,7 +452,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       "when Has Website is true, but there are no websites" in {
 
         val userAnswers =
-          answers
+          answersNotPartOfVatGroup
             .set(HasWebsitePage, true).success.value
             .remove(AllWebsites).success.value
 
@@ -450,7 +463,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Is Online Marketplace is missing" in {
 
-        val userAnswers = answers.remove(IsOnlineMarketplacePage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(IsOnlineMarketplacePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(IsOnlineMarketplacePage)))
@@ -458,7 +471,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Previously Registered has not been answered" in {
 
-        val userAnswers = answers.remove(PreviouslyRegisteredPage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(PreviouslyRegisteredPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviouslyRegisteredPage)))
@@ -469,7 +482,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         "but there are no previous registrations" in {
 
           val userAnswers =
-            answers
+            answersNotPartOfVatGroup
               .set(PreviouslyRegisteredPage, true).success.value
               .remove(AllPreviousRegistrationsRawQuery).success.value
 
@@ -480,7 +493,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "but there is a previous registration without a country" in {
 
-          val userAnswers = answers.remove(PreviousEuCountryPage(Index(0))).success.value
+          val userAnswers = answersNotPartOfVatGroup.remove(PreviousEuCountryPage(Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousEuCountryPage(Index(0)))))
@@ -488,7 +501,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "but there is a previous registration without a VAT number" in {
 
-          val userAnswers = answers.remove(PreviousOssNumberPage(Index(0), Index(0))).success.value
+          val userAnswers = answersNotPartOfVatGroup.remove(PreviousOssNumberPage(Index(0), Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviousOssNumberPage(Index(0), Index(0)))))
@@ -497,7 +510,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
       "when Tax Registered in EU is missing" in {
 
-        val userAnswers = answers.remove(TaxRegisteredInEuPage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(TaxRegisteredInEuPage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(TaxRegisteredInEuPage)))
@@ -508,7 +521,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         "and there are no EU country details" in {
 
           val userAnswers =
-            answers
+            answersNotPartOfVatGroup
               .set(TaxRegisteredInEuPage, true).success.value
               .remove(AllEuDetailsRawQuery).success.value
 
@@ -519,7 +532,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "and there is a record with no country" in {
 
-          val userAnswers = answers.remove(EuCountryPage(Index(0))).success.value
+          val userAnswers = answersNotPartOfVatGroup.remove(EuCountryPage(Index(0))).success.value
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
           result mustEqual Invalid(NonEmptyChain(DataMissingError(EuCountryPage(Index(0)))))
@@ -527,204 +540,290 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "and there is a record with a country" - {
 
-          "with Vat Number missing when a user is part of vat group" in {
-            val userAnswers =
-              UserAnswers("id", vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-                .set(BusinessBasedInNiPage, true).success.value
-                .set(DateOfFirstSalePage, arbitraryDate).success.value
-                .set(hasTradingNamePage, true).success.value
-                .set(AllTradingNames, List("single", "double")).success.value
-                .set(TaxRegisteredInEuPage, true).success.value
-                .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-                .set(
-                  BusinessContactDetailsPage,
-                  BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-                .set(HasWebsitePage, true).success.value
-                .set(AllWebsites, List("website1", "website2")).success.value
-                .set(PreviouslyRegisteredPage, false).success.value
-                .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
-                .set(IsOnlineMarketplacePage, false).success.value
-                .set(BusinessBasedInNiPage, true).success.value
+          "when Part of VAT group is true" - {
 
-            val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+            "when Sells Goods To EU Consumers is true" - {
 
-            result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(0)))))
-          }
+              "when Sells Goods To EU Consumer Method is DispatchWarehouse" - {
 
-          "where Vat Registered is missing" in {
+                "when Registration Type is Vat Number" - {
 
-            val userAnswers = answers.remove(VatRegisteredPage(Index(2))).success.value
-            val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+                  "and Vat Number is missing" in {
 
-            result mustEqual Invalid(NonEmptyChain(DataMissingError(VatRegisteredPage(Index(2)))))
-          }
-
-          "without a VAT registration" - {
-
-            "which does not have an answer for Has Fixed Establishment" in {
-
-              val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(2))).success.value
-              val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-              result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentPage(Index(2)))))
-            }
-
-            "and Has Fixed Establishment is true" - {
-
-              "and it does not have an EU Tax identifier" in {
-
-                val userAnswers = answers.remove(EuTaxReferencePage(Index(2))).success.value
-                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(2)))))
-              }
-
-              "and it does not have a fixed establishment trading name" in {
-
-                val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(2))).success.value
-                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(2)))))
-              }
-
-              "and it does not have a fixed establishment address" in {
-
-                val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(2))).success.value
-                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(2)))))
-              }
-            }
-
-            "and Has Fixed Establishment is false" - {
-
-              "and Sends Goods is missing" in {
-
-                val userAnswers = answers.remove(EuSendGoodsPage(Index(3))).success.value
-                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsPage(Index(3)))))
-              }
-
-              "and Send Goods is true" - {
-
-                "and it does not have a trading name" in {
-
-                  val userAnswers = answers.remove(EuSendGoodsTradingNamePage(Index(3))).success.value
-                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsTradingNamePage(Index(3)))))
-                }
-
-                "and it does not have an address" in {
-
-                  val userAnswers = answers.remove(EuSendGoodsAddressPage(Index(3))).success.value
-                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsAddressPage(Index(3)))))
-                }
-
-                "and it does not have a tax id" in {
-
-                  val userAnswers = answers.remove(EuTaxReferencePage(Index(3))).success.value
-                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(3)))))
-                }
-              }
-            }
-          }
-
-          "with a VAT registration" - {
-
-            "with the VAT number missing" in {
-
-              val userAnswers = answers.remove(EuVatNumberPage(Index(0))).success.value
-              val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-              result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(0)))))
-            }
-
-            "with a VAT number" - {
-
-              "which does not have an answer for Has Fixed Establishment" in {
-
-                val userAnswers = answers.remove(HasFixedEstablishmentPage(Index(0))).success.value
-                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                result mustEqual Invalid(NonEmptyChain(DataMissingError(HasFixedEstablishmentPage(Index(0)))))
-              }
-
-              "and Has Fixed Establishment is true" - {
-
-                "and it does not have a fixed establishment trading name" in {
-
-                  val userAnswers = answers.remove(FixedEstablishmentTradingNamePage(Index(1))).success.value
-                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                  result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(1)))))
-                }
-
-                "and it does not have a fixed establishment address" in {
-
-                  val userAnswers = answers.remove(FixedEstablishmentAddressPage(Index(1))).success.value
-                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                  result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(1)))))
-                }
-              }
-
-              "and Has Fixed Establishment is false" - {
-
-                "and Sends Goods is missing" in {
-
-                  val userAnswers = answers.remove(EuSendGoodsPage(Index(0))).success.value
-                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-
-                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsPage(Index(0)))))
-                }
-
-                "and Send Goods is true" - {
-
-                  "and it does not have a trading name" in {
-
-                    val userAnswers = answers.remove(EuSendGoodsTradingNamePage(Index(0))).success.value
+                    val userAnswers = answersPartOfVatGroup.remove(EuVatNumberPage(Index(0))).success.value
                     val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsTradingNamePage(Index(0)))))
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(0)))))
+
                   }
 
-                  "and it does not have an address" in {
+                }
 
-                    val userAnswers = answers.remove(EuSendGoodsAddressPage(Index(0))).success.value
+                "when Registration Type is Tax Id" - {
+
+                  "and TaxId is missing" in {
+
+                    val userAnswers = answersPartOfVatGroup.remove(EuTaxReferencePage(Index(2))).success.value
                     val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsAddressPage(Index(0)))))
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(2)))))
+
                   }
+
+                }
+
+                "when Registration Type is missing" - {
+
+                  val userAnswers = answersPartOfVatGroup.remove(RegistrationTypePage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(RegistrationTypePage(Index(0)))))
+
+                }
+
+                "when EU Send Goods Trading Name is missing" in {
+
+                  val userAnswers = answersPartOfVatGroup.remove(EuSendGoodsTradingNamePage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsTradingNamePage(Index(0)))))
+
+                }
+
+                "when EU Send Goods Address is missing" in {
+
+                  val userAnswers = answersPartOfVatGroup.remove(EuSendGoodsAddressPage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsAddressPage(Index(0)))))
+
+                }
+
+              }
+
+              "when Sells Goods To EU Consumer Method is missing" - {
+
+                val userAnswers = answersPartOfVatGroup.remove(SellsGoodsToEUConsumerMethodPage(Index(0))).success.value
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(SellsGoodsToEUConsumerMethodPage(Index(0)))))
+
+              }
+
+            }
+
+            "when Sells Goods To EU Consumers is false" - {
+
+              "when Vat Registered is true" - {
+
+                "and EU Vat Number is missing" in {
+
+                  val userAnswers = answersPartOfVatGroup.remove(EuVatNumberPage(Index(1))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(1)))))
+
                 }
               }
+
+              "when Vat Registered is missing" in {
+
+                val userAnswers = answersPartOfVatGroup.remove(VatRegisteredPage(Index(1))).success.value
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(VatRegisteredPage(Index(1)))))
+
+              }
+
             }
+
+            "when Sells Goods To EU Consumers is missing" in {
+
+              val userAnswers = answersPartOfVatGroup.remove(SellsGoodsToEUConsumersPage(Index(0))).success.value
+              val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+              result mustEqual Invalid(NonEmptyChain(DataMissingError(SellsGoodsToEUConsumersPage(Index(0)))))
+
+            }
+
+          }
+
+          "when Part of VAT group is false" - {
+
+            "when Sells Goods To EU Consumers is true" - {
+
+              "when Sells Goods To EU Consumer Method is DispatchWarehouse" - {
+
+                "when Registration Type is Vat Number" - {
+
+                  "and Vat Number is missing" in {
+
+                    val userAnswers = answersNotPartOfVatGroup.remove(EuVatNumberPage(Index(0))).success.value
+                    val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(0)))))
+
+                  }
+
+                }
+
+                "when Registration Type is Tax Id" - {
+
+                  "and TaxId is missing" in {
+
+                    val userAnswers = answersNotPartOfVatGroup.remove(EuTaxReferencePage(Index(2))).success.value
+                    val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(2)))))
+
+                  }
+
+                }
+
+                "when Registration Type is missing" - {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(RegistrationTypePage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(RegistrationTypePage(Index(0)))))
+
+                }
+
+                "when EU Send Goods Trading Name is missing" in {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(EuSendGoodsTradingNamePage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsTradingNamePage(Index(0)))))
+
+                }
+
+                "when EU Send Goods Address is missing" in {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(EuSendGoodsAddressPage(Index(0))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuSendGoodsAddressPage(Index(0)))))
+
+                }
+
+              }
+
+              "when Sells Goods To EU Consumer Method is Fixed Establishment" - {
+
+                "when Registration Type is Vat Number" - {
+
+                  "and Vat Number is missing" in {
+
+                    val userAnswers = answersNotPartOfVatGroup.remove(EuVatNumberPage(Index(4))).success.value
+                    val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(4)))))
+
+                  }
+
+                }
+
+                "when Registration Type is Tax Id" - {
+
+                  "and TaxId is missing" in {
+
+                    val userAnswers = answersNotPartOfVatGroup.remove(EuTaxReferencePage(Index(5))).success.value
+                    val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                    result mustEqual Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(5)))))
+
+                  }
+
+                }
+
+                "when Registration Type is missing" - {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(RegistrationTypePage(Index(4))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(RegistrationTypePage(Index(4)))))
+
+                }
+
+                "when Fixed Establishment Trading Name is missing" in {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(FixedEstablishmentTradingNamePage(Index(4))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentTradingNamePage(Index(4)))))
+
+                }
+
+                "when Fixed Establishment Address is missing" in {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(FixedEstablishmentAddressPage(Index(4))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(FixedEstablishmentAddressPage(Index(4)))))
+
+                }
+
+              }
+
+              "when Sells Goods To EU Consumer Method is missing" - {
+
+                val userAnswers = answersNotPartOfVatGroup.remove(SellsGoodsToEUConsumerMethodPage(Index(0))).success.value
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(SellsGoodsToEUConsumerMethodPage(Index(0)))))
+
+              }
+
+            }
+
+            "when Sells Goods To EU Consumers is false" - {
+
+              "when Vat Registered is true" - {
+
+                "and EU Vat Number is missing" in {
+
+                  val userAnswers = answersNotPartOfVatGroup.remove(EuVatNumberPage(Index(1))).success.value
+                  val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                  result mustEqual Invalid(NonEmptyChain(DataMissingError(EuVatNumberPage(Index(1)))))
+
+                }
+              }
+
+              "when Vat Registered is missing" in {
+
+                val userAnswers = answersNotPartOfVatGroup.remove(VatRegisteredPage(Index(1))).success.value
+                val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+                result mustEqual Invalid(NonEmptyChain(DataMissingError(VatRegisteredPage(Index(1)))))
+
+              }
+
+            }
+
+            "when Sells Goods To EU Consumers is missing" in {
+
+              val userAnswers = answersNotPartOfVatGroup.remove(SellsGoodsToEUConsumersPage(Index(0))).success.value
+              val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+
+              result mustEqual Invalid(NonEmptyChain(DataMissingError(SellsGoodsToEUConsumersPage(Index(0)))))
+
+            }
+
           }
         }
       }
 
-      "when Vat Registered has not been answered" in {
-
-        val regDate = LocalDate.of(2000, 1, 1)
-        val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
-        val vatInfo = VatCustomerInfo(
-          registrationDate = regDate,
-          address = address,
-          partOfVatGroup = false,
-          organisationName = "bar"
-        )
+      "when Tax Registered has not been answered" in {
 
         val userAnswers =
-          answers.copy(vatInfo = Some(vatInfo))
-            .remove(VatRegisteredPage(Index(0))).success.value
+          answersNotPartOfVatGroup
+            .remove(TaxRegisteredInEuPage).success.value
 
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(VatRegisteredPage(Index(0)))))
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(TaxRegisteredInEuPage)))
 
       }
 
@@ -736,12 +835,12 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
 
         "when Has Made Sales is Yes and Date of First Sale is populated" in {
           val userAnswers =
-            answers
+            answersNotPartOfVatGroup
               .set(HasMadeSalesPage, true).success.value
 
           val expectedRegistration = RegistrationData.registration.copy(
-            dateOfFirstSale  = Some(arbitraryDate),
-            vatDetails       = RegistrationData.registration.vatDetails,
+            dateOfFirstSale = Some(arbitraryDate),
+            vatDetails = RegistrationData.registration.vatDetails,
             commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
           )
 
