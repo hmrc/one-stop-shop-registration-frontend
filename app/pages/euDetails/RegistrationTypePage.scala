@@ -18,10 +18,12 @@ package pages.euDetails
 
 import models.euDetails.RegistrationType
 import controllers.euDetails.routes
-import models.{Index, NormalMode}
+import models.{Index, Mode, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+
+import scala.util.Try
 
 case class RegistrationTypePage(countryIndex: Index) extends QuestionPage[RegistrationType] {
 
@@ -29,12 +31,21 @@ case class RegistrationTypePage(countryIndex: Index) extends QuestionPage[Regist
 
   override def toString: String = "registrationType"
 
-  def navigate(answer: RegistrationType): Call = answer match {
-    case RegistrationType.VatNumber =>
-      routes.EuVatNumberController.onPageLoad(NormalMode, countryIndex)
+  override def navigate(mode: Mode, answers: UserAnswers): Call = answers.get(this) match {
+    case Some(RegistrationType.VatNumber) =>
+      routes.EuVatNumberController.onPageLoad(mode, countryIndex)
     case _ =>
-      routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
+      routes.EuTaxReferenceController.onPageLoad(mode, countryIndex)
 
   }
 
+  override def cleanup(value: Option[RegistrationType], userAnswers: UserAnswers): Try[UserAnswers] = {
+    value match {
+      case Some(RegistrationType.VatNumber) =>
+        userAnswers.remove(EuTaxReferencePage(countryIndex))
+      case Some(RegistrationType.TaxId) =>
+        userAnswers.remove(EuVatNumberPage(countryIndex))
+      case None => super.cleanup(value, userAnswers)
+    }
+  }
 }

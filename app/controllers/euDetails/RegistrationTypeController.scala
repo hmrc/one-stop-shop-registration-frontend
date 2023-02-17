@@ -71,7 +71,7 @@ class RegistrationTypeController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationTypePage(countryIndex), value))
               _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield Redirect(RegistrationTypePage(countryIndex).navigate(value))
+            } yield Redirect(RegistrationTypePage(countryIndex).navigate(mode, updatedAnswers))
         )
       }
   }

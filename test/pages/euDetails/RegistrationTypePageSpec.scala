@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.euDetails.routes
 import models.{Index, NormalMode}
 import models.euDetails.RegistrationType
-import models.euDetails.RegistrationType.{TaxId, VatNumber}
 import pages.behaviours.PageBehaviours
 
 class RegistrationTypePageSpec extends SpecBase with PageBehaviours {
@@ -39,12 +38,18 @@ class RegistrationTypePageSpec extends SpecBase with PageBehaviours {
 
       "to EU VAT number when the answer is Vat number" in {
 
-        RegistrationTypePage(countryIndex).navigate(VatNumber) mustEqual routes.EuVatNumberController.onPageLoad(NormalMode, countryIndex)
+        val answers = emptyUserAnswers
+          .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+
+        RegistrationTypePage(countryIndex).navigate(NormalMode, answers) mustEqual routes.EuVatNumberController.onPageLoad(NormalMode, countryIndex)
       }
 
       "to EU Tax Reference when the answer Tax Id" in {
 
-        RegistrationTypePage(countryIndex).navigate(TaxId) mustEqual routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
+        val answers = emptyUserAnswers
+          .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
+
+        RegistrationTypePage(countryIndex).navigate(NormalMode, answers) mustEqual routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
       }
     }
   }

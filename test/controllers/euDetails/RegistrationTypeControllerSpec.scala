@@ -103,7 +103,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
         val expectedAnswers = answers.set(RegistrationTypePage(countryIndex), RegistrationType.values.head).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual RegistrationTypePage(countryIndex).navigate(RegistrationType.values.head).url
+        redirectLocation(result).value mustEqual RegistrationTypePage(countryIndex).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
