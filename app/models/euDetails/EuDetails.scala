@@ -24,7 +24,7 @@ case class EuDetails(
                       sellsGoodsToEUConsumers: Boolean,
                       sellsGoodsToEUConsumerMethod: EuConsumerSalesMethod,
                       registrationType: RegistrationType,
-                      vatRegistered: Boolean,
+                      vatRegistered: Option[Boolean],
                       euVatNumber: Option[String],
                       euTaxReference: Option[String],
                       fixedEstablishmentTradingName: Option[String],
@@ -38,3 +38,4 @@ object EuDetails {
   implicit val format: OFormat[EuDetails] =
     Json.format[EuDetails]
 }
+

@@ -23,6 +23,8 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
+import scala.util.Try
+
 case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends QuestionPage[EuConsumerSalesMethod] {
 
   override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
@@ -34,12 +36,32 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
       case (true, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
         euRoutes.CannotAddCountryController.onPageLoad(countryIndex)
       case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
-        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+        euRoutes.RegistrationTypeController.onPageLoad(mode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
-        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+        euRoutes.RegistrationTypeController.onPageLoad(mode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
-        euRoutes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex)
+        euRoutes.RegistrationTypeController.onPageLoad(mode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  private def cleanupCommonData(userAnswers: UserAnswers): Try[UserAnswers] = {
+    userAnswers.remove(RegistrationTypePage(countryIndex))
+      .flatMap(_.remove(EuVatNumberPage(countryIndex)))
+      .flatMap(_.remove(EuTaxReferencePage(countryIndex)))
+  }
+
+  override def cleanup(value: Option[EuConsumerSalesMethod], userAnswers: UserAnswers): Try[UserAnswers] = {
+    value match {
+      case Some(EuConsumerSalesMethod.DispatchWarehouse) =>
+        cleanupCommonData(userAnswers)
+        .flatMap(_.remove(FixedEstablishmentTradingNamePage(countryIndex)))
+        .flatMap(_.remove(FixedEstablishmentAddressPage(countryIndex)))
+      case Some(EuConsumerSalesMethod.FixedEstablishment) =>
+        cleanupCommonData(userAnswers)
+          .flatMap(_.remove(EuSendGoodsTradingNamePage(countryIndex)))
+          .flatMap(_.remove(EuSendGoodsAddressPage(countryIndex)))
+      case None => super.cleanup(value, userAnswers)
     }
   }
 
