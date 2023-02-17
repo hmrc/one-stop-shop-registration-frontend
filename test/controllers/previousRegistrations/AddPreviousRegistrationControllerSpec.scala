@@ -19,11 +19,11 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, PreviousSchemeNumbers, SchemeDetailsWithOptionalVatNumber}
-import models.{Country, Index, NormalMode, PreviousScheme}
+import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -96,7 +96,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
             Seq(
               PreviousRegistrationDetailsWithOptionalVatNumber(
                 Country.euCountries.head,
-                Seq(SchemeDetailsWithOptionalVatNumber(Some(PreviousScheme.OSSU), None))
+                Some(List(SchemeDetailsWithOptionalVatNumber(Some(PreviousScheme.OSSU), None)))
               )
             )
           )(request, implicitly).toString
@@ -212,7 +212,9 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the PreviousEuVatNumber page for a POST if answers are incomplete and prompt has been shown" in {
 
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+      val incompleteAnswersWithPreviousSchemetype = incompleteAnswers
+        .set(PreviousSchemeTypePage(Index(0), Index(0)), PreviousSchemeType.OSS).success.value
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswersWithPreviousSchemetype)).build()
 
       running(application) {
         val request =
@@ -225,5 +227,63 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
+
+    "must redirect to the PreviousIOSSNumber page for a POST if answers are incomplete and prompt has been shown and previousScheme is set" in {
+
+      val incompleteAnswersWithPreviousSchemetype = basicUserAnswersWithVatInfo
+        .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+        .set(PreviousSchemeTypePage(Index(0), Index(0)), PreviousSchemeType.IOSS).success.value
+        .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.IOSSWI).success.value
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswersWithPreviousSchemetype)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addPreviousRegistrationRoutePost(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.PreviousIossNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
+      }
+    }
+
+    "must redirect to the PreviousIOSSScheme page for a POST if answers are incomplete and prompt has been shown and previousScheme is not set" in {
+
+      val incompleteAnswersWithPreviousSchemetype = basicUserAnswersWithVatInfo
+        .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+        .set(PreviousSchemeTypePage(Index(0), Index(0)), PreviousSchemeType.IOSS).success.value
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswersWithPreviousSchemetype)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addPreviousRegistrationRoutePost(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.PreviousIossSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
+      }
+    }
+
+    "must redirect to the PreviousScheme page for a POST if answers are incomplete and prompt has been shown and previousSchemeDetails is not set" in {
+
+      val incompleteAnswersWithPreviousSchemetype = basicUserAnswersWithVatInfo
+        .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswersWithPreviousSchemetype)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addPreviousRegistrationRoutePost(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.PreviousSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
+      }
+    }
+
   }
 }

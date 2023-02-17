@@ -24,7 +24,7 @@ import models.{Index, Mode}
 import pages.previousRegistrations.CheckPreviousSchemeAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.previousRegistration.AllPreviousSchemesForCountryQuery
+import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import viewmodels.checkAnswers.previousRegistrations._
@@ -48,8 +48,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
     implicit request =>
       getPreviousCountry(index) {
         country =>
-
-          request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
+          request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).map { previousSchemes =>
 
             val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
@@ -74,17 +73,10 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      /* TODO handle incomplete
-      val incomplete = getIncompletePreviousSchemesDetails(index)
-      if(incomplete.isEmpty) {
-        Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, request.userAnswers))
-      } else {
-        Redirect(controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, index))
-      }*/
 
       getPreviousCountry(index) { country =>
 
-        request.userAnswers.get(AllPreviousSchemesForCountryQuery(index)).map { previousSchemes =>
+        request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).map { previousSchemes =>
 
           val canAddScheme = previousSchemes.size < Constants.maxSchemes
 

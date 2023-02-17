@@ -18,15 +18,16 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
+import models.{Country, Mode}
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
 import views.html.previousRegistrations.AddPreviousRegistrationView
 
@@ -58,8 +59,6 @@ class AddPreviousRegistrationController @Inject()(
             }) {
             Future.successful(Ok(view(form, mode, previousRegistrations, canAddCountries)))
           }
-
-
       }
   }
 
@@ -69,12 +68,9 @@ class AddPreviousRegistrationController @Inject()(
         data = getAllIncompleteDeregisteredDetails,
         onFailure = (incomplete: Seq[PreviousRegistrationDetailsWithOptionalVatNumber]) => {
           if (incompletePromptShown) {
-            firstIndexedIncompleteDeregisteredCountry(incomplete.map(_.previousEuCountry)) match {
-              case Some(incompleteCountry) =>
-                Future.successful(Redirect(routes.PreviousOssNumberController.onPageLoad(mode, Index(incompleteCountry._2), Index(0)))) // TODO incomplete checks
-              case None =>
-                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }
+            incompletePreviousRegistrationRedirect(mode).map(
+              redirectIncompletePage => redirectIncompletePage.toFuture
+            ).getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
           } else {
             Future.successful(Redirect(routes.AddPreviousRegistrationController.onPageLoad(mode)))
           }
