@@ -48,9 +48,6 @@ trait PageGenerators {
   implicit lazy val arbitraryPreviousSchemeTypePage: Arbitrary[PreviousSchemeTypePage] =
     Arbitrary(PreviousSchemeTypePage(Index(0), Index(0)))
 
-  implicit lazy val arbitraryEuSendGoodsPage: Arbitrary[EuSendGoodsPage] =
-    Arbitrary(euDetails.EuSendGoodsPage(Index(0)))
-
   implicit lazy val arbitraryEuSendGoodsTradingNamePage: Arbitrary[EuSendGoodsTradingNamePage] =
     Arbitrary(EuSendGoodsTradingNamePage(Index(0)))
 
@@ -104,9 +101,6 @@ trait PageGenerators {
 
   implicit lazy val arbitraryAddPreviousRegistrationPage: Arbitrary[AddPreviousRegistrationPage.type] =
     Arbitrary(AddPreviousRegistrationPage)
-
-  implicit lazy val arbitraryHasFixedEstablishmentPage: Arbitrary[HasFixedEstablishmentPage] =
-    Arbitrary(euDetails.HasFixedEstablishmentPage(Index(0)))
 
   implicit lazy val arbitraryFixedEstablishmentTradingNamePage: Arbitrary[FixedEstablishmentTradingNamePage] =
     Arbitrary(euDetails.FixedEstablishmentTradingNamePage(Index(0)))

@@ -18,11 +18,12 @@ package controllers.euDetails
 
 import base.SpecBase
 import forms.euDetails.EuSendGoodsAddressFormProvider
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{Country, Index, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsPage, EuSendGoodsTradingNamePage, EuVatNumberPage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails._
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -35,7 +36,7 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private val country: Country = Country("FR", "France")
   private val index: Index = Index(0)
-  private val businessName: String = "Business Address"
+  private val businessName: String = "Business Name"
 
   private val exampleAddress: InternationalAddress = InternationalAddress("line1", None, "town", None, None, country)
 
@@ -48,10 +49,10 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo.set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(index), country).success.value
-      .set(HasFixedEstablishmentPage(index), false).success.value
-      .set(VatRegisteredPage(index), true).success.value
+      .set(SellsGoodsToEUConsumersPage(index), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(index), EuConsumerSalesMethod.DispatchWarehouse).success.value
+      .set(RegistrationTypePage(index), RegistrationType.VatNumber).success.value
       .set(EuVatNumberPage(index), "123456778").success.value
-    .set(EuSendGoodsPage(index), true).success.value
     .set(EuSendGoodsTradingNamePage(index), businessName).success.value
 
   "EuSendGoodsAddress Controller" - {
@@ -73,8 +74,6 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
-
 
       val userAnswers = baseUserAnswers.set(EuSendGoodsAddressPage(index), exampleAddress).success.value
 

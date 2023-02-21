@@ -343,12 +343,6 @@ fixedEstablishmentTradingName.error.length = Trading name must be 40 characters 
 fixedEstablishmentTradingName.change.hidden = trading name
 fixedEstablishmentTradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 
-hasFixedEstablishment.title = Does your business have a fixed establishment in {0}?
-hasFixedEstablishment.heading = Does your business have a fixed establishment in {0}?
-hasFixedEstablishment.checkYourAnswersLabel = Fixed establishment
-hasFixedEstablishment.error.required = Select yes if your business has a fixed establishment in {0}
-hasFixedEstablishment.change.hidden = fixed establishment
-
 checkEuVatDetailsAnswers.title = Check your answers for {0}
 checkEuVatDetailsAnswers.heading = Check your answers for {0}
 

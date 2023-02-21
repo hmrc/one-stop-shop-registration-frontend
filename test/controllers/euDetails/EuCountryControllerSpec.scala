@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
-import pages.euDetails.{EuCountryPage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{EuCountryPage, SellsGoodsToEUConsumersPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -65,10 +65,8 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(euDetails.EuCountryPage(index), country).success.value
+        .set(SellsGoodsToEUConsumersPage(index), false).success.value
         .set(VatRegisteredPage(index), false).success.value
-        .set(EuVatNumberPage(index), "test").success.value
-        .set(HasFixedEstablishmentPage(index), false).success.value
-        .set(EuTaxReferencePage(index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -133,10 +131,8 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(euDetails.EuCountryPage(index), country).success.value
+        .set(SellsGoodsToEUConsumersPage(index), false).success.value
         .set(VatRegisteredPage(index), false).success.value
-        .set(EuVatNumberPage(index), "test").success.value
-        .set(HasFixedEstablishmentPage(index), false).success.value
-        .set(EuTaxReferencePage(index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

@@ -17,6 +17,7 @@
 package services
 
 import cats.data.Validated
+import cats.data.Validated.Invalid
 import cats.implicits._
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
@@ -67,7 +68,10 @@ class RegistrationService @Inject()(dateService: DateService) {
           registeredCompanyName = name,
           tradingNames = tradingNames,
           vatDetails = vatDetails,
-          euRegistrations = euRegistrations,
+          euRegistrations = euRegistrations.map {
+            case Some(list) => list
+            case _ => ???
+          },
           contactDetails = contactDetails,
           websites = websites,
           commencementDate = startDate,
@@ -211,7 +215,7 @@ class RegistrationService @Inject()(dateService: DateService) {
     )
   }
 
-  private def getEuTaxRegistrations(answers: UserAnswers): ValidationResult[List[EuTaxRegistration]] = {
+  private def getEuTaxRegistrations(answers: UserAnswers): ValidationResult[List[Option[EuTaxRegistration]]] = {
     answers.get(TaxRegisteredInEuPage) match {
       case Some(true) =>
         answers.get(AllEuDetailsRawQuery) match {
@@ -232,14 +236,14 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
   }
 
-  private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[EuTaxRegistration] = {
+  private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[Option[EuTaxRegistration]] = {
     answers.get(EuCountryPage(index)) match {
       case Some(country) =>
         answers.get(SellsGoodsToEUConsumersPage(index)) match {
           case Some(true) =>
             sellsGoodsToEuConsumers(answers, country, index)
           case Some(false) =>
-            doesNotSellGoodsToEuConsumers(answers, country, index)
+            doesNotSellGoodsToEuConsumers(answers, country, index).map(Some(_))
           case None => DataMissingError(SellsGoodsToEUConsumersPage(index)).invalidNec
         }
       case None =>
@@ -251,6 +255,9 @@ class RegistrationService @Inject()(dateService: DateService) {
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(index))) match {
       case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         getRegistrationWithDispatchWarehouse(answers, country, index)
+      case (true, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+//       TODO DataMissingError()
+      ???
       case (true, None) =>
         DataMissingError(SellsGoodsToEUConsumerMethodPage(index)).invalidNec
       case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
@@ -299,16 +306,18 @@ class RegistrationService @Inject()(dateService: DateService) {
       case Some(true) =>
         answers.get(RegistrationTypePage(index)) match {
           case Some(RegistrationType.VatNumber) =>
-            getEuVatNumber(answers, index).map(EuTaxIdentifier(Vat, _))
+            getEuVatNumber(answers, index).map(v => EuTaxIdentifier(Vat, Some(v)))
           case Some(RegistrationType.TaxId) =>
-            getEuTaxId(answers, index).map(EuTaxIdentifier(Other, _))
+            getEuTaxId(answers, index).map(v => EuTaxIdentifier(Other, Some(v)))
           case None => DataMissingError(RegistrationTypePage(index)).invalidNec
         }
 
       case Some(false) =>
         answers.get(VatRegisteredPage(index)) match {
           case Some(true) =>
-            getEuVatNumber(answers, index).map(EuTaxIdentifier(Vat, _))
+            getEuVatNumber(answers, index).map(v => EuTaxIdentifier(Vat, Some(v)))
+          case Some(false) =>
+            EuTaxIdentifier(Other, None).validNec
           case None =>
             DataMissingError(VatRegisteredPage(index)).invalidNec
         }

@@ -81,7 +81,6 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
               .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
               .set(VatRegisteredPage(Index(0)), true).success.value
               .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-              .set(HasFixedEstablishmentPage(Index(0)), false).success.value
 
           AddEuDetailsPage.navigate(CheckMode, answers)
             .mustEqual(euRoutes.EuCountryController.onPageLoad(CheckMode, Index(1)))
