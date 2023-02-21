@@ -17,7 +17,6 @@
 package services
 
 import cats.data.Validated
-import cats.data.Validated.Invalid
 import cats.implicits._
 import models._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
@@ -68,10 +67,7 @@ class RegistrationService @Inject()(dateService: DateService) {
           registeredCompanyName = name,
           tradingNames = tradingNames,
           vatDetails = vatDetails,
-          euRegistrations = euRegistrations.map {
-            case Some(list) => list
-            case _ => ???
-          },
+          euRegistrations = euRegistrations,
           contactDetails = contactDetails,
           websites = websites,
           commencementDate = startDate,
@@ -215,7 +211,7 @@ class RegistrationService @Inject()(dateService: DateService) {
     )
   }
 
-  private def getEuTaxRegistrations(answers: UserAnswers): ValidationResult[List[Option[EuTaxRegistration]]] = {
+  private def getEuTaxRegistrations(answers: UserAnswers): ValidationResult[List[EuTaxRegistration]] = {
     answers.get(TaxRegisteredInEuPage) match {
       case Some(true) =>
         answers.get(AllEuDetailsRawQuery) match {
@@ -236,14 +232,14 @@ class RegistrationService @Inject()(dateService: DateService) {
     }
   }
 
-  private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[Option[EuTaxRegistration]] = {
+  private def processEuDetail(answers: UserAnswers, index: Index): ValidationResult[EuTaxRegistration] = {
     answers.get(EuCountryPage(index)) match {
       case Some(country) =>
         answers.get(SellsGoodsToEUConsumersPage(index)) match {
           case Some(true) =>
             sellsGoodsToEuConsumers(answers, country, index)
           case Some(false) =>
-            doesNotSellGoodsToEuConsumers(answers, country, index).map(Some(_))
+            doesNotSellGoodsToEuConsumers(answers, country, index)
           case None => DataMissingError(SellsGoodsToEUConsumersPage(index)).invalidNec
         }
       case None =>
@@ -256,8 +252,7 @@ class RegistrationService @Inject()(dateService: DateService) {
       case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         getRegistrationWithDispatchWarehouse(answers, country, index)
       case (true, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
-//       TODO DataMissingError()
-      ???
+        GenericError("A state where a country exists but cannot be added").invalidNec
       case (true, None) =>
         DataMissingError(SellsGoodsToEUConsumerMethodPage(index)).invalidNec
       case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>

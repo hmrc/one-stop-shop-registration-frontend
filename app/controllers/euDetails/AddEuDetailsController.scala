@@ -20,13 +20,15 @@ import controllers.actions._
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
+import models.{CheckMode, Country, Mode}
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
+import utils.EuDetailsCompletionChecks.{getAllIncompleteEuDetails, incompleteCheckEuDetailsRedirect}
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
 import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
 
@@ -80,13 +82,10 @@ class AddEuDetailsController @Inject()(
       withCompleteDataAsync[EuOptionalDetails](
         data = getAllIncompleteEuDetails,
         onFailure = (incomplete: Seq[EuOptionalDetails]) => {
-          if(incompletePromptShown) {
-            firstIndexedIncompleteEuDetails(incomplete.map(_.euCountry)) match {
-              case Some(incompleteCountry) =>
-                Future.successful(Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, Index(incompleteCountry._2))))
-              case None =>
-                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }
+          if (incompletePromptShown) {
+            incompleteCheckEuDetailsRedirect(CheckMode).map(
+              redirectIncompletePage => redirectIncompletePage.toFuture
+            ).getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
           } else {
             Future.successful(Redirect(routes.AddEuDetailsController.onPageLoad(mode)))
           }

@@ -27,3 +27,8 @@ case class DataMissingError(page: Gettable[_]) extends ValidationError {
 
   override val errorMessage: String = s"Data missing at ${page.path.toString}"
 }
+
+case class GenericError(error: String) extends ValidationError {
+
+  override val errorMessage: String = s"Generic Error ${error}"
+}

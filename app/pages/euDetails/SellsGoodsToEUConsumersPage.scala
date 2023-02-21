@@ -36,7 +36,6 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
-
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = {
