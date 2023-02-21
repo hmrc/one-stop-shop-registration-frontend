@@ -24,6 +24,7 @@ import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.EuDetailsCompletionChecks.getIncompleteEuDetails
 import utils.CompletionChecks
 import viewmodels.checkAnswers.euDetails._
 import viewmodels.govuk.summarylist._

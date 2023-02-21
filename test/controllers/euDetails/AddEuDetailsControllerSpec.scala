@@ -19,11 +19,11 @@ package controllers.euDetails
 import base.SpecBase
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
-import models.{Country, Index, NormalMode}
+import models.{CheckMode, Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuSendGoodsAddressPage, EuSendGoodsTradingNamePage, EuTaxReferencePage, EuVatNumberPage, RegistrationTypePage, SellsGoodsToEUConsumerMethodPage, SellsGoodsToEUConsumersPage, TaxRegisteredInEuPage, VatRegisteredPage}
+import pages.euDetails._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -57,7 +57,10 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val incompleteAnswers =
     basicUserAnswersWithVatInfo
       .set(EuCountryPage(countryIndex), country).success.value
-      .set(VatRegisteredPage(countryIndex), true).success.value
+
+  private val incompleteAnswersPartOfVatGroup =
+    basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+      .set(EuCountryPage(countryIndex), country).success.value
 
   "AddEuDetails Controller" - {
 
@@ -270,7 +273,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to CheckEuDetailsAnswers page for a POST if answers are incomplete and the prompt has been shown" in {
+    "must redirect to Sells Goods to EU Consumers page for a POST if answer is incomplete and the prompt has been shown" in {
 
       val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
 
@@ -282,8 +285,231 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex).url
+        redirectLocation(result).value mustEqual routes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex).url
       }
     }
+
+    "must redirect to Sells Goods to EU Consumer Method page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to Registration Type page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to VAT Number page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.values.head).success.value
+        .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to EU Tax Reference Number page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+        .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EuTaxReferenceController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to Fixed Establishment Trading Name page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+        .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+        .set(EuVatNumberPage(countryIndex), "").success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to Fixed Establishment Address page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+        .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+        .set(EuVatNumberPage(countryIndex), "123456789").success.value
+        .set(FixedEstablishmentTradingNamePage(countryIndex), "Foo").success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.FixedEstablishmentAddressController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to EU Send Goods Trading Name page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+        .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+        .set(EuVatNumberPage(countryIndex), "").success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to EU Send Goods Address page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+        .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+        .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+        .set(EuVatNumberPage(countryIndex), "123456789").success.value
+        .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EuSendGoodsAddressController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to VAT Registered page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.VatRegisteredController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "must redirect to EU VAT Number page for a POST if answer is incomplete and the prompt has been shown" in {
+
+      val application = applicationBuilder(userAnswers = Some(incompleteAnswers
+        .set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+        .set(VatRegisteredPage(countryIndex), true).success.value
+      )).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
+      }
+    }
+
+    "when part of VAT group is true" - {
+
+      "must redirect to Cannot Add Country page for a POST if answer is incomplete and the prompt has been shown" in {
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswersPartOfVatGroup
+          .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+          .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+        )).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, addEuVatDetailsPostRoute(true))
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.CannotAddCountryController.onPageLoad(countryIndex).url
+        }
+      }
+    }
+
   }
 }
