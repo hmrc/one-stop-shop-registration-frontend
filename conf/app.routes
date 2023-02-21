@@ -139,13 +139,6 @@ POST        /check-eu-trading-name/:index                                       
 GET         /first-check-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
-GET         /eu-fixed-establishment/:index                                      controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-fixed-establishment/:index                                      controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-fixed-establishment/:index                                controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-fixed-establishment/:index                                controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-fixed-establishment/:index                          controllers.euDetails.HasFixedEstablishmentController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-fixed-establishment/:index                          controllers.euDetails.HasFixedEstablishmentController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
 GET         /check-tax-details/:index                                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /check-tax-details/:index                                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index, incompletePromptShown: Boolean)
 GET         /change-check-tax-details/:index                                    controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
@@ -300,13 +293,6 @@ GET         /no-saved-registration                                              
 GET         /account-restore-error                                              controllers.ProblemWithAccountController.onPageLoad()
 
 GET         /already-registered-other-country                                   controllers.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
-
-GET         /eu-send-goods/:index                                               controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = NormalMode, index: Index)
-POST        /eu-send-goods/:index                                               controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = NormalMode, index: Index)
-GET         /check-eu-send-goods/:index                                         controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckMode, index: Index)
-POST        /check-eu-send-goods/:index                                         controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckMode, index: Index)
-GET         /first-check-eu-send-goods/:index                                   controllers.euDetails.EuSendGoodsController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
-POST        /first-check-eu-send-goods/:index                                   controllers.euDetails.EuSendGoodsController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
 
 GET         /eu-send-goods-trading-name/:index                                  controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-send-goods-trading-name/:index                                  controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)

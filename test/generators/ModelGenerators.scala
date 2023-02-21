@@ -125,7 +125,7 @@ trait ModelGenerators {
     Arbitrary {
       for {
         identifierType <- arbitrary[EuTaxIdentifierType]
-        value          <- arbitrary[Int].map(_.toString)
+        value          <- Gen.option(arbitrary[Int].toString)
       } yield EuTaxIdentifier(identifierType, value)
     }
 

@@ -18,7 +18,7 @@ package models.domain
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EuTaxIdentifier(identifierType: EuTaxIdentifierType, value: String)
+case class EuTaxIdentifier(identifierType: EuTaxIdentifierType, value: Option[String])
 
 object EuTaxIdentifier {
 
