@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,43 +17,39 @@
 package controllers.actions
 
 import config.FrontendAppConfig
-import connectors.RegistrationConnector
 import controllers.routes
-import models.requests.AuthenticatedIdentifierRequest
-import play.api.mvc.Results.Redirect
+import models.requests.AuthenticatedDataRequest
 import play.api.mvc.{ActionFilter, Result}
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolFilterImpl @Inject()(connector: RegistrationConnector,
-                                          appConfig: FrontendAppConfig
-                                         )
+class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
                                          (implicit val executionContext: ExecutionContext)
   extends CheckNiProtocolFilter {
 
-  override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.registrationValidationEnabled) {
-      connector.validateRegistration(request.vrn) map {
-        case Right(validationResult) =>
-          if (validationResult.validRegistration) {
-            None
-          } else {
-            Some(Redirect(routes.NiProtocolRejectionController.onPageLoad()))
-          }
-        case Left(error) =>
-          throw new Exception(error.body)
+      request.userAnswers.vatInfo match {
+        case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
+          case Some(true) => Future.successful(None)
+
+          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolRejectionController.onPageLoad())))
+
+          case _ => throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
+        }
+        case _ => Future.successful(None)
       }
     } else {
       Future.successful(None)
     }
-
   }
 }
 
-trait CheckNiProtocolFilter extends ActionFilter[AuthenticatedIdentifierRequest]
+trait CheckNiProtocolFilter extends ActionFilter[AuthenticatedDataRequest]

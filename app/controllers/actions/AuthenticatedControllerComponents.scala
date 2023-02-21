@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,17 +46,16 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
-      checkNiProtocol andThen
       checkOtherCountryRegistration andThen
       getData andThen
-      requireData
+      requireData andThen
+      checkNiProtocol
 
   def authAndGetOptionalData: ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
-      checkNiProtocol andThen
       checkOtherCountryRegistration andThen
       getData
 
