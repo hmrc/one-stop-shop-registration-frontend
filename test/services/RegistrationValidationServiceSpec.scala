@@ -45,7 +45,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
   private def getDateService(date: LocalDate) = new DateService(getStubClock(date))
   
   private def getRegistrationService(today: LocalDate) =
-    new RegistrationService(getDateService(today))
+    new RegistrationValidationService(getDateService(today))
 
   private val hasTradingNamePage = HasTradingNamePage
 
