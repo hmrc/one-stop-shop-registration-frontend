@@ -53,7 +53,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
   private val registration = RegistrationData.registration
 
-  private val registrationService = mock[RegistrationService]
+  private val registrationService = mock[RegistrationValidationService]
   private val registrationConnector = mock[RegistrationConnector]
   private val saveForLaterService = mock[SaveForLaterService]
   private val emailService = mock[EmailService]
@@ -278,7 +278,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .configure("features.enrolments-enabled" -> "false")
             .overrides(
-              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[EmailService].toInstance(emailService),
               bind[AuditService].toInstance(auditService),
@@ -323,7 +323,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .configure("features.enrolments-enabled" -> "true")
             .overrides(
-              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[EmailService].toInstance(emailService),
               bind[AuditService].toInstance(auditService),
@@ -356,7 +356,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
 
           val application = applicationBuilder(userAnswers = None)
-            .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+            .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
@@ -372,7 +372,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
 
           val application = applicationBuilder(userAnswers = Some(invalidUserAnswers))
-            .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+            .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
@@ -392,7 +392,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .set(EuCountryPage(Index(0)), country).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -414,7 +414,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .set(PreviousSchemeTypePage(Index(0), Index(0)), PreviousSchemeType.OSS).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -432,7 +432,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             when(registrationService.fromUserAnswers(any(), any())) thenReturn Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0)))))
             val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -450,7 +450,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -468,7 +468,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -486,7 +486,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -504,7 +504,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationService].toInstance(registrationService)).build()
+              .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
               val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
@@ -529,7 +529,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
-              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[AuditService].toInstance(auditService)
             ).build()
@@ -559,7 +559,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
-              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[SaveForLaterService].toInstance(saveForLaterService),
               bind[AuditService].toInstance(auditService)
@@ -588,7 +588,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
-              bind[RegistrationService].toInstance(registrationService),
+              bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[SaveForLaterService].toInstance(saveForLaterService),
               bind[AuditService].toInstance(auditService)

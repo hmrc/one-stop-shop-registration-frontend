@@ -49,7 +49,7 @@ class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             cc: AuthenticatedControllerComponents,
                                             registrationConnector: RegistrationConnector,
-                                            registrationService: RegistrationService,
+                                            registrationService: RegistrationValidationService,
                                             auditService: AuditService,
                                             view: CheckYourAnswersView,
                                             emailService: EmailService,
