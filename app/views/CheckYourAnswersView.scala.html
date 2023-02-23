@@ -13,14 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *@
-@import components.ButtonGroup
+@import views.html.components.ButtonGroupProcessing
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukErrorSummary: GovukErrorSummary,
-        button: ButtonGroup,
+        button: ButtonGroupProcessing,
         govukWarningText: GovukWarningText
 )
 
@@ -46,7 +46,7 @@
         )
 
         <p class="govuk-body govuk-!-margin-bottom-9">
-            @Html(messages("vatRegistrationDetails.checkYourAnswers.manageVatBTA"))
+        @Html(messages("vatRegistrationDetails.checkYourAnswers.manageVatBTA"))
         </p>
 
         <h2 class="govuk-heading-m">@messages("checkYourAnswers.details.Heading")</h2>
@@ -68,5 +68,14 @@
                 @button("error.resolve_missing_answers", routes.CheckYourAnswersController.onPageLoad().url)
             }
         }
+
+        <div id="processing-wheel" hidden>
+            <div id="processing" aria-live="polite" class="govuk-!-margin-bottom-9">
+                <h2 class="govuk-heading-m">
+                    @messages("site.processing")
+                </h2>
+                <div class="processing-wheel-loader"></div>
+            </div>
+        </div>
     }
 
