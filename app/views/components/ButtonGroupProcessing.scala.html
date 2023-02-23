@@ -18,7 +18,7 @@
 @(continueMessage: String, continueUrl: String = "")(implicit messages: Messages)
 <div class="govuk-button-group">
     @govukButton(
-        ButtonViewModel(messages(continueMessage)).withAttribute(("id", "continue"))
+        ButtonViewModel(messages(continueMessage)).withAttribute(("id", "continue")).withAttribute("onclick", "showTheSpinner()")
     )
 
     <a id="saveProgress" role="button" href="@routes.SavedProgressController.onPageLoad(continueUrl)" class="govuk-button govuk-button--secondary" data-module="govuk-button">

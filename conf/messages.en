@@ -17,6 +17,7 @@ site.govuk = GOV.UK
 site.submit = Register
 site.tryAgain = Try again
 site.to = to
+site.processing = We are processing your registration. Do not click the Back Button or refresh the page.
 
 date.day = Day
 date.month = Month
