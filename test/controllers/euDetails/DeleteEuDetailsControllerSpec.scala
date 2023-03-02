@@ -39,7 +39,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val country = Country.euCountries.head
   private val euVatDetails =
     EuDetails(
-      country, sellsGoodsToEUConsumers = true, EuConsumerSalesMethod.DispatchWarehouse, RegistrationType.TaxId, vatRegistered = Some(false), None, Some("12345678"), None, None, None, None)
+      country, sellsGoodsToEUConsumers = true, Some(EuConsumerSalesMethod.DispatchWarehouse), Some(RegistrationType.TaxId), vatRegistered = Some(false), None, Some("12345678"), None, None, None, None)
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
 
   private val formProvider = new DeleteEuDetailsFormProvider()
