@@ -104,8 +104,9 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         LocalDate.now,
         partOfVatGroup = false,
-        "foo")
-      )
+        organisationName = "foo",
+        singleMarketIndicator = Some(true)
+      ))
     )
       .set(EuCountryPage(Index(4)), Country("ES", "Spain")).success.value
       .set(SellsGoodsToEUConsumersPage(Index(4)), true).success.value
