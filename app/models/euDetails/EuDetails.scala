@@ -20,17 +20,22 @@ import models.{Country, InternationalAddress}
 import play.api.libs.json.{Json, OFormat}
 
 case class EuDetails(
-                         euCountry: Country,
-                         vatRegistered: Boolean,
-                         euVatNumber: Option[String],
-                         hasFixedEstablishment: Boolean,
-                         euTaxReference: Option[String],
-                         fixedEstablishmentTradingName: Option[String],
-                         fixedEstablishmentAddress: Option[InternationalAddress]
-                       )
+                      euCountry: Country,
+                      sellsGoodsToEUConsumers: Boolean,
+                      sellsGoodsToEUConsumerMethod: Option[EuConsumerSalesMethod],
+                      registrationType: Option[RegistrationType],
+                      vatRegistered: Option[Boolean],
+                      euVatNumber: Option[String],
+                      euTaxReference: Option[String],
+                      fixedEstablishmentTradingName: Option[String],
+                      fixedEstablishmentAddress: Option[InternationalAddress],
+                      euSendGoodsTradingName: Option[String],
+                      euSendGoodsAddress: Option[InternationalAddress]
+                    )
 
 object EuDetails {
 
   implicit val format: OFormat[EuDetails] =
     Json.format[EuDetails]
 }
+

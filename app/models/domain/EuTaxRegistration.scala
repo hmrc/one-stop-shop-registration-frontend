@@ -25,7 +25,7 @@ object EuTaxRegistration {
 
   implicit val reads: Reads[EuTaxRegistration] =
     RegistrationWithFixedEstablishment.format.widen[EuTaxRegistration] orElse
-    RegistrationWithoutFixedEstablishment.format.widen[EuTaxRegistration] orElse
+    RegistrationWithoutFixedEstablishmentWithTradeDetails.format.widen[EuTaxRegistration] orElse
       EuVatRegistration.format.widen[EuTaxRegistration] orElse
       RegistrationWithoutTaxId.format.widen[EuTaxRegistration]
 
@@ -33,7 +33,7 @@ object EuTaxRegistration {
   implicit val writes: Writes[EuTaxRegistration] = Writes {
     case v: EuVatRegistration                     => Json.toJson(v)(EuVatRegistration.format)
     case fe: RegistrationWithFixedEstablishment   => Json.toJson(fe)(RegistrationWithFixedEstablishment.format)
-    case fe: RegistrationWithoutFixedEstablishment   => Json.toJson(fe)(RegistrationWithoutFixedEstablishment.format)
+    case fe: RegistrationWithoutFixedEstablishmentWithTradeDetails   => Json.toJson(fe)(RegistrationWithoutFixedEstablishmentWithTradeDetails.format)
     case w: RegistrationWithoutTaxId => Json.toJson(w)(RegistrationWithoutTaxId.format)
   }
 }
@@ -52,7 +52,7 @@ object EuVatRegistration {
 final case class RegistrationWithFixedEstablishment(
                                                     country: Country,
                                                     taxIdentifier: EuTaxIdentifier,
-                                                    fixedEstablishment: FixedEstablishment
+                                                    fixedEstablishment: TradeDetails
                                                   ) extends EuTaxRegistration
 
 object RegistrationWithFixedEstablishment {
@@ -60,15 +60,16 @@ object RegistrationWithFixedEstablishment {
     Json.format[RegistrationWithFixedEstablishment]
 }
 
-final case class RegistrationWithoutFixedEstablishment(
-                                    country: Country,
-                                    taxIdentifier: EuTaxIdentifier
-                                  ) extends EuTaxRegistration
+final case class RegistrationWithoutFixedEstablishmentWithTradeDetails(
+                                                        country: Country,
+                                                        taxIdentifier: EuTaxIdentifier,
+                                                        tradeDetails: TradeDetails
+                                                      ) extends EuTaxRegistration
 
-object RegistrationWithoutFixedEstablishment {
+object RegistrationWithoutFixedEstablishmentWithTradeDetails {
 
-  implicit val format: OFormat[RegistrationWithoutFixedEstablishment] =
-    Json.format[RegistrationWithoutFixedEstablishment]
+  implicit val format: OFormat[RegistrationWithoutFixedEstablishmentWithTradeDetails] =
+    Json.format[RegistrationWithoutFixedEstablishmentWithTradeDetails]
 }
 
 final case class RegistrationWithoutTaxId(country: Country) extends EuTaxRegistration

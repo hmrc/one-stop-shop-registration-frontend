@@ -19,13 +19,11 @@ package connectors
 import config.FrontendAppConfig
 import connectors.ValidateCoreRegistrationHttpParser.{ValidateCoreRegistrationReads, ValidateCoreRegistrationResponse}
 import logging.Logging
-import models.core.{CoreRegistrationRequest, EisErrorResponse, ErrorDetail}
+import models.core.{CoreRegistrationRequest, EisErrorResponse}
 import models.responses.EisError
-import play.api.http.HeaderNames.AUTHORIZATION
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpException}
 
 import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,41 +32,23 @@ class ValidateCoreRegistrationConnector @Inject()(
                                                    httpClient: HttpClient
                                                  )(implicit ec: ExecutionContext) extends HttpErrorFunctions with Logging {
 
-  private implicit val emptyHc: HeaderCarrier = HeaderCarrier()
-
   private val baseUrl = frontendAppConfig.coreValidationUrl
-  private def headers(correlationId: String): Seq[(String, String)] = frontendAppConfig.eisHeaders(correlationId)
 
   def validateCoreRegistration(
                                 coreRegistrationRequest: CoreRegistrationRequest
-                              ): Future[ValidateCoreRegistrationResponse] = {
-    val correlationId: String = UUID.randomUUID().toString
-    val headersWithCorrelationId = headers(correlationId)
+                              )(implicit hc: HeaderCarrier): Future[ValidateCoreRegistrationResponse] = {
 
-    val headersWithoutAuth = headersWithCorrelationId.filterNot {
-      case (key, _) => key.matches(AUTHORIZATION)
-    }
-
-    logger.info(s"Sending request to EIS with headers $headersWithoutAuth")
-
-    val url = s"$baseUrl/validateCoreRegistration"
+    val url = s"$baseUrl/validate-core-registration"
     httpClient.POST[CoreRegistrationRequest, ValidateCoreRegistrationResponse](
       url,
-      coreRegistrationRequest,
-      headers = headersWithCorrelationId
+      coreRegistrationRequest
     ).recover {
       case e: HttpException =>
-        val selfGeneratedRandomUUID = UUID.randomUUID()
         logger.error(
-          s"Unexpected error response from EIS $url, received status ${e.responseCode}," +
-            s"body of response was: ${e.message} with self-generated CorrelationId $selfGeneratedRandomUUID"
+          s"Unexpected error response from backend"
         )
         Left(EisError(
-          EisErrorResponse(
-            ErrorDetail(
-              Some(s"UNEXPECTED_${e.responseCode.toString}"), Some(e.message), Some("EIS"), Instant.now(), selfGeneratedRandomUUID
-            )
-          )
+          EisErrorResponse(Instant.now(), s"UNEXPECTED_${e.responseCode.toString}", e.message)
         ))
     }
   }

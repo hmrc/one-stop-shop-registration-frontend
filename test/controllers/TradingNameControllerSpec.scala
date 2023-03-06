@@ -45,7 +45,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, tradingNameRoute)
@@ -84,7 +84,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -94,7 +94,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswers.set(TradingNamePage(index), "answer").success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(TradingNamePage(index), "answer").success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual TradingNamePage(index).navigate(NormalMode, expectedAnswers).url
@@ -104,7 +104,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =
@@ -154,7 +154,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return NOT_FOUND for a GET with an index of position 10 or greater" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
       val highIndex = Gen.choose(10, Int.MaxValue).map(Index(_)).sample.value
 
       running(application) {
@@ -170,7 +170,7 @@ class TradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must return NOT_FOUND for a POST with an index of position 10 or greater" in {
 
       val answers =
-        basicUserAnswers
+        basicUserAnswersWithVatInfo
           .set(TradingNamePage(Index(0)), "foo").success.value
           .set(TradingNamePage(Index(1)), "foo").success.value
           .set(TradingNamePage(Index(2)), "foo").success.value

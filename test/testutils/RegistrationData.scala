@@ -18,7 +18,8 @@ package testutils
 
 import generators.Generators
 import models.domain._
-import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress}
+import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, PreviousScheme}
+import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
 
@@ -37,31 +38,68 @@ object RegistrationData extends Generators with EitherValues {
       vatDetails = VatDetails(
         registrationDate = LocalDate.now,
         address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-        partOfVatGroup   = true,
+        partOfVatGroup   = false,
         source           = VatDetailSource.Etmp
       ),
       euRegistrations = Seq(
-        RegistrationWithoutFixedEstablishment(Country("FR", "France"), EuTaxIdentifier(EuTaxIdentifierType.Vat, "FR123456789")),
+        RegistrationWithoutFixedEstablishmentWithTradeDetails(Country("FR", "France"),
+          EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("FR123456789")),
+          TradeDetails(
+            "French trading name",
+          InternationalAddress(
+            line1 = "Line 1",
+            line2 = None,
+            townOrCity = "Town",
+            stateOrRegion = None,
+            None,
+            Country("FR", "France")
+          ))
+        ),
+        EuVatRegistration(
+          Country("DE", "Germany"),
+          vatNumber = "DE123456789"
+        ),
+        RegistrationWithoutFixedEstablishmentWithTradeDetails(
+          Country("IE", "Ireland"),
+          EuTaxIdentifier(EuTaxIdentifierType.Other, Some("IE123456789")),
+          TradeDetails(
+          "Irish trading name",
+          InternationalAddress(
+            line1 = "Line 1",
+            line2 = None,
+            townOrCity = "Town",
+            stateOrRegion = None,
+            None,
+            Country("IE", "Ireland")
+          ))
+        ),
+        RegistrationWithoutTaxId(
+          Country("CR", "Croatia")
+        ),
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, "ES123456789"),
-          FixedEstablishment("Spanish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain")))
+          EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("ES123456789")),
+          TradeDetails("Spanish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain")))
         ),
         RegistrationWithFixedEstablishment(
-          Country("DE", "Germany"),
-          EuTaxIdentifier(EuTaxIdentifierType.Other, "DE123456789"),
-          FixedEstablishment("German trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DE", "Germany")))
+          Country("DK", "Denmark"),
+          EuTaxIdentifier(EuTaxIdentifierType.Other, Some("DK123456789")),
+          TradeDetails("Danish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark")))
         ),
-        RegistrationWithoutFixedEstablishment(
-          Country("IE", "Ireland"),
-          EuTaxIdentifier(EuTaxIdentifierType.Other, "IE123456789"),
-        )
       ),
       contactDetails = createBusinessContactDetails(),
       websites = Seq("website1", "website2"),
       commencementDate = LocalDate.now(),
       previousRegistrations = Seq(
-        PreviousRegistration(Country("DE", "Germany"), "DE123")
+        PreviousRegistration(
+          country = Country("DE", "Germany"),
+          previousSchemesDetails = Seq(
+            PreviousSchemeDetails(
+              previousScheme = PreviousScheme.OSSU,
+              previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
+            )
+          )
+        )
       ),
       bankDetails = BankDetails("Account name", Some(bic), iban),
       isOnlineMarketplace = false,

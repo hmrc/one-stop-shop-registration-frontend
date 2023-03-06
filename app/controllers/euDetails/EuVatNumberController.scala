@@ -16,13 +16,15 @@
 
 package controllers.euDetails
 
+import config.FrontendAppConfig
+import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuVatNumberFormProvider
-import models.requests.AuthenticatedDataRequest
-import models.{Country, CountryWithValidationDetails, Index, Mode}
-import pages.euDetails.{EuCountryPage, EuVatNumberPage}
+import models.{CountryWithValidationDetails, Index, Mode}
+import pages.euDetails.EuVatNumberPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.CoreRegistrationValidationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.EuVatNumberView
 
@@ -30,11 +32,13 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class EuVatNumberController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        cc: AuthenticatedControllerComponents,
-                                        formProvider: EuVatNumberFormProvider,
-                                        view: EuVatNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       override val messagesApi: MessagesApi,
+                                       cc: AuthenticatedControllerComponents,
+                                       formProvider: EuVatNumberFormProvider,
+                                       coreRegistrationValidationService: CoreRegistrationValidationService,
+                                       appConfig: FrontendAppConfig,
+                                       view: EuVatNumberView
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -73,19 +77,30 @@ class EuVatNumberController @Inject()(
               },
 
             value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
+
+              if (appConfig.otherCountryRegistrationValidationEnabled) {
+                coreRegistrationValidationService.searchEuVrn(value, country.code).flatMap {
+
+                  case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
+                    Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad()))
+
+                  case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
+                    Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
+
+                  case _ => for {
+                    updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
+                    _ <- cc.sessionRepository.set(updatedAnswers)
+                  } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
+                }
+              } else {
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
+                  _ <- cc.sessionRepository.set(updatedAnswers)
+                } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
+              }
           )
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+

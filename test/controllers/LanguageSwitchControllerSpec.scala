@@ -26,7 +26,7 @@ class LanguageSwitchControllerSpec extends SpecBase {
 
     "fallbackURL and languageMap must be correct" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val controller = application.injector.instanceOf[LanguageSwitchController]

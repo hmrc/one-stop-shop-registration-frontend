@@ -27,23 +27,23 @@ import play.api.Application
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testutils.WireMockHelper
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Instant, LocalDate}
-import java.util.UUID
 
 class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper {
 
+  implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+
   private val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 
-  private val randomUUID = UUID.randomUUID()
   private val timestamp = Instant.now
 
-  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration-stub/validateCoreRegistration"
+  def getValidateCoreRegistrationUrl = s"/one-stop-shop-registration/validate-core-registration"
 
   private def application: Application =
     applicationBuilder()
       .configure("microservice.services.core-validation.port" -> server.port)
-      .configure("microservice.services.core-validation.authorizationToken" -> "auth-token")
       .build()
 
   private val validCoreRegistrationResponse: CoreRegistrationValidationResult =
@@ -59,8 +59,8 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
           intermediary = Some("IN4819283759"),
           memberState = "DE",
           exclusionStatusCode = Some(3),
-          exclusionDecisionDate = Some(LocalDate.now().format(Match.dateFormatter)),
-          exclusionEffectiveDate = Some(LocalDate.now().format(Match.dateFormatter)),
+          exclusionDecisionDate = Some(LocalDate.now()),
+          exclusionEffectiveDate = Some(LocalDate.now()),
           nonCompliantReturns = Some(0),
           nonCompliantPayments = Some(0)
         )
@@ -103,13 +103,11 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
       ).sample.value
 
       val errorResponseJson =
-        s"""{"errorDetail": {
-           |    "errorCode": "$status",
-           |    "errorMessage": "Error",
-           |    "source": "EIS",
-           |    "timestamp": "$timestamp",
-           |    "correlationId": "$randomUUID"
-           |}}""".stripMargin
+        s"""{
+           |  "timestamp": "$timestamp",
+           |  "error": "$status",
+           |  "errorMessage": "Error"
+           |}""".stripMargin
 
 
       server.stubFor(
@@ -126,7 +124,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
         val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
 
-        val expectedResponse = EisError(EisErrorResponse(ErrorDetail(Some(s"$status"), Some("Error"), Some("EIS"), timestamp, randomUUID)))
+        val expectedResponse = EisError(EisErrorResponse(timestamp, s"$status", "Error"))
 
         result mustBe Left(expectedResponse)
 
@@ -158,18 +156,15 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
         val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
 
-        val errorResponse = result.left.get.asInstanceOf[EisError].eISErrorResponse.errorDetail
+        val errorResponse = result.left.get.asInstanceOf[EisError].eisErrorResponse
 
         val expectedResponse = EisError(
           EisErrorResponse(
-            ErrorDetail(
-              Some(s"$status"),
-              Some("The response body was empty"),
-              None,
-              errorResponse.timestamp,
-              errorResponse.correlationId
-            )
-          ))
+            errorResponse.timestamp,
+            s"$status",
+            "The response body was empty"
+          )
+        )
 
         result mustBe Left(expectedResponse)
       }

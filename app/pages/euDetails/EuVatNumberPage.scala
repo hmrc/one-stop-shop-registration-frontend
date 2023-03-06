@@ -17,27 +17,81 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
+import models.euDetails.EuConsumerSalesMethod
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class EuVatNumberPage(index: Index) extends QuestionPage[String] {
+case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
 
   override def toString: String = "euVatNumber"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.HasFixedEstablishmentController.onPageLoad(NormalMode, index)
-
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
-    case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckMode, answers)
-    case None    => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckMode, index)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    (answers.vatInfo.exists(_.partOfVatGroup),
+      answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
+      answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
+      case (_, Some(false), _) =>
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex)
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+        euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex)
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
   }
 
-  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = answers.get(HasFixedEstablishmentPage(index)) match {
-    case Some(_) => HasFixedEstablishmentPage(index).navigate(CheckLoopMode, answers)
-    case None    => euRoutes.HasFixedEstablishmentController.onPageLoad(CheckLoopMode, index)
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    (answers.vatInfo.exists(_.partOfVatGroup),
+      answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
+      answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
+        }
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
+          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckMode, answers)
+          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex)
+        }
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex)
+        }
+      case (_, Some(false), _) =>
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
+    (answers.vatInfo.exists(_.partOfVatGroup),
+      answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
+      answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
+        }
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
+          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
+          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
+        }
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex)
+        }
+      case (_, Some(false), _) =>
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
   }
 }

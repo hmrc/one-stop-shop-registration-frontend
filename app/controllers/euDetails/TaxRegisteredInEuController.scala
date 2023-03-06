@@ -29,14 +29,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaxRegisteredInEuController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: TaxRegisteredInEuFormProvider,
-                                         view: TaxRegisteredInEuView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                             override val messagesApi: MessagesApi,
+                                             cc: AuthenticatedControllerComponents,
+                                             formProvider: TaxRegisteredInEuFormProvider,
+                                             view: TaxRegisteredInEuView
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  protected val controllerComponents: MessagesControllerComponents = cc
 
   private val form = formProvider()
-  protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
@@ -45,13 +46,11 @@ class TaxRegisteredInEuController @Inject()(
         case None => form
         case Some(value) => form.fill(value)
       }
-
       Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
@@ -59,7 +58,7 @@ class TaxRegisteredInEuController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
+            _ <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(TaxRegisteredInEuPage.navigate(mode, updatedAnswers))
       )
   }

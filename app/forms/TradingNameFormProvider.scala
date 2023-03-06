@@ -30,7 +30,7 @@ class TradingNameFormProvider @Inject() extends Mappings {
     Form(
       "value" -> text("tradingName.error.required")
         .verifying(firstError(
-          maxLength(160, "tradingName.error.length"),
+          maxLength(100, "tradingName.error.length"),
           notADuplicate(thisIndex, existingAnswers, "tradingName.error.duplicate"),
           regexp(commonTextPattern, "tradingName.error.invalid"),
           notContainStrings(tradingNameReservedWords, "tradingName.error.invalid")

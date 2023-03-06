@@ -21,14 +21,22 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
 import pages._
-import pages.euDetails.{AddEuDetailsPage, EuCountryPage, EuTaxReferencePage, EuVatNumberPage, FixedEstablishmentAddressPage, FixedEstablishmentTradingNamePage, HasFixedEstablishmentPage, TaxRegisteredInEuPage, VatRegisteredPage}
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousEuVatNumberPage, PreviouslyRegisteredPage}
-import play.api.libs.json.{JsValue, Json}
+import pages.euDetails._
+import pages.previousRegistrations._
+import play.api.libs.json.{Json, JsValue}
 
 trait UserAnswersGenerator extends TryValues {
   self: Generators =>
 
   val generators: Seq[Gen[(QuestionPage[_], JsValue)]] =
+    arbitrary[(RegistrationTypePage, JsValue)] ::
+    arbitrary[(SellsGoodsToEUConsumerMethodPage, JsValue)] ::
+    arbitrary[(SellsGoodsToEUConsumersPage, JsValue)] ::
+    arbitrary[(PreviousSchemePage, JsValue)] ::
+    arbitrary[(PreviousSchemeTypePage, JsValue)] ::
+    arbitrary[(PreviousSchemeNumbersPage, JsValue)] ::
+    arbitrary[(PreviousIossSchemePage, JsValue)] ::
+    arbitrary[(EuSendGoodsTradingNamePage, JsValue)] ::
     arbitrary[(IsPlanningFirstEligibleSalePage.type, JsValue)] ::
     arbitrary[(SalesChannelsPage.type, JsValue)] ::
     arbitrary[(HasFixedEstablishmentInNiPage.type, JsValue)] ::
@@ -40,10 +48,9 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(EuTaxReferencePage, JsValue)] ::
     arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::
-    arbitrary[(PreviousEuVatNumberPage, JsValue)] ::
+    arbitrary[(PreviousOssNumberPage, JsValue)] ::
     arbitrary[(PreviousEuCountryPage, JsValue)] ::
     arbitrary[(AddPreviousRegistrationPage.type, JsValue)] ::
-    arbitrary[(HasFixedEstablishmentPage, JsValue)] ::
     arbitrary[(FixedEstablishmentTradingNamePage, JsValue)] ::
     arbitrary[(FixedEstablishmentAddressPage, JsValue)] ::
     arbitrary[(CheckVatDetailsPage.type, JsValue)] ::

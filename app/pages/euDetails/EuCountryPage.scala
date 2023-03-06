@@ -17,27 +17,26 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Country, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case class EuCountryPage(index: Index) extends QuestionPage[Country] {
+case class EuCountryPage(countryIndex: Index) extends QuestionPage[Country] {
 
-  override def path: JsPath = JsPath \ "euDetails" \ index.position \ toString
+  override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
 
   override def toString: String = "euCountry"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    euRoutes.VatRegisteredController.onPageLoad(NormalMode, index)
-
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(VatRegisteredPage(index)) match {
-    case Some(_) => VatRegisteredPage(index).navigate(CheckMode, answers)
-    case None    => euRoutes.VatRegisteredController.onPageLoad(CheckMode, index)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, countryIndex)
   }
 
-  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = answers.get(VatRegisteredPage(index)) match {
-    case Some(_) => VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-    case None    => euRoutes.VatRegisteredController.onPageLoad(CheckLoopMode, index)
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(_) => SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
+      case None => euRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex)
+    }
   }
+
 }

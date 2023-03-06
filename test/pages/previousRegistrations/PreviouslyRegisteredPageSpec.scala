@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import models.{CheckMode, Country, Index, NormalMode}
+import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
 
 class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -47,12 +48,12 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Is Online Marketplace" in {
+        "to Commencement Date" in {
 
           val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
 
           PreviouslyRegisteredPage.navigate(NormalMode, answers)
-            .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
+            .mustEqual(routes.CommencementDateController.onPageLoad(NormalMode))
         }
       }
 
@@ -78,7 +79,7 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
               emptyUserAnswers
                 .set(PreviouslyRegisteredPage, true).success.value
                 .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-                .set(PreviousEuVatNumberPage(Index(0)), "123").success.value
+                .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
 
             PreviouslyRegisteredPage.navigate(CheckMode, answers)
               .mustEqual(routes.CheckYourAnswersController.onPageLoad())
@@ -123,12 +124,12 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
       val answers =
         emptyUserAnswers
           .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-          .set(PreviousEuVatNumberPage(Index(0)), "123").success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
 
       val result = answers.set(PreviouslyRegisteredPage, false).success.value
 
       result.get(PreviousEuCountryPage(Index(0))) must not be defined
-      result.get(PreviousEuVatNumberPage(Index(0))) must not be defined
+      result.get(PreviousOssNumberPage(Index(0), Index(0))) must not be defined
     }
 
     "must leave all previous registrations in place when the answer is yes" in {
@@ -136,12 +137,12 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
       val answers =
         emptyUserAnswers
           .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-          .set(PreviousEuVatNumberPage(Index(0)), "123").success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
 
       val result = answers.set(PreviouslyRegisteredPage, true).success.value
 
       result.get(PreviousEuCountryPage(Index(0))).value mustEqual Country("FR", "France")
-      result.get(PreviousEuVatNumberPage(Index(0))).value mustEqual "123"
+      result.get(PreviousOssNumberPage(Index(0), Index(0))).value mustEqual PreviousSchemeNumbers("123", None)
     }
   }
 }

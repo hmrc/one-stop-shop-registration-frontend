@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
-import pages.euDetails.{EuCountryPage, EuTaxReferencePage, EuVatNumberPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails.{EuCountryPage, SellsGoodsToEUConsumersPage, VatRegisteredPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -47,7 +47,7 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, euCountryRoute)
@@ -65,10 +65,8 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(euDetails.EuCountryPage(index), country).success.value
+        .set(SellsGoodsToEUConsumersPage(index), false).success.value
         .set(VatRegisteredPage(index), false).success.value
-        .set(EuVatNumberPage(index), "test").success.value
-        .set(HasFixedEstablishmentPage(index), false).success.value
-        .set(EuTaxReferencePage(index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -91,7 +89,7 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -101,7 +99,7 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", country.code))
 
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswers.set(EuCountryPage(index), country).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual EuCountryPage(index).navigate(NormalMode, expectedAnswers).url
@@ -111,7 +109,7 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =
@@ -133,10 +131,8 @@ class EuCountryControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(euDetails.EuCountryPage(index), country).success.value
+        .set(SellsGoodsToEUConsumersPage(index), false).success.value
         .set(VatRegisteredPage(index), false).success.value
-        .set(EuVatNumberPage(index), "test").success.value
-        .set(HasFixedEstablishmentPage(index), false).success.value
-        .set(EuTaxReferencePage(index), "test").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

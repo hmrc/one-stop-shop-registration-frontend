@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Country, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.behaviours.PageBehaviours
@@ -27,77 +27,52 @@ import pages.euDetails
 
 class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckPropertyChecks {
 
-  private val index = Index(0)
+  private val countryIndex = Index(0)
 
   "EuCountryPage" - {
 
-    beRetrievable[Country](EuCountryPage(index))
+    beRetrievable[Country](EuCountryPage(countryIndex))
 
-    beSettable[Country](euDetails.EuCountryPage(index))
+    beSettable[Country](euDetails.EuCountryPage(countryIndex))
 
-    beRemovable[Country](euDetails.EuCountryPage(index))
+    beRemovable[Country](euDetails.EuCountryPage(countryIndex))
 
     "must navigate in Normal mode" - {
 
-      "to Vat Registered for the same index" in {
+      "to Sells Goods to EU Consumer for the same index" in {
 
-        EuCountryPage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(euRoutes.VatRegisteredController.onPageLoad(NormalMode, index))
+        EuCountryPage(countryIndex).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(NormalMode, countryIndex))
       }
     }
 
     "must navigate in Check mode" - {
 
-      "when Vat Registered has not been answered" - {
+      "when Sells Goods to EU Consumers has not been answered" - {
 
-        "to Vat Registered for the same index" in {
+        "to Sells Goods to EU Consumers for the same index" in {
 
-          EuCountryPage(index).navigate(CheckMode, emptyUserAnswers)
-            .mustEqual(euRoutes.VatRegisteredController.onPageLoad(CheckMode, index))
+          EuCountryPage(countryIndex).navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex))
         }
       }
 
-      "when Vat Registered has been answered" - {
+      "when Sells Goods to EU Consumers has been answered" - {
 
-        "to wherever Vat Registered would navigate to in Check mode" in {
+        "to wherever Sells Goods to EU Consumers would navigate to in Check mode" in {
 
           forAll(arbitrary[UserAnswers]) {
             baseAnswers =>
 
-              val answers = baseAnswers.set(VatRegisteredPage(Index(0)), true).success.value
+              val answers = baseAnswers
+                .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
 
-              EuCountryPage(index).navigate(CheckMode, answers)
-                .mustEqual(VatRegisteredPage(Index(0)).navigate(CheckMode, answers))
+              EuCountryPage(countryIndex).navigate(CheckMode, answers)
+                .mustEqual(SellsGoodsToEUConsumersPage(Index(0)).navigate(CheckMode, answers))
           }
         }
       }
     }
 
-    "must navigate in Check Loop mode" - {
-
-      "when Vat Registered has not been answered" - {
-
-        "to Vat Registered for the same index" in {
-
-          EuCountryPage(index).navigate(CheckLoopMode, emptyUserAnswers)
-            .mustEqual(euRoutes.VatRegisteredController.onPageLoad(CheckLoopMode, index))
-        }
-      }
-
-      "when Vat Registered has been answered" - {
-
-        "to wherever Vat Registered would navigate to in Check Loop mode" in {
-
-          forAll(arbitrary[UserAnswers]) {
-            baseAnswers =>
-
-              val answers = baseAnswers.set(VatRegisteredPage(Index(0)), true).success.value
-
-              EuCountryPage(index).navigate(CheckLoopMode, answers)
-                .mustEqual(VatRegisteredPage(Index(0)).navigate(CheckLoopMode, answers))
-          }
-        }
-      }
-    }
   }
 }

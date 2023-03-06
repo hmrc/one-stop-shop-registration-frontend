@@ -1,0 +1,21 @@
+@this(
+        formHelper: FormWithCSRF,
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(mode: Mode, countryIndex: Index)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("cannotAddCountry.title"))) {
+
+    @formHelper(action = controllers.euDetails.routes.CannotAddCountryController.onSubmit(countryIndex), 'autoComplete -> "off") {
+
+        <h1 class="govuk-heading-xl">@messages("cannotAddCountry.heading")</h1>
+
+        <p class="govuk-body">@messages("cannotAddCountry.paragraph")</p>
+
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
+}

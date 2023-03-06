@@ -20,7 +20,7 @@ import controllers.previousRegistrations.routes
 import models.{CheckMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import queries.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
+import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
@@ -34,7 +34,7 @@ object PreviousRegistrationSummary {
       case (details, index) =>
         ListItem(
           name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-          changeUrl = routes.PreviousEuCountryController.onPageLoad(mode, Index(index)).url,
+          changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
           removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
         )
     }
@@ -45,7 +45,7 @@ object PreviousRegistrationSummary {
 
         val value = previousRegistrations.map {
           details =>
-            HtmlFormat.escape(details.previousEuCountry.name) + " - " + HtmlFormat.escape(details.previousEuVatNumber)
+            HtmlFormat.escape(details.previousEuCountry.name)
         }.mkString("<br/>")
 
         SummaryListRowViewModel(

@@ -17,16 +17,13 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import formats.Format
 import play.api.Configuration
-import play.api.http.HeaderNames.{ACCEPT, CONTENT_TYPE, DATE, X_FORWARDED_HOST, AUTHORIZATION}
-import play.api.http.MimeTypes
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 import java.net.URI
-import java.time.{Clock, LocalDateTime}
+import java.time.Clock
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
@@ -87,18 +84,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
   val accessibilityStatementUrl: String = configuration.get[String]("accessibility-statement.service-path")
 
   val coreValidationUrl: Service = configuration.get[Service]("microservice.services.core-validation")
-
-  private val XCorrelationId = "X-Correlation-Id"
-  private val authorizationToken: String = configuration.get[String]("microservice.services.core-validation.authorizationToken")
-
-  def eisHeaders(correlationId: String): Seq[(String, String)] = Seq(
-    XCorrelationId -> correlationId,
-    X_FORWARDED_HOST -> "MDTP",
-    CONTENT_TYPE -> MimeTypes.JSON,
-    ACCEPT -> MimeTypes.JSON,
-    DATE -> Format.eisDateTimeFormatter.format(LocalDateTime.now(clock)),
-    AUTHORIZATION -> s"Bearer $authorizationToken"
-  )
 
   val emailVerificationEnabled: Boolean = configuration.get[Boolean]("features.email-verification-enabled")
 

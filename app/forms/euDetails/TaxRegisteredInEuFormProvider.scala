@@ -23,8 +23,9 @@ import javax.inject.Inject
 
 class TaxRegisteredInEuFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(): Form[Boolean] = {
     Form(
       "value" -> boolean("taxRegisteredInEu.error.required")
     )
+  }
 }

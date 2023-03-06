@@ -18,6 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import controllers.routes
+import logging.Logging
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
@@ -29,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
                                          (implicit val executionContext: ExecutionContext)
-  extends CheckNiProtocolFilter {
+  extends CheckNiProtocolFilter with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
@@ -42,7 +43,9 @@ class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
 
           case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolRejectionController.onPageLoad())))
 
-          case _ => throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
+          case _ =>
+            logger.error("Illegal state cause by SingleMarketIndicator missing")
+            throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
         }
         case _ => Future.successful(None)
       }

@@ -20,15 +20,17 @@ import controllers.actions._
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
+import models.{CheckMode, Country, Mode}
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
+import utils.EuDetailsCompletionChecks.{getAllIncompleteEuDetails, incompleteCheckEuDetailsRedirect}
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
-import views.html.euDetails.AddEuDetailsView
+import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +39,8 @@ class AddEuDetailsController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: AddEuDetailsFormProvider,
-                                        view: AddEuDetailsView
+                                        view: AddEuDetailsView,
+                                        viewPartOfVatGroup: PartOfVatGroupAddEuDetailsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -45,34 +48,44 @@ class AddEuDetailsController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       getNumberOfEuCountries {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
 
           withCompleteDataAsync[EuOptionalDetails](
             data = getAllIncompleteEuDetails,
             onFailure = (incomplete: Seq[EuOptionalDetails]) => {
-              Future.successful(Ok(view(form, mode, list, canAddCountries, incomplete)))
+              if(vatOnly){
+                val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
+                Future.successful(Ok(viewPartOfVatGroup(form, mode, list, canAddCountries, incomplete)))
+              } else {
+                val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+                Future.successful(Ok(view(form, mode, list, canAddCountries, incomplete)))
+              }
             }) {
-            Future.successful(Ok(view(form, mode, list, canAddCountries)))
+            if(vatOnly) {
+              val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
+              Future.successful(Ok(viewPartOfVatGroup(form, mode, list, canAddCountries)))
+            } else {
+              val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+              Future.successful(Ok(view(form, mode, list, canAddCountries)))
+            }
           }
       }
   }
 
   def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
+      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       withCompleteDataAsync[EuOptionalDetails](
         data = getAllIncompleteEuDetails,
         onFailure = (incomplete: Seq[EuOptionalDetails]) => {
-          if(incompletePromptShown) {
-            firstIndexedIncompleteEuDetails(incomplete.map(_.euCountry)) match {
-              case Some(incompleteCountry) =>
-                Future.successful(Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, Index(incompleteCountry._2))))
-              case None =>
-                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }
+          if (incompletePromptShown) {
+            incompleteCheckEuDetailsRedirect(CheckMode).map(
+              redirectIncompletePage => redirectIncompletePage.toFuture
+            ).getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
           } else {
             Future.successful(Redirect(routes.AddEuDetailsController.onPageLoad(mode)))
           }
@@ -82,9 +95,14 @@ class AddEuDetailsController @Inject()(
             val canAddCountries = number < Country.euCountries.size
             form.bindFromRequest().fold(
               formWithErrors => {
-                val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+                if(vatOnly) {
+                  val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
+                  Future.successful(BadRequest(viewPartOfVatGroup(formWithErrors, mode, list, canAddCountries)))
+                } else {
+                  val list = EuDetailsSummary.addToListRows(request.userAnswers, mode)
+                  Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
+                }
 
-                Future.successful(BadRequest(view(formWithErrors, mode, list, canAddCountries)))
               },
               value =>
                 for {

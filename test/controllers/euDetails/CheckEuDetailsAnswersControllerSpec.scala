@@ -17,6 +17,7 @@
 package controllers.euDetails
 
 import base.SpecBase
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -24,13 +25,13 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails
-import pages.euDetails.{CheckEuDetailsAnswersPage, EuCountryPage, HasFixedEstablishmentPage, VatRegisteredPage}
+import pages.euDetails._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import viewmodels.checkAnswers.euDetails.{HasFixedEstablishmentSummary, VatRegisteredSummary}
+import viewmodels.checkAnswers.euDetails._
 import viewmodels.govuk.SummaryListFluency
 import views.html.euDetails.CheckEuDetailsAnswersView
 
@@ -38,18 +39,25 @@ import scala.concurrent.Future
 
 class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
 
-  private val index                 = Index(0)
-  private val country               = Country.euCountries.head
+  private val countryIndex = Index(0)
+  private val country = Country.euCountries.head
   private val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
   private val baseUserAnswers =
-    basicUserAnswers
-      .set(euDetails.EuCountryPage(index), Country.euCountries.head).success.value
-      .set(euDetails.VatRegisteredPage(index), true).success.value
+    basicUserAnswersWithVatInfo
+      .set(euDetails.EuCountryPage(countryIndex), Country.euCountries.head).success.value
+      .set(euDetails.VatRegisteredPage(countryIndex), true).success.value
 
-  private val answersNotRegisteredNoEstablishment = baseUserAnswers.set(EuCountryPage(index), country).success.value
-    .set(VatRegisteredPage(index), false).success.value
-    .set(HasFixedEstablishmentPage(index), false).success.value
+  private val answers =
+    basicUserAnswersWithVatInfo
+    .set(TaxRegisteredInEuPage, true).success.value
+    .set(EuCountryPage(countryIndex), country).success.value
+    .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+    .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+    .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
+    .set(EuTaxReferencePage(countryIndex), "12345678").success.value
+    .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+    .set(EuSendGoodsAddressPage(countryIndex), arbitraryInternationalAddress.arbitrary.sample.value).success.value
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockSessionRepository)
@@ -59,19 +67,25 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
 
     "must return OK and the correct view for a GET when answers are complete" in {
 
-      val application = applicationBuilder(userAnswers = Some(answersNotRegisteredNoEstablishment)).build()
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         implicit val msgs: Messages = messages(application)
-        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
+        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
         val list = SummaryListViewModel(
-          Seq(VatRegisteredSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode), HasFixedEstablishmentSummary.row(answersNotRegisteredNoEstablishment, index, NormalMode)).flatten
+          Seq(
+            SellsGoodsToEUConsumersSummary.row(answers, countryIndex, NormalMode),
+            SellsGoodsToEUConsumerMethodSummary.row(answers, countryIndex),
+            RegistrationTypeSummary.row(answers, countryIndex),
+            EuTaxReferenceSummary.row(answers, countryIndex, NormalMode),
+            EuSendGoodsTradingNameSummary.row(answers, countryIndex, NormalMode),
+            EuSendGoodsAddressSummary.row(answers, countryIndex, NormalMode)).flatten
         )
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, NormalMode, index, country)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(list, NormalMode, countryIndex, country)(request, messages(application)).toString
       }
     }
 
@@ -80,22 +94,22 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
+        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex).url)
         val result = route(application, request).value
         val view = application.injector.instanceOf[CheckEuDetailsAnswersView]
         val list = SummaryListViewModel(Seq.empty)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list, NormalMode, index, country, true)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(list, NormalMode, countryIndex, country, true)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery if user answers are empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url)
+        val request = FakeRequest(GET, routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -108,18 +122,18 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
       "must redirect to the next page when answers are complete" in {
 
         val application =
-          applicationBuilder(userAnswers = Some(answersNotRegisteredNoEstablishment))
+          applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
             .build()
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         running(application) {
-          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index, false).url)
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, countryIndex, false).url)
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, answersNotRegisteredNoEstablishment).url
+          redirectLocation(result).value mustEqual CheckEuDetailsAnswersPage.navigate(NormalMode, answers).url
         }
       }
 
@@ -133,11 +147,11 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         running(application) {
-          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index, true).url)
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, countryIndex, true).url)
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.EuCountryController.onPageLoad(NormalMode, index).url
+          redirectLocation(result).value mustEqual routes.EuCountryController.onPageLoad(NormalMode, countryIndex).url
         }
       }
 
@@ -151,11 +165,11 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
         running(application) {
-          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, index, false).url)
+          val request = FakeRequest(POST, routes.CheckEuDetailsAnswersController.onSubmit(NormalMode, countryIndex, false).url)
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index).url
+          redirectLocation(result).value mustEqual routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, countryIndex).url
         }
       }
     }

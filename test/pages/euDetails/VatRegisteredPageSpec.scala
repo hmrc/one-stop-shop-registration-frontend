@@ -48,12 +48,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to EU Tax Reference for the same index" in {
+        "to Check EU Details Answers for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(NormalMode, index))
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
         }
       }
 
@@ -99,29 +99,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and EU Tax Reference has not been answered" - {
+        "to Check EU Details Answers" in {
 
-          "to EU Tax Reference" in {
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
-            val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
-
-            VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(CheckMode, index))
-          }
-        }
-
-        "and EU Tax Reference has been answered" - {
-
-          "to wherever EU Tax Reference navigates to" in {
-
-            val answers =
-              emptyUserAnswers
-                .set(VatRegisteredPage(index), false).success.value
-                .set(EuTaxReferencePage(index), "123").success.value
-
-            VatRegisteredPage(index).navigate(CheckMode, answers)
-              .mustEqual(EuTaxReferencePage(index).navigate(CheckMode, answers))
-          }
+          VatRegisteredPage(index).navigate(CheckMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index))
         }
       }
 
@@ -167,29 +150,13 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "and EU Tax Reference has not been answered" - {
-
-          "to EU Tax Reference" in {
+          "to Check EU Details Answers" in {
 
             val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
             VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(euRoutes.EuTaxReferenceController.onPageLoad(CheckLoopMode, index))
+              .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index))
           }
-        }
-
-        "and EU Tax Reference has been answered" - {
-
-          "to wherever EU Tax Reference navigates to" in {
-            val answers =
-              emptyUserAnswers
-                .set(VatRegisteredPage(index), false).success.value
-                .set(EuTaxReferencePage(index), "123").success.value
-
-            VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(EuTaxReferencePage(index).navigate(CheckLoopMode, answers))
-          }
-        }
       }
 
       "when the answer is empty" - {

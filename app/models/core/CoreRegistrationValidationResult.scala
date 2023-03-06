@@ -18,7 +18,7 @@ package models.core
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.format.DateTimeFormatter
+import java.time.LocalDate
 
 case class CoreRegistrationValidationResult(
                                              searchId: String,
@@ -40,15 +40,13 @@ case class Match(
                     intermediary: Option[String],
                     memberState: String,
                     exclusionStatusCode: Option[Int],
-                    exclusionDecisionDate: Option[String],
-                    exclusionEffectiveDate: Option[String],
+                    exclusionDecisionDate: Option[LocalDate],
+                    exclusionEffectiveDate: Option[LocalDate],
                     nonCompliantReturns: Option[Int],
                     nonCompliantPayments: Option[Int]
                   )
 
 object Match {
-
-  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy MM dd")
 
   implicit val format: OFormat[Match] = Json.format[Match]
 

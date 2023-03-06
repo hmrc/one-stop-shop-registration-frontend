@@ -37,7 +37,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new AddTradingNameFormProvider()
   private val form = formProvider()
-  private val baseAnswers = basicUserAnswers.set(TradingNamePage(Index(0)), "foo").success.value
+  private val baseAnswers = basicUserAnswersWithVatInfo.set(TradingNamePage(Index(0)), "foo").success.value
   private lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(NormalMode).url
 
   "AddTradingName Controller" - {
@@ -63,7 +63,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET when the maximum number of trading names have already been added" in {
 
       val answers =
-        basicUserAnswers
+        basicUserAnswersWithVatInfo
           .set(TradingNamePage(Index(0)), "foo").success.value
           .set(TradingNamePage(Index(1)), "foo").success.value
           .set(TradingNamePage(Index(2)), "foo").success.value
@@ -93,7 +93,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to journey recovery and the correct view for a GET when cannot derive number of trading names" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)

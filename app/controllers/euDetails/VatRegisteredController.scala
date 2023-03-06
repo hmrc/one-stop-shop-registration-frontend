@@ -16,13 +16,13 @@
 
 package controllers.euDetails
 
+import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.VatRegisteredFormProvider
-import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
-import pages.euDetails.{EuCountryPage, VatRegisteredPage}
+import models.{Index, Mode}
+import pages.euDetails.VatRegisteredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.VatRegisteredView
 
@@ -34,7 +34,7 @@ class VatRegisteredController @Inject()(
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: VatRegisteredFormProvider,
                                          view: VatRegisteredView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -68,17 +68,11 @@ class VatRegisteredController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(VatRegisteredPage(index), value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
+                _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(VatRegisteredPage(index).navigate(mode, updatedAnswers))
           )
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+

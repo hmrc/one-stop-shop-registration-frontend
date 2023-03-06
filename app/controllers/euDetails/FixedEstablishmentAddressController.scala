@@ -16,13 +16,13 @@
 
 package controllers.euDetails
 
+import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.FixedEstablishmentAddressFormProvider
-import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
-import pages.euDetails.{EuCountryPage, FixedEstablishmentAddressPage}
+import models.{Index, Mode}
+import pages.euDetails.FixedEstablishmentAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.FixedEstablishmentAddressView
 
@@ -30,11 +30,11 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class FixedEstablishmentAddressController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      cc: AuthenticatedControllerComponents,
-                                      formProvider: FixedEstablishmentAddressFormProvider,
-                                      view: FixedEstablishmentAddressView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                     override val messagesApi: MessagesApi,
+                                                     cc: AuthenticatedControllerComponents,
+                                                     formProvider: FixedEstablishmentAddressFormProvider,
+                                                     view: FixedEstablishmentAddressView
+                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -68,18 +68,12 @@ class FixedEstablishmentAddressController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(FixedEstablishmentAddressPage(index), value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
+                _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(FixedEstablishmentAddressPage(index).navigate(mode, updatedAnswers))
           )
 
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+

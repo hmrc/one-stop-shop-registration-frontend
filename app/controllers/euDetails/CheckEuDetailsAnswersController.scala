@@ -16,15 +16,15 @@
 
 package controllers.euDetails
 
+import controllers.GetCountry
 import controllers.actions.AuthenticatedControllerComponents
 import models.euDetails.EuOptionalDetails
-import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode}
-import pages.euDetails
+import models.{Index, Mode}
 import pages.euDetails.CheckEuDetailsAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.EuDetailsCompletionChecks.getIncompleteEuDetails
 import utils.CompletionChecks
 import viewmodels.checkAnswers.euDetails._
 import viewmodels.govuk.summarylist._
@@ -37,56 +37,54 @@ class CheckEuDetailsAnswersController @Inject()(
                                                  override val messagesApi: MessagesApi,
                                                  cc: AuthenticatedControllerComponents,
                                                  view: CheckEuDetailsAnswersView
-                                               ) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                               ) extends FrontendBaseController with CompletionChecks with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      getCountry(index) {
+      getCountry(countryIndex) {
         country =>
 
           val list = SummaryListViewModel(
             rows = Seq(
-              VatRegisteredSummary.row(request.userAnswers, index, mode),
-              EuVatNumberSummary.row(request.userAnswers, index, mode),
-              EuTaxReferenceSummary.row(request.userAnswers, index, mode),
-              HasFixedEstablishmentSummary.row(request.userAnswers, index, mode),
-              FixedEstablishmentTradingNameSummary.row(request.userAnswers, index, mode),
-              FixedEstablishmentAddressSummary.row(request.userAnswers, index, mode)
+              SellsGoodsToEUConsumersSummary.row(request.userAnswers, countryIndex, mode),
+              SellsGoodsToEUConsumerMethodSummary.row(request.userAnswers, countryIndex),
+              RegistrationTypeSummary.row(request.userAnswers, countryIndex),
+              VatRegisteredSummary.row(request.userAnswers, countryIndex, mode),
+              EuVatNumberSummary.row(request.userAnswers, countryIndex, mode),
+              EuTaxReferenceSummary.row(request.userAnswers, countryIndex, mode),
+              FixedEstablishmentTradingNameSummary.row(request.userAnswers, countryIndex, mode),
+              FixedEstablishmentAddressSummary.row(request.userAnswers, countryIndex, mode),
+              EuSendGoodsTradingNameSummary.row(request.userAnswers, countryIndex, mode),
+              EuSendGoodsAddressSummary.row(request.userAnswers, countryIndex, mode)
             ).flatten
           )
 
           Future.successful(withCompleteDataModel[EuOptionalDetails](
-            index,
+            countryIndex,
             data = getIncompleteEuDetails _,
             onFailure = (incomplete: Option[EuOptionalDetails]) => {
-              Ok(view(list, mode, index, country, incomplete.isDefined))
+              Ok(view(list, mode, countryIndex, country, incomplete.isDefined))
             }) {
-            Ok(view(list, mode, index, country))
+            Ok(view(list, mode, countryIndex, country))
           })
       }
   }
 
-  def onSubmit(mode: Mode, index: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, countryIndex: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      val incomplete = getIncompleteEuDetails(index)
+      val incomplete = getIncompleteEuDetails(countryIndex)
       if(incomplete.isEmpty) {
         Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
       } else {
         if(!incompletePromptShown) {
-          Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, index))
+          Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, countryIndex))
         } else{
-          Redirect(routes.EuCountryController.onPageLoad(mode, index))
+          Redirect(routes.EuCountryController.onPageLoad(mode, countryIndex))
         }
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(euDetails.EuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }
+

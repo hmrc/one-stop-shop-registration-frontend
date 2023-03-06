@@ -22,7 +22,7 @@ import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import queries.{AllPreviousRegistrationsQuery, DeriveNumberOfPreviousRegistrations}
+import queries.previousRegistration.{AllPreviousRegistrationsQuery, DeriveNumberOfPreviousRegistrations}
 
 import scala.util.Try
 
@@ -35,7 +35,7 @@ case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(PreviouslyRegisteredPage) match {
       case Some(true)  => prevRegRoutes.PreviousEuCountryController.onPageLoad(NormalMode, Index(0))
-      case Some(false) => routes.IsOnlineMarketplaceController.onPageLoad(NormalMode)
+      case Some(false) => routes.CommencementDateController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 

@@ -42,13 +42,13 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val bic         = arbitrary[Bic].sample.value
   private val iban        = arbitrary[Iban].sample.value
   private val bankDetails = BankDetails("account name", Some(bic), iban)
-  private val userAnswers = basicUserAnswers.set(BankDetailsPage, bankDetails).success.value
+  private val userAnswers = basicUserAnswersWithVatInfo.set(BankDetailsPage, bankDetails).success.value
 
   "BankDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, bankDetailsRoute)
@@ -85,7 +85,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswers))
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(
             bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
           )
@@ -97,7 +97,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("accountName", "account name"), ("bic", bic.toString), ("iban", iban.toString))
 
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswers.set(BankDetailsPage, bankDetails).success.value
+        val expectedAnswers = basicUserAnswersWithVatInfo.set(BankDetailsPage, bankDetails).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual BankDetailsPage.navigate(NormalMode, expectedAnswers).url
@@ -107,7 +107,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =

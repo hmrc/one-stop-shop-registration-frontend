@@ -18,7 +18,6 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import models.{CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
@@ -52,11 +51,11 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
 
       "when the user answers no" - {
 
-        "must be Previously Registered" in {
+        "must be Is Online Marketplace" in {
 
           val answers = emptyUserAnswers.set(AddEuDetailsPage, false).success.value
           AddEuDetailsPage.navigate(NormalMode, answers)
-            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode))
+            .mustEqual(routes.IsOnlineMarketplaceController.onPageLoad(NormalMode))
         }
       }
 
@@ -82,7 +81,6 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
               .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
               .set(VatRegisteredPage(Index(0)), true).success.value
               .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-              .set(HasFixedEstablishmentPage(Index(0)), false).success.value
 
           AddEuDetailsPage.navigate(CheckMode, answers)
             .mustEqual(euRoutes.EuCountryController.onPageLoad(CheckMode, Index(1)))
