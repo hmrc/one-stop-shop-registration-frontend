@@ -35,7 +35,7 @@ object VatCustomerInfoHttpParser extends Logging {
             case JsSuccess(value, _) =>
               Right(value)
             case JsError(errors) =>
-              logger.error("Could not read payload as a VatCustomerInfo model", errors)
+              logger.error(s"Could not read payload as a VatCustomerInfo model $errors", errors)
               Left(InvalidJson)
         }
 
