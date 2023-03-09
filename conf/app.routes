@@ -276,6 +276,7 @@ POST        /planned-first-sale                                                 
 GET         /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
 
++nocsrf
 POST        /external-entry                                                     controllers.external.ExternalController.onExternal(lang: Option[String] ?= None)
 GET         /no-welsh-service                                                   controllers.external.NoMoreWelshController.onPageLoad()
 GET         /cannot-register-ni-protocol                                        controllers.NiProtocolRejectionController.onPageLoad()
