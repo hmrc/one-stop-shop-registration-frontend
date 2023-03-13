@@ -51,7 +51,7 @@ class AuthenticatedIdentifierAction @Inject()(
   //noinspection ScalaStyle
   override def refine[A](request: Request[A]): IdentifierActionResult[A] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.withHeaders(request.headers), request.session)
 
     authorised(
       AuthProviders(AuthProvider.GovernmentGateway) and
