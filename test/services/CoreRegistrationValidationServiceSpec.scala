@@ -20,6 +20,7 @@ import base.SpecBase
 import connectors.ValidateCoreRegistrationConnector
 import models.core.{CoreRegistrationValidationResult, Match, MatchType}
 import models.PreviousScheme
+import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -29,6 +30,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
+import play.api.mvc.AnyContent
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -61,7 +64,13 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
   private val connector = mock[ValidateCoreRegistrationConnector]
 
+  private val auditService = mock[AuditService]
+
   implicit val hc: HeaderCarrier = HeaderCarrier()
+
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
+
+  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
 
   "coreRegistrationValidationService.searchUkVrn" - {
 
@@ -71,7 +80,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue.get
 
@@ -85,7 +94,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
 
@@ -117,7 +126,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue.get
 
@@ -132,7 +141,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue
 
@@ -165,7 +174,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchEuVrn(euVrn, countrycode).futureValue.get
 
@@ -180,7 +189,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue
 
@@ -214,7 +223,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue.get
 
@@ -230,7 +239,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, Some(intermediaryNumber), countryCode).futureValue.get
 
@@ -246,7 +255,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue
 
@@ -275,7 +284,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isActiveTrader with matchType = FixedEstablishmentActiveNETP and must return true" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val response = coreRegistrationValidationService.isActiveTrader(genericMatch)
 
@@ -284,7 +293,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isActiveTrader with matchType = TraderIdActiveNETP and must return true" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
       val response = coreRegistrationValidationService.isActiveTrader(newMatch)
@@ -294,7 +303,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isActiveTrader with matchType = OtherMSNETPActiveNETP and must return true" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
       val response = coreRegistrationValidationService.isActiveTrader(newMatch)
@@ -304,7 +313,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isActiveTrader with matchType = FixedEstablishmentQuarantinedNETP and must return false" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
       val response = coreRegistrationValidationService.isActiveTrader(newMatch)
@@ -317,7 +326,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isExcludedTrader with matchType = FixedEstablishmentQuarantinedNETP and must return true" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
@@ -327,7 +336,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isExcludedTrader with matchType = TraderIdQuarantinedNETP and must return true" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
@@ -337,7 +346,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isExcludedTrader with matchType = OtherMSNETPQuarantinedNETP and must return true" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
@@ -347,7 +356,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
     "call isExcludedTrader with matchType = FixedEstablishmentActiveNETP and must return false" in {
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentActiveNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
