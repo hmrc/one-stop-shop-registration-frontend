@@ -35,10 +35,11 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) if coreRegistrationResponse.matches.nonEmpty =>
-        coreRegistrationResponse.matches.headOption
+      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
 
-      case _ => None
+
+      case _ => throw CoreRegistrationValidationException("Error while validating core registration")
+
     }
   }
 
@@ -50,7 +51,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
       case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
 
-      case _ => None
+      case _ => throw CoreRegistrationValidationException("Error while validating core registration")
     }
   }
 
@@ -63,7 +64,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
 
       case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
 
-      case _ => None
+      case _ => throw CoreRegistrationValidationException("Error while validating core registration")
     }
   }
 
@@ -81,7 +82,7 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
         case PreviousScheme.IOSSWI => SourceType.TraderId
       }
 
-      val convertedSearchNumber = if(sourceType == SourceType.EUVATNumber) {
+      val convertedSearchNumber = if (sourceType == SourceType.EUVATNumber) {
         convertTaxIdentifierForTransfer(searchNumber, countryCode)
       } else {
         searchNumber
@@ -96,12 +97,12 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
       )
 
       connector.validateCoreRegistration(coreRegistrationRequest).map {
+
         case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
-        case _ => None
+
+        case _ => throw CoreRegistrationValidationException("Error while validating core registration")
       }
-
     }
-
   }
 
   def isActiveTrader(activeMatch: Match): Boolean = {
@@ -138,6 +139,6 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
         throw new IllegalStateException("Error occurred while getting country code regex, unable to convert identifier")
     }
   }
-
-
 }
+
+case class CoreRegistrationValidationException(message: String) extends Exception(message)
