@@ -60,7 +60,7 @@ class UnauthenticatedUserAnswersRepository @Inject()(
         filter = byId(id),
         update = Updates.set("lastUpdated", Instant.now(clock)),
       )
-      .toFuture
+      .toFuture()
       .map(_ => true)
 
   def get(id: String): Future[Option[UserAnswers]] =
@@ -68,7 +68,7 @@ class UnauthenticatedUserAnswersRepository @Inject()(
       _ =>
         collection
           .find(byId(id))
-          .headOption
+          .headOption()
     }
 
   def set(answers: UserAnswers): Future[Boolean] = {
@@ -81,13 +81,13 @@ class UnauthenticatedUserAnswersRepository @Inject()(
         replacement = updatedAnswers,
         options     = ReplaceOptions().upsert(true)
       )
-      .toFuture
+      .toFuture()
       .map(_ => true)
   }
 
   def clear(id: String): Future[Boolean] =
     collection
       .deleteOne(byId(id))
-      .toFuture
+      .toFuture()
       .map(_ => true)
 }

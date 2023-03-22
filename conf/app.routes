@@ -2,23 +2,23 @@
 
 ->          /hmrc-frontend                                                      hmrcfrontend.Routes
 
-GET         /                                                                   controllers.IndexController.onPageLoad
+GET         /                                                                   controllers.IndexController.onPageLoad()
 
 GET         /assets/*file                                                       controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /language/:lang                                                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                                                    controllers.KeepAliveController.keepAliveAuthenticated
-GET         /refresh-session-unauthenticated                                    controllers.KeepAliveController.keepAliveUnauthenticated
+GET         /refresh-session                                                    controllers.KeepAliveController.keepAliveAuthenticated()
+GET         /refresh-session-unauthenticated                                    controllers.KeepAliveController.keepAliveUnauthenticated()
 
 GET         /there-is-a-problem                                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /start-again                                                        controllers.JourneyRecoveryController.onMissingAnswers()
 
-GET         /check-answers                                                      controllers.CheckYourAnswersController.onPageLoad
+GET         /check-answers                                                      controllers.CheckYourAnswersController.onPageLoad()
 POST        /check-answers/:incompletePrompt                                    controllers.CheckYourAnswersController.onSubmit(incompletePrompt: Boolean)
 
-GET         /unauthorised                                                       controllers.UnauthorisedController.onPageLoad
+GET         /unauthorised                                                       controllers.UnauthorisedController.onPageLoad()
 
 GET         /have-uk-trading-name                                               controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /have-uk-trading-name                                               controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
@@ -93,35 +93,35 @@ POST        /check-remove-website-address/:index                                
 
 GET         /identity-complete                                                  controllers.auth.IdentityVerificationController.handleIvFailure(continueURL: String, journeyId: Option[String])
 GET         /identity-problem                                                   controllers.auth.IdentityVerificationController.identityError(continueUrl: String)
-GET         /iv/error                                                           controllers.auth.IvReturnController.error
-GET         /iv/incomplete                                                      controllers.auth.IvReturnController.incomplete
-GET         /iv/insufficient-evidence                                           controllers.auth.IvReturnController.insufficientEvidence
-GET         /iv/locked-out                                                      controllers.auth.IvReturnController.lockedOut
-GET         /iv/precondition-failed                                             controllers.auth.IvReturnController.preconditionFailed
-GET         /iv/technical-issue                                                 controllers.auth.IvReturnController.technicalIssue
-GET         /iv/timeout                                                         controllers.auth.IvReturnController.timeout
+GET         /iv/error                                                           controllers.auth.IvReturnController.error()
+GET         /iv/incomplete                                                      controllers.auth.IvReturnController.incomplete()
+GET         /iv/insufficient-evidence                                           controllers.auth.IvReturnController.insufficientEvidence()
+GET         /iv/locked-out                                                      controllers.auth.IvReturnController.lockedOut()
+GET         /iv/precondition-failed                                             controllers.auth.IvReturnController.preconditionFailed()
+GET         /iv/technical-issue                                                 controllers.auth.IvReturnController.technicalIssue()
+GET         /iv/timeout                                                         controllers.auth.IvReturnController.timeout()
 GET         /iv/user-aborted                                                    controllers.auth.IvReturnController.userAborted(continueUrl: String)
-GET         /iv/insufficient-evidence-sources                                   controllers.auth.IvReturnController.notEnoughEvidenceSources
+GET         /iv/insufficient-evidence-sources                                   controllers.auth.IvReturnController.notEnoughEvidenceSources()
 GET         /iv/failed-matching                                                 controllers.auth.IvReturnController.failedMatching(continueUrl: String)
 GET         /iv/failed-identity-verification                                    controllers.auth.IvReturnController.failed(continueUrl: String)
 
 GET         /account/register                                                   controllers.auth.AuthController.redirectToRegister(continueUrl: String)
 GET         /account/login                                                      controllers.auth.AuthController.redirectToLogin(continueUrl: String)
-GET         /account/sign-out-survey                                            controllers.auth.AuthController.signOut
-GET         /account/sign-out                                                   controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                                                 controllers.auth.SignedOutController.onPageLoad
+GET         /account/sign-out-survey                                            controllers.auth.AuthController.signOut()
+GET         /account/sign-out                                                   controllers.auth.AuthController.signOutNoSurvey()
+GET         /account/signed-out                                                 controllers.auth.SignedOutController.onPageLoad()
 GET         /cannot-use-agent                                                   controllers.auth.AuthController.unsupportedAffinityGroup()
 GET         /account/provider-unsupported                                       controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
 GET         /account/credential-unsupported                                     controllers.auth.AuthController.insufficientEnrolments()
-GET         /account/role-unsupported                                           controllers.auth.AuthController.unsupportedCredentialRole
+GET         /account/role-unsupported                                           controllers.auth.AuthController.unsupportedCredentialRole()
 
-GET         /on-sign-in                                                         controllers.auth.AuthController.onSignIn
-GET         /continue-on-sign-in                                                controllers.auth.AuthController.continueOnSignIn
+GET         /on-sign-in                                                         controllers.auth.AuthController.onSignIn()
+GET         /continue-on-sign-in                                                controllers.auth.AuthController.continueOnSignIn()
 
-GET         /confirm-vat-details                                                controllers.CheckVatDetailsController.onPageLoad
-POST        /confirm-vat-details                                                controllers.CheckVatDetailsController.onSubmit
+GET         /confirm-vat-details                                                controllers.CheckVatDetailsController.onPageLoad()
+POST        /confirm-vat-details                                                controllers.CheckVatDetailsController.onSubmit()
 
-GET         /register-different-business                                        controllers.UseOtherAccountController.onPageLoad
+GET         /register-different-business                                        controllers.UseOtherAccountController.onPageLoad()
 
 GET         /eu-fixed-establishment-address/:index                              controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-fixed-establishment-address/:index                              controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -211,10 +211,10 @@ POST        /give-website-address                                               
 GET         /check-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
 
-GET         /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onPageLoad
-POST        /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onSubmit
-GET         /check-sell-from-northern-ireland                                   controllers.SellsGoodsFromNiController.onPageLoad
-POST        /check-sell-from-northern-ireland                                   controllers.SellsGoodsFromNiController.onSubmit
+GET         /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onPageLoad()
+POST        /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onSubmit()
+GET         /check-sell-from-northern-ireland                                   controllers.SellsGoodsFromNiController.onPageLoad()
+POST        /check-sell-from-northern-ireland                                   controllers.SellsGoodsFromNiController.onSubmit()
 
 GET         /tax-in-eu                                                          controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = NormalMode)
 POST        /tax-in-eu                                                          controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
@@ -252,11 +252,11 @@ POST        /online-marketplace                                                 
 GET         /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
 
-GET         /northern-ireland-business                                          controllers.BusinessBasedInNiController.onPageLoad
-POST        /northern-ireland-business                                          controllers.BusinessBasedInNiController.onSubmit
+GET         /northern-ireland-business                                          controllers.BusinessBasedInNiController.onPageLoad()
+POST        /northern-ireland-business                                          controllers.BusinessBasedInNiController.onSubmit()
 
-GET         /northern-ireland-fixed-establishment                               controllers.HasFixedEstablishmentInNiController.onPageLoad
-POST        /northern-ireland-fixed-establishment                               controllers.HasFixedEstablishmentInNiController.onSubmit
+GET         /northern-ireland-fixed-establishment                               controllers.HasFixedEstablishmentInNiController.onPageLoad()
+POST        /northern-ireland-fixed-establishment                               controllers.HasFixedEstablishmentInNiController.onSubmit()
 
 GET         /business-pay                                                       controllers.LiableForVatOnAllSalesController.onPageLoad()
 POST        /business-pay                                                       controllers.LiableForVatOnAllSalesController.onSubmit()
@@ -266,10 +266,10 @@ POST        /do-not-pay-sales-on-marketplace                                    
 
 GET         /cannot-use-no-vat                                                  controllers.NotLiableForVatController.onPageLoad()
 
-GET         /sales-on-marketplaces                                              controllers.SalesChannelsController.onPageLoad
-POST        /sales-on-marketplaces                                              controllers.SalesChannelsController.onSubmit
+GET         /sales-on-marketplaces                                              controllers.SalesChannelsController.onPageLoad()
+POST        /sales-on-marketplaces                                              controllers.SalesChannelsController.onSubmit()
 
-GET         /answers-deleted                                                    controllers.AnswersDeletedController.onPageLoad
+GET         /answers-deleted                                                    controllers.AnswersDeletedController.onPageLoad()
 
 GET         /planned-first-sale                                                 controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
 POST        /planned-first-sale                                                 controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)

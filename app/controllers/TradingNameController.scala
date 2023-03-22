@@ -40,7 +40,7 @@ class TradingNameController @Inject()(
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData andThen cc.limitIndex(index, Constants.maxTradingNames)) {
+    (cc.authAndGetData() andThen cc.limitIndex(index, Constants.maxTradingNames)) {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllTradingNames).getOrElse(Seq.empty))
@@ -54,7 +54,7 @@ class TradingNameController @Inject()(
     }
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
+    (cc.authAndGetData() andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllTradingNames).getOrElse(Seq.empty))

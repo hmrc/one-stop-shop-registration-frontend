@@ -40,7 +40,7 @@ class WebsiteController @Inject()(
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData andThen cc.limitIndex(index, Constants.maxWebsites)) {
+    (cc.authAndGetData() andThen cc.limitIndex(index, Constants.maxWebsites)) {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
@@ -54,7 +54,7 @@ class WebsiteController @Inject()(
     }
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
+    (cc.authAndGetData() andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
