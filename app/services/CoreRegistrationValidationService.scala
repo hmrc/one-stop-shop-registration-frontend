@@ -77,8 +77,8 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
       val sourceType = previousScheme match {
         case PreviousScheme.OSSU => SourceType.EUVATNumber
         case PreviousScheme.OSSNU => SourceType.EUVATNumber
-        case PreviousScheme.IOSSWOI => SourceType.EUTraderId
-        case PreviousScheme.IOSSWI => SourceType.EUTraderId
+        case PreviousScheme.IOSSWOI => SourceType.TraderId
+        case PreviousScheme.IOSSWI => SourceType.TraderId
       }
 
       val convertedSearchNumber = if(sourceType == SourceType.EUVATNumber) {
