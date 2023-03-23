@@ -28,6 +28,7 @@ import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.ExternalEntryUtils
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.{Clock, LocalDate}
@@ -51,8 +52,11 @@ class ApplicationCompleteController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData).async {
     implicit request => {
+
+      val id = ExternalEntryUtils.getSessionId()
+
       for {
-        sessionData <- sessionRepository.get(request.userId)
+        sessionData <- sessionRepository.get(id)
         maybeMatch <- coreRegistrationValidationService.searchUkVrn(request.vrn)
 
       } yield {

@@ -23,6 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.ExternalEntryUtils
 import views.html.ErrorSubmittingRegistration
 
 import javax.inject.Inject
@@ -38,8 +39,11 @@ class ErrorSubmittingRegistrationController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
+
+      val id = ExternalEntryUtils.getSessionId()
+
       for {
-        sessionData <- sessionRepository.get(request.userId)
+        sessionData <- sessionRepository.get(id)
       } yield {
         val externalUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
         Ok(view(externalUrl))

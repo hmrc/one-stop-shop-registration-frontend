@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.ExternalEntryUtils
 import views.html.SavedProgressView
 
 import java.time.ZoneId
@@ -53,8 +54,9 @@ class SavedProgressController @Inject()(
       Future.fromTry(request.userAnswers.set(SavedProgressPage, continueUrl)).flatMap {
         updatedAnswers =>
           val s4LRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
+          val id = ExternalEntryUtils.getSessionId()
           (for{
-            sessionData <- sessionRepository.get(request.userId)
+            sessionData <- sessionRepository.get(id)
             s4laterResult <- connector.submit(s4LRequest)
           } yield {
             val externalUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))

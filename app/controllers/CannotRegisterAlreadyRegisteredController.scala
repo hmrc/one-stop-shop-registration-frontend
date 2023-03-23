@@ -24,6 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.ExternalEntryUtils
 import views.html.CannotRegisterAlreadyRegisteredView
 
 import scala.concurrent.ExecutionContext
@@ -39,7 +40,10 @@ class CannotRegisterAlreadyRegisteredController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      sessionRepository.get(request.userId).map {
+
+      val id = ExternalEntryUtils.getSessionId()
+
+      sessionRepository.get(id).map {
         sessionData =>
           Ok(view(sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))))
       }
