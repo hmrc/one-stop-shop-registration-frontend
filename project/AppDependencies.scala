@@ -18,6 +18,7 @@ object AppDependencies {
     "org.scalatest"           %% "scalatest"               % "3.2.12",
     "org.scalatestplus"       %% "scalacheck-1-15"         % "3.2.11.0",
     "org.scalatestplus"       %% "mockito-3-4"             % "3.2.10.0",
+    "uk.gov.hmrc"             %% "bootstrap-test-play-28"  % "7.15.0",
     "org.scalatestplus.play"  %% "scalatestplus-play"      % "5.1.0",
     "org.pegdown"             %  "pegdown"                 % "1.6.0",
     "org.jsoup"               %  "jsoup"                   % "1.14.3",
