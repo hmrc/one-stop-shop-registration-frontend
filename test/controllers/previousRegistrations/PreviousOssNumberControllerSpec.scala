@@ -61,7 +61,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PreviousOssNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, index, countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, index, index, countryWithValidation,
+          PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
 
@@ -79,7 +80,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, index, countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, index,
+          countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
 
@@ -88,11 +90,16 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       "when the ID starts with EU it sets to non-union" in {
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(None)
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -114,11 +121,16 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       "when the ID doesn't start with EU it sets to union" in {
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(None)
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -273,7 +285,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, countryWithValidation,
+          PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
 

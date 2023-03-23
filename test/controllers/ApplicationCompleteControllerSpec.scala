@@ -31,15 +31,18 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
-import services.{DateService, PeriodService}
+import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.{Clock, LocalDate, ZoneId}
+import scala.concurrent.Future
 
 
 class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
   private val periodService = mock[PeriodService]
+
+  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
 
   private  val userAnswers = UserAnswers(
@@ -62,6 +65,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view for a GET with no enrolments" in {
 
+
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
@@ -70,11 +74,14 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "false")
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -110,11 +117,14 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "true")
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -150,11 +160,14 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
           .configure("features.enrolments-enabled" -> "false")
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -190,11 +203,14 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(answers))
           .configure("features.enrolments-enabled" -> "false")
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -235,12 +251,15 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -277,6 +296,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+
         val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
@@ -285,6 +306,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()

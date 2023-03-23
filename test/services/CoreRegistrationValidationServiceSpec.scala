@@ -20,16 +20,22 @@ import base.SpecBase
 import connectors.ValidateCoreRegistrationConnector
 import models.core.{CoreRegistrationValidationResult, Match, MatchType}
 import models.PreviousScheme
+import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
+import org.scalacheck.Gen
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CoreRegistrationValidationServiceSpec extends SpecBase {
+class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar with ScalaFutures with Matchers with BeforeAndAfterEach {
 
   private val genericMatch = Match(
     MatchType.FixedEstablishmentActiveNETP,
@@ -85,6 +91,21 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
 
       value mustBe None
     }
+
+    "must return exception when server responds with an error" in {
+
+      val vrn = Vrn("333333333")
+
+      val errorCode = Gen.oneOf(BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR).sample.value
+
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val response = intercept[Exception](coreRegistrationValidationService.searchUkVrn(vrn).futureValue)
+
+      response.getMessage must include("Error while validating core registration")
+    }
   }
 
   "coreRegistrationValidationService.searchEuTaxId" - {
@@ -92,13 +113,13 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
     "call searchEuTaxId with correct Tax reference number and must return match data" in {
 
       val taxRefNo: String = "333333333"
-      val countrycode: String = "DE"
+      val countryCode: String = "DE"
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(coreValidationResponses))
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
-      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countrycode).futureValue.get
+      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue.get
 
       value equals genericMatch
     }
@@ -106,16 +127,32 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
     "must return None when no match found" in {
 
       val taxRefNo: String = "333333333"
-      val countrycode: String = "DE"
+      val countryCode: String = "DE"
 
       val expectedResponse = coreValidationResponses.copy(matches = Seq[Match]())
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Right(expectedResponse))
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
 
-      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countrycode).futureValue
+      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue
 
       value mustBe None
+    }
+
+    "must return exception when server responds with an error" in {
+
+      val taxRefNo: String = "333333333"
+      val countryCode: String = "DE"
+
+      val errorCode = Gen.oneOf(BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR).sample.value
+
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val response = intercept[Exception](coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue)
+
+      response.getMessage must include("Error while validating core registration")
     }
   }
 
@@ -148,6 +185,22 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val value = coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue
 
       value mustBe None
+    }
+
+    "must return exception when server responds with an error" in {
+
+      val euVrn: String = "333333333"
+      val countryCode: String = "DE"
+
+      val errorCode = Gen.oneOf(BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR).sample.value
+
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val response = intercept[Exception](coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue)
+
+      response.getMessage must include("Error while validating core registration")
     }
   }
 
@@ -198,6 +251,23 @@ class CoreRegistrationValidationServiceSpec extends SpecBase {
       val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue
 
       value mustBe None
+    }
+
+    "must return exception when server responds with an error" in {
+
+      val iossNumber: String = "333333333"
+      val countryCode: String = "DE"
+      val previousScheme: PreviousScheme = PreviousScheme.OSSU
+
+      val errorCode = Gen.oneOf(BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR).sample.value
+
+      when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
+
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+
+      val response = intercept[Exception](coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue)
+
+      response.getMessage must include("Error while validating core registration")
     }
   }
 
