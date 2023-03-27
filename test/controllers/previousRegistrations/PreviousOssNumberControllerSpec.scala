@@ -94,7 +94,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(None)
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -125,7 +125,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(None)
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))

@@ -46,17 +46,16 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
-      checkOtherCountryRegistration andThen
       getData andThen
       requireData andThen
-      checkNiProtocol
+      checkNiProtocol andThen
+      checkOtherCountryRegistration
 
   def authAndGetOptionalData: ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
       checkRegistration andThen
-      checkOtherCountryRegistration andThen
       getData
 
   def authAndGetDataAndCheckVerifyEmail(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =

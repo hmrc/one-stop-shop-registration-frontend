@@ -109,7 +109,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val response = intercept[Exception](coreRegistrationValidationService.searchUkVrn(vrn).futureValue)
 
@@ -157,7 +157,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val response = intercept[Exception](coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue)
 
@@ -205,7 +205,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val response = intercept[Exception](coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue)
 
@@ -272,7 +272,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       when(connector.validateCoreRegistration(any())(any())) thenReturn Future.successful(Left(UnexpectedResponseStatus(errorCode, "error")))
 
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector)
+      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
       val response = intercept[Exception](coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue)
 

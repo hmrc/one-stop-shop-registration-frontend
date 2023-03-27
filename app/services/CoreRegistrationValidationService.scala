@@ -34,15 +34,16 @@ class CoreRegistrationValidationService @Inject()(
                                                  )
                                                  (implicit ec: ExecutionContext) extends Logging {
 
-  def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
+  def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier,
+                            request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
-        // TODO: To add audit event for this method
-        //        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+      case Right(coreRegistrationResponse) =>
+        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+        coreRegistrationResponse.matches.headOption
 
       case _ => throw CoreRegistrationValidationException("Error while validating core registration")
 

@@ -19,7 +19,7 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import models.core.{Match, MatchType}
-import models.requests.AuthenticatedIdentifierRequest
+import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito.when
@@ -31,7 +31,6 @@ import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.running
 import services.CoreRegistrationValidationService
-import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.LocalDate
@@ -54,7 +53,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
   class Harness(service: CoreRegistrationValidationService, appConfig: FrontendAppConfig) extends
     CheckOtherCountryRegistrationFilterImpl(service, appConfig) {
-    def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
+    def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
@@ -78,9 +77,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(genericMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(genericMatch))
 
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -108,9 +107,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
 
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -137,9 +136,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
           running(app) {
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2022, 10, 10)))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -167,9 +166,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
           running(app) {
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2022, 10, 10)))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -198,9 +197,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
               exclusionEffectiveDate = Some(LocalDate.of(2022, 10, 10)), exclusionStatusCode = Some(4))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -229,9 +228,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
               exclusionEffectiveDate = None, exclusionStatusCode = Some(4))
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(Option(expectedMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
             val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -260,9 +259,9 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
       running(app) {
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(None)
 
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
         val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
         val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 
@@ -288,7 +287,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
       running(app) {
 
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+        val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, emptyUserAnswers)
         val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
         val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
 

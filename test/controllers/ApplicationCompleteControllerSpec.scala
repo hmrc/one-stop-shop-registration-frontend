@@ -81,7 +81,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -124,7 +124,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -167,7 +167,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -210,7 +210,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -259,7 +259,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -296,7 +296,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()

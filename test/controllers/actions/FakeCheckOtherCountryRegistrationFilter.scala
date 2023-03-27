@@ -16,14 +16,14 @@
 
 package controllers.actions
 
-import models.requests.AuthenticatedIdentifierRequest
+import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Result
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeCheckOtherCountryRegistrationFilter extends CheckOtherCountryRegistrationFilter {
 
-  override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
     Future.successful(None)
   }
 
