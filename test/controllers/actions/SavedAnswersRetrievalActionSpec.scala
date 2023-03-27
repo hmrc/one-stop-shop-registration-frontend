@@ -77,7 +77,7 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
         val connector  = mock[SaveForLaterConnector]
         val instant = Instant.now
         val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
-        val answers = UserAnswers(userAnswersId).set(SavedProgressPage, "/url").success.value
+        val answers = UserAnswers(userAnswersId, lastUpdated = Instant.now(stubClock)).set(SavedProgressPage, "/url").success.value
 
         when(connector.get()(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, answers.data, None, instant))))
         when(sessionRepository.set(any())) thenReturn Future.successful(true)
