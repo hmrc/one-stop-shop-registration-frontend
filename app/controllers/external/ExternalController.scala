@@ -41,7 +41,6 @@ class ExternalController @Inject()(
         externalRequest =>
           externalService.getExternalResponse(externalRequest, request.userId, lang) map {
             response =>
-              logger.error(s"user id is ${request.userId} response ${Json.toJson(response)}") // TODO remove
               Ok(Json.toJson(response))
           }
       }
