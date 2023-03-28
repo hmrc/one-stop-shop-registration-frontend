@@ -106,23 +106,23 @@ trait CompletionChecks {
   }
 
   def validate()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
-    getAllIncompleteDeregisteredDetails.isEmpty &&
-      getAllIncompleteEuDetails.isEmpty &&
-      isTradingNamesValid &&
-      isAlreadyMadeSalesValid &&
-      hasWebsiteValid &&
-      isEuDetailsPopulated &&
-      isDeregisteredPopulated
+    getAllIncompleteDeregisteredDetails().isEmpty &&
+      getAllIncompleteEuDetails().isEmpty &&
+      isTradingNamesValid() &&
+      isAlreadyMadeSalesValid() &&
+      hasWebsiteValid() &&
+      isEuDetailsPopulated() &&
+      isDeregisteredPopulated()
   }
 
   def getFirstValidationErrorRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
-    (incompleteTradingNameRedirect ++
-      incompleteEligibleSalesRedirect ++
-      emptyEuDetailsRedirect ++
-      incompleteEuDetailsRedirect ++
-      emptyDeregisteredRedirect ++
+    (incompleteTradingNameRedirect() ++
+      incompleteEligibleSalesRedirect() ++
+      emptyEuDetailsRedirect() ++
+      incompleteEuDetailsRedirect() ++
+      emptyDeregisteredRedirect() ++
       incompletePreviousRegistrationRedirect(CheckMode) ++
-      incompleteWebsiteUrlsRedirect
+      incompleteWebsiteUrlsRedirect()
       ).headOption
   }
 
@@ -157,25 +157,25 @@ trait CompletionChecks {
       case None => None
     }
 
-  private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isTradingNamesValid) {
+  private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isTradingNamesValid()) {
     Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def incompleteEligibleSalesRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isAlreadyMadeSalesValid) {
+  private def incompleteEligibleSalesRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isAlreadyMadeSalesValid()) {
     Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def incompleteWebsiteUrlsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!hasWebsiteValid) {
+  private def incompleteWebsiteUrlsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!hasWebsiteValid()) {
     Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(CheckMode)))
   } else {
     None
   }
 
-  private def emptyDeregisteredRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isDeregisteredPopulated) {
+  private def emptyDeregisteredRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isDeregisteredPopulated()) {
     Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)))
   } else {
     None

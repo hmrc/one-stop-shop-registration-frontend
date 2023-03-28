@@ -59,7 +59,7 @@ class IdentityVerificationController @Inject()(
           ivConnector.getJourneyStatus(id).flatMap {
             case Some(result: IdentityVerificationResult) =>
               result match {
-                case InsufficientEvidence       => handleInsufficientEvidence
+                case InsufficientEvidence       => handleInsufficientEvidence()
                 case Success                    => Redirect(continueUrl).toFuture
                 case Incomplete                 => Redirect(routes.IvReturnController.incomplete().url).toFuture
                 case FailedMatching             => Redirect(routes.IvReturnController.failedMatching(continueUrl).url).toFuture
