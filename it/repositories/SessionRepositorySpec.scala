@@ -43,16 +43,14 @@ class SessionRepositorySpec
     "must set the last updated time on the supplied session data to `now`, and save them" in {
 
       val sessionData = SessionData("id")
-      val expectedResult = sessionData copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
+      val expectedResult = sessionData copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
 
       val setResult     = repository.set(sessionData).futureValue
       val updatedRecord = find(Filters.equal("userId", sessionData.userId)).futureValue.headOption.value
 
-      val actualUpdatedRecord = updatedRecord copy (lastUpdated = updatedRecord.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
-
       setResult mustEqual true
 
-      actualUpdatedRecord mustEqual expectedResult
+      updatedRecord mustEqual expectedResult
     }
   }
 
@@ -69,11 +67,9 @@ class SessionRepositorySpec
 
         val result         = repository.get(answers.userId).futureValue
 
-        val actualResult = result.head copy (lastUpdated = result.head.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+        val expectedResult = answers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
 
-        val expectedResult = answers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
-
-        actualResult mustEqual expectedResult
+        result.head mustEqual expectedResult
       }
     }
 
@@ -122,15 +118,13 @@ class SessionRepositorySpec
         val result = repository.keepAlive("id").futureValue
 
         val expectedUpdatedAnswers = Seq(
-          answers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
+          answers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
         )
 
         result mustEqual true
         val updatedAnswers = find(Filters.equal("userId", "id")).futureValue
 
-        val actualUpdatedAnswers = updatedAnswers.map (sd => sd copy (lastUpdated = sd.lastUpdated.truncatedTo(ChronoUnit.SECONDS)))
-
-        actualUpdatedAnswers must contain theSameElementsAs expectedUpdatedAnswers
+        updatedAnswers must contain theSameElementsAs expectedUpdatedAnswers
       }
     }
 

@@ -43,16 +43,14 @@ class UnauthenticatedUserAnswersRepositorySpec
 
     "must set the last updated time on the supplied user answers to `now`, and save them" in {
 
-      val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
+      val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
 
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
-      val actualUpdatedRecord = updatedRecord copy (lastUpdated = updatedRecord.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
-
       setResult mustEqual true
 
-      actualUpdatedRecord mustEqual expectedResult
+      updatedRecord mustEqual expectedResult
     }
   }
 
@@ -66,11 +64,9 @@ class UnauthenticatedUserAnswersRepositorySpec
 
         val result         = repository.get(userAnswers.id).futureValue
 
-        val actualResult = result.value copy (lastUpdated = result.value.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+        val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
 
-        val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
-
-        actualResult mustEqual expectedResult
+        result.value mustEqual expectedResult
       }
     }
 
@@ -112,14 +108,12 @@ class UnauthenticatedUserAnswersRepositorySpec
 
         val result = repository.keepAlive(userAnswers.id).futureValue
 
-        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
+        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
 
         result mustEqual true
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
-        val actualUpdatedAnswers = updatedAnswers copy (lastUpdated = updatedAnswers.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
-
-        actualUpdatedAnswers mustEqual expectedUpdatedAnswers
+        updatedAnswers mustEqual expectedUpdatedAnswers
       }
     }
 
