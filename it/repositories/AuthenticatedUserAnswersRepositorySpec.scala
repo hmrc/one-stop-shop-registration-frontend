@@ -43,7 +43,7 @@ class AuthenticatedUserAnswersRepositorySpec
 
     "must set the last updated time on the supplied user answers to `now`, and save them" in {
 
-      val expectedResult = userAnswers copy (lastUpdated = instant)
+      val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
 
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
@@ -51,7 +51,7 @@ class AuthenticatedUserAnswersRepositorySpec
       val actualUpdatedRecord = updatedRecord copy (lastUpdated = updatedRecord.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
 
       setResult mustEqual true
-      updatedRecord mustEqual expectedResult
+      actualUpdatedRecord mustEqual expectedResult
     }
   }
 
