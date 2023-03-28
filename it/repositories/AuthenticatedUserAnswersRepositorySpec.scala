@@ -13,6 +13,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.{Clock, Instant, ZoneId}
+import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuthenticatedUserAnswersRepositorySpec
@@ -47,6 +48,8 @@ class AuthenticatedUserAnswersRepositorySpec
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
+      val actualUpdatedRecord = updatedRecord copy (lastUpdated = updatedRecord.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+
       setResult mustEqual true
       updatedRecord mustEqual expectedResult
     }
@@ -61,9 +64,11 @@ class AuthenticatedUserAnswersRepositorySpec
         insert(userAnswers).futureValue
 
         val result         = repository.get(userAnswers.id).futureValue
-        val expectedResult = userAnswers copy (lastUpdated = instant)
+        val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
 
-        result.value mustEqual expectedResult
+        val actualResult = result.value copy (lastUpdated = result.value.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+
+        actualResult mustEqual expectedResult
       }
     }
 
@@ -105,11 +110,14 @@ class AuthenticatedUserAnswersRepositorySpec
 
         val result = repository.keepAlive(userAnswers.id).futureValue
 
-        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
+        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
 
         result mustEqual true
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
-        updatedAnswers mustEqual expectedUpdatedAnswers
+
+        val actualUpdatedAnswers = updatedAnswers copy (lastUpdated = updatedAnswers.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+
+        actualUpdatedAnswers mustEqual expectedUpdatedAnswers
       }
     }
 

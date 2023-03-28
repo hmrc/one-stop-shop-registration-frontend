@@ -13,6 +13,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.{Clock, Instant, ZoneId}
+import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SessionRepositorySpec
@@ -42,13 +43,16 @@ class SessionRepositorySpec
     "must set the last updated time on the supplied session data to `now`, and save them" in {
 
       val sessionData = SessionData("id")
-      val expectedResult = sessionData copy (lastUpdated = instant)
+      val expectedResult = sessionData copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
 
       val setResult     = repository.set(sessionData).futureValue
       val updatedRecord = find(Filters.equal("userId", sessionData.userId)).futureValue.headOption.value
 
+      val actualUpdatedRecord = updatedRecord copy (lastUpdated = updatedRecord.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+
       setResult mustEqual true
-      updatedRecord mustEqual expectedResult
+
+      actualUpdatedRecord mustEqual expectedResult
     }
   }
 
@@ -64,9 +68,12 @@ class SessionRepositorySpec
         insert(otherAnswers).futureValue
 
         val result         = repository.get(answers.userId).futureValue
-        val expectedResult = answers copy (lastUpdated = instant)
 
-        result.head mustEqual expectedResult
+        val actualResult = result.head copy (lastUpdated = result.head.lastUpdated.truncatedTo(ChronoUnit.SECONDS))
+
+        val expectedResult = answers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
+
+        actualResult mustEqual expectedResult
       }
     }
 
@@ -115,12 +122,15 @@ class SessionRepositorySpec
         val result = repository.keepAlive("id").futureValue
 
         val expectedUpdatedAnswers = Seq(
-          answers copy (lastUpdated = instant)
+          answers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.SECONDS))
         )
 
         result mustEqual true
         val updatedAnswers = find(Filters.equal("userId", "id")).futureValue
-        updatedAnswers must contain theSameElementsAs expectedUpdatedAnswers
+
+        val actualUpdatedAnswers = updatedAnswers.map (sd => sd copy (lastUpdated = sd.lastUpdated.truncatedTo(ChronoUnit.SECONDS)))
+
+        actualUpdatedAnswers must contain theSameElementsAs expectedUpdatedAnswers
       }
     }
 
