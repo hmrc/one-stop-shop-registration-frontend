@@ -16,10 +16,10 @@
 
 package controllers.external
 
-import controllers.actions.AuthenticatedControllerComponents
+import controllers.actions.{AuthenticatedControllerComponents, UnauthenticatedControllerComponents}
 import models.external._
 import play.api.Logging
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.{Action, MessagesControllerComponents}
 import services.external.ExternalService
 import uk.gov.hmrc.play.bootstrap.controller.WithJsonBody
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext
 
 class ExternalController @Inject()(
                                     externalService: ExternalService,
-                                    cc: AuthenticatedControllerComponents
+                                    cc: UnauthenticatedControllerComponents
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with WithJsonBody with Logging {
 
   override protected def controllerComponents: MessagesControllerComponents = cc
@@ -40,7 +40,8 @@ class ExternalController @Inject()(
       withJsonBody[ExternalRequest] {
         externalRequest =>
           externalService.getExternalResponse(externalRequest, request.userId, lang) map {
-            response => Ok(Json.toJson(response))
+            response =>
+              Ok(Json.toJson(response))
           }
       }
   }
