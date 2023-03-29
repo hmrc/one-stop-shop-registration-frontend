@@ -18,58 +18,71 @@ package services
 
 import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
-import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
 import models.{CountryWithValidationDetails, PreviousScheme}
+import models.audit.CoreRegistrationAuditModel
+import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
+import models.requests.AuthenticatedDataRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistrationConnector)
+class CoreRegistrationValidationService @Inject()(
+                                                   connector: ValidateCoreRegistrationConnector,
+                                                   auditService: AuditService,
+                                                 )
                                                  (implicit ec: ExecutionContext) extends Logging {
 
-  def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
+  def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier,
+                            request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
-
+      case Right(coreRegistrationResponse) =>
+        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+        coreRegistrationResponse.matches.headOption
 
       case _ => throw CoreRegistrationValidationException("Error while validating core registration")
 
     }
   }
 
-  def searchEuTaxId(euTaxReference: String, countryCode: String)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
+  def searchEuTaxId(euTaxReference: String, countryCode: String)(implicit hc: HeaderCarrier,
+                                                                 request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUTraderId.toString, None, euTaxReference, None, countryCode)
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
+      case Right(coreRegistrationResponse) =>
+        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+        coreRegistrationResponse.matches.headOption
 
       case _ => throw CoreRegistrationValidationException("Error while validating core registration")
     }
   }
 
-  def searchEuVrn(euVrn: String, countryCode: String)(implicit hc: HeaderCarrier): Future[Option[Match]] = {
+  def searchEuVrn(euVrn: String, countryCode: String)(implicit hc: HeaderCarrier,
+                                                      request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
 
     val convertedEuVrn = convertTaxIdentifierForTransfer(euVrn, countryCode)
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.EUVATNumber.toString, None, convertedEuVrn, None, countryCode)
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
-      case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
+      case Right(coreRegistrationResponse) =>
+        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+        coreRegistrationResponse.matches.headOption
 
       case _ => throw CoreRegistrationValidationException("Error while validating core registration")
     }
   }
 
   def searchScheme(searchNumber: String, previousScheme: PreviousScheme, intermediaryNumber: Option[String], countryCode: String)
-                  (implicit hc: HeaderCarrier): Future[Option[Match]] = {
+                  (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
 
     if (previousScheme == PreviousScheme.OSSNU) {
       Future.successful(None)
@@ -97,9 +110,9 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
       )
 
       connector.validateCoreRegistration(coreRegistrationRequest).map {
-
-        case Right(coreRegistrationResponse) => coreRegistrationResponse.matches.headOption
-
+        case Right(coreRegistrationResponse) =>
+          auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+          coreRegistrationResponse.matches.headOption
         case _ => throw CoreRegistrationValidationException("Error while validating core registration")
       }
     }
@@ -140,5 +153,4 @@ class CoreRegistrationValidationService @Inject()(connector: ValidateCoreRegistr
     }
   }
 }
-
 case class CoreRegistrationValidationException(message: String) extends Exception(message)

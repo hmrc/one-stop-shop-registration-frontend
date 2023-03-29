@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
 import models.core.MatchType
-import models.requests.AuthenticatedIdentifierRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedIdentifierRequest}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.CoreRegistrationValidationService
@@ -38,12 +38,12 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
   private val exclusionStatusCode = 4
 
-  override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.otherCountryRegistrationValidationEnabled) {
-      service.searchUkVrn(request.vrn).map {
+      service.searchUkVrn(request.vrn)(hc, request).map {
 
         case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
           Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
@@ -70,4 +70,4 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
   }
 }
 
-trait CheckOtherCountryRegistrationFilter extends ActionFilter[AuthenticatedIdentifierRequest]
+trait CheckOtherCountryRegistrationFilter extends ActionFilter[AuthenticatedDataRequest]
