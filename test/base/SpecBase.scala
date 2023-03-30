@@ -41,6 +41,7 @@ import uk.gov.hmrc.domain.Vrn
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
+import viewmodels.govuk.summarylist._
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 
@@ -137,20 +138,20 @@ trait SpecBase
 
   def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) = {
     Seq(
-      new HasTradingNameSummary().row(answers),
-      HasMadeSalesSummary.row(answers),
-      IsPlanningFirstEligibleSaleSummary.row(answers),
-      PreviouslyRegisteredSummary.row(answers),
+      new HasTradingNameSummary().row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      HasMadeSalesSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      IsPlanningFirstEligibleSaleSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
       new CommencementDateSummary(dateService).row(answers),
-      TaxRegisteredInEuSummary.row(answers),
+      PreviouslyRegisteredSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      TaxRegisteredInEuSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
       EuDetailsSummary.checkAnswersRow(answers),
       IsOnlineMarketplaceSummary.row(answers),
-      HasWebsiteSummary.row(answers),
-      BusinessContactDetailsSummary.rowContactName(answers),
-      BusinessContactDetailsSummary.rowTelephoneNumber(answers),
+      HasWebsiteSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BusinessContactDetailsSummary.rowContactName(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BusinessContactDetailsSummary.rowTelephoneNumber(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
       BusinessContactDetailsSummary.rowEmailAddress(answers),
-      BankDetailsSummary.rowAccountName(answers),
-      BankDetailsSummary.rowBIC(answers),
+      BankDetailsSummary.rowAccountName(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BankDetailsSummary.rowBIC(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
       BankDetailsSummary.rowIBAN(answers)
     ).flatten
   }

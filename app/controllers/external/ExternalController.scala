@@ -16,10 +16,10 @@
 
 package controllers.external
 
-import controllers.actions.{AuthenticatedControllerComponents, UnauthenticatedControllerComponents}
+import controllers.actions.UnauthenticatedControllerComponents
 import models.external._
 import play.api.Logging
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, MessagesControllerComponents}
 import services.external.ExternalService
 import uk.gov.hmrc.play.bootstrap.controller.WithJsonBody
