@@ -75,24 +75,24 @@ class CheckYourAnswersController @Inject()(
 
         val list = SummaryListViewModel(
           rows = Seq(
-            new HasTradingNameSummary().row(request.userAnswers),
+            new HasTradingNameSummary().row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             TradingNameSummary.checkAnswersRow(request.userAnswers),
-            HasMadeSalesSummary.row(request.userAnswers),
-            DateOfFirstSaleSummary.row(request.userAnswers),
-            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers),
-            PreviouslyRegisteredSummary.row(request.userAnswers),
-            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+            HasMadeSalesSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             Some(commencementDateSummary),
-            TaxRegisteredInEuSummary.row(request.userAnswers),
+            PreviouslyRegisteredSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+            TaxRegisteredInEuSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             EuDetailsSummary.checkAnswersRow(request.userAnswers),
             IsOnlineMarketplaceSummary.row(request.userAnswers),
-            HasWebsiteSummary.row(request.userAnswers),
+            HasWebsiteSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             WebsiteSummary.checkAnswersRow(request.userAnswers),
-            BusinessContactDetailsSummary.rowContactName(request.userAnswers),
-            BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers),
+            BusinessContactDetailsSummary.rowContactName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
-            BankDetailsSummary.rowAccountName(request.userAnswers),
-            BankDetailsSummary.rowBIC(request.userAnswers),
+            BankDetailsSummary.rowAccountName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            BankDetailsSummary.rowBIC(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BankDetailsSummary.rowIBAN(request.userAnswers)
           ).flatten
         )
