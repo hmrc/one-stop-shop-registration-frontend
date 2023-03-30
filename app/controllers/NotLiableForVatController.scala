@@ -16,15 +16,14 @@
 
 package controllers
 
+import connectors.RegistrationConnector
 import controllers.actions._
+import logging.Logging
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.external.ExternalReturnUrlQuery
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ExternalEntryUtils
 import views.html.NotLiableForVatView
 
 import scala.concurrent.ExecutionContext
@@ -32,20 +31,21 @@ import scala.concurrent.ExecutionContext
 class NotLiableForVatController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: UnauthenticatedControllerComponents,
-                                       sessionRepository: SessionRepository,
+                                       registrationConnector: RegistrationConnector,
                                        view: NotLiableForVatView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 
-      val id = ExternalEntryUtils.getSessionId()
-
-      sessionRepository.get(id).map {
-        sessionData =>
-          Ok(view(sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))))
+      registrationConnector.getSavedExternalEntry().map {
+        case Right(response) =>
+          Ok(view(response.url))
+        case Left(e) =>
+          logger.warn(s"There was an error when getting saved external entry url ${e.body} but we didn't block the user from continuing the journey")
+          Ok(view(None))
       }
 
   }

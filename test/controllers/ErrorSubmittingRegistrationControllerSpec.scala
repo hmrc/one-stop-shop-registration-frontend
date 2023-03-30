@@ -17,23 +17,22 @@
 package controllers
 
 import base.SpecBase
-import models.SessionData
+import connectors.RegistrationConnector
+import models.external.ExternalEntryUrl
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.external.ExternalReturnUrlQuery
-import repositories.SessionRepository
 import views.html.ErrorSubmittingRegistration
 
 import scala.concurrent.Future
 
-class ErrorSubmittingRegistrationControllerSpec extends SpecBase  with MockitoSugar {
+class ErrorSubmittingRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
   private val externalUrl = "/test"
-  private val sessionRepository = mock[SessionRepository]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   "ErrorSubmittingRegistration Controller" - {
 
@@ -41,11 +40,11 @@ class ErrorSubmittingRegistrationControllerSpec extends SpecBase  with MockitoSu
 
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(
-            inject.bind[SessionRepository].toInstance(sessionRepository)
+            inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector)
           )
           .build()
 
-        when(sessionRepository.get(any())) thenReturn Future.successful(Seq(SessionData("id").set(ExternalReturnUrlQuery.path, externalUrl).success.value))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(Some(externalUrl))))
 
         running(application) {
           val request = FakeRequest(GET, routes.ErrorSubmittingRegistrationController.onPageLoad().url)

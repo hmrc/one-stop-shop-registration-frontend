@@ -16,23 +16,21 @@
 
 package controllers
 
+import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.external.ExternalReturnUrlQuery
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ExternalEntryUtils
 import views.html.ErrorSubmittingRegistration
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class ErrorSubmittingRegistrationController @Inject()(
-                                           cc: AuthenticatedControllerComponents,
-                                           sessionRepository: SessionRepository,
-                                           view: ErrorSubmittingRegistration
+                                                       cc: AuthenticatedControllerComponents,
+                                                       registrationConnector: RegistrationConnector,
+                                                       view: ErrorSubmittingRegistration
                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -40,13 +38,12 @@ class ErrorSubmittingRegistrationController @Inject()(
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 
-      val id = ExternalEntryUtils.getSessionId()
-
-      for {
-        sessionData <- sessionRepository.get(id)
-      } yield {
-        val externalUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
-        Ok(view(externalUrl))
+      registrationConnector.getSavedExternalEntry().map {
+        case Right(response) =>
+          Ok(view(response.url))
+        case Left(e) =>
+          logger.warn(s"There was an error when getting saved external entry url ${e.body} but we didn't block the user from continuing the journey")
+          Ok(view(None))
       }
 
   }
