@@ -27,7 +27,7 @@
 
 @layout(pageTitle = title(form, messages("deletePreviousScheme.title", country.name))) {
 
-    @formHelper(action = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onSubmit(mode, countryIndex, schemeIndex), 'autoComplete -> "off") {
+    @formHelper(action = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onSubmit(mode, countryIndex, schemeIndex), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

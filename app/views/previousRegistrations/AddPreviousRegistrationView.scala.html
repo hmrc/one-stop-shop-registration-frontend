@@ -50,7 +50,7 @@
             @addToList(list, Long, "addPreviousRegistration.change.hidden", "addPreviousRegistration.remove.hidden")
 
             @if(incompleteCountries.isEmpty) {
-                @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode, false), 'autoComplete -> "off") {
+                @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode, false), Symbol("autoComplete") -> "off") {
                     @if(canAddCountries) {
                         @govukRadios(
                             RadiosViewModel.yesNo(

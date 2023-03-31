@@ -30,7 +30,7 @@
 
     <p class="govuk-body">@messages("liableForVatOnAllSales.p2")</p>
 
-    @formHelper(action = routes.LiableForVatOnAllSalesController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.LiableForVatOnAllSalesController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @govukButton(
             ButtonViewModel(messages("site.continue")).withAttribute(("id", "continue"))

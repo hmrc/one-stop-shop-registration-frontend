@@ -32,7 +32,7 @@
 
     <p class="govuk-body">@messages("liableForVatOnDirectSales.p3")</p>
 
-    @formHelper(action = routes.LiableForVatOnDirectSalesController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.LiableForVatOnDirectSalesController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @govukButton(
             ButtonViewModel(messages("site.continue")).withAttribute(("id", "continue"))

@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("vatRegistered.title", country.name))) {
 
-    @formHelper(action = controllers.euDetails.routes.VatRegisteredController.onSubmit(mode, index), 'autoComplete -> "off") {
+    @formHelper(action = controllers.euDetails.routes.VatRegisteredController.onSubmit(mode, index), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

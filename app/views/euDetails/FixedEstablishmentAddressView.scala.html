@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("fixedEstablishmentAddress.title", country.name))) {
 
-    @formHelper(action = controllers.euDetails.routes.FixedEstablishmentAddressController.onSubmit(mode, index), 'autoComplete -> "off") {
+    @formHelper(action = controllers.euDetails.routes.FixedEstablishmentAddressController.onSubmit(mode, index), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

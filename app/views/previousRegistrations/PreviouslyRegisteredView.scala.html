@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("previouslyRegistered.title"))) {
 
-    @formHelper(action = controllers.previousRegistrations.routes.PreviouslyRegisteredController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = controllers.previousRegistrations.routes.PreviouslyRegisteredController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

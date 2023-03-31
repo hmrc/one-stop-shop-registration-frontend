@@ -27,7 +27,7 @@
 
 @layout(pageTitle = title(form, messages("previousScheme.title"))) {
 
-    @formHelper(action = controllers.previousRegistrations.routes.PreviousSchemeController.onSubmit(mode, countryIndex, schemeIndex), 'autoComplete -> "off") {
+    @formHelper(action = controllers.previousRegistrations.routes.PreviousSchemeController.onSubmit(mode, countryIndex, schemeIndex), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

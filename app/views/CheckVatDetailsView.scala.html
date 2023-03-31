@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("checkVatDetails.title"))) {
 
-    @formHelper(action = routes.CheckVatDetailsController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.CheckVatDetailsController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(
