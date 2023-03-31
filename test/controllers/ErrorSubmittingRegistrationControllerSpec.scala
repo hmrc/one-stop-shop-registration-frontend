@@ -39,9 +39,7 @@ class ErrorSubmittingRegistrationControllerSpec extends SpecBase with MockitoSug
       "must return OK and the correct view with back to your account link if external url is present" in {
 
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(
-            inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector)
-          )
+          .overrides(inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(Some(externalUrl))))
@@ -60,7 +58,11 @@ class ErrorSubmittingRegistrationControllerSpec extends SpecBase with MockitoSug
 
       "must return OK and the correct view with no link if external url is not present" in {
 
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           val request = FakeRequest(GET, routes.ErrorSubmittingRegistrationController.onPageLoad().url)

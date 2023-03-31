@@ -218,7 +218,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getSavedExternalEntry().futureValue
 
-        result mustBe Left(InvalidJson)
+        result mustBe Right(ExternalEntryUrl(None))
       }
     }
 
@@ -246,7 +246,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val result = connector.getSavedExternalEntry().futureValue
 
-        result mustBe Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
+        result mustBe Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status with body "))
       }
     }
   }

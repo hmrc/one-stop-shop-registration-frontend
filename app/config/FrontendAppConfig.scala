@@ -16,7 +16,6 @@
 
 package config
 
-import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
@@ -24,6 +23,7 @@ import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 import java.net.URI
 import java.time.Clock
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {

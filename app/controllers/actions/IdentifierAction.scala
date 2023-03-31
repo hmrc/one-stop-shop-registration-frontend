@@ -16,7 +16,6 @@
 
 package controllers.actions
 
-import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.auth.{routes => authRoutes}
 import controllers.routes
@@ -34,6 +33,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.FutureSyntax._
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedIdentifierAction @Inject()(
