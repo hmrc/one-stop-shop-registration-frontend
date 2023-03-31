@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("registrationType.title", country.name))) {
 
-    @formHelper(action = controllers.euDetails.routes.RegistrationTypeController.onSubmit(mode, countryIndex), 'autoComplete -> "off") {
+    @formHelper(action = controllers.euDetails.routes.RegistrationTypeController.onSubmit(mode, countryIndex), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("bankDetails.title"))) {
 
-    @formHelper(action = routes.BankDetailsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.BankDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("deleteWebsite.title", website))) {
 
-    @formHelper(action = routes.DeleteWebsiteController.onSubmit(mode, index), 'autoComplete -> "off") {
+    @formHelper(action = routes.DeleteWebsiteController.onSubmit(mode, index), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

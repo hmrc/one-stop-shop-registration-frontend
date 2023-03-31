@@ -48,7 +48,7 @@
 
             @addToList(list, Long, "addEuDetails.change.hidden", "addEuDetails.remove.hidden")
             @if(incompleteCountries.isEmpty) {
-                @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, false), 'autoComplete -> "off") {
+                @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, false), Symbol("autoComplete") -> "off") {
                     @if(canAddCountries) {
                         @govukRadios(
                             RadiosViewModel.yesNo(

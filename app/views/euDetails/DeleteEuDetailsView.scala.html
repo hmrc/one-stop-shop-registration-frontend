@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("deleteEuVatDetails.title", country))) {
 
-    @formHelper(action = controllers.euDetails.routes.DeleteEuDetailsController.onSubmit(mode, index), 'autoComplete -> "off") {
+    @formHelper(action = controllers.euDetails.routes.DeleteEuDetailsController.onSubmit(mode, index), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

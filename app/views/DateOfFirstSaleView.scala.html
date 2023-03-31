@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("dateOfFirstSale.title", dateFormatted))) {
 
-    @formHelper(action = routes.DateOfFirstSaleController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.DateOfFirstSaleController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value.day")))
