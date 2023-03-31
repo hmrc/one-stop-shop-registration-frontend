@@ -35,7 +35,7 @@
     @formHelper(action = routes.LiableForVatOnDirectSalesController.onSubmit(), 'autoComplete -> "off") {
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.continue")).withAttribute(("id", "continue"))
         )
     }
 }
