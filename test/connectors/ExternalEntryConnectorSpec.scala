@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package queries.external
+package connectors
 
-import play.api.libs.json.JsPath
+class ExternalEntryConnectorSpec {
 
-object ExternalReturnUrlQuery {
- def path = (JsPath \ "returnUrl")
 }

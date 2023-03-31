@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package utils
+package models.external
 
-import logging.Logging
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.libs.json._
 
-object ExternalEntryUtils extends Logging {
+case class ExternalEntryUrl(url: Option[String])
 
-  def getSessionId()(implicit hc: HeaderCarrier): String = {
-    hc.sessionId match {
-      case Some(sessionId) =>
-        sessionId.value
-      case _ =>
-        logger.error("No session id found")
-        throw new Exception("No session ID was found")
-    }
-  }
-
+object ExternalEntryUrl {
+  implicit val format: OFormat[ExternalEntryUrl] = Json.format[ExternalEntryUrl]
 }

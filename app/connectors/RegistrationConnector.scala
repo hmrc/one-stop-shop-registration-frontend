@@ -17,6 +17,7 @@
 package connectors
 
 import config.Service
+import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, ExternalEntryUrlResponseReads}
 import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
@@ -43,5 +44,9 @@ class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpCli
 
   def getVatCustomerInfo()(implicit hc: HeaderCarrier): Future[VatCustomerInfoResponse] =
     httpClient.GET[VatCustomerInfoResponse](s"$baseUrl/vat-information")
+
+  def getSavedExternalEntry()(implicit hc: HeaderCarrier): Future[ExternalEntryUrlResponse] = {
+    httpClient.GET[ExternalEntryUrlResponse](s"$baseUrl/external-entry")
+  }
 
 }

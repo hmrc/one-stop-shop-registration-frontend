@@ -21,10 +21,7 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.external.ExternalReturnUrlQuery
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ExternalEntryUtils
 import views.html.AlreadyRegisteredView
 
 import javax.inject.Inject
@@ -35,7 +32,6 @@ class AlreadyRegisteredController @Inject()(
    cc: AuthenticatedControllerComponents,
    view: AlreadyRegisteredView,
    connector: RegistrationConnector,
-   sessionRepository: SessionRepository,
    config: FrontendAppConfig
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -44,15 +40,13 @@ class AlreadyRegisteredController @Inject()(
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 
-      val id = ExternalEntryUtils.getSessionId()
-
       for {
-        sessionData <- sessionRepository.get(id)
+        savedExternalEntry <- connector.getSavedExternalEntry()
         registrationData <- connector.getRegistration()
       } yield {
+        val savedUrl = savedExternalEntry.fold(_ => None, _.url)
         registrationData match {
           case Some(_) =>
-            val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
             Ok(
               view(
                 config.feedbackUrl,

@@ -17,17 +17,37 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
+import models.external.ExternalEntryUrl
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.RegisterLaterView
 
-class RegisterLaterControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class RegisterLaterControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockRegistrationConnector)
+  }
 
   "RegisterLater Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.RegisterLaterController.onPageLoad().url)

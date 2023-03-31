@@ -17,35 +17,32 @@
 package controllers
 
 import base.SpecBase
-import models.SessionData
+import connectors.RegistrationConnector
+import models.external.ExternalEntryUrl
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.external.ExternalReturnUrlQuery
-import repositories.SessionRepository
 import views.html.ErrorSubmittingRegistration
 
 import scala.concurrent.Future
 
-class ErrorSubmittingRegistrationControllerSpec extends SpecBase  with MockitoSugar {
+class ErrorSubmittingRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
   private val externalUrl = "/test"
-  private val sessionRepository = mock[SessionRepository]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   "ErrorSubmittingRegistration Controller" - {
 
       "must return OK and the correct view with back to your account link if external url is present" in {
 
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(
-            inject.bind[SessionRepository].toInstance(sessionRepository)
-          )
+          .overrides(inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
-        when(sessionRepository.get(any())) thenReturn Future.successful(Seq(SessionData("id").set(ExternalReturnUrlQuery.path, externalUrl).success.value))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(Some(externalUrl))))
 
         running(application) {
           val request = FakeRequest(GET, routes.ErrorSubmittingRegistrationController.onPageLoad().url)
@@ -61,7 +58,11 @@ class ErrorSubmittingRegistrationControllerSpec extends SpecBase  with MockitoSu
 
       "must return OK and the correct view with no link if external url is not present" in {
 
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           val request = FakeRequest(GET, routes.ErrorSubmittingRegistrationController.onPageLoad().url)

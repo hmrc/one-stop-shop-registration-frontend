@@ -17,17 +17,15 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.{SaveForLaterConnector, SavedUserAnswers}
+import connectors.{RegistrationConnector, SavedUserAnswers, SaveForLaterConnector}
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.requests.SaveForLaterRequest
 import pages.SavedProgressPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.external.ExternalReturnUrlQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ExternalEntryUtils
 import views.html.SavedProgressView
 
 import java.time.ZoneId
@@ -41,7 +39,7 @@ class SavedProgressController @Inject()(
                                          view: SavedProgressView,
                                          connector: SaveForLaterConnector,
                                          appConfig: FrontendAppConfig,
-                                         sessionRepository: SessionRepository
+                                         registrationConnector: RegistrationConnector
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -54,12 +52,11 @@ class SavedProgressController @Inject()(
       Future.fromTry(request.userAnswers.set(SavedProgressPage, continueUrl)).flatMap {
         updatedAnswers =>
           val s4LRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
-          val id = ExternalEntryUtils.getSessionId()
           (for{
-            sessionData <- sessionRepository.get(id)
+            savedExternalEntry <- registrationConnector.getSavedExternalEntry()
             s4laterResult <- connector.submit(s4LRequest)
           } yield {
-            val externalUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
+            val externalUrl = savedExternalEntry.fold(_ => None, _.url)
             (s4laterResult, externalUrl)
           }).flatMap {
             case (Right(Some(_: SavedUserAnswers)), externalUrl) =>

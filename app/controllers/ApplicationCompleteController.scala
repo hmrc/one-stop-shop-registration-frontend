@@ -17,6 +17,7 @@
 package controllers
 
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers
@@ -24,11 +25,8 @@ import models.core.{Match, MatchType}
 import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.external.ExternalReturnUrlQuery
-import repositories.SessionRepository
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ExternalEntryUtils
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.{Clock, LocalDate}
@@ -36,16 +34,16 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class ApplicationCompleteController @Inject()(
-  override val messagesApi: MessagesApi,
-  cc: AuthenticatedControllerComponents,
-  view: ApplicationCompleteView,
-  viewEnrolments: ApplicationCompleteWithEnrolmentView,
-  frontendAppConfig: FrontendAppConfig,
-  dateService: DateService,
-  sessionRepository: SessionRepository,
-  periodService: PeriodService,
-  coreRegistrationValidationService: CoreRegistrationValidationService,
-  clock: Clock
+                                               override val messagesApi: MessagesApi,
+                                               cc: AuthenticatedControllerComponents,
+                                               view: ApplicationCompleteView,
+                                               viewEnrolments: ApplicationCompleteWithEnrolmentView,
+                                               frontendAppConfig: FrontendAppConfig,
+                                               dateService: DateService,
+                                               periodService: PeriodService,
+                                               coreRegistrationValidationService: CoreRegistrationValidationService,
+                                               registrationConnector: RegistrationConnector,
+                                               clock: Clock
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -53,10 +51,8 @@ class ApplicationCompleteController @Inject()(
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData).async {
     implicit request => {
 
-      val id = ExternalEntryUtils.getSessionId()
-
       for {
-        sessionData <- sessionRepository.get(id)
+        externalEntryUrl <- registrationConnector.getSavedExternalEntry()
         maybeMatch <- coreRegistrationValidationService.searchUkVrn(request.vrn)
 
       } yield {
@@ -66,7 +62,7 @@ class ApplicationCompleteController @Inject()(
 
           } yield {
             val exclusionCommencementDate = getExclusionCommencementDate(maybeMatch, commencementDate)
-            val savedUrl = sessionData.headOption.flatMap(_.get[String](ExternalReturnUrlQuery.path))
+            val savedUrl = externalEntryUrl.fold(_ => None, _.url)
             val periodOfFirstReturn = periodService.getFirstReturnPeriod(exclusionCommencementDate)
             val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
             val firstDayOfNextPeriod = nextPeriod.firstDay

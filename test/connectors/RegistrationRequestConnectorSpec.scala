@@ -18,6 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
+import models.external.ExternalEntryUrl
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
@@ -181,6 +182,71 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         val result = connector.getVatCustomerInfo().futureValue
 
         result mustBe Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status"))
+      }
+    }
+  }
+
+  "getSavedExternalEntry" - {
+
+    val url = s"/one-stop-shop-registration/external-entry"
+
+    "must return information when the backend returns some" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val externalEntryResponse = ExternalEntryUrl(Some("/url"))
+
+        val responseBody = Json.toJson(externalEntryResponse).toString
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getSavedExternalEntry().futureValue
+
+        result mustBe Right(externalEntryResponse)
+      }
+    }
+
+    "must return invalid json when the backend returns some" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val responseBody = Json.obj("test" -> "test").toString()
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getSavedExternalEntry().futureValue
+
+        result mustBe Right(ExternalEntryUrl(None))
+      }
+    }
+
+    "must return Left(NotFound) when the backend returns NOT_FOUND" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(notFound()))
+
+        val result = connector.getSavedExternalEntry().futureValue
+
+        result mustBe Left(NotFound)
+      }
+    }
+
+    "must return Left(UnexpectedStatus) when the backend returns another error code" in {
+
+      val status = Gen.oneOf(400, 500, 501, 502, 503).sample.value
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(status)))
+
+        val result = connector.getSavedExternalEntry().futureValue
+
+        result mustBe Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status with body "))
       }
     }
   }

@@ -16,7 +16,6 @@
 
 package connectors
 
-import com.google.inject.Inject
 import config.Service
 import models.emails.EmailSendingResult.EMAIL_NOT_SENT
 import models.emails.{EmailSendingResult, EmailToSendRequest}
@@ -25,7 +24,7 @@ import connectors.EmailHttpParser._
 import logging.Logging
 import uk.gov.hmrc.http.{BadGatewayException, GatewayTimeoutException, HeaderCarrier, HttpClient}
 
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

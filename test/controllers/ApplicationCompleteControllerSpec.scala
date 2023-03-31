@@ -18,9 +18,11 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import formats.Format.dateFormatter
 import models.{Period, UserAnswers}
 import models.Quarter.{Q1, Q4}
+import models.external.ExternalEntryUrl
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -43,7 +45,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
   private val periodService = mock[PeriodService]
 
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
-
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   private  val userAnswers = UserAnswers(
     userAnswersId,
@@ -75,6 +77,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
@@ -82,6 +85,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -118,6 +123,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
@@ -125,6 +131,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -161,6 +169,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
           .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
@@ -168,6 +177,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -204,6 +215,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(userAnswers = Some(answers))
           .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
@@ -211,6 +223,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -252,6 +266,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
@@ -260,6 +275,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -298,6 +315,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+
         val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
@@ -307,6 +326,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
             .configure("features.enrolments-enabled" -> "false")
             .build()

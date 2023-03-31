@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
+import models.external.ExternalEntryUrl
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -48,6 +49,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
       "must return OK and the correct view for a GET" in {
 
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         val application =
           applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -78,6 +80,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
         registration copy (dateOfFirstSale = Some(LocalDate.now().minusDays(1)))
 
       when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDiff))
+      when(mockConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -108,6 +111,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
       val registrationDOFSEmpty = registration copy (dateOfFirstSale = None)
 
       when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(registrationDOFSEmpty))
+      when(mockConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -135,6 +139,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
       "must redirect the user to the Problem With Account page" in {
         when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
+        when(mockConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         val application =
           applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
