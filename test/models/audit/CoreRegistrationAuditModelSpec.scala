@@ -64,6 +64,7 @@ class CoreRegistrationAuditModelSpec extends SpecBase with Matchers {
       val expectedJson = Json.obj(
         "credId" -> request.credentials.providerId,
         "browserUserAgent" -> "",
+        "requestersVrn" -> request.vrn.vrn,
         "coreRegistrationRequest" -> coreRegistrationRequest,
         "coreRegistrationValidationResponse" -> coreRegistrationValidationResult
       )
