@@ -23,6 +23,7 @@ import play.api.libs.json.{Json, JsValue}
 case class CoreRegistrationAuditModel(
                                        credId: String,
                                        userAgent: String,
+                                       vrn: String,
                                        coreRegistrationRequest: CoreRegistrationRequest,
                                        coreRegistrationValidationResult: CoreRegistrationValidationResult
                                      ) extends JsonAuditModel {
@@ -35,6 +36,7 @@ case class CoreRegistrationAuditModel(
   override val detail: JsValue = Json.obj(
     "credId" -> credId,
     "browserUserAgent" -> userAgent,
+    "requestersVrn" -> vrn,
     "coreRegistrationRequest" -> Json.toJson(coreRegistrationRequest),
     "coreRegistrationValidationResponse" -> Json.toJson(coreRegistrationValidationResult)
   )
@@ -49,6 +51,7 @@ object CoreRegistrationAuditModel {
     CoreRegistrationAuditModel(
       credId = request.credentials.providerId,
       userAgent = request.headers.get("user-agent").getOrElse(""),
+      request.vrn.vrn,
       coreRegistrationRequest: CoreRegistrationRequest,
       coreRegistrationValidationResult: CoreRegistrationValidationResult
     )
