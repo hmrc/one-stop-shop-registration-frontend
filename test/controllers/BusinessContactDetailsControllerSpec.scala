@@ -68,7 +68,9 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
       "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, businessContactDetailsRoute)
@@ -82,9 +84,29 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         }
       }
 
+      "must return OK and the correct view for a GET when enrolments enabled" in {
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .configure("features.enrolments-enabled" -> "true")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessContactDetailsRoute)
+
+          val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form, NormalMode, enrolmentsEnabled = true)(request, messages(application)).toString
+        }
+      }
+
       "must populate the view correctly on a GET when the question has previously been answered" in {
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, businessContactDetailsRoute)
@@ -112,23 +134,23 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             eqTo(emailVerificationRequest.email.get.address),
             eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(Verified)
 
-      val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .configure("features.email-verification-enabled" -> "true")
+          val application =
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
               .overrides(
-            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-          )
-          .build()
+                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+              )
+              .build()
 
           running(application) {
             val request =
               FakeRequest(POST, businessContactDetailsRoute)
                 .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
-        val result = route(application, request).value
-        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+            val result = route(application, request).value
+            val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
@@ -160,24 +182,24 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             eqTo(emailVerificationRequest.pageTitle),
             eqTo(emailVerificationRequest.continueUrl))(any())) thenReturn Future.successful(Right(emailVerificationResponse))
 
-      val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .configure("features.email-verification-enabled" -> "true")
+          val application =
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
               .overrides(
-            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-          )
-          .build()
+                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+              )
+              .build()
 
           running(application) {
             val request =
               FakeRequest(POST, businessContactDetailsRoute)
                 .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
 
-        val config = application.injector.instanceOf[FrontendAppConfig]
-        val result = route(application, request).value
-        val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val result = route(application, request).value
+            val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual config.emailVerificationUrl + emailVerificationResponse.redirectUri
@@ -194,7 +216,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           }
         }
 
-        "must save the answer and redirect to the Email Verification Codes Exceeded page if valid data is submitted but verification attempts on a single email are exceeded" in {
+        "must save the answer and redirect to the Email Verification Codes Exceeded page if valid data is submitted but" +
+          " verification attempts on a single email are exceeded" in {
 
           when(mockEmailVerificationService.isEmailVerified(
             eqTo(emailVerificationRequest.email.get.address),
@@ -205,7 +228,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val application =
             applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "true")
-              .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
               .overrides(
                 bind[EmailVerificationService].toInstance(mockEmailVerificationService),
                 bind[SaveForLaterService].toInstance(mockSaveForLaterService)
@@ -232,7 +255,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           }
         }
 
-        "must save the answer and redirect to the Email Verification Codes and Emails Exceeded page if valid data is submitted but verification attempts on maximum emails are exceeded" in {
+        "must save the answer and redirect to the Email Verification Codes and Emails Exceeded page if valid data is submitted but" +
+          " verification attempts on maximum emails are exceeded" in {
 
           when(mockEmailVerificationService.isEmailVerified(
             eqTo(emailVerificationRequest.email.get.address),
@@ -243,7 +267,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val application =
             applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "true")
-              .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
               .overrides(
                 bind[EmailVerificationService].toInstance(mockEmailVerificationService),
                 bind[SaveForLaterService].toInstance(mockSaveForLaterService)
@@ -288,15 +312,15 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             eqTo(emailVerificationRequest.continueUrl))(any())) thenReturn
             Future.successful(Left(UnexpectedResponseStatus(httpStatus, "error")))
 
-      val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .configure("features.email-verification-enabled" -> "true")
+          val application =
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
               .overrides(
-            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
-            bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-          )
-          .build()
+                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+              )
+              .build()
 
           running(application) {
             val request =
@@ -333,6 +357,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val application =
             applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
               .configure("features.email-verification-enabled" -> "false")
+              .configure("features.enrolments-enabled" -> "false")
               .overrides(
                 bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
               )
@@ -356,7 +381,9 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
       "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request =
@@ -390,7 +417,9 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
       "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+        val application = applicationBuilder(userAnswers = None)
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
 
         running(application) {
           val request =
