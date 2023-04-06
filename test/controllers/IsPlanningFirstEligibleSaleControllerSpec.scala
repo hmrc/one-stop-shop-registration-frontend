@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import connectors.ValidateCoreRegistrationConnector
 import formats.Format.dateFormatter
 import forms.IsPlanningFirstEligibleSaleFormProvider
 import models.{NormalMode, UserAnswers}
@@ -28,14 +29,16 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.DateService
+import services.{AuditService, CoreRegistrationValidationService, DateService}
 import views.html.IsPlanningFirstEligibleSaleView
 
 import scala.concurrent.Future
 
 class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSugar {
 
-  private val dateService = new DateService(stubClockAtArbitraryDate)
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+  private val dateService = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
   private val dateFormatted = dateService.startOfNextQuarter.format(dateFormatter)
 
   private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService)

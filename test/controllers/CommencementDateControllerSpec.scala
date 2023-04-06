@@ -28,14 +28,16 @@ import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPla
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.DateService
+import services.{CoreRegistrationValidationService, DateService}
 import views.html.CommencementDateView
 
 import java.time.LocalDate
+import scala.concurrent.Future
 
 class CommencementDateControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
  private val dateService: DateService = mock[DateService]
+ private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   override def beforeEach(): Unit = {
     reset(dateService)
@@ -54,14 +56,17 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.getExclusionCommencementDate(any(), any())) thenReturn dateOfFirstSale
         when(dateService.startDateBasedOnFirstSale(any())) thenReturn dateOfFirstSale
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
         when(dateService.startOfNextQuarter)thenReturn now
+        when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -96,6 +101,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val application =
           applicationBuilder(userAnswers = Some(answer1))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -117,6 +123,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
         when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.getExclusionCommencementDate(any(), any())) thenReturn commencementDate
         when(dateService.startDateBasedOnFirstSale(any())) thenReturn commencementDate
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
@@ -125,6 +132,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -154,6 +162,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -182,6 +191,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -200,6 +210,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val application =
           applicationBuilder(userAnswers = Some(answer1))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {
@@ -217,6 +228,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val application =
           applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
             .build()
 
         running(application) {

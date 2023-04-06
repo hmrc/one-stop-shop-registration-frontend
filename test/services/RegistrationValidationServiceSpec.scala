@@ -19,6 +19,7 @@ package services
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
+import connectors.ValidateCoreRegistrationConnector
 import models._
 import models.domain._
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
@@ -42,7 +43,9 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
   private def getStubClock(date: LocalDate) =
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
 
-  private def getDateService(date: LocalDate) = new DateService(getStubClock(date))
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+  private def getDateService(date: LocalDate) = new DateService(getStubClock(date), coreRegistrationValidationService)
   
   private def getRegistrationService(today: LocalDate) =
     new RegistrationValidationService(getDateService(today))

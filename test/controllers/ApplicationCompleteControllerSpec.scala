@@ -260,7 +260,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(EmailConfirmationQuery, true).success.value
 
-        val dateService = new DateService(stubClockForToday)
+        val dateService = new DateService(stubClockForToday, mockCoreRegistrationValidationService)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -317,7 +317,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
-        val dateService = new DateService(stubClockFor11Aug)
+        val dateService = new DateService(stubClockFor11Aug, mockCoreRegistrationValidationService)
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
           .set(EmailConfirmationQuery, true).success.value

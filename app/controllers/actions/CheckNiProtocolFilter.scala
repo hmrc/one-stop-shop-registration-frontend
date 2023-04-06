@@ -34,8 +34,6 @@ class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
     if (appConfig.registrationValidationEnabled) {
       request.userAnswers.vatInfo match {
         case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {

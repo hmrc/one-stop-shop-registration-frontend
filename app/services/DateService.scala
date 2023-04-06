@@ -17,12 +17,25 @@
 package services
 
 import config.Constants.schemeStartDate
+import logging.Logging
+import models.core.{Match, MatchType}
+import models.requests.AuthenticatedDataRequest
+import models.{PreviousScheme, UserAnswers}
+import pages.DateOfFirstSalePage
+import queries.previousRegistration.AllPreviousRegistrationsQuery
+import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.{Clock, LocalDate}
 import java.time.Month._
+import java.time.{Clock, LocalDate}
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
-class DateService @Inject()(clock: Clock) {
+class DateService @Inject()(
+                             clock: Clock,
+                             coreRegistrationValidationService: CoreRegistrationValidationService
+                           ) extends Logging {
+
+  private val exclusionStatusCode = 7
 
   def startOfNextQuarter: LocalDate = {
     val today                    = LocalDate.now(clock)
@@ -95,6 +108,68 @@ class DateService @Inject()(clock: Clock) {
       today.minusMonths(1).withDayOfMonth(1)
     } else {
       startOfNextQuarter.minusMonths(3)
+    }
+  }
+
+  private def isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate: LocalDate): Boolean = {
+    val lastDayOfRegistration = exclusionEffectiveDate.plusMonths(1).withDayOfMonth(10)
+    LocalDate.now(clock).minusDays(1).isBefore(lastDayOfRegistration)
+  }
+
+  def getExclusionCommencementDate(maybeMatch: Option[Match], commencementDate: LocalDate): LocalDate = {
+    maybeMatch.filter(_.matchType == MatchType.TransferringMSID).flatMap { aMatch =>
+      aMatch.exclusionEffectiveDate.map { exclusionEffectiveDate =>
+        if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
+          exclusionEffectiveDate
+        } else {
+          commencementDate
+        }
+      }
+    }.getOrElse(commencementDate)
+  }
+
+  def calculateCommencementDate(
+                                 userAnswers: UserAnswers
+                               )(implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[LocalDate]] = {
+
+    val futureSeqAllMatches = userAnswers.get(AllPreviousRegistrationsQuery).map { allPreviousRegistrationDetails =>
+
+      val schemesToSearch = allPreviousRegistrationDetails.flatMap { countryPreviousRegistrations =>
+        val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU.toString)
+        val idToSearch = countriesIdsToSearch.map(_.previousSchemeNumbers.previousSchemeNumber)
+        idToSearch.map((countryPreviousRegistrations.previousEuCountry.code, _))
+      }
+
+      schemesToSearch.map { case (countryCode, searchId) =>
+        coreRegistrationValidationService.searchScheme(
+          searchId,
+          PreviousScheme.OSSU,
+          None,
+          countryCode
+        )
+
+      }
+    }.getOrElse {
+      logger.error(s"Trader does not have any previous registrations")
+      throw new IllegalStateException("Trader must have a previous registration in this state")
+    }
+
+    val futureAllMatches = Future.sequence(futureSeqAllMatches).map(_.flatten)
+
+    for {
+      allMatches <- futureAllMatches
+    } yield {
+      val findTransferringMsid = allMatches.find(_.exclusionStatusCode.contains(exclusionStatusCode))
+
+      findTransferringMsid match {
+        case Some(matchedTransferringMsid) =>
+          matchedTransferringMsid.exclusionEffectiveDate
+        case _ =>
+          userAnswers.get(DateOfFirstSalePage).map {
+            date =>
+              startDateBasedOnFirstSale(date)
+          }
+      }
     }
   }
 }

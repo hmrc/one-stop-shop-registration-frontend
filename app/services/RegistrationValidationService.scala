@@ -108,6 +108,7 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
     )
   }
 
+  //TODO - Use new method in date service for Some(startDate)
   private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
     answers.get(DateOfFirstSalePage) match {
       case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
