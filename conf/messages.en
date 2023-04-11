@@ -671,7 +671,7 @@ noMoreWelsh.submit = Yn eich blaen
 
 niProtocolRejection.title = Register to trade under the Northern Ireland Protocol
 niProtocolRejection.heading = Register to trade under the Northern Ireland Protocol
-niProtocolRejection.paragraph = You need a VAT number starting with 'XI' to use this service.
+niProtocolRejection.paragraph = You need a VAT number starting with ''XI'' to use this service.
 niProtocolRejection.guidance = <a class="govuk-link" href="https://www.gov.uk/register-for-vat/selling-or-moving-goods-between-northern-ireland-and-the-eu">Find out more and register</a>
 
 applicationComplete.enrolment.heading = We''ve received your registration request
