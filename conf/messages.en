@@ -712,11 +712,12 @@ problemWithAccount.title = There is a problem with your account
 problemWithAccount.heading = There is a problem with your account
 problemWithAccount.contact = Contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a> to restore your account.
 
-alreadyRegisteredOtherCountry.title = This account is already registered on a One Stop Shop scheme in {0}
-alreadyRegisteredOtherCountry.heading = This account is already registered on a One Stop Shop scheme in {0}
-alreadyRegisteredOtherCountry.register = You can only register on one OSS Union scheme at a time.
-alreadyRegisteredOtherCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
-alreadyRegisteredOtherCountry.returnBTA = <a class="govuk-link" href="/business-account">Return to Business Tax Account</a>
+alreadyRegisteredOtherCountry.title = You cannot use this registration number
+alreadyRegisteredOtherCountry.heading = You cannot use this registration number
+alreadyRegisteredOtherCountry.register = This One Stop Shop registration in {0} is still active. You can only have one active OSS account.
+alreadyRegisteredOtherCountry.paragraph = Deregister from the OSS service in {0} and try again.
+alreadyRegisteredOtherCountry.contact = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+alreadyRegisteredOtherCountry.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
 
 emailVerificationCodesAndEmailsExceeded.title = You''ve tried too many email addresses
 emailVerificationCodesAndEmailsExceeded.heading = You''ve tried too many email addresses
