@@ -38,7 +38,9 @@ class TestOnlyEmailPasscodeController @Inject()(
     implicit request =>
       logger.info("REQUEST: " + request)
       testOnlyEmailPasscodeConnector.getTestOnlyPasscode().flatMap {
-        case Right(response) => Future.successful(Ok(response))
+        case Right(response) =>
+          val test = (Json.parse(response) \ "passcodes" \ 0 \ "passcode").validate[String].get
+          Future.successful(Ok(s"""<p id="testOnlyPasscodes">$response</p><p id="testOnlyPasscode">${test}</p>"""))
         case Left(error) => throw error
       }
   }
