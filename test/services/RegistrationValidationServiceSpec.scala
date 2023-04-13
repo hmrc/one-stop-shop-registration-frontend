@@ -19,34 +19,42 @@ package services
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
-import connectors.ValidateCoreRegistrationConnector
 import models._
 import models.domain._
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.previousRegistrations.PreviousSchemeNumbers
+import models.requests.AuthenticatedDataRequest
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
+import play.api.mvc.AnyContent
+import play.api.test.FakeRequest
 import queries.previousRegistration.AllPreviousRegistrationsRawQuery
 import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Clock, LocalDate, ZoneId}
+import scala.concurrent.ExecutionContext
 
-class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val iban = RegistrationData.iban
   private val bic = RegistrationData.bic
 
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
+  private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
   private def getStubClock(date: LocalDate) =
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault()).toInstant, ZoneId.systemDefault())
 
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   private def getDateService(date: LocalDate) = new DateService(getStubClock(date), coreRegistrationValidationService)
-  
+
   private def getRegistrationService(today: LocalDate) =
     new RegistrationValidationService(getDateService(today))
 
@@ -144,14 +152,14 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
       val userAnswers =
         answersNotPartOfVatGroup.copy(vatInfo = Some(vatInfo))
 
-      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
+      val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn).futureValue
 
       val expectedRegistration =
         RegistrationData.registration.copy(
           dateOfFirstSale = Some(arbitraryDate),
           vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue
         )
 
       registration mustEqual Valid(expectedRegistration)
@@ -180,7 +188,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           dateOfFirstSale = Some(arbitraryDate),
           vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue,
           previousRegistrations = Seq.empty
         )
 
@@ -205,7 +213,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           euRegistrations = Seq.empty,
           vatDetails = RegistrationData.registration.vatDetails,
           websites = Seq.empty,
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+          commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue
         )
 
       val registration = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -236,7 +244,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           dateOfFirstSale = Some(arbitraryDate),
           vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue,
           niPresence = Some(FixedEstablishmentInNi)
         )
 
@@ -268,7 +276,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           dateOfFirstSale = Some(arbitraryDate),
           vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue,
           niPresence = Some(NoPresence(SalesChannels.OnlineMarketplaces))
         )
 
@@ -308,7 +316,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             partOfVatGroup = true,
             source = VatDetailSource.Etmp
           ),
-          commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate),
+          commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue,
           previousRegistrations = Seq.empty,
           euRegistrations = Seq(
             EuVatRegistration(Country("FR", "France"), "FR123456789")
@@ -330,7 +338,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
             niPresence = None,
-            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+            commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue
           )
 
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -350,7 +358,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
             niPresence = None,
-            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+            commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue
           )
 
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -371,7 +379,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
             niPresence = None,
-            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+            commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue
           )
 
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
@@ -412,7 +420,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
         val userAnswers = answersNotPartOfVatGroup.remove(hasTradingNamePage).success.value
         val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)
 
-        result.isInvalid mustBe true
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
       }
 
       "when Has Trading Name is true, but there are no trading names" in {
@@ -850,7 +858,7 @@ class RegistrationServiceSpec extends SpecBase with MockitoSugar with BeforeAndA
           val expectedRegistration = RegistrationData.registration.copy(
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
-            commencementDate = getDateService(arbitraryDate).startDateBasedOnFirstSale(arbitraryDate)
+            commencementDate = getDateService(arbitraryDate).calculateCommencementDate(userAnswers).futureValue
           )
 
           val result = getRegistrationService(arbitraryDate).fromUserAnswers(userAnswers, vrn)

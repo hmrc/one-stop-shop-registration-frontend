@@ -167,7 +167,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
         val controller = application.injector.instanceOf[HasMadeSalesController]
 
-        val showHintTextMethod = PrivateMethod[Boolean]('showHintText)
+        val showHintTextMethod = PrivateMethod[Boolean](Symbol("showHintText"))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
@@ -191,7 +191,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
 
         val controller = application.injector.instanceOf[HasMadeSalesController]
 
-        val showHintTextMethod = PrivateMethod[Boolean]('showHintText)
+        val showHintTextMethod = PrivateMethod[Boolean](Symbol("showHintText"))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(

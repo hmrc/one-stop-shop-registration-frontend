@@ -26,7 +26,7 @@ import services.{CoreRegistrationValidationService, DateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
-import java.time.{Clock, LocalDate}
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -44,15 +44,13 @@ class CommencementDateController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       for {
-        maybeMatch <- coreRegistrationValidationService.searchUkVrn(request.vrn)
+        calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
       } yield {
         request.userAnswers.get(HasMadeSalesPage) match {
           case Some(true) =>
             request.userAnswers.get(DateOfFirstSalePage).map {
               date =>
-                val commencementDate = dateService.startDateBasedOnFirstSale(date)
-                val exclusionCommencementDate = dateService.getExclusionCommencementDate(maybeMatch, commencementDate)
-                val isDateInCurrentQuarter = date.isEqual(exclusionCommencementDate)
+                val isDateInCurrentQuarter = date.isEqual(calculatedCommencementDate)
                 val startOfCurrentQuarter = dateService.startOfCurrentQuarter
                 val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
                 val startOfNextQuarter = dateService.startOfNextQuarter
@@ -60,7 +58,7 @@ class CommencementDateController @Inject()(
                 Ok(
                   view(
                     mode,
-                    commencementDate.format(dateFormatter),
+                    calculatedCommencementDate.format(dateFormatter),
                     isDateInCurrentQuarter,
                     Some(startOfCurrentQuarter.format(dateFormatter)),
                     Some(endOfCurrentQuarter.format(dateFormatter)),
@@ -72,8 +70,7 @@ class CommencementDateController @Inject()(
           case Some(false) =>
             request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
               case Some(true) =>
-                val commencementDate = LocalDate.now(clock)
-                Ok(view(mode, commencementDate.format(dateFormatter), isDateInCurrentQuarter = true, None, None, None))
+                Ok(view(mode, calculatedCommencementDate.format(dateFormatter), isDateInCurrentQuarter = true, None, None, None))
               case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
               case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
             }

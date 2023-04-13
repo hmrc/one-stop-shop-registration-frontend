@@ -25,9 +25,10 @@ import models.{Country, Index, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.MockitoSugar.when
 import org.scalacheck.Gen
+import org.scalatest.PrivateMethodTester
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.DateOfFirstSalePage
+import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -38,7 +39,7 @@ import java.time.{Clock, LocalDate, Year, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
+class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators with PrivateMethodTester {
 
   private def getStubClock(date: LocalDate): Clock =
     Clock.fixed(date.atStartOfDay(ZoneId.systemDefault).toInstant, ZoneId.systemDefault)
@@ -235,7 +236,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(today)
             val service = new DateService(stubClock, coreRegistrationValidationService)
 
-            service.startDateBasedOnFirstSale(firstSale) mustEqual firstSale
+            val startDateBasedOnFirstSaleMethod = PrivateMethod[LocalDate](Symbol("startDateBasedOnFirstSale"))
+            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual firstSale
         }
       }
 
@@ -251,7 +253,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(today)
             val service = new DateService(stubClock, coreRegistrationValidationService)
 
-            service.startDateBasedOnFirstSale(firstSale) mustEqual firstSale
+            val startDateBasedOnFirstSaleMethod = PrivateMethod[LocalDate](Symbol("startDateBasedOnFirstSale"))
+            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual firstSale
         }
       }
     }
@@ -270,7 +273,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(today)
             val service = new DateService(stubClock, coreRegistrationValidationService)
 
-            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextQuarter
+            val startDateBasedOnFirstSaleMethod = PrivateMethod[LocalDate](Symbol("startDateBasedOnFirstSale"))
+            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual service.startOfNextQuarter
         }
       }
 
@@ -286,7 +290,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(today)
             val service = new DateService(stubClock, coreRegistrationValidationService)
 
-            service.startDateBasedOnFirstSale(firstSale) mustEqual service.startOfNextQuarter
+            val startDateBasedOnFirstSaleMethod = PrivateMethod[LocalDate](Symbol("startDateBasedOnFirstSale"))
+            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual service.startOfNextQuarter
         }
       }
     }
@@ -448,56 +453,6 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
   }
 
-  "getExclusionCommencementDate" - {
-
-    "must return commencement date when trader is match type TransferringMSID and effective date is not within last day of registration" in {
-
-      val stubClock = getStubClock(LocalDate.of(2023, 4, 2))
-
-      val commencementDate = LocalDate.of(2023, 3, 11)
-
-      val aMatch: Match = Match(
-        matchType = MatchType.TransferringMSID,
-        traderId = s"$vrn-id",
-        intermediary = None,
-        memberState = "EE",
-        exclusionStatusCode = None,
-        exclusionDecisionDate = None,
-        exclusionEffectiveDate = Some(LocalDate.of(2023, 2, 11)),
-        nonCompliantReturns = None,
-        nonCompliantPayments = None
-      )
-
-      val dateService = new DateService(stubClock, coreRegistrationValidationService)
-
-      dateService.getExclusionCommencementDate(Some(aMatch), commencementDate) mustBe commencementDate
-    }
-
-    "must return exclusion effective date as commencement date when match type is TransferringMSID and is within last day of registration" in {
-
-      val stubClock = getStubClock(LocalDate.of(2023, 4, 2))
-
-      val commencementDate = LocalDate.of(2023, 4, 1)
-
-      val aMatch: Match = Match(
-        matchType = MatchType.TransferringMSID,
-        traderId = s"$vrn-id",
-        intermediary = None,
-        memberState = "EE",
-        exclusionStatusCode = None,
-        exclusionDecisionDate = None,
-        exclusionEffectiveDate = Some(LocalDate.of(2023, 3, 11)),
-        nonCompliantReturns = None,
-        nonCompliantPayments = None
-      )
-
-      val dateService = new DateService(stubClock, coreRegistrationValidationService)
-
-      dateService.getExclusionCommencementDate(Some(aMatch), commencementDate) mustBe aMatch.exclusionEffectiveDate.get
-    }
-
-  }
-
   "calculateCommencementDate" - {
 
     "must return exclusion effective date as commencement date when trader has a previous registration and is transferring MSID" in {
@@ -513,7 +468,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val index = Index(0)
 
-      val stubClock = getStubClock(LocalDate.now)
+      val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
       val userAnswers = emptyUserAnswers
         .set(DateOfFirstSalePage, LocalDate.of(2023, 3, 14)).success.value
         .set(PreviousEuCountryPage(index), Country("EE", "Estonia")).success.value
@@ -523,7 +478,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(exclusionEffectiveDate)
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe exclusionEffectiveDate
 
     }
 
@@ -541,7 +496,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       val index = Index(0)
       val index1 = Index(1)
 
-      val stubClock = getStubClock(LocalDate.now)
+      val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
       val userAnswers = emptyUserAnswers
         .set(DateOfFirstSalePage, LocalDate.of(2023, 3, 14)).success.value
         .set(PreviousEuCountryPage(index), Country("EE", "Estonia")).success.value
@@ -557,7 +512,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(exclusionEffectiveDate)
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe exclusionEffectiveDate
 
     }
 
@@ -573,8 +528,9 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val index = Index(0)
 
-      val stubClock = getStubClock(LocalDate.now)
+      val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
       val userAnswers = emptyUserAnswers
+        .set(HasMadeSalesPage, true).success.value
         .set(DateOfFirstSalePage, commencementDate).success.value
         .set(PreviousEuCountryPage(index), Country("ES", "Spain")).success.value
         .set(PreviousSchemeTypePage(index, index), PreviousSchemeType.OSS).success.value
@@ -583,13 +539,13 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(commencementDate)
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe commencementDate
 
     }
 
     "must return an Illegal State Exception when there are no previous registrations" in {
 
-      val stubClock = getStubClock(LocalDate.now)
+      val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
 
       val userAnswers = emptyUserAnswers
 

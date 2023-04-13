@@ -20,6 +20,7 @@ import controllers.actions._
 import generators.Generators
 import models.domain.VatCustomerInfo
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
+import models.requests.AuthenticatedDataRequest
 import models.{BusinessContactDetails, Country, DesAddress, Index, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -38,11 +39,13 @@ import play.api.test.FakeRequest
 import services.DateService
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SpecBase
   extends AnyFreeSpec
@@ -135,24 +138,28 @@ trait SpecBase
     ).flatten
   }
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService)(implicit msgs: Messages) = {
-    Seq(
-      new HasTradingNameSummary().row(answers),
-      HasMadeSalesSummary.row(answers),
-      IsPlanningFirstEligibleSaleSummary.row(answers),
-      PreviouslyRegisteredSummary.row(answers),
-      new CommencementDateSummary(dateService).row(answers),
-      TaxRegisteredInEuSummary.row(answers),
-      EuDetailsSummary.checkAnswersRow(answers),
-      IsOnlineMarketplaceSummary.row(answers),
-      HasWebsiteSummary.row(answers),
-      BusinessContactDetailsSummary.rowContactName(answers),
-      BusinessContactDetailsSummary.rowTelephoneNumber(answers),
-      BusinessContactDetailsSummary.rowEmailAddress(answers),
-      BankDetailsSummary.rowAccountName(answers),
-      BankDetailsSummary.rowBIC(answers),
-      BankDetailsSummary.rowIBAN(answers)
-    ).flatten
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService)
+                       (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]) = {
+    new CommencementDateSummary(dateService).row(answers).map { commencementDateSummary =>
+
+      Seq(
+        new HasTradingNameSummary().row(answers),
+        HasMadeSalesSummary.row(answers),
+        IsPlanningFirstEligibleSaleSummary.row(answers),
+        PreviouslyRegisteredSummary.row(answers),
+        Some(commencementDateSummary),
+        TaxRegisteredInEuSummary.row(answers),
+        EuDetailsSummary.checkAnswersRow(answers),
+        IsOnlineMarketplaceSummary.row(answers),
+        HasWebsiteSummary.row(answers),
+        BusinessContactDetailsSummary.rowContactName(answers),
+        BusinessContactDetailsSummary.rowTelephoneNumber(answers),
+        BusinessContactDetailsSummary.rowEmailAddress(answers),
+        BankDetailsSummary.rowAccountName(answers),
+        BankDetailsSummary.rowBIC(answers),
+        BankDetailsSummary.rowIBAN(answers)
+      ).flatten
+    }
   }
 
 }

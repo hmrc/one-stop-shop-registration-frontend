@@ -60,7 +60,7 @@ class CheckYourAnswersController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail() {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail().async {
     implicit request =>
       val vatRegistrationDetailsList = SummaryListViewModel(
         rows = Seq(
@@ -71,39 +71,40 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      val list = SummaryListViewModel(
-        rows = Seq(
-          new HasTradingNameSummary().row(request.userAnswers),
-          TradingNameSummary.checkAnswersRow(request.userAnswers),
-          HasMadeSalesSummary.row(request.userAnswers),
-          DateOfFirstSaleSummary.row(request.userAnswers),
-          IsPlanningFirstEligibleSaleSummary.row(request.userAnswers),
-          PreviouslyRegisteredSummary.row(request.userAnswers),
-          PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
-          new CommencementDateSummary(dateService).row(request.userAnswers),
-          TaxRegisteredInEuSummary.row(request.userAnswers),
-          EuDetailsSummary.checkAnswersRow(request.userAnswers),
-          IsOnlineMarketplaceSummary.row(request.userAnswers),
-          HasWebsiteSummary.row(request.userAnswers),
-          WebsiteSummary.checkAnswersRow(request.userAnswers),
-          BusinessContactDetailsSummary.rowContactName(request.userAnswers),
-          BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers),
-          BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
-          BankDetailsSummary.rowAccountName(request.userAnswers),
-          BankDetailsSummary.rowBIC(request.userAnswers),
-          BankDetailsSummary.rowIBAN(request.userAnswers)
-        ).flatten
-      )
+      new CommencementDateSummary(dateService).row(request.userAnswers).map { commencementDateSummary =>
 
-      val isValid = validate()
-      Ok(view(vatRegistrationDetailsList, list, isValid))
+        val list = SummaryListViewModel(
+          rows = Seq(
+            new HasTradingNameSummary().row(request.userAnswers),
+            TradingNameSummary.checkAnswersRow(request.userAnswers),
+            HasMadeSalesSummary.row(request.userAnswers),
+            DateOfFirstSaleSummary.row(request.userAnswers),
+            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers),
+            PreviouslyRegisteredSummary.row(request.userAnswers),
+            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+            Some(commencementDateSummary),
+            TaxRegisteredInEuSummary.row(request.userAnswers),
+            EuDetailsSummary.checkAnswersRow(request.userAnswers),
+            IsOnlineMarketplaceSummary.row(request.userAnswers),
+            HasWebsiteSummary.row(request.userAnswers),
+            WebsiteSummary.checkAnswersRow(request.userAnswers),
+            BusinessContactDetailsSummary.rowContactName(request.userAnswers),
+            BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers),
+            BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
+            BankDetailsSummary.rowAccountName(request.userAnswers),
+            BankDetailsSummary.rowBIC(request.userAnswers),
+            BankDetailsSummary.rowIBAN(request.userAnswers)
+          ).flatten
+        )
+
+        val isValid = validate()
+        Ok(view(vatRegistrationDetailsList, list, isValid))
+      }
   }
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      val registration = registrationService.fromUserAnswers(request.userAnswers, request.vrn)
-
-      registration match {
+      registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
         case Valid(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>

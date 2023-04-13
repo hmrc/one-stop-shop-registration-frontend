@@ -18,44 +18,31 @@ package viewmodels.checkAnswers
 
 import formats.Format.dateFormatter
 import models.UserAnswers
-import pages.{DateOfFirstSalePage, IsPlanningFirstEligibleSalePage}
+import models.requests.AuthenticatedDataRequest
 import play.api.i18n.Messages
 import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class CommencementDateSummary @Inject()(dateService: DateService) {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    answers.get(DateOfFirstSalePage).isEmpty match {
-      case true =>
-        val startDate = LocalDate.now()
-        answers.get(IsPlanningFirstEligibleSalePage).map {
-          _ =>
-            SummaryListRowViewModel(
-              key = "commencementDate.checkYourAnswersLabel",
-              value = ValueViewModel(startDate.format(dateFormatter)),
-              actions = Seq.empty
-            )
-        }
+  def row(answers: UserAnswers)
+         (implicit messages: Messages, ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[SummaryListRow] = {
 
-      case _ =>
-        answers.get(DateOfFirstSalePage).map {
-          answer =>
+    for {
+      calculatedCommencementDate <- dateService.calculateCommencementDate(answers)
+    } yield {
 
-            val startDate = dateService.startDateBasedOnFirstSale(answer)
-
-            SummaryListRowViewModel(
-              key = "commencementDate.checkYourAnswersLabel",
-              value = ValueViewModel(startDate.format(dateFormatter)),
-              actions = Seq.empty
-            )
-        }
-
+      SummaryListRowViewModel(
+        key = "commencementDate.checkYourAnswersLabel",
+        value = ValueViewModel(calculatedCommencementDate.format(dateFormatter)),
+        actions = Seq.empty
+      )
     }
   }
 }

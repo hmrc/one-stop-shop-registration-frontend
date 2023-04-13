@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import connectors.ValidateCoreRegistrationConnector
 import formats.Format.dateFormatter
 import forms.IsPlanningFirstEligibleSaleFormProvider
 import models.{NormalMode, UserAnswers}
@@ -29,7 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.{AuditService, CoreRegistrationValidationService, DateService}
+import services.{CoreRegistrationValidationService, DateService}
 import views.html.IsPlanningFirstEligibleSaleView
 
 import scala.concurrent.Future

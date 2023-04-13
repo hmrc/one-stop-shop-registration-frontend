@@ -21,7 +21,7 @@ import logging.Logging
 import models.core.{Match, MatchType}
 import models.requests.AuthenticatedDataRequest
 import models.{PreviousScheme, UserAnswers}
-import pages.DateOfFirstSalePage
+import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,8 +34,6 @@ class DateService @Inject()(
                              clock: Clock,
                              coreRegistrationValidationService: CoreRegistrationValidationService
                            ) extends Logging {
-
-  private val exclusionStatusCode = 7
 
   def startOfNextQuarter: LocalDate = {
     val today                    = LocalDate.now(clock)
@@ -60,7 +58,7 @@ class DateService @Inject()(
     startOfQuarterAfterNextQuarter.withDayOfMonth(lengthOfMonth)
   }
 
-  def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
+  private def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
     val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
     if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {
       startOfNextQuarter
@@ -111,27 +109,8 @@ class DateService @Inject()(
     }
   }
 
-  private def isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate: LocalDate): Boolean = {
-    val lastDayOfRegistration = exclusionEffectiveDate.plusMonths(1).withDayOfMonth(10)
-    LocalDate.now(clock).minusDays(1).isBefore(lastDayOfRegistration)
-  }
-
-  def getExclusionCommencementDate(maybeMatch: Option[Match], commencementDate: LocalDate): LocalDate = {
-    maybeMatch.filter(_.matchType == MatchType.TransferringMSID).flatMap { aMatch =>
-      aMatch.exclusionEffectiveDate.map { exclusionEffectiveDate =>
-        if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
-          exclusionEffectiveDate
-        } else {
-          commencementDate
-        }
-      }
-    }.getOrElse(commencementDate)
-  }
-
-  def calculateCommencementDate(
-                                 userAnswers: UserAnswers
-                               )(implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[LocalDate]] = {
-
+  private def searchPreviousRegistrationSchemes(userAnswers: UserAnswers)
+                                               (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): List[Future[Option[Match]]] = {
     val futureSeqAllMatches = userAnswers.get(AllPreviousRegistrationsQuery).map { allPreviousRegistrationDetails =>
 
       val schemesToSearch = allPreviousRegistrationDetails.flatMap { countryPreviousRegistrations =>
@@ -153,23 +132,49 @@ class DateService @Inject()(
       logger.error(s"Trader does not have any previous registrations")
       throw new IllegalStateException("Trader must have a previous registration in this state")
     }
+    futureSeqAllMatches
+  }
+
+  def calculateCommencementDate(userAnswers: UserAnswers)
+                               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[LocalDate] = {
+
+    val futureSeqAllMatches: List[Future[Option[Match]]] = searchPreviousRegistrationSchemes(userAnswers)
 
     val futureAllMatches = Future.sequence(futureSeqAllMatches).map(_.flatten)
 
     for {
       allMatches <- futureAllMatches
     } yield {
-      val findTransferringMsid = allMatches.find(_.exclusionStatusCode.contains(exclusionStatusCode))
+      val findTransferringMsid = allMatches.find(_.matchType == MatchType.TransferringMSID)
 
       findTransferringMsid match {
         case Some(matchedTransferringMsid) =>
-          matchedTransferringMsid.exclusionEffectiveDate
+          matchedTransferringMsid.exclusionEffectiveDate.getOrElse {
+            val exception = new IllegalStateException("Transferring MSID match didn't have an expected exclusion effective date")
+            logger.error(exception.getMessage, exception)
+            throw exception
+          }
         case _ =>
-          userAnswers.get(DateOfFirstSalePage).map {
-            date =>
-              startDateBasedOnFirstSale(date)
+          userAnswers.get(HasMadeSalesPage) match {
+            case Some(true) =>
+              userAnswers.get(DateOfFirstSalePage) match {
+                case Some(date) =>
+                  startDateBasedOnFirstSale(date)
+                case _ =>
+                  val exception = new IllegalStateException("Must provide a Date of First Sale")
+                  logger.error(exception.getMessage, exception)
+                  throw exception
+              }
+            case Some(false) =>
+              LocalDate.now(clock)
+
+            case _ =>
+              val exception = new IllegalStateException("Must answer Has Made Sales")
+              logger.error(exception.getMessage, exception)
+              throw exception
           }
       }
     }
   }
+
 }
