@@ -17,6 +17,7 @@
 package controllers
 
 import config.Constants.addQuarantineYears
+import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.Country
@@ -27,20 +28,27 @@ import views.html.OtherCountryExcludedAndQuarantinedView
 
 import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class OtherCountryExcludedAndQuarantinedController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
-                                       view: OtherCountryExcludedAndQuarantinedView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                       view: OtherCountryExcludedAndQuarantinedView,
+                                       connector: RegistrationConnector
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 
       val exclusionDateFormatted = LocalDate.parse(exclusionDate).plusYears(addQuarantineYears).format(dateFormatter)
 
-      Ok(view(Country.getCountryName(countryCode), exclusionDateFormatted))
+      connector.getSavedExternalEntry().map {
+        case Right(response) =>
+          Ok(view(Country.getCountryName(countryCode), exclusionDateFormatted, response.url))
+        case Left(e) =>
+          Ok(view(Country.getCountryName(countryCode), exclusionDateFormatted))
+      }
   }
 }
