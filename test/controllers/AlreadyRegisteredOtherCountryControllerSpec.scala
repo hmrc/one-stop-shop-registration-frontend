@@ -17,19 +17,39 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
+import models.external.ExternalEntryUrl
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.AlreadyRegisteredOtherCountryView
 
-class AlreadyRegisteredOtherCountryControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class AlreadyRegisteredOtherCountryControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockRegistrationConnector)
+  }
 
   "AlreadyRegisteredOtherCountry Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
+      when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+
       val countryCode: String = "NL"
       val countryName: String = "Netherlands"
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode).url)
