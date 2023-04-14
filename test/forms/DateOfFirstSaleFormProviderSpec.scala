@@ -21,13 +21,15 @@ import formats.Format.dateFormatter
 import forms.behaviours.DateBehaviours
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.FormError
-import services.DateService
+import services.{CoreRegistrationValidationService, DateService}
 
 import java.time.LocalDate
 
 class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with MockitoSugar {
 
-  private val dateService = new DateService(stubClockAtArbitraryDate)
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+  private val dateService = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
 
   val form = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)()
 

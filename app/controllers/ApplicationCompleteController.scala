@@ -21,15 +21,13 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers
-import models.core.{Match, MatchType}
-import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
-import java.time.{Clock, LocalDate}
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -53,17 +51,13 @@ class ApplicationCompleteController @Inject()(
 
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()
-        maybeMatch <- coreRegistrationValidationService.searchUkVrn(request.vrn)
-
+        calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
       } yield {
           {for {
             organisationName <- getOrganisationName(request.userAnswers)
-            commencementDate <- getStartDate(request.userAnswers)
-
           } yield {
-            val exclusionCommencementDate = getExclusionCommencementDate(maybeMatch, commencementDate)
             val savedUrl = externalEntryUrl.fold(_ => None, _.url)
-            val periodOfFirstReturn = periodService.getFirstReturnPeriod(exclusionCommencementDate)
+            val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
             val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
             val firstDayOfNextPeriod = nextPeriod.firstDay
             if(frontendAppConfig.enrolmentsEnabled) {
@@ -71,7 +65,7 @@ class ApplicationCompleteController @Inject()(
                 viewEnrolments(
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
-                  exclusionCommencementDate.format(dateFormatter),
+                  calculatedCommencementDate.format(dateFormatter),
                   savedUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,
@@ -83,7 +77,7 @@ class ApplicationCompleteController @Inject()(
                 view(
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
-                  exclusionCommencementDate.format(dateFormatter),
+                  calculatedCommencementDate.format(dateFormatter),
                   savedUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,
@@ -96,32 +90,9 @@ class ApplicationCompleteController @Inject()(
     }
   }
 
-  private def isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate: LocalDate): Boolean = {
-    val lastDayOfRegistration = exclusionEffectiveDate.plusMonths(1).withDayOfMonth(10)
-    LocalDate.now(clock).minusDays(1).isBefore(lastDayOfRegistration)
-  }
-
-  private def getStartDate(answers: UserAnswers): Option[LocalDate] =
-    answers.get(DateOfFirstSalePage) match {
-      case Some(startDate) => Some(dateService.startDateBasedOnFirstSale(startDate))
-      case None            => Some(LocalDate.now())
-    }
-
   private def getOrganisationName(answers: UserAnswers): Option[String] =
     answers.vatInfo match {
       case Some(vatInfo) => Some(vatInfo.organisationName)
       case _             => None
     }
-
-  private def getExclusionCommencementDate(maybeMatch: Option[Match], commencementDate: LocalDate): LocalDate = {
-    maybeMatch.filter(_.matchType == MatchType.TransferringMSID).flatMap { aMatch =>
-      aMatch.exclusionEffectiveDate.map { exclusionEffectiveDate =>
-        if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
-          exclusionEffectiveDate
-        } else {
-          commencementDate
-        }
-      }
-    }.getOrElse(commencementDate)
-  }
 }

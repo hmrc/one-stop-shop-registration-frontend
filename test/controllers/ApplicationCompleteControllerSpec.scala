@@ -20,9 +20,10 @@ import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import formats.Format.dateFormatter
-import models.{Period, UserAnswers}
 import models.Quarter.{Q1, Q4}
 import models.external.ExternalEntryUrl
+import models.{Period, UserAnswers}
+import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,22 +31,29 @@ import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage,
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.Json
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
 
 import java.time.{Clock, LocalDate, ZoneId}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
   private val periodService = mock[PeriodService]
-
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
   private val mockRegistrationConnector = mock[RegistrationConnector]
+  private val mockDateService = mock[DateService]
+
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
+  private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
 
   private  val userAnswers = UserAnswers(
     userAnswersId,
@@ -67,7 +75,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view for a GET with no enrolments" in {
 
-
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
@@ -79,11 +86,13 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
           .build()
 
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
+        when(mockDateService.startOfNextQuarter) thenReturn arbitraryStartDate
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
@@ -94,7 +103,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteView]
-          val commencementDate = LocalDate.now()
+          val commencementDate = mockDateService.calculateCommencementDate(userAnswersWithEmail).futureValue
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -125,10 +134,12 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockAtArbitraryDate))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
@@ -140,7 +151,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[ApplicationCompleteWithEnrolmentView]
-          val commencementDate = LocalDate.now()
+          val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -171,10 +182,12 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockAtArbitraryDate))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
@@ -185,7 +198,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val commencementDate = LocalDate.now()
+          val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -217,11 +230,12 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
           .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockAtArbitraryDate))
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
@@ -231,7 +245,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val commencementDate = LocalDate.now()
+          val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
@@ -250,7 +264,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must return OK and the correct view when Date Of First Sale is the same to the Commencement Date" in {
+      "must return OK and the correct view when Date Of First Sale is the same as the Commencement Date" in {
 
         val todayInstant = LocalDate.now().atStartOfDay(ZoneId.systemDefault).toInstant
 
@@ -260,19 +274,18 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(EmailConfirmationQuery, true).success.value
 
-        val dateService = new DateService(stubClockForToday)
-
         val application =
           applicationBuilder(userAnswers = Some(answers))
-            .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
+            .overrides(bind[DateService].toInstance(mockDateService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockForToday))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
@@ -305,29 +318,24 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view when Date Of First Sale is different to the Commencement Date" in {
 
-        val aug11thInstant =
-          LocalDate.of(2021,8,11).atStartOfDay(ZoneId.systemDefault).toInstant
-
-        val stubClockFor11Aug = Clock.fixed(aug11thInstant, ZoneId.systemDefault)
-
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.of(2021, 10, 1))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
-        val dateService = new DateService(stubClockFor11Aug)
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
-            .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
+            .overrides(bind[DateService].toInstance(mockDateService))
             .configure("features.enrolments-enabled" -> "false")
             .build()
 

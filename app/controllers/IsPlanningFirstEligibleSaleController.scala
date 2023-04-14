@@ -39,12 +39,12 @@ class IsPlanningFirstEligibleSaleController @Inject()(
                                          dateService: DateService
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
+      val form = formProvider()
       val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
 
       val preparedForm = request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
@@ -58,6 +58,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
 
+      val form = formProvider()
       val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
 
       form.bindFromRequest().fold(

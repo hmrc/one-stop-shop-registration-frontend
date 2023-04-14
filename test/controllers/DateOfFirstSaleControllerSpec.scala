@@ -16,7 +16,6 @@
 
 package controllers
 
-import java.time.LocalDate
 import base.SpecBase
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
@@ -31,15 +30,18 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.DateService
+import services.{CoreRegistrationValidationService, DateService}
 import views.html.DateOfFirstSaleView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
   private val date: LocalDate   = LocalDate.now(stubClockAtArbitraryDate)
-  private val dateService       = new DateService(stubClockAtArbitraryDate)
+  private val dateService       = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
   private val dateFormatted     = dateService.earliestSaleAllowed.format(dateFormatter)
   private val dateHintFormatted = dateService.earliestSaleAllowed.format(dateHintFormatter)
 

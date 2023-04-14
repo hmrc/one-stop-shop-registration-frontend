@@ -17,7 +17,6 @@
 package connectors
 
 import logging.Logging
-import models.domain.VatCustomerInfo
 import models.external.ExternalEntryUrl
 import models.responses.{ErrorResponse, InvalidJson, NotFound, UnexpectedResponseStatus}
 import play.api.http.Status.{NOT_FOUND, OK}

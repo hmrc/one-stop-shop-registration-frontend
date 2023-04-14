@@ -22,8 +22,6 @@ import logging.Logging
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,8 +31,6 @@ class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
   extends CheckNiProtocolFilter with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.registrationValidationEnabled) {
       request.userAnswers.vatInfo match {

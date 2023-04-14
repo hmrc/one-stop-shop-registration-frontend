@@ -18,8 +18,7 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
-import connectors.{RegistrationConnector, SavedUserAnswers, SaveForLaterConnector}
-import models.SessionData
+import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import models.external.ExternalEntryUrl
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +30,7 @@ import play.api.inject.bind
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.{AuthenticatedUserAnswersRepository, SessionRepository}
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.SavedProgressView
 
 import java.time.format.DateTimeFormatter

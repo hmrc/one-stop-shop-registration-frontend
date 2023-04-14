@@ -19,58 +19,70 @@ package services
 import cats.implicits._
 import models._
 import models.domain._
+import models.requests.AuthenticatedDataRequest
 import pages._
 import queries._
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationValidationService @Inject()(dateService: DateService) extends EuTaxRegistrationValidations with PreviousRegistrationsValidations {
 
-  def fromUserAnswers(answers: UserAnswers, vrn: Vrn): ValidationResult[Registration] =
-    (
-      getCompanyName(answers),
-      getTradingNames(answers),
-      getVatDetails(answers),
-      getEuTaxRegistrations(answers),
-      getCommencementDate(answers),
-      getContactDetails(answers),
-      getWebsites(answers),
-      getPreviousRegistrations(answers),
-      getBankDetails(answers),
-      getOnlineMarketplace(answers),
-      getNiPresence(answers),
-      ).mapN(
+
+  def fromUserAnswers(answers: UserAnswers, vrn: Vrn)
+                     (
+                       implicit ec: ExecutionContext,
+                       hc: HeaderCarrier,
+                       request: AuthenticatedDataRequest[_]
+                     ): Future[ValidationResult[Registration]] = {
+    getCommencementDate(answers).map { validationCommencementDate =>
       (
-        name,
-        tradingNames,
-        vatDetails,
-        euRegistrations,
-        startDate,
-        contactDetails,
-        websites,
-        previousRegistrations,
-        bankDetails,
-        isOnlineMarketplace,
-        niPresence
-      ) =>
-        Registration(
-          vrn = vrn,
-          registeredCompanyName = name,
-          tradingNames = tradingNames,
-          vatDetails = vatDetails,
-          euRegistrations = euRegistrations,
-          contactDetails = contactDetails,
-          websites = websites,
-          commencementDate = startDate,
-          previousRegistrations = previousRegistrations,
-          bankDetails = bankDetails,
-          isOnlineMarketplace = isOnlineMarketplace,
-          niPresence = niPresence,
-          dateOfFirstSale = answers.get(DateOfFirstSalePage)
-        )
-    )
+        getCompanyName(answers),
+        getTradingNames(answers),
+        getVatDetails(answers),
+        getEuTaxRegistrations(answers),
+        validationCommencementDate,
+        getContactDetails(answers),
+        getWebsites(answers),
+        getPreviousRegistrations(answers),
+        getBankDetails(answers),
+        getOnlineMarketplace(answers),
+        getNiPresence(answers),
+        ).mapN(
+        (
+          name,
+          tradingNames,
+          vatDetails,
+          euRegistrations,
+          startDate,
+          contactDetails,
+          websites,
+          previousRegistrations,
+          bankDetails,
+          isOnlineMarketplace,
+          niPresence
+        ) =>
+          Registration(
+            vrn = vrn,
+            registeredCompanyName = name,
+            tradingNames = tradingNames,
+            vatDetails = vatDetails,
+            euRegistrations = euRegistrations,
+            contactDetails = contactDetails,
+            websites = websites,
+            commencementDate = startDate,
+            previousRegistrations = previousRegistrations,
+            bankDetails = bankDetails,
+            isOnlineMarketplace = isOnlineMarketplace,
+            niPresence = niPresence,
+            dateOfFirstSale = answers.get(DateOfFirstSalePage)
+          )
+      )
+    }
+  }
 
   private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
     answers.vatInfo match {
@@ -108,14 +120,21 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
     )
   }
 
-  private def getCommencementDate(answers: UserAnswers): ValidationResult[LocalDate] =
-    answers.get(DateOfFirstSalePage) match {
-      case Some(startDate) => dateService.startDateBasedOnFirstSale(startDate).validNec
-      case None => answers.get(IsPlanningFirstEligibleSalePage) match {
-        case Some(true) => LocalDate.now().validNec
-        case _ => DataMissingError(IsPlanningFirstEligibleSalePage).invalidNec
+  private def getCommencementDate(answers: UserAnswers)
+                                 (
+                                   implicit ec: ExecutionContext,
+                                   hc: HeaderCarrier,
+                                   request: AuthenticatedDataRequest[_]
+                                 ): Future[ValidationResult[LocalDate]] = {
+
+    if (answers.get(DateOfFirstSalePage).isEmpty && answers.get(IsPlanningFirstEligibleSalePage).isEmpty) {
+      Future.successful(DataMissingError(IsPlanningFirstEligibleSalePage).invalidNec)
+    } else {
+      dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
+        calculatedCommencementDate.validNec
       }
     }
+  }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
     answers.get(BusinessContactDetailsPage) match {
