@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqual
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK, UNAUTHORIZED}
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,15 +46,17 @@ class TestOnlyEmailPasscodeConnectorSpec extends SpecBase with WireMockHelper {
 
         val connector = application.injector.instanceOf[TestOnlyEmailPasscodeConnector]
 
-        val expectedResponse = "{\"passcodes\":\"[{\"email\" : \"ppt@mail.com\", \"passcode\" : \"HDDDYX\", }]\"}"
+        val response = """{"passcodes":[{"email": "ppt@mail.com", "passcode": "HDDDYX"}]}"""
 
         server.stubFor(
           get(urlEqualTo(url))
             .willReturn(aResponse
               .withStatus(OK)
-              .withBody(expectedResponse)
+              .withBody(response)
             )
         )
+
+        val expectedResponse = EmailPasscodes(Seq(EmailPasscodeEntry("ppt@mail.com", "HDDDYX")))
 
         connector.getTestOnlyPasscode().futureValue mustBe Right(expectedResponse)
 
