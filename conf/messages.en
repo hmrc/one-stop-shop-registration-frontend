@@ -394,7 +394,7 @@ previousOssNumber.error.invalid = Enter a registration number in the correct for
 previouslyRegistered.title = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.heading = Has your business ever registered for a One Stop Shop scheme in an EU country?
 previouslyRegistered.hint = This includes Import One Stop Shop (IOSS).
-previouslyRegistered.checkYourAnswersLabel = Registered for other One Stop Shop schemes in the EU
+previouslyRegistered.checkYourAnswersLabel = Other One Stop Shop registrations
 previouslyRegistered.error.required = Select yes if your business has ever registered for a One Stop Shop scheme in an EU country
 previouslyRegistered.change.hidden = if your business has ever registered for a One Stop Shop scheme in an EU country
 
@@ -531,7 +531,7 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
 commencementDate.p1 = You must include all eligible sales from {0} in your first return.
-commencementDate.checkYourAnswersLabel = Date your sales start to be included in this scheme
+commencementDate.checkYourAnswersLabel = Include sales from this date
 
 commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
 commencementDate.CurrentQuarter.heading = Between {0} and {1}
