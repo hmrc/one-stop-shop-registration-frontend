@@ -18,17 +18,36 @@ package connectors.test
 
 import logging.Logging
 import play.api.http.Status.OK
+import play.api.libs.json._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+
+case class EmailPasscodeEntry(email: String, passcode: String)
+
+object EmailPasscodeEntry {
+  implicit val format: Format[EmailPasscodeEntry] = Json.format[EmailPasscodeEntry]
+}
+
+case class EmailPasscodes(passcodes: Seq[EmailPasscodeEntry])
+
+object EmailPasscodes {
+  implicit val format: Format[EmailPasscodes] = Json.format[EmailPasscodes]
+}
 
 object TestOnlyEmailPasscodeHttpParser extends Logging {
 
-  type TestOnlyEmailPasscodeResponse = Either[ServiceError, String]
+  type TestOnlyEmailPasscodeResponse = Either[ServiceError, EmailPasscodes]
 
   implicit object TestOnlyEmailPasscodeReads extends HttpReads[TestOnlyEmailPasscodeResponse] {
     override def read(method: String, url: String, response: HttpResponse): TestOnlyEmailPasscodeResponse = {
       response.status match {
-        case OK => Right(response.body)
-
+        case OK =>
+          response.json.validate[EmailPasscodes] match {
+            case JsSuccess(value, _) => Right(value)
+            case JsError(errors) => {
+              val errorMessage = s"Unable to read json got errors $errors"
+              Left(DownstreamServiceError(errorMessage, FailedToFetchTestOnlyPasscode(errorMessage)))
+            }
+          }
         case _ =>
           logger.error(s"Unable to find test only passcodes with status ${response.status} with body ${response.body}")
           Left(DownstreamServiceError(s"Received unexpected response code ${response.status}",
