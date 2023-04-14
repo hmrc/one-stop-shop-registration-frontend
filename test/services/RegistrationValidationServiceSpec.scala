@@ -37,7 +37,7 @@ import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Clock, LocalDate, ZoneId}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 

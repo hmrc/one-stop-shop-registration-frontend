@@ -37,7 +37,6 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
   private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
   private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
   private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
-  private val mockDateService = mock[DateService]
 
   ".row" - {
 
@@ -47,8 +46,6 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 
         val answers = emptyUserAnswers
           .set(DateOfFirstSalePage, arbitraryDate).success.value
-
-//        when(mockDateService.calculateCommencementDate(answers)) thenReturn Future.successful(arbitraryDate)
 
         val app = applicationBuilder(Some(answers), Some(stubClockAtArbitraryDate))
           .build()
