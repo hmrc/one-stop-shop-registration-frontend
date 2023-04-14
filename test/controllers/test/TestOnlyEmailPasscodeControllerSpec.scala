@@ -17,7 +17,7 @@
 package controllers.test
 
 import base.SpecBase
-import connectors.test.{DownstreamServiceError, FailedToFetchTestOnlyPasscode, TestOnlyEmailPasscodeConnector}
+import connectors.test.{DownstreamServiceError, EmailPasscodeEntry, EmailPasscodes, FailedToFetchTestOnlyPasscode, TestOnlyEmailPasscodeConnector}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
@@ -44,7 +44,9 @@ class TestOnlyEmailPasscodeControllerSpec extends SpecBase {
 
       running(application) {
 
-        when(testOnlyEmailPasscodeConnector.getTestOnlyPasscode()(any())) thenReturn Future.successful(Right("passcodes"))
+        val testOnlyResponse = EmailPasscodes(Seq(EmailPasscodeEntry("test@test.com", "passcode")))
+
+        when(testOnlyEmailPasscodeConnector.getTestOnlyPasscode()(any())) thenReturn Future.successful(Right(testOnlyResponse))
 
         val request = FakeRequest(GET, testOnlyEmailPasscodeRoute)
 
