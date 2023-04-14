@@ -54,8 +54,9 @@
 
         @govukSummaryList(list)
 
-        <p class="govuk-body">@messages("checkYourAnswers.info")</p>
+        <p class="govuk-body">@messages("checkYourAnswers.info.p1")</p>
 
+        <p class="govuk-body">@messages("checkYourAnswers.info.p2")</p>
 
         @if(isValid) {
             @formHelper(action = routes.CheckYourAnswersController.onSubmit(false)) {

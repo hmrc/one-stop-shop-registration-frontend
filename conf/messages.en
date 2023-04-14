@@ -17,7 +17,7 @@ site.govuk = GOV.UK
 site.submit = Register
 site.tryAgain = Try again
 site.to = to
-site.processing = We are processing your registration. Do not click the Back Button or refresh the page.
+site.processing = We are processing your registration.
 
 date.day = Day
 date.month = Month
@@ -49,7 +49,8 @@ error.summary.title = There is a problem
 checkYourAnswers.title = Check Your Answers
 checkYourAnswers.heading = Check Your Answers
 checkYourAnswers.details.Heading = One Stop Shop details
-checkYourAnswers.info = By registering for this scheme, you confirm that the information you are providing is correct and complete.
+checkYourAnswers.info.p1 = By registering for this scheme, you confirm that the information you are providing is correct and complete.
+checkYourAnswers.info.p2 = After registering, do not click the Back button or refresh the page.
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
