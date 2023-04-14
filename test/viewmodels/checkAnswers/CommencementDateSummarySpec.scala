@@ -19,8 +19,11 @@ package viewmodels.checkAnswers
 import base.SpecBase
 import formats.Format.dateFormatter
 import models.requests.AuthenticatedDataRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DateOfFirstSalePage
+import play.api.inject.bind
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -29,7 +32,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.govuk.summarylist._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 
@@ -37,6 +40,7 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
   private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
   private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
   private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
+  private val mockDateService = mock[DateService]
 
   ".row" - {
 
@@ -44,17 +48,20 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 
       "must return a view model when DateOfFirstSale has been answered" in {
 
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+
         val answers = emptyUserAnswers
           .set(DateOfFirstSalePage, arbitraryDate).success.value
 
         val app = applicationBuilder(Some(answers), Some(stubClockAtArbitraryDate))
+          .overrides(bind[DateService].toInstance(mockDateService))
           .build()
 
         running(app) {
           val viewmodel   = app.injector.instanceOf[CommencementDateSummary]
           val msgs        = messages(app)
 
-          val row = viewmodel.row(answers)(msgs, ec, hc, dataRequest).value
+          val row = viewmodel.row(answers)(msgs, ec, hc, dataRequest).futureValue
           row mustEqual SummaryListRowViewModel(
             key     = KeyViewModel(Text(msgs("commencementDate.checkYourAnswersLabel"))),
             value   = ValueViewModel(Text(answers.get(DateOfFirstSalePage).get.format(dateFormatter))),

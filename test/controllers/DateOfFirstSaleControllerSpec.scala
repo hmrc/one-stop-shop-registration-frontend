@@ -16,9 +16,7 @@
 
 package controllers
 
-import java.time.LocalDate
 import base.SpecBase
-import connectors.ValidateCoreRegistrationConnector
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
 import models.{NormalMode, UserAnswers}
@@ -35,6 +33,7 @@ import repositories.AuthenticatedUserAnswersRepository
 import services.{CoreRegistrationValidationService, DateService}
 import views.html.DateOfFirstSaleView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {

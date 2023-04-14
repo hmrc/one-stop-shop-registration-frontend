@@ -127,8 +127,12 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
                                    request: AuthenticatedDataRequest[_]
                                  ): Future[ValidationResult[LocalDate]] = {
 
-    dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
-      calculatedCommencementDate.validNec
+    if (answers.get(DateOfFirstSalePage).isEmpty && answers.get(IsPlanningFirstEligibleSalePage).isEmpty) {
+      Future.successful(DataMissingError(IsPlanningFirstEligibleSalePage).invalidNec)
+    } else {
+      dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
+        calculatedCommencementDate.validNec
+      }
     }
   }
 
