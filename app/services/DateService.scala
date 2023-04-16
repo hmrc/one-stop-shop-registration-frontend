@@ -110,40 +110,37 @@ class DateService @Inject()(
   }
 
   private def searchPreviousRegistrationSchemes(userAnswers: UserAnswers)
-                                               (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): List[Future[Option[Match]]] = {
-    val futureSeqAllMatches = userAnswers.get(AllPreviousRegistrationsQuery).map { allPreviousRegistrationDetails =>
+                                               (implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthenticatedDataRequest[_]): Future[List[Match]] = {
+    val futureSeqAllMatches = userAnswers.get(AllPreviousRegistrationsQuery) match {
+      case Some(allPreviousRegistrationDetails) =>
 
-      val schemesToSearch = allPreviousRegistrationDetails.flatMap { countryPreviousRegistrations =>
-        val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU.toString)
-        val idToSearch = countriesIdsToSearch.map(_.previousSchemeNumbers.previousSchemeNumber)
-        idToSearch.map((countryPreviousRegistrations.previousEuCountry.code, _))
-      }
+        val schemesToSearch = allPreviousRegistrationDetails.flatMap { countryPreviousRegistrations =>
+          val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU.toString)
+          val idToSearch = countriesIdsToSearch.map(_.previousSchemeNumbers.previousSchemeNumber)
+          idToSearch.map((countryPreviousRegistrations.previousEuCountry.code, _))
+        }
 
-      schemesToSearch.map { case (countryCode, searchId) =>
-        coreRegistrationValidationService.searchScheme(
-          searchId,
-          PreviousScheme.OSSU,
-          None,
-          countryCode
-        )
+        schemesToSearch.map { case (countryCode, searchId) =>
+          coreRegistrationValidationService.searchScheme(
+            searchId,
+            PreviousScheme.OSSU,
+            None,
+            countryCode
+          )
 
-      }
-    }.getOrElse {
-      logger.error(s"Trader does not have any previous registrations")
-      throw new IllegalStateException("Trader must have a previous registration in this state")
+        }
+      case None =>
+        List.empty
     }
-    futureSeqAllMatches
+
+    Future.sequence(futureSeqAllMatches).map(_.flatten)
   }
 
   def calculateCommencementDate(userAnswers: UserAnswers)
                                (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[LocalDate] = {
 
-    val futureSeqAllMatches: List[Future[Option[Match]]] = searchPreviousRegistrationSchemes(userAnswers)
-
-    val futureAllMatches = Future.sequence(futureSeqAllMatches).map(_.flatten)
-
     for {
-      allMatches <- futureAllMatches
+      allMatches <- searchPreviousRegistrationSchemes(userAnswers)
     } yield {
       val findTransferringMsid = allMatches.find(_.matchType == MatchType.TransferringMSID)
 
