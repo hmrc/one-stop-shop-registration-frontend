@@ -38,6 +38,7 @@ import java.time.Month._
 import java.time.{Clock, LocalDate, Year, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators with PrivateMethodTester {
 
@@ -566,9 +567,14 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      val response = intercept[IllegalStateException](dateService.calculateCommencementDate(userAnswers).futureValue)
-
-      response.getMessage must include("Must answer Has Made Sales")
+      Try {
+        dateService.calculateCommencementDate(userAnswers).futureValue
+      } match {
+        case Success(_) => fail("failed, got success")
+        case Failure(exception) =>
+          exception mustBe a[Exception]
+          exception.getCause.getMessage mustBe "Must answer Has Made Sales"
+      }
     }
 
   }
