@@ -38,6 +38,7 @@ import java.time.Month._
 import java.time.{Clock, LocalDate, Year, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators with PrivateMethodTester {
 
@@ -543,7 +544,22 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
     }
 
-    "must return an Illegal State Exception when there are no previous registrations" in {
+    "must return an empty list when there are no previous registrations" in {
+
+      val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
+      val commencementDate = LocalDate.of(2023, 3, 14)
+
+      val userAnswers = emptyUserAnswers
+        .set(HasMadeSalesPage, true).success.value
+        .set(DateOfFirstSalePage, commencementDate).success.value
+
+      val dateService = new DateService(stubClock, coreRegistrationValidationService)
+
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe commencementDate
+
+    }
+
+    "must return an Exception when no answers" in {
 
       val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
 
@@ -551,10 +567,14 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      val response = intercept[IllegalStateException](dateService.calculateCommencementDate(userAnswers).futureValue)
-
-      response.getMessage must include("Trader must have a previous registration in this state")
-
+      Try {
+        dateService.calculateCommencementDate(userAnswers).futureValue
+      } match {
+        case Success(_) => fail("failed, got success")
+        case Failure(exception) =>
+          exception mustBe a[Exception]
+          exception.getCause.getMessage mustBe "Must answer Has Made Sales"
+      }
     }
 
   }
