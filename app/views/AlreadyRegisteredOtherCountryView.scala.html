@@ -19,7 +19,10 @@
         govukButton: GovukButton
 )
 
-@(memberState: String)(implicit request: Request[_], messages: Messages)
+@(
+    memberState: String,
+    externalUrl: Option[String] = None
+)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("alreadyRegisteredOtherCountry.title"))) {
 
@@ -31,6 +34,12 @@
 
     <p class="govuk-body">@Html(messages("alreadyRegisteredOtherCountry.contact"))</p>
 
-    <p class="govuk-body">@Html(messages("alreadyRegisteredOtherCountry.returnToRegistration"))</p>
-
+    @if(externalUrl) {
+        @externalUrl.map(
+        url => Html(
+        s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("site.back.BTA") + "</a></p>"
+        ))
+    } else {
+        <p class="govuk-body">@Html(messages("alreadyRegisteredOtherCountry.returnToRegistration"))</p>
+    }
 }

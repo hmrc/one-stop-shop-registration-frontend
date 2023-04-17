@@ -19,7 +19,11 @@
         govukButton: GovukButton
 )
 
-@(memberState: String, exclusionDate: String)(implicit request: Request[_], messages: Messages)
+@(
+    memberState: String,
+    exclusionDate: String,
+    externalUrl: Option[String] = None
+)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("otherCountryExcludedAndQuarantined.title"))) {
 
@@ -29,5 +33,9 @@
 
     <p class="govuk-body">@Html(messages("otherCountryExcludedAndQuarantined.contact"))</p>
 
-    <p class="govuk-body">@Html(messages("otherCountryExcludedAndQuarantined.returnBTA"))</p>
+    @externalUrl.map(
+    url => Html(
+    s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("otherCountryExcludedAndQuarantined.returnBTA") + "</a></p>"
+    ))
+
 }

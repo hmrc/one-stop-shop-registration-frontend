@@ -18,25 +18,44 @@ package controllers
 
 import base.SpecBase
 import config.Constants.addQuarantineYears
+import connectors.RegistrationConnector
 import formats.Format.dateFormatter
+import models.external.ExternalEntryUrl
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.OtherCountryExcludedAndQuarantinedView
 
 import java.time.LocalDate
+import scala.concurrent.Future
 
-class OtherCountryExcludedAndQuarantinedControllerSpec extends SpecBase {
+class OtherCountryExcludedAndQuarantinedControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockRegistrationConnector)
+  }
 
   "OtherCountryExcludedAndQuarantined Controller" - {
 
     "must return OK and the correct view for a GET" in {
+
+      when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
       val countryCode: String = "NL"
       val countryName: String = "Netherlands"
       val effectiveDecisionDate = "2022-10-10"
       val formattedEffectiveDecisionDate = LocalDate.parse(effectiveDecisionDate).plusYears(addQuarantineYears).format(dateFormatter)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(countryCode, effectiveDecisionDate).url)
