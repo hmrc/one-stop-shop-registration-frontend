@@ -109,6 +109,12 @@ class DateService @Inject()(
     }
   }
 
+  private def isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate: LocalDate): Boolean = {
+    val lastDayOfRegistration = exclusionEffectiveDate.plusMonths(1).withDayOfMonth(10)
+    LocalDate.now(clock).minusDays(1).isBefore(lastDayOfRegistration)
+  }
+
+
   private def searchPreviousRegistrationSchemes(userAnswers: UserAnswers)
                                                (implicit hc: HeaderCarrier, ec: ExecutionContext, request: AuthenticatedDataRequest[_]): Future[List[Match]] = {
     val futureSeqAllMatches = userAnswers.get(AllPreviousRegistrationsQuery) match {
@@ -146,22 +152,23 @@ class DateService @Inject()(
 
       findTransferringMsid match {
         case Some(matchedTransferringMsid) =>
-          matchedTransferringMsid.exclusionEffectiveDate.getOrElse {
-            val exception = new IllegalStateException("Transferring MSID match didn't have an expected exclusion effective date")
-            logger.error(exception.getMessage, exception)
-            throw exception
+          matchedTransferringMsid.exclusionEffectiveDate match {
+            case Some(exclusionEffectiveDate) =>
+              if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
+                exclusionEffectiveDate
+              } else {
+                getDateOfFirstSale(userAnswers)
+              }
+            case _ =>
+              val exception = new IllegalStateException("Transferring MSID match didn't have an expected exclusion effective date")
+              logger.error(exception.getMessage, exception)
+              throw exception
           }
+
         case _ =>
           userAnswers.get(HasMadeSalesPage) match {
             case Some(true) =>
-              userAnswers.get(DateOfFirstSalePage) match {
-                case Some(date) =>
-                  startDateBasedOnFirstSale(date)
-                case _ =>
-                  val exception = new IllegalStateException("Must provide a Date of First Sale")
-                  logger.error(exception.getMessage, exception)
-                  throw exception
-              }
+              getDateOfFirstSale(userAnswers)
             case Some(false) =>
               LocalDate.now(clock)
 
@@ -174,4 +181,14 @@ class DateService @Inject()(
     }
   }
 
+  private def getDateOfFirstSale(userAnswers: UserAnswers): LocalDate = {
+    userAnswers.get(DateOfFirstSalePage) match {
+      case Some(date) =>
+        startDateBasedOnFirstSale(date)
+      case _ =>
+        val exception = new IllegalStateException("Must provide a Date of First Sale")
+        logger.error(exception.getMessage, exception)
+        throw exception
+    }
+  }
 }

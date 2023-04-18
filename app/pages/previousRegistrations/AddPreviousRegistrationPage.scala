@@ -40,7 +40,7 @@ case object AddPreviousRegistrationPage extends QuestionPage[Boolean] {
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
       case (Some(true), Some(size)) => prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(size))
-      case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(false), _)         => routes.CommencementDateController.onPageLoad(CheckMode)
       case _                        => routes.JourneyRecoveryController.onPageLoad()
     }
 }

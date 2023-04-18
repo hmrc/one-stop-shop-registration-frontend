@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import formats.Format.dateFormatter
+import models.core.{Match, MatchType}
 import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.reset
