@@ -52,7 +52,7 @@ class CommencementDateController @Inject()(
               date =>
 
                 val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
-                val isDateInCurrentQuarter = endOfCurrentQuarter.isBefore(calculatedCommencementDate)
+                val isDateInCurrentQuarter = calculatedCommencementDate.isBefore(endOfCurrentQuarter) || endOfCurrentQuarter == calculatedCommencementDate
                 val startOfCurrentQuarter = dateService.startOfCurrentQuarter
                 val startOfNextQuarter = dateService.startOfNextQuarter
 
