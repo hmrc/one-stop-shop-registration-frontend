@@ -98,7 +98,7 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check Your Answers" in {
+        "to Commencement Date" in {
 
           val answers = emptyUserAnswers
             .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
@@ -108,7 +108,7 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
             .set(AddPreviousRegistrationPage, false).success.value
 
           AddPreviousRegistrationPage.navigate(CheckMode, answers)
-            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+            .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
         }
       }
 

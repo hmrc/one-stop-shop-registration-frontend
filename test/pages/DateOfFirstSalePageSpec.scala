@@ -18,6 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.routes
 import models.{CheckMode, NormalMode}
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
@@ -50,10 +51,10 @@ class DateOfFirstSalePageSpec extends SpecBase with PageBehaviours {
 
   "must navigate in Check Mode" - {
 
-    "to Previously Registered" in {
+    "to Check Your Answers" in {
 
       DateOfFirstSalePage.navigate(CheckMode, emptyUserAnswers)
-        .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode))
+        .mustEqual(routes.CheckYourAnswersController.onPageLoad())
     }
   }
 }
