@@ -54,7 +54,7 @@ class DateOfFirstSalePageSpec extends SpecBase with PageBehaviours {
     "to Check Your Answers" in {
 
       DateOfFirstSalePage.navigate(CheckMode, emptyUserAnswers)
-        .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
     }
   }
 }

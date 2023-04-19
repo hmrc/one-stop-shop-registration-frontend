@@ -36,7 +36,7 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
-    case Some(true)  => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode)
+    case Some(true)  => routes.CommencementDateController.onPageLoad(CheckMode)
     case Some(false) => routes.RegisterLaterController.onPageLoad()
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
