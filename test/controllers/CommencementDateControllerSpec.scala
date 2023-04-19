@@ -57,10 +57,9 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
-        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
-        when(dateService.startOfNextQuarter)thenReturn now
+        when(dateService.startOfNextQuarter) thenReturn now
         when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         val application =
