@@ -21,7 +21,7 @@ import generators.Generators
 import models.domain.VatCustomerInfo
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.requests.AuthenticatedDataRequest
-import models.{BusinessContactDetails, Country, DesAddress, Index, UserAnswers}
+import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -140,12 +140,12 @@ trait SpecBase
     ).flatten
   }
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService)
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService, mode: Mode)
                        (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]) = {
     new CommencementDateSummary(dateService).row(answers).map { commencementDateSummary =>
 
       Seq(
-        new HasTradingNameSummary().row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        new HasTradingNameSummary().row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         HasMadeSalesSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         IsPlanningFirstEligibleSaleSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         Some(commencementDateSummary),

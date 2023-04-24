@@ -50,7 +50,7 @@ class BusinessContactDetailsController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BusinessContactDetailsPage) match {
@@ -61,7 +61,7 @@ class BusinessContactDetailsController @Inject()(
       Ok(view(preparedForm, mode, config.enrolmentsEnabled))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
       val messages = messagesApi.preferred(request)

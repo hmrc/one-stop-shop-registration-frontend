@@ -46,7 +46,7 @@ class AddEuDetailsController @Inject()(
   protected val controllerComponents: MessagesControllerComponents = cc
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       getNumberOfEuCountries {
@@ -76,7 +76,7 @@ class AddEuDetailsController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       withCompleteDataAsync[EuOptionalDetails](
