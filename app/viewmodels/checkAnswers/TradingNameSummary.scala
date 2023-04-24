@@ -39,7 +39,7 @@ object TradingNameSummary  {
         )
     }
 
-  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllTradingNames).map {
       tradingNames =>
 
@@ -52,7 +52,7 @@ object TradingNameSummary  {
           key     = "tradingNames.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("tradingNames.change.hidden"))
           )
         )
