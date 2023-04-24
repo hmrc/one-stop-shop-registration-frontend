@@ -99,7 +99,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val view = application.injector.instanceOf[ChangeYourRegistrationView]
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
-          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService).futureValue)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, AmendMode).futureValue)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true)(request, messages(application)).toString
