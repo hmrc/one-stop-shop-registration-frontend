@@ -44,7 +44,7 @@ class DateOfFirstSaleController @Inject()(
   private def form: Form[LocalDate] = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(DateOfFirstSalePage) match {
@@ -58,7 +58,7 @@ class DateOfFirstSaleController @Inject()(
       Ok(view(preparedForm, mode, earliestDateFormatted, earliestDateHintFormatted))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
       form.bindFromRequest().fold(

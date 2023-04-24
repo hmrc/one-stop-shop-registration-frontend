@@ -17,7 +17,8 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllTradingNames
@@ -42,6 +43,14 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
       case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad()
       case (Some(false), _)                                           => routes.CheckYourAnswersController.onPageLoad()
       case _                                                          => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case (Some(true), _)                                           => routes.TradingNameController.onPageLoad(AmendMode, Index(0))
+      case (Some(false), _)                                          => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _                                                         => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }

@@ -24,6 +24,8 @@ GET         /have-uk-trading-name                                               
 POST        /have-uk-trading-name                                               controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET         /check-have-uk-trading-name                                         controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-have-uk-trading-name                                         controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-have-uk-trading-name                                         controllers.HasTradingNameController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-have-uk-trading-name                                         controllers.HasTradingNameController.onSubmit(mode: Mode = AmendMode)
 
 GET         /uk-trading-name/:index                                             controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /uk-trading-name/:index                                             controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -80,6 +82,8 @@ GET         /add-uk-trading-name                                                
 POST        /add-uk-trading-name                                                controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET         /check-add-uk-trading-name                                          controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-uk-trading-name                                          controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-add-uk-trading-name                                          controllers.AddTradingNameController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-add-uk-trading-name                                          controllers.AddTradingNameController.onSubmit(mode: Mode = AmendMode)
 
 GET         /website-address/:index                                             controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /website-address/:index                                             controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -350,6 +354,11 @@ GET         /first-check-registration-type/:countryIndex                        
 POST        /first-check-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+
+GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
+
+GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
+POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
 
 GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)

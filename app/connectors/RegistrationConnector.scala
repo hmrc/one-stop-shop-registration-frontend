@@ -19,6 +19,7 @@ package connectors
 import config.Service
 import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, ExternalEntryUrlResponseReads}
 import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
+import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponseReads, AmendRegistrationResultResponse}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
 import play.api.Configuration
@@ -47,6 +48,10 @@ class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpCli
 
   def getSavedExternalEntry()(implicit hc: HeaderCarrier): Future[ExternalEntryUrlResponse] = {
     httpClient.GET[ExternalEntryUrlResponse](s"$baseUrl/external-entry")
+  }
+
+  def amendRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[AmendRegistrationResultResponse] = {
+    httpClient.POST[Registration, AmendRegistrationResultResponse](s"$baseUrl/amend", registration)
   }
 
 }
