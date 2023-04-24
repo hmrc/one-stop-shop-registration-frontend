@@ -38,7 +38,7 @@ class CommencementDateController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       for {
         calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
@@ -78,7 +78,7 @@ class CommencementDateController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
       Redirect(CommencementDatePage.navigate(mode, request.userAnswers))
   }
