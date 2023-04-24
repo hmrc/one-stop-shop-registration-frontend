@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
 import models.requests.AuthenticatedIdentifierRequest
+import models.{AmendMode, Mode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
@@ -30,34 +31,49 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckRegistrationFilterImpl @Inject()(connector: RegistrationConnector,
-                                            config: FrontendAppConfig,
-                                            migrationService: DataMigrationService)
-                                           (implicit val executionContext: ExecutionContext)
+class CheckRegistrationFilterImpl(mode: Option[Mode],
+                                  connector: RegistrationConnector,
+                                  config: FrontendAppConfig,
+                                  migrationService: DataMigrationService)
+                                 (implicit val executionContext: ExecutionContext)
   extends CheckRegistrationFilter {
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    for {
-      registration <- connector.getRegistration()
-    } yield {
+    if (mode.contains(AmendMode)) {
+      Future.successful(None)
+    } else {
+      for {
+        registration <- connector.getRegistration()
+      } yield {
 
-      if(registration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
-        request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
-          migrationService
-            .migrate(sessionId, request.userId)
-        )
-        Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
-      } else {
-        None
+        if (registration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
+          request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
+            migrationService
+              .migrate(sessionId, request.userId)
+          )
+          Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
+        } else {
+          None
+        }
       }
     }
   }
 
   private def hasRegistrationEnrolment(enrolments: Enrolments): Boolean = {
     config.enrolmentsEnabled && enrolments.enrolments.exists(_.key == config.ossEnrolment)
+  }
+}
+
+class CheckRegistrationFilterProvider @Inject()(
+                                             connector: RegistrationConnector,
+                                             config: FrontendAppConfig,
+                                             migrationService: DataMigrationService
+                                           )(implicit ec: ExecutionContext) {
+  def apply(mode: Option[Mode]): CheckRegistrationFilterImpl = {
+    new CheckRegistrationFilterImpl(mode, connector, config, migrationService)
   }
 }
 

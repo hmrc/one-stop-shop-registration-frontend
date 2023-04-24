@@ -25,7 +25,6 @@ class Module extends AbstractModule {
 
   override def configure(): Unit = {
 
-    bind(classOf[CheckRegistrationFilter]).to(classOf[CheckRegistrationFilterImpl]).asEagerSingleton()
     bind(classOf[CheckNiProtocolFilter]).to(classOf[CheckNiProtocolFilterImpl]).asEagerSingleton()
     bind(classOf[CheckEmailVerificationFilter]).to(classOf[CheckEmailVerificationFilterImpl]).asEagerSingleton()
     bind(classOf[VrnAllowListFilter]).to(classOf[VrnAllowListFilterImpl]).asEagerSingleton()
