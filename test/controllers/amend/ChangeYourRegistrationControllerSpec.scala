@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.amend
 
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
+import controllers.routes
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -32,7 +34,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -46,12 +48,12 @@ import services._
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.govuk.SummaryListFluency
-import views.html.CheckYourAnswersView
+import views.html.amend.ChangeYourRegistrationView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
+class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
   private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
@@ -79,7 +81,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
     )
   }
 
-  "Check Your Answers Controller" - {
+  "Change Your Registration Controller" - {
 
     "GET" - {
       "must return OK and the correct view when answers are complete" in {
@@ -92,12 +94,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
           val result = route(application, request).value
-          val view = application.injector.instanceOf[CheckYourAnswersView]
+          val view = application.injector.instanceOf[ChangeYourRegistrationView]
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
-          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, CheckMode).futureValue)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, AmendMode).futureValue)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true)(request, messages(application)).toString
@@ -116,12 +118,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
 
             status(result) mustEqual OK
@@ -139,12 +141,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
@@ -161,12 +163,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
@@ -183,12 +185,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
@@ -205,12 +207,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
@@ -229,12 +231,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
@@ -253,12 +255,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .build()
 
           running(application) {
-            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
             val result = route(application, request).value
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
@@ -300,7 +302,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               eqTo(registration.contactDetails.emailAddress)
             )(any(), any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
@@ -339,7 +341,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           running(application) {
 
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
@@ -367,7 +369,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
           running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
@@ -384,11 +386,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
           running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+            redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
           }
         }
 
@@ -405,7 +407,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
@@ -428,7 +430,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
@@ -447,11 +449,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.routes.HasTradingNameController.onPageLoad(CheckMode).url
+              redirectLocation(result).value mustEqual controllers.routes.HasTradingNameController.onPageLoad(AmendMode).url
 
             }
 
@@ -466,7 +468,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
@@ -485,7 +487,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
@@ -504,7 +506,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
@@ -523,7 +525,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               .overrides(bind[RegistrationValidationService].toInstance(registrationService)).build()
 
             running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
@@ -551,7 +553,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             ).build()
 
           running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
@@ -583,7 +585,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             ).build()
 
           running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
@@ -613,7 +615,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             ).build()
 
           running(application) {
-            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
+            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
             val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)

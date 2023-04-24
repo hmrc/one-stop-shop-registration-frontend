@@ -41,7 +41,7 @@ class CheckEuDetailsAnswersController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getCountry(countryIndex) {
         country =>
@@ -72,7 +72,7 @@ class CheckEuDetailsAnswersController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, countryIndex: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode, countryIndex: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
       val incomplete = getIncompleteEuDetails(countryIndex)
       if(incomplete.isEmpty) {
