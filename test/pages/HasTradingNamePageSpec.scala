@@ -171,6 +171,51 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
         }
       }
 
+    "must navigate in Amend mode" - {
+
+      "when the answer is yes" - {
+
+        "to Trading name (index 0) when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasTradingNamePage ,true).success.value
+
+          HasTradingNamePage.navigate(AmendMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(AmendMode, Index(0)))
+        }
+
+        "to Check Your Answers when there are trading names in the user's answers" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo").success.value
+              .set(HasTradingNamePage ,true).success.value
+
+          HasTradingNamePage.navigate(AmendMode, answers)
+            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+        }
+
+        "when the answer is empty" - {
+
+          "to Journey recovery" in {
+
+            HasTradingNamePage.navigate(AmendMode, emptyUserAnswers)
+              .mustBe(routes.JourneyRecoveryController.onPageLoad())
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+
+          HasTradingNamePage.navigate(AmendMode, answers)
+            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+        }
+      }
+    }
+
       "when the answer is empty" - {
 
         "to Journey recovery" in {
