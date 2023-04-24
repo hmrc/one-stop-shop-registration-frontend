@@ -104,7 +104,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
-      .set(BusinessBasedInNiPage, true).success.value
 
   private val answersNotPartOfVatGroup =
     answersPartOfVatGroup.copy(vatInfo =
@@ -308,7 +307,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           .set(PreviouslyRegisteredPage, false).success.value
           .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
           .set(IsOnlineMarketplacePage, false).success.value
-          .set(BusinessBasedInNiPage, true).success.value
 
       val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 

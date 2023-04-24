@@ -45,7 +45,7 @@ class AuthController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onSignIn: Action[AnyContent] = (cc.authAndGetOptionalData andThen cc.retrieveSavedAnswers()).async {
+  def onSignIn: Action[AnyContent] = (cc.authAndGetOptionalData() andThen cc.retrieveSavedAnswers()).async {
     implicit request =>
       val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
       answers.get(SavedProgressPage).map {
@@ -74,7 +74,7 @@ class AuthController @Inject()(
       )
   }
 
-  def continueOnSignIn: Action[AnyContent] = (cc.authAndGetOptionalData andThen cc.retrieveSavedAnswers()) {
+  def continueOnSignIn: Action[AnyContent] = (cc.authAndGetOptionalData() andThen cc.retrieveSavedAnswers()) {
     implicit request =>
       val answers = request.userAnswers.getOrElse(UserAnswers(request.userId, lastUpdated = Instant.now(clock)))
       answers.get(SavedProgressPage).map {
