@@ -23,6 +23,7 @@ sealed trait Mode
 case object CheckMode extends Mode
 case object NormalMode extends Mode
 case object CheckLoopMode extends Mode
+case object AmendMode extends Mode
 
 object Mode {
 

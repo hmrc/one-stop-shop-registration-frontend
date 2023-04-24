@@ -44,7 +44,7 @@ class AddPreviousRegistrationController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getNumberOfPreviousRegistrations {
         number =>
@@ -62,7 +62,7 @@ class AddPreviousRegistrationController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
         data = getAllIncompleteDeregisteredDetails,

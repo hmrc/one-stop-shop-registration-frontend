@@ -39,7 +39,7 @@ class TaxRegisteredInEuController @Inject()(
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(TaxRegisteredInEuPage) match {
@@ -49,7 +49,7 @@ class TaxRegisteredInEuController @Inject()(
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
