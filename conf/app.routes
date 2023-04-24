@@ -462,11 +462,6 @@ GET         /start-amend-journey                                                
 GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
 POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
 
-GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
-
-GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
-POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
-
 GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = AmendMode)
@@ -495,3 +490,9 @@ GET         /no-longer-amendable                                                
 
 GET         /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onPageLoad()
 POST        /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onSubmit()
+
+
+GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
+
+GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
+POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
