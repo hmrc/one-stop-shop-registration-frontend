@@ -360,11 +360,6 @@ POST        /check-registration-type/:countryIndex                              
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 
-GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
-
-GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
-POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
-
 GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = AmendMode)
@@ -374,3 +369,8 @@ GET         /check-remove-all-trading-names                                     
 POST        /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = AmendMode)
 POST        /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = AmendMode)
+
+GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
+
+GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
+POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
