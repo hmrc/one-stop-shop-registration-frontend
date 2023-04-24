@@ -40,9 +40,9 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
   "submitRegistration" - {
 
-    "must return Right when a new registration is created on the backend" in {
+    val url = s"/one-stop-shop-registration/create"
 
-      val url = s"/one-stop-shop-registration/create"
+    "must return Right when a new registration is created on the backend" in {
 
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
@@ -57,8 +57,6 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
     "must return Left(ConflictFound) when the backend returns CONFLICT" in {
 
-      val url = s"/one-stop-shop-registration/create"
-
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
 
@@ -70,9 +68,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       }
     }
 
-    "must return Left(ConflictFound) when the backend returns UnexpectedResponseStatus" in {
-
-      val url = s"/one-stop-shop-registration/create"
+    "must return Left(UnexpectedResponseStatus) when the backend returns UnexpectedResponseStatus" in {
 
       running(application) {
         val connector = application.injector.instanceOf[RegistrationConnector]
@@ -247,6 +243,36 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         val result = connector.getSavedExternalEntry().futureValue
 
         result mustBe Left(UnexpectedResponseStatus(status, s"Received unexpected response code $status with body "))
+      }
+    }
+  }
+
+  "amendRegistration" - {
+    val url = s"/one-stop-shop-registration/amend"
+
+    "must return Right when a new registration is created on the backend" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(post(urlEqualTo(url)).willReturn(ok()))
+
+        val result = connector.amendRegistration(registration).futureValue
+
+        result mustBe Right(())
+      }
+    }
+
+    "must return Left(UnexpectedResponseStatus) when the backend returns UnexpectedResponseStatus" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(post(urlEqualTo(url)).willReturn(aResponse().withStatus(123)))
+
+        val result = connector.amendRegistration(registration).futureValue
+
+        result mustBe Left(UnexpectedResponseStatus(123, "Unexpected amend response, status 123 returned"))
       }
     }
   }

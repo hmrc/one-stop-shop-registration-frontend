@@ -42,7 +42,7 @@ import scala.concurrent.Future
 class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   class Harness(connector: RegistrationConnector, config:FrontendAppConfig, migrationService: DataMigrationService)
-    extends CheckRegistrationFilterImpl(connector, config, migrationService) {
+    extends CheckRegistrationFilterImpl(None, connector, config, migrationService) {
     def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
