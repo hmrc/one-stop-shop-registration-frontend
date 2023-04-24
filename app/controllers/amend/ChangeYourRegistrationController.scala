@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.amend
 
 import cats.data.Validated.{Invalid, Valid}
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
+import controllers.routes
 import logging.Logging
-import models.{CheckMode, NormalMode}
+import models.{AmendMode, NormalMode}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
@@ -40,32 +41,31 @@ import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
 import viewmodels.govuk.summarylist._
-import views.html.CheckYourAnswersView
+import views.html.amend.ChangeYourRegistrationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            cc: AuthenticatedControllerComponents,
-                                            registrationConnector: RegistrationConnector,
-                                            registrationService: RegistrationValidationService,
-                                            auditService: AuditService,
-                                            view: CheckYourAnswersView,
-                                            emailService: EmailService,
-                                            dateService: DateService,
-                                            saveForLaterService: SaveForLaterService,
-                                            frontendAppConfig: FrontendAppConfig
-                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
+class ChangeYourRegistrationController @Inject()(
+                                                  override val messagesApi: MessagesApi,
+                                                  cc: AuthenticatedControllerComponents,
+                                                  registrationConnector: RegistrationConnector,
+                                                  registrationService: RegistrationValidationService,
+                                                  auditService: AuditService,
+                                                  view: ChangeYourRegistrationView,
+                                                  emailService: EmailService,
+                                                  dateService: DateService,
+                                                  saveForLaterService: SaveForLaterService,
+                                                  frontendAppConfig: FrontendAppConfig
+                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail().async {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
     implicit request =>
       val vatRegistrationDetailsList = SummaryListViewModel(
         rows = Seq(
           VatRegistrationDetailsSummary.rowBusinessName(request.userAnswers),
-          VatRegistrationDetailsSummary.rowIndividualName(request.userAnswers),
           VatRegistrationDetailsSummary.rowPartOfVatUkGroup(request.userAnswers),
           VatRegistrationDetailsSummary.rowUkVatRegistrationDate(request.userAnswers),
           VatRegistrationDetailsSummary.rowBusinessAddress(request.userAnswers)
@@ -76,8 +76,8 @@ class CheckYourAnswersController @Inject()(
 
         val list = SummaryListViewModel(
           rows = Seq(
-            new HasTradingNameSummary().row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode),
+            new HasTradingNameSummary().row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            TradingNameSummary.checkAnswersRow(request.userAnswers, AmendMode),
             HasMadeSalesSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
@@ -103,17 +103,14 @@ class CheckYourAnswersController @Inject()(
       }
   }
 
-  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
     implicit request =>
       registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
         case Valid(registration) =>
-          registrationConnector.submitRegistration(registration).flatMap {
+          registrationConnector.amendRegistration(registration).flatMap {
             case Right(_) =>
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
               sendEmailConfirmation(request, registration)
-            case Left(ConflictFound) =>
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
-              Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
@@ -147,7 +144,15 @@ class CheckYourAnswersController @Inject()(
                                      request: AuthenticatedDataRequest[AnyContent],
                                      registration: Registration
                                    )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
-    if (frontendAppConfig.registrationEmailEnabled) {
+    if (frontendAppConfig.enrolmentsEnabled) {
+      val emailSent = false
+      for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
+        _ <- cc.sessionRepository.set(updatedAnswers)
+      } yield {
+        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+      }
+    } else {
       emailService.sendConfirmationEmail(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
@@ -162,14 +167,6 @@ class CheckYourAnswersController @Inject()(
           } yield {
             Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
           }
-      }
-    } else {
-      val emailSent = false
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-        _ <- cc.sessionRepository.set(updatedAnswers)
-      } yield {
-        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
       }
     }
   }

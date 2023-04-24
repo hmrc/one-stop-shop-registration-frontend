@@ -33,7 +33,7 @@ class SalesDeclarationNotRequiredController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
       Ok(view(mode, countryIndex))
   }

@@ -38,7 +38,7 @@ class PreviousIossSchemeController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(PreviousIossSchemePage(countryIndex, schemeIndex)) match {
@@ -49,7 +49,7 @@ class PreviousIossSchemeController @Inject()(
       Ok(view(preparedForm, mode, countryIndex, schemeIndex))
   }
 
-  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
       form.bindFromRequest().fold(
