@@ -22,7 +22,7 @@ import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
+import models.{AmendMode, BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
