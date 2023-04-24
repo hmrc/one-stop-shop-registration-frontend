@@ -27,6 +27,7 @@ import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
+import models.responses.ConflictFound
 import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
