@@ -787,3 +787,9 @@ registrationType.change.hidden = Your registration type
 
 salesDeclarationNotRequired.title = Do not tell us about sales of services on your returns
 salesDeclarationNotRequired.heading = Do not tell us about sales of services on your returns
+
+deleteAllWebsites.title = deleteAllWebsites
+deleteAllWebsites.heading = deleteAllWebsites
+deleteAllWebsites.checkYourAnswersLabel = deleteAllWebsites
+deleteAllWebsites.error.required = Select yes if deleteAllWebsites
+deleteAllWebsites.change.hidden = DeleteAllWebsites
