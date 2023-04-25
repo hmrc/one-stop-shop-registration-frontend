@@ -156,9 +156,9 @@ trait SpecBase
         BusinessContactDetailsSummary.rowContactName(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         BusinessContactDetailsSummary.rowTelephoneNumber(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         BusinessContactDetailsSummary.rowEmailAddress(answers),
-        BankDetailsSummary.rowAccountName(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BankDetailsSummary.rowBIC(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BankDetailsSummary.rowIBAN(answers)
+        BankDetailsSummary.rowAccountName(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        BankDetailsSummary.rowBIC(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        BankDetailsSummary.rowIBAN(answers, mode)
       ).flatten
     }
   }
