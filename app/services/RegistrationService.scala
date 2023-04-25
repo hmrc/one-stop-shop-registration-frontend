@@ -19,7 +19,7 @@ package services
 import models._
 import models.domain._
 import pages._
-import queries.AllTradingNames
+import queries.{AllTradingNames, AllWebsites}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -46,7 +46,14 @@ class RegistrationService {
         Try(hasTradingNameUA)
       }
       isOnlineMarket <- tradingNamesUA.set(IsOnlineMarketplacePage, registration.isOnlineMarketplace)
-    } yield isOnlineMarket
+      hasWebsiteUA <- isOnlineMarket.set(HasWebsitePage, registration.websites.nonEmpty)
+      websites <- if(registration.websites.nonEmpty) {
+        hasWebsiteUA.set(AllWebsites, registration.websites.toList)
+      } else {
+        Try(hasWebsiteUA)
+      }
+
+    } yield websites
 
     Future.fromTry(userAnswers)
   }
@@ -57,8 +64,6 @@ class RegistrationService {
         .set(IsPlanningFirstEligibleSalePage, true).success.value
         .set(TaxRegisteredInEuPage, false).success.value
         .set(PreviouslyRegisteredPage, false).success.value
-        .set(HasWebsitePage, false).success.value
-
         .set(TaxRegisteredInEuPage, true).success.value
         .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
         .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
@@ -84,8 +89,6 @@ class RegistrationService {
         .set(
           BusinessContactDetailsPage,
           BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-        .set(HasWebsitePage, true).success.value
-        .set(AllWebsites, List("website1", "website2")).success.value
         .set(PreviouslyRegisteredPage, true).success.value
         .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
         .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
