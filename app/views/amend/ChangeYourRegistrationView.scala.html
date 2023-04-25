@@ -27,7 +27,7 @@
 
 @(vatRegistrationDetailsList: SummaryList, list: SummaryList, isValid: Boolean)(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+    @layout(pageTitle = titleNoForm(messages("changeYourRegistration.title"))) {
 
         @if(!isValid) {
             @govukWarningText(WarningText(
@@ -36,7 +36,7 @@
             ))
         }
 
-        <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("changeYourRegistration.heading")</h1>
 
         <h2 class="govuk-heading-m">@messages("vatRegistrationDetails.checkYourAnswers.heading")</h2>
 
@@ -54,13 +54,11 @@
 
         @govukSummaryList(list)
 
-        <p class="govuk-body">@messages("checkYourAnswers.info.p1")</p>
-
-        <p class="govuk-body">@messages("checkYourAnswers.info.p2")</p>
+        <p class="govuk-body">@messages("changeYourRegistration.info.p1")</p>
 
         @if(isValid) {
             @formHelper(action = routes.CheckYourAnswersController.onSubmit(false)) {
-                @button("site.submit", routes.CheckYourAnswersController.onPageLoad().url)
+                @button("site.confirm", routes.CheckYourAnswersController.onPageLoad().url)
             }
         } else {
             <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
