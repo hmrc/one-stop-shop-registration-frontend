@@ -36,7 +36,7 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
                                   config: FrontendAppConfig,
                                   migrationService: DataMigrationService)
                                  (implicit val executionContext: ExecutionContext)
-  extends CheckRegistrationFilter {
+  extends ActionFilter[AuthenticatedIdentifierRequest] {
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
 
@@ -76,5 +76,3 @@ class CheckRegistrationFilterProvider @Inject()(
     new CheckRegistrationFilterImpl(mode, connector, config, migrationService)
   }
 }
-
-trait CheckRegistrationFilter extends ActionFilter[AuthenticatedIdentifierRequest]
