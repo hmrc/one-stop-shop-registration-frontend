@@ -19,7 +19,6 @@ package services
 import models._
 import models.domain._
 import pages._
-import pages.euDetails._
 import queries.AllTradingNames
 
 import scala.concurrent.Future
@@ -46,19 +45,18 @@ class RegistrationService {
       } else {
         Try(hasTradingNameUA)
       }
-
-    } yield tradingNamesUA
+      isOnlineMarket <- tradingNamesUA.set(IsOnlineMarketplacePage, registration.isOnlineMarketplace)
+    } yield isOnlineMarket
 
     Future.fromTry(userAnswers)
   }
 
   /* TODO
         .set(HasTradingNamePage, false).success.value
-        
+
         .set(IsPlanningFirstEligibleSalePage, true).success.value
         .set(TaxRegisteredInEuPage, false).success.value
         .set(PreviouslyRegisteredPage, false).success.value
-        .set(IsOnlineMarketplacePage, false).success.value
         .set(HasWebsitePage, false).success.value
 
         .set(TaxRegisteredInEuPage, true).success.value
@@ -92,7 +90,6 @@ class RegistrationService {
         .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
         .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
         .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
-        .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
-        .set(IsOnlineMarketplacePage, false).success.value*/
+        .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value*/
 
 }
