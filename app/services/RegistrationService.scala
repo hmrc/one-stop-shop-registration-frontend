@@ -21,7 +21,6 @@ import models.domain._
 import models.euDetails._
 import models.previousRegistrations.PreviousSchemeNumbers
 import pages._
-import pages.euDetails._
 import pages.previousRegistrations._
 import queries.{AllTradingNames, AllWebsites}
 
@@ -102,8 +101,6 @@ class RegistrationService {
         .set(IsPlanningFirstEligibleSalePage, true).success.value
         .set(TaxRegisteredInEuPage, false).success.value
         .set(PreviouslyRegisteredPage, false).success.value
-        .set(HasWebsitePage, false).success.value
-
         .set(TaxRegisteredInEuPage, true).success.value
         .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
         .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
@@ -129,8 +126,6 @@ class RegistrationService {
         .set(
           BusinessContactDetailsPage,
           BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-        .set(HasWebsitePage, true).success.value
-        .set(AllWebsites, List("website1", "website2")).success.value
         .set(PreviouslyRegisteredPage, true).success.value
         .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
         .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
