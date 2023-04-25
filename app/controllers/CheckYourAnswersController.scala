@@ -86,7 +86,7 @@ class CheckYourAnswersController @Inject()(
             PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
             TaxRegisteredInEuSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             EuDetailsSummary.checkAnswersRow(request.userAnswers),
-            IsOnlineMarketplaceSummary.row(request.userAnswers),
+            IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode),
             HasWebsiteSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             WebsiteSummary.checkAnswersRow(request.userAnswers),
             BusinessContactDetailsSummary.rowContactName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
