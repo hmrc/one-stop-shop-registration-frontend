@@ -17,7 +17,8 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllWebsites
@@ -38,10 +39,18 @@ case object HasWebsitePage extends QuestionPage[Boolean] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(HasWebsitePage), answers.get(AllWebsites)) match {
-      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(true), Some(websites)) if websites.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
       case (Some(true), _)                                           => routes.WebsiteController.onPageLoad(CheckMode, Index(0))
       case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()
       case _                                                         => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    (answers.get(HasWebsitePage), answers.get(AllWebsites)) match {
+      case (Some(true), Some(websites)) if websites.nonEmpty => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case (Some(true), _)                                            => routes.WebsiteController.onPageLoad(AmendMode, Index(0))
+      case (Some(false), _)                                           => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _                                                          => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =

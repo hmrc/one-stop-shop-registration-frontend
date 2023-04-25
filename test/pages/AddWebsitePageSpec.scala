@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class AddWebsitePageSpec extends SpecBase with PageBehaviours {
@@ -92,5 +93,40 @@ class AddWebsitePageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "when the answer is yes" - {
+
+        "to Website with index equal to the number of websites already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(WebsitePage(Index(0)), "foo").success.value
+              .set(WebsitePage(Index(1)), "bar").success.value
+              .set(AddWebsitePage, true).success.value
+
+          AddWebsitePage.navigate(AmendMode, answers)
+            .mustEqual(routes.WebsiteController.onPageLoad(AmendMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check Your Answers" in {
+
+          val answers = emptyUserAnswers.set(AddWebsitePage, false).success.value
+
+          AddWebsitePage.navigate(AmendMode, answers)
+            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+        }
+      }
+
+      "to Journey recovery when the answer is none" in {
+        AddWebsitePage.navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
   }
 }
