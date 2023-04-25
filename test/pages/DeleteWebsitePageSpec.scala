@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode}
 
 class DeleteWebsitePageSpec extends SpecBase {
 
@@ -26,7 +26,7 @@ class DeleteWebsitePageSpec extends SpecBase {
 
     "must navigate in Normal mode" - {
 
-      "to Add Website when there are still trading names present" in {
+      "to Add Website when there are still websites present" in {
 
         val answers = emptyUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
 
@@ -34,7 +34,7 @@ class DeleteWebsitePageSpec extends SpecBase {
           .mustEqual(routes.AddWebsiteController.onPageLoad(NormalMode))
       }
 
-      "to Has Website when there are no trading names present" in {
+      "to Has Website when there are no websites present" in {
 
         DeleteWebsitePage(Index(0)).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
@@ -57,5 +57,23 @@ class DeleteWebsitePageSpec extends SpecBase {
           .mustEqual(routes.HasWebsiteController.onPageLoad(CheckMode))
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to Add Website when there are still websites present" in {
+
+        val answers = emptyUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
+
+        DeleteWebsitePage(Index(0)).navigate(AmendMode, answers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
+      }
+
+      "to Has Website when there are no websites present" in {
+
+        DeleteWebsitePage(Index(0)).navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(AmendMode))
+      }
+    }
+
   }
 }
