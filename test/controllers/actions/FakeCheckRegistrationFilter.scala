@@ -15,17 +15,43 @@
  */
 
 package controllers.actions
+
+import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import models.requests.AuthenticatedIdentifierRequest
+import models.Mode
 import play.api.mvc.Result
+import org.scalatestplus.mockito.MockitoSugar.mock
+import services.DataMigrationService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeCheckRegistrationFilter() extends CheckRegistrationFilter {
+
+/*
+mode: Option[Mode],
+                                  connector: RegistrationConnector,
+                                  config: FrontendAppConfig,
+                                  migrationService: DataMigrationService
+ */
+class FakeCheckRegistrationFilter() extends CheckRegistrationFilterImpl(
+  mock[Option[Mode]],
+  mock[RegistrationConnector],
+  mock[FrontendAppConfig],
+  mock[DataMigrationService]
+)(ExecutionContext.Implicits.global) {
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
     Future.successful(None)
   }
 
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+}
+
+class FakeCheckRegistrationFilterProvider()
+  extends CheckRegistrationFilterProvider(
+    mock[RegistrationConnector],
+    mock[FrontendAppConfig],
+    mock[DataMigrationService])(ExecutionContext.Implicits.global) {
+
+  override def apply(mode: Option[Mode]): CheckRegistrationFilterImpl = new FakeCheckRegistrationFilter()
+
 }
