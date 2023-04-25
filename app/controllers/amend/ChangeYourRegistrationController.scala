@@ -91,9 +91,9 @@ class ChangeYourRegistrationController @Inject()(
             BusinessContactDetailsSummary.rowContactName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
-            BankDetailsSummary.rowAccountName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BankDetailsSummary.rowBIC(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BankDetailsSummary.rowIBAN(request.userAnswers)
+            BankDetailsSummary.rowAccountName(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            BankDetailsSummary.rowBIC(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            BankDetailsSummary.rowIBAN(request.userAnswers, AmendMode)
           ).flatten
         )
 
