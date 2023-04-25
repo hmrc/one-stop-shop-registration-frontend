@@ -17,8 +17,9 @@
 package pages
 
 import base.SpecBase
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
@@ -46,6 +47,15 @@ class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
 
         IsOnlineMarketplacePage.navigate(CheckMode, emptyUserAnswers)
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "to Change Your Registration" in {
+
+        IsOnlineMarketplacePage.navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
       }
     }
   }
