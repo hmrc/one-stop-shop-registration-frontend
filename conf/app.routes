@@ -84,11 +84,15 @@ GET         /website-address/:index                                             
 POST        /website-address/:index                                             controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-website-address/:index                                       controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-website-address/:index                                       controllers.WebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-website-address/:index                                       controllers.WebsiteController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-website-address/:index                                       controllers.WebsiteController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /add-website-address                                                controllers.AddWebsiteController.onPageLoad(mode: Mode = NormalMode)
 POST        /add-website-address                                                controllers.AddWebsiteController.onSubmit(mode: Mode = NormalMode)
 GET         /check-add-website-address                                          controllers.AddWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-website-address                                          controllers.AddWebsiteController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-add-website-address                                          controllers.AddWebsiteController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-add-website-address                                          controllers.AddWebsiteController.onSubmit(mode: Mode = AmendMode)
 
 GET         /remove-website-address/:index                                      controllers.DeleteWebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-website-address/:index                                      controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -214,6 +218,8 @@ GET         /give-website-address                                               
 POST        /give-website-address                                               controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
 GET         /check-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = AmendMode)
 
 GET         /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onPageLoad()
 POST        /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onSubmit()
