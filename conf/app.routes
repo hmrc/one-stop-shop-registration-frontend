@@ -255,6 +255,8 @@ GET         /online-marketplace                                                 
 POST        /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
 GET         /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-online-marketplace                                           controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-online-marketplace                                           controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = AmendMode)
 
 GET         /northern-ireland-business                                          controllers.BusinessBasedInNiController.onPageLoad()
 POST        /northern-ireland-business                                          controllers.BusinessBasedInNiController.onSubmit()
