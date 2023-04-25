@@ -16,6 +16,7 @@
 
 package pages
 
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
@@ -32,4 +33,7 @@ case object IsOnlineMarketplacePage extends QuestionPage[Boolean] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     routes.CheckYourAnswersController.onPageLoad()
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    amendRoutes.ChangeYourRegistrationController.onPageLoad()
 }
