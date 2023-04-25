@@ -57,7 +57,9 @@ class RegistrationService {
         Try(hasWebsiteUA)
       }
 
-    } yield websites // TODO remove test data
+      bankDetails <- websites.set(BankDetailsPage, registration.bankDetails)
+
+    } yield bankDetails // TODO remove test data
       .set(IsPlanningFirstEligibleSalePage, true).get
       .set(TaxRegisteredInEuPage, false).get
       .set(PreviouslyRegisteredPage, false).get
@@ -90,7 +92,6 @@ class RegistrationService {
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).get
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).get
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).get
-      .set(BankDetailsPage, BankDetails("Account name", Some(Bic("ABCDGB2A").get), Iban("GB33BUKB20201555555555").getOrElse(throw new Exception("TODO")))).get
 
     Future.fromTry(userAnswers)
   }
