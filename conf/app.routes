@@ -98,6 +98,8 @@ GET         /remove-website-address/:index                                      
 POST        /remove-website-address/:index                                      controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-remove-website-address/:index                                controllers.DeleteWebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-remove-website-address/:index                                controllers.DeleteWebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-remove-website-address/:index                                controllers.DeleteWebsiteController.onSubmit(mode: Mode = AmendMode, index: Index)
+POST        /amend-remove-website-address/:index                                controllers.DeleteWebsiteController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /identity-complete                                                  controllers.auth.IdentityVerificationController.handleIvFailure(continueURL: String, journeyId: Option[String])
 GET         /identity-problem                                                   controllers.auth.IdentityVerificationController.identityError(continueUrl: String)
