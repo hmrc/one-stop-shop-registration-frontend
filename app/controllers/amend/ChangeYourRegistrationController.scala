@@ -86,7 +86,7 @@ class ChangeYourRegistrationController @Inject()(
             TaxRegisteredInEuSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             EuDetailsSummary.checkAnswersRow(request.userAnswers),
             IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode),
-            HasWebsiteSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            HasWebsiteSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             WebsiteSummary.checkAnswersRow(request.userAnswers),
             BusinessContactDetailsSummary.rowContactName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
