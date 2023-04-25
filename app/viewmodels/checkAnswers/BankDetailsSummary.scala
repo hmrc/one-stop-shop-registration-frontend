@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{Mode, UserAnswers}
 import pages.BankDetailsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,7 @@ import viewmodels.implicits._
 
 object BankDetailsSummary  {
 
-  def rowAccountName(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def rowAccountName(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(BankDetailsPage).map {
       answer =>
 
@@ -38,13 +38,13 @@ object BankDetailsSummary  {
           key     = "bankDetails.accountName",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
           )
         )
     }
 
-  def rowBIC(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def rowBIC(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(BankDetailsPage).map {
       answer =>
 
@@ -56,13 +56,13 @@ object BankDetailsSummary  {
           key     = "bankDetails.bic",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
           )
         )
     }
 
-  def rowIBAN(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def rowIBAN(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(BankDetailsPage).map {
       answer =>
 
@@ -72,7 +72,7 @@ object BankDetailsSummary  {
           key     = "bankDetails.iban",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
           )
         )
