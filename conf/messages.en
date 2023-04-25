@@ -15,6 +15,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.submit = Register
+site.confirm = Confirm
 site.tryAgain = Try again
 site.to = to
 site.processing = We are processing your registration.
@@ -789,6 +790,10 @@ registrationType.change.hidden = Your registration type
 
 salesDeclarationNotRequired.title = Do not tell us about sales of services on your returns
 salesDeclarationNotRequired.heading = Do not tell us about sales of services on your returns
+
+changeYourRegistration.title = Change Your Registration
+changeYourRegistration.heading = Change Your Registration
+changeYourRegistration.info.p1 = Confirm these changes to save them to your account.
 
 deleteAllWebsites.title = Remove all your website information from this scheme?
 deleteAllWebsites.heading = Remove all your website information from this scheme?
