@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.HasWebsitePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,7 @@ import viewmodels.implicits._
 
 object HasWebsiteSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HasWebsitePage).map {
       answer =>
 
@@ -36,7 +36,7 @@ object HasWebsiteSummary  {
           key     = "hasWebsite.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.HasWebsiteController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.HasWebsiteController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("hasWebsite.change.hidden"))
           )
         )

@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class WebsitePageSpec extends SpecBase with PageBehaviours {
@@ -50,5 +50,15 @@ class WebsitePageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to Add Website" in {
+
+        WebsitePage(index).navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
+      }
+    }
+
   }
 }
