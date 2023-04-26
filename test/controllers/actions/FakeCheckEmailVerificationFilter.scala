@@ -15,18 +15,13 @@
  */
 
 package controllers.actions
-import models.requests.AuthenticatedDataRequest
-import play.api.mvc.Result
+import config.FrontendAppConfig
+import org.scalatestplus.mockito.MockitoSugar.mock
+import services.EmailVerificationService
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-class FakeCheckEmailVerificationFilter extends CheckEmailVerificationFilter {
-
-  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
-    Future.successful(None)
-  }
-
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
-
+class FakeCheckEmailVerificationFilter extends CheckEmailVerificationFilterProvider(
+  mock[FrontendAppConfig],
+  mock[EmailVerificationService])(ExecutionContext.Implicits.global) {
 }

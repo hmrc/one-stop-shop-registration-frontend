@@ -40,7 +40,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def checkNiProtocol: CheckNiProtocolFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
   def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
-  def checkEmailVerificationStatus: CheckEmailVerificationFilter
+  def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
 
   def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     actionBuilder andThen
@@ -61,7 +61,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     authAndGetData(mode) andThen
-      checkEmailVerificationStatus
+      checkEmailVerificationStatus(mode)
 
 }
 
@@ -84,5 +84,5 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkNiProtocol: CheckNiProtocolFilter,
                                                                retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
                                                                checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
-                                                               checkEmailVerificationStatus: CheckEmailVerificationFilter
+                                                               checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
                                                              ) extends AuthenticatedControllerComponents
