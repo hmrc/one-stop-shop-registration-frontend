@@ -213,8 +213,8 @@ GET         /bank-details                                                       
 POST        /bank-details                                                       controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /check-bank-details                                                 controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-bank-details                                                 controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
-GET         /amend-check-bank-details                                           controllers.BankDetailsController.onPageLoad(mode: Mode = AmendMode)
-POST        /amend-check-bank-details                                           controllers.BankDetailsController.onSubmit(mode: Mode = AmendMode)
+GET         /amend-bank-details                                                 controllers.BankDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-bank-details                                                 controllers.BankDetailsController.onSubmit(mode: Mode = AmendMode)
 
 GET         /eu-tax-number/:index                                               controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-tax-number/:index                                               controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode, index: Index)
