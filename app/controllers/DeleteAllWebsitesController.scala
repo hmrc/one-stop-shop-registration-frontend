@@ -18,24 +18,24 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteAllWebsitesFormProvider
-
-import javax.inject.Inject
 import models.Mode
+import models.requests.AuthenticatedDataRequest
 import pages.{DeleteAllWebsitesPage, HasWebsitePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.AllWebsites
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteAllWebsitesView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DeleteAllWebsitesController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: DeleteAllWebsitesFormProvider,
-                                         view: DeleteAllWebsitesView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                             override val messagesApi: MessagesApi,
+                                             cc: AuthenticatedControllerComponents,
+                                             formProvider: DeleteAllWebsitesFormProvider,
+                                             view: DeleteAllWebsitesView
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -54,22 +54,21 @@ class DeleteAllWebsitesController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          if(value) {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAllWebsitesPage, value))
-              updatedRemovedAnswers <- Future.fromTry(updatedAnswers.remove(AllWebsites))
-              _ <- cc.sessionRepository.set(updatedRemovedAnswers)
-            } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedRemovedAnswers))
-          } else {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(HasWebsitePage, true))
-              updatedRetainAnswers <- Future.fromTry(updatedAnswers.set(DeleteAllWebsitesPage, value))
-              _ <- cc.sessionRepository.set(updatedRetainAnswers)
-            } yield {
-              Redirect(DeleteAllWebsitesPage.navigate(mode, updatedRetainAnswers))
-            }
-          }
-
+          determineRemoveAllWebsitesAndRedirect(mode, value)
       )
   }
+
+  private def determineRemoveAllWebsitesAndRedirect(mode: Mode, value: Boolean)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    val removeWebsites = if (value) {
+      request.userAnswers.remove(AllWebsites)
+    } else {
+      request.userAnswers.set(HasWebsitePage, true)
+    }
+    for {
+      updatedAnswers <- Future.fromTry(removeWebsites)
+      calculatedAnswers <- Future.fromTry(updatedAnswers.set(DeleteAllWebsitesPage, value))
+      _ <- cc.sessionRepository.set(calculatedAnswers)
+    } yield Redirect(DeleteAllWebsitesPage.navigate(mode, calculatedAnswers))
+  }
+
 }

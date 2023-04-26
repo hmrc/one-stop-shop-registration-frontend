@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class HasWebsitePageSpec extends SpecBase with PageBehaviours {
@@ -76,16 +76,6 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
         }
 
-//        "to Check Your Answers when there are websites in the user's answers" in {
-//
-//          val answers =
-//            emptyUserAnswers
-//              .set(WebsitePage(Index(0)), "foo").success.value
-//              .set(HasWebsitePage ,true).success.value
-//
-//          HasWebsitePage.navigate(CheckMode, answers)
-//            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-//        }
       }
 
       "when the answer is no" - {

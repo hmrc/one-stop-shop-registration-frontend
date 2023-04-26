@@ -22,8 +22,6 @@ import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllWebsites
 
-import scala.util.Try
-
 case object HasWebsitePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
