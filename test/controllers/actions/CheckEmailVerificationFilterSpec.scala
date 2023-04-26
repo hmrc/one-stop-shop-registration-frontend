@@ -40,7 +40,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with EitherValues {
 
   class Harness(frontendAppConfig: FrontendAppConfig, emailVerificationService: EmailVerificationService)
-    extends CheckEmailVerificationFilterImpl(frontendAppConfig, emailVerificationService) {
+    extends CheckEmailVerificationFilterImpl(None, frontendAppConfig, emailVerificationService) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
