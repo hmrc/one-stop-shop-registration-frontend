@@ -21,7 +21,7 @@ import forms.DeleteAllWebsitesFormProvider
 
 import javax.inject.Inject
 import models.Mode
-import pages.DeleteAllWebsitesPage
+import pages.{DeleteAllWebsitesPage, HasWebsitePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.AllWebsites
@@ -65,7 +65,10 @@ class DeleteAllWebsitesController @Inject()(
               _ <- cc.sessionRepository.set(updatedAnswers)
             } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedAnswers))
           } else {
-            Future.successful(Redirect(DeleteAllWebsitesPage.navigate(mode, request.userAnswers)))
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(HasWebsitePage, true))
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedAnswers))
           }
 
       )

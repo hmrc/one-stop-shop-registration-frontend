@@ -36,8 +36,15 @@ case object DeleteAllWebsitesPage extends QuestionPage[Boolean] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(DeleteAllWebsitesPage), answers.get(AllWebsites)) match {
-      case (Some(true), Some(websites)) if websites.nonEmpty => routes.HasWebsiteController.onPageLoad(CheckMode)
+      case (Some(true), _) => routes.HasWebsiteController.onPageLoad(CheckMode)
       case (Some(false), Some(websites)) if websites.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
       case _ => routes.CheckYourAnswersController.onPageLoad()
     }
+
+//  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+//    (answers.get(DeleteAllWebsitesPage), answers.get(AllWebsites)) match {
+//      case (Some(true), Some(websites)) if websites.nonEmpty => routes.HasWebsiteController.onPageLoad(CheckMode)
+//      case (Some(false), Some(websites)) if websites.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
+//      case _ => routes.CheckYourAnswersController.onPageLoad()
+//    }
 }
