@@ -18,11 +18,11 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteAllWebsitesFormProvider
-import models.{Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{DeleteAllWebsitesPage, WebsitePage}
+import pages.{DeleteAllWebsitesPage, HasWebsitePage, WebsitePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -41,7 +41,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
     .set(WebsitePage(Index(0)), "foo").success.value
     .set(WebsitePage(Index(1)), "bar").success.value
 
-  private lazy val deleteAllWebsitesRoute = routes.DeleteAllWebsitesController.onPageLoad(NormalMode).url
+  private lazy val deleteAllWebsitesRoute = routes.DeleteAllWebsitesController.onPageLoad().url
 
   "DeleteAllWebsites Controller" - {
 
@@ -57,25 +57,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[DeleteAllWebsitesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(DeleteAllWebsitesPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteAllWebsitesRoute)
-
-        val view = application.injector.instanceOf[DeleteAllWebsitesView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
       }
     }
 
@@ -101,7 +83,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
           .remove(AllWebsites).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -113,7 +95,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -123,11 +105,13 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
-        val expectedAnswers = userAnswers.set(DeleteAllWebsitesPage, false).success.value
+        val expectedAnswers = userAnswers
+          .set(DeleteAllWebsitesPage, false).success.value
+          .set(HasWebsitePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(NormalMode, expectedAnswers).url
-        verifyNoInteractions(mockSessionRepository)
+        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(CheckMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
@@ -147,7 +131,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, CheckMode)(request, messages(application)).toString
       }
     }
 

@@ -43,12 +43,7 @@ class DeleteAllWebsitesController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(DeleteAllWebsitesPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+      Ok(view(form, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
@@ -61,14 +56,18 @@ class DeleteAllWebsitesController @Inject()(
         value =>
           if(value) {
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.remove(AllWebsites))
-              _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedAnswers))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAllWebsitesPage, value))
+              updatedRemovedAnswers <- Future.fromTry(updatedAnswers.remove(AllWebsites))
+              _ <- cc.sessionRepository.set(updatedRemovedAnswers)
+            } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedRemovedAnswers))
           } else {
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(HasWebsitePage, true))
-              _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedAnswers))
+              updatedRetainAnswers <- Future.fromTry(updatedAnswers.set(DeleteAllWebsitesPage, value))
+              _ <- cc.sessionRepository.set(updatedRetainAnswers)
+            } yield {
+              Redirect(DeleteAllWebsitesPage.navigate(mode, updatedRetainAnswers))
+            }
           }
 
       )

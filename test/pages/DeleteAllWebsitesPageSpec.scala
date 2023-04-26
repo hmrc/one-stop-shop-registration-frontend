@@ -18,9 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode}
+import models.{CheckMode, Index}
 import pages.behaviours.PageBehaviours
-
 
 class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
 
@@ -32,36 +31,9 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
 
     beRemovable[Boolean](DeleteAllWebsitesPage)
 
-    "must navigate in Normal mode" - {
-
-      "to Check Your Answers Page when user answers Yes" in {
-
-        val answers = emptyUserAnswers
-          .set(WebsitePage(Index(0)), "website1").success.value
-          .set(WebsitePage(Index(1)), "website2").success.value
-          .set(DeleteAllWebsitesPage, true).success.value
-
-        DeleteAllWebsitesPage.navigate(NormalMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Has Website Page when user answers No" in {
-
-        val answers = emptyUserAnswers
-          .set(WebsitePage(Index(0)), "website1").success.value
-          .set(WebsitePage(Index(1)), "website1").success.value
-          .set(DeleteAllWebsitesPage, false).success.value
-
-        DeleteAllWebsitesPage.navigate(NormalMode, answers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
-
-      }
-
-    }
-
     "must navigate in CheckMode" - {
 
-      "to Check Your Answers Page when user answers Yes" in {
+      "to Check Your Answers Page when user answers Yes and there are websites present" in {
 
         val answers = emptyUserAnswers
           .set(WebsitePage(Index(0)), "website1").success.value
@@ -72,16 +44,41 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "to Has Website Page when user answers No" in {
+      "to Check Your Answers Page when user answers Yes and there are no websites present" in {
+
+        val answers = emptyUserAnswers
+          .set(DeleteAllWebsitesPage, true).success.value
+
+        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Check Your Answers Page when user answers No when there are websites present" in {
 
         val answers = emptyUserAnswers
           .set(WebsitePage(Index(0)), "website1").success.value
-          .set(WebsitePage(Index(1)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
           .set(DeleteAllWebsitesPage, false).success.value
 
         DeleteAllWebsitesPage.navigate(CheckMode, answers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(CheckMode))
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
 
+      "to Check Your Answers Page when user answers No and there are no websites present" in {
+
+        val answers = emptyUserAnswers
+          .set(DeleteAllWebsitesPage, false).success.value
+
+        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+
+        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
 
     }
