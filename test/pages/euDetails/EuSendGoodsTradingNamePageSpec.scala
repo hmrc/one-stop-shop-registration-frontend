@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
@@ -62,6 +62,19 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
         val address = arbitraryInternationalAddress.arbitrary.sample.value
         EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
           EuSendGoodsAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
+      }
+    }
+
+    "must navigate in Amend Mode" - {
+      "to Eu Send Goods Address if it hasn't been answered" in {
+        EuSendGoodsTradingNamePage(index).navigate(AmendMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(AmendMode, index)
+      }
+
+      "to wherever Eu Send Goods Address navigates if it has been answered" in {
+        val address = arbitraryInternationalAddress.arbitrary.sample.value
+        EuSendGoodsTradingNamePage(index).navigate(AmendMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
+          EuSendGoodsAddressPage(index).navigate(AmendMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
       }
     }
   }

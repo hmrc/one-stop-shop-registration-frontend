@@ -33,7 +33,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(true) =>
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode, countryIndex)
       case Some(false) =>
-        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
@@ -43,7 +43,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(true) =>
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex)
       case Some(false) =>
-        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
@@ -53,7 +53,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(true) =>
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendMode, countryIndex)
       case Some(false) =>
-        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }

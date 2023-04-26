@@ -392,6 +392,7 @@ POST        /amend-check-registration-type/:countryIndex                        
 
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+GET         /amend-sales-declaration-not-required/:countryIndex                 controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
 
 GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
 
