@@ -122,7 +122,7 @@ trait SpecBase
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilterProvider].toInstance(new FakeCheckRegistrationFilterProvider()),
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
-        bind[CheckEmailVerificationFilter].toInstance(new FakeCheckEmailVerificationFilter()),
+        bind[CheckEmailVerificationFilterProvider].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
         bind[Clock].toInstance(clockToBind)
       )
