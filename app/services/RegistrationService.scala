@@ -23,7 +23,7 @@ import models.previousRegistrations.PreviousSchemeNumbers
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations._
-import queries.{AllTradingNames, AllWebsites}
+import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -49,6 +49,33 @@ class RegistrationService {
       } else {
         Try(hasTradingNameUA)
       }
+
+
+      /*
+      case v: EuVatRegistration                     => Json.toJson(v)(EuVatRegistration.format)
+      case fe: RegistrationWithFixedEstablishment   => Json.toJson(fe)(RegistrationWithFixedEstablishment.format)
+      case fe: RegistrationWithoutFixedEstablishmentWithTradeDetails   => Json.toJson(fe)(RegistrationWithoutFixedEstablishmentWithTradeDetails.format)
+      case w: RegistrationWithoutTaxId => Json.toJson(w)(RegistrationWithoutTaxId.format)
+       */
+      hasTaxRegisteredInEuUA <- tradingNamesUA.set(TaxRegisteredInEuPage, registration.euRegistrations.nonEmpty)
+//      test = registration.euRegistrations.zipWithIndex map {
+//        case (euRegistration: EuVatRegistration, index) =>
+//          ???.set(EuCountryPage(Index(index)), euRegistration.country)
+//          ???.set(EuVatNumberPage(Index(index)), euRegistration.vatNumber))
+//              ???
+//        case (euRegistration: RegistrationWithFixedEstablishment, index) =>
+//          ???.set(EuCountryPage(Index(index)), euRegistration.country)
+//          ???.set(EuVatNumberPage(Index(index)), euRegistration.vatNumber))
+//      }
+
+//      registration.euRegistrations.zipWithIndex map {
+//      case (euRegistration: EuVatRegistration, index) =>
+//      EuOptionalDetails(euCountry = euRegistration.country, euVatNumber = Some(euRegistration.vatNumber))
+
+//            euVatDetailsUA <- if(registration.euRegistrations.nonEmpty) {
+//              hasTaxRegisteredInEuUA.set(AllEuOptionalDetailsQuery)
+//            }
+
       isOnlineMarket <- tradingNamesUA.set(IsOnlineMarketplacePage, registration.isOnlineMarketplace)
       hasWebsiteUA <- isOnlineMarket.set(HasWebsitePage, registration.websites.nonEmpty)
       websites <- if (registration.websites.nonEmpty) {
