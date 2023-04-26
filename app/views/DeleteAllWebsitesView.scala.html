@@ -14,19 +14,22 @@
  * limitations under the License.
  *@
 
+@import components.ButtonGroup
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    button: ButtonGroup,
+    govukWarningText: GovukWarningText
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("deleteAllWebsites.title"))) {
 
-    @formHelper(action = routes.DeleteAllWebsitesController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.DeleteAllWebsitesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -39,8 +42,11 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @govukWarningText(WarningText(
+            iconFallbackText = messages("site.warning"),
+            content = Text(messages("deleteAllWebsites.warning"))
+        ))
+
+        @button("site.continue", routes.DeleteAllWebsitesController.onPageLoad(mode).url)
     }
 }

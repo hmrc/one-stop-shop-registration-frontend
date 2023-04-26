@@ -16,11 +16,28 @@
 
 package pages
 
+import models.{CheckMode, NormalMode, UserAnswers}
+import controllers.routes
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import queries.{AllWebsites, DeriveNumberOfWebsites}
 
 case object DeleteAllWebsitesPage extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ "websites"
 
   override def toString: String = "deleteAllWebsites"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
+    answers.get(AllWebsites) match {
+      case Some(websites) if websites.nonEmpty => routes.HasWebsiteController.onPageLoad(NormalMode)
+      case _ => routes.CheckYourAnswersController.onPageLoad()
+    }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(DeleteAllWebsitesPage), answers.get(AllWebsites)) match {
+      case (Some(true), Some(websites)) if websites.nonEmpty => routes.HasWebsiteController.onPageLoad(CheckMode)
+      case (Some(false), Some(websites)) if websites.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
+      case _ => routes.CheckYourAnswersController.onPageLoad()
+    }
 }

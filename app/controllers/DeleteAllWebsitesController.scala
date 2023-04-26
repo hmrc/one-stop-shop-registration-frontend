@@ -18,11 +18,13 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteAllWebsitesFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import pages.DeleteAllWebsitesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AllWebsites
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteAllWebsitesView
 
@@ -57,10 +59,15 @@ class DeleteAllWebsitesController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAllWebsitesPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedAnswers))
+          if(value) {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.remove(AllWebsites))
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield Redirect(DeleteAllWebsitesPage.navigate(mode, updatedAnswers))
+          } else {
+            Future.successful(Redirect(DeleteAllWebsitesPage.navigate(mode, request.userAnswers)))
+          }
+
       )
   }
 }

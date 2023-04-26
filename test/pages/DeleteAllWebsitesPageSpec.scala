@@ -17,7 +17,10 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
+
 
 class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
 
@@ -28,5 +31,60 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
     beSettable[Boolean](DeleteAllWebsitesPage)
 
     beRemovable[Boolean](DeleteAllWebsitesPage)
+
+    "must navigate in Normal mode" - {
+
+      "to Check Your Answers Page when user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
+          .set(DeleteAllWebsitesPage, true).success.value
+
+        DeleteAllWebsitesPage.navigate(NormalMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Has Website Page when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website1").success.value
+          .set(DeleteAllWebsitesPage, false).success.value
+
+        DeleteAllWebsitesPage.navigate(NormalMode, answers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+
+      }
+
+    }
+
+    "must navigate in CheckMode" - {
+
+      "to Check Your Answers Page when user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
+          .set(DeleteAllWebsitesPage, true).success.value
+
+        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Has Website Page when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website1").success.value
+          .set(DeleteAllWebsitesPage, false).success.value
+
+        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(CheckMode))
+
+      }
+
+    }
+
   }
 }

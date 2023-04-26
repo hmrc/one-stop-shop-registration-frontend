@@ -18,14 +18,15 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteAllWebsitesFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.DeleteAllWebsitesPage
+import pages.{DeleteAllWebsitesPage, WebsitePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.AllWebsites
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.DeleteAllWebsitesView
 
@@ -35,6 +36,10 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new DeleteAllWebsitesFormProvider()
   private val form = formProvider()
+
+  private val userAnswers = basicUserAnswersWithVatInfo
+    .set(WebsitePage(Index(0)), "foo").success.value
+    .set(WebsitePage(Index(1)), "bar").success.value
 
   private lazy val deleteAllWebsitesRoute = routes.DeleteAllWebsitesController.onPageLoad(NormalMode).url
 
@@ -74,14 +79,14 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must delete all websites and redirect to the next page when user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,11 +96,38 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(DeleteAllWebsitesPage, true).success.value
+        val expectedAnswers = userAnswers
+          .set(DeleteAllWebsitesPage, true).success.value
+          .remove(AllWebsites).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must not delete all websites and redirect to the next page when user answers No" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteAllWebsitesRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+        val expectedAnswers = userAnswers.set(DeleteAllWebsitesPage, false).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(NormalMode, expectedAnswers).url
+        verifyNoInteractions(mockSessionRepository)
       }
     }
 
