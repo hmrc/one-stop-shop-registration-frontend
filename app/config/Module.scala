@@ -26,7 +26,6 @@ class Module extends AbstractModule {
   override def configure(): Unit = {
 
     bind(classOf[CheckNiProtocolFilter]).to(classOf[CheckNiProtocolFilterImpl]).asEagerSingleton()
-    bind(classOf[CheckEmailVerificationFilter]).to(classOf[CheckEmailVerificationFilterImpl]).asEagerSingleton()
     bind(classOf[VrnAllowListFilter]).to(classOf[VrnAllowListFilterImpl]).asEagerSingleton()
 
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
