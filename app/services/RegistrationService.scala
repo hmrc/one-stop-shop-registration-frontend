@@ -24,7 +24,9 @@ import pages.euDetails._
 import pages.previousRegistrations._
 import pages._
 import queries.{AllTradingNames, AllWebsites}
+import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 
+import scala.collection.Seq
 import scala.concurrent.Future
 import scala.util.Try
 
@@ -49,7 +51,15 @@ class RegistrationService {
       } else {
         Try(hasTradingNameUA)
       }
-      isOnlineMarket <- tradingNamesUA.set(IsOnlineMarketplacePage, registration.isOnlineMarketplace)
+
+      hasTaxRegisteredInEuUA <- tradingNamesUA.set(TaxRegisteredInEuPage, registration.euRegistrations.nonEmpty)
+      euVatDetailsUA <- if (registration.euRegistrations.nonEmpty) {
+        hasTaxRegisteredInEuUA.set(AllEuOptionalDetailsQuery, getEuRegistrationDetails(registration).toList)
+      } else {
+        Try(hasTaxRegisteredInEuUA)
+      }
+
+      isOnlineMarket <- euVatDetailsUA.set(IsOnlineMarketplacePage, registration.isOnlineMarketplace)
       hasWebsiteUA <- isOnlineMarket.set(HasWebsitePage, registration.websites.nonEmpty)
       websites <- if (registration.websites.nonEmpty) {
         hasWebsiteUA.set(AllWebsites, registration.websites.toList)
@@ -62,28 +72,7 @@ class RegistrationService {
     } yield bankDetails // TODO remove test data
       .set(IsPlanningFirstEligibleSalePage, true).get
       .set(PreviouslyRegisteredPage, false).get
-      .set(TaxRegisteredInEuPage, true).get
-      .set(EuCountryPage(Index(0)), Country("FR", "France")).get
-      .set(SellsGoodsToEUConsumersPage(Index(0)), true).get
-      .set(SellsGoodsToEUConsumerMethodPage(Index(0)), EuConsumerSalesMethod.DispatchWarehouse).get
-      .set(RegistrationTypePage(Index(0)), RegistrationType.VatNumber).get
-      .set(EuVatNumberPage(Index(0)), "FR123456789").get
-      .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").get
-      .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).get
-      .set(EuCountryPage(Index(1)), Country("DE", "Germany")).get
-      .set(SellsGoodsToEUConsumersPage(Index(1)), false).get
-      .set(VatRegisteredPage(Index(1)), true).get
-      .set(EuVatNumberPage(Index(1)), "DE123456789").get
-      .set(EuCountryPage(Index(2)), Country("IE", "Ireland")).get
-      .set(SellsGoodsToEUConsumersPage(Index(2)), true).get
-      .set(SellsGoodsToEUConsumerMethodPage(Index(2)), EuConsumerSalesMethod.DispatchWarehouse).get
-      .set(RegistrationTypePage(Index(2)), RegistrationType.TaxId).get
-      .set(EuTaxReferencePage(Index(2)), "IE123456789").get
-      .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").get
-      .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).get
-      .set(EuCountryPage(Index(3)), Country("CR", "Croatia")).get
-      .set(SellsGoodsToEUConsumersPage(Index(3)), false).get
-      .set(VatRegisteredPage(Index(3)), false).get
+
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).get
@@ -93,6 +82,28 @@ class RegistrationService {
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).get
 
     Future.fromTry(userAnswers)
+  }
+
+  private def getEuRegistrationDetails(registration: Registration): Seq[EuOptionalDetails] = {
+    registration.euRegistrations.zipWithIndex map {
+      case (euVatRegistration: EuVatRegistration, _) =>
+        EuOptionalDetails(euCountry = euVatRegistration.country, None, None, None, None,
+          euVatNumber = Some(euVatRegistration.vatNumber), None, None, None, None, None)
+      case (registrationWithFE: RegistrationWithFixedEstablishment, _) =>
+        EuOptionalDetails(euCountry = registrationWithFE.country, Some(true), None, None, None,
+          euVatNumber = registrationWithFE.taxIdentifier.value,
+          euTaxReference = Some(registrationWithFE.taxIdentifier.identifierType.toString),
+          fixedEstablishmentTradingName = Some(registrationWithFE.fixedEstablishment.tradingName),
+          fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address), None, None)
+      case (registrationWithoutFE: RegistrationWithoutFixedEstablishmentWithTradeDetails, _) =>
+        EuOptionalDetails(euCountry = registrationWithoutFE.country, Some(true), None, None, None,
+          euVatNumber = registrationWithoutFE.taxIdentifier.value,
+          euTaxReference = Some(registrationWithoutFE.taxIdentifier.identifierType.toString),
+          fixedEstablishmentTradingName = Some(registrationWithoutFE.tradeDetails.tradingName),
+          fixedEstablishmentAddress = Some(registrationWithoutFE.tradeDetails.address), None, None)
+      case (registrationWithoutTaxID: RegistrationWithoutTaxId, _) =>
+        EuOptionalDetails(euCountry = registrationWithoutTaxID.country, None, None, None, None, None, None, None, None, None, None)
+    }
   }
 
   /* TODO
