@@ -31,6 +31,8 @@ GET         /uk-trading-name/:index                                             
 POST        /uk-trading-name/:index                                             controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-uk-trading-name/:index                                       controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-uk-trading-name/:index                                       controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-check-uk-trading-name/:index                                 controllers.TradingNameController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-check-uk-trading-name/:index                                 controllers.TradingNameController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /eu-vat-number/:index                                               controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-vat-number/:index                                               controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -72,6 +74,8 @@ GET         /remove-uk-trading-name/:index                                      
 POST        /remove-uk-trading-name/:index                                      controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-check-remove-uk-trading-name/:index                          controllers.DeleteTradingNameController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-check-remove-uk-trading-name/:index                          controllers.DeleteTradingNameController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /add-uk-trading-name                                                controllers.AddTradingNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /add-uk-trading-name                                                controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)

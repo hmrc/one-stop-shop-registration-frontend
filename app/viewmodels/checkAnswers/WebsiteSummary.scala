@@ -39,7 +39,7 @@ object WebsiteSummary {
         )
     }
 
-  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllWebsites).map {
       websites =>
 
@@ -52,7 +52,7 @@ object WebsiteSummary {
           key     = "websites.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("websites.change.hidden"))
           )
         )
