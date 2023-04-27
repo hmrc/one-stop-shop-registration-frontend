@@ -18,10 +18,11 @@ package services
 
 import models._
 import models.domain._
-import models.euDetails._
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.previousRegistrations.PreviousSchemeNumbers
-import pages._
+import pages.euDetails._
 import pages.previousRegistrations._
+import pages._
 import queries.{AllTradingNames, AllWebsites}
 
 import scala.concurrent.Future
