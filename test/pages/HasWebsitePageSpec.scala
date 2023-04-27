@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class HasWebsitePageSpec extends SpecBase with PageBehaviours {
@@ -66,21 +66,32 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.WebsiteController.onPageLoad(CheckMode, Index(0)))
         }
 
-        "to Check Your Answers when there are websites in the user's answers" in {
+        "to Add Websites when there are websites in the users answers" in {
 
-          val answers =
-            emptyUserAnswers
-              .set(WebsitePage(Index(0)), "foo").success.value
-              .set(HasWebsitePage ,true).success.value
+          val answers = emptyUserAnswers
+            .set(WebsitePage(Index(0)), "foo").success.value
+            .set(HasWebsitePage, true).success.value
 
           HasWebsitePage.navigate(CheckMode, answers)
-            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+            .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
         }
+
       }
 
       "when the answer is no" - {
 
-        "to Check Your Answers" in {
+        "to Delete All Websites if there are websites present" in {
+
+          val answers = emptyUserAnswers
+            .set(HasWebsitePage, false).success.value
+            .set(WebsitePage(Index(0)), "foo").success.value
+            .set(WebsitePage(Index(1)), "bar").success.value
+
+          HasWebsitePage.navigate(CheckMode, answers)
+            .mustEqual(routes.DeleteAllWebsitesController.onPageLoad())
+        }
+
+        "to Check Your Answers if there are no websites present" in {
 
           val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
 
@@ -94,32 +105,6 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
         HasWebsitePage.navigate(CheckMode, emptyUserAnswers)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
-    }
-
-    "must remove all websites when the answer is no" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(WebsitePage(Index(0)), "website 1").success.value
-          .set(WebsitePage(Index(1)), "website 2").success.value
-
-      val result = answers.set(HasWebsitePage, false).success.value
-
-      result.get(WebsitePage(Index(0))) must not be defined
-      result.get(WebsitePage(Index(1))) must not be defined
-    }
-
-    "must not remove any websites when the answer is yes" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(WebsitePage(Index(0)), "website 1").success.value
-          .set(WebsitePage(Index(1)), "website 2").success.value
-
-      val result = answers.set(HasWebsitePage, true).success.value
-
-      result.get(WebsitePage(Index(0))).value mustEqual "website 1"
-      result.get(WebsitePage(Index(1))).value mustEqual "website 2"
     }
   }
 }

@@ -339,3 +339,6 @@ GET         /check-registration-type/:countryIndex                              
 POST        /check-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+
+GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)

@@ -787,3 +787,9 @@ registrationType.change.hidden = Your registration type
 
 salesDeclarationNotRequired.title = Do not tell us about sales of services on your returns
 salesDeclarationNotRequired.heading = Do not tell us about sales of services on your returns
+
+deleteAllWebsites.title = Remove all your website information from this scheme?
+deleteAllWebsites.heading = Remove all your website information from this scheme?
+deleteAllWebsites.warning = This will delete all the trading websites you have added.
+deleteAllWebsites.error.required = Select yes if you want to remove all your website information from this scheme
+deleteAllWebsites.change.hidden = Remove all your website information from this scheme

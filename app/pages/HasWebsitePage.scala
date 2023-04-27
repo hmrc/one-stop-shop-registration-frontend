@@ -22,8 +22,6 @@ import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllWebsites
 
-import scala.util.Try
-
 case object HasWebsitePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
@@ -38,15 +36,11 @@ case object HasWebsitePage extends QuestionPage[Boolean] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(HasWebsitePage), answers.get(AllWebsites)) match {
-      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
-      case (Some(true), _)                                           => routes.WebsiteController.onPageLoad(CheckMode, Index(0))
-      case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()
-      case _                                                         => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(true), Some(websites)) if websites.nonEmpty  => routes.AddWebsiteController.onPageLoad(CheckMode)
+      case (Some(true), _)                                    => routes.WebsiteController.onPageLoad(CheckMode, Index(0))
+      case (Some(false), Some(websites)) if websites.nonEmpty => routes.DeleteAllWebsitesController.onPageLoad()
+      case (Some(false), _)                                   => routes.CheckYourAnswersController.onPageLoad()
+      case _                                                  => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(AllWebsites)
-      case _           => super.cleanup(value, userAnswers)
-    }
 }
