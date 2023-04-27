@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.Page
 import play.api.mvc.Call
 import queries.DeriveNumberOfEuRegistrations
@@ -34,5 +34,11 @@ case class DeleteEuDetailsPage(index: Index) extends Page {
     answers.get(DeriveNumberOfEuRegistrations) match {
       case Some(n) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(CheckMode)
       case _                => euRoutes.TaxRegisteredInEuController.onPageLoad(CheckMode)
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfEuRegistrations) match {
+      case Some(n) if n > 0 => euRoutes.AddEuDetailsController.onPageLoad(AmendMode)
+      case _ => euRoutes.TaxRegisteredInEuController.onPageLoad(AmendMode)
     }
 }
