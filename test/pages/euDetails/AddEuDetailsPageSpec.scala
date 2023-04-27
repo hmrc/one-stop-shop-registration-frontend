@@ -18,8 +18,9 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
-import models.{CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -103,6 +104,45 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
         "must be Journey recovery" in {
 
           AddEuDetailsPage.navigate(CheckMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Amend Mode" - {
+
+      "when the answer is yes" - {
+
+        "to Eu Country with an Index(0) equal to the number of countries we have details for" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(AddEuDetailsPage, true).success.value
+              .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+              .set(VatRegisteredPage(Index(0)), true).success.value
+              .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
+
+          AddEuDetailsPage.navigate(AmendMode, answers)
+            .mustEqual(euRoutes.EuCountryController.onPageLoad(AmendMode, Index(1)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Change Your Registration" in {
+
+          val answers = emptyUserAnswers.set(AddEuDetailsPage, false).success.value
+
+          AddEuDetailsPage.navigate(AmendMode, answers)
+            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the user answers empty" - {
+
+        "must be Journey recovery" in {
+
+          AddEuDetailsPage.navigate(AmendMode, emptyUserAnswers)
             .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }

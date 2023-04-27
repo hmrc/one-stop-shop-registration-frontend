@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 import pages.euDetails
@@ -88,6 +88,30 @@ class FixedEstablishmentTradingNamePageSpec extends SpecBase with PageBehaviours
 
           FixedEstablishmentTradingNamePage(index).navigate(CheckLoopMode, answers)
             .mustEqual(FixedEstablishmentAddressPage(index).navigate(CheckLoopMode, answers))
+        }
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "when Fixed Establishment Address has not been answered" - {
+
+        "to Fixed Establishment Address" in {
+
+          FixedEstablishmentTradingNamePage(index).navigate(AmendMode, emptyUserAnswers)
+            .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendMode, index))
+        }
+      }
+
+      "when Fixed Establishment Address has already been answered" - {
+
+        "to wherever Fixed Establishment Address would navigate to" in {
+
+          val address = arbitrary[InternationalAddress].sample.value
+          val answers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
+
+          FixedEstablishmentTradingNamePage(index).navigate(AmendMode, answers)
+            .mustEqual(FixedEstablishmentAddressPage(index).navigate(AmendMode, answers))
         }
       }
     }

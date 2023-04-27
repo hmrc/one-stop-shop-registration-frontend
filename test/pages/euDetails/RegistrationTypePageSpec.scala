@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.routes
-import models.{Index, NormalMode}
+import models.{AmendMode, Index, NormalMode}
 import models.euDetails.RegistrationType
 import pages.behaviours.PageBehaviours
 
@@ -50,6 +50,25 @@ class RegistrationTypePageSpec extends SpecBase with PageBehaviours {
           .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
 
         RegistrationTypePage(countryIndex).navigate(NormalMode, answers) mustEqual routes.EuTaxReferenceController.onPageLoad(NormalMode, countryIndex)
+      }
+    }
+
+    "must navigate in Amend Mode" - {
+
+      "to EU VAT number when the answer is Vat number" in {
+
+        val answers = emptyUserAnswers
+          .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
+
+        RegistrationTypePage(countryIndex).navigate(AmendMode, answers) mustEqual routes.EuVatNumberController.onPageLoad(AmendMode, countryIndex)
+      }
+
+      "to EU Tax Reference when the answer Tax Id" in {
+
+        val answers = emptyUserAnswers
+          .set(RegistrationTypePage(countryIndex), RegistrationType.TaxId).success.value
+
+        RegistrationTypePage(countryIndex).navigate(AmendMode, answers) mustEqual routes.EuTaxReferenceController.onPageLoad(AmendMode, countryIndex)
       }
     }
   }

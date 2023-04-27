@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuOptionalDetailsQuery
@@ -34,6 +34,7 @@ object EuDetailsSummary {
     val changeLinkMode = currentMode match {
       case NormalMode => NormalMode
       case CheckMode => CheckMode
+      case AmendMode => AmendMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }
 
@@ -47,7 +48,7 @@ object EuDetailsSummary {
     }
   }
 
-  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllEuOptionalDetailsQuery).map {
       euVatDetails =>
 
@@ -60,7 +61,7 @@ object EuDetailsSummary {
           key = "euVatDetails.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AddEuDetailsController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.AddEuDetailsController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("euVatDetails.change.hidden"))
           )
         )

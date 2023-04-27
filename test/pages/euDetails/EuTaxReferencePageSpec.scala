@@ -19,7 +19,7 @@ package pages.euDetails
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.EuConsumerSalesMethod
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
@@ -140,7 +140,6 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Check Loop mode" - {
 
-
       "when user is not part of VAT group" - {
 
         "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
@@ -203,7 +202,71 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+    }
 
+    "must navigate in Amend mode" - {
+
+      "when user is not part of VAT group" - {
+
+        "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex))
+        }
+
+        "to wherever Fixed Establishment Trading Name navigates when Sells Goods To EU Consumer Method is Fixed Establishment and it has been answered" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+            .set(FixedEstablishmentTradingNamePage(countryIndex), "foo").success.value
+
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendMode, answers))
+        }
+
+        "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex))
+        }
+
+        "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
+
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers))
+        }
+      }
+
+      "when user is part of VAT group" - {
+
+        "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex))
+        }
+
+        "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
+
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers))
+        }
+      }
     }
   }
 }
