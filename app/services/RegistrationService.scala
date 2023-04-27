@@ -61,7 +61,6 @@ class RegistrationService {
 
     } yield bankDetails // TODO remove test data
       .set(IsPlanningFirstEligibleSalePage, true).get
-      .set(TaxRegisteredInEuPage, false).get
       .set(PreviouslyRegisteredPage, false).get
       .set(TaxRegisteredInEuPage, true).get
       .set(EuCountryPage(Index(0)), Country("FR", "France")).get
