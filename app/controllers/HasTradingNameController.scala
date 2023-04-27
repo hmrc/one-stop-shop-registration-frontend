@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.HasTradingNameFormProvider
+import logging.Logging
 import models.Mode
 import models.requests.AuthenticatedDataRequest
 import pages.HasTradingNamePage
@@ -34,7 +35,7 @@ class HasTradingNameController @Inject()(
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: HasTradingNameFormProvider,
                                          view: HasTradingNameView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -77,8 +78,19 @@ class HasTradingNameController @Inject()(
   private def getCompanyName(block: String => Future[Result])
                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.vatInfo match {
-      case Some(vatInfo) =>
-        val name = vatInfo.organisationName
+      case Some(vatInfo) if(vatInfo.organisationName.isDefined) =>
+        val name = vatInfo.organisationName.getOrElse{
+          val exception = new IllegalStateException("No organisation name when expecting one")
+          logger.error(exception.getMessage, exception)
+          throw exception
+        }
+        block(name)
+      case Some(vatInfo) if(vatInfo.individualName.isDefined) =>
+        val name = vatInfo.individualName.getOrElse {
+          val exception = new IllegalStateException("No individual name when expecting one")
+          logger.error(exception.getMessage, exception)
+          throw exception
+        }
         block(name)
       case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }

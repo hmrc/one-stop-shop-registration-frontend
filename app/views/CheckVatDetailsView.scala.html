@@ -41,12 +41,20 @@
         <h1 class="govuk-heading-xl">@messages("checkVatDetails.heading")</h1>
 
         <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.organisationName")</dt>
-                <dd class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.organisationName</dd>
-            </div>
-
-
+            @(viewModel.organisationName, viewModel.individualName) match {
+              case (Some(organisationName), _) => {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.organisationName")</dt>
+                  <dd class="govuk-summary-list__value govuk-!-width-one-half">@organisationName</dd>
+                </div>
+              }
+              case (_, Some(individualName)) => {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.individualName")</dt>
+                  <dd class="govuk-summary-list__value govuk-!-width-one-half">@individualName</dd>
+                </div>
+              }
+            }
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-width-one-half">@messages("checkVatDetails.vrn")</dt>
                 <dd class="govuk-summary-list__value govuk-!-width-one-half">@viewModel.vrn</dd>
