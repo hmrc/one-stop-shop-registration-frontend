@@ -38,7 +38,7 @@ class SalesDeclarationNotRequiredControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex).url)
+        val request = FakeRequest(GET, routes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex).url)
 
         val result = route(application, request).value
 

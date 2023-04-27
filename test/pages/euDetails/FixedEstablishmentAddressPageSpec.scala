@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -58,6 +58,15 @@ class FixedEstablishmentAddressPageSpec extends SpecBase with PageBehaviours {
 
         FixedEstablishmentAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers)
           .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "to Check Eu Details Answers in Check mode" in {
+
+        FixedEstablishmentAddressPage(index).navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index))
       }
     }
   }

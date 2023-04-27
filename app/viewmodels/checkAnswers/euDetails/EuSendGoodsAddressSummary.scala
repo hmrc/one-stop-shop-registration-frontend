@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails.EuSendGoodsAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -35,6 +35,7 @@ object EuSendGoodsAddressSummary {
         val changeLinkMode = currentMode match {
           case NormalMode    => CheckLoopMode
           case CheckMode     => CheckMode
+          case AmendMode     => AmendMode
           case CheckLoopMode => CheckLoopMode
         }
 
