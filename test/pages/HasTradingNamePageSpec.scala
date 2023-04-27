@@ -155,6 +155,8 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
       }
     }
 
+    // TODO Remove cleanup tests when remove all trading names changes from main are merged in
+
     "must remove all trading names when the answer is false" in {
 
       val answers =
