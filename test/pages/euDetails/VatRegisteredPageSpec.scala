@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -164,6 +164,57 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
         "to Journey recovery" in {
 
           VatRegisteredPage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "when the answer is yes" - {
+
+        "and EU VAT number has not been answered" - {
+
+          "to EU VAT number" in {
+
+            val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+
+            VatRegisteredPage(index).navigate(AmendMode, answers)
+              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(AmendMode, index))
+          }
+        }
+
+        "and EU VAT number has been answered" - {
+
+          "to wherever EU VAT number would navigate to" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), true).success.value
+                .set(EuVatNumberPage(index), "foo").success.value
+
+            VatRegisteredPage(index).navigate(AmendMode, answers)
+              .mustEqual(EuVatNumberPage(index).navigate(AmendMode, answers))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check EU Details Answers" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+
+          VatRegisteredPage(index).navigate(AmendMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index))
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(AmendMode, emptyUserAnswers)
             .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
       }

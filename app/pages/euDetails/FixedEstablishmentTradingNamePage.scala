@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -43,5 +43,12 @@ case class FixedEstablishmentTradingNamePage(index: Index) extends QuestionPage[
       FixedEstablishmentAddressPage(index).navigate(CheckLoopMode, answers)
     } else {
       euRoutes.FixedEstablishmentAddressController.onPageLoad(CheckLoopMode, index)
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    if (answers.get(FixedEstablishmentAddressPage(index)).isDefined) {
+      FixedEstablishmentAddressPage(index).navigate(AmendMode, answers)
+    } else {
+      euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendMode, index)
     }
 }
