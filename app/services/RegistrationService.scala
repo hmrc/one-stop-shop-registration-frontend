@@ -96,11 +96,11 @@ class RegistrationService {
   }
 
   /* TODO
-        .set(HasTradingNamePage, false).success.value
 
         .set(IsPlanningFirstEligibleSalePage, true).success.value
         .set(TaxRegisteredInEuPage, false).success.value
         .set(PreviouslyRegisteredPage, false).success.value
+
         .set(TaxRegisteredInEuPage, true).success.value
         .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
         .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
@@ -130,6 +130,6 @@ class RegistrationService {
         .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
         .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
         .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
-        .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value*/
+        */
 
 }

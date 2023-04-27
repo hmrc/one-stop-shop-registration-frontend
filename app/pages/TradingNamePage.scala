@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -32,4 +32,7 @@ case class TradingNamePage(index: Index) extends QuestionPage[String] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     routes.AddTradingNameController.onPageLoad(CheckMode)
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    routes.AddTradingNameController.onPageLoad(AmendMode)
 }
