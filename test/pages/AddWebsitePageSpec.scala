@@ -113,7 +113,7 @@ class AddWebsitePageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check Your Answers" in {
+        "to Change Your Registration" in {
 
           val answers = emptyUserAnswers.set(AddWebsitePage, false).success.value
 
