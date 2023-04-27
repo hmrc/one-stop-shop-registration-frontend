@@ -22,7 +22,7 @@ import logging.Logging
 import models.AmendMode
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.{AuthenticatedUserAnswersRepository, SessionRepository}
+import repositories.AuthenticatedUserAnswersRepository
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 

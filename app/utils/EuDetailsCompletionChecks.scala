@@ -33,7 +33,7 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
     }
   }
 
-  def emptyEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isEuDetailsPopulated) {
+  def emptyEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isEuDetailsPopulated()) {
     Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode)))
   } else {
     None

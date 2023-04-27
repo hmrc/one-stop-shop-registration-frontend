@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, Index, Mode, UserAnswers}
+import models.{Index, Mode, UserAnswers}
 import pages.euDetails.SellsGoodsToEUConsumerMethodPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat

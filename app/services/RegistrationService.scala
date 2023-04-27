@@ -114,28 +114,6 @@ class RegistrationService {
         .set(PreviouslyRegisteredPage, false).success.value
         .set(HasWebsitePage, false).success.value
 
-        .set(TaxRegisteredInEuPage, true).success.value
-        .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
-        .set(SellsGoodsToEUConsumerMethodPage(Index(0)), EuConsumerSalesMethod.DispatchWarehouse).success.value
-        .set(RegistrationTypePage(Index(0)), RegistrationType.VatNumber).success.value
-        .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-        .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
-        .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
-        .set(EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(1)), false).success.value
-        .set(VatRegisteredPage(Index(1)), true).success.value
-        .set(EuVatNumberPage(Index(1)), "DE123456789").success.value
-        .set(EuCountryPage(Index(2)), Country("IE", "Ireland")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(2)), true).success.value
-        .set(SellsGoodsToEUConsumerMethodPage(Index(2)), EuConsumerSalesMethod.DispatchWarehouse).success.value
-        .set(RegistrationTypePage(Index(2)), RegistrationType.TaxId).success.value
-        .set(EuTaxReferencePage(Index(2)), "IE123456789").success.value
-        .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
-        .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
-        .set(EuCountryPage(Index(3)), Country("CR", "Croatia")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
-        .set(VatRegisteredPage(Index(3)), false).success.value
         .set(
           BusinessContactDetailsPage,
           BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
@@ -144,7 +122,6 @@ class RegistrationService {
         .set(PreviouslyRegisteredPage, true).success.value
         .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
         .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
-        .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
-        .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value*/
+        .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value*/
 
 }
