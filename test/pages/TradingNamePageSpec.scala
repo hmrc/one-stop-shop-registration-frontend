@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 
@@ -49,6 +49,15 @@ class TradingNamePageSpec extends SpecBase with PageBehaviours {
 
         TradingNamePage(index).navigate(CheckMode, emptyUserAnswers)
           .mustBe(routes.AddTradingNameController.onPageLoad(CheckMode))
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "to Add Trading Name" in {
+
+        TradingNamePage(index).navigate(AmendMode, emptyUserAnswers)
+          .mustBe(routes.AddTradingNameController.onPageLoad(AmendMode))
       }
     }
 
