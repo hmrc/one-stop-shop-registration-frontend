@@ -795,3 +795,9 @@ deleteAllWebsites.heading = Remove all your website information from this scheme
 deleteAllWebsites.warning = This will delete all the trading websites you have added.
 deleteAllWebsites.error.required = Select yes if you want to remove all your website information from this scheme
 deleteAllWebsites.change.hidden = Remove all your website information from this scheme
+
+deleteAllTradingNames.title = deleteAllTradingNames
+deleteAllTradingNames.heading = deleteAllTradingNames
+deleteAllTradingNames.checkYourAnswersLabel = deleteAllTradingNames
+deleteAllTradingNames.error.required = Select yes if deleteAllTradingNames
+deleteAllTradingNames.change.hidden = DeleteAllTradingNames
