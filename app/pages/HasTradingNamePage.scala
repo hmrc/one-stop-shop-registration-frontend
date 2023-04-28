@@ -52,12 +52,4 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
       case (Some(false), _)                                          => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _                                                         => routes.JourneyRecoveryController.onPageLoad()
     }
-
-  // TODO Remove cleanup when remove all trading names changes from main are merged in
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(AllTradingNames)
-      case _           => super.cleanup(value, userAnswers)
-    }
 }

@@ -154,33 +154,5 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
         }
       }
     }
-
-    // TODO Remove cleanup tests when remove all trading names changes from main are merged in
-
-    "must remove all trading names when the answer is false" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(TradingNamePage(Index(0)), "name 1").success.value
-          .set(TradingNamePage(Index(1)), "name 2").success.value
-
-      val result = answers.set(HasTradingNamePage, false).success.value
-
-      result.get(TradingNamePage(Index(0))) must not be defined
-      result.get(TradingNamePage(Index(1))) must not be defined
-    }
-
-    "must not remove any trading names when the answer is true" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(TradingNamePage(Index(0)), "name 1").success.value
-          .set(TradingNamePage(Index(1)), "name 2").success.value
-
-      val result = answers.set(HasTradingNamePage, true).success.value
-
-      result.get(TradingNamePage(Index(0))).value mustEqual "name 1"
-      result.get(TradingNamePage(Index(1))).value mustEqual "name 2"
-    }
   }
 }
