@@ -38,15 +38,11 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
-      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.CheckYourAnswersController.onPageLoad()
-      case (Some(true), _)                                           => routes.TradingNameController.onPageLoad(CheckMode, Index(0))
-      case (Some(false), _)                                          => routes.CheckYourAnswersController.onPageLoad()
-      case _                                                         => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty  => routes.AddTradingNameController.onPageLoad(CheckMode)
+      case (Some(true), _)                                            => routes.TradingNameController.onPageLoad(CheckMode, Index(0))
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad()
+      case (Some(false), _)                                           => routes.CheckYourAnswersController.onPageLoad()
+      case _                                                          => routes.JourneyRecoveryController.onPageLoad()
     }
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(false) => userAnswers.remove(AllTradingNames)
-      case _           => super.cleanup(value, userAnswers)
-    }
 }

@@ -18,14 +18,15 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteAllTradingNamesFormProvider
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.DeleteAllTradingNamesPage
+import pages.{DeleteAllTradingNamesPage, HasTradingNamePage, TradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.DeleteAllTradingNamesView
 
@@ -35,6 +36,10 @@ class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new DeleteAllTradingNamesFormProvider()
   private val form = formProvider()
+
+  private val userAnswers = basicUserAnswersWithVatInfo
+    .set(TradingNamePage(Index(0)), "foo trading name").success.value
+    .set(TradingNamePage(Index(1)), "bar trading name").success.value
 
   private lazy val deleteAllTradingNamesRoute = routes.DeleteAllTradingNamesController.onPageLoad().url
 
@@ -56,32 +61,14 @@ class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(DeleteAllTradingNamesPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteAllTradingNamesRoute)
-
-        val view = application.injector.instanceOf[DeleteAllTradingNamesView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), CheckMode)(request, messages(application)).toString
-      }
-    }
-
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must delete all trading names answers and redirect to the next page when user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,7 +78,38 @@ class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = basicUserAnswersWithVatInfo.set(DeleteAllTradingNamesPage, true).success.value
+        val expectedAnswers = userAnswers
+          .set(DeleteAllTradingNamesPage, true).success.value
+          .remove(AllTradingNames).success.value
+
+        println("EXPECTED_ANSWERS: " + expectedAnswers)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must not delete all trading names answers and redirect to the next page when user answers No" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteAllTradingNamesRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+        val expectedAnswers = userAnswers
+          .set(DeleteAllTradingNamesPage, false).success.value
+          .set(HasTradingNamePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url

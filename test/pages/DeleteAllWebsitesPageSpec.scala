@@ -33,7 +33,7 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in CheckMode" - {
 
-      "to Check Your Answers Page when user answers Yes and there are websites present" in {
+      "to Check Your Answers Page when user answers Yes" in {
 
         val answers = emptyUserAnswers
           .set(WebsitePage(Index(0)), "website1").success.value
@@ -44,29 +44,11 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "to Check Your Answers Page when user answers Yes and there are no websites present" in {
-
-        val answers = emptyUserAnswers
-          .set(DeleteAllWebsitesPage, true).success.value
-
-        DeleteAllWebsitesPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Check Your Answers Page when user answers No when there are websites present" in {
+      "to Check Your Answers Page when user answers No" in {
 
         val answers = emptyUserAnswers
           .set(WebsitePage(Index(0)), "website1").success.value
           .set(WebsitePage(Index(1)), "website2").success.value
-          .set(DeleteAllWebsitesPage, false).success.value
-
-        DeleteAllWebsitesPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Check Your Answers Page when user answers No and there are no websites present" in {
-
-        val answers = emptyUserAnswers
           .set(DeleteAllWebsitesPage, false).success.value
 
         DeleteAllWebsitesPage.navigate(CheckMode, answers)
@@ -80,8 +62,6 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
         DeleteAllWebsitesPage.navigate(CheckMode, answers)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
-
     }
-
   }
 }

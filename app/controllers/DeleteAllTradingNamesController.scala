@@ -18,11 +18,14 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteAllTradingNamesFormProvider
+
 import javax.inject.Inject
 import models.Mode
-import pages.DeleteAllTradingNamesPage
+import models.requests.AuthenticatedDataRequest
+import pages.{DeleteAllTradingNamesPage, HasTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.AllTradingNames
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteAllTradingNamesView
 
@@ -41,12 +44,7 @@ class DeleteAllTradingNamesController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(DeleteAllTradingNamesPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+      Ok(view(form, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
@@ -57,10 +55,21 @@ class DeleteAllTradingNamesController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAllTradingNamesPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(DeleteAllTradingNamesPage.navigate(mode, updatedAnswers))
+
+          determineRemoveAllTradingNamesAndRedirect(mode, value)
       )
+  }
+
+  private def determineRemoveAllTradingNamesAndRedirect(mode: Mode, value: Boolean)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    val removeTradingNames = if (value) {
+      request.userAnswers.remove(AllTradingNames)
+    } else {
+      request.userAnswers.set(HasTradingNamePage, true)
+    }
+    for {
+      updatedAnswers <- Future.fromTry(removeTradingNames)
+      calculatedAnswers <- Future.fromTry(updatedAnswers.set(DeleteAllTradingNamesPage, value))
+      _ <- cc.sessionRepository.set(calculatedAnswers)
+    } yield Redirect(DeleteAllTradingNamesPage.navigate(mode, calculatedAnswers))
   }
 }

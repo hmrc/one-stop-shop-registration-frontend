@@ -33,7 +33,7 @@ class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in CheckMode" - {
 
-      "to Check Your Answers Page when the user answers Yes and there are trading names present" in {
+      "to Check Your Answers Page when the user answers Yes" in {
 
         val answers = emptyUserAnswers
           .set(TradingNamePage(Index(0)), "foo trading name").success.value
@@ -44,29 +44,11 @@ class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "to Check Your Answers Page when the user answers Yes and there are no trading names present" in {
-
-        val answers = emptyUserAnswers
-          .set(DeleteAllTradingNamesPage, true).success.value
-
-        DeleteAllTradingNamesPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Check Your Answers Page when the user answers No and there are trading names present" in {
+      "to Check Your Answers Page when the user answers No" in {
 
         val answers = emptyUserAnswers
           .set(TradingNamePage(Index(0)), "foo trading Name").success.value
           .set(TradingNamePage(Index(1)), "bar trading Name").success.value
-          .set(DeleteAllTradingNamesPage, false).success.value
-
-        DeleteAllTradingNamesPage.navigate(CheckMode, answers)
-          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
-      }
-
-      "to Check Your Answers Page when the user answers No and there are no trading names present" in {
-
-        val answers = emptyUserAnswers
           .set(DeleteAllTradingNamesPage, false).success.value
 
         DeleteAllTradingNamesPage.navigate(CheckMode, answers)

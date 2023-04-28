@@ -61,7 +61,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must delete all websites and redirect to the next page when user answers Yes" in {
+    "must delete all websites answers and redirect to the next page when user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -88,7 +88,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must not delete all websites and redirect to the next page when user answers No" in {
+    "must not delete all websites answers and redirect to the next page when user answers No" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 

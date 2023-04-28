@@ -66,7 +66,7 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.WebsiteController.onPageLoad(CheckMode, Index(0)))
         }
 
-        "to Add Websites when there are websites in the users answers" in {
+        "to Add Websites when there are websites in the user's answers" in {
 
           val answers = emptyUserAnswers
             .set(WebsitePage(Index(0)), "foo").success.value
@@ -80,7 +80,7 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Delete All Websites if there are websites present" in {
+        "to Delete All Websites if there are websites in the user's answers" in {
 
           val answers = emptyUserAnswers
             .set(HasWebsitePage, false).success.value
@@ -91,7 +91,7 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.DeleteAllWebsitesController.onPageLoad())
         }
 
-        "to Check Your Answers if there are no websites present" in {
+        "to Check Your Answers if there are no websites in the user's answers" in {
 
           val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
 
