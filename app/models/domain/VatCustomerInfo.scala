@@ -25,7 +25,8 @@ case class VatCustomerInfo(
                             address: DesAddress,
                             registrationDate: LocalDate,
                             partOfVatGroup: Boolean,
-                            organisationName: String,
+                            organisationName: Option[String],
+                            individualName: Option[String],
                             singleMarketIndicator: Option[Boolean]
                           )
 

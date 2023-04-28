@@ -28,15 +28,31 @@ import viewmodels.implicits._
 object VatRegistrationDetailsSummary {
 
   def rowBusinessName(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.vatInfo.map {
+    answers.vatInfo.flatMap {
       answer =>
 
-        val value = HtmlFormat.escape(answer.organisationName).toString
+        answer.organisationName.map { organisationName =>
+          val value = HtmlFormat.escape(organisationName).toString
 
-        SummaryListRowViewModel(
-          key = "vatRegistrationDetails.checkYourAnswers.organisationName",
-          value = ValueViewModel(HtmlContent(value))
-        )
+          SummaryListRowViewModel(
+            key = "vatRegistrationDetails.checkYourAnswers.organisationName",
+            value = ValueViewModel(HtmlContent(value))
+          )
+        }
+    }
+
+  def rowIndividualName(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.vatInfo.flatMap {
+      answer =>
+
+        answer.individualName.map { individualName =>
+          val value = HtmlFormat.escape(individualName).toString
+
+          SummaryListRowViewModel(
+            key = "vatRegistrationDetails.checkYourAnswers.individualName",
+            value = ValueViewModel(HtmlContent(value))
+          )
+        }
     }
 
   def rowPartOfVatUkGroup(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =

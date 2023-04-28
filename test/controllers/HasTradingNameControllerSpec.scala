@@ -71,7 +71,26 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[HasTradingNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, vatCustomerInfo.organisationName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, vatCustomerInfo.organisationName.get)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when we don't have the user's company name but has individual name in their VAT details" in {
+
+      val individualName = "a b c"
+      val vatCustomerInfoWithIndividualName = vatCustomerInfo.copy(organisationName = None, individualName = Some(individualName))
+
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfoWithIndividualName)))).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasTradingNameRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HasTradingNameView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, individualName)(request, messages(application)).toString
       }
     }
 

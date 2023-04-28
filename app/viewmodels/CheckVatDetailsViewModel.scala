@@ -26,7 +26,9 @@ import uk.gov.hmrc.domain.Vrn
 
 case class CheckVatDetailsViewModel(vrn: Vrn, vatCustomerInfo: VatCustomerInfo)(implicit messages: Messages) {
 
-  val organisationName: String = HtmlFormat.escape(vatCustomerInfo.organisationName).toString
+  val organisationName: Option[String] = vatCustomerInfo.organisationName.map(orgName => HtmlFormat.escape(orgName).toString)
+
+  val individualName: Option[String] = vatCustomerInfo.individualName.map(individualName => HtmlFormat.escape(individualName).toString)
 
   val formattedDate: String = vatCustomerInfo.registrationDate.format(dateFormatter)
 

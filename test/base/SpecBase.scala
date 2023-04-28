@@ -71,8 +71,9 @@ trait SpecBase
       registrationDate = LocalDate.now(stubClockAtArbitraryDate),
       address = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
       partOfVatGroup = false,
-      organisationName      = "Company name",
-      singleMarketIndicator =  Some(true)
+      organisationName      = Some("Company name"),
+      singleMarketIndicator =  Some(true),
+      individualName = None
     )
 
   val verifyEmail: VerifyEmail = VerifyEmail(

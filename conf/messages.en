@@ -302,6 +302,7 @@ checkVatDetails.error.required = Select if you want to register this business fo
 checkVatDetails.question = Do you want to register this business for the One Stop Shop Union scheme?
 checkVatDetails.vrn = UK VAT registration number
 checkVatDetails.organisationName = Business name
+checkVatDetails.individualName = Name
 checkVatDetails.partOfVatGroup = Part of a UK VAT group
 checkVatDetails.address = Principal place of business address
 checkVatDetails.yes = Yes
@@ -738,6 +739,7 @@ otherCountryExcludedAndQuarantined.returnBTA = <a class="govuk-link" href="/busi
 
 vatRegistrationDetails.checkYourAnswers.heading = VAT registration details
 vatRegistrationDetails.checkYourAnswers.organisationName = Business name
+vatRegistrationDetails.checkYourAnswers.individualName = Name
 vatRegistrationDetails.checkYourAnswers.partOfVatGroup = Part of a VAT group
 vatRegistrationDetails.checkYourAnswers.vatRegistrationDate = UK VAT registration date
 vatRegistrationDetails.checkYourAnswers.businessAddress = Business address

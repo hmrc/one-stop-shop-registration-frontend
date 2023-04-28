@@ -86,7 +86,15 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
 
   private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
     answers.vatInfo match {
-      case Some(vatInfo) => vatInfo.organisationName.validNec
+      case Some(vatInfo) =>
+        vatInfo.organisationName match {
+          case Some(organisationName) => organisationName.validNec
+          case _ =>
+            vatInfo.individualName match {
+              case Some(individualName) => individualName.validNec
+              case _ => DataMissingError(CheckVatDetailsPage).invalidNec
+            }
+        }
       case _ => DataMissingError(CheckVatDetailsPage).invalidNec
     }
 

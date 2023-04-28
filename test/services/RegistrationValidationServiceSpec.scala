@@ -62,9 +62,10 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         LocalDate.now,
         partOfVatGroup = true,
-        "foo",
-      Some(true)
-    ))
+        Some("foo"),
+        Some("a b c"),
+        Some(true)
+      ))
     )
       .set(BusinessBasedInNiPage, true).success.value
       .set(DateOfFirstSalePage, arbitraryDate).success.value
@@ -111,7 +112,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
         LocalDate.now,
         partOfVatGroup = false,
-        organisationName = "foo",
+        organisationName = Some("foo"),
+        individualName = None,
         singleMarketIndicator = Some(true)
       ))
     )
@@ -143,7 +145,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         registrationDate = regDate,
         address = address,
         partOfVatGroup = false,
-        organisationName = "bar",
+        organisationName = Some("bar"),
+        individualName = Some("a b c"),
         singleMarketIndicator = Some(true)
       )
 
@@ -171,7 +174,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         registrationDate = regDate,
         address = address,
         partOfVatGroup = false,
-        organisationName = "bar",
+        organisationName = Some("bar"),
+        individualName = Some("a b c"),
         singleMarketIndicator = Some(true)
       )
 
@@ -227,7 +231,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         registrationDate = regDate,
         address = address,
         partOfVatGroup = false,
-        organisationName = "bar",
+        organisationName = Some("bar"),
+        individualName = Some("a b c"),
         singleMarketIndicator = Some(true)
       )
 
@@ -258,7 +263,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         registrationDate = regDate,
         address = address,
         partOfVatGroup = false,
-        organisationName = "bar",
+        organisationName = Some("bar"),
+        individualName = Some("a b c"),
         singleMarketIndicator = Some(true)
       )
 

@@ -92,7 +92,8 @@ class ApplicationCompleteController @Inject()(
 
   private def getOrganisationName(answers: UserAnswers): Option[String] =
     answers.vatInfo match {
-      case Some(vatInfo) => Some(vatInfo.organisationName)
+      case Some(vatInfo) if(vatInfo.organisationName.isDefined) => vatInfo.organisationName
+      case Some(vatInfo) if(vatInfo.individualName.isDefined) => vatInfo.individualName
       case _             => None
     }
 }
