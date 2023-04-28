@@ -17,6 +17,7 @@
 package pages
 
 import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import models.UserAnswers
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -30,6 +31,12 @@ case object DeleteAllWebsitesPage extends QuestionPage[Boolean] {
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     answers.get(DeleteAllWebsitesPage) match {
       case Some(_) => routes.CheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    answers.get(DeleteAllWebsitesPage) match {
+      case Some(_) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
 
