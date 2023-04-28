@@ -46,10 +46,11 @@ case object HasWebsitePage extends QuestionPage[Boolean] {
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     (answers.get(HasWebsitePage), answers.get(AllWebsites)) match {
-      case (Some(true), Some(websites)) if websites.nonEmpty => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case (Some(true), _)                                            => routes.WebsiteController.onPageLoad(AmendMode, Index(0))
-      case (Some(false), _)                                           => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _                                                          => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(true), Some(websites)) if websites.nonEmpty  => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case (Some(true), _)                                    => routes.WebsiteController.onPageLoad(AmendMode, Index(0))
+      case (Some(false), Some(websites)) if websites.nonEmpty => routes.DeleteAllWebsitesController.onPageLoad()
+      case (Some(false), _)                                   => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _                                                  => routes.JourneyRecoveryController.onPageLoad()
     }
 
 }
