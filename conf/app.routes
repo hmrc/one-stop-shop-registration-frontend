@@ -367,6 +367,8 @@ POST        /change-your-registration                                           
 
 GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = AmendMode)
 
 GET         /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)
