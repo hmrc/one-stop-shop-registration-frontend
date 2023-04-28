@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("deleteAllWebsites.title"))) {
 
-    @formHelper(action = routes.DeleteAllWebsitesController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.DeleteAllWebsitesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -47,6 +47,6 @@
             content = Text(messages("deleteAllWebsites.warning"))
         ))
 
-        @button("site.continue", routes.DeleteAllWebsitesController.onPageLoad().url)
+        @button("site.continue", routes.DeleteAllWebsitesController.onPageLoad(mode).url)
     }
 }

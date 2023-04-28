@@ -32,6 +32,7 @@ object Mode {
       case NormalMode    => "NormalMode"
       case CheckMode     => "CheckMode"
       case CheckLoopMode => "CheckLoopMode"
+      case AmendMode     => "AmendMode"
     }
   }
 }
