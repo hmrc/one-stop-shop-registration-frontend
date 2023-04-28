@@ -52,5 +52,4 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
       case (Some(false), _)                                          => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _                                                         => routes.JourneyRecoveryController.onPageLoad()
     }
-
 }
