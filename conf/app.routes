@@ -390,7 +390,7 @@ POST        /check-remove-all-previous-registrations                            
 
 GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
 
-GET         /succesful-amend                                                    controllers.amend.AmendCompleteController.onPageLoad()
+GET         /successful-amend                                                   controllers.amend.AmendCompleteController.onPageLoad()
 
 GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
 POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
