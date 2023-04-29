@@ -119,7 +119,7 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.WebsiteController.onPageLoad(AmendMode, Index(0)))
         }
 
-        "to Change Your Registration when there are websites in the user's answers" in {
+        "to Add Website when there are websites in the user's answers" in {
 
           val answers =
             emptyUserAnswers
@@ -127,7 +127,7 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
               .set(HasWebsitePage, true).success.value
 
           HasWebsitePage.navigate(AmendMode, answers)
-            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+            .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
         }
       }
 
