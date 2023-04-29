@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.amend
 
-import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import models.UserAnswers
+import pages.Page
 import play.api.mvc.Call
 
-case object CheckYourAnswersPage extends Page {
+case object ChangeYourRegistrationPage extends Page {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.ApplicationCompleteController.onPageLoad()
+    amendRoutes.AmendCompleteController.onPageLoad()
 }
