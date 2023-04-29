@@ -21,14 +21,14 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import logging.Logging
 import models.{AmendMode, NormalMode}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
-import models.responses.ConflictFound
-import pages.CheckYourAnswersPage
+import pages.amend.ChangeYourRegistrationPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
@@ -117,7 +117,7 @@ class ChangeYourRegistrationController @Inject()(
               auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
               saveForLaterService.saveAnswers(
                 routes.ErrorSubmittingRegistrationController.onPageLoad(),
-                routes.CheckYourAnswersController.onPageLoad()
+                amendRoutes.ChangeYourRegistrationController.onPageLoad()
               )
           }
 
@@ -126,7 +126,7 @@ class ChangeYourRegistrationController @Inject()(
             errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {
-              Redirect(routes.CheckYourAnswersController.onPageLoad()).toFuture
+              Redirect(amendRoutes.ChangeYourRegistrationController.onPageLoad()).toFuture
             }
           ).getOrElse {
             val errorList = errors.toChain.toList
@@ -134,7 +134,7 @@ class ChangeYourRegistrationController @Inject()(
             logger.error(s"Unable to create a registration request from user answers: $errorMessages")
             saveForLaterService.saveAnswers(
               routes.ErrorSubmittingRegistrationController.onPageLoad(),
-              routes.CheckYourAnswersController.onPageLoad()
+              amendRoutes.ChangeYourRegistrationController.onPageLoad()
             )
           }
       }
@@ -144,15 +144,7 @@ class ChangeYourRegistrationController @Inject()(
                                      request: AuthenticatedDataRequest[AnyContent],
                                      registration: Registration
                                    )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
-    if (frontendAppConfig.enrolmentsEnabled) {
-      val emailSent = false
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-        _ <- cc.sessionRepository.set(updatedAnswers)
-      } yield {
-        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
-      }
-    } else {
+    if (frontendAppConfig.amendmentEmailEnabled) {
       emailService.sendConfirmationEmail(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
@@ -165,8 +157,16 @@ class ChangeYourRegistrationController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
             _ <- cc.sessionRepository.set(updatedAnswers)
           } yield {
-            Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
+            Redirect(ChangeYourRegistrationPage.navigate(NormalMode, request.userAnswers))
           }
+      }
+    } else {
+      val emailSent = false
+      for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
+        _ <- cc.sessionRepository.set(updatedAnswers)
+      } yield {
+        Redirect(ChangeYourRegistrationPage.navigate(NormalMode, request.userAnswers))
       }
     }
   }

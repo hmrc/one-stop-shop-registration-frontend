@@ -39,7 +39,7 @@ import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
+import views.html.amend.AmendCompleteView
 
 import java.time.{Clock, LocalDate, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,54 +75,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
     "when the scheme has started" - {
 
-      "must return OK and the correct view for a GET with no enrolments" in {
-
-        val userAnswersWithEmail = userAnswers.copy()
-          .remove(DateOfFirstSalePage).success.value
-          .set(HasMadeSalesPage, false).success.value
-          .set(IsPlanningFirstEligibleSalePage, true).success.value
-          .set(EmailConfirmationQuery, true).success.value
-
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
-          .configure("features.enrolments-enabled" -> "false")
-          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-          .overrides(bind[PeriodService].toInstance(periodService))
-          .overrides(bind[DateService].toInstance(mockDateService))
-          .build()
-
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-        when(mockDateService.startOfNextQuarter) thenReturn arbitraryStartDate
-        when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
-        when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
-
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
-
-        running(application) {
-          implicit val msgs: Messages = messages(application)
-          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
-          val config = application.injector.instanceOf[FrontendAppConfig]
-          val result = route(application, request).value
-          val view = application.injector.instanceOf[ApplicationCompleteView]
-          val commencementDate = mockDateService.calculateCommencementDate(userAnswersWithEmail).futureValue
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
-
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
-            vrn,
-            config.feedbackUrl(request),
-            commencementDate.format(dateFormatter),
-            None,
-            "Company name",
-            periodOfFirstReturn.displayShortText,
-            firstDayOfNextPeriod.format(dateFormatter)
-          )(request, messages(application)).toString
-        }
-      }
-
       "must return OK and the correct view for a GET with enrolments enabled" in {
 
         val userAnswersWithEmail = userAnswers.copy()
@@ -132,7 +84,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
-          .configure("features.enrolments-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -152,7 +103,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val view = application.injector.instanceOf[ApplicationCompleteWithEnrolmentView]
+          val view = application.injector.instanceOf[AmendCompleteView]
           val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
@@ -180,7 +131,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(EmailConfirmationQuery, false).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
-          .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -204,7 +154,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
-          val view = application.injector.instanceOf[ApplicationCompleteView]
+          val view = application.injector.instanceOf[AmendCompleteView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
@@ -228,7 +178,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers))
-          .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -252,7 +201,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
 
-          val view = application.injector.instanceOf[ApplicationCompleteView]
+          val view = application.injector.instanceOf[AmendCompleteView]
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
             vrn,
@@ -282,7 +231,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
             .overrides(bind[DateService].toInstance(mockDateService))
-            .configure("features.enrolments-enabled" -> "false")
             .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
@@ -298,7 +246,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val view = application.injector.instanceOf[ApplicationCompleteView]
+          val view = application.injector.instanceOf[AmendCompleteView]
           val commencementDate = LocalDate.now()
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
@@ -338,7 +286,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
             .overrides(bind[DateService].toInstance(mockDateService))
-            .configure("features.enrolments-enabled" -> "false")
             .build()
 
         running(application) {
@@ -346,7 +293,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val view = application.injector.instanceOf[ApplicationCompleteView]
+          val view = application.injector.instanceOf[AmendCompleteView]
           val commencementDate = LocalDate.of(2021, 10, 1)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
@@ -369,7 +316,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
       "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
 
         val application = applicationBuilder(userAnswers = None)
-          .configure("features.enrolments-enabled" -> "false")
           .overrides(bind[PeriodService].toInstance(periodService))
           .build()
 
