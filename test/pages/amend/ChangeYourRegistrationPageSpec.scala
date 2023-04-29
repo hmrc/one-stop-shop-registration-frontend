@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package pages
+package pages.amend
 
-import controllers.routes
-import models.UserAnswers
-import play.api.mvc.Call
+import base.SpecBase
+import controllers.amend.{routes => amendRoutes}
+import models.NormalMode
 
-case object CheckYourAnswersPage extends Page {
+class ChangeYourRegistrationPageSpec extends SpecBase {
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.ApplicationCompleteController.onPageLoad()
+  "ChangeYourRegistrationPage" - {
+
+    "must navigate in Normal mode" - {
+
+      "to Application Complete" in {
+
+        ChangeYourRegistrationPage.navigate(NormalMode, emptyUserAnswers)
+          .mustBe(amendRoutes.AmendCompleteController.onPageLoad())
+      }
+    }
+  }
 }
