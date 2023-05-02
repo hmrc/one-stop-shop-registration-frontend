@@ -383,6 +383,8 @@ POST        /amend-remove-all-websites                                          
 
 GET         /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = AmendMode)
 
 GET         /check-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = CheckMode)
