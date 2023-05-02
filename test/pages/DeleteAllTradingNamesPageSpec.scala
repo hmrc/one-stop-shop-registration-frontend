@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, Index}
 import pages.behaviours.PageBehaviours
 
 class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
@@ -60,6 +61,39 @@ class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers
 
         DeleteAllTradingNamesPage.navigate(CheckMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in Amend" - {
+
+      "to Change Your Registration Page when the user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(TradingNamePage(Index(0)), "foo trading name").success.value
+          .set(TradingNamePage(Index(1)), "bar trading name").success.value
+          .set(DeleteAllTradingNamesPage, true).success.value
+
+        DeleteAllTradingNamesPage.navigate(AmendMode, answers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+
+      "to Change Your Registration Page when the user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(TradingNamePage(Index(0)), "foo trading Name").success.value
+          .set(TradingNamePage(Index(1)), "bar trading Name").success.value
+          .set(DeleteAllTradingNamesPage, false).success.value
+
+        DeleteAllTradingNamesPage.navigate(AmendMode, answers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+
+      "to Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+
+        DeleteAllTradingNamesPage.navigate(AmendMode, answers)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }

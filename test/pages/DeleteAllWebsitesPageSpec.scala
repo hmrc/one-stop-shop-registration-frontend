@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, Index}
 import pages.behaviours.PageBehaviours
 
 class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
@@ -63,5 +64,39 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
+
+    "must navigate in AmendMode" - {
+
+      "to Change Your Registration Page when user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
+          .set(DeleteAllWebsitesPage, true).success.value
+
+        DeleteAllWebsitesPage.navigate(AmendMode, answers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+
+      "to Change Your Registration Page when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
+          .set(DeleteAllWebsitesPage, false).success.value
+
+        DeleteAllWebsitesPage.navigate(AmendMode, answers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+
+      "to Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+
+        DeleteAllWebsitesPage.navigate(AmendMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
   }
 }
