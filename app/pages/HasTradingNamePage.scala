@@ -40,16 +40,17 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
     (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
       case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty  => routes.AddTradingNameController.onPageLoad(CheckMode)
       case (Some(true), _)                                            => routes.TradingNameController.onPageLoad(CheckMode, Index(0))
-      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad()
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(CheckMode)
       case (Some(false), _)                                           => routes.CheckYourAnswersController.onPageLoad()
       case _                                                          => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
-      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case (Some(true), _)                                           => routes.TradingNameController.onPageLoad(AmendMode, Index(0))
-      case (Some(false), _)                                          => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _                                                         => routes.JourneyRecoveryController.onPageLoad()
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty  => routes.AddTradingNameController.onPageLoad(AmendMode)
+      case (Some(true), _)                                            => routes.TradingNameController.onPageLoad(AmendMode, Index(0))
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(AmendMode)
+      case (Some(false), _)                                           => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _                                                          => routes.JourneyRecoveryController.onPageLoad()
     }
 }
