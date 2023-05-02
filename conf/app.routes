@@ -324,11 +324,15 @@ GET         /sells-goods-to-eu-consumers/:countryIndex                          
 POST        /sells-goods-to-eu-consumers/:countryIndex                          controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
 GET         /check-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
 POST        /check-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /first-check-sells-goods-to-eu-consumers/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
+POST        /first-check-sells-goods-to-eu-consumers/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
 
 GET         /sells-goods-to-eu-consumer-method/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /sells-goods-to-eu-consumer-method/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
 GET         /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
 POST        /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /first-check-sells-goods-to-eu-consumer-method/:countryIndex        controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
+POST        /first-check-sells-goods-to-eu-consumer-method/:countryIndex        controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
 
 GET         /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
@@ -337,6 +341,8 @@ GET         /registration-type/:countryIndex                                    
 POST        /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
 GET         /check-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
 POST        /check-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /first-check-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
+POST        /first-check-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 

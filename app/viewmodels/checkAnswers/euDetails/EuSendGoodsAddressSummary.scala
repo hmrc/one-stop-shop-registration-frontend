@@ -33,7 +33,7 @@ object EuSendGoodsAddressSummary {
       answer =>
 
         val changeLinkMode = currentMode match {
-          case NormalMode    => NormalMode
+          case NormalMode    => CheckLoopMode
           case CheckMode     => CheckMode
           case CheckLoopMode => CheckLoopMode
         }
