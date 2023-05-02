@@ -17,51 +17,51 @@
 package controllers
 
 import base.SpecBase
-import forms.DeleteAllWebsitesFormProvider
+import forms.DeleteAllTradingNamesFormProvider
 import models.{CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{DeleteAllWebsitesPage, HasWebsitePage, WebsitePage}
+import pages.{DeleteAllTradingNamesPage, HasTradingNamePage, TradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.AllWebsites
+import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
-import views.html.DeleteAllWebsitesView
+import views.html.DeleteAllTradingNamesView
 
 import scala.concurrent.Future
 
-class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
+class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider = new DeleteAllWebsitesFormProvider()
+  private val formProvider = new DeleteAllTradingNamesFormProvider()
   private val form = formProvider()
 
   private val userAnswers = basicUserAnswersWithVatInfo
-    .set(WebsitePage(Index(0)), "foo").success.value
-    .set(WebsitePage(Index(1)), "bar").success.value
+    .set(TradingNamePage(Index(0)), "foo trading name").success.value
+    .set(TradingNamePage(Index(1)), "bar trading name").success.value
 
-  private lazy val deleteAllWebsitesRoute = routes.DeleteAllWebsitesController.onPageLoad().url
+  private lazy val deleteAllTradingNamesRoute = routes.DeleteAllTradingNamesController.onPageLoad().url
 
-  "DeleteAllWebsites Controller" - {
+  "DeleteAllTradingNames Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
-        val request = FakeRequest(GET, deleteAllWebsitesRoute)
+        val request = FakeRequest(GET, deleteAllTradingNamesRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[DeleteAllWebsitesView]
+        val view = application.injector.instanceOf[DeleteAllTradingNamesView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
       }
     }
 
-    "must delete all websites answers and redirect to the next page when user answers Yes" in {
+    "must delete all trading names answers and redirect to the next page when user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -74,21 +74,23 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
+          FakeRequest(POST, deleteAllTradingNamesRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
         val expectedAnswers = userAnswers
-          .set(DeleteAllWebsitesPage, true).success.value
-          .remove(AllWebsites).success.value
+          .set(DeleteAllTradingNamesPage, true).success.value
+          .remove(AllTradingNames).success.value
+
+        println("EXPECTED_ANSWERS: " + expectedAnswers)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(CheckMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
-    "must not delete all websites answers and redirect to the next page when user answers No" in {
+    "must not delete all trading names answers and redirect to the next page when user answers No" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -101,16 +103,16 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
+          FakeRequest(POST, deleteAllTradingNamesRoute)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
         val expectedAnswers = userAnswers
-          .set(DeleteAllWebsitesPage, false).success.value
-          .set(HasWebsitePage, true).success.value
+          .set(DeleteAllTradingNamesPage, false).success.value
+          .set(HasTradingNamePage, true).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(CheckMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -121,12 +123,12 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
+          FakeRequest(POST, deleteAllTradingNamesRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[DeleteAllWebsitesView]
+        val view = application.injector.instanceOf[DeleteAllTradingNamesView]
 
         val result = route(application, request).value
 
@@ -140,7 +142,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, deleteAllWebsitesRoute)
+        val request = FakeRequest(GET, deleteAllTradingNamesRoute)
 
         val result = route(application, request).value
 
@@ -155,7 +157,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
+          FakeRequest(POST, deleteAllTradingNamesRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

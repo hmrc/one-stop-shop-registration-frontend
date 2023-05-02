@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{CheckMode, Index, NormalMode}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
@@ -76,63 +76,52 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .mustEqual(routes.TradingNameController.onPageLoad(CheckMode, Index(0)))
         }
 
-        "to Check Your Answers when there are trading names in the user's answers" in {
+        "to Add Trading Name when there are trading names in the user's answers" in {
 
           val answers =
             emptyUserAnswers
-              .set(TradingNamePage(Index(0)), "foo").success.value
+              .set(TradingNamePage(Index(0)), "foo trading name").success.value
               .set(HasTradingNamePage ,true).success.value
 
           HasTradingNamePage.navigate(CheckMode, answers)
-            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+            .mustEqual(routes.AddTradingNameController.onPageLoad(CheckMode))
         }
 
-        "when the answer is empty" - {
-
-          "to Journey recovery" in {
-
-            HasTradingNamePage.navigate(CheckMode, emptyUserAnswers)
-              .mustBe(routes.JourneyRecoveryController.onPageLoad())
-          }
-        }
       }
 
       "when the answer is no" - {
 
-        "to Check Your Answers" in {
+        "to Delete All Trading Names when there are trading names in the user's answers" in {
 
-          val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+          val answers = emptyUserAnswers
+            .set(HasTradingNamePage, false).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasTradingNamePage.navigate(CheckMode, answers)
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad())
+        }
+
+        "to Check Your Answers when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasTradingNamePage, false).success.value
 
           HasTradingNamePage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
         }
+
       }
-    }
 
-    "must remove all trading names when the answer is false" in {
+      "when the answer is empty" - {
 
-      val answers =
-        UserAnswers("id")
-          .set(TradingNamePage(Index(0)), "name 1").success.value
-          .set(TradingNamePage(Index(1)), "name 2").success.value
+        "to Journey recovery" in {
 
-      val result = answers.set(HasTradingNamePage, false).success.value
+          HasTradingNamePage.navigate(CheckMode, emptyUserAnswers)
+            .mustBe(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
 
-      result.get(TradingNamePage(Index(0))) must not be defined
-      result.get(TradingNamePage(Index(1))) must not be defined
-    }
-
-    "must not remove any trading names when the answer is true" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(TradingNamePage(Index(0)), "name 1").success.value
-          .set(TradingNamePage(Index(1)), "name 2").success.value
-
-      val result = answers.set(HasTradingNamePage, true).success.value
-
-      result.get(TradingNamePage(Index(0))).value mustEqual "name 1"
-      result.get(TradingNamePage(Index(1))).value mustEqual "name 2"
     }
   }
 }

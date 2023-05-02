@@ -342,3 +342,6 @@ GET         /sales-declaration-not-required/:countryIndex                       
 
 GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
+
+GET         /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)

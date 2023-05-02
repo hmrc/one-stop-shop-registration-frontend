@@ -21,37 +21,37 @@ import controllers.routes
 import models.{CheckMode, Index}
 import pages.behaviours.PageBehaviours
 
-class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
+class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
 
-  "DeleteAllWebsitesPage" - {
+  "DeleteAllTradingNamesPage" - {
 
-    beRetrievable[Boolean](DeleteAllWebsitesPage)
+    beRetrievable[Boolean](DeleteAllTradingNamesPage)
 
-    beSettable[Boolean](DeleteAllWebsitesPage)
+    beSettable[Boolean](DeleteAllTradingNamesPage)
 
-    beRemovable[Boolean](DeleteAllWebsitesPage)
+    beRemovable[Boolean](DeleteAllTradingNamesPage)
 
     "must navigate in CheckMode" - {
 
-      "to Check Your Answers Page when user answers Yes" in {
+      "to Check Your Answers Page when the user answers Yes" in {
 
         val answers = emptyUserAnswers
-          .set(WebsitePage(Index(0)), "website1").success.value
-          .set(WebsitePage(Index(1)), "website2").success.value
-          .set(DeleteAllWebsitesPage, true).success.value
+          .set(TradingNamePage(Index(0)), "foo trading name").success.value
+          .set(TradingNamePage(Index(1)), "bar trading name").success.value
+          .set(DeleteAllTradingNamesPage, true).success.value
 
-        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+        DeleteAllTradingNamesPage.navigate(CheckMode, answers)
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
-      "to Check Your Answers Page when user answers No" in {
+      "to Check Your Answers Page when the user answers No" in {
 
         val answers = emptyUserAnswers
-          .set(WebsitePage(Index(0)), "website1").success.value
-          .set(WebsitePage(Index(1)), "website2").success.value
-          .set(DeleteAllWebsitesPage, false).success.value
+          .set(TradingNamePage(Index(0)), "foo trading Name").success.value
+          .set(TradingNamePage(Index(1)), "bar trading Name").success.value
+          .set(DeleteAllTradingNamesPage, false).success.value
 
-        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+        DeleteAllTradingNamesPage.navigate(CheckMode, answers)
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
 
@@ -59,7 +59,7 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
 
         val answers = emptyUserAnswers
 
-        DeleteAllWebsitesPage.navigate(CheckMode, answers)
+        DeleteAllTradingNamesPage.navigate(CheckMode, answers)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
