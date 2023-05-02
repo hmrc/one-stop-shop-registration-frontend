@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("deleteAllTradingNames.title"))) {
 
-    @formHelper(action = routes.DeleteAllTradingNamesController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.DeleteAllTradingNamesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -47,6 +47,6 @@
             content = Text(messages("deleteAllTradingNames.warning"))
         ))
 
-        @button("site.continue", routes.DeleteAllTradingNamesController.onPageLoad().url)
+        @button("site.continue", routes.DeleteAllTradingNamesController.onPageLoad(mode).url)
     }
 }
