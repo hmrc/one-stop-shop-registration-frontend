@@ -87,22 +87,29 @@ class RegistrationService {
   private def getEuRegistrationDetails(registration: Registration): Seq[EuOptionalDetails] = {
     registration.euRegistrations.zipWithIndex map {
       case (euVatRegistration: EuVatRegistration, _) =>
-        EuOptionalDetails(euCountry = euVatRegistration.country, None, None, None, None,
-          euVatNumber = Some(euVatRegistration.vatNumber), None, None, None, None, None)
+        EuOptionalDetails(euCountry = euVatRegistration.country, sellsGoodsToEUConsumers = None, vatRegistered = None,
+          sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = Some(euVatRegistration.vatNumber),
+          euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
+          euSendGoodsTradingName = None, euSendGoodsAddress = None)
       case (registrationWithFE: RegistrationWithFixedEstablishment, _) =>
-        EuOptionalDetails(euCountry = registrationWithFE.country, Some(true), None, None, None,
+        EuOptionalDetails(euCountry = registrationWithFE.country, sellsGoodsToEUConsumers = None, vatRegistered = None,
+          sellsGoodsToEUConsumerMethod = None, registrationType = None,
           euVatNumber = registrationWithFE.taxIdentifier.value,
           euTaxReference = Some(registrationWithFE.taxIdentifier.identifierType.toString),
           fixedEstablishmentTradingName = Some(registrationWithFE.fixedEstablishment.tradingName),
-          fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address), None, None)
+          fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address), euSendGoodsTradingName = None, euSendGoodsAddress = None)
       case (registrationWithoutFE: RegistrationWithoutFixedEstablishmentWithTradeDetails, _) =>
-        EuOptionalDetails(euCountry = registrationWithoutFE.country, Some(true), None, None, None,
+        EuOptionalDetails(euCountry = registrationWithoutFE.country, sellsGoodsToEUConsumers = None, vatRegistered = None,
+          sellsGoodsToEUConsumerMethod = None, registrationType = None,
           euVatNumber = registrationWithoutFE.taxIdentifier.value,
           euTaxReference = Some(registrationWithoutFE.taxIdentifier.identifierType.toString),
           fixedEstablishmentTradingName = Some(registrationWithoutFE.tradeDetails.tradingName),
-          fixedEstablishmentAddress = Some(registrationWithoutFE.tradeDetails.address), None, None)
+          fixedEstablishmentAddress = Some(registrationWithoutFE.tradeDetails.address), euSendGoodsTradingName = None, euSendGoodsAddress = None)
       case (registrationWithoutTaxID: RegistrationWithoutTaxId, _) =>
-        EuOptionalDetails(euCountry = registrationWithoutTaxID.country, None, None, None, None, None, None, None, None, None, None)
+        EuOptionalDetails(euCountry = registrationWithoutTaxID.country, sellsGoodsToEUConsumers = None, vatRegistered = None,
+          sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = None,
+          euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
+          euSendGoodsTradingName = None, euSendGoodsAddress = None)
     }
   }
 
