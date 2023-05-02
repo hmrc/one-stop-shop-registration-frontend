@@ -175,8 +175,8 @@ GET         /change-check-tax-details/:index                                    
 POST        /change-check-tax-details/:index                                    controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index, incompletePromptShown: Boolean)
 GET         /first-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index, incompletePromptShown: Boolean)
-GET         /amend-change-check-tax-details/:index                              controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = AmendMode, index: Index)
-POST        /amend-change-check-tax-details/:index                              controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = AmendMode, index: Index, incompletePromptShown: Boolean)
+GET         /amend-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = AmendMode, index: Index, incompletePromptShown: Boolean)
 
 GET         /already-registered                                                 controllers.AlreadyRegisteredController.onPageLoad()
 
