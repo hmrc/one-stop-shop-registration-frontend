@@ -18,7 +18,6 @@ package controllers
 
 import base.SpecBase
 import formats.Format.dateFormatter
-import models.core.{Match, MatchType}
 import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.reset
@@ -51,7 +50,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       "must return OK and the correct view for a GET when user enters date and commencement date is this quarter" in {
         val now = LocalDate.now()
         val nowFormatted = LocalDate.now().format(dateFormatter)
-        val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
+        val dateOfFirstSale = LocalDate.now().withDayOfMonth(1)
 
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, true).success.value
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
