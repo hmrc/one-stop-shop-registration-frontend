@@ -49,8 +49,8 @@ class CheckEuDetailsAnswersController @Inject()(
           val list = SummaryListViewModel(
             rows = Seq(
               SellsGoodsToEUConsumersSummary.row(request.userAnswers, countryIndex, mode),
-              SellsGoodsToEUConsumerMethodSummary.row(request.userAnswers, countryIndex),
-              RegistrationTypeSummary.row(request.userAnswers, countryIndex),
+              SellsGoodsToEUConsumerMethodSummary.row(request.userAnswers, countryIndex, mode),
+              RegistrationTypeSummary.row(request.userAnswers, countryIndex, mode),
               VatRegisteredSummary.row(request.userAnswers, countryIndex, mode),
               EuVatNumberSummary.row(request.userAnswers, countryIndex, mode),
               EuTaxReferenceSummary.row(request.userAnswers, countryIndex, mode),

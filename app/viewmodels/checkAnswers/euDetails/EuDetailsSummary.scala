@@ -32,7 +32,7 @@ object EuDetailsSummary {
   def addToListRows(answers: UserAnswers, currentMode: Mode): Seq[ListItem] = {
 
     val changeLinkMode = currentMode match {
-      case NormalMode => CheckLoopMode
+      case NormalMode => NormalMode
       case CheckMode => CheckMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }
@@ -68,7 +68,7 @@ object EuDetailsSummary {
 
   def countryAndVatNumberList(answers: UserAnswers, currentMode: Mode)(implicit messages: Messages) = {
     val changeLinkMode = currentMode match {
-      case NormalMode => CheckLoopMode
+      case NormalMode => NormalMode
       case CheckMode => CheckMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }

@@ -31,7 +31,7 @@ object FixedEstablishmentTradingNameSummary {
   def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
 
     val changeLinkMode = currentMode match {
-      case NormalMode    => CheckLoopMode
+      case NormalMode    => NormalMode
       case CheckMode     => CheckMode
       case CheckLoopMode => CheckLoopMode
     }
