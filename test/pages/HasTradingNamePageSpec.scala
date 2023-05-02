@@ -17,9 +17,9 @@
 package pages
 
 import base.SpecBase
-import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import controllers.routes
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
@@ -100,7 +100,7 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .set(TradingNamePage(Index(1)), "bar trading name").success.value
 
           HasTradingNamePage.navigate(CheckMode, answers)
-            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad())
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad(CheckMode))
         }
 
         "to Check Your Answers when there are no trading names in the user's answers" in {
@@ -136,30 +136,33 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .mustEqual(routes.TradingNameController.onPageLoad(AmendMode, Index(0)))
         }
 
-        "to Check Your Answers when there are trading names in the user's answers" in {
+        "to Add Trading name when there are trading names in the user's answers" in {
 
-          val answers =
-            emptyUserAnswers
-              .set(TradingNamePage(Index(0)), "foo").success.value
-              .set(HasTradingNamePage, true).success.value
+          val answers = emptyUserAnswers
+            .set(HasTradingNamePage, true).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
 
           HasTradingNamePage.navigate(AmendMode, answers)
-            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+            .mustEqual(routes.AddTradingNameController.onPageLoad(AmendMode))
         }
 
-        "when the answer is empty" - {
-
-          "to Journey recovery" in {
-
-            HasTradingNamePage.navigate(AmendMode, emptyUserAnswers)
-              .mustBe(routes.JourneyRecoveryController.onPageLoad())
-          }
-        }
       }
 
       "when the answer is no" - {
 
-        "to Check Your Answers" in {
+        "to Delete All Trading Names Page when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasTradingNamePage, false).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasTradingNamePage.navigate(AmendMode, answers)
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad(AmendMode))
+        }
+
+        "to Change Your Registration Page when there are no trading names in the user's answers" in {
 
           val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
 
@@ -167,6 +170,16 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
         }
       }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasTradingNamePage.navigate(AmendMode, emptyUserAnswers)
+            .mustBe(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+
     }
   }
 }
