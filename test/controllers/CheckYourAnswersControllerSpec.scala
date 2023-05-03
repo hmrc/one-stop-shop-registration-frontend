@@ -271,7 +271,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-        "must audit the event and redirect to the next page and successfully send email confirmation when enrolment is not enabled" in {
+        "must audit the event and redirect to the next page and successfully send email confirmation when email is enabled" in {
           val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -284,6 +284,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .configure("features.enrolments-enabled" -> "false")
+            .configure("features.registration.email-enabled" -> "true")
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),

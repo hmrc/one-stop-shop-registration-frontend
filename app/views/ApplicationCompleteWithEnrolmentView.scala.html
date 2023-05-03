@@ -22,7 +22,9 @@
 )
 
 @(
+    email: String,
     vrn: Vrn,
+    showEmailConfirmation: Boolean,
     feedbackLink: String,
     commencementDate: String,
     externalUrl: Option[String] = None,
@@ -38,6 +40,12 @@
         </div>
 
         <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
+
+        @if(showEmailConfirmation) {
+          <div class="govuk-body">
+          @Html(messages("applicationComplete.enrolment.confirmation", email))
+          </div>
+        }
 
         <div class="govuk-body">@Html(messages("applicationComplete.reference", vrn.vrn))</div>
 

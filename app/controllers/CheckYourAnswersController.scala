@@ -147,7 +147,7 @@ class CheckYourAnswersController @Inject()(
                                      request: AuthenticatedDataRequest[AnyContent],
                                      registration: Registration
                                    )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
-    if (frontendAppConfig.enrolmentsEnabled) {
+    if (frontendAppConfig.registrationEmailEnabled) {
       val emailSent = false
       for {
         updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))

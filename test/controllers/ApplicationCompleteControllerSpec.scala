@@ -110,7 +110,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -158,7 +160,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -206,7 +210,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -253,7 +259,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val view = application.injector.instanceOf[ApplicationCompleteView]
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -305,7 +313,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -353,7 +363,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
