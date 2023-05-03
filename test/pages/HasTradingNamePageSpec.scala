@@ -179,7 +179,6 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
             .mustBe(routes.JourneyRecoveryController.onPageLoad())
         }
       }
-
     }
   }
 }

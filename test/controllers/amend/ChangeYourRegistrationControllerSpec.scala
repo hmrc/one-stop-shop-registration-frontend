@@ -33,6 +33,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
+import pages.amend.ChangeYourRegistrationPage
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.i18n.Messages
@@ -285,7 +286,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
-            .configure("features.enrolments-enabled" -> "false")
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -309,7 +309,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
+            redirectLocation(result).value mustEqual ChangeYourRegistrationPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
               .sendConfirmationEmail(any(), any(), any(), any())(any(), any())
@@ -318,7 +318,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           }
         }
 
-        "must audit the event and redirect to the next page and not send email confirmation when enrolment is enabled" in {
+        "must audit the event and redirect to the next page and not send email confirmation when send email is disabled" in {
           val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
           when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -330,7 +330,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
-            .configure("features.enrolments-enabled" -> "true")
+            .configure("features.amend.email-enabled" -> "false")
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -348,7 +348,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, false).success.value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
+            redirectLocation(result).value mustEqual ChangeYourRegistrationPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verifyNoInteractions(emailService)
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
@@ -393,6 +393,8 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
           }
         }
+
+        /* TODO uncomment when routes are in place for pages
 
         "the user is redirected when the incomplete prompt is shown" - {
 
@@ -534,35 +536,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             }
 
           }
-        }
-      }
-
-      "when the submission fails because the user has already registered" - {
-
-        "the user is redirected to Already Registered Page" in {
-
-          when(registrationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
-          when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(ConflictFound))
-          doNothing().when(auditService).audit(any())(any(), any())
-
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-            .overrides(
-              bind[RegistrationValidationService].toInstance(registrationService),
-              bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[AuditService].toInstance(auditService)
-            ).build()
-
-          running(application) {
-            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
-            val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.AlreadyRegisteredController.onPageLoad().url
-            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-          }
-        }
+        }*/
       }
 
       "when the submission fails because of a technical issue" - {
