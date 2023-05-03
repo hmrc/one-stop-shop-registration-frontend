@@ -50,5 +50,24 @@ class WebsitePageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
       }
     }
+
+    "must remove all websites if user answers are empty" in {
+
+      val answers = emptyUserAnswers
+
+      val result = answers.get(WebsitePage(Index(0)))
+
+      result must not be defined
+    }
+
+    "must not remove all websites if user answers are defined" in {
+
+      val answers = emptyUserAnswers
+        .set(WebsitePage(Index(0)), "foo").success.value
+
+      val result = answers.get(WebsitePage(Index(0)))
+
+      result mustBe Some("foo")
+    }
   }
 }

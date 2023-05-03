@@ -20,6 +20,9 @@ import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import queries.AllTradingNames
+
+import scala.util.Try
 
 case class TradingNamePage(index: Index) extends QuestionPage[String] {
 
@@ -32,4 +35,12 @@ case class TradingNamePage(index: Index) extends QuestionPage[String] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     routes.AddTradingNameController.onPageLoad(CheckMode)
+
+  override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] = {
+    if (userAnswers.get(AllTradingNames).exists(_.isEmpty)) {
+      userAnswers.remove(AllTradingNames)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+  }
 }

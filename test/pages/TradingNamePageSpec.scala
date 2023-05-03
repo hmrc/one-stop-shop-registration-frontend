@@ -51,5 +51,24 @@ class TradingNamePageSpec extends SpecBase with PageBehaviours {
           .mustBe(routes.AddTradingNameController.onPageLoad(CheckMode))
       }
     }
+
+    "must remove all trading names if user answers are empty" in {
+
+      val answers = emptyUserAnswers
+
+      val result = answers.get(TradingNamePage(Index(0)))
+
+      result must not be defined
+    }
+
+    "must not remove all trading names if user answers are defined" in {
+
+      val answers = emptyUserAnswers
+        .set(TradingNamePage(Index(0)), "foo trading name").success.value
+
+      val result = answers.get(TradingNamePage(Index(0)))
+
+      result mustBe Some("foo trading name")
+    }
   }
 }

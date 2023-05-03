@@ -20,6 +20,9 @@ import controllers.routes
 import models.{CheckMode, Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import queries.AllWebsites
+
+import scala.util.Try
 
 case class WebsitePage(index: Index) extends QuestionPage[String] {
 
@@ -32,4 +35,12 @@ case class WebsitePage(index: Index) extends QuestionPage[String] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     routes.AddWebsiteController.onPageLoad(CheckMode)
+
+  override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] = {
+    if (userAnswers.get(AllWebsites).exists(_.isEmpty)) {
+      userAnswers.remove(AllWebsites)
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+  }
 }
