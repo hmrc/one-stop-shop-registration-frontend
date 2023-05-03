@@ -71,6 +71,7 @@ object EuDetailsSummary {
     val changeLinkMode = currentMode match {
       case NormalMode => NormalMode
       case CheckMode => CheckMode
+      case AmendMode => AmendMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
     }
 

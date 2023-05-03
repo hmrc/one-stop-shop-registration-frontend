@@ -100,22 +100,13 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
       answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
       answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
       case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
-        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
-          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers)
-          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
-        }
-      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
-        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
-          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendMode, answers)
-          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex)
-        }
-      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
-        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
-          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers)
-          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
-        }
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
       case (_, Some(false), _) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, countryIndex)
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+        euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex)
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }

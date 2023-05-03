@@ -94,25 +94,10 @@ class FixedEstablishmentTradingNamePageSpec extends SpecBase with PageBehaviours
 
     "must navigate in Amend mode" - {
 
-      "when Fixed Establishment Address has not been answered" - {
+      "to Fixed Establishment Address" in {
 
-        "to Fixed Establishment Address" in {
-
-          FixedEstablishmentTradingNamePage(index).navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendMode, index))
-        }
-      }
-
-      "when Fixed Establishment Address has already been answered" - {
-
-        "to wherever Fixed Establishment Address would navigate to" in {
-
-          val address = arbitrary[InternationalAddress].sample.value
-          val answers = emptyUserAnswers.set(FixedEstablishmentAddressPage(index), address).success.value
-
-          FixedEstablishmentTradingNamePage(index).navigate(AmendMode, answers)
-            .mustEqual(FixedEstablishmentAddressPage(index).navigate(AmendMode, answers))
-        }
+        FixedEstablishmentTradingNamePage(index).navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendMode, index))
       }
     }
   }
