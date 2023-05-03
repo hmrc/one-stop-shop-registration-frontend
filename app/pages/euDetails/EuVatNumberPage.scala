@@ -135,4 +135,29 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call = {
+    (answers.vatInfo.exists(_.partOfVatGroup),
+      answers.get(SellsGoodsToEUConsumersPage(countryIndex)),
+      answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
+        }
+      case (false, Some(true), Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
+          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
+          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
+        }
+      case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
+        }
+      case (_, Some(false), _) =>
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
 }
