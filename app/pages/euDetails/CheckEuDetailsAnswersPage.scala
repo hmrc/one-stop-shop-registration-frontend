@@ -34,4 +34,7 @@ case object CheckEuDetailsAnswersPage extends Page {
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     euRoutes.AddEuDetailsController.onPageLoad(AmendMode)
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    euRoutes.AddEuDetailsController.onPageLoad(AmendMode)
 }

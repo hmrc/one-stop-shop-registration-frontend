@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import pages.euDetails.VatRegisteredPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -31,8 +31,9 @@ object VatRegisteredSummary {
     val changeLinkMode = currentMode match {
       case NormalMode    => CheckLoopMode
       case CheckMode     => CheckMode
-      case AmendMode     => AmendMode
+      case AmendMode     => AmendLoopMode
       case CheckLoopMode => CheckLoopMode
+      case AmendLoopMode => AmendLoopMode
     }
 
     answers.get(VatRegisteredPage(index)).map {

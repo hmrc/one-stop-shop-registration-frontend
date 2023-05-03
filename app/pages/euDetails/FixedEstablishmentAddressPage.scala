@@ -39,4 +39,7 @@ case class FixedEstablishmentAddressPage(index: Index) extends QuestionPage[Inte
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
 }
