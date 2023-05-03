@@ -46,7 +46,7 @@
                     case PreviousSchemeHintText.OssUnion =>
                         messages("previousOssNumber.hint.union",  countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))
                     case PreviousSchemeHintText.OssNonUnion =>
-                        messages("previousOssNumber.hint.nonunion", countryWithValidationDetails.exampleVrn)
+                        messages("previousOssNumber.hint.nonunion")
                     case PreviousSchemeHintText.Both =>
                         messages("previousOssNumber.hint.default",  countryWithValidationDetails.country.code, countryWithValidationDetails.exampleVrn, countryWithValidationDetails.additionalMessage.getOrElse(""))
                 }
