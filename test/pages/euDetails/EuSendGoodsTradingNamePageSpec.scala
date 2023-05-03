@@ -66,16 +66,11 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
     }
 
     "must navigate in Amend Mode" - {
-      "to Eu Send Goods Address if it hasn't been answered" in {
+      "to Eu Send Goods Address" in {
         EuSendGoodsTradingNamePage(index).navigate(AmendMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(AmendMode, index)
       }
-
-      "to wherever Eu Send Goods Address navigates if it has been answered" in {
-        val address = arbitraryInternationalAddress.arbitrary.sample.value
-        EuSendGoodsTradingNamePage(index).navigate(AmendMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
-          EuSendGoodsAddressPage(index).navigate(AmendMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
-      }
     }
+
   }
 }

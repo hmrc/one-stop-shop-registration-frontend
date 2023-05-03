@@ -84,20 +84,11 @@ case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
       case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
-        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
-          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers)
-          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
-        }
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
-        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
-          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendMode, answers)
-          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex)
-        }
+        euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
-        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
-          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers)
-          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
-        }
+        euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
 

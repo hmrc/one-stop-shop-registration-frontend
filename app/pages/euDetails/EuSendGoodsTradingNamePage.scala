@@ -48,11 +48,7 @@ case class EuSendGoodsTradingNamePage(index: Index) extends QuestionPage[String]
   }
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call = {
-    if (answers.get(EuSendGoodsAddressPage(index)).isEmpty) {
-      euRoutes.EuSendGoodsAddressController.onPageLoad(AmendMode, index)
-    } else {
-      EuSendGoodsAddressPage(index).navigate(AmendMode, answers)
-    }
+    euRoutes.EuSendGoodsAddressController.onPageLoad(AmendMode, index)
   }
 
   override protected def navigateInAmendLoopMode(answers: UserAnswers): Call = {
