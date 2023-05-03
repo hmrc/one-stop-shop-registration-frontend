@@ -54,4 +54,11 @@ case class FixedEstablishmentTradingNamePage(index: Index) extends QuestionPage[
     } else {
       euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendLoopMode, index)
     }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    if (answers.get(FixedEstablishmentAddressPage(index)).isDefined) {
+      FixedEstablishmentAddressPage(index).navigate(AmendLoopMode, answers)
+    } else {
+      euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendLoopMode, index)
+    }
 }
