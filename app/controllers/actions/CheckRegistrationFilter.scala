@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
 import models.requests.AuthenticatedIdentifierRequest
-import models.{AmendMode, Mode}
+import models.{AmendLoopMode, AmendMode, Mode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
@@ -42,7 +42,7 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    if (mode.contains(AmendMode)) {
+    if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
       Future.successful(None)
     } else {
       for {

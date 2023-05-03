@@ -19,7 +19,7 @@ package pages.euDetails
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.euDetails.EuConsumerSalesMethod
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -97,6 +97,26 @@ case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] 
         answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
+        }
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    (answers.vatInfo.exists(_.partOfVatGroup), answers.get(SellsGoodsToEUConsumerMethodPage(countryIndex))) match {
+      case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
+        }
+      case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
+        answers.get(FixedEstablishmentTradingNamePage(countryIndex)) match {
+          case Some(_) => FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
+          case None => euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
+        }
+      case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
+        answers.get(EuSendGoodsTradingNamePage(countryIndex)) match {
+          case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
+          case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
         }
       case _ => routes.JourneyRecoveryController.onPageLoad()
     }
