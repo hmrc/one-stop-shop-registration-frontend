@@ -144,17 +144,6 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.DeleteAllWebsitesController.onPageLoad(AmendMode))
         }
 
-        "to Delete All Websites when there are websites in the user's answers" in {
-
-          val answers = emptyUserAnswers
-            .set(HasWebsitePage, false).success.value
-            .set(WebsitePage(Index(0)), "foo").success.value
-            .set(WebsitePage(Index(1)), "bar").success.value
-
-          HasWebsitePage.navigate(AmendMode, answers)
-            .mustEqual(routes.DeleteAllWebsitesController.onPageLoad(AmendMode))
-        }
-
         "to Change Your Registration when there are no websites in the user's answers" in {
 
           val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
