@@ -148,14 +148,6 @@ class CheckYourAnswersController @Inject()(
                                      registration: Registration
                                    )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
     if (frontendAppConfig.registrationEmailEnabled) {
-      val emailSent = false
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-        _ <- cc.sessionRepository.set(updatedAnswers)
-      } yield {
-        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
-      }
-    } else {
       emailService.sendConfirmationEmail(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
@@ -170,6 +162,14 @@ class CheckYourAnswersController @Inject()(
           } yield {
             Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
           }
+      }
+    } else {
+      val emailSent = false
+      for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
+        _ <- cc.sessionRepository.set(updatedAnswers)
+      } yield {
+        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
       }
     }
   }
