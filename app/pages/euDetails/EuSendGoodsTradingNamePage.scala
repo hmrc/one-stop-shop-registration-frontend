@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -52,6 +52,14 @@ case class EuSendGoodsTradingNamePage(index: Index) extends QuestionPage[String]
       euRoutes.EuSendGoodsAddressController.onPageLoad(AmendMode, index)
     } else {
       EuSendGoodsAddressPage(index).navigate(AmendMode, answers)
+    }
+  }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call = {
+    if (answers.get(EuSendGoodsAddressPage(index)).isEmpty) {
+      euRoutes.EuSendGoodsAddressController.onPageLoad(AmendLoopMode, index)
+    } else {
+      EuSendGoodsAddressPage(index).navigate(AmendLoopMode, answers)
     }
   }
 
