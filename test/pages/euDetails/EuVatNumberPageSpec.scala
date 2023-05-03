@@ -347,7 +347,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
         "when user sells goods to consumers in the EU" - {
 
-          "to Fixed Establishment Trading Name for the same index when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
+          "to Fixed Establishment Trading Name for the same index when Sells Goods To EU Consumer Method is Fixed Establishment" in {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
@@ -357,18 +357,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
               .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex))
           }
 
-          "to wherever Fixed Establishment Trading Name would navigate for the same index when Sells Goods To EU Consumer Method is Fixed Establishment when it has been answered" in {
-
-            val answers = emptyUserAnswers
-              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
-              .set(FixedEstablishmentTradingNamePage(countryIndex), "Foo").success.value
-
-            EuVatNumberPage(countryIndex).navigate(AmendMode, answers)
-              .mustEqual(FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendMode, answers))
-          }
-
-          "to EU Send Goods Trading Name for the same index when Sells Goods To EU Consumer Method is Warehouse Dispatch and it has not been answered" in {
+          "to EU Send Goods Trading Name for the same index when Sells Goods To EU Consumer Method is Warehouse Dispatch" in {
 
             val answers = emptyUserAnswers
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
@@ -376,17 +365,6 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
             EuVatNumberPage(countryIndex).navigate(AmendMode, answers)
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex))
-          }
-
-          "to wherever EU Send Goods Trading Name would navigate for the same index when Sells Goods To EU Consumer Method is Warehouse Dispatch when it has been answered" in {
-
-            val answers = emptyUserAnswers
-              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
-              .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
-
-            EuVatNumberPage(countryIndex).navigate(AmendMode, answers)
-              .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers))
           }
 
         }
@@ -410,7 +388,7 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
         "when user sells goods to consumers in the EU" - {
 
-          "to EU Send Goods Trading Name for the same index and it has not been answered" in {
+          "to EU Send Goods Trading Name for the same index" in {
 
             val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
               .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
@@ -420,21 +398,9 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
               .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex))
           }
 
-          "to wherever EU Send Goods Trading Name would navigate to for the same index when it has been answered" in {
-
-            val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
-              .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
-
-            EuVatNumberPage(countryIndex).navigate(AmendMode, answers)
-              .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendMode, answers))
-          }
-
         }
 
       }
-
     }
 
   }
