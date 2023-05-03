@@ -59,4 +59,12 @@ case class EuSendGoodsTradingNamePage(index: Index) extends QuestionPage[String]
     }
   }
 
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call = {
+    if (answers.get(EuSendGoodsAddressPage(index)).isEmpty) {
+      euRoutes.EuSendGoodsAddressController.onPageLoad(AmendLoopMode, index)
+    } else {
+      EuSendGoodsAddressPage(index).navigate(AmendLoopMode, answers)
+    }
+  }
+
 }
