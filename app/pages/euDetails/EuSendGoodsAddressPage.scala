@@ -39,4 +39,7 @@ case class EuSendGoodsAddressPage(index: Index) extends QuestionPage[Internation
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
 }

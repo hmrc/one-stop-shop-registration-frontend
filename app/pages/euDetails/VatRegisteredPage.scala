@@ -18,7 +18,7 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -76,6 +76,20 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
         }
       case Some(false) =>
           euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index)
+      case None =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(AmendLoopMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(AmendLoopMode, index)
+        }
+      case Some(false) =>
+        euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }

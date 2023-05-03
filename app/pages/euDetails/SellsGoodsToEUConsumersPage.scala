@@ -17,6 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
+import models.{AmendLoopMode, AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
@@ -65,6 +66,16 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckLoopMode, countryIndex)
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
+      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(true) =>
+        euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendLoopMode, countryIndex)
+      case Some(false) =>
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
