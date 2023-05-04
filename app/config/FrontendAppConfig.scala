@@ -46,6 +46,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
   val ivUpliftUrl: String      = configuration.get[String]("urls.ivUplift")
   val emailVerificationUrl: String      = configuration.get[String]("urls.emailVerificationUrl")
   val ossCompleteReturnUrl: String = configuration.get[String]("urls.ossCompleteReturnGuidanceUrl")
+  val ossYourAccountUrl: String = configuration.get[String]("urls.yourAccountUrl")
 
   val ivEvidenceStatusUrl: String =
     s"${configuration.get[Service]("microservice.services.identity-verification").baseUrl}/disabled-evidences?origin=$origin"
