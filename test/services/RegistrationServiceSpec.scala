@@ -18,7 +18,6 @@ package services
 
 import base.SpecBase
 import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
-import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
@@ -46,41 +45,53 @@ class RegistrationServiceSpec
       .set(HasMadeSalesPage, true).success.value
       .set(HasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
+      .set(TaxRegisteredInEuPage, true).success.value
+
+      .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+      .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
+      .set(EuTaxReferencePage(Index(0)), "vat").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(0)), "French trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
+
+      .set(EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
+      .set(EuVatNumberPage(Index(1)), "DE123456789").success.value
+
+      .set(EuCountryPage(Index(2)), Country("IE", "Ireland")).success.value
+      .set(EuVatNumberPage(Index(2)), "IE123456789").success.value
+      .set(EuTaxReferencePage(Index(2)), "other").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(2)), "Irish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
+
+      .set(EuCountryPage(Index(3)), Country("CR", "Croatia")).success.value
+
+      .set(EuCountryPage(Index(4)), Country("ES", "Spain")).success.value
+      .set(EuVatNumberPage(Index(4)), "ES123456789").success.value
+      .set(EuTaxReferencePage(Index(4)), "vat").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(4)), "Spanish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
+
+      .set(EuCountryPage(Index(5)), Country("DK", "Denmark")).success.value
+      .set(EuVatNumberPage(Index(5)), "DK123456789").success.value
+      .set(EuTaxReferencePage(Index(5)), "other").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(5)), "Danish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(5)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
+
       .set(IsOnlineMarketplacePage, false).success.value
       .set(HasWebsitePage, true).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
-      .set(BankDetailsPage, BankDetails("Account name", Some(Bic("ABCDGB2A").get), Iban("GB33BUKB20201555555555").getOrElse(throw new Exception("TODO")))).success.value
+
+      .set(BankDetailsPage, BankDetails("Account name", Some(Bic("ABCDGB2A").get), Iban("GB33BUKB20201555555555").
+        getOrElse(throw new Exception("TODO")))).success.value
+
       .set(IsPlanningFirstEligibleSalePage, true).success.value
-      .set(PreviouslyRegisteredPage, false).success.value
-      .set(TaxRegisteredInEuPage, true).success.value
-      .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-      .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(Index(0)), EuConsumerSalesMethod.DispatchWarehouse).success.value
-      .set(RegistrationTypePage(Index(0)), RegistrationType.VatNumber).success.value
-      .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-      .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
-      .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
-      .set(EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
-      .set(SellsGoodsToEUConsumersPage(Index(1)), false).success.value
-      .set(VatRegisteredPage(Index(1)), true).success.value
-      .set(EuVatNumberPage(Index(1)), "DE123456789").success.value
-      .set(EuCountryPage(Index(2)), Country("IE", "Ireland")).success.value
-      .set(SellsGoodsToEUConsumersPage(Index(2)), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(Index(2)), EuConsumerSalesMethod.DispatchWarehouse).success.value
-      .set(RegistrationTypePage(Index(2)), RegistrationType.TaxId).success.value
-      .set(EuTaxReferencePage(Index(2)), "IE123456789").success.value
-      .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
-      .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
-      .set(EuCountryPage(Index(3)), Country("CR", "Croatia")).success.value
-      .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
-      .set(VatRegisteredPage(Index(3)), false).success.value
+      .set(PreviouslyRegisteredPage, true).success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-      .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
+
 
   ".toUserAnswers" - {
 
