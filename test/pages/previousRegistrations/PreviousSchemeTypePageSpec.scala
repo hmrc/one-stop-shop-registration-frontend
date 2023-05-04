@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import models.{CheckMode, Index, NormalMode, PreviousSchemeType}
+import models.{AmendMode, CheckMode, Index, NormalMode, PreviousSchemeType}
 import pages.behaviours.PageBehaviours
 
 class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
@@ -69,5 +69,25 @@ class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
           .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(CheckMode, index, index))
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to OSS scheme number when OSS is selected" in {
+
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.OSS).success.value
+
+        PreviousSchemeTypePage(index, index).navigate(AmendMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(AmendMode, index, index))
+      }
+
+      "to IOSS scheme when IOSS is selected" in {
+
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.IOSS).success.value
+
+        PreviousSchemeTypePage(index, index).navigate(AmendMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(AmendMode, index, index))
+      }
+    }
+
   }
 }
