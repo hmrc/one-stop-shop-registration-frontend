@@ -18,9 +18,10 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.previousRegistrations.PreviousSchemeNumbers
-import models.{CheckMode, Country, Index, NormalMode}
+import models._
 import pages.behaviours.PageBehaviours
 
 class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -129,6 +130,85 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "when the answer is yes" - {
+
+        "and there are already some previous registrations in the user's answers" - {
+
+          "to Change Your Registration" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(PreviouslyRegisteredPage, true).success.value
+                .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+                .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
+
+            PreviouslyRegisteredPage.navigate(AmendMode, answers)
+              .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+          }
+        }
+
+        "and there are no previous registrations in the user's answers" - {
+
+          "to Previous EU Country with index 0" in {
+
+            val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+
+            PreviouslyRegisteredPage.navigate(CheckMode, answers)
+              .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(0)))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Change Your Registration" in {
+
+          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+
+          PreviouslyRegisteredPage.navigate(AmendMode, answers)
+            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          PreviouslyRegisteredPage.navigate(AmendMode, emptyUserAnswers)
+            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+
+    "must remove all previous registrations when the answer is no" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
+
+      val result = answers.set(PreviouslyRegisteredPage, false).success.value
+
+      result.get(PreviousEuCountryPage(Index(0))) must not be defined
+      result.get(PreviousOssNumberPage(Index(0), Index(0))) must not be defined
+    }
+
+    "must leave all previous registrations in place when the answer is yes" in {
+
+      val answers =
+        emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
+
+      val result = answers.set(PreviouslyRegisteredPage, true).success.value
+
+      result.get(PreviousEuCountryPage(Index(0))).value mustEqual Country("FR", "France")
+      result.get(PreviousOssNumberPage(Index(0), Index(0))).value mustEqual PreviousSchemeNumbers("123", None)
     }
   }
 }
