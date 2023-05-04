@@ -796,6 +796,15 @@ changeYourRegistration.title = Change Your Registration
 changeYourRegistration.heading = Change Your Registration
 changeYourRegistration.info.p1 = Confirm these changes to save them to your account.
 
+amendComplete.title = Registration details changed
+amendComplete.heading = Registration details changed
+amendComplete.info = You changed the following details:
+amendComplete.link.BTA = Manage your One Stop Shop returns in your account.
+amendComplete.link.yourAccount = Manage your One Stop Shop returns in your account.
+amendComplete.contact.text = We’ll contact you if we need to check any information.
+amendComplete.feedback.link.text = What did you think of this service?
+amendComplete.feedback.30seconds = (takes 30 seconds)
+
 deleteAllWebsites.title = Remove all your website information from this scheme?
 deleteAllWebsites.heading = Remove all your website information from this scheme?
 deleteAllWebsites.warning = This will delete all the trading websites you have added.
