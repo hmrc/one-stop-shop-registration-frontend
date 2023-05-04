@@ -17,9 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{AmendLoopMode, AmendMode, CheckMode, Index, NormalMode, UserAnswers}
-import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -65,7 +63,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(true) =>
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckLoopMode, countryIndex)
       case Some(false) =>
-        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }
