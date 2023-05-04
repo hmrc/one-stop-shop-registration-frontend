@@ -65,6 +65,7 @@ class AmendCompleteController @Inject()(
                   frontendAppConfig.feedbackUrl,
                   calculatedCommencementDate.format(dateFormatter),
                   savedUrl,
+                  frontendAppConfig.ossYourAccountUrl,
                   organisationName,
                   periodOfFirstReturn.displayShortText,
                   firstDayOfNextPeriod.format(dateFormatter)

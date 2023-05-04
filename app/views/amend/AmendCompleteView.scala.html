@@ -26,37 +26,34 @@
     feedbackLink: String,
     commencementDate: String,
     externalUrl: Option[String] = None,
+    yourAccountUrl: String,
     organisationName: String,
     periodOfFirstReturn: String,
     firstDayOfNextPeriod: String
 )(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("applicationComplete.title")),  showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("amendComplete.title")), showBackLink = false) {
     <div class="grid-row column-two-thirds" id="application_complete_id">
         <div class="govuk-panel govuk-panel--confirmation">
-            <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
+            <h1 class="govuk-panel__title">@messages("amendComplete.heading")</h1>
         </div>
 
-        <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
+        @*<div class="govuk-body">@messages("amendComplete.info")</div>*@
 
-        <div class="govuk-body">@Html(messages("applicationComplete.reference", vrn.vrn))</div>
+        @externalUrl match {
+          case Some(url) => {
+            @Html(
+            s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("amendComplete.link.BTA") + "</a></p>"
+            )
+          }
+          case _ => {
+            @Html(
+              s"""<p class="govuk-body"><a href=$yourAccountUrl id="back-to-your-account" class="govuk-link">""" + messages("amendComplete.link.yourAccount") + "</a></p>"
+            )
+          }
+        }
 
-        <div class="govuk-body">@messages("applicationComplete.useService.text")</div>
-
-        <div class="govuk-body">@messages("applicationComplete.payVat.text")</div>
-
-        <div class="govuk-body">@messages("applicationComplete.returns.text", periodOfFirstReturn, firstDayOfNextPeriod, commencementDate)</div>
-
-        <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
-
-        @externalUrl.map(
-        url => Html(
-        s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("applicationComplete.link.BTA") + "</a></p>"
-        ))
-
-        <p class="govuk-body">@messages("applicationComplete.contact.text")</p>
-
-        <p class="govuk-body">@Html(messages("applicationComplete.readInformation"))</p>
+        <p class="govuk-body">@messages("amendComplete.contact.text")</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
