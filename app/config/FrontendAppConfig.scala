@@ -87,4 +87,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
 
   val emailVerificationEnabled: Boolean = configuration.get[Boolean]("features.email-verification-enabled")
 
+  val registrationEmailEnabled: Boolean = configuration.get[Boolean]("features.registration.email-enabled")
+
 }

@@ -83,6 +83,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "false")
+          .configure("features.registration.email-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -110,7 +111,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "test@test.com",
             vrn,
+            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -131,6 +134,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "true")
+          .configure("features.registration.email-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -158,7 +162,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "test@test.com",
             vrn,
+            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -206,7 +212,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "",
             vrn,
+            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -227,6 +235,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(answers))
           .configure("features.enrolments-enabled" -> "false")
+          .configure("features.registration.email-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -253,7 +262,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val view = application.injector.instanceOf[ApplicationCompleteView]
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
+            "test@test.com",
             vrn,
+            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -281,6 +292,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             .overrides(bind[PeriodService].toInstance(periodService))
             .overrides(bind[DateService].toInstance(mockDateService))
             .configure("features.enrolments-enabled" -> "false")
+            .configure("features.registration.email-enabled" -> "true")
             .build()
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
@@ -305,7 +317,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual view(
+            "test@test.com",
             vrn,
+            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -337,6 +351,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             .overrides(bind[PeriodService].toInstance(periodService))
             .overrides(bind[DateService].toInstance(mockDateService))
             .configure("features.enrolments-enabled" -> "false")
+            .configure("features.registration.email-enabled" -> "true")
             .build()
 
         running(application) {
@@ -353,7 +368,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual view(
+            "test@test.com",
             vrn,
+            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,

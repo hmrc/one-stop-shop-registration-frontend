@@ -21,8 +21,11 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.UserAnswers
+import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.twirl.api.HtmlFormat
+import queries.EmailConfirmationQuery
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
@@ -55,6 +58,8 @@ class ApplicationCompleteController @Inject()(
       } yield {
           {for {
             organisationName <- getOrganisationName(request.userAnswers)
+            contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)
+            showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
           } yield {
             val savedUrl = externalEntryUrl.fold(_ => None, _.url)
             val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
@@ -63,7 +68,9 @@ class ApplicationCompleteController @Inject()(
             if(frontendAppConfig.enrolmentsEnabled) {
               Ok(
                 viewEnrolments(
+                  HtmlFormat.escape(contactDetails.emailAddress).toString,
                   request.vrn,
+                  showEmailConfirmation,
                   frontendAppConfig.feedbackUrl,
                   calculatedCommencementDate.format(dateFormatter),
                   savedUrl,
@@ -75,7 +82,9 @@ class ApplicationCompleteController @Inject()(
             } else {
               Ok(
                 view(
+                  HtmlFormat.escape(contactDetails.emailAddress).toString,
                   request.vrn,
+                  showEmailConfirmation,
                   frontendAppConfig.feedbackUrl,
                   calculatedCommencementDate.format(dateFormatter),
                   savedUrl,
