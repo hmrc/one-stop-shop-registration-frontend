@@ -77,8 +77,8 @@ class CheckEuDetailsAnswersControllerSpec extends SpecBase with SummaryListFluen
         val list = SummaryListViewModel(
           Seq(
             SellsGoodsToEUConsumersSummary.row(answers, countryIndex, NormalMode),
-            SellsGoodsToEUConsumerMethodSummary.row(answers, countryIndex),
-            RegistrationTypeSummary.row(answers, countryIndex),
+            SellsGoodsToEUConsumerMethodSummary.row(answers, countryIndex, NormalMode),
+            RegistrationTypeSummary.row(answers, countryIndex, NormalMode),
             EuTaxReferenceSummary.row(answers, countryIndex, NormalMode),
             EuSendGoodsTradingNameSummary.row(answers, countryIndex, NormalMode),
             EuSendGoodsAddressSummary.row(answers, countryIndex, NormalMode)).flatten
