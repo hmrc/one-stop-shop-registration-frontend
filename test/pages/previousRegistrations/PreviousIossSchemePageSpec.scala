@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import models.{Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousIossSchemePageSpec extends SpecBase with PageBehaviours {
@@ -34,12 +34,33 @@ class PreviousIossSchemePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to IOSS scheme number" in {
+      "to Previous IOSS scheme number" in {
 
         PreviousIossSchemePage(index, index).navigate(NormalMode, emptyUserAnswers)
           .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index))
       }
 
     }
+
+    "must navigate in Check mode" - {
+
+      "to Previous IOSS scheme number" in {
+
+        PreviousIossSchemePage(index, index).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, index, index))
+      }
+
+    }
+
+    "must navigate in Amend mode" - {
+
+      "to Previous IOSS scheme number" in {
+
+        PreviousIossSchemePage(index, index).navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(AmendMode, index, index))
+      }
+
+    }
+
   }
 }

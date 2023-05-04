@@ -151,7 +151,7 @@ trait SpecBase
         HasMadeSalesSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         IsPlanningFirstEligibleSaleSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         Some(commencementDateSummary),
-        PreviouslyRegisteredSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        PreviouslyRegisteredSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         TaxRegisteredInEuSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         EuDetailsSummary.checkAnswersRow(answers, mode),
         IsOnlineMarketplaceSummary.row(answers, mode),
