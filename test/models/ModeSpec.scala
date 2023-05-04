@@ -42,6 +42,16 @@ class ModeSpec extends AnyFreeSpec with Matchers {
 
         literal.to(CheckLoopMode) mustEqual "CheckLoopMode"
       }
+
+      "from AmendMode" in {
+
+        literal.to(AmendMode) mustEqual "AmendMode"
+      }
+
+      "from AmendLoopMode" in {
+
+        literal.to(AmendLoopMode) mustEqual "AmendLoopMode"
+      }
     }
   }
 }

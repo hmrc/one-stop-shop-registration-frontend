@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
@@ -34,14 +34,14 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal Mode" - {
       "to Eu Send Goods Address" in {
-        EuSendGoodsTradingNamePage(index).navigate(NormalMode, emptyUserAnswers)mustBe
+        EuSendGoodsTradingNamePage(index).navigate(NormalMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index)
       }
     }
 
     "must navigate in Check Mode" - {
       "to Eu Send Goods Address if it hasn't been answered" in {
-        EuSendGoodsTradingNamePage(index).navigate(CheckMode, emptyUserAnswers)mustBe
+        EuSendGoodsTradingNamePage(index).navigate(CheckMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(CheckMode, index)
       }
 
@@ -54,7 +54,7 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Check Loop Mode" - {
       "to Eu Send Goods Address if it hasn't been answered" in {
-        EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, emptyUserAnswers)mustBe
+        EuSendGoodsTradingNamePage(index).navigate(CheckLoopMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(CheckLoopMode, index)
       }
 
@@ -69,6 +69,19 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
       "to Eu Send Goods Address" in {
         EuSendGoodsTradingNamePage(index).navigate(AmendMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(AmendMode, index)
+      }
+    }
+
+    "must navigate in Amend Loop Mode" - {
+      "to Eu Send Goods Address if it hasn't been answered" in {
+        EuSendGoodsTradingNamePage(index).navigate(AmendLoopMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(AmendLoopMode, index)
+      }
+
+      "to wherever Eu Send Goods Address navigates if it has been answered" in {
+        val address = arbitraryInternationalAddress.arbitrary.sample.value
+        EuSendGoodsTradingNamePage(index).navigate(AmendLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
+          EuSendGoodsAddressPage(index).navigate(AmendLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
       }
     }
 
