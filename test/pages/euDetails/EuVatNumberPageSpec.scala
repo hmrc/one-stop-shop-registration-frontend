@@ -19,7 +19,7 @@ package pages.euDetails
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import models.euDetails.EuConsumerSalesMethod
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -401,6 +401,115 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+    }
+
+    "must navigate in Amend Loop mode" - {
+
+      "when user is not part of VAT group" - {
+
+        "when user does not sell goods to consumers in the EU" - {
+
+          "to Check EU Details for the same index" in {
+
+            val answers = emptyUserAnswers
+              .set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, countryIndex))
+          }
+
+        }
+
+        "when user sells goods to consumers in the EU" - {
+
+          "to Fixed Establishment Trading Name for the same index when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
+
+            val answers = emptyUserAnswers
+              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendLoopMode, countryIndex))
+          }
+
+          "to wherever Fixed Establishment Trading Name would navigate for the same index when Sells Goods To EU Consumer Method is Fixed Establishment when it has been answered" in {
+
+            val answers = emptyUserAnswers
+              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+              .set(FixedEstablishmentTradingNamePage(countryIndex), "Foo").success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(FixedEstablishmentTradingNamePage(countryIndex).navigate(AmendLoopMode, answers))
+          }
+
+          "to EU Send Goods Trading Name for the same index when Sells Goods To EU Consumer Method is Warehouse Dispatch and it has not been answered" in {
+
+            val answers = emptyUserAnswers
+              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex))
+          }
+
+          "to wherever EU Send Goods Trading Name would navigate for the same index when Sells Goods To EU Consumer Method is Warehouse Dispatch when it has been answered" in {
+
+            val answers = emptyUserAnswers
+              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers))
+          }
+
+        }
+
+      }
+
+      "when user is part of VAT group" - {
+
+        "when user does not sell goods to consumers in the EU" - {
+
+          "to Check Eu Details Answers for the same index" in {
+
+            val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+              .set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, countryIndex))
+          }
+
+        }
+
+        "when user sells goods to consumers in the EU" - {
+
+          "to EU Send Goods Trading Name for the same index and it has not been answered" in {
+
+            val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex))
+          }
+
+          "to wherever EU Send Goods Trading Name would navigate to for the same index when it has been answered" in {
+
+            val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+              .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+              .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+              .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
+
+            EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+              .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers))
+          }
+
+        }
+
+      }
+
     }
 
   }
