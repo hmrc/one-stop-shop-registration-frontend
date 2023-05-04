@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
@@ -34,21 +34,21 @@ class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal Mode" - {
       "to Check Eu Details Answers" in {
-        EuSendGoodsAddressPage(index).navigate(NormalMode, emptyUserAnswers)mustBe
+        EuSendGoodsAddressPage(index).navigate(NormalMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
       }
     }
 
     "must navigate in Check Mode" - {
       "to Check Eu Details Answers" in {
-        EuSendGoodsAddressPage(index).navigate(CheckMode, emptyUserAnswers)mustBe
+        EuSendGoodsAddressPage(index).navigate(CheckMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
       }
     }
 
     "must navigate in Check Loop Mode" - {
       "to Check Eu Details Answers" in {
-        EuSendGoodsAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers)mustBe
+        EuSendGoodsAddressPage(index).navigate(CheckLoopMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
       }
     }
@@ -56,6 +56,13 @@ class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
     "must navigate in Amend Mode" - {
       "to Check Eu Details Answers" in {
         EuSendGoodsAddressPage(index).navigate(AmendMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
+      }
+    }
+
+    "must navigate in Amend Loop Mode" - {
+      "to Check Eu Details Answers" in {
+        EuSendGoodsAddressPage(index).navigate(AmendLoopMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
       }
     }
