@@ -16,15 +16,20 @@
 
 package pages.previousRegistrations
 
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import controllers.previousRegistrations.routes
 import play.api.mvc.Call
 
 case class PreviousIossNumberPage(countryIndex: Index, schemeIndex: Index)
   extends PreviousSchemeNumbersPage {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)
+    routes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, countryIndex)
+    routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, countryIndex)
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, countryIndex)
+
 }

@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -29,7 +29,7 @@ case class DeletePreviousSchemePage(countryIndex: Index) extends QuestionPage[Bo
 
   override def toString: String = "deletePreviousScheme"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+  override protected def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.get(DeriveNumberOfPreviousRegistrations), answers.get(DeriveNumberOfPreviousSchemes(countryIndex))) match {
       case (_, Some(numberOfSchemes)) if numberOfSchemes > 0 =>
         prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)
@@ -38,9 +38,8 @@ case class DeletePreviousSchemePage(countryIndex: Index) extends QuestionPage[Bo
       case _ =>
         prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     }
-  }
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(DeriveNumberOfPreviousRegistrations), answers.get(DeriveNumberOfPreviousSchemes(countryIndex))) match {
       case (_, Some(numberOfSchemes)) if numberOfSchemes > 0 =>
         prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, countryIndex)
@@ -49,7 +48,16 @@ case class DeletePreviousSchemePage(countryIndex: Index) extends QuestionPage[Bo
       case _ =>
         prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode)
     }
-  }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    (answers.get(DeriveNumberOfPreviousRegistrations), answers.get(DeriveNumberOfPreviousSchemes(countryIndex))) match {
+      case (_, Some(numberOfSchemes)) if numberOfSchemes > 0 =>
+        prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, countryIndex)
+      case (Some(numberOfCountries), _) if numberOfCountries > 0 =>
+        prevRegRoutes.AddPreviousRegistrationController.onPageLoad(AmendMode)
+      case _ =>
+        prevRegRoutes.PreviouslyRegisteredController.onPageLoad(AmendMode)
+    }
 
 }
 

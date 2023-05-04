@@ -17,8 +17,9 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -45,6 +46,14 @@ case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
       case (Some(true), _)                      => prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(0))
       case (Some(false), _)                     => routes.CheckYourAnswersController.onPageLoad()
       case _                                    => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    (answers.get(PreviouslyRegisteredPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
+      case (Some(true), Some(size)) if size > 0 => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case (Some(true), _) => prevRegRoutes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0))
+      case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =

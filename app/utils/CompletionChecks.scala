@@ -77,28 +77,28 @@ trait CompletionChecks {
       .find(indexedDetails => incompleteCountries.contains(indexedDetails._1.euCountry))
   }
 
-  def isTradingNamesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def isTradingNamesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasTradingNamePage).exists {
       case true => request.userAnswers.get(AllTradingNames).getOrElse(List.empty).nonEmpty
       case false => true
     }
   }
 
-  def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasMadeSalesPage).exists {
       case true => request.userAnswers.get(DateOfFirstSalePage).isDefined
       case false => request.userAnswers.get(IsPlanningFirstEligibleSalePage).isDefined
     }
   }
 
-  def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasWebsitePage).exists {
       case true => request.userAnswers.get(AllWebsites).getOrElse(List.empty).nonEmpty
       case false => true
     }
   }
 
-  def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
       case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
       case false => true
