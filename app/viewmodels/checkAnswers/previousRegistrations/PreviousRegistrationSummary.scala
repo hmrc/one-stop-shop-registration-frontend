@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
-import models.{CheckMode, Index, Mode, UserAnswers}
+import models.{AmendMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
@@ -39,7 +39,7 @@ object PreviousRegistrationSummary {
         )
     }
 
-  def checkAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllPreviousRegistrationsQuery).map {
       previousRegistrations =>
 
@@ -48,13 +48,21 @@ object PreviousRegistrationSummary {
             HtmlFormat.escape(details.previousEuCountry.name)
         }.mkString("<br/>")
 
-        SummaryListRowViewModel(
+          SummaryListRowViewModel(
           key = "previousRegistrations.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.AddPreviousRegistrationController.onPageLoad(CheckMode).url)
+          actions = Seq(if(mode==AmendMode) {
+            //TODO
+            println(s"Mode: $mode")
+            ActionItemViewModel("site.add", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
+          } else {
+            println(s"Mode: $mode")
+            ActionItemViewModel("site.change", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
+              .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
+          }
           )
         )
+
     }
 }
