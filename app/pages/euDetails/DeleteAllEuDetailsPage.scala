@@ -16,12 +16,21 @@
 
 package pages.euDetails
 
+import controllers.routes
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object DeleteAllEuDetailsPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "deleteAllEuDetails"
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    answers.get(DeleteAllEuDetailsPage) match {
+      case Some(_) => routes.CheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

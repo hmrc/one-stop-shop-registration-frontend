@@ -19,9 +19,11 @@ package controllers.euDetails
 import controllers.actions._
 import forms.euDetails.DeleteAllEuDetailsFormProvider
 import models.Mode
-import pages.euDetails.DeleteAllEuDetailsPage
+import models.requests.AuthenticatedDataRequest
+import pages.euDetails.{DeleteAllEuDetailsPage, TaxRegisteredInEuPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.EuDetailsTopLevelNode
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.DeleteAllEuDetailsView
 
@@ -41,26 +43,31 @@ class DeleteAllEuDetailsController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(DeleteAllEuDetailsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+      Ok(view(form, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAllEuDetailsPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(DeleteAllEuDetailsPage.navigate(mode, updatedAnswers))
+          determineRemoveAllEuDetailsAndRedirect(mode, value)
       )
+  }
+
+  private def determineRemoveAllEuDetailsAndRedirect(mode: Mode, value: Boolean)
+                                                    (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    val removeEuDetails = if (value) {
+      request.userAnswers.remove(EuDetailsTopLevelNode)
+    } else {
+      request.userAnswers.set(TaxRegisteredInEuPage, true)
+    }
+    for {
+      updatedAnswers <- Future.fromTry(removeEuDetails)
+      calculatedAnswers <- Future.fromTry(updatedAnswers.set(DeleteAllEuDetailsPage, value))
+      _ <- cc.sessionRepository.set(calculatedAnswers)
+    } yield Redirect(DeleteAllEuDetailsPage.navigate(mode, calculatedAnswers))
   }
 }

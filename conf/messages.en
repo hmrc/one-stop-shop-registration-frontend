@@ -802,8 +802,8 @@ deleteAllTradingNames.warning = This will delete all the trading names you have 
 deleteAllTradingNames.error.required = Select yes if you want to remove all your alternative trading names from this scheme
 deleteAllTradingNames.change.hidden = Remove all your alternative trading names from this scheme
 
-deleteAllEuDetails.title = deleteAllEuDetails
-deleteAllEuDetails.heading = deleteAllEuDetails
-deleteAllEuDetails.checkYourAnswersLabel = deleteAllEuDetails
-deleteAllEuDetails.error.required = Select yes if deleteAllEuDetails
-deleteAllEuDetails.change.hidden = DeleteAllEuDetails
+deleteAllEuDetails.title = Remove all your EU tax information from this scheme?
+deleteAllEuDetails.heading = Remove all your EU tax information from this scheme?
+deleteAllEuDetails.warning = This will delete all EU tax information you have added.
+deleteAllEuDetails.error.required = Select yes if you want to remove all your EU tax information from this scheme
+deleteAllEuDetails.change.hidden = Remove all your EU tax information from this scheme

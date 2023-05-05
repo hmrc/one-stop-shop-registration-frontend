@@ -22,9 +22,6 @@ import models.{CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import queries.EuDetailsTopLevelNode
-
-import scala.util.Try
 
 case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
@@ -49,18 +46,15 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
         }
 
       case Some(false) =>
-        routes.CheckYourAnswersController.onPageLoad()
+        if(answers.get(EuCountryPage(Index(0))).isDefined) {
+          euRoutes.DeleteAllEuDetailsController.onPageLoad()
+        } else {
+          routes.CheckYourAnswersController.onPageLoad()
+        }
 
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
-    if (value contains false) {
-      userAnswers.remove(EuDetailsTopLevelNode)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
-  }
 }
