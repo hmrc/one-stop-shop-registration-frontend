@@ -801,3 +801,9 @@ deleteAllTradingNames.heading = Remove all your alternative trading names from t
 deleteAllTradingNames.warning = This will delete all the trading names you have added.
 deleteAllTradingNames.error.required = Select yes if you want to remove all your alternative trading names from this scheme
 deleteAllTradingNames.change.hidden = Remove all your alternative trading names from this scheme
+
+deleteAllEuDetails.title = deleteAllEuDetails
+deleteAllEuDetails.heading = deleteAllEuDetails
+deleteAllEuDetails.checkYourAnswersLabel = deleteAllEuDetails
+deleteAllEuDetails.error.required = Select yes if deleteAllEuDetails
+deleteAllEuDetails.change.hidden = DeleteAllEuDetails
