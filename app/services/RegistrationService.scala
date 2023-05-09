@@ -84,35 +84,55 @@ class RegistrationService {
   }
 
   private def getEuRegistrationDetails(registration: Registration): Seq[EuOptionalDetails] = {
+
     registration.euRegistrations map {
-      case euVatRegistration: EuVatRegistration =>
-        EuOptionalDetails(euCountry = euVatRegistration.country, sellsGoodsToEUConsumers = Some(false),
-          vatRegistered = if (Some(euVatRegistration.vatNumber).isDefined) Some(true) else Some(false),
-          sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = Some(euVatRegistration.vatNumber),
-          euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
-          euSendGoodsTradingName = None, euSendGoodsAddress = None)
-      case registrationWithFE: RegistrationWithFixedEstablishment =>
-        EuOptionalDetails(euCountry = registrationWithFE.country, sellsGoodsToEUConsumers = Some(true), vatRegistered = None,
-          sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.FixedEstablishment),
-          registrationType = getRegistrationType(registrationWithFE.taxIdentifier.identifierType),
-          euVatNumber = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) registrationWithFE.taxIdentifier.value else None,
-          euTaxReference = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Other) registrationWithFE.taxIdentifier.value else None,
-          fixedEstablishmentTradingName = Some(registrationWithFE.fixedEstablishment.tradingName),
-          fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address), euSendGoodsTradingName = None, euSendGoodsAddress = None)
+      case euVatRegistration: EuVatRegistration => getEuDetailsForEuVatRegistration(euVatRegistration)
+
+      case registrationWithFE: RegistrationWithFixedEstablishment => getEuDetailsForRegistrationWithFixedEstablishment(registrationWithFE)
+
       case registrationWithoutFE: RegistrationWithoutFixedEstablishmentWithTradeDetails =>
-        EuOptionalDetails(euCountry = registrationWithoutFE.country, sellsGoodsToEUConsumers = Some(true), vatRegistered = None,
-          sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.DispatchWarehouse),
-          registrationType = getRegistrationType(registrationWithoutFE.taxIdentifier.identifierType),
-          euVatNumber = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) registrationWithoutFE.taxIdentifier.value else None,
-          euTaxReference = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Other) registrationWithoutFE.taxIdentifier.value else None,
-          fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
-          euSendGoodsTradingName = Some(registrationWithoutFE.tradeDetails.tradingName), euSendGoodsAddress = Some(registrationWithoutFE.tradeDetails.address))
-      case registrationWithoutTaxID: RegistrationWithoutTaxId =>
-        EuOptionalDetails(euCountry = registrationWithoutTaxID.country, sellsGoodsToEUConsumers = Some(false), vatRegistered = Some(false),
-          sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = None,
-          euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
-          euSendGoodsTradingName = None, euSendGoodsAddress = None)
+        getEuDetailsForRegistrationWithoutFEWithTradeDetails(registrationWithoutFE)
+
+      case registrationWithoutTaxID: RegistrationWithoutTaxId => getEuDetailsForRegistrationWithoutTaxId(registrationWithoutTaxID)
+
     }
+  }
+
+  private def getEuDetailsForEuVatRegistration(euVatRegistration: EuVatRegistration): EuOptionalDetails = {
+    EuOptionalDetails(euCountry = euVatRegistration.country, sellsGoodsToEUConsumers = Some(false),
+      vatRegistered = if (Some(euVatRegistration.vatNumber).isDefined) Some(true) else Some(false),
+      sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = Some(euVatRegistration.vatNumber),
+      euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = None, euSendGoodsAddress = None)
+  }
+
+  private def getEuDetailsForRegistrationWithFixedEstablishment(registrationWithFE: RegistrationWithFixedEstablishment): EuOptionalDetails = {
+    EuOptionalDetails(euCountry = registrationWithFE.country, sellsGoodsToEUConsumers = Some(true), vatRegistered = None,
+      sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.FixedEstablishment),
+      registrationType = getRegistrationType(registrationWithFE.taxIdentifier.identifierType),
+      euVatNumber = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) registrationWithFE.taxIdentifier.value else None,
+      euTaxReference = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Other) registrationWithFE.taxIdentifier.value else None,
+      fixedEstablishmentTradingName = Some(registrationWithFE.fixedEstablishment.tradingName),
+      fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address), euSendGoodsTradingName = None, euSendGoodsAddress = None)
+  }
+
+  private def getEuDetailsForRegistrationWithoutFEWithTradeDetails(
+                                                                    registrationWithoutFE: RegistrationWithoutFixedEstablishmentWithTradeDetails
+                                                                  ): EuOptionalDetails = {
+    EuOptionalDetails(euCountry = registrationWithoutFE.country, sellsGoodsToEUConsumers = Some(true), vatRegistered = None,
+      sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.DispatchWarehouse),
+      registrationType = getRegistrationType(registrationWithoutFE.taxIdentifier.identifierType),
+      euVatNumber = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) registrationWithoutFE.taxIdentifier.value else None,
+      euTaxReference = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Other) registrationWithoutFE.taxIdentifier.value else None,
+      fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = Some(registrationWithoutFE.tradeDetails.tradingName), euSendGoodsAddress = Some(registrationWithoutFE.tradeDetails.address))
+  }
+
+  private def getEuDetailsForRegistrationWithoutTaxId(registrationWithoutTaxID: RegistrationWithoutTaxId): EuOptionalDetails = {
+    EuOptionalDetails(euCountry = registrationWithoutTaxID.country, sellsGoodsToEUConsumers = Some(false), vatRegistered = Some(false),
+      sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = None,
+      euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = None, euSendGoodsAddress = None)
   }
 
   private def getRegistrationType(identifierType: EuTaxIdentifierType): Option[RegistrationType] = {
