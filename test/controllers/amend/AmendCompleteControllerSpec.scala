@@ -115,6 +115,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
+            yourAccountUrl,
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter)
@@ -162,6 +163,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
+            yourAccountUrl,
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter)
@@ -208,6 +210,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
+            yourAccountUrl,
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter)
@@ -259,6 +262,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
+            yourAccountUrl,
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter)
@@ -306,6 +310,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
+            yourAccountUrl,
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter)
