@@ -68,7 +68,14 @@ class RegistrationService {
 
       bankDetails <- websites.set(BankDetailsPage, registration.bankDetails)
 
-    } yield bankDetails // TODO remove test data
+      hasPreviousRegistrationsUA <- bankDetails.set(PreviouslyRegisteredPage, registration.previousRegistrations.nonEmpty)
+      previousRegistrations <- if(registration.previousRegistrations.nonEmpty) {
+        hasPreviousRegistrationsUA.set(AllPreviousRegistrationsWithOptionalVatNumberQuery, getPreviousRegistrations(registration).toList)
+      } else {
+        Try(hasPreviousRegistrationsUA)
+      }
+
+    } yield previousRegistrations // TODO remove test data
       .set(IsPlanningFirstEligibleSalePage, true).get
       .set(PreviouslyRegisteredPage, false).get
 
@@ -180,4 +187,19 @@ class RegistrationService {
         .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
         */
 
+
+  private def getPreviousRegistrations(registration: Registration): Seq[PreviousRegistrationDetails] = {
+   val previousRegistrations = registration.previousRegistrations
+    println(s"Here are the previous regostarions: $previousRegistrations")
+
+    previousRegistrations.foreach {
+      previousRegistration =>
+        PreviousRegistrationDetails(previousRegistration.country,
+          PreviousSchemeDetails(
+            previousRegistration.previousSchemesDetails.foreach(_.previousScheme).toString,
+            previousRegistration.previousSchemesDetails.foreach(_.previousSchemeNumbers).asInstanceOf[PreviousSchemeNumbers]
+          ))
+        )
+    }
+  }
 }
