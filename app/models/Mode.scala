@@ -21,9 +21,14 @@ import play.api.mvc.JavascriptLiteral
 sealed trait Mode
 
 case object CheckMode extends Mode
+
 case object NormalMode extends Mode
+
 case object CheckLoopMode extends Mode
+
 case object AmendMode extends Mode
+
+case object AmendLoopMode extends Mode
 
 object Mode {
 
@@ -33,6 +38,7 @@ object Mode {
       case CheckMode     => "CheckMode"
       case CheckLoopMode => "CheckLoopMode"
       case AmendMode     => "AmendMode"
+      case AmendLoopMode => "AmendLoopMode"
     }
   }
 }

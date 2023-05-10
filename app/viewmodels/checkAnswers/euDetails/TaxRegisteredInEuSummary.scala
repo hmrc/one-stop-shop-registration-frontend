@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{CheckMode, UserAnswers}
+import models.{Mode, UserAnswers}
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,7 @@ import viewmodels.implicits._
 
 object TaxRegisteredInEuSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TaxRegisteredInEuPage).map {
       answer =>
 
@@ -36,7 +36,7 @@ object TaxRegisteredInEuSummary {
           key = "taxRegisteredInEu.checkYourAnswersLabel",
           value = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.TaxRegisteredInEuController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.TaxRegisteredInEuController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("taxRegisteredInEu.change.hidden"))
           )
         )

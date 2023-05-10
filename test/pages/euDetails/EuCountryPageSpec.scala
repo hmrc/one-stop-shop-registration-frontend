@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.behaviours.PageBehaviours
@@ -69,6 +69,34 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
 
               EuCountryPage(countryIndex).navigate(CheckMode, answers)
                 .mustEqual(SellsGoodsToEUConsumersPage(Index(0)).navigate(CheckMode, answers))
+          }
+        }
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "when Sells Goods to EU Consumers has not been answered" - {
+
+        "to Sells Goods to EU Consumers for the same index" in {
+
+          EuCountryPage(countryIndex).navigate(AmendMode, emptyUserAnswers)
+            .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(AmendMode, countryIndex))
+        }
+      }
+
+      "when Sells Goods to EU Consumers has been answered" - {
+
+        "to wherever Sells Goods to EU Consumers would navigate to in Amend mode" in {
+
+          forAll(arbitrary[UserAnswers]) {
+            baseAnswers =>
+
+              val answers = baseAnswers
+                .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
+
+              EuCountryPage(countryIndex).navigate(AmendMode, answers)
+                .mustEqual(SellsGoodsToEUConsumersPage(Index(0)).navigate(AmendMode, answers))
           }
         }
       }

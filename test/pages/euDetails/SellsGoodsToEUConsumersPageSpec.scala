@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
@@ -48,7 +48,7 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
 
         SellsGoodsToEUConsumersPage(countryIndex).navigate(NormalMode, answers)
-          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex))
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex))
       }
 
     }
@@ -68,7 +68,26 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
 
         SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
-          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex))
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex))
+      }
+    }
+
+    "must navigate in Amend Mode" - {
+
+      "to Sells Goods To EU Consumer Method when answer is Yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendMode, answers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendMode, countryIndex))
+      }
+
+      "to Sales Declaration Not Required when answer is No" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex))
       }
 
     }

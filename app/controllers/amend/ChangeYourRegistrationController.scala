@@ -29,6 +29,8 @@ import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import pages.amend.ChangeYourRegistrationPage
+import models.responses.ConflictFound
+import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
@@ -84,8 +86,8 @@ class ChangeYourRegistrationController @Inject()(
             Some(commencementDateSummary),
             PreviouslyRegisteredSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
-            TaxRegisteredInEuSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            EuDetailsSummary.checkAnswersRow(request.userAnswers),
+            TaxRegisteredInEuSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            EuDetailsSummary.checkAnswersRow(request.userAnswers, AmendMode),
             IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode),
             HasWebsiteSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             WebsiteSummary.checkAnswersRow(request.userAnswers, AmendMode),

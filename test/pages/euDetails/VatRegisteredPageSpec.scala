@@ -18,7 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -150,13 +150,13 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-          "to Check EU Details Answers" in {
+        "to Check EU Details Answers" in {
 
-            val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
-            VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-              .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index))
-          }
+          VatRegisteredPage(index).navigate(CheckLoopMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index))
+        }
       }
 
       "when the answer is empty" - {
@@ -164,6 +164,108 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
         "to Journey recovery" in {
 
           VatRegisteredPage(index).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "when the answer is yes" - {
+
+        "and EU VAT number has not been answered" - {
+
+          "to EU VAT number" in {
+
+            val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+
+            VatRegisteredPage(index).navigate(AmendMode, answers)
+              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(AmendMode, index))
+          }
+        }
+
+        "and EU VAT number has been answered" - {
+
+          "to wherever EU VAT number would navigate to" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), true).success.value
+                .set(EuVatNumberPage(index), "foo").success.value
+
+            VatRegisteredPage(index).navigate(AmendMode, answers)
+              .mustEqual(EuVatNumberPage(index).navigate(AmendMode, answers))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check EU Details Answers" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+
+          VatRegisteredPage(index).navigate(AmendMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index))
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(AmendMode, emptyUserAnswers)
+            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Amend Loop mode" - {
+
+      "when the answer is yes" - {
+
+        "and EU VAT number has not been answered" - {
+
+          "to EU VAT number" in {
+
+            val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+
+            VatRegisteredPage(index).navigate(AmendLoopMode, answers)
+              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(AmendLoopMode, index))
+          }
+        }
+
+        "and EU VAT number has been answered" - {
+
+          "to wherever EU VAT number would navigate to" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), true).success.value
+                .set(EuVatNumberPage(index), "foo").success.value
+
+            VatRegisteredPage(index).navigate(AmendLoopMode, answers)
+              .mustEqual(EuVatNumberPage(index).navigate(AmendLoopMode, answers))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Check EU Details Answers" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+
+          VatRegisteredPage(index).navigate(AmendLoopMode, answers)
+            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, index))
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(AmendLoopMode, emptyUserAnswers)
             .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
       }
