@@ -192,55 +192,5 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
         }
       }
     }
-
-    "must remove all EU VAT details when the answer is false" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
-          .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
-          .set(VatRegisteredPage(Index(0)), true).success.value
-          .set(EuVatNumberPage(Index(0)), "reg 1").success.value
-          .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
-          .set(SellsGoodsToEUConsumersPage(Index(1)), false).success.value
-          .set(VatRegisteredPage(Index(1)), true).success.value
-          .set(EuVatNumberPage(Index(1)), "reg 2").success.value
-
-      val result = answers.set(TaxRegisteredInEuPage, false).success.value
-
-      result.get(EuCountryPage(Index(0))) must not be defined
-      result.get(SellsGoodsToEUConsumersPage(Index(0))) must not be defined
-      result.get(VatRegisteredPage(Index(0))) must not be defined
-      result.get(EuVatNumberPage(Index(0))) must not be defined
-      result.get(EuCountryPage(Index(1))) must not be defined
-      result.get(SellsGoodsToEUConsumersPage(Index(1))) must not be defined
-      result.get(VatRegisteredPage(Index(1))) must not be defined
-      result.get(EuVatNumberPage(Index(1))) must not be defined
-    }
-
-    "must not remove any EU VAT details when the answer is true" in {
-
-      val answers =
-        UserAnswers("id")
-          .set(EuCountryPage(Index(0)), Country.euCountries.head).success.value
-          .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
-          .set(VatRegisteredPage(Index(0)), true).success.value
-          .set(EuVatNumberPage(Index(0)), "reg 1").success.value
-          .set(EuCountryPage(Index(1)), Country.euCountries.tail.head).success.value
-          .set(SellsGoodsToEUConsumersPage(Index(1)), false).success.value
-          .set(VatRegisteredPage(Index(1)), true).success.value
-          .set(EuVatNumberPage(Index(1)), "reg 2").success.value
-
-      val result = answers.set(TaxRegisteredInEuPage, true).success.value
-
-      result.get(EuCountryPage(Index(0))).value mustEqual Country.euCountries.head
-      result.get(SellsGoodsToEUConsumersPage(Index(0))).value mustEqual false
-      result.get(VatRegisteredPage(Index(0))).value mustEqual true
-      result.get(EuVatNumberPage(Index(0))).value mustEqual "reg 1"
-      result.get(EuCountryPage(Index(1))).value mustEqual Country.euCountries.tail.head
-      result.get(SellsGoodsToEUConsumersPage(Index(1))).value mustEqual false
-      result.get(VatRegisteredPage(Index(1))).value mustEqual true
-      result.get(EuVatNumberPage(Index(1))).value mustEqual "reg 2"
-    }
   }
 }
