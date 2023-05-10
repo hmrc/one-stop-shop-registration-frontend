@@ -48,7 +48,7 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
       case Some(false) =>
         if(answers.get(EuCountryPage(Index(0))).isDefined) {
-          euRoutes.DeleteAllEuDetailsController.onPageLoad()
+          euRoutes.DeleteAllEuDetailsController.onPageLoad(CheckMode)
         } else {
           routes.CheckYourAnswersController.onPageLoad()
         }
@@ -68,7 +68,11 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
         }
 
       case Some(false) =>
-        amendRoutes.ChangeYourRegistrationController.onPageLoad()
+        if (answers.get(EuCountryPage(Index(0))).isDefined) {
+          euRoutes.DeleteAllEuDetailsController.onPageLoad(AmendMode)
+        } else {
+          amendRoutes.ChangeYourRegistrationController.onPageLoad()
+        }
 
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
