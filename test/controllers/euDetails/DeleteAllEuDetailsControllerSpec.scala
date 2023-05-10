@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import forms.euDetails.DeleteAllEuDetailsFormProvider
-import models.{CheckMode, Country, Index, InternationalAddress}
+import models.{AmendMode, CheckMode, Country, Index, InternationalAddress}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails._
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.{POST, _}
 import queries.EuDetailsTopLevelNode
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.euDetails.DeleteAllEuDetailsView
@@ -54,128 +54,134 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
     .set(VatRegisteredPage(Index(1)), true).success.value
     .set(EuVatNumberPage(Index(1)), "DE123456789").success.value
 
-  private lazy val deleteAllEuDetailsRoute = euRoutes.DeleteAllEuDetailsController.onPageLoad().url
-
   "DeleteAllEuDetails Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    Seq(CheckMode, AmendMode).foreach {
+      mode =>
+        lazy val deleteAllEuDetailsRoute = euRoutes.DeleteAllEuDetailsController.onPageLoad(mode).url
+        s"$mode" - {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+          "must return OK and the correct view for a GET" in {
 
-      running(application) {
-        val request = FakeRequest(GET, deleteAllEuDetailsRoute)
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
-        val result = route(application, request).value
+            running(application) {
+              val request = FakeRequest(GET, deleteAllEuDetailsRoute)
 
-        val view = application.injector.instanceOf[DeleteAllEuDetailsView]
+              val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
-      }
-    }
+              val view = application.injector.instanceOf[DeleteAllEuDetailsView]
 
-    "must delete all eu details and redirect to the next page when user answers Yes" in {
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(form, mode)(request, messages(application)).toString
+            }
+          }
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+          "must delete all eu details and redirect to the next page when user answers Yes" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+            val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllEuDetailsRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            val application =
+              applicationBuilder(userAnswers = Some(userAnswers))
+                .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .build()
 
-        val result = route(application, request).value
-        val expectedAnswers = userAnswers
-          .set(DeleteAllEuDetailsPage, true).success.value
-          .remove(EuDetailsTopLevelNode).success.value
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllEuDetailsRoute)
+                  .withFormUrlEncodedBody(("value", "true"))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllEuDetailsPage.navigate(CheckMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-      }
-    }
+              val result = route(application, request).value
+              val expectedAnswers = userAnswers
+                .set(DeleteAllEuDetailsPage, true).success.value
+                .remove(EuDetailsTopLevelNode).success.value
 
-    "must not delete all eu details and redirect to the next page when user answers No" in {
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual DeleteAllEuDetailsPage.navigate(mode, expectedAnswers).url
+              verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+          "must not delete all eu details and redirect to the next page when user answers No" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+            val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllEuDetailsRoute)
-            .withFormUrlEncodedBody(("value", "false"))
+            val application =
+              applicationBuilder(userAnswers = Some(userAnswers))
+                .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .build()
 
-        val result = route(application, request).value
-        val expectedAnswers = userAnswers
-          .set(DeleteAllEuDetailsPage, false).success.value
-          .set(TaxRegisteredInEuPage, true).success.value
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllEuDetailsRoute)
+                  .withFormUrlEncodedBody(("value", "false"))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllEuDetailsPage.navigate(CheckMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-      }
-    }
+              val result = route(application, request).value
+              val expectedAnswers = userAnswers
+                .set(DeleteAllEuDetailsPage, false).success.value
+                .set(TaxRegisteredInEuPage, true).success.value
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual DeleteAllEuDetailsPage.navigate(mode, expectedAnswers).url
+              verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+          "must return a Bad Request and errors when invalid data is submitted" in {
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllEuDetailsRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
-        val boundForm = form.bind(Map("value" -> ""))
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllEuDetailsRoute)
+                  .withFormUrlEncodedBody(("value", ""))
 
-        val view = application.injector.instanceOf[DeleteAllEuDetailsView]
+              val boundForm = form.bind(Map("value" -> ""))
 
-        val result = route(application, request).value
+              val view = application.injector.instanceOf[DeleteAllEuDetailsView]
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, CheckMode)(request, messages(application)).toString
-      }
-    }
+              val result = route(application, request).value
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+              status(result) mustEqual BAD_REQUEST
+              contentAsString(result) mustEqual view(boundForm, mode)(request, messages(application)).toString
+            }
+          }
 
-      val application = applicationBuilder(userAnswers = None).build()
+          "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      running(application) {
-        val request = FakeRequest(GET, deleteAllEuDetailsRoute)
+            val application = applicationBuilder(userAnswers = None).build()
 
-        val result = route(application, request).value
+            running(application) {
+              val request = FakeRequest(GET, deleteAllEuDetailsRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
+              val result = route(application, request).value
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            }
+          }
 
-      val application = applicationBuilder(userAnswers = None).build()
+          "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllEuDetailsRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            val application = applicationBuilder(userAnswers = None).build()
 
-        val result = route(application, request).value
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllEuDetailsRoute)
+                  .withFormUrlEncodedBody(("value", "true"))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            }
+          }
+
+        }
     }
   }
 }

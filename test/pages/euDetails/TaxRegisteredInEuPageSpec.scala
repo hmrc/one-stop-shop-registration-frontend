@@ -17,11 +17,10 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
 import controllers.amend.{routes => amendRoutes}
+import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{AmendMode, CheckMode, Country, Index, NormalMode, UserAnswers}
-import models.{CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
@@ -112,7 +111,7 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
             .set(TaxRegisteredInEuPage, false).success.value
 
           TaxRegisteredInEuPage.navigate(CheckMode, answers)
-            .mustEqual(euRoutes.DeleteAllEuDetailsController.onPageLoad())
+            .mustEqual(euRoutes.DeleteAllEuDetailsController.onPageLoad(CheckMode))
         }
 
         "to Check Your Answers if there are not eu details in the user's answers" in {
