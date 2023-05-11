@@ -18,7 +18,8 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, PreviousSchemeNumbers, SchemeDetailsWithOptionalVatNumber}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}

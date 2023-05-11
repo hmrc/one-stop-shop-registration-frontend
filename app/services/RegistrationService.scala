@@ -17,21 +17,21 @@
 package services
 
 import models._
-import models.domain._
+import models.domain.{PreviousSchemeNumbers, _}
 import models.euDetails._
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.previousRegistrations.PreviousRegistrationDetails
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations._
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 
-import scala.collection.Seq
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class RegistrationService {
 
-  def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo): Future[UserAnswers] = {
+  def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo)(implicit ec: ExecutionContext): Future[UserAnswers] = {
 
     val userAnswers = for {
       businessBasedInNiUA <- UserAnswers(userId,
@@ -70,12 +70,14 @@ class RegistrationService {
 
       hasPreviousRegistrationsUA <- bankDetails.set(PreviouslyRegisteredPage, registration.previousRegistrations.nonEmpty)
       previousRegistrations <- if(registration.previousRegistrations.nonEmpty) {
-        hasPreviousRegistrationsUA.set(AllPreviousRegistrationsWithOptionalVatNumberQuery, getPreviousRegistrations(registration).toList)
+        hasPreviousRegistrationsUA.set(AllPreviousRegistrationsQuery, getPreviousRegistrations(registration).toList)
       } else {
         Try(hasPreviousRegistrationsUA)
       }
+      previousRegistrationsUA <- setDeterminePreviousRegistrationAnswers(registration, previousRegistrations)
 
-    } yield previousRegistrations // TODO remove test data
+    } yield previousRegistrationsUA // TODO remove test data
+
       .set(IsPlanningFirstEligibleSalePage, true).get
       .set(PreviouslyRegisteredPage, false).get
 
@@ -189,17 +191,103 @@ class RegistrationService {
 
 
   private def getPreviousRegistrations(registration: Registration): Seq[PreviousRegistrationDetails] = {
-   val previousRegistrations = registration.previousRegistrations
-    println(s"Here are the previous regostarions: $previousRegistrations")
-
-    previousRegistrations.foreach {
-      previousRegistration =>
-        PreviousRegistrationDetails(previousRegistration.country,
-          PreviousSchemeDetails(
-            previousRegistration.previousSchemesDetails.foreach(_.previousScheme).toString,
-            previousRegistration.previousSchemesDetails.foreach(_.previousSchemeNumbers).asInstanceOf[PreviousSchemeNumbers]
+    registration.previousRegistrations map {
+      case previousRegistration: PreviousRegistrationNew =>
+        PreviousRegistrationDetails(
+          previousEuCountry = previousRegistration.country,
+          previousSchemesDetails = previousRegistration.previousSchemesDetails.map {
+            previousSchemesDetails =>
+              PreviousSchemeDetails(
+                previousScheme = previousSchemesDetails.previousScheme,
+                previousSchemeNumbers =
+                  PreviousSchemeNumbers(
+                    previousSchemesDetails.previousSchemeNumbers.previousSchemeNumber,
+                    previousSchemesDetails.previousSchemeNumbers.previousIntermediaryNumber
+                  ))
+          }.toList
+        )
+      case legacyPreviousRegistration: PreviousRegistrationLegacy =>
+        PreviousRegistrationDetails(
+          previousEuCountry = legacyPreviousRegistration.country,
+          previousSchemesDetails = Seq(PreviousSchemeDetails(
+            previousScheme = PreviousScheme.OSSU,
+            previousSchemeNumbers = PreviousSchemeNumbers(
+              previousSchemeNumber = legacyPreviousRegistration.vatNumber,
+              previousIntermediaryNumber = None
+            )
           ))
         )
     }
   }
+
+  private def setDeterminePreviousRegistrationAnswers(
+                                              registration: Registration,
+                                              userAnswers: UserAnswers
+                                            )(implicit ec: ExecutionContext): Try[UserAnswers] = {
+
+    def recursivelySetPreviousSchemeUserAnswers(remainingPreviousRegistration: Seq[PreviousRegistration], currentUserAnswers: UserAnswers, countryIndex: Int): Try[UserAnswers] = {
+
+      remainingPreviousRegistration match {
+        case Nil => Try(currentUserAnswers)
+        case (firstPreviousRegistration: PreviousRegistrationNew) :: Nil => recursivelySetPreviousSchemeDetails(firstPreviousRegistration.previousSchemesDetails, currentUserAnswers, countryIndex, 0)
+        case (_: PreviousRegistrationLegacy) :: Nil => setLegacyPreviousRegistration(currentUserAnswers, countryIndex)
+        case (firstPreviousRegistration: PreviousRegistrationNew) :: otherPreviousRegistrations => for {
+          updatedUserAnswers <- recursivelySetPreviousSchemeDetails(firstPreviousRegistration.previousSchemesDetails, currentUserAnswers, countryIndex, 0)
+          reallyUpdatedUserAnswers <- recursivelySetPreviousSchemeUserAnswers(otherPreviousRegistrations, updatedUserAnswers, countryIndex + 1)
+        } yield reallyUpdatedUserAnswers
+        case (_: PreviousRegistrationLegacy) :: otherPreviousRegistrations => for {
+          updatedUserAnswers <- setLegacyPreviousRegistration(currentUserAnswers, countryIndex)
+          reallyUpdatedUserAnswers <- recursivelySetPreviousSchemeUserAnswers(otherPreviousRegistrations, updatedUserAnswers, countryIndex + 1)
+        } yield reallyUpdatedUserAnswers
+      }
+    }
+
+    def recursivelySetPreviousSchemeDetails(remainingSchemeDetails: Seq[PreviousSchemeDetails], currentUserAnswers: UserAnswers, countryIndex: Int, schemeIndex: Int): Try[UserAnswers] = {
+      remainingSchemeDetails match {
+        case Nil => Try(currentUserAnswers)
+        case firstSchemeDetails :: Nil => settingOfPreviousSchemeDetailsUserAnswers(firstSchemeDetails, countryIndex, schemeIndex)
+        case firstSchemeDetails :: otherSchemeDetails =>
+          for {
+            updatedUserAnswers <- settingOfPreviousSchemeDetailsUserAnswers(firstSchemeDetails, countryIndex, schemeIndex)
+            reallyUpdateUserAnswers <- recursivelySetPreviousSchemeDetails(otherSchemeDetails, updatedUserAnswers, countryIndex, schemeIndex + 1)
+          } yield reallyUpdateUserAnswers
+      }
+    }
+
+
+    def settingOfPreviousSchemeDetailsUserAnswers(schemeDetails: PreviousSchemeDetails, countryIndex: Int, schemeIndex: Int): Try[UserAnswers] = {
+      for {
+        answers <- userAnswers.set(PreviousSchemeTypePage(Index(countryIndex), Index(schemeIndex)), determineSchemeType(schemeDetails))
+        updatedAnswers <- answers.set(PreviousSchemePage(Index(countryIndex), Index(schemeIndex)), schemeDetails.previousScheme)
+        previousSchemeNumbers = schemeDetails.previousSchemeNumbers
+        schemeType = updatedAnswers.get(PreviousSchemeTypePage(Index(countryIndex), Index(schemeIndex)))
+        finalAnswers <-
+          if (previousSchemeNumbers.previousIntermediaryNumber.nonEmpty && schemeType.contains(PreviousSchemeType.IOSS)) {
+            updatedAnswers.set(PreviousIossSchemePage(Index(countryIndex), Index(schemeIndex)), true)
+          } else {
+            Try(updatedAnswers)
+          }
+      } yield finalAnswers
+    }
+
+    def setLegacyPreviousRegistration(userAnswers: UserAnswers, countryIndex: Int): Try[UserAnswers] = {
+      for {
+        answers <- userAnswers.set(PreviousSchemeTypePage(Index(countryIndex), Index(0)), PreviousSchemeType.OSS)
+        updatedAnswers <- answers.set(PreviousSchemePage(Index(countryIndex), Index(0)), PreviousScheme.OSSU)
+      } yield updatedAnswers
+    }
+
+    recursivelySetPreviousSchemeUserAnswers(registration.previousRegistrations, userAnswers, 0)
+
+}
+
+  private def determineSchemeType(previousSchemeDetails: PreviousSchemeDetails): PreviousSchemeType = {
+    previousSchemeDetails.previousScheme match {
+      case scheme if scheme == PreviousScheme.OSSU || scheme == PreviousScheme.OSSNU =>
+        PreviousSchemeType.OSS
+      case scheme if scheme == PreviousScheme.IOSSWI || scheme == PreviousScheme.IOSSWOI =>
+        PreviousSchemeType.IOSS
+    }
+  }
+
 }

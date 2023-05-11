@@ -121,7 +121,7 @@ class DateService @Inject()(
       case Some(allPreviousRegistrationDetails) =>
 
         val schemesToSearch = allPreviousRegistrationDetails.flatMap { countryPreviousRegistrations =>
-          val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU.toString)
+          val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU)
           val idToSearch = countriesIdsToSearch.map(_.previousSchemeNumbers.previousSchemeNumber)
           idToSearch.map((countryPreviousRegistrations.previousEuCountry.code, _))
         }
