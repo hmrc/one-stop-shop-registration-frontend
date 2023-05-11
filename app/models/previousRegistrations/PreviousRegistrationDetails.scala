@@ -17,6 +17,7 @@
 package models.previousRegistrations
 
 import models.Country
+import models.domain._
 import play.api.libs.json.{Json, OFormat}
 
 case class PreviousRegistrationDetails(
@@ -27,13 +28,4 @@ case class PreviousRegistrationDetails(
 object PreviousRegistrationDetails {
 
   implicit val format: OFormat[PreviousRegistrationDetails] = Json.format[PreviousRegistrationDetails]
-}
-
-case class PreviousSchemeDetails(
-                                  previousScheme: String,
-                                  previousSchemeNumbers: PreviousSchemeNumbers
-                                )
-
-object PreviousSchemeDetails {
-  implicit val format: OFormat[PreviousSchemeDetails] = Json.format[PreviousSchemeDetails]
 }

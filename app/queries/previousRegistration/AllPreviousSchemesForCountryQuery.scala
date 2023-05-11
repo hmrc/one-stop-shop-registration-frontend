@@ -16,7 +16,7 @@
 
 package queries.previousRegistration
 
-import models.previousRegistrations.PreviousSchemeDetails
+import models.domain.PreviousSchemeDetails
 import models.Index
 import play.api.libs.json.JsPath
 import queries.{Gettable, Settable}

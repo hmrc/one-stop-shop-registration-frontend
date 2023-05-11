@@ -20,8 +20,8 @@ import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
+import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, CheckMode, Country, Index, NormalMode}
-import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
 
 class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
