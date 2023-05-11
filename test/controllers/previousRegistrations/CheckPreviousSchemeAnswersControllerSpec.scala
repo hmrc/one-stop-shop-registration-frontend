@@ -18,8 +18,8 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
+import models.domain.PreviousSchemeNumbers
 import models.{Country, Index, NormalMode, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
