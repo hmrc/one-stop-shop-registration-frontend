@@ -22,7 +22,6 @@ import cats.data.Validated.{Invalid, Valid}
 import models._
 import models.domain._
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.previousRegistrations.PreviousSchemeNumbers
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when

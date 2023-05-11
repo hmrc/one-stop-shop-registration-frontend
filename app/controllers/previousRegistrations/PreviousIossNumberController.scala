@@ -21,7 +21,8 @@ import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
-import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation, PreviousSchemeNumbers}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}

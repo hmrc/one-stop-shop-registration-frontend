@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import models._
 import pages.behaviours.PageBehaviours
 

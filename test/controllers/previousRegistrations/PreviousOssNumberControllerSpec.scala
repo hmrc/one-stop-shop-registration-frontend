@@ -20,7 +20,8 @@ import base.SpecBase
 import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme}
 import models.core.{Match, MatchType}
-import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.PreviousSchemeHintText
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar

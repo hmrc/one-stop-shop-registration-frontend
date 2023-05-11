@@ -17,9 +17,9 @@
 package services
 
 import base.SpecBase
-import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
+import models.domain.PreviousSchemeNumbers
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks

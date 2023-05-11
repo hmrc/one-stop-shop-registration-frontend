@@ -17,8 +17,8 @@
 package forms.previousRegistrations
 
 import forms.mappings.{IntermediaryIdentificationNumberConstraints, IossRegistrationNumberConstraints, Mappings}
-import models.previousRegistrations.PreviousSchemeNumbers
 import models.Country
+import models.domain.PreviousSchemeNumbers
 import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.voa.play.form.ConditionalMappings.mandatory
