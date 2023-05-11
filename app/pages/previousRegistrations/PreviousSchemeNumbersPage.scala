@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import models.Index
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 

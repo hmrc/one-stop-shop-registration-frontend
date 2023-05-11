@@ -19,7 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 

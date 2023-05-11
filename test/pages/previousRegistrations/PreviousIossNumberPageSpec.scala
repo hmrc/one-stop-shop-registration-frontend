@@ -18,8 +18,8 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.routes
+import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, CheckMode, Index, NormalMode}
-import models.previousRegistrations.PreviousSchemeNumbers
 import pages.behaviours.PageBehaviours
 
 class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {

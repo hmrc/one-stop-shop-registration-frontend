@@ -18,8 +18,8 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, CheckMode, Country, Index, NormalMode}
-import models.previousRegistrations.PreviousSchemeNumbers
 
 class DeletePreviousRegistrationPageSpec extends SpecBase {
 

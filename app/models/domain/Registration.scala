@@ -43,19 +43,19 @@ object Registration {
 
   implicit val format: OFormat[Registration] = Json.format[Registration]
 
-  def apply( vrn: Vrn,
-             registeredCompanyName: String,
-             tradingNames: Seq[String],
-             vatDetails: VatDetails,
-             euRegistrations: Seq[EuTaxRegistration],
-             contactDetails: BusinessContactDetails,
-             websites: Seq[String],
-             commencementDate: LocalDate,
-             previousRegistrations: Seq[PreviousRegistration],
-             bankDetails: BankDetails,
-             isOnlineMarketplace: Boolean,
-             niPresence: Option[NiPresence],
-             dateOfFirstSale: Option[LocalDate]): Registration = new Registration(
+  def apply(vrn: Vrn,
+            registeredCompanyName: String,
+            tradingNames: Seq[String],
+            vatDetails: VatDetails,
+            euRegistrations: Seq[EuTaxRegistration],
+            contactDetails: BusinessContactDetails,
+            websites: Seq[String],
+            commencementDate: LocalDate,
+            previousRegistrations: Seq[PreviousRegistration],
+            bankDetails: BankDetails,
+            isOnlineMarketplace: Boolean,
+            niPresence: Option[NiPresence],
+            dateOfFirstSale: Option[LocalDate]): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
     tradingNames.map(normaliseSpaces),

@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import generators.Generators
 import models.core.{Match, MatchType}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
