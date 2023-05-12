@@ -80,6 +80,28 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
         }
       }
 
+      "must redirect to Not Registered Page when no registration found" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(None)
+        when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
+        when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn Future.successful(completeUserAnswers)
+        when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn Future.successful(true)
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.StartAmendJourneyController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.NotRegisteredController.onPageLoad().url
+        }
+      }
+
     }
 
   }

@@ -821,3 +821,7 @@ deleteAllEuDetails.heading = Remove all your EU tax information from this scheme
 deleteAllEuDetails.warning = This will delete all the countries you have added tax information for.
 deleteAllEuDetails.error.required = Select yes if you want to remove all the countries you have added tax information for
 deleteAllEuDetails.change.hidden = Remove all the countries you have added tax information for
+
+notRegistered.title = You cannot use this service
+notRegistered.heading = You cannot use this service
+notRegistered.label = You must <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu">register for the VAT One Stop Shop scheme</a> to use this service.

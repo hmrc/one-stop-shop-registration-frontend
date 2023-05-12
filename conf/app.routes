@@ -444,3 +444,5 @@ GET         /amend-remove-all-eu-details                                        
 POST        /amend-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = AmendMode)
 
 GET         /successful-amend                                                   controllers.amend.AmendCompleteController.onPageLoad()
+
+GET         /cannot-use-not-registered                                          controllers.NotRegisteredController.onPageLoad()
