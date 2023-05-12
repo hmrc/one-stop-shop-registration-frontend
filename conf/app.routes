@@ -447,3 +447,5 @@ GET         /check-remove-all-previous-registrations                            
 POST        /check-remove-all-previous-registrations                            controllers.DeleteAllPreviousRegistrationsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /successful-amend                                                   controllers.amend.AmendCompleteController.onPageLoad()
+
+GET         /cannot-use-not-registered                                          controllers.NotRegisteredController.onPageLoad()
