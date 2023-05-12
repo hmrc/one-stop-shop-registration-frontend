@@ -827,3 +827,7 @@ deleteAllPreviousRegistrations.heading = Remove all your previous registrations 
 deleteAllPreviousRegistrations.warning = This will delete all your previous registrations you have added.
 deleteAllPreviousRegistrations.error.required = Select yes if you want to remove all your previous registrations from this scheme
 deleteAllPreviousRegistrations.change.hidden = Remove all your previous registrations information from this scheme
+
+notRegistered.title = You cannot use this service
+notRegistered.heading = You cannot use this service
+notRegistered.label = You must <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu">register for the VAT One Stop Shop scheme</a> to use this service.
