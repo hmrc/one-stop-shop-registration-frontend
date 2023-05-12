@@ -22,9 +22,10 @@ import logging.Logging
 import models.AmendMode
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.{AuthenticatedUserAnswersRepository, SessionRepository}
+import repositories.AuthenticatedUserAnswersRepository
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -42,21 +43,26 @@ class StartAmendJourneyController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = cc.authAndGetOptionalData(Some(AmendMode)).async { // TODO require HMRC-OSS-ORG enrolment key
     implicit request =>
-      for {
+      (for {
         maybeRegistration <- registrationConnector.getRegistration()
-        registration = maybeRegistration.getOrElse(throw new Exception("TODO")) // TODO
-        maybeVatCustomerInfo <- registrationConnector.getVatCustomerInfo()
-        vatCustomerInfo = maybeVatCustomerInfo match {
-          case Right(vci) => vci
-          case Left(error) => val exception = new Exception(s"TODO ${error}") // TODO
-            logger.error(exception.getMessage, exception)
-            throw exception
+      } yield {
+        maybeRegistration match {
+          case Some(registration) =>
+            registrationConnector.getVatCustomerInfo().flatMap {
+              case Right(vatInfo) =>
+                for {
+                  userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                  _ <- authenticatedUserAnswersRepository.set(userAnswers)
+                } yield Redirect(routes.ChangeYourRegistrationController.onPageLoad().url)
+
+              case Left(error) => val exception = new Exception(s"TODO ${error}") // TODO
+                logger.error(exception.getMessage, exception)
+                throw exception
+            }
+
+          case None =>
+            Redirect(controllers.routes.NotRegisteredController.onPageLoad().url).toFuture
         }
-        userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatCustomerInfo)
-        _ <- authenticatedUserAnswersRepository.set(userAnswers)
-      } yield
-        Redirect(routes.ChangeYourRegistrationController.onPageLoad().url)
-
+      }).flatten
   }
-
 }
