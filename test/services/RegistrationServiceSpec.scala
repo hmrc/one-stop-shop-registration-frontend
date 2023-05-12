@@ -30,6 +30,7 @@ import queries.{AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
 import java.time.LocalDate
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrationServiceSpec
   extends SpecBase
