@@ -17,8 +17,8 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.euDetails.EuConsumerSalesMethod
 import models.{Index, Mode, UserAnswers}
+import models.euDetails.EuConsumerSalesMethod
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -45,21 +45,13 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
     }
   }
 
-  private def cleanupCommonData(userAnswers: UserAnswers): Try[UserAnswers] = {
-    userAnswers.remove(RegistrationTypePage(countryIndex))
-      .flatMap(_.remove(EuVatNumberPage(countryIndex)))
-      .flatMap(_.remove(EuTaxReferencePage(countryIndex)))
-  }
-
   override def cleanup(value: Option[EuConsumerSalesMethod], userAnswers: UserAnswers): Try[UserAnswers] = {
     value match {
       case Some(EuConsumerSalesMethod.DispatchWarehouse) =>
-        cleanupCommonData(userAnswers)
-        .flatMap(_.remove(FixedEstablishmentTradingNamePage(countryIndex)))
-        .flatMap(_.remove(FixedEstablishmentAddressPage(countryIndex)))
+        userAnswers.remove(FixedEstablishmentTradingNamePage(countryIndex))
+          .flatMap(_.remove(FixedEstablishmentAddressPage(countryIndex)))
       case Some(EuConsumerSalesMethod.FixedEstablishment) =>
-        cleanupCommonData(userAnswers)
-          .flatMap(_.remove(EuSendGoodsTradingNamePage(countryIndex)))
+        userAnswers.remove(EuSendGoodsTradingNamePage(countryIndex))
           .flatMap(_.remove(EuSendGoodsAddressPage(countryIndex)))
       case None => super.cleanup(value, userAnswers)
     }
