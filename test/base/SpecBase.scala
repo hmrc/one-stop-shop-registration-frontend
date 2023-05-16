@@ -157,9 +157,9 @@ trait SpecBase
         EuDetailsSummary.checkAnswersRow(answers, mode),
         IsOnlineMarketplaceSummary.row(answers, mode),
         HasWebsiteSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BusinessContactDetailsSummary.rowContactName(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BusinessContactDetailsSummary.rowTelephoneNumber(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BusinessContactDetailsSummary.rowEmailAddress(answers),
+        BusinessContactDetailsSummary.rowContactName(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        BusinessContactDetailsSummary.rowTelephoneNumber(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        BusinessContactDetailsSummary.rowEmailAddress(answers, mode),
         BankDetailsSummary.rowAccountName(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         BankDetailsSummary.rowBIC(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         BankDetailsSummary.rowIBAN(answers, mode)

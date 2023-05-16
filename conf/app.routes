@@ -81,6 +81,8 @@ GET         /business-contact-details                                           
 POST        /business-contact-details                                           controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /check-business-contact-details                                     controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-business-contact-details                                     controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-business-contact-details                                     controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-business-contact-details                                     controllers.BusinessContactDetailsController.onSubmit(mode: Mode = AmendMode)
 
 GET         /successful                                                         controllers.ApplicationCompleteController.onPageLoad()
 
