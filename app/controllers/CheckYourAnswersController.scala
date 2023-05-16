@@ -89,9 +89,9 @@ class CheckYourAnswersController @Inject()(
             IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode),
             HasWebsiteSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             WebsiteSummary.checkAnswersRow(request.userAnswers, CheckMode),
-            BusinessContactDetailsSummary.rowContactName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
+            BusinessContactDetailsSummary.rowContactName(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers, CheckMode),
             BankDetailsSummary.rowAccountName(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BankDetailsSummary.rowBIC(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             BankDetailsSummary.rowIBAN(request.userAnswers, CheckMode)
