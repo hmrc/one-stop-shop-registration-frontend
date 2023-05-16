@@ -17,13 +17,13 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.SaveForLaterConnector
+import connectors.{RegistrationConnector, SaveForLaterConnector}
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
 import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
-import models.{BusinessContactDetails, CheckMode, Mode, NormalMode}
+import models.{AmendMode, BusinessContactDetails, CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
-                                                  saveForLaterConnector: SaveForLaterConnector,
+                                                  registrationConnector: RegistrationConnector,
                                                   saveForLaterService: SaveForLaterService,
                                                   emailVerificationService: EmailVerificationService,
                                                   formProvider: BusinessContactDetailsFormProvider,
@@ -66,21 +66,39 @@ class BusinessContactDetailsController @Inject()(
 
       val messages = messagesApi.preferred(request)
 
-      val continueUrl = if (mode == CheckMode) {
-        routes.CheckYourAnswersController.onPageLoad().url
-      } else {
-        routes.BankDetailsController.onPageLoad(NormalMode).url
-      }
-
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled))),
 
         value => {
 
-          if (config.emailVerificationEnabled) {
+          val isNotMatchingEmailAddress = request.userAnswers.get(BusinessContactDetailsPage) match {
+            case Some(contactDetails) =>
+              for {
+                maybeRegistration <- registrationConnector.getRegistration()
+              } yield {
+                maybeRegistration match {
+                  case Some(registration) =>
+                    contactDetails.emailAddress != registration.contactDetails.emailAddress
+                }
+              }
+
+          }
+
+          val continueUrl = if (mode == CheckMode) {
+            routes.CheckYourAnswersController.onPageLoad().url
+          } else if (mode == AmendMode) {
+            controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          } else {
+            routes.BankDetailsController.onPageLoad(NormalMode).url
+          }
+
+          if (mode == AmendMode && config.emailVerificationEnabled && isNotMatchingEmailAddress) {
+            verifyEmailAndRedirect(mode, messages, continueUrl, value)
+          } else if (mode != AmendMode && config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else {
+            logger.info("update answers ")
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
               _ <- cc.sessionRepository.set(updatedAnswers)
