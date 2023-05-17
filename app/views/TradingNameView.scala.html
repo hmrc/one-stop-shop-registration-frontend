@@ -44,6 +44,6 @@
             .withHint(HintViewModel("tradingName.hint"))
         )
 
-        @button("site.continue",  routes.TradingNameController.onPageLoad(mode, index).url)
+        @button("site.continue",  routes.TradingNameController.onPageLoad(mode, index).url, mode)
     }
 }

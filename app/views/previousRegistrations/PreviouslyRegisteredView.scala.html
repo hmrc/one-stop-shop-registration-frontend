@@ -41,6 +41,6 @@
             ).withHint(HintViewModel(messages("previouslyRegistered.hint")))
         )
 
-        @button("site.continue",  controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(mode).url)
+        @button("site.continue",  controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(mode).url, mode)
     }
 }
