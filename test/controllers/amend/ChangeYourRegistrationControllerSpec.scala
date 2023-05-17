@@ -20,13 +20,13 @@ import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
-import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
+import controllers.routes
+import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
-import models.responses.{ConflictFound, UnexpectedResponseStatus}
+import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -35,7 +35,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.amend.ChangeYourRegistrationPage
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -103,7 +103,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, AmendMode).futureValue)
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true, AmendMode)(request, messages(application)).toString
         }
       }
 
@@ -128,7 +128,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -150,7 +150,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -172,7 +172,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -194,7 +194,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -216,7 +216,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -240,7 +240,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -264,7 +264,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, AmendMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
         }
       }
