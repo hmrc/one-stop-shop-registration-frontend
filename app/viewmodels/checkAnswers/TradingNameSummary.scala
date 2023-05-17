@@ -24,18 +24,22 @@ import queries.AllTradingNames
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
+import viewmodels.ListItemWrapper
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object TradingNameSummary  {
+object TradingNameSummary {
 
-  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItemWrapper] =
     answers.get(AllTradingNames).getOrElse(List.empty).zipWithIndex.map {
       case (name, index) =>
-        ListItem(
-          name      = HtmlFormat.escape(name).toString,
-          changeUrl = routes.TradingNameController.onPageLoad(mode, Index(index)).url,
-          removeUrl = routes.DeleteTradingNameController.onPageLoad(mode, Index(index)).url
+        ListItemWrapper(
+          ListItem(
+            name = HtmlFormat.escape(name).toString,
+            changeUrl = routes.TradingNameController.onPageLoad(mode, Index(index)).url,
+            removeUrl = routes.DeleteTradingNameController.onPageLoad(mode, Index(index)).url
+          ),
+          removeButtonEnabled = true
         )
     }
 
@@ -49,8 +53,8 @@ object TradingNameSummary  {
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
-          key     = "tradingNames.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
+          key = "tradingNames.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("tradingNames.change.hidden"))

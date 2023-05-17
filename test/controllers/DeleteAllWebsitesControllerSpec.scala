@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.DeleteAllWebsitesFormProvider
 import models.{AmendMode, CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -28,6 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.AllWebsites
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.DeleteAllWebsitesView
 
 import scala.concurrent.Future
@@ -36,6 +38,8 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new DeleteAllWebsitesFormProvider()
   private val form = formProvider()
+
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   private val userAnswers = basicUserAnswersWithVatInfo
     .set(WebsitePage(Index(0)), "foo").success.value
@@ -51,7 +55,11 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
           "must return OK and the correct view for a GET" in {
 
-            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
             running(application) {
               val request = FakeRequest(GET, deleteAllWebsitesRoute)
@@ -67,6 +75,8 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
           "must delete all websites answers and redirect to the next page when user answers Yes" in {
 
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
             val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
             when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -74,6 +84,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
             val application =
               applicationBuilder(userAnswers = Some(userAnswers))
                 .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
                 .build()
 
             running(application) {
@@ -94,6 +105,8 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
           "must not delete all websites answers and redirect to the next page when user answers No" in {
 
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
             val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
             when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -101,6 +114,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
             val application =
               applicationBuilder(userAnswers = Some(userAnswers))
                 .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
                 .build()
 
             running(application) {
@@ -121,7 +135,11 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
 
           "must return a Bad Request and errors when invalid data is submitted" in {
 
-            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
             running(application) {
               val request =

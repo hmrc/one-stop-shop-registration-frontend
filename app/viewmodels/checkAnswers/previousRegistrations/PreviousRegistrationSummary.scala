@@ -26,34 +26,33 @@ import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousR
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
+import viewmodels.ListItemWrapper
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object PreviousRegistrationSummary extends Logging {
+object PreviousRegistrationSummary {
 
-  def addToListRows(answers: UserAnswers, existingPreviousRegistrations: Option[Seq[PreviousRegistration]], mode: Mode): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, existingPreviousRegistrations: Seq[PreviousRegistration], mode: Mode): Seq[ListItemWrapper] =
     answers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
         if(mode == AmendMode) {
 
-          if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations.get)) {
+          ListItemWrapper(
             ListItem(
               name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-              changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
-              removeUrl = ""
-            )
-          } else {
+            changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
+            removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
+            ),
+            !existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)
+          )
+        } else {
+          ListItemWrapper(
             ListItem(
               name = HtmlFormat.escape(details.previousEuCountry.name).toString,
               changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
               removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
-            )
-          }
-        } else {
-          ListItem(
-            name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-            changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
-            removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
+            ),
+            removeButtonEnabled = true
           )
         }
     }

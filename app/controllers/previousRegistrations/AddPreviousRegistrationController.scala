@@ -69,9 +69,9 @@ class AddPreviousRegistrationController @Inject()(
               case previousRegistrationLegacy: PreviousRegistrationLegacy =>
                 previousRegistrationLegacy.country
             }
-            PreviousRegistrationSummary.addToListRows(request.userAnswers, Some(registration.previousRegistrations), mode)
+            PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
           } else {
-            PreviousRegistrationSummary.addToListRows(request.userAnswers, None, mode)
+            PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
           }
 
           withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
@@ -115,9 +115,9 @@ class AddPreviousRegistrationController @Inject()(
                 case previousRegistrationLegacy: PreviousRegistrationLegacy =>
                   previousRegistrationLegacy.country
               }
-              PreviousRegistrationSummary.addToListRows(request.userAnswers, Some(registration.previousRegistrations), mode)
+              PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
             } else {
-              PreviousRegistrationSummary.addToListRows(request.userAnswers, None, mode)
+              PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
             }
 
             form.bindFromRequest().fold(
