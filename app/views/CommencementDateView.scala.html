@@ -43,6 +43,6 @@ endOfCurrentQuarter: Option[String], startOfNextQuarter: Option[String])(implici
 
     @formHelper(action = routes.CommencementDateController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
-        @button("site.continue", routes.CommencementDateController.onPageLoad(mode).url)
+        @button("site.continue", routes.CommencementDateController.onPageLoad(mode).url, mode)
     }
 }

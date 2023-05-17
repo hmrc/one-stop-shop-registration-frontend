@@ -47,6 +47,6 @@
             content = Text(messages("deleteAllTradingNames.warning"))
         ))
 
-        @button("site.continue", routes.DeleteAllTradingNamesController.onPageLoad(mode).url)
+        @button("site.continue", routes.DeleteAllTradingNamesController.onPageLoad(mode).url, mode)
     }
 }

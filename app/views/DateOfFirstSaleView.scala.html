@@ -42,6 +42,6 @@
             .withHint(HintViewModel(messages("dateOfFirstSale.hint", dateHintFormatted)))
         )
 
-        @button("site.continue", routes.DateOfFirstSaleController.onPageLoad(mode).url)
+        @button("site.continue", routes.DateOfFirstSaleController.onPageLoad(mode).url, mode)
     }
 }

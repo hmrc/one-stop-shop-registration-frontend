@@ -41,7 +41,7 @@
             ).withHint(HintViewModel(messages("isOnlineMarketplace.caption")))
         )
 
-        @button("site.continue",  routes.IsOnlineMarketplaceController.onPageLoad(mode).url)
+        @button("site.continue",  routes.IsOnlineMarketplaceController.onPageLoad(mode).url, mode)
 
     }
 }

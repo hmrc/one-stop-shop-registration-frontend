@@ -47,6 +47,6 @@
             content = Text(messages("deleteAllWebsites.warning"))
         ))
 
-        @button("site.continue", routes.DeleteAllWebsitesController.onPageLoad(mode).url)
+        @button("site.continue", routes.DeleteAllWebsitesController.onPageLoad(mode).url, mode)
     }
 }
