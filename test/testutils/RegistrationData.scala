@@ -74,7 +74,7 @@ object RegistrationData extends Generators with EitherValues {
           ))
         ),
         RegistrationWithoutTaxId(
-          Country("CR", "Croatia")
+          Country("HR", "Croatia")
         ),
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
