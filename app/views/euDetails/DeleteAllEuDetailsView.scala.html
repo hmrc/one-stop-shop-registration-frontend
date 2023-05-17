@@ -48,6 +48,6 @@
             content = Text(messages("deleteAllEuDetails.warning"))
         ))
 
-        @button("site.continue", routes.DeleteAllEuDetailsController.onPageLoad(mode).url)
+        @button("site.continue", routes.DeleteAllEuDetailsController.onPageLoad(mode).url, mode)
     }
 }

@@ -42,7 +42,7 @@
             @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, false)) {
                 @govukSummaryList(list)
 
-            @button("site.continue",  controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, index).url)
+            @button("site.continue",  controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, index).url, mode)
 
 }
         } else {
@@ -51,7 +51,7 @@
 
             @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, true)) {
 
-                @button("error.resolve_missing_answers",  controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, index).url)
+                @button("error.resolve_missing_answers",  controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, index).url, mode)
 
             }
 
