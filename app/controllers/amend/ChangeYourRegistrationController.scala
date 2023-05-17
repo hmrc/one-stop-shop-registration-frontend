@@ -20,8 +20,8 @@ import cats.data.Validated.{Invalid, Valid}
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import controllers.routes
 import controllers.amend.{routes => amendRoutes}
+import controllers.routes
 import logging.Logging
 import models.{AmendMode, NormalMode}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
@@ -29,8 +29,6 @@ import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import pages.amend.ChangeYourRegistrationPage
-import models.responses.ConflictFound
-import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
@@ -101,7 +99,7 @@ class ChangeYourRegistrationController @Inject()(
         )
 
         val isValid = validate()
-        Ok(view(vatRegistrationDetailsList, list, isValid))
+        Ok(view(vatRegistrationDetailsList, list, isValid, AmendMode))
       }
   }
 
