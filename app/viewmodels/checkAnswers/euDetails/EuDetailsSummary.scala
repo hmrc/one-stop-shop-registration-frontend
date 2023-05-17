@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuOptionalDetailsQuery
@@ -36,6 +36,7 @@ object EuDetailsSummary {
       case CheckMode => CheckMode
       case AmendMode => AmendMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
+      case AmendLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Amend Loop Mode")
     }
 
     answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
@@ -73,6 +74,7 @@ object EuDetailsSummary {
       case CheckMode => CheckMode
       case AmendMode => AmendMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
+      case AmendLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Amend Loop Mode")
     }
 
       SummaryList(
