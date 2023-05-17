@@ -63,7 +63,7 @@
                         <input type="hidden" name="value" id="value" value="false"/>
                     }
 
-                    @button("site.continue",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
+                    @button("site.continue",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url, mode)
                 }
             } else {
                 <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
@@ -71,7 +71,7 @@
 
                 @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, true)) {
 
-                    @button("error.resolve_missing_answers",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
+                    @button("error.resolve_missing_answers",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url, mode)
                 }
             }
     }

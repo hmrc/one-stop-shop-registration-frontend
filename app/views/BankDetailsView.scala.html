@@ -67,6 +67,6 @@
             .withHint(HintViewModel(messages("bankDetails.iban.hint")))
         )
 
-        @button("site.continue", routes.BankDetailsController.onPageLoad(mode).url)
+        @button("site.continue", routes.BankDetailsController.onPageLoad(mode).url, mode)
     }
 }
