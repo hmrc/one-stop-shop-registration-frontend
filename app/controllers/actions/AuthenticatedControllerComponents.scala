@@ -48,7 +48,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
       getData andThen
-      requireData andThen
+      requireData(mode) andThen
       checkNiProtocol andThen
       checkOtherCountryRegistration
 
