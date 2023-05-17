@@ -24,18 +24,22 @@ import queries.AllWebsites
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
+import viewmodels.ListItemWrapper
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object WebsiteSummary {
 
-  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItemWrapper] =
     answers.get(AllWebsites).getOrElse(List.empty).zipWithIndex.map {
       case (website, index) =>
-        ListItem(
-          name      = HtmlFormat.escape(website).toString,
-          changeUrl = routes.WebsiteController.onPageLoad(mode, Index(index)).url,
-          removeUrl = routes.DeleteWebsiteController.onPageLoad(mode, Index(index)).url
+        ListItemWrapper(
+          ListItem(
+            name = HtmlFormat.escape(website).toString,
+            changeUrl = routes.WebsiteController.onPageLoad(mode, Index(index)).url,
+            removeUrl = routes.DeleteWebsiteController.onPageLoad(mode, Index(index)).url
+          ),
+          removeButtonEnabled = true
         )
     }
 
@@ -49,8 +53,8 @@ object WebsiteSummary {
         }.mkString("<br/>")
 
         SummaryListRowViewModel(
-          key     = "websites.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
+          key = "websites.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("websites.change.hidden"))
