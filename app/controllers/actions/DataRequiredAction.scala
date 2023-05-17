@@ -60,11 +60,6 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
     }
   }
 
-//  def apply(mode: Option[Mode]): AuthenticatedDataRequiredActionImpl = {
-//
-//    new AuthenticatedDataRequiredActionImpl(mode, registrationConnector)
-//  }
-
 }
 
 class UnauthenticatedDataRequiredAction @Inject()(implicit val executionContext: ExecutionContext)
