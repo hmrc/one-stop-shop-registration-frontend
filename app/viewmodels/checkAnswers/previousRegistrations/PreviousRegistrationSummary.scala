@@ -17,7 +17,9 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
-import models.{AmendMode, Index, Mode, UserAnswers}
+import logging.Logging
+import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew}
+import models.{AmendMode, Country, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
@@ -27,17 +29,41 @@ import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object PreviousRegistrationSummary {
+object PreviousRegistrationSummary extends Logging {
 
-  def addToListRows(answers: UserAnswers, mode: Mode): Seq[ListItem] =
+  def addToListRows(answers: UserAnswers, existingPreviousRegistrations: Option[Seq[PreviousRegistration]], mode: Mode): Seq[ListItem] =
     answers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
-        ListItem(
-          name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-          changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
-          removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
-        )
+        if(mode == AmendMode) {
+
+          if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations.get)) {
+            ListItem(
+              name = HtmlFormat.escape(details.previousEuCountry.name).toString,
+              changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
+              removeUrl = ""
+            )
+          } else {
+            ListItem(
+              name = HtmlFormat.escape(details.previousEuCountry.name).toString,
+              changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
+              removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
+            )
+          }
+        } else {
+          ListItem(
+            name = HtmlFormat.escape(details.previousEuCountry.name).toString,
+            changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
+            removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
+          )
+        }
     }
+
+  private def existingPreviousRegistration(country: Country, existingPreviousRegistration: Seq[PreviousRegistration]): Boolean = {
+    existingPreviousRegistration.exists {
+      case previousRegistrationNew: PreviousRegistrationNew => previousRegistrationNew.country == country
+      case previousRegistrationLegacy: PreviousRegistrationLegacy => previousRegistrationLegacy.country == country
+    }
+  }
 
   def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllPreviousRegistrationsQuery).map {
@@ -52,12 +78,9 @@ object PreviousRegistrationSummary {
           key = "previousRegistrations.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
           actions = Seq(if(mode==AmendMode) {
-            //TODO
-            println(s"Mode: $mode")
             ActionItemViewModel("site.add", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
           } else {
-            println(s"Mode: $mode")
             ActionItemViewModel("site.change", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
           }
