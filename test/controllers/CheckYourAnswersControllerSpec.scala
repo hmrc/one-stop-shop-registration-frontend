@@ -20,11 +20,11 @@ import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
+import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import models.audit.{RegistrationAuditModel, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
-import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -32,7 +32,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -100,7 +100,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, CheckMode).futureValue)
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true, CheckMode)(request, messages(application)).toString
         }
       }
 
@@ -125,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -147,7 +147,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -169,7 +169,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -191,7 +191,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -213,7 +213,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -237,7 +237,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -261,7 +261,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, CheckMode).futureValue)
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false)(request, messages(application)).toString
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
           }
         }
       }
