@@ -56,6 +56,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
   "AddPreviousRegistration Controller" - {
 
+    // TODO - Add also for amend mode
+
     "must return OK and the correct view for a GET when answers are complete" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
@@ -67,7 +69,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, NormalMode)
+        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -85,7 +87,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, NormalMode)
+        val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, Seq.empty, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
@@ -142,7 +144,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, NormalMode)
+        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
 
         val result = route(application, request).value
 

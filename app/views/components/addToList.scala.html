@@ -15,31 +15,34 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ItemSize, ListItem}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ItemSize
+@import viewmodels.ListItemWrapper
 
 @this()
 
-@(itemList: Seq[ListItem], itemSize: ItemSize = addtoalist.Short, changePrefix :String, removePrefix :String)(implicit messages: Messages)
+@(itemList: Seq[ListItemWrapper], itemSize: ItemSize = addtoalist.Short, changePrefix :String, removePrefix :String)(implicit messages: Messages)
 
 <div class="govuk-form-group">
     <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--@itemSize.suffix">
     @for(item <- itemList) {
         <div class="hmrc-add-to-a-list__contents">
             <dt class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light">
-            @Html(item.name)
+            @Html(item.listItem.name)
             </dt>
             <dd class="hmrc-add-to-a-list__change">
-                <a class="govuk-link" href="@item.changeUrl">
+                <a class="govuk-link" href="@item.listItem.changeUrl">
                     <span aria-hidden="true">@messages("site.change")</span>
-                    <span class="govuk-visually-hidden">@messages(changePrefix, item.name)</span>
+                    <span class="govuk-visually-hidden">@messages(changePrefix, item.listItem.name)</span>
                 </a>
             </dd>
-            <dd class="hmrc-add-to-a-list__remove">
-                <a class="govuk-link" href="@item.removeUrl">
-                    <span aria-hidden="true">@messages("site.remove")</span>
-                    <span class="govuk-visually-hidden">@messages(removePrefix, item.name)</span>
-                </a>
-            </dd>
+            @if(item.removeButtonEnabled) {
+                <dd class="hmrc-add-to-a-list__remove">
+                    <a class="govuk-link" href="@item.listItem.removeUrl">
+                        <span aria-hidden="true">@messages("site.remove")</span>
+                        <span class="govuk-visually-hidden">@messages(removePrefix, item.listItem.name)</span>
+                    </a>
+                </dd>
+            }
         </div>
     }
     </dl>

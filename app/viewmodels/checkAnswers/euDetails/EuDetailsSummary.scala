@@ -24,12 +24,13 @@ import queries.AllEuOptionalDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
+import viewmodels.ListItemWrapper
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
 object EuDetailsSummary {
 
-  def addToListRows(answers: UserAnswers, currentMode: Mode): Seq[ListItem] = {
+  def addToListRows(answers: UserAnswers, currentMode: Mode): Seq[ListItemWrapper] = {
 
     val changeLinkMode = currentMode match {
       case NormalMode => NormalMode
@@ -41,10 +42,13 @@ object EuDetailsSummary {
 
     answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
-        ListItem(
+        ListItemWrapper(
+          ListItem(
           name = HtmlFormat.escape(details.euCountry.name).toString,
           changeUrl = routes.CheckEuDetailsAnswersController.onPageLoad(changeLinkMode, Index(index)).url,
           removeUrl = routes.DeleteEuDetailsController.onPageLoad(currentMode, Index(index)).url
+        ),
+          removeButtonEnabled = true
         )
     }
   }
