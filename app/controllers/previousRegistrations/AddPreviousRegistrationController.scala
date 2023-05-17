@@ -18,7 +18,9 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.{Country, Mode}
+import logging.Logging
+import models.domain.{PreviousRegistrationLegacy, PreviousRegistrationNew, Registration}
+import models.{AmendMode, Country, Mode}
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
 import pages.previousRegistrations.AddPreviousRegistrationPage
@@ -39,10 +41,12 @@ class AddPreviousRegistrationController @Inject()(
                                                    cc: AuthenticatedControllerComponents,
                                                    formProvider: AddPreviousRegistrationFormProvider,
                                                    view: AddPreviousRegistrationView
-                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport with Logging {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
+
+  private val exception = new IllegalStateException("Can't amend a non-existent registration")
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
@@ -50,7 +54,25 @@ class AddPreviousRegistrationController @Inject()(
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers, mode)
+
+          val previousRegistrations = if (mode == AmendMode) {
+            val registration: Registration = request.registration match {
+              case Some(registration) => registration
+              case None =>
+                logger.error(exception.getMessage, exception)
+                throw exception
+            }
+
+            registration.previousRegistrations.map {
+              case previousRegistrationNew: PreviousRegistrationNew =>
+                previousRegistrationNew.country
+              case previousRegistrationLegacy: PreviousRegistrationLegacy =>
+                previousRegistrationLegacy.country
+            }
+            PreviousRegistrationSummary.addToListRows(request.userAnswers, Some(registration.previousRegistrations), mode)
+          } else {
+            PreviousRegistrationSummary.addToListRows(request.userAnswers, None, mode)
+          }
 
           withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
             data = getAllIncompleteDeregisteredDetails,
@@ -77,8 +99,26 @@ class AddPreviousRegistrationController @Inject()(
         }) {
         getNumberOfPreviousRegistrations {
           number =>
+
             val canAddCountries = number < Country.euCountries.size
-            val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers, mode)
+
+            val previousRegistrations = if (mode == AmendMode) {
+              val registration: Registration = request.registration match {
+                case Some(registration) => registration
+                case None => logger.error(exception.getMessage, exception)
+                  throw exception
+              }
+
+              registration.previousRegistrations.map {
+                case previousRegistrationNew: PreviousRegistrationNew =>
+                  previousRegistrationNew.country
+                case previousRegistrationLegacy: PreviousRegistrationLegacy =>
+                  previousRegistrationLegacy.country
+              }
+              PreviousRegistrationSummary.addToListRows(request.userAnswers, Some(registration.previousRegistrations), mode)
+            } else {
+              PreviousRegistrationSummary.addToListRows(request.userAnswers, None, mode)
+            }
 
             form.bindFromRequest().fold(
               formWithErrors =>
