@@ -15,13 +15,16 @@
  *@
 
 @this(govukButton: GovukButton)
-@(continueMessage: String, continueUrl: String = "")(implicit messages: Messages)
+@(continueMessage: String, continueUrl: String = "", mode: Mode)(implicit messages: Messages)
 <div class="govuk-button-group">
     @govukButton(
         ButtonViewModel(messages(continueMessage)).withAttribute(("id", "continue")).withAttribute("onclick", "showTheSpinner()")
     )
 
-    <a id="saveProgress" role="button" href="@routes.SavedProgressController.onPageLoad(continueUrl)" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-        @messages("saveProgress.button")
-    </a>
+    @if(mode == CheckMode) {
+        <a id="saveProgress" role="button" href="@routes.SavedProgressController.onPageLoad(continueUrl)" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            @messages("saveProgress.button")
+        </a>
+    }
+
 </div>
