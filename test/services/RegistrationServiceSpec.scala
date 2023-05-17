@@ -69,7 +69,7 @@ class RegistrationServiceSpec
       .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
       .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
 
-      .set(EuCountryPage(Index(3)), Country("CR", "Croatia")).success.value
+      .set(EuCountryPage(Index(3)), Country("HR", "Croatia")).success.value
       .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
       .set(VatRegisteredPage(Index(3)), false).success.value
 
