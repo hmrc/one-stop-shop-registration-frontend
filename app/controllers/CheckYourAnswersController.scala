@@ -99,7 +99,7 @@ class CheckYourAnswersController @Inject()(
         )
 
         val isValid = validate()
-        Ok(view(vatRegistrationDetailsList, list, isValid))
+        Ok(view(vatRegistrationDetailsList, list, isValid, CheckMode))
       }
   }
 
