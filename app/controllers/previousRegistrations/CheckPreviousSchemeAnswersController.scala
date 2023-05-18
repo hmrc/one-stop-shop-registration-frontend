@@ -20,12 +20,13 @@ import config.Constants
 import controllers.GetCountry
 import controllers.actions.AuthenticatedControllerComponents
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
-import models.{Index, Mode}
+import models.{AmendMode, Index, Mode}
 import pages.previousRegistrations.CheckPreviousSchemeAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckExistingRegistrations.getExistingRegistrationSchemes
 import utils.CompletionChecks
 import viewmodels.checkAnswers.previousRegistrations._
 import viewmodels.govuk.summarylist._
@@ -52,10 +53,16 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
             val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
+            val existingSchemes = if (mode == AmendMode) getExistingRegistrationSchemes(country) else Seq.empty
+
             val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
               SummaryListViewModel(
                 rows = Seq(
-                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), mode),
+                 if (mode == AmendMode) {
+                    PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), existingSchemes, mode)
+                  } else {
+                    PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), Seq.empty, mode)
+                  },
                   PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
                   PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
                 ).flatten
@@ -80,10 +87,16 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
           val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
+          val existingSchemes = if (mode == AmendMode) getExistingRegistrationSchemes(country) else Seq.empty
+
           val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
             SummaryListViewModel(
               rows = Seq(
-                PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), mode),
+                if (mode == AmendMode) {
+                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), existingSchemes, mode)
+                } else {
+                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), Seq.empty, mode)
+                },
                 PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
                 PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
               ).flatten

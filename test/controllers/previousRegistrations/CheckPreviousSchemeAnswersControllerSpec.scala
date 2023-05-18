@@ -59,6 +59,8 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
   "CheckPreviousSchemeAnswersController" - {
 
+    // TODO - Add test for getExistingRegistrationSchemes in amend mode
+
     "must return OK and the correct view for a GET when answers are complete" in {
 
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers)).build()
@@ -70,7 +72,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
         val lists = Seq(SummaryListViewModel(
           Seq(
-            PreviousSchemeSummary.row(baseUserAnswers, index, index, NormalMode),
+            PreviousSchemeSummary.row(baseUserAnswers, index, index, Seq.empty, NormalMode),
             PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
           ).flatten
         ))
@@ -136,7 +138,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
           val list = Seq(SummaryListViewModel(
             Seq(
-              PreviousSchemeSummary.row(baseUserAnswers, index, index, NormalMode),
+              PreviousSchemeSummary.row(baseUserAnswers, index, index, Seq.empty, NormalMode),
               PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
             ).flatten
           ))
