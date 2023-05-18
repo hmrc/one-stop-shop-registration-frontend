@@ -446,3 +446,5 @@ GET         /successful-amend                                                   
 
 GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
 POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
+
+GET        /cannot-use-not-registered                                           controllers.NotRegisteredController.onPageLoad()
