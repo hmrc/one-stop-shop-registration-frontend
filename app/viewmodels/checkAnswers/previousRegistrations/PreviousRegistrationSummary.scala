@@ -63,7 +63,11 @@ object PreviousRegistrationSummary {
     }
   }
 
-  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(
+                       answers: UserAnswers,
+                       existingPreviousRegistrations: Seq[PreviousRegistration],
+                       mode: Mode
+                     )(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllPreviousRegistrationsQuery).map {
       previousRegistrations =>
 
@@ -72,11 +76,20 @@ object PreviousRegistrationSummary {
             HtmlFormat.escape(details.previousEuCountry.name)
         }.mkString("<br/>")
 
+
+        val currentAnswerCountries = previousRegistrations.map(_.previousEuCountry)
+
+        val existingCountries = existingPreviousRegistrations.map {
+          case previousRegistrationNew: PreviousRegistrationNew => previousRegistrationNew.country
+          case previousRegistrationLegacy: PreviousRegistrationLegacy => previousRegistrationLegacy.country
+        }
+
+        val sameListOfCountries: Boolean = currentAnswerCountries.sortBy(_.code) == existingCountries.sortBy(_.code)
+
         SummaryListRowViewModel(
           key = "previousRegistrations.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
-          //TODO - Add additional check to see
-          actions = Seq(if (mode == AmendMode) {
+          actions = Seq(if (mode == AmendMode && sameListOfCountries) {
             ActionItemViewModel("site.add", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.add.hidden"))
           } else {
