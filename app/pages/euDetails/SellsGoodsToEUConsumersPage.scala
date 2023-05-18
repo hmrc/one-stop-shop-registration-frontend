@@ -22,6 +22,8 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
+import scala.util.Try
+
 case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ "euDetails" \ countryIndex.position \ toString
@@ -55,6 +57,22 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
+    value match {
+      case Some(false) =>
+        userAnswers.remove(RegistrationTypePage(countryIndex))
+          .flatMap(_.remove(EuVatNumberPage(countryIndex)))
+          .flatMap(_.remove(EuTaxReferencePage(countryIndex)))
+          .flatMap(_.remove(SellsGoodsToEUConsumerMethodPage(countryIndex)))
+          .flatMap(_.remove(FixedEstablishmentTradingNamePage(countryIndex)))
+          .flatMap(_.remove(FixedEstablishmentAddressPage(countryIndex)))
+          .flatMap(_.remove(EuSendGoodsTradingNamePage(countryIndex)))
+          .flatMap(_.remove(EuSendGoodsAddressPage(countryIndex)))
+
+      case _ => super.cleanup(value, userAnswers)
     }
   }
 

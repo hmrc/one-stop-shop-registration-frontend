@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{CheckMode, Country, Index, NormalMode, UserAnswers}
+import models.{CheckLoopMode, CheckMode, Country, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -36,6 +36,13 @@ case class EuCountryPage(countryIndex: Index) extends QuestionPage[Country] {
     answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
       case Some(_) => SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
       case None => euRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex)
+    }
+  }
+
+  override protected def navigateInCheckLoopMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(_) => SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckLoopMode, answers)
+      case None => euRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckLoopMode, countryIndex)
     }
   }
 
