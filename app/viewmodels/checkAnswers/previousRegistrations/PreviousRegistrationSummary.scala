@@ -17,7 +17,6 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
-import logging.Logging
 import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew}
 import models.{AmendMode, Country, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
@@ -35,13 +34,13 @@ object PreviousRegistrationSummary {
   def addToListRows(answers: UserAnswers, existingPreviousRegistrations: Seq[PreviousRegistration], mode: Mode): Seq[ListItemWrapper] =
     answers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
-        if(mode == AmendMode) {
+        if (mode == AmendMode) {
 
           ListItemWrapper(
             ListItem(
               name = HtmlFormat.escape(details.previousEuCountry.name).toString,
-            changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
-            removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
+              changeUrl = routes.CheckPreviousSchemeAnswersController.onPageLoad(mode, Index(index)).url,
+              removeUrl = routes.DeletePreviousRegistrationController.onPageLoad(mode, Index(index)).url
             ),
             !existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)
           )
@@ -73,18 +72,19 @@ object PreviousRegistrationSummary {
             HtmlFormat.escape(details.previousEuCountry.name)
         }.mkString("<br/>")
 
-          SummaryListRowViewModel(
+        SummaryListRowViewModel(
           key = "previousRegistrations.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(if(mode==AmendMode) {
+          //TODO - Add additional check to see
+          actions = Seq(if (mode == AmendMode) {
             ActionItemViewModel("site.add", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
-              .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
+              .withVisuallyHiddenText(messages("previousRegistrations.add.hidden"))
           } else {
             ActionItemViewModel("site.change", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
           }
           )
         )
-
     }
+
 }

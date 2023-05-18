@@ -30,7 +30,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class FakeAuthenticatedDataRequiredAction(dataToReturn: Option[UserAnswers], mode: Option[Mode])
   extends AuthenticatedDataRequiredActionImpl(mode, mock[RegistrationConnector])(ExecutionContext.Implicits.global) {
 
-
   private val emptyUserAnswers: UserAnswers = UserAnswers("12345-credId", lastUpdated = LocalDate.now.atStartOfDay(ZoneId.systemDefault).toInstant)
 
   private val registration = RegistrationData.registration
