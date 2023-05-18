@@ -19,15 +19,16 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
 import logging.Logging
-import models.domain.{PreviousRegistrationLegacy, PreviousRegistrationNew, Registration}
-import models.{AmendMode, Country, Mode}
+import models.domain.Registration
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
+import models.{AmendMode, Country, Mode}
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
@@ -46,29 +47,16 @@ class AddPreviousRegistrationController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  private val exception = new IllegalStateException("Can't amend a non-existent registration")
-
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
+
       getNumberOfPreviousRegistrations {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
 
           val previousRegistrations = if (mode == AmendMode) {
-            val registration: Registration = request.registration match {
-              case Some(registration) => registration
-              case None =>
-                logger.error(exception.getMessage, exception)
-                throw exception
-            }
-
-            registration.previousRegistrations.map {
-              case previousRegistrationNew: PreviousRegistrationNew =>
-                previousRegistrationNew.country
-              case previousRegistrationLegacy: PreviousRegistrationLegacy =>
-                previousRegistrationLegacy.country
-            }
+            val registration: Registration = checkExistingRegistration
             PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
           } else {
             PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
@@ -103,18 +91,7 @@ class AddPreviousRegistrationController @Inject()(
             val canAddCountries = number < Country.euCountries.size
 
             val previousRegistrations = if (mode == AmendMode) {
-              val registration: Registration = request.registration match {
-                case Some(registration) => registration
-                case None => logger.error(exception.getMessage, exception)
-                  throw exception
-              }
-
-              registration.previousRegistrations.map {
-                case previousRegistrationNew: PreviousRegistrationNew =>
-                  previousRegistrationNew.country
-                case previousRegistrationLegacy: PreviousRegistrationLegacy =>
-                  previousRegistrationLegacy.country
-              }
+              val registration: Registration = checkExistingRegistration
               PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
             } else {
               PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
