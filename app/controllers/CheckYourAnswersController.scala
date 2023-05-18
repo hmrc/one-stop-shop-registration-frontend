@@ -83,7 +83,7 @@ class CheckYourAnswersController @Inject()(
             DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             Some(commencementDateSummary),
             PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, CheckMode),
+            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode),
             TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             EuDetailsSummary.checkAnswersRow(request.userAnswers, CheckMode),
             IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode),

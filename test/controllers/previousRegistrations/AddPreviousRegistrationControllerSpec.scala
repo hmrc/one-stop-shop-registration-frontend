@@ -108,7 +108,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return OK and the correct view for a GET when there are existing previous registrations in amend mode" in {
+    "must return OK and the correct view for a GET when there are existing previous registrations in Amend mode" in {
 
       val addPreviousRegistrationRouteAmend = routes.AddPreviousRegistrationController.onPageLoad(AmendMode).url
 
