@@ -17,10 +17,9 @@
 package utils
 
 import logging.Logging
-import models.{Country, Index, PreviousScheme}
-import models.domain.{PreviousRegistrationLegacy, PreviousRegistrationNew, PreviousSchemeDetails, Registration}
-import models.previousRegistrations.SchemeDetailsWithOptionalVatNumber
+import models.domain.{PreviousRegistrationLegacy, PreviousRegistrationNew, Registration}
 import models.requests.AuthenticatedDataRequest
+import models.{Country, PreviousScheme}
 import play.api.mvc.AnyContent
 
 object CheckExistingRegistrations extends Logging {
