@@ -177,7 +177,7 @@ applicationComplete.useService.text = You can now use this service to fill out q
 applicationComplete.payVat.text = You can also pay any One Stop Shop VAT that you owe.
 applicationComplete.returns.text = You can begin your {0} return on {1}. Include any sales from {2}.
 applicationComplete.registration.text = We''ve received your registration for <span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
-applicationComplete.contact.text = We’ll contact you if we need to check any information.
+applicationComplete.contact.text = We will contact you if we need to check any information.
 applicationComplete.readInformation = Read more information about <a class="govuk-link" href="https://www.gov.uk/guidance/completing-a-one-stop-shop-vat-return">how to complete an OSS return.</a>
 
 deleteTradingName.title = Are you sure you want to remove {0}?
@@ -800,7 +800,7 @@ amendComplete.heading = Registration details changed
 amendComplete.info = You changed the following details:
 amendComplete.link.BTA = Manage your One Stop Shop returns in your account.
 amendComplete.link.yourAccount = Manage your One Stop Shop returns in your account.
-amendComplete.contact.text = We’ll contact you if we need to check any information.
+amendComplete.contact.text = We will contact you if we need to check any information.
 amendComplete.feedback.link.text = What did you think of this service?
 amendComplete.feedback.30seconds = (takes 30 seconds)
 
