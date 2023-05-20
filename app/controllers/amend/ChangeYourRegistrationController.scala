@@ -24,7 +24,7 @@ import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import logging.Logging
 import models.{AmendMode, NormalMode}
-import models.audit.{RegistrationAuditModel, SubmissionResult}
+import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
@@ -109,12 +109,12 @@ class ChangeYourRegistrationController @Inject()(
         case Valid(registration) =>
           registrationConnector.amendRegistration(registration).flatMap {
             case Right(_) =>
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, request))
               sendEmailConfirmation(request, registration)
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
               saveForLaterService.saveAnswers(
                 routes.ErrorSubmittingRegistrationController.onPageLoad(),
                 amendRoutes.ChangeYourRegistrationController.onPageLoad()

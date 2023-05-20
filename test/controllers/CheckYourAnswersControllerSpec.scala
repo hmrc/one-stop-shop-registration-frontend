@@ -21,7 +21,7 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
-import models.audit.{RegistrationAuditModel, SubmissionResult}
+import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
@@ -304,7 +304,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
+            val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, dataRequest)
             val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
 
             status(result) mustEqual SEE_OTHER
@@ -343,7 +343,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, userAnswers)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Success, dataRequest)
+            val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, dataRequest)
             val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, false).success.value
 
             status(result) mustEqual SEE_OTHER
@@ -555,7 +555,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, dataRequest)
+            val expectedAuditEvent = RegistrationAuditModel.build(
+              RegistrationAuditType.CreateRegistration,
+              registration,
+              SubmissionResult.Duplicate,
+              dataRequest
+            )
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.AlreadyRegisteredController.onPageLoad().url
@@ -587,7 +592,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
+            val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.ErrorSubmittingRegistrationController.onPageLoad().url
@@ -617,7 +622,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, basicUserAnswersWithVatInfo)
-            val expectedAuditEvent = RegistrationAuditModel.build(registration, SubmissionResult.Failure, dataRequest)
+            val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
