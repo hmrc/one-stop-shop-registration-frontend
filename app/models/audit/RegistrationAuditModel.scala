@@ -15,19 +15,21 @@
  */
 
 package models.audit
+
 import models.domain.Registration
 import models.requests.AuthenticatedDataRequest
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 case class RegistrationAuditModel(
+                                   registrationAuditType: RegistrationAuditType,
                                    credId: String,
                                    userAgent: String,
                                    registration: Registration,
                                    result: SubmissionResult
                                  ) extends JsonAuditModel {
 
-  override val auditType: String       = "RegistrationSubmitted"
-  override val transactionName: String = "registration-submitted"
+  override val auditType: String = registrationAuditType.auditType
+  override val transactionName: String = registrationAuditType.transactionName
 
   private val previousRegistrationDetail: JsObject =
     if (registration.previousRegistrations.nonEmpty) {
@@ -37,7 +39,7 @@ case class RegistrationAuditModel(
     }
 
   private val websiteDetail: JsObject =
-    if(registration.websites.nonEmpty) Json.obj("websites" -> registration.websites) else Json.obj()
+    if (registration.websites.nonEmpty) Json.obj("websites" -> registration.websites) else Json.obj()
 
   private val euRegistrationDetail: JsObject =
     if (registration.euRegistrations.nonEmpty) Json.obj("euRegistrations" -> Json.toJson(registration.euRegistrations)) else Json.obj()
@@ -54,11 +56,11 @@ case class RegistrationAuditModel(
   private val registrationDetail: JsValue = Json.obj(
     "vatRegistrationNumber" -> registration.vrn,
     "registeredCompanyName" -> registration.registeredCompanyName,
-    "vatDetails"            -> Json.toJson(registration.vatDetails),
-    "contactDetails"        -> Json.toJson(registration.contactDetails),
-    "commencementDate"      -> Json.toJson(registration.commencementDate),
-    "bankDetails"           -> Json.toJson(registration.bankDetails),
-    "isOnlineMarketplace"   -> registration.isOnlineMarketplace
+    "vatDetails" -> Json.toJson(registration.vatDetails),
+    "contactDetails" -> Json.toJson(registration.contactDetails),
+    "commencementDate" -> Json.toJson(registration.commencementDate),
+    "bankDetails" -> Json.toJson(registration.bankDetails),
+    "isOnlineMarketplace" -> registration.isOnlineMarketplace
   ) ++ tradingNameDetail ++
     euRegistrationDetail ++
     websiteDetail ++
@@ -67,9 +69,9 @@ case class RegistrationAuditModel(
     dateOfFirstSale
 
   override val detail: JsValue = Json.obj(
-    "credId"              -> credId,
-    "browserUserAgent"    -> userAgent,
-    "submissionResult"    -> Json.toJson(result),
+    "credId" -> credId,
+    "browserUserAgent" -> userAgent,
+    "submissionResult" -> Json.toJson(result),
     "registrationDetails" -> registrationDetail
   )
 }
@@ -77,11 +79,13 @@ case class RegistrationAuditModel(
 object RegistrationAuditModel {
 
   def build(
+             registrationAuditType: RegistrationAuditType,
              registration: Registration,
              result: SubmissionResult,
              request: AuthenticatedDataRequest[_]
            ): RegistrationAuditModel =
     RegistrationAuditModel(
+      registrationAuditType = registrationAuditType,
       credId = request.credentials.providerId,
       userAgent = request.headers.get("user-agent").getOrElse(""),
       registration = registration,
