@@ -833,3 +833,9 @@ deleteAllPreviousRegistrations.change.hidden = Remove all your previous registra
 notRegistered.title = You cannot use this service
 notRegistered.heading = You cannot use this service
 notRegistered.label = You must <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu">register for the VAT One Stop Shop scheme</a> to use this service.
+
+errorSubmittingAmendment.title = We have a problem with our service right now
+errorSubmittingAmendment.heading = We cannot update your registration
+errorSubmittingAmendment.tryAgainLater = You can <a class="govuk-link" href="{0}">try again later</a>.
+errorSubmittingAmendment.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+errorSubmittingAmendment.yourAccount = Back to your account

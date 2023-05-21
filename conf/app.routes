@@ -471,3 +471,5 @@ POST        /check-remove-all-previous-registrations                            
 GET         /successful-amend                                                   controllers.amend.AmendCompleteController.onPageLoad()
 
 GET         /cannot-use-not-registered                                          controllers.NotRegisteredController.onPageLoad()
+
+GET         /error-submitting-amendment                                         controllers.amend.ErrorSubmittingAmendmentController.onPageLoad()
