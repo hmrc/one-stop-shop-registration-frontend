@@ -64,7 +64,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
   private val registrationService = mock[RegistrationValidationService]
   private val registrationConnector = mock[RegistrationConnector]
-  private val saveForLaterService = mock[SaveForLaterService]
   private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
   private val dateService = mock[DateService]
@@ -77,8 +76,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
       registrationService,
       auditService,
       emailService,
-      dateService,
-      saveForLaterService
+      dateService
     )
   }
 
@@ -546,15 +544,12 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
           when(registrationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
-          when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn
-            Future.successful(Redirect(routes.ErrorSubmittingRegistrationController.onPageLoad().url))
           doNothing().when(auditService).audit(any())(any(), any())
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[SaveForLaterService].toInstance(saveForLaterService),
               bind[AuditService].toInstance(auditService)
             ).build()
 
@@ -565,9 +560,8 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.ErrorSubmittingRegistrationController.onPageLoad().url
+            redirectLocation(result).value mustEqual amendRoutes.ErrorSubmittingAmendmentController.onPageLoad().url
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-            verify(saveForLaterService, times(1)).saveAnswers(any(), any())(any(), any(), any())
           }
         }
 
@@ -576,15 +570,12 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
           when(registrationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
-          when(saveForLaterService.saveAnswers(any(), any())(any(), any(), any())) thenReturn
-            Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
           doNothing().when(auditService).audit(any())(any(), any())
 
           val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[SaveForLaterService].toInstance(saveForLaterService),
               bind[AuditService].toInstance(auditService)
             ).build()
 
@@ -595,9 +586,8 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, dataRequest)
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            redirectLocation(result).value mustEqual amendRoutes.ErrorSubmittingAmendmentController.onPageLoad().url
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-            verify(saveForLaterService, times(1)).saveAnswers(any(), any())(any(), any(), any())
           }
         }
       }
