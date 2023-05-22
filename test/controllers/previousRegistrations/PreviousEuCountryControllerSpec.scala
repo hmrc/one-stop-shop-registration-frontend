@@ -18,8 +18,8 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousEuCountryFormProvider
+import models.domain.PreviousSchemeNumbers
 import models.{Country, Index, NormalMode}
-import models.previousRegistrations.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar

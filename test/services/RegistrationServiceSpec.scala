@@ -17,9 +17,9 @@
 package services
 
 import base.SpecBase
-import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
+import models.domain.PreviousSchemeNumbers
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -30,6 +30,7 @@ import queries.{AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 
 import java.time.LocalDate
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrationServiceSpec
   extends SpecBase
@@ -97,10 +98,10 @@ class RegistrationServiceSpec
         getOrElse(throw new Exception("TODO")))).success.value
 
       .set(IsPlanningFirstEligibleSalePage, true).success.value
-      .set(PreviouslyRegisteredPage, true).success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
+      .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value

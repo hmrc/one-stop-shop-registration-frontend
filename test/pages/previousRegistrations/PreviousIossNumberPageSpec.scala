@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package pages
+package pages.previousRegistrations
 
 import base.SpecBase
-import models.Index
-import models.previousRegistrations.PreviousSchemeNumbers
+import controllers.previousRegistrations.routes
+import models.domain.PreviousSchemeNumbers
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
-import pages.previousRegistrations.PreviousIossNumberPage
 
 class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
 
@@ -33,5 +33,33 @@ class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
     beSettable[PreviousSchemeNumbers](PreviousIossNumberPage(index, index))
 
     beRemovable[PreviousSchemeNumbers](PreviousIossNumberPage(index, index))
+
+    "must navigate in Normal mode" - {
+
+      "to Check Previous Scheme Answers Page" in {
+
+        PreviousIossNumberPage(index, index).navigate(NormalMode, emptyUserAnswers)
+          .mustEqual(routes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index))
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "to Check Previous Scheme Answers Page" in {
+
+        PreviousIossNumberPage(index, index).navigate(CheckMode, emptyUserAnswers)
+          .mustEqual(routes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index))
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "to Check Previous Scheme Answers Page" in {
+
+        PreviousIossNumberPage(index, index).navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index))
+      }
+    }
+
   }
 }

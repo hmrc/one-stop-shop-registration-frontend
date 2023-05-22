@@ -112,7 +112,7 @@ trait SpecBase
 
   val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None): GuiceApplicationBuilder = {
+  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None, mode: Option[Mode] = None): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 
@@ -126,6 +126,7 @@ trait SpecBase
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
         bind[CheckEmailVerificationFilterProvider].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
+        bind[AuthenticatedDataRequiredActionImpl].toInstance(new FakeAuthenticatedDataRequiredAction(userAnswers, mode = mode)),
         bind[Clock].toInstance(clockToBind)
       )
   }
@@ -151,7 +152,7 @@ trait SpecBase
         HasMadeSalesSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         IsPlanningFirstEligibleSaleSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
         Some(commencementDateSummary),
-        PreviouslyRegisteredSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        PreviouslyRegisteredSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         TaxRegisteredInEuSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         EuDetailsSummary.checkAnswersRow(answers, mode),
         IsOnlineMarketplaceSummary.row(answers, mode),

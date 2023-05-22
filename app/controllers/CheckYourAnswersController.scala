@@ -82,8 +82,8 @@ class CheckYourAnswersController @Inject()(
             IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             Some(commencementDateSummary),
-            PreviouslyRegisteredSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+            PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode),
             TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             EuDetailsSummary.checkAnswersRow(request.userAnswers, CheckMode),
             IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode),
@@ -125,7 +125,7 @@ class CheckYourAnswersController @Inject()(
           }
 
         case Invalid(errors) =>
-          getFirstValidationErrorRedirect().map(
+          getFirstValidationErrorRedirect(CheckMode).map(
             errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {

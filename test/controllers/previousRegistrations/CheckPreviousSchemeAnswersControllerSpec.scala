@@ -17,9 +17,10 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
-import models.{Country, Index, NormalMode, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -31,6 +32,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import viewmodels.checkAnswers.previousRegistrations._
 import viewmodels.govuk.SummaryListFluency
 import views.html.previousRegistrations.CheckPreviousSchemeAnswersView
@@ -40,11 +42,12 @@ import scala.concurrent.Future
 class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
 
 
-  private val index                 = Index(0)
-  private val country               = Country.euCountries.head
+  private val index = Index(0)
+  private val country = Country.euCountries.head
   private val formProvider = new CheckPreviousSchemeAnswersFormProvider()
   private val form = formProvider(country)
   private val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
@@ -70,7 +73,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
         val lists = Seq(SummaryListViewModel(
           Seq(
-            PreviousSchemeSummary.row(baseUserAnswers, index, index, NormalMode),
+            PreviousSchemeSummary.row(baseUserAnswers, index, index, Seq.empty, NormalMode),
             PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
           ).flatten
         ))
@@ -79,6 +82,34 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         contentAsString(result) mustEqual view(form, NormalMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
       }
     }
+
+    "must return OK and the correct view for a GET when there are existing previous schemes in Amend mode" in {
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers), mode = Some(AmendMode))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
+
+      val previousSchemes = Seq(PreviousScheme.OSSNU)
+
+      running(application) {
+        implicit val msgs: Messages = messages(application)
+        val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index).url)
+        val result = route(application, request).value
+        val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
+        val lists = Seq(SummaryListViewModel(
+          Seq(
+            PreviousSchemeSummary.row(baseUserAnswers, index, index, previousSchemes, AmendMode),
+            PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
+          ).flatten
+        ))
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
+      }
+    }
+
 
     "must redirect to Journey Recovery if user answers are empty" in {
 
@@ -136,7 +167,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
           val list = Seq(SummaryListViewModel(
             Seq(
-              PreviousSchemeSummary.row(baseUserAnswers, index, index, NormalMode),
+              PreviousSchemeSummary.row(baseUserAnswers, index, index, Seq.empty, NormalMode),
               PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
             ).flatten
           ))
@@ -150,4 +181,5 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
     }
   }
+
 }

@@ -49,7 +49,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -71,7 +71,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           Some(vatCustomerInfo copy(singleMarketIndicator = Some(false))))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, userAnswersWithSingleMarketIndicatorFalse)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -93,7 +93,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           Some(vatCustomerInfo copy (singleMarketIndicator = None)))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, userAnswersWithSingleMarketIndicatorNone)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorNone)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -114,7 +114,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
         val userAnswersWithVatCustomerInfoNone = basicUserAnswersWithVatInfo copy (vatInfo = None)
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, userAnswersWithVatCustomerInfoNone)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithVatCustomerInfoNone)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -135,7 +135,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           ).build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 

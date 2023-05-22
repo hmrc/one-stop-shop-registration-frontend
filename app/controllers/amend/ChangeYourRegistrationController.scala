@@ -35,11 +35,12 @@ import queries.EmailConfirmationQuery
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
 import utils.FutureSyntax._
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
 import views.html.amend.ChangeYourRegistrationView
 
@@ -62,6 +63,9 @@ class ChangeYourRegistrationController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
     implicit request =>
+
+      val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
+
       val vatRegistrationDetailsList = SummaryListViewModel(
         rows = Seq(
           VatRegistrationDetailsSummary.rowBusinessName(request.userAnswers),
@@ -81,8 +85,8 @@ class ChangeYourRegistrationController @Inject()(
             IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
             Some(commencementDateSummary),
-            PreviouslyRegisteredSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
+            PreviouslyRegisteredSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, existingPreviousRegistrations, AmendMode),
             TaxRegisteredInEuSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             EuDetailsSummary.checkAnswersRow(request.userAnswers, AmendMode),
             IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode),
@@ -118,7 +122,7 @@ class ChangeYourRegistrationController @Inject()(
           }
 
         case Invalid(errors) =>
-          getFirstValidationErrorRedirect().map(
+          getFirstValidationErrorRedirect(AmendMode).map(
             errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {

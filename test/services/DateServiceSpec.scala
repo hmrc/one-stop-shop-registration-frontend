@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import generators.Generators
 import models.core.{Match, MatchType}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -47,9 +47,9 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, emptyUserAnswers)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
 
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   ".startOfNextQuarter" - {

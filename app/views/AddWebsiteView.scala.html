@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ListItem, Long}
-@import viewmodels.LegendSize
 @import components.ButtonGroup
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.Long
+@import viewmodels.{LegendSize, ListItemWrapper}
 
 @this(
         layout: templates.Layout,
@@ -27,8 +27,7 @@
         addToList: components.addToList
 )
 
-
-@(form: Form[_], mode: Mode, list: Seq[ListItem], canAddWebsites: Boolean)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: Seq[ListItemWrapper], canAddWebsites: Boolean)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
     @layout(pageTitle = title(form, messages("addWebsite.title" + messageSuffix, list.size))) {

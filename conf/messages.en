@@ -4,6 +4,7 @@ site.back = Back
 site.remove = Remove
 site.remove.hidden = Remove tax details for {0}
 site.change = Change
+site.add = Add
 site.change.hidden = Change tax details for {0}
 change.euVatNumber.hidden = Change VAT registration number for {0}
 site.deregistered.hidden = Change if you have deregistered from the VAT One Stop Shop for goods in {0}
@@ -448,6 +449,7 @@ deletePreviousRegistration.error.required = Select yes if you are sure you need 
 
 previousRegistrations.checkYourAnswersLabel = Countries registered in
 previousRegistrations.change.hidden = Countries registered in
+previousRegistrations.add.hidden = Countries registered in
 
 checkPreviousSchemeAnswers.title = Check your answers for {0}
 checkPreviousSchemeAnswers.heading = Check your answers for {0}

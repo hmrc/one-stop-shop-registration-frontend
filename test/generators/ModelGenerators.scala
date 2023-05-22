@@ -19,9 +19,8 @@ package generators
 import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, PreviousSchemeNumbers, TradeDetails}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}

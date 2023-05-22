@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package models.previousRegistrations
+package models.domain
 
-import models.Country
-import models.domain._
 import play.api.libs.json.{Json, OFormat}
 
-case class PreviousRegistrationDetails(
-                                        previousEuCountry: Country,
-                                        previousSchemesDetails: Seq[PreviousSchemeDetails]
-                                      )
+case class PreviousSchemeNumbers(
+                              previousSchemeNumber: String,
+                              previousIntermediaryNumber: Option[String]
+                            )
 
-object PreviousRegistrationDetails {
-
-  implicit val format: OFormat[PreviousRegistrationDetails] = Json.format[PreviousRegistrationDetails]
+object PreviousSchemeNumbers {
+  implicit val format: OFormat[PreviousSchemeNumbers] = Json.format[PreviousSchemeNumbers]
 }

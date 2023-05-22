@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package models.previousRegistrations
+package viewmodels
 
-import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 
-case class PreviousSchemeNumbers(
-                              previousSchemeNumber: String,
-                              previousIntermediaryNumber: Option[String]
-                            )
+case class ListItemWrapper(listItem: ListItem, removeButtonEnabled: Boolean)
 
-object PreviousSchemeNumbers {
-  implicit val format: OFormat[PreviousSchemeNumbers] = Json.format[PreviousSchemeNumbers]
-}

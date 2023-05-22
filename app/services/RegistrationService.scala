@@ -16,22 +16,23 @@
 
 package services
 
+import logging.Logging
 import models._
-import models.domain._
+import models.domain.{PreviousSchemeNumbers, _}
 import models.euDetails._
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.previousRegistrations.PreviousRegistrationDetails
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations._
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 
-import scala.collection.Seq
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class RegistrationService {
+class RegistrationService extends Logging {
 
-  def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo): Future[UserAnswers] = {
+  def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo)(implicit ec: ExecutionContext): Future[UserAnswers] = {
 
     val userAnswers = for {
       businessBasedInNiUA <- UserAnswers(userId,
@@ -68,17 +69,22 @@ class RegistrationService {
 
       bankDetails <- websites.set(BankDetailsPage, registration.bankDetails)
 
-    } yield bankDetails // TODO remove test data
+      hasPreviousRegistrationsUA <- bankDetails.set(PreviouslyRegisteredPage, registration.previousRegistrations.nonEmpty)
+      previousRegistrationsUA <- setDeterminePreviousRegistrationAnswers(registration, hasPreviousRegistrationsUA)
+
+      previousRegistrations <- if(registration.previousRegistrations.nonEmpty) {
+        previousRegistrationsUA.set(AllPreviousRegistrationsQuery, getPreviousRegistrations(registration).toList)
+      } else {
+        Try(previousRegistrationsUA)
+      }
+
+    } yield previousRegistrations // TODO remove test data
+
       .set(IsPlanningFirstEligibleSalePage, true).get
-      .set(PreviouslyRegisteredPage, false).get
 
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).get
-      .set(PreviouslyRegisteredPage, true).get
-      .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).get
-      .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).get
-      .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).get
 
     Future.fromTry(userAnswers)
   }
@@ -147,7 +153,6 @@ class RegistrationService {
 
         .set(IsPlanningFirstEligibleSalePage, true).success.value
         .set(TaxRegisteredInEuPage, false).success.value
-        .set(PreviouslyRegisteredPage, false).success.value
 
         .set(TaxRegisteredInEuPage, true).success.value
         .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
@@ -174,10 +179,120 @@ class RegistrationService {
         .set(
           BusinessContactDetailsPage,
           BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-        .set(PreviouslyRegisteredPage, true).success.value
-        .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
-        .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
-        .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
         */
+
+
+  private def getPreviousRegistrations(registration: Registration): Seq[PreviousRegistrationDetails] = {
+    registration.previousRegistrations map {
+      case previousRegistration: PreviousRegistrationNew =>
+        PreviousRegistrationDetails(
+          previousEuCountry = previousRegistration.country,
+          previousSchemesDetails = previousRegistration.previousSchemesDetails.map {
+            previousSchemesDetails =>
+              PreviousSchemeDetails(
+                previousScheme = previousSchemesDetails.previousScheme,
+                previousSchemeNumbers =
+                  PreviousSchemeNumbers(
+                    previousSchemesDetails.previousSchemeNumbers.previousSchemeNumber,
+                    previousSchemesDetails.previousSchemeNumbers.previousIntermediaryNumber
+                  ))
+          }.toList
+        )
+      case legacyPreviousRegistration: PreviousRegistrationLegacy =>
+        PreviousRegistrationDetails(
+          previousEuCountry = legacyPreviousRegistration.country,
+          previousSchemesDetails = Seq(PreviousSchemeDetails(
+            previousScheme = PreviousScheme.OSSU,
+            previousSchemeNumbers = PreviousSchemeNumbers(
+              previousSchemeNumber = legacyPreviousRegistration.vatNumber,
+              previousIntermediaryNumber = None
+            )
+          ))
+        )
+    }
+  }
+
+  private def setDeterminePreviousRegistrationAnswers(
+                                                       registration: Registration,
+                                                       userAnswers: UserAnswers
+                                                     ): Try[UserAnswers] = {
+
+    recursivelySetPreviousSchemeUserAnswers(registration.previousRegistrations, userAnswers, 0)
+
+  }
+
+  private def recursivelySetPreviousSchemeUserAnswers(
+                                                       remainingPreviousRegistration: Seq[PreviousRegistration],
+                                                       currentUserAnswers: UserAnswers,
+                                                       countryIndex: Int
+                                                     ): Try[UserAnswers] = {
+    remainingPreviousRegistration match {
+      case Nil => Try(currentUserAnswers)
+      case (firstPreviousRegistration: PreviousRegistrationNew) :: Nil =>
+        recursivelySetPreviousSchemeDetails(firstPreviousRegistration.previousSchemesDetails, currentUserAnswers, countryIndex, 0)
+      case (_: PreviousRegistrationLegacy) :: Nil => setLegacyPreviousRegistration(currentUserAnswers, countryIndex)
+      case (firstPreviousRegistration: PreviousRegistrationNew) :: otherPreviousRegistrations => for {
+        updatedUserAnswers <- recursivelySetPreviousSchemeDetails(firstPreviousRegistration.previousSchemesDetails, currentUserAnswers, countryIndex, 0)
+        finalUpdatedUserAnswers <- recursivelySetPreviousSchemeUserAnswers(otherPreviousRegistrations, updatedUserAnswers, countryIndex + 1)
+      } yield finalUpdatedUserAnswers
+      case (_: PreviousRegistrationLegacy) :: otherPreviousRegistrations => for {
+        updatedUserAnswers <- setLegacyPreviousRegistration(currentUserAnswers, countryIndex)
+        finalUpdatedUserAnswers <- recursivelySetPreviousSchemeUserAnswers(otherPreviousRegistrations, updatedUserAnswers, countryIndex + 1)
+      } yield finalUpdatedUserAnswers
+    }
+  }
+
+  private def setLegacyPreviousRegistration(userAnswers: UserAnswers, countryIndex: Int): Try[UserAnswers] = {
+    for {
+      answers <- userAnswers.set(PreviousSchemeTypePage(Index(countryIndex), Index(0)), PreviousSchemeType.OSS)
+      updatedAnswers <- answers.set(PreviousSchemePage(Index(countryIndex), Index(0)), PreviousScheme.OSSU)
+    } yield updatedAnswers
+  }
+
+  private def settingOfPreviousSchemeDetailsUserAnswers(
+                                                         currentUserAnswers: UserAnswers,
+                                                         schemeDetails: PreviousSchemeDetails,
+                                                         countryIndex: Int,
+                                                         schemeIndex: Int
+                                                       ): Try[UserAnswers] = {
+    for {
+      answers <- currentUserAnswers.set(PreviousSchemeTypePage(Index(countryIndex), Index(schemeIndex)), determineSchemeType(schemeDetails))
+      updatedAnswers <- answers.set(PreviousSchemePage(Index(countryIndex), Index(schemeIndex)), schemeDetails.previousScheme)
+      previousSchemeNumbers = schemeDetails.previousSchemeNumbers
+      schemeType = updatedAnswers.get(PreviousSchemeTypePage(Index(countryIndex), Index(schemeIndex)))
+      finalUserAnswers <-
+        if (previousSchemeNumbers.previousIntermediaryNumber.nonEmpty && schemeType.contains(PreviousSchemeType.IOSS)) {
+          updatedAnswers.set(PreviousIossSchemePage(Index(countryIndex), Index(schemeIndex)), true)
+        } else {
+          Try(updatedAnswers)
+        }
+    } yield finalUserAnswers
+  }
+
+  private def recursivelySetPreviousSchemeDetails(
+                                                   remainingSchemeDetails: Seq[PreviousSchemeDetails],
+                                                   currentUserAnswers: UserAnswers,
+                                                   countryIndex: Int,
+                                                   schemeIndex: Int
+                                                 ): Try[UserAnswers] = {
+    remainingSchemeDetails match {
+      case Nil => Try(currentUserAnswers)
+      case firstSchemeDetails :: Nil => settingOfPreviousSchemeDetailsUserAnswers(currentUserAnswers, firstSchemeDetails, countryIndex, schemeIndex)
+      case firstSchemeDetails :: otherSchemeDetails =>
+        for {
+          updatedUserAnswers <- settingOfPreviousSchemeDetailsUserAnswers(currentUserAnswers, firstSchemeDetails, countryIndex, schemeIndex)
+          finalUpdateUserAnswers <- recursivelySetPreviousSchemeDetails(otherSchemeDetails, updatedUserAnswers, countryIndex, schemeIndex + 1)
+        } yield finalUpdateUserAnswers
+    }
+  }
+
+  private def determineSchemeType(previousSchemeDetails: PreviousSchemeDetails): PreviousSchemeType = {
+    previousSchemeDetails.previousScheme match {
+      case scheme if scheme == PreviousScheme.OSSU || scheme == PreviousScheme.OSSNU =>
+        PreviousSchemeType.OSS
+      case scheme if scheme == PreviousScheme.IOSSWI || scheme == PreviousScheme.IOSSWOI =>
+        PreviousSchemeType.IOSS
+    }
+  }
 
 }

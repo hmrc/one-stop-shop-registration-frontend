@@ -21,7 +21,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqual
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK, UNAUTHORIZED}
-import play.api.libs.json.Json
 import play.api.test.Helpers.running
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier

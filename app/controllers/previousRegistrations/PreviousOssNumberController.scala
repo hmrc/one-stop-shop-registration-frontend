@@ -20,7 +20,8 @@ import config.FrontendAppConfig
 import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.PreviousSchemeHintText
 import models.requests.AuthenticatedDataRequest
 import models.{CountryWithValidationDetails, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
