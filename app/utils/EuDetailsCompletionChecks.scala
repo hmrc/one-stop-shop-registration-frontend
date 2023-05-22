@@ -33,8 +33,8 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
     }
   }
 
-  def emptyEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isEuDetailsPopulated) {
-    Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode)))
+  def emptyEuDetailsRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isEuDetailsPopulated) {
+    Some(Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(mode)))
   } else {
     None
   }
@@ -93,12 +93,12 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
       (isPartOfVatGroup && details.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.FixedEstablishment))
   }
 
-  def incompleteEuDetailsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] =
+  def incompleteEuDetailsRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] =
     firstIndexedIncompleteEuDetails(getAllIncompleteEuDetails().map(
       _.euCountry
     )).map(
       incompleteCountry =>
-        Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(incompleteCountry._2)))
+        Redirect(controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(mode, Index(incompleteCountry._2)))
     )
 
   def incompleteCheckEuDetailsRedirect(mode: Mode)

@@ -98,10 +98,10 @@ class RegistrationServiceSpec
         getOrElse(throw new Exception("TODO")))).success.value
 
       .set(IsPlanningFirstEligibleSalePage, true).success.value
-      .set(PreviouslyRegisteredPage, true).success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
+      .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value

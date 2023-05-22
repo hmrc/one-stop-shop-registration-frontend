@@ -81,7 +81,6 @@ class RegistrationService extends Logging {
     } yield previousRegistrations // TODO remove test data
 
       .set(IsPlanningFirstEligibleSalePage, true).get
-      .set(PreviouslyRegisteredPage, false).get
 
       .set(
         BusinessContactDetailsPage,
@@ -216,7 +215,7 @@ class RegistrationService extends Logging {
   private def setDeterminePreviousRegistrationAnswers(
                                                        registration: Registration,
                                                        userAnswers: UserAnswers
-                                                     )(implicit ec: ExecutionContext): Try[UserAnswers] = {
+                                                     ): Try[UserAnswers] = {
 
     recursivelySetPreviousSchemeUserAnswers(registration.previousRegistrations, userAnswers, 0)
 
