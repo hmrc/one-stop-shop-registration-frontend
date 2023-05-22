@@ -126,7 +126,7 @@ class ChangeYourRegistrationController @Inject()(
           }
 
         case Invalid(errors) =>
-          getFirstValidationErrorRedirect().map(
+          getFirstValidationErrorRedirect(AmendMode).map(
             errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {

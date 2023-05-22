@@ -19,30 +19,22 @@ package controllers.amend
 import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.amend.{routes => amendRoutes}
-import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import repositories.AuthenticatedUserAnswersRepository
 import services._
 import testutils.RegistrationData
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.govuk.SummaryListFluency
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
-
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
   private val registration = RegistrationData.registration
 
@@ -59,6 +51,7 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
   "Start Amend Controller" - {
 
     "GET" - {
+
       "must set user answers from registration and redirect to change your registration" in {
 
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
@@ -85,12 +78,10 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
 
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(None)
         when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-        when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn Future.successful(completeUserAnswers)
         when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn Future.successful(true)
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-          .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
           .build()
 
