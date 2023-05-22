@@ -434,10 +434,10 @@ POST        /check-remove-all-trading-names                                     
 GET         /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = AmendMode)
 POST        /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = AmendMode)
 
-GET        /check-remove-all-eu-details                                         controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /check-remove-all-eu-details                                         controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = CheckMode)
-GET        /amend-remove-all-eu-details                                         controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = AmendMode)
-POST       /amend-remove-all-eu-details                                         controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = AmendMode)
+GET         /check-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = AmendMode)
 
 
 GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
@@ -447,4 +447,6 @@ GET         /successful-amend                                                   
 GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
 POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
 
-GET        /cannot-use-not-registered                                           controllers.NotRegisteredController.onPageLoad()
+GET         /cannot-use-not-registered                                          controllers.NotRegisteredController.onPageLoad()
+
+GET         /error-submitting-amendment                                         controllers.amend.ErrorSubmittingAmendmentController.onPageLoad()

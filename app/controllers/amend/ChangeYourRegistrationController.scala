@@ -55,7 +55,6 @@ class ChangeYourRegistrationController @Inject()(
                                                   view: ChangeYourRegistrationView,
                                                   emailService: EmailService,
                                                   dateService: DateService,
-                                                  saveForLaterService: SaveForLaterService,
                                                   frontendAppConfig: FrontendAppConfig
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
@@ -115,10 +114,7 @@ class ChangeYourRegistrationController @Inject()(
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
               auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
-              saveForLaterService.saveAnswers(
-                routes.ErrorSubmittingRegistrationController.onPageLoad(),
-                amendRoutes.ChangeYourRegistrationController.onPageLoad()
-              )
+              Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
           }
 
         case Invalid(errors) =>
@@ -132,10 +128,7 @@ class ChangeYourRegistrationController @Inject()(
             val errorList = errors.toChain.toList
             val errorMessages = errorList.map(_.errorMessage).mkString("\n")
             logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-            saveForLaterService.saveAnswers(
-              routes.ErrorSubmittingRegistrationController.onPageLoad(),
-              amendRoutes.ChangeYourRegistrationController.onPageLoad()
-            )
+            Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
           }
       }
   }
