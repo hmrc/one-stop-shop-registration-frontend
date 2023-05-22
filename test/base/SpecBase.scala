@@ -126,7 +126,7 @@ trait SpecBase
         bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
         bind[CheckEmailVerificationFilterProvider].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
-        bind[AuthenticatedDataRequiredActionImpl].toInstance(new FakeAuthenticatedDataRequiredAction(userAnswers, mode = Some(NormalMode))),
+        bind[AuthenticatedDataRequiredActionImpl].toInstance(new FakeAuthenticatedDataRequiredAction(userAnswers, mode = mode)),
         bind[Clock].toInstance(clockToBind)
       )
   }
