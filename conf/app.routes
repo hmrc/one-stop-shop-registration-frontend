@@ -359,3 +359,8 @@ POST        /check-remove-all-trading-names                                     
 
 GET        /check-remove-all-eu-details                                         controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /check-remove-all-eu-details                                         controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /deleteAllPreviousRegistrations                        controllers.DeleteAllPreviousRegistrationsController.onPageLoad(mode: Mode = NormalMode)
+POST       /deleteAllPreviousRegistrations                        controllers.DeleteAllPreviousRegistrationsController.onSubmit(mode: Mode = NormalMode)
+GET        /changeDeleteAllPreviousRegistrations                  controllers.DeleteAllPreviousRegistrationsController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeDeleteAllPreviousRegistrations                  controllers.DeleteAllPreviousRegistrationsController.onSubmit(mode: Mode = CheckMode)
