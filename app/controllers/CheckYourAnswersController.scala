@@ -22,7 +22,7 @@ import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.{CheckMode, NormalMode}
-import models.audit.{RegistrationAuditModel, SubmissionResult}
+import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
@@ -109,15 +109,15 @@ class CheckYourAnswersController @Inject()(
         case Valid(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, request))
               sendEmailConfirmation(request, registration)
             case Left(ConflictFound) =>
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Duplicate, request))
               Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Failure, request))
               saveForLaterService.saveAnswers(
                 routes.ErrorSubmittingRegistrationController.onPageLoad(),
                 routes.CheckYourAnswersController.onPageLoad()
