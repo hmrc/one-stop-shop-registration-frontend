@@ -18,9 +18,8 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import connectors.RegistrationConnector
-import controllers.actions.{AuthenticatedDataRequiredActionImpl, FakeAuthenticatedDataRequiredAction}
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
-import models.domain.{PreviousRegistrationLegacy, PreviousRegistrationNew, PreviousSchemeDetails, PreviousSchemeNumbers}
+import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
@@ -34,7 +33,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
-import utils.CheckExistingRegistrations.getExistingRegistrationSchemes
 import viewmodels.checkAnswers.previousRegistrations._
 import viewmodels.govuk.SummaryListFluency
 import views.html.previousRegistrations.CheckPreviousSchemeAnswersView
@@ -44,8 +42,8 @@ import scala.concurrent.Future
 class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
 
 
-  private val index                 = Index(0)
-  private val country               = Country.euCountries.head
+  private val index = Index(0)
+  private val country = Country.euCountries.head
   private val formProvider = new CheckPreviousSchemeAnswersFormProvider()
   private val form = formProvider(country)
   private val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -91,58 +89,24 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
       val application = applicationBuilder(userAnswers = Some(baseUserAnswers), mode = Some(AmendMode))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-//        .overrides(bind[AuthenticatedDataRequiredActionImpl].toInstance(new FakeAuthenticatedDataRequiredAction(Some(baseUserAnswers), mode = Some(AmendMode))))
         .build()
 
-//      val existingPreviousRegistrations = Seq(
-//        PreviousRegistrationNew(country = Country("DE", "Germany"),
-//          previousSchemesDetails = Seq(
-//            PreviousSchemeDetails(
-//              previousScheme = PreviousScheme.OSSU,
-//              previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
-//            )
-//          )
-//        ),
-//      PreviousRegistrationNew(country = Country("ES", "Spain"),
-//        previousSchemesDetails = Seq(
-//          PreviousSchemeDetails(
-//            previousScheme = PreviousScheme.OSSNU,
-//            previousSchemeNumbers = PreviousSchemeNumbers("ES123", None)
-//          )
-//        )
-//      ),
-//        PreviousRegistrationLegacy(country = Country("FR", "France"), vatNumber = "FR123")
-//      )
+      val previousSchemes = Seq(PreviousScheme.OSSNU)
 
-      val existingPreviousRegistrations = RegistrationData.registration.previousRegistrations
-      for {
-        previousRegistrations <- existingPreviousRegistrations
-      } yield {
+      running(application) {
+        implicit val msgs: Messages = messages(application)
+        val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index).url)
+        val result = route(application, request).value
+        val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
+        val lists = Seq(SummaryListViewModel(
+          Seq(
+            PreviousSchemeSummary.row(baseUserAnswers, index, index, previousSchemes, AmendMode),
+            PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
+          ).flatten
+        ))
 
-        val country = previousRegistrations match {
-          case previousRegistrationNew: PreviousRegistrationNew =>
-            previousRegistrationNew.country
-          case previousRegistrationLegacy: PreviousRegistrationLegacy =>
-            previousRegistrationLegacy.country
-        }
-
-        val previousSchemes = getExistingRegistrationSchemes(country)(any())
-
-        running(application) {
-          implicit val msgs: Messages = messages(application)
-          val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index).url)
-          val result = route(application, request).value
-          val view = application.injector.instanceOf[CheckPreviousSchemeAnswersView]
-          val lists = Seq(SummaryListViewModel(
-            Seq(
-              PreviousSchemeSummary.row(baseUserAnswers, index, index, previousSchemes, NormalMode),
-              PreviousSchemeNumberSummary.row(baseUserAnswers, index, index)
-            ).flatten
-          ))
-
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, AmendMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
-        }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
       }
     }
 
@@ -217,4 +181,5 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
     }
   }
+
 }
