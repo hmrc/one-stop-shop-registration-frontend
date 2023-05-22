@@ -21,7 +21,7 @@ import generators.Generators
 import models.domain.VatCustomerInfo
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.requests.AuthenticatedDataRequest
-import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, NormalMode, UserAnswers}
+import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -110,9 +110,9 @@ trait SpecBase
     .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None, mode: Option[Mode] = None): GuiceApplicationBuilder = {
+  val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
 
-    val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
+  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None, mode: Option[Mode] = None): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 

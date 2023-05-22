@@ -125,7 +125,7 @@ class CheckYourAnswersController @Inject()(
           }
 
         case Invalid(errors) =>
-          getFirstValidationErrorRedirect().map(
+          getFirstValidationErrorRedirect(CheckMode).map(
             errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {
