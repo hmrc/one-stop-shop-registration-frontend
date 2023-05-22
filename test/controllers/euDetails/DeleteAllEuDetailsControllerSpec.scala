@@ -17,9 +17,11 @@
 package controllers.euDetails
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import forms.euDetails.DeleteAllEuDetailsFormProvider
+import models.domain.Registration
 import models.{AmendMode, CheckMode, Country, Index, InternationalAddress}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -31,14 +33,19 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{POST, _}
 import queries.EuDetailsTopLevelNode
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.euDetails.DeleteAllEuDetailsView
 
 import scala.concurrent.Future
 
 class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   private val formProvider = new DeleteAllEuDetailsFormProvider()
   private val form = formProvider()
+
+  private val registration: Registration = RegistrationData.registration
 
   private val userAnswers = basicUserAnswersWithVatInfo
     .set(TaxRegisteredInEuPage, true).success.value
@@ -63,7 +70,11 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
           "must return OK and the correct view for a GET" in {
 
-            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
             running(application) {
               val request = FakeRequest(GET, deleteAllEuDetailsRoute)
@@ -82,10 +93,12 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
             val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
             when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
             val application =
               applicationBuilder(userAnswers = Some(userAnswers))
                 .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
                 .build()
 
             running(application) {
@@ -109,10 +122,12 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
             val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
             when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
             val application =
               applicationBuilder(userAnswers = Some(userAnswers))
                 .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
                 .build()
 
             running(application) {
@@ -133,7 +148,11 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
           "must return a Bad Request and errors when invalid data is submitted" in {
 
-            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
             running(application) {
               val request =
