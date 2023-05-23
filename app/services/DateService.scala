@@ -149,9 +149,11 @@ class DateService @Inject()(
       allMatches <- searchPreviousRegistrationSchemes(userAnswers)
     } yield {
       val findTransferringMsid = allMatches.find(_.matchType == MatchType.TransferringMSID)
+      println("test3")
 
       findTransferringMsid match {
         case Some(matchedTransferringMsid) =>
+          println("test2")
           matchedTransferringMsid.exclusionEffectiveDate match {
             case Some(exclusionEffectiveDate) =>
               if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
@@ -168,10 +170,11 @@ class DateService @Inject()(
         case _ =>
           userAnswers.get(HasMadeSalesPage) match {
             case Some(true) =>
+              println("test4")
               getDateOfFirstSale(userAnswers)
             case Some(false) =>
-              LocalDate.now(clock)
-
+              println("test...")
+              startOfNextQuarter
             case _ =>
               val exception = new IllegalStateException("Must answer Has Made Sales")
               logger.error(exception.getMessage, exception)
@@ -190,5 +193,10 @@ class DateService @Inject()(
         logger.error(exception.getMessage, exception)
         throw exception
     }
+  }
+
+  def calculateFinalAmendmentDate(commencementDate: LocalDate): LocalDate = {
+    val daysIntoReturnForAmendment = 10
+    getVatReturnEndDate(commencementDate).plusDays(daysIntoReturnForAmendment)
   }
 }

@@ -317,11 +317,15 @@ GET         /date-of-first-sale                                                 
 POST        /date-of-first-sale                                                 controllers.DateOfFirstSaleController.onSubmit(mode: Mode = NormalMode)
 GET         /check-date-of-first-sale                                           controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-date-of-first-sale                                           controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-date-of-first-sale                                           controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-date-of-first-sale                                           controllers.DateOfFirstSaleController.onSubmit(mode: Mode = AmendMode)
 
 GET         /already-made-sales                                                 controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
 POST        /already-made-sales                                                 controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
 GET         /check-already-made-sales                                           controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-already-made-sales                                           controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-already-made-sales                                           controllers.HasMadeSalesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-already-made-sales                                           controllers.HasMadeSalesController.onSubmit(mode: Mode = AmendMode)
 
 GET         /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
 POST        /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
@@ -353,6 +357,8 @@ GET         /planned-first-sale                                                 
 POST        /planned-first-sale                                                 controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
 GET         /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = AmendMode)
 
 GET         /no-welsh-service                                                   controllers.external.NoMoreWelshController.onPageLoad()
 GET         /cannot-register-ni-protocol                                        controllers.NiProtocolRejectionController.onPageLoad()
@@ -476,5 +482,7 @@ GET         /cannot-use-not-registered                                          
 
 GET         /error-submitting-amendment                                         controllers.amend.ErrorSubmittingAmendmentController.onPageLoad()
 
-GET        /delete-all-fixed-establishment                                      controllers.DeleteAllFixedEstablishmentController.onPageLoad()
-POST       /delete-all-fixed-establishment                                      controllers.DeleteAllFixedEstablishmentController.onSubmit()
+GET         /no-longer-amendable                                                controllers.amend.NoLongerAmendableController.onPageLoad()
+
+GET         /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onPageLoad()
+POST        /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onSubmit()

@@ -31,10 +31,10 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckEmailVerificationFilterImpl (mode: Option[Mode],
-                                        frontendAppConfig: FrontendAppConfig,
-                                        emailVerificationService: EmailVerificationService
-                                        )(implicit val executionContext: ExecutionContext)
+class CheckEmailVerificationFilterImpl(mode: Option[Mode],
+                                       frontendAppConfig: FrontendAppConfig,
+                                       emailVerificationService: EmailVerificationService
+                                      )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
@@ -69,9 +69,9 @@ class CheckEmailVerificationFilterImpl (mode: Option[Mode],
 }
 
 class CheckEmailVerificationFilterProvider @Inject()(
-                                              frontendAppConfig: FrontendAppConfig,
-                                              emailVerificationService: EmailVerificationService
-                                            )(implicit val executionContext: ExecutionContext) {
+                                                      frontendAppConfig: FrontendAppConfig,
+                                                      emailVerificationService: EmailVerificationService
+                                                    )(implicit val executionContext: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckEmailVerificationFilterImpl = {
     new CheckEmailVerificationFilterImpl(mode, frontendAppConfig, emailVerificationService)
   }

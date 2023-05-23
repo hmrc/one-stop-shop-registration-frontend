@@ -51,9 +51,10 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
   private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
   private val mockDateService: DateService = mock[DateService]
+  private val mockRegistrationService: RegistrationService = mock[RegistrationService]
 
   private def getRegistrationService =
-    new RegistrationValidationService(mockDateService)
+    new RegistrationValidationService(mockDateService, mockRegistrationService)
 
   private val answersPartOfVatGroup =
     UserAnswers("id",
