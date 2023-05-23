@@ -51,6 +51,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val now = LocalDate.now()
         val nowFormatted = LocalDate.now().format(dateFormatter)
         val dateOfFirstSale = LocalDate.now().withDayOfMonth(1)
+        val dateOfLastAmendment = LocalDate.now() // TODO
 
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, true).success.value
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
@@ -76,6 +77,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           contentAsString(result) mustEqual view(
             NormalMode,
             dateOfFirstSale.format(dateFormatter),
+            dateOfLastAmendment.format(dateFormatter),
             true,
             Some(nowFormatted),
             Some(nowFormatted),
@@ -116,6 +118,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val nowFormatted = LocalDate.now().format(dateFormatter)
         val dateOfFirstSale = LocalDate.now().minusMonths(2)
         val commencementDate = now.plusMonths(2)
+        val dateOfLastAmendment = LocalDate.now() // TODO
 
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, true).success.value
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
@@ -141,6 +144,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           contentAsString(result) mustEqual view(
             NormalMode,
             commencementDate.format(dateFormatter),
+            dateOfLastAmendment.format(dateFormatter),
             false,
             Some(nowFormatted),
             Some(nowFormatted),
@@ -154,6 +158,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
         val answers = answer1.set(IsPlanningFirstEligibleSalePage, true).success.value
         val startDateNow = LocalDate.now(stubClockAtArbitraryDate)
+        val dateOfLastAmendment = LocalDate.now() // TODO
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(startDateNow)
         when(dateService.startOfNextQuarter) thenReturn startDateNow
@@ -173,6 +178,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           contentAsString(result) mustEqual view(
             NormalMode,
             nowFormatted,
+            dateOfLastAmendment.format(dateFormatter),
             true,
             None,
             None,

@@ -120,4 +120,32 @@ class RegistrationServiceSpec
 
   }
 
+  ".eligibleSalesDifference" - {
+    "return true if the user answers are different" in {
+      val service = new RegistrationService()
+
+      val result = service.eligibleSalesDifference(Some(RegistrationData.registration), completeUserAnswers)
+
+      result mustBe true
+    }
+
+    "return true if there is no registration provided" in {
+      val service = new RegistrationService()
+
+      val result = service.eligibleSalesDifference(None, completeUserAnswers)
+
+      result mustBe true
+    }
+
+    "return false if the user answers are not different" in {
+      val service = new RegistrationService()
+
+      val userAnswers = completeUserAnswers.set(DateOfFirstSalePage, RegistrationData.registration.dateOfFirstSale.get).success.value
+
+      val result = service.eligibleSalesDifference(Some(RegistrationData.registration), userAnswers)
+
+      result mustBe false
+    }
+  }
+
 }

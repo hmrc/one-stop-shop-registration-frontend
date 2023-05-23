@@ -27,10 +27,12 @@ import pages.previousRegistrations._
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 
+import java.time.{Clock, LocalDate}
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class RegistrationService extends Logging {
+class RegistrationService @Inject()(dateService: DateService, clock: Clock) extends Logging {
 
   def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo)(implicit ec: ExecutionContext): Future[UserAnswers] = {
 
@@ -38,14 +40,8 @@ class RegistrationService extends Logging {
       businessBasedInNiUA <- UserAnswers(userId,
         vatInfo = Some(vatCustomerInfo)
       ).set(BusinessBasedInNiPage, true)
-      dateOfFirstSaleUA <- registration.dateOfFirstSale match {
-        case Some(dateOfFirstSale) =>
-          businessBasedInNiUA.set(DateOfFirstSalePage, dateOfFirstSale)
-        case _ =>
-          Try(businessBasedInNiUA)
-      }
-      hasMadeSalesUA <- dateOfFirstSaleUA.set(HasMadeSalesPage, registration.dateOfFirstSale.nonEmpty)
-      hasTradingNameUA <- hasMadeSalesUA.set(HasTradingNamePage, registration.tradingNames.nonEmpty)
+      eligibleSalesUA <- setEligibleSales(businessBasedInNiUA, registration)
+      hasTradingNameUA <- eligibleSalesUA.set(HasTradingNamePage, registration.tradingNames.nonEmpty)
       tradingNamesUA <- if (registration.tradingNames.nonEmpty) {
         hasTradingNameUA.set(AllTradingNames, registration.tradingNames.toList)
       } else {
@@ -72,7 +68,7 @@ class RegistrationService extends Logging {
       hasPreviousRegistrationsUA <- bankDetails.set(PreviouslyRegisteredPage, registration.previousRegistrations.nonEmpty)
       previousRegistrationsUA <- setDeterminePreviousRegistrationAnswers(registration, hasPreviousRegistrationsUA)
 
-      previousRegistrations <- if(registration.previousRegistrations.nonEmpty) {
+      previousRegistrations <- if (registration.previousRegistrations.nonEmpty) {
         previousRegistrationsUA.set(AllPreviousRegistrationsQuery, getPreviousRegistrations(registration).toList)
       } else {
         Try(previousRegistrationsUA)
@@ -80,9 +76,7 @@ class RegistrationService extends Logging {
 
       contactDetails <- previousRegistrations.set(BusinessContactDetailsPage, registration.contactDetails)
 
-    } yield contactDetails // TODO remove test data
-
-      .set(IsPlanningFirstEligibleSalePage, true).get
+    } yield contactDetails
 
     Future.fromTry(userAnswers)
   }
@@ -145,38 +139,6 @@ class RegistrationService extends Logging {
       case EuTaxIdentifierType.Other => Some(RegistrationType.TaxId)
     }
   }
-
-
-  /* TODO
-
-        .set(IsPlanningFirstEligibleSalePage, true).success.value
-        .set(TaxRegisteredInEuPage, false).success.value
-
-        .set(TaxRegisteredInEuPage, true).success.value
-        .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
-        .set(SellsGoodsToEUConsumerMethodPage(Index(0)), EuConsumerSalesMethod.DispatchWarehouse).success.value
-        .set(RegistrationTypePage(Index(0)), RegistrationType.VatNumber).success.value
-        .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
-        .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
-        .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
-        .set(EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(1)), false).success.value
-        .set(VatRegisteredPage(Index(1)), true).success.value
-        .set(EuVatNumberPage(Index(1)), "DE123456789").success.value
-        .set(EuCountryPage(Index(2)), Country("IE", "Ireland")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(2)), true).success.value
-        .set(SellsGoodsToEUConsumerMethodPage(Index(2)), EuConsumerSalesMethod.DispatchWarehouse).success.value
-        .set(RegistrationTypePage(Index(2)), RegistrationType.TaxId).success.value
-        .set(EuTaxReferencePage(Index(2)), "IE123456789").success.value
-        .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
-        .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
-        .set(EuCountryPage(Index(3)), Country("HR", "Croatia")).success.value
-        .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
-        .set(VatRegisteredPage(Index(3)), false).success.value
-
-        */
-
 
   private def getPreviousRegistrations(registration: Registration): Seq[PreviousRegistrationDetails] = {
     registration.previousRegistrations map {
@@ -290,5 +252,43 @@ class RegistrationService extends Logging {
         PreviousSchemeType.IOSS
     }
   }
+
+  private def setEligibleSales(userAnswers: UserAnswers, registration: Registration): Try[UserAnswers] = {
+
+    for {
+      hasMadeSalesUA <- userAnswers.set(HasMadeSalesPage, registration.dateOfFirstSale.nonEmpty)
+      dateOfFirstSaleUA <- registration.dateOfFirstSale match {
+        case Some(dateOfFirstSale) =>
+          hasMadeSalesUA.set(DateOfFirstSalePage, dateOfFirstSale)
+        case _ =>
+          Try(hasMadeSalesUA)
+      }
+      firstEligibleSaleUA <- dateOfFirstSaleUA.set(IsPlanningFirstEligibleSalePage, true) // TODO possible to reverse the "using start of next period as commencement date" logic?
+
+    } yield firstEligibleSaleUA
+  }
+
+  def eligibleSalesDifference(maybeRegistration: Option[Registration], userAnswers: UserAnswers): Boolean = {
+    maybeRegistration match {
+      case Some(registration) =>
+        val answeredDateOfFirstSale = userAnswers.get(DateOfFirstSalePage)
+        val currentDateOfFirstSale = registration.dateOfFirstSale
+
+        val dateOfFirstSaleDifference = answeredDateOfFirstSale != currentDateOfFirstSale
+
+        dateOfFirstSaleDifference
+      case _ => true
+    }
+  }
+
+  def isAmendable(maybeRegistration: Option[Registration]): Boolean = {
+    maybeRegistration match {
+      case Some(registration) =>
+        val today = LocalDate.now(clock)
+        dateService.calculateFinalAmendmentDate(registration.commencementDate).isBefore(today)
+      case _ => true
+    }
+  }
+
 
 }

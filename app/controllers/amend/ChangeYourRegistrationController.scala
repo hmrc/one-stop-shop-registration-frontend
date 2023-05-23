@@ -23,12 +23,13 @@ import controllers.actions.AuthenticatedControllerComponents
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import logging.Logging
-import models.{AmendMode, NormalMode}
+import models.{AmendMode, NormalMode, UserAnswers}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import pages.amend.ChangeYourRegistrationPage
+import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
@@ -38,9 +39,9 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
 import utils.FutureSyntax._
-import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.{CommencementDateSummary, _}
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
+import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
 import viewmodels.govuk.summarylist._
 import views.html.amend.ChangeYourRegistrationView
 
@@ -55,7 +56,7 @@ class ChangeYourRegistrationController @Inject()(
                                                   auditService: AuditService,
                                                   view: ChangeYourRegistrationView,
                                                   emailService: EmailService,
-                                                  dateService: DateService,
+                                                  commencementDateSummary: CommencementDateSummary,
                                                   frontendAppConfig: FrontendAppConfig
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
@@ -75,16 +76,16 @@ class ChangeYourRegistrationController @Inject()(
         ).flatten
       )
 
-      new CommencementDateSummary(dateService).row(request.userAnswers).map { commencementDateSummary =>
+        commencementDateSummary.row(request.userAnswers).map { cds =>
 
         val list = SummaryListViewModel(
           rows = Seq(
             new HasTradingNameSummary().row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             TradingNameSummary.checkAnswersRow(request.userAnswers, AmendMode),
-            HasMadeSalesSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            Some(commencementDateSummary),
+            HasMadeSalesSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            DateOfFirstSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            Some(cds),
             PreviouslyRegisteredSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, existingPreviousRegistrations, AmendMode),
             TaxRegisteredInEuSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
