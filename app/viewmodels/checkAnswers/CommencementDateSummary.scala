@@ -17,10 +17,11 @@
 package viewmodels.checkAnswers
 
 import formats.Format.dateFormatter
+import logging.Logging
 import models.UserAnswers
 import models.requests.AuthenticatedDataRequest
 import play.api.i18n.Messages
-import services.DateService
+import services.{DateService, RegistrationService}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.govuk.summarylist._
@@ -29,13 +30,22 @@ import viewmodels.implicits._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CommencementDateSummary @Inject()(dateService: DateService) {
+class CommencementDateSummary @Inject()(dateService: DateService, registrationService: RegistrationService) extends Logging {
 
   def row(answers: UserAnswers)
          (implicit messages: Messages, ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[SummaryListRow] = {
 
     for {
-      calculatedCommencementDate <- dateService.calculateCommencementDate(answers)
+      calculatedCommencementDate <- if (registrationService.eligibleSalesDifference(request.registration, answers)) {
+        dateService.calculateCommencementDate(answers)
+      } else {
+        request.registration match {
+          case Some(registration) => Future.successful(registration.commencementDate)
+          case _ => val exception = new IllegalStateException("Registration was expected but not found")
+            logger.error(exception.getMessage, exception)
+            throw exception
+        }
+      }
     } yield {
 
       SummaryListRowViewModel(

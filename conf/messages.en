@@ -538,6 +538,7 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
 commencementDate.p1 = You must include all eligible sales from {0} in your first return.
+commencementDate.p2 = You can change your sales information up to {0}.
 commencementDate.checkYourAnswersLabel = Include sales from this date
 
 commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
@@ -841,6 +842,10 @@ errorSubmittingAmendment.heading = We cannot update your registration
 errorSubmittingAmendment.tryAgainLater = You can <a class="govuk-link" href="{0}">try again later</a>.
 errorSubmittingAmendment.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 errorSubmittingAmendment.yourAccount = Back to your account
+
+noLongerAmendable.title = You can no longer change your sales information
+noLongerAmendable.heading = You can no longer change your sales information
+noLongerAmendable.paragraph = If you have any questions about your OSS account, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 
 deleteAllFixedEstablishment.title = Delete your fixed establishment information
 deleteAllFixedEstablishment.heading = Delete your fixed establishment information

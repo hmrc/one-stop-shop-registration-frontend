@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{Mode, UserAnswers}
 import pages.HasMadeSalesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,7 +26,7 @@ import viewmodels.implicits._
 
 object HasMadeSalesSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HasMadeSalesPage).map {
       hasMadeSales =>
 
@@ -36,7 +36,7 @@ object HasMadeSalesSummary  {
           key     = messages("hasMadeSales.checkYourAnswersLabel"),
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.HasMadeSalesController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.HasMadeSalesController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("hasMadeSales.change.hidden"))
           )
         )

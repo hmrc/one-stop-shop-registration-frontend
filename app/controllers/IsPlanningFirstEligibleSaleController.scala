@@ -41,7 +41,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))) {
     implicit request =>
 
       val form = formProvider()
@@ -55,7 +55,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
       Ok(view(preparedForm, mode, firstDayOfNextCalendarQuarter.format(dateFormatter)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
       val form = formProvider()
