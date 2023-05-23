@@ -16,19 +16,19 @@
 
 package viewmodels.checkAnswers
 
-import java.time.format.DateTimeFormatter
-
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{Mode, UserAnswers}
 import pages.DateOfFirstSalePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
+import java.time.format.DateTimeFormatter
+
 object DateOfFirstSaleSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(DateOfFirstSalePage).map {
       answer =>
 
@@ -38,7 +38,7 @@ object DateOfFirstSaleSummary  {
           key     = "dateOfFirstSale.checkYourAnswersLabel",
           value   = ValueViewModel(answer.format(dateFormatter)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.DateOfFirstSaleController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.DateOfFirstSaleController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("dateOfFirstSale.change.hidden"))
           )
         )
