@@ -42,6 +42,7 @@ class CommencementDateController @Inject()(
     implicit request =>
       for {
         calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        finalDayOfDateAmendment = dateService.calculateFinalAmendmentDate(calculatedCommencementDate)
       } yield {
         request.userAnswers.get(HasMadeSalesPage) match {
           case Some(true) =>
@@ -57,6 +58,7 @@ class CommencementDateController @Inject()(
                   view(
                     mode,
                     calculatedCommencementDate.format(dateFormatter),
+                    finalDayOfDateAmendment.format(dateFormatter),
                     isDateInCurrentQuarter,
                     Some(startOfCurrentQuarter.format(dateFormatter)),
                     Some(endOfCurrentQuarter.format(dateFormatter)),
@@ -68,7 +70,15 @@ class CommencementDateController @Inject()(
           case Some(false) =>
             request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
               case Some(true) =>
-                Ok(view(mode, calculatedCommencementDate.format(dateFormatter), isDateInCurrentQuarter = true, None, None, None))
+                Ok(view(
+                  mode,
+                  calculatedCommencementDate.format(dateFormatter),
+                  finalDayOfDateAmendment.format(dateFormatter),
+                  isDateInCurrentQuarter = true,
+                  None,
+                  None,
+                  None
+                ))
               case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
               case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
             }

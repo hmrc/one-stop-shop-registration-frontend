@@ -53,7 +53,7 @@ class CheckYourAnswersController @Inject()(
                                             auditService: AuditService,
                                             view: CheckYourAnswersView,
                                             emailService: EmailService,
-                                            dateService: DateService,
+                                            commencementDateSummary: CommencementDateSummary,
                                             saveForLaterService: SaveForLaterService,
                                             frontendAppConfig: FrontendAppConfig
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
@@ -72,16 +72,16 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      new CommencementDateSummary(dateService).row(request.userAnswers).map { commencementDateSummary =>
+        commencementDateSummary.row(request.userAnswers).map { cds =>
 
         val list = SummaryListViewModel(
           rows = Seq(
             new HasTradingNameSummary().row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode),
-            HasMadeSalesSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            Some(commencementDateSummary),
+            HasMadeSalesSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            DateOfFirstSaleSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+            Some(cds),
             PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
             PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode),
             TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode).map(_.withCssClass("govuk-summary-list__row--no-border")),

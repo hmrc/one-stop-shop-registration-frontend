@@ -36,7 +36,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
-import services.DateService
+import services.{DateService, RegistrationService}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -143,9 +143,9 @@ trait SpecBase
     ).flatten
   }
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService, mode: Mode)
+  def getCYASummaryList(answers: UserAnswers, dateService: DateService, registrationService: RegistrationService, mode: Mode)
                        (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]) = {
-    new CommencementDateSummary(dateService).row(answers).map { commencementDateSummary =>
+    new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
       Seq(
         new HasTradingNameSummary().row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),

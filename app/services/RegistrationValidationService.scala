@@ -17,6 +17,7 @@
 package services
 
 import cats.implicits._
+import logging.Logging
 import models._
 import models.domain._
 import models.requests.AuthenticatedDataRequest
@@ -29,7 +30,11 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationValidationService @Inject()(dateService: DateService) extends EuTaxRegistrationValidations with PreviousRegistrationsValidations {
+class RegistrationValidationService @Inject()(
+                                               dateService: DateService,
+                                               registrationService: RegistrationService
+                                             )
+  extends EuTaxRegistrationValidations with PreviousRegistrationsValidations with Logging {
 
 
   def fromUserAnswers(answers: UserAnswers, vrn: Vrn)
@@ -51,7 +56,7 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
         getBankDetails(answers),
         getOnlineMarketplace(answers),
         getNiPresence(answers),
-        ).mapN(
+      ).mapN(
         (
           name,
           tradingNames,
@@ -138,9 +143,19 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
     if (answers.get(DateOfFirstSalePage).isEmpty && answers.get(IsPlanningFirstEligibleSalePage).isEmpty) {
       Future.successful(DataMissingError(IsPlanningFirstEligibleSalePage).invalidNec)
     } else {
-      dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
-        calculatedCommencementDate.validNec
+      if (registrationService.eligibleSalesDifference(request.registration, answers)) {
+        dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
+          calculatedCommencementDate.validNec
+        }
+      } else {
+        request.registration match {
+          case Some(registration) => Future.successful(registration.commencementDate.validNec)
+          case _ => val exception = new IllegalStateException("We were expecting a registration here")
+            logger.error(exception.getMessage, exception)
+            throw exception
+        }
       }
+
     }
   }
 
