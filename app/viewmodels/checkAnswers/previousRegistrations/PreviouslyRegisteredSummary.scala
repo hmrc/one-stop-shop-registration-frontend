@@ -20,6 +20,7 @@ import controllers.previousRegistrations.routes
 import models.{AmendMode, Mode, UserAnswers}
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.Messages
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -35,7 +36,7 @@ object PreviouslyRegisteredSummary {
         SummaryListRowViewModel(
           key = "previouslyRegistered.checkYourAnswersLabel",
           value = ValueViewModel(value),
-          actions = if(mode != AmendMode) {
+          actions = if((mode != AmendMode) || (mode == AmendMode && answers.get(AllPreviousRegistrationsQuery).isEmpty)) {
             Seq(
               ActionItemViewModel("site.change", routes.PreviouslyRegisteredController.onPageLoad(mode).url)
                 .withVisuallyHiddenText(messages("previouslyRegistered.change.hidden"))
