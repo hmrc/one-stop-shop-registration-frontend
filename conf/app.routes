@@ -496,3 +496,7 @@ GET         /start-amend-journey                                                
 
 GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
 POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
+
+GET        /cancelAmendRegistration                                             controllers.CancelAmendRegistrationController.onPageLoad(continueUrl: String, mode: Mode = AmendMode)
+POST       /cancelAmendRegistration                                             controllers.CancelAmendRegistrationController.onSubmit(mode: Mode = AmendMode)
+
