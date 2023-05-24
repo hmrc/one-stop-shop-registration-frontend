@@ -72,17 +72,12 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          val isNotMatchingEmailAddress = request.userAnswers.get(BusinessContactDetailsPage) match {
-            case Some(contactDetails) =>
-              for {
-                maybeRegistration <- registrationConnector.getRegistration()
-              } yield {
-                maybeRegistration match {
-                  case Some(registration) =>
-                    contactDetails.emailAddress != registration.contactDetails.emailAddress
-                }
-              }
-
+          val emailAddress = value.emailAddress
+          val isMatchingEmailAddress = request.registration match {
+            case Some(registration) if mode == AmendMode =>
+              registration.contactDetails.emailAddress.contains(emailAddress)
+            case _ =>
+              false
           }
 
           val continueUrl = if (mode == CheckMode) {
@@ -93,7 +88,7 @@ class BusinessContactDetailsController @Inject()(
             routes.BankDetailsController.onPageLoad(NormalMode).url
           }
 
-          if (mode == AmendMode && config.emailVerificationEnabled && isNotMatchingEmailAddress) {
+          if (mode == AmendMode && config.emailVerificationEnabled && !isMatchingEmailAddress) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else if (mode != AmendMode && config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
