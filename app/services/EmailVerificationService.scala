@@ -23,7 +23,7 @@ import controllers.routes
 import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.NotVerified
 import models.emailVerification.{EmailVerificationRequest, PasscodeAttemptsStatus, VerifyEmail}
-import models.{Mode, NormalMode}
+import models.Mode
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -55,7 +55,7 @@ class EmailVerificationService @Inject()(
         email = Some(
           VerifyEmail(
             address = emailAddress,
-            enterUrl = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
+            enterUrl = routes.BusinessContactDetailsController.onPageLoad(mode).url
           )
         )
       )
