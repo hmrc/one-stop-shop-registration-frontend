@@ -78,13 +78,11 @@ class RegistrationService extends Logging {
         Try(previousRegistrationsUA)
       }
 
-    } yield previousRegistrations // TODO remove test data
+      contactDetails <- previousRegistrations.set(BusinessContactDetailsPage, registration.contactDetails)
+
+    } yield contactDetails // TODO remove test data
 
       .set(IsPlanningFirstEligibleSalePage, true).get
-
-      .set(
-        BusinessContactDetailsPage,
-        BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).get
 
     Future.fromTry(userAnswers)
   }
@@ -176,9 +174,7 @@ class RegistrationService extends Logging {
         .set(EuCountryPage(Index(3)), Country("HR", "Croatia")).success.value
         .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
         .set(VatRegisteredPage(Index(3)), false).success.value
-        .set(
-          BusinessContactDetailsPage,
-          BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
+
         */
 
 
