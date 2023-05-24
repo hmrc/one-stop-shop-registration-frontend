@@ -17,7 +17,7 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.{RegistrationConnector, SaveForLaterConnector}
+import connectors.RegistrationConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
 import logging.Logging
@@ -144,7 +144,7 @@ class BusinessContactDetailsController @Inject()(
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
-            case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+            case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(mode).url))
           }
     }
   }
