@@ -466,3 +466,6 @@ GET         /successful-amend                                                   
 GET         /cannot-use-not-registered                                          controllers.NotRegisteredController.onPageLoad()
 
 GET         /error-submitting-amendment                                         controllers.amend.ErrorSubmittingAmendmentController.onPageLoad()
+
+GET        /delete-all-fixed-establishment                                      controllers.DeleteAllFixedEstablishmentController.onPageLoad()
+POST       /delete-all-fixed-establishment                                      controllers.DeleteAllFixedEstablishmentController.onSubmit()
