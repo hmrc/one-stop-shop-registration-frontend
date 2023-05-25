@@ -91,7 +91,6 @@ class BusinessContactDetailsController @Inject()(
           } else if (mode != AmendMode && config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else {
-            logger.info("update answers ")
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
               _ <- cc.sessionRepository.set(updatedAnswers)
