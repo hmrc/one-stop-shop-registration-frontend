@@ -61,7 +61,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 1, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 1, 1)
       }
     }
 
@@ -72,7 +72,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 4, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 4, 1)
       }
     }
 
@@ -83,7 +83,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 7, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 7, 1)
       }
     }
 
@@ -94,7 +94,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           val stubClock = getStubClock(date)
           val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-          service.startOfNextQuarter mustEqual LocalDate.of(2022, 10, 1)
+          service.startOfNextQuarter() mustEqual LocalDate.of(2022, 10, 1)
       }
     }
   }
@@ -275,7 +275,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val service = new DateService(stubClock, coreRegistrationValidationService)
 
             val startDateBasedOnFirstSaleMethod = PrivateMethod[LocalDate](Symbol("startDateBasedOnFirstSale"))
-            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual service.startOfNextQuarter
+            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual service.startOfNextQuarter()
         }
       }
 
@@ -292,7 +292,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val service = new DateService(stubClock, coreRegistrationValidationService)
 
             val startDateBasedOnFirstSaleMethod = PrivateMethod[LocalDate](Symbol("startDateBasedOnFirstSale"))
-            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual service.startOfNextQuarter
+            service invokePrivate startDateBasedOnFirstSaleMethod(firstSale) mustEqual service.startOfNextQuarter()
         }
       }
     }
@@ -371,7 +371,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
             val stubClock = getStubClock(date)
             val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-            service.earliestSaleAllowed mustEqual LocalDate.of(2021, 7, 1)
+            service.earliestSaleAllowed() mustEqual LocalDate.of(2021, 7, 1)
         }
       }
     }
@@ -393,7 +393,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               val stubClock = getStubClock(date)
               val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-              service.earliestSaleAllowed mustEqual date.minusMonths(1).withDayOfMonth(1)
+              service.earliestSaleAllowed() mustEqual date.minusMonths(1).withDayOfMonth(1)
           }
         }
       }
@@ -420,7 +420,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               val stubClock = getStubClock(date)
               val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-              service.earliestSaleAllowed mustEqual date.withDayOfMonth(1)
+              service.earliestSaleAllowed() mustEqual date.withDayOfMonth(1)
           }
         }
       }
@@ -447,7 +447,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               val stubClock = getStubClock(today)
               val service   = new DateService(stubClock, coreRegistrationValidationService)
 
-              service.earliestSaleAllowed mustEqual startOfQuarter
+              service.earliestSaleAllowed() mustEqual startOfQuarter
           }
         }
       }
