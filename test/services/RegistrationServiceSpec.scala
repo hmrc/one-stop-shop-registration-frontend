@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import connectors.returns.VatReturnConnector
 import models.domain.PreviousSchemeNumbers
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
@@ -28,8 +29,9 @@ import pages.euDetails._
 import pages.previousRegistrations._
 import queries.{AllTradingNames, AllWebsites}
 import testutils.RegistrationData
+import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDate
+import java.time.{Clock, Instant, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrationServiceSpec
@@ -106,12 +108,19 @@ class RegistrationServiceSpec
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
 
+  private val mockDateService: DateService = mock[DateService]
+  private val mockPeriodService: PeriodService = mock[PeriodService]
+  private val mockVatReturnConnector: VatReturnConnector = mock[VatReturnConnector]
+  private val instant = Instant.now
+  private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   ".toUserAnswers" - {
 
     "normal registration returns good user answers for all pages" in {
 
-      val service = new RegistrationService()
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val result = service.toUserAnswers(userAnswersId, RegistrationData.registration, vatCustomerInfo).futureValue
 
@@ -122,7 +131,7 @@ class RegistrationServiceSpec
 
   ".eligibleSalesDifference" - {
     "return true if the user answers are different" in {
-      val service = new RegistrationService()
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val result = service.eligibleSalesDifference(Some(RegistrationData.registration), completeUserAnswers)
 
@@ -130,7 +139,7 @@ class RegistrationServiceSpec
     }
 
     "return true if there is no registration provided" in {
-      val service = new RegistrationService()
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val result = service.eligibleSalesDifference(None, completeUserAnswers)
 
@@ -138,11 +147,37 @@ class RegistrationServiceSpec
     }
 
     "return false if the user answers are not different" in {
-      val service = new RegistrationService()
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val userAnswers = completeUserAnswers.set(DateOfFirstSalePage, RegistrationData.registration.dateOfFirstSale.get).success.value
 
       val result = service.eligibleSalesDifference(Some(RegistrationData.registration), userAnswers)
+
+      result mustBe false
+    }
+  }
+
+  ".isEligibleSalesAmendable" - {
+    "return true when registrations is amendable" in {
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
+
+      result mustBe true
+    }
+
+    "return true when no registration provided" in {
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+
+      val result = service.isEligibleSalesAmendable(None)
+
+      result mustBe true
+    }
+
+    "return false when not amendable" in {
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
 
       result mustBe false
     }
