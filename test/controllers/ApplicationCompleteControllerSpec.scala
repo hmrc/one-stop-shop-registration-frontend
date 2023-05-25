@@ -91,7 +91,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-        when(mockDateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(mockDateService.startOfNextQuarter()) thenReturn arbitraryStartDate
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)

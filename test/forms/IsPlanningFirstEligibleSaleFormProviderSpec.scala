@@ -19,6 +19,7 @@ package forms
 import base.SpecBase
 import formats.Format.dateFormatter
 import forms.behaviours.BooleanFieldBehaviours
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.mockito.MockitoSugar.mock
 import play.api.data.FormError
@@ -37,9 +38,9 @@ class IsPlanningFirstEligibleSaleFormProviderSpec extends SpecBase with BooleanF
 
   ".value" - {
 
-    when(dateService.startOfNextQuarter).thenReturn(date)
+    when(dateService.startOfNextQuarter(any())).thenReturn(date)
 
-    val form = new IsPlanningFirstEligibleSaleFormProvider(dateService)()
+    val form = new IsPlanningFirstEligibleSaleFormProvider(dateService, stubClockAtArbitraryDate)(None)
     val fieldName = "value"
 
     behave like booleanField(

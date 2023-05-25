@@ -87,7 +87,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       "must return OK and the correct view when answers are complete" in {
         val commencementDate = LocalDate.of(2022, 1, 1)
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-        when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+        when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(bind[DateService].toInstance(dateService))
@@ -110,7 +111,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "trading name is missing" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -133,7 +135,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "websites are missing" in {
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -155,7 +158,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "eligible sales is not populated correctly" in {
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -177,7 +181,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "tax registered in eu is not populated correctly" in {
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -199,7 +204,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "previous registrations is not populated correctly" in {
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
@@ -221,7 +227,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "tax registered in eu has a country with missing data" in {
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers
             .set(TaxRegisteredInEuPage, true).success.value
@@ -245,7 +252,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
         "previous registrations has a country with missing data" in {
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-          when(dateService.startOfNextQuarter) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers
             .set(PreviouslyRegisteredPage, true).success.value
