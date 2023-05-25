@@ -18,6 +18,7 @@ package connectors
 
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
+import config.Constants
 import models.emails.EmailSendingResult.{EMAIL_ACCEPTED, EMAIL_NOT_SENT, EMAIL_UNSENDABLE}
 import models.emails._
 import play.api.Application
@@ -33,8 +34,8 @@ class EmailConnectorSpec extends SpecBase with WireMockHelper {
 
   private val request = EmailToSendRequest(
     to = List("name@example.com"),
-    templateId = "oss_registration_confirmation_pre_10th_of_month",
-    parameters = EmailParameters(
+    templateId = Constants.registrationConfirmationTemplateId,
+    parameters = RegistrationConfirmation(
       "Joe Bloggs", "Test Business", "July to September 2021", "1 October 2021", "31 August 2021", "www.test.com"
     ))
 
