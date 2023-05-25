@@ -22,6 +22,8 @@ import models.requests.AuthenticatedDataRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
 import services.RegistrationService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,12 +35,14 @@ class CheckEligibleSalesAmendableFilterImpl(mode: Option[Mode],
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    implicit val req: AuthenticatedDataRequest[A] = request
+
     mode match {
       case Some(AmendMode) =>
-        if(registrationService.isAmendable(request.registration)) {
-          Future.successful(Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url)))
-        } else {
-          Future.successful(None)
+        registrationService.isEligibleSalesAmendable(request.registration).map {
+          case false => Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url))
+          case _ => None
         }
       case _ => Future.successful(None)
     }

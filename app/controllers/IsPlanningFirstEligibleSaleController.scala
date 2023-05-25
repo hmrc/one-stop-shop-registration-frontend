@@ -45,7 +45,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
     implicit request =>
 
       val form = formProvider()
-      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter()
 
       val preparedForm = request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
         case None => form
@@ -59,7 +59,7 @@ class IsPlanningFirstEligibleSaleController @Inject()(
     implicit request =>
 
       val form = formProvider()
-      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+      val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter()
 
       form.bindFromRequest().fold(
         formWithErrors =>
