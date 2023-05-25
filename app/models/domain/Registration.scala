@@ -56,7 +56,8 @@ object Registration {
             bankDetails: BankDetails,
             isOnlineMarketplace: Boolean,
             niPresence: Option[NiPresence],
-            dateOfFirstSale: Option[LocalDate]): Registration = new Registration(
+            dateOfFirstSale: Option[LocalDate],
+            submissionReceived: Option[Instant] = None): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
     tradingNames.map(normaliseSpaces),
@@ -69,6 +70,8 @@ object Registration {
     bankDetails,
     isOnlineMarketplace,
     niPresence,
-    dateOfFirstSale)
+    dateOfFirstSale,
+    submissionReceived
+  )
 
 }

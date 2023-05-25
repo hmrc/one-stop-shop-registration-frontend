@@ -137,6 +137,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
     "must return a Registration when user answers are provided and we have full VAT information on the user and is not part of vat group" in {
 
       when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+      when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
@@ -167,6 +168,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
     "must return a Registration when no trading names, EU countries or websites were provided" in {
 
+      when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
       val userAnswers =
         answersNotPartOfVatGroup
           .set(HasTradingNamePage, false).success.value
@@ -192,6 +195,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
     }
 
     "must return a Registration when user answers are provided and BusinessBasedInNi is false and HasFixedEstablishmentInNi is true" in {
+
+      when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
@@ -225,6 +230,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
     "must return a Registration when user answers are provided and BusinessBasedInNi is false and HasFixedEstablishmentInNi is false and SalesChannels has been answered" in {
 
+      when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
       val regDate = LocalDate.of(2000, 1, 1)
       val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
       val vatInfo = VatCustomerInfo(
@@ -257,6 +264,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
     }
 
     "must return a registration when a user is part of a vat group and has eu registrations with vat numbers and no other details" in {
+
+      when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
       val userAnswers =
         UserAnswers("id", vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
           .set(BusinessBasedInNiPage, true).success.value
@@ -304,6 +313,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Business Based in NI is missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup.remove(BusinessBasedInNiPage).success.value
 
         val expectedRegistration =
@@ -320,6 +331,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Business Based in NI is false and Has Fixed Establishment in NI is missing" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers =
           answersNotPartOfVatGroup
@@ -340,6 +353,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Has Fixed Establishment in NI is false and Sales Channels is missing" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers =
           answersNotPartOfVatGroup
@@ -362,6 +377,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Date Of First Sale is missing and Is Planning First Eligible Sale is true" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup
           .remove(DateOfFirstSalePage).success.value
           .set(IsPlanningFirstEligibleSalePage, true).success.value
@@ -383,6 +400,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Vat Customer Info is missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup.copy(vatInfo = None)
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -391,6 +410,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Has Trading Name is missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup.remove(HasTradingNamePage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -398,6 +419,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Has Trading Name is true, but there are no trading names" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers = answersNotPartOfVatGroup.remove(AllTradingNames).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -415,6 +438,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when both Date of First Sale and Is Planning First Eligible Sale are missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup
           .remove(DateOfFirstSalePage).success.value
           .remove(IsPlanningFirstEligibleSalePage).success.value
@@ -426,6 +451,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Contact Details are missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup.remove(BusinessContactDetailsPage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -433,6 +460,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Bank Details are missing" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers = answersNotPartOfVatGroup.remove(BankDetailsPage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -442,6 +471,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Has Website is missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup.remove(HasWebsitePage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -449,6 +480,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Has Website is true, but there are no websites" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers =
           answersNotPartOfVatGroup
@@ -473,6 +506,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       "when Is Online Marketplace is missing" in {
 
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
         val userAnswers = answersNotPartOfVatGroup.remove(IsOnlineMarketplacePage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -480,6 +515,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Previously Registered has not been answered" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers = answersNotPartOfVatGroup.remove(PreviouslyRegisteredPage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -490,6 +527,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       "when Previously Registered is true" - {
 
         "but there are no previous registrations" in {
+
+          when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val userAnswers =
             answersNotPartOfVatGroup
@@ -503,6 +542,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
         "but there is a previous registration without a country" in {
 
+          when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
           val userAnswers = answersNotPartOfVatGroup.remove(PreviousEuCountryPage(Index(0))).success.value
           val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -510,6 +551,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         }
 
         "but there is a previous registration without a VAT number" in {
+
+          when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val userAnswers = answersNotPartOfVatGroup.remove(PreviousOssNumberPage(Index(0), Index(0))).success.value
           val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -529,6 +572,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Tax Registered in EU is missing" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers = answersNotPartOfVatGroup.remove(TaxRegisteredInEuPage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -550,6 +595,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
         "and there are no EU country details" in {
 
+          when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
           val userAnswers =
             answersNotPartOfVatGroup
               .set(TaxRegisteredInEuPage, true).success.value
@@ -561,6 +608,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         }
 
         "and there is a record with no country" in {
+
+          when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val userAnswers = answersNotPartOfVatGroup.remove(EuCountryPage(Index(0))).success.value
           val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -580,6 +629,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                   "and Vat Number is missing" in {
 
+                    when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                     val userAnswers = answersPartOfVatGroup.remove(EuVatNumberPage(Index(0))).success.value
                     val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -593,6 +644,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                   "and TaxId is missing" in {
 
+                    when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                     val userAnswers = answersPartOfVatGroup.remove(EuTaxReferencePage(Index(2))).success.value
                     val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -605,6 +658,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
                 "when Registration Type is missing" - {
 
                   when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersPartOfVatGroup.remove(RegistrationTypePage(Index(0))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -615,6 +669,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "when EU Send Goods Trading Name is missing" in {
 
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                   val userAnswers = answersPartOfVatGroup.remove(EuSendGoodsTradingNamePage(Index(0))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -623,6 +679,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
                 }
 
                 "when EU Send Goods Address is missing" in {
+
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersPartOfVatGroup.remove(EuSendGoodsAddressPage(Index(0))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -636,6 +694,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
               "when Sells Goods To EU Consumer Method is missing" - {
 
                 when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                 val userAnswers = answersPartOfVatGroup.remove(SellsGoodsToEUConsumerMethodPage(Index(0))).success.value
                 val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -652,6 +711,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "and EU Vat Number is missing" in {
 
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                   val userAnswers = answersPartOfVatGroup.remove(EuVatNumberPage(Index(1))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -661,6 +722,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
               }
 
               "when Vat Registered is missing" in {
+
+                when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                 val userAnswers = answersPartOfVatGroup.remove(VatRegisteredPage(Index(1))).success.value
                 val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -672,6 +735,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
             }
 
             "when Sells Goods To EU Consumers is missing" in {
+
+              when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
               val userAnswers = answersPartOfVatGroup.remove(SellsGoodsToEUConsumersPage(Index(0))).success.value
               val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -692,6 +757,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                   "and Vat Number is missing" in {
 
+                    when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                     val userAnswers = answersNotPartOfVatGroup.remove(EuVatNumberPage(Index(0))).success.value
                     val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -705,6 +772,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                   "and TaxId is missing" in {
 
+                    when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                     val userAnswers = answersNotPartOfVatGroup.remove(EuTaxReferencePage(Index(2))).success.value
                     val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -717,6 +786,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
                 "when Registration Type is missing" - {
 
                   when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersNotPartOfVatGroup.remove(RegistrationTypePage(Index(0))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -727,6 +797,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "when EU Send Goods Trading Name is missing" in {
 
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                   val userAnswers = answersNotPartOfVatGroup.remove(EuSendGoodsTradingNamePage(Index(0))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -735,6 +807,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
                 }
 
                 "when EU Send Goods Address is missing" in {
+
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersNotPartOfVatGroup.remove(EuSendGoodsAddressPage(Index(0))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -751,6 +825,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                   "and Vat Number is missing" in {
 
+                    when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                     val userAnswers = answersNotPartOfVatGroup.remove(EuVatNumberPage(Index(4))).success.value
                     val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -764,6 +840,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                   "and TaxId is missing" in {
 
+                    when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                     val userAnswers = answersNotPartOfVatGroup.remove(EuTaxReferencePage(Index(5))).success.value
                     val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -776,6 +854,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
                 "when Registration Type is missing" - {
 
                   when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersNotPartOfVatGroup.remove(RegistrationTypePage(Index(4))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -786,6 +865,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "when Fixed Establishment Trading Name is missing" in {
 
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                   val userAnswers = answersNotPartOfVatGroup.remove(FixedEstablishmentTradingNamePage(Index(4))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -794,6 +875,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
                 }
 
                 "when Fixed Establishment Address is missing" in {
+
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersNotPartOfVatGroup.remove(FixedEstablishmentAddressPage(Index(4))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -807,6 +890,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
               "when Sells Goods To EU Consumer Method is missing" - {
 
                 when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                 val userAnswers = answersNotPartOfVatGroup.remove(SellsGoodsToEUConsumerMethodPage(Index(0))).success.value
                 val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -823,6 +907,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "and EU Vat Number is missing" in {
 
+                  when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
                   val userAnswers = answersNotPartOfVatGroup.remove(EuVatNumberPage(Index(1))).success.value
                   val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
@@ -832,6 +918,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
               }
 
               "when Vat Registered is missing" in {
+
+                when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                 val userAnswers = answersNotPartOfVatGroup.remove(VatRegisteredPage(Index(1))).success.value
                 val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -843,6 +931,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
             }
 
             "when Sells Goods To EU Consumers is missing" in {
+
+              when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
               val userAnswers = answersNotPartOfVatGroup.remove(SellsGoodsToEUConsumersPage(Index(0))).success.value
               val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
@@ -856,6 +946,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       }
 
       "when Tax Registered has not been answered" in {
+
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers =
           answersNotPartOfVatGroup
@@ -874,6 +966,9 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       "should return Valid" - {
 
         "when Has Made Sales is Yes and Date of First Sale is populated" in {
+
+          when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
           val userAnswers =
             answersNotPartOfVatGroup
               .set(HasMadeSalesPage, true).success.value
