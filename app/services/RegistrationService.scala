@@ -305,7 +305,8 @@ class RegistrationService @Inject()(
             false
           case _ =>
             val today = LocalDate.now(clock)
-            dateService.calculateFinalAmendmentDate(registration.commencementDate).isAfter(today)
+            val finalDay = dateService.calculateFinalAmendmentDate(registration.commencementDate)
+            finalDay.isAfter(today) || finalDay.isEqual(today)
         }
       case _ =>
         Future.successful(true)
