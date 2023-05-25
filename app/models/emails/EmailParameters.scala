@@ -18,18 +18,41 @@ package models.emails
 
 import play.api.libs.json.{Json, Reads, Writes}
 
-case class EmailParameters(
-  recipientName_line1: String,
-  businessName:String,
-  periodOfFirstReturn: String,
-  firstDayOfNextPeriod: String,
-  commencementDate: String,
-  redirectLink: String
-)
+sealed trait EmailParameters
 
 object EmailParameters {
-  implicit val writes: Writes[EmailParameters] =
-    Json.writes[EmailParameters]
-  implicit val reads: Reads[EmailParameters] =
-    Json.reads[EmailParameters]
+  implicit val reads: Reads[EmailParameters] = Json.reads[EmailParameters]
+  implicit val writes: Writes[EmailParameters] = Writes[EmailParameters] {
+  case registration: RegistrationConfirmation =>
+      Json.toJson(registration)(RegistrationConfirmation.writes)
+  case amendRegistration: AmendRegistrationConfirmation =>
+      Json.toJson(amendRegistration)(AmendRegistrationConfirmation.writes)
+  }
 }
+
+case class RegistrationConfirmation(
+                                     recipientName_line1: String,
+                                     businessName: String,
+                                     periodOfFirstReturn: String,
+                                     firstDayOfNextPeriod: String,
+                                     commencementDate: String,
+                                     redirectLink: String
+                                   ) extends EmailParameters
+
+object RegistrationConfirmation {
+  implicit val reads: Reads[RegistrationConfirmation] = Json.reads[RegistrationConfirmation]
+  implicit val writes: Writes[RegistrationConfirmation] = Json.writes[RegistrationConfirmation]
+}
+
+case class AmendRegistrationConfirmation(
+                                          recipientName_line1: String,
+                                          amendmentDate: String
+                                        ) extends EmailParameters
+
+object AmendRegistrationConfirmation {
+
+  implicit val reads: Reads[AmendRegistrationConfirmation] = Json.reads[AmendRegistrationConfirmation]
+  implicit val writes: Writes[AmendRegistrationConfirmation] = Json.writes[AmendRegistrationConfirmation]
+}
+
+
