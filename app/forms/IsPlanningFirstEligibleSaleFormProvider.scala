@@ -26,7 +26,7 @@ class IsPlanningFirstEligibleSaleFormProvider @Inject()(dateService: DateService
 
   def apply(): Form[Boolean] = {
 
-    val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+    val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter() // TODO
 
     Form(
       "value" -> boolean(
