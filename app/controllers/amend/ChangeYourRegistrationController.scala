@@ -45,6 +45,7 @@ import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummar
 import viewmodels.govuk.summarylist._
 import views.html.amend.ChangeYourRegistrationView
 
+import java.time.{Clock, Instant}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,7 +58,8 @@ class ChangeYourRegistrationController @Inject()(
                                                   view: ChangeYourRegistrationView,
                                                   emailService: EmailService,
                                                   commencementDateSummary: CommencementDateSummary,
-                                                  frontendAppConfig: FrontendAppConfig
+                                                  frontendAppConfig: FrontendAppConfig,
+                                                  clock: Clock
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc

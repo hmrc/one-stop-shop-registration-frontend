@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
 import ModelHelpers._
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 
 final case class Registration(
                                vrn: Vrn,
@@ -36,7 +36,8 @@ final case class Registration(
                                bankDetails: BankDetails,
                                isOnlineMarketplace: Boolean,
                                niPresence: Option[NiPresence],
-                               dateOfFirstSale: Option[LocalDate]
+                               dateOfFirstSale: Option[LocalDate],
+                               submissionReceived: Option[Instant] = None
                              )
 
 object Registration {

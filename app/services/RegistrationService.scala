@@ -16,23 +16,31 @@
 
 package services
 
+import connectors.returns.VatReturnConnector
 import logging.Logging
 import models._
 import models.domain.{PreviousSchemeNumbers, _}
 import models.euDetails._
 import models.previousRegistrations.PreviousRegistrationDetails
+import models.requests.AuthenticatedDataRequest
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations._
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class RegistrationService @Inject()(dateService: DateService, clock: Clock) extends Logging {
+class RegistrationService @Inject()(
+                                     dateService: DateService,
+                                     periodService: PeriodService,
+                                     vatReturnConnector: VatReturnConnector,
+                                     clock: Clock
+                                   ) extends Logging {
 
   def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo)(implicit ec: ExecutionContext): Future[UserAnswers] = {
 
@@ -263,7 +271,12 @@ class RegistrationService @Inject()(dateService: DateService, clock: Clock) exte
         case _ =>
           Try(hasMadeSalesUA)
       }
-      firstEligibleSaleUA <- dateOfFirstSaleUA.set(IsPlanningFirstEligibleSalePage, true) // TODO possible to reverse the "using start of next period as commencement date" logic?
+      firstEligibleSaleUA <-
+        if (registration.dateOfFirstSale.isEmpty) {
+          dateOfFirstSaleUA.set(IsPlanningFirstEligibleSalePage, true)
+        } else {
+          Try(dateOfFirstSaleUA)
+        }
 
     } yield firstEligibleSaleUA
   }
@@ -281,14 +294,43 @@ class RegistrationService @Inject()(dateService: DateService, clock: Clock) exte
     }
   }
 
-  def isAmendable(maybeRegistration: Option[Registration]): Boolean = {
+  def isEligibleSalesAmendable(maybeRegistration: Option[Registration])
+                              (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Boolean] = {
+
     maybeRegistration match {
       case Some(registration) =>
-        val today = LocalDate.now(clock)
-        dateService.calculateFinalAmendmentDate(registration.commencementDate).isBefore(today)
-      case _ => true
+        val firstReturnPeriod = periodService.getFirstReturnPeriod(registration.commencementDate)
+        vatReturnConnector.get(firstReturnPeriod).map {
+          case Right(_) =>
+            false
+          case _ =>
+            val today = LocalDate.now(clock)
+            dateService.calculateFinalAmendmentDate(registration.commencementDate).isAfter(today)
+        }
+      case _ =>
+        Future.successful(true)
     }
   }
+
+  def getLastPossibleDateOfFirstSale(maybeRegistration: Option[Registration])(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[LocalDate]] = {
+    maybeRegistration match {
+      case Some(registration) =>
+        val firstReturnPeriod = periodService.getFirstReturnPeriod(registration.commencementDate)
+        vatReturnConnector.get(firstReturnPeriod).map {
+          case Right(_) =>
+            Some(firstReturnPeriod.lastDay)
+          case _ =>
+            None
+        }
+      case _ =>
+        Future.successful(None)
+    }
+  }
+
+  /* TODO this to be used for the last day that is possible to make a sale
+  val today = LocalDate.now(clock)
+  today.isBefore(firstReturnPeriod.lastDay)
+   */
 
 
 }

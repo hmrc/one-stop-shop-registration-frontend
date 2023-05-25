@@ -21,7 +21,7 @@ import generators.Generators
 import models.domain.VatCustomerInfo
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.requests.AuthenticatedDataRequest
-import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, UserAnswers}
+import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, Period, Quarter, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -64,6 +64,8 @@ trait SpecBase
   val arbitraryInstant: Instant = arbitraryDate.atStartOfDay(ZoneId.systemDefault).toInstant
   val stubClockAtArbitraryDate: Clock = Clock.fixed(arbitraryInstant, ZoneId.systemDefault)
 
+  def period: Period = Period(2021, Quarter.Q3)
+
   val userAnswersId: String = "12345-credId"
   val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
 
@@ -72,8 +74,8 @@ trait SpecBase
       registrationDate = LocalDate.now(stubClockAtArbitraryDate),
       address = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
       partOfVatGroup = false,
-      organisationName      = Some("Company name"),
-      singleMarketIndicator =  Some(true),
+      organisationName = Some("Company name"),
+      singleMarketIndicator = Some(true),
       individualName = None
     )
 
@@ -149,8 +151,8 @@ trait SpecBase
 
       Seq(
         new HasTradingNameSummary().row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        HasMadeSalesSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        IsPlanningFirstEligibleSaleSummary.row(answers).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        HasMadeSalesSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+        IsPlanningFirstEligibleSaleSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         Some(commencementDateSummary),
         PreviouslyRegisteredSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
         TaxRegisteredInEuSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
