@@ -20,13 +20,14 @@ import base.SpecBase
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
 import models.{NormalMode, UserAnswers}
+import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DateOfFirstSalePage
 import play.api.inject.bind
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
+import play.api.mvc.{AnyContent, AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
@@ -42,8 +43,10 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
 
   private val date: LocalDate   = LocalDate.now(stubClockAtArbitraryDate)
   private val dateService       = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
-  private val dateFormatted     = dateService.earliestSaleAllowed.format(dateFormatter)
-  private val dateHintFormatted = dateService.earliestSaleAllowed.format(dateHintFormatter)
+  private val dateFormatted     = dateService.earliestSaleAllowed().format(dateFormatter)
+  private val dateHintFormatted = dateService.earliestSaleAllowed().format(dateHintFormatter)
+
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(getRequest(), testCredentials, vrn, None, emptyUserAnswers)
 
   private val formProvider = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)
   private val form = formProvider()
@@ -68,12 +71,12 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
-        val result = route(application, getRequest).value
+        val result = route(application, getRequest()).value
 
         val view = application.injector.instanceOf[DateOfFirstSaleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted, dateHintFormatted)(getRequest(), messages(application)).toString
       }
     }
 
@@ -86,10 +89,10 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       running(application) {
         val view = application.injector.instanceOf[DateOfFirstSaleView]
 
-        val result = route(application, getRequest).value
+        val result = route(application, getRequest()).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(date), NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(date), NormalMode, dateFormatted, dateHintFormatted)(getRequest(), messages(application)).toString
       }
     }
 
@@ -108,7 +111,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
           .build()
 
       running(application) {
-        val result = route(application, postRequest).value
+        val result = route(application, postRequest()).value
         val expectedAnswers = basicUserAnswersWithVatInfo.set(DateOfFirstSalePage, date).success.value
 
         status(result) mustEqual SEE_OTHER
@@ -142,7 +145,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val result = route(application, getRequest).value
+        val result = route(application, getRequest()).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
@@ -154,7 +157,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val result = route(application, postRequest).value
+        val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
