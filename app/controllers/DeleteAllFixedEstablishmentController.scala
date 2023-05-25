@@ -65,7 +65,7 @@ class DeleteAllFixedEstablishmentController @Inject()(
                   Ok(view(euDetails))
                 }
 
-              case Left(error) => val exception = new Exception(s"TODO ${error}") // TODO
+              case Left(error) => val exception = new Exception(s"Error while getting VAT Customer Info $error")
                 logger.error(exception.getMessage, exception)
                 throw exception
             }
@@ -78,10 +78,8 @@ class DeleteAllFixedEstablishmentController @Inject()(
   def onSubmit(): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
     implicit request =>
 
-      val futureUserAnswers = Future.fromTry(deleteFixedEstablishment(request.userAnswers))
-
       (for {
-        userAnswers <- futureUserAnswers
+        userAnswers <- Future.fromTry(deleteFixedEstablishment(request.userAnswers))
         _ <- authenticatedUserAnswersRepository.set(userAnswers)
       } yield {
         registrationValidationService.fromUserAnswers(userAnswers, request.vrn).flatMap {
@@ -101,9 +99,8 @@ class DeleteAllFixedEstablishmentController @Inject()(
   }
 
   private def getEuDetailsForFixedEstablishment(userAnswers: UserAnswers): Seq[EuDetails] = {
-
-    userAnswers.get(AllEuDetailsQuery).getOrElse(Seq.empty).filter(_.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.FixedEstablishment))
-
+    userAnswers.get(AllEuDetailsQuery).getOrElse(Seq.empty)
+      .filter(_.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.FixedEstablishment))
   }
 
   private def deleteFixedEstablishment(userAnswers: UserAnswers): Try[UserAnswers] = {
