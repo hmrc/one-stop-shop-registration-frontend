@@ -156,7 +156,8 @@ class ChangeYourRegistrationController @Inject()(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
         registration.commencementDate,
-        registration.contactDetails.emailAddress
+        registration.contactDetails.emailAddress,
+        AmendMode
       ) flatMap {
         emailConfirmationResult =>
           val emailSent = EMAIL_ACCEPTED == emailConfirmationResult

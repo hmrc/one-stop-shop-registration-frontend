@@ -19,12 +19,13 @@ package services
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.EmailConnector
-import models.Period
 import models.Quarter.{Q1, Q4}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.emails.{EmailParameters, EmailToSendRequest}
+import models.emails.{AmendRegistrationConfirmation, EmailToSendRequest, RegistrationConfirmation}
+import models.{AmendMode, NormalMode, Period}
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.Mockito.{times, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.i18n.Messages
@@ -36,7 +37,7 @@ import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EmailServiceSpec extends SpecBase {
+class EmailServiceSpec extends SpecBase with BeforeAndAfterEach {
 
   implicit val messages: Messages = Helpers.stubMessages(
     Helpers.stubMessagesApi(Map("en" -> Map("site.to" -> "to"))))
@@ -44,7 +45,7 @@ class EmailServiceSpec extends SpecBase {
     when(config.ossCompleteReturnUrl) thenReturn("url")
   private val connector = mock[EmailConnector]
   private val periodService = mock[PeriodService]
-  private val emailService = new EmailService(connector, periodService, config)
+  private val emailService = new EmailService(connector, periodService, config, stubClockAtArbitraryDate)
   private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -72,7 +73,7 @@ class EmailServiceSpec extends SpecBase {
           val expectedEmailToSendRequest = EmailToSendRequest(
             List(email),
             "oss_registration_confirmation",
-            EmailParameters(
+            RegistrationConfirmation(
               contactName,
               businessName,
               "October to December 2022",
@@ -90,7 +91,44 @@ class EmailServiceSpec extends SpecBase {
             contactName,
             businessName,
             commencementDate,
-            email
+            email,
+            NormalMode
+          ).futureValue mustBe EMAIL_ACCEPTED
+          verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
+      }
+    }
+
+    "call sendConfirmationEmail with oss_registration_amendment_confirmation with the correct parameters" in {
+      val maxLengthContactName = 105
+      val maxLengthBusiness = 160
+      val commencementDate = LocalDate.of(2022, 10, 1)
+
+      forAll(
+        validEmails,
+        safeInputsWithMaxLength(maxLengthContactName),
+        safeInputsWithMaxLength(maxLengthBusiness)
+      ) {
+        (email: String, businessName: String, contactName: String) =>
+
+          val expectedAmendmentDateDate = LocalDate.now(stubClockAtArbitraryDate).format(formatter)
+
+          val expectedEmailToSendRequest = EmailToSendRequest(
+            List(email),
+            "oss_registration_amendment_confirmation",
+            AmendRegistrationConfirmation(
+              contactName,
+              expectedAmendmentDateDate
+            )
+          )
+
+          when(connector.send(any())(any(), any())).thenReturn(Future.successful(EMAIL_ACCEPTED))
+
+          emailService.sendConfirmationEmail(
+            contactName,
+            businessName,
+            commencementDate,
+            email,
+            AmendMode
           ).futureValue mustBe EMAIL_ACCEPTED
           verify(connector, times(1)).send(refEq(expectedEmailToSendRequest))(any(), any())
       }

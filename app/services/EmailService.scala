@@ -16,14 +16,15 @@
 
 package services
 
-import config.Constants.registrationConfirmationTemplateId
+import config.Constants.{amendRegistrationConfirmationTemplateId, registrationConfirmationTemplateId}
 import config.FrontendAppConfig
 import connectors.EmailConnector
-import models.emails.{EmailParameters, EmailSendingResult, EmailToSendRequest}
+import models.{AmendMode, Mode}
+import models.emails.{AmendRegistrationConfirmation, EmailSendingResult, EmailToSendRequest, RegistrationConfirmation}
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate}
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +33,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class EmailService@Inject()(
    emailConnector: EmailConnector,
    periodService: PeriodService,
-   frontendAppConfig: FrontendAppConfig
+   frontendAppConfig: FrontendAppConfig,
+   clock: Clock
  )(implicit executionContext: ExecutionContext) {
 
   private val redirectLink = frontendAppConfig.ossCompleteReturnUrl
@@ -41,15 +43,18 @@ class EmailService@Inject()(
    recipientName_line1: String,
    businessName: String,
    commencementDate: LocalDate,
-   emailAddress: String
+   emailAddress: String,
+   mode: Mode
   )(implicit hc: HeaderCarrier, messages: Messages): Future[EmailSendingResult] = {
 
-    val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-    val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-    val firstDayOfNextPeriod = nextPeriod.firstDay
+    lazy val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
+    lazy val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
+    lazy val firstDayOfNextPeriod = nextPeriod.firstDay
+    val amendmentDate = format(LocalDate.now(clock))
 
     val emailParameters =
-        EmailParameters(
+      if (mode != AmendMode) {
+        RegistrationConfirmation(
           recipientName_line1,
           businessName,
           periodOfFirstReturn.displayShortText,
@@ -57,11 +62,21 @@ class EmailService@Inject()(
           format(commencementDate),
           redirectLink
         )
+      } else {
+        AmendRegistrationConfirmation(
+          recipientName_line1,
+          amendmentDate
+        )
+      }
 
     emailConnector.send(
       EmailToSendRequest(
         List(emailAddress),
-          registrationConfirmationTemplateId,
+        if (mode != AmendMode) {
+          registrationConfirmationTemplateId
+        } else {
+          amendRegistrationConfirmationTemplateId
+        },
         emailParameters
       )
     )
