@@ -18,8 +18,9 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import forms.BusinessContactDetailsFormProvider
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import models.emailVerification.EmailVerificationResponse
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.responses.UnexpectedResponseStatus
@@ -37,6 +38,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
 import services.{EmailVerificationService, SaveForLaterService}
+import testutils.RegistrationData
 import views.html.BusinessContactDetailsView
 
 import scala.concurrent.Future
@@ -47,19 +49,26 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
   private val form = formProvider()
 
   private lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
+  private lazy val amendBusinessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(AmendMode).url
 
   private val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
   private val mockEmailVerificationService = mock[EmailVerificationService]
   private val mockSaveForLaterService = mock[SaveForLaterService]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   private val emailVerificationResponse: EmailVerificationResponse = EmailVerificationResponse(
     redirectUri = routes.BankDetailsController.onPageLoad(NormalMode).url
   )
 
+  private val amendEmailVerificationResponse: EmailVerificationResponse = EmailVerificationResponse(
+    redirectUri = controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+  )
+
   override def beforeEach(): Unit = {
     Mockito.reset(mockEmailVerificationService)
     Mockito.reset(mockSaveForLaterService)
+    Mockito.reset(mockRegistrationConnector)
   }
 
   "BusinessContactDetails Controller" - {
@@ -167,6 +176,50 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           }
         }
 
+        "must save the answer and redirect to the next page if email is already verified and valid data is submitted in amend mode" in {
+
+          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+          when(mockEmailVerificationService.isEmailVerified(
+            eqTo(emailVerificationRequest.email.get.address),
+            eqTo(emailVerificationRequest.credId))(any())) thenReturn Future.successful(Verified)
+
+          val application =
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
+              .overrides(
+                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+                bind[EmailVerificationService].toInstance(mockEmailVerificationService),
+                bind[RegistrationConnector].toInstance(mockRegistrationConnector)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, amendBusinessContactDetailsRoute)
+                .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@example.com"))
+
+            val result = route(application, request).value
+            val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+            verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            verify(mockEmailVerificationService, times(1))
+              .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
+            verify(mockEmailVerificationService, times(0))
+              .createEmailVerificationRequest(
+                eqTo(AmendMode),
+                eqTo(emailVerificationRequest.credId),
+                eqTo(emailVerificationRequest.email.get.address),
+                eqTo(emailVerificationRequest.pageTitle),
+                eqTo(emailVerificationRequest.continueUrl))(any())
+          }
+        }
+
         "must save the answer and redirect to the Business Contact Details page if email is not verified and valid data is submitted" in {
 
           val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -213,6 +266,67 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 eqTo(emailVerificationRequest.email.get.address),
                 eqTo(emailVerificationRequest.pageTitle),
                 eqTo(emailVerificationRequest.continueUrl))(any())
+
+          }
+        }
+
+        "must save the answer and redirect to the Business Contact Details page if email is not verified and valid data is submitted in amend mode" in {
+
+          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+          val newEmailAddress = "email@example.co.uk"
+
+          val amendEmailVerificationRequest = emailVerificationRequest.copy(
+            email = emailVerificationRequest.email.map(_.copy(address = newEmailAddress)),
+            continueUrl = controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          )
+
+          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+          when(mockEmailVerificationService.isEmailVerified(
+            any(),
+            any())(any())) thenReturn Future.successful(NotVerified)
+          when(mockEmailVerificationService.createEmailVerificationRequest(
+            any(),
+            any(),
+            any(),
+            any(),
+            any())(any())) thenReturn Future.successful(Right(amendEmailVerificationResponse))
+
+          val application =
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo), mode = Some(AmendMode))
+              .configure("features.email-verification-enabled" -> "true")
+              .configure("features.enrolments-enabled" -> "false")
+              .overrides(
+                bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+                bind[EmailVerificationService].toInstance(mockEmailVerificationService),
+                bind[RegistrationConnector].toInstance(mockRegistrationConnector)
+              )
+              .build()
+
+
+
+          running(application) {
+            val request =
+              FakeRequest(POST, amendBusinessContactDetailsRoute)
+                .withFormUrlEncodedBody(("fullName", "name"), ("telephoneNumber", "0111 2223334"), ("emailAddress", newEmailAddress))
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val result = route(application, request).value
+            val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails.copy(emailAddress = newEmailAddress)).success.value
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual config.emailVerificationUrl + amendEmailVerificationResponse.redirectUri
+            verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            verify(mockEmailVerificationService, times(1))
+              .isEmailVerified(eqTo(newEmailAddress), eqTo(amendEmailVerificationRequest.credId))(any())
+            verify(mockEmailVerificationService, times(1))
+              .createEmailVerificationRequest(
+                eqTo(AmendMode),
+                eqTo(amendEmailVerificationRequest.credId),
+                eqTo(amendEmailVerificationRequest.email.get.address),
+                eqTo(amendEmailVerificationRequest.pageTitle),
+                eqTo(amendEmailVerificationRequest.continueUrl))(any())
+
           }
         }
 
