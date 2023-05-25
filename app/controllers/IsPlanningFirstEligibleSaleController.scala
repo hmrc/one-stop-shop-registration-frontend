@@ -29,6 +29,7 @@ import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IsPlanningFirstEligibleSaleView
 
+import java.time.Clock
 import scala.concurrent.{ExecutionContext, Future}
 
 class IsPlanningFirstEligibleSaleController @Inject()(
@@ -36,7 +37,8 @@ class IsPlanningFirstEligibleSaleController @Inject()(
                                          cc: AuthenticatedControllerComponents,
                                          formProvider: IsPlanningFirstEligibleSaleFormProvider,
                                          view: IsPlanningFirstEligibleSaleView,
-                                         dateService: DateService
+                                         dateService: DateService,
+                                         clock: Clock
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -44,7 +46,8 @@ class IsPlanningFirstEligibleSaleController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))) {
     implicit request =>
 
-      val form = formProvider()
+      val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
+      val form = formProvider(maybeRegistrationDate)
       val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter()
 
       val preparedForm = request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
@@ -58,7 +61,8 @@ class IsPlanningFirstEligibleSaleController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
-      val form = formProvider()
+      val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
+      val form = formProvider(maybeRegistrationDate)
       val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter()
 
       form.bindFromRequest().fold(

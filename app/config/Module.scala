@@ -28,7 +28,7 @@ class Module extends AbstractModule {
     bind(classOf[CheckNiProtocolFilter]).to(classOf[CheckNiProtocolFilterImpl]).asEagerSingleton()
     bind(classOf[VrnAllowListFilter]).to(classOf[VrnAllowListFilterImpl]).asEagerSingleton()
 
-    val instant = Instant.ofEpochMilli(1712695478000L)
+    val instant = Instant.ofEpochMilli(1712766927000L)
     val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
     bind(classOf[Clock]).toInstance(stubClock)

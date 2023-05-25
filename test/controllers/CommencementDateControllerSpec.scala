@@ -59,8 +59,8 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
-        when(dateService.startOfNextQuarter) thenReturn now
-        when(dateService.calculateFinalAmendmentDate(any())) thenReturn dateOfLastAmendment
+        when(dateService.startOfNextQuarter()) thenReturn now
+        when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
         when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         val application =
@@ -94,10 +94,10 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, true).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
-        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
-        when(dateService.startOfNextQuarter)thenReturn now
+        when(dateService.startOfNextQuarter())thenReturn now
 
         val application =
           applicationBuilder(userAnswers = Some(answer1))
@@ -125,10 +125,11 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
-        when(dateService.startOfNextQuarter)thenReturn now
+        when(dateService.startOfNextQuarter())thenReturn now
+        when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -162,7 +163,8 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val dateOfLastAmendment = LocalDate.now() // TODO
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(startDateNow)
-        when(dateService.startOfNextQuarter) thenReturn startDateNow
+        when(dateService.startOfNextQuarter()) thenReturn startDateNow
+        when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -193,7 +195,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answers = answer1.set(IsPlanningFirstEligibleSalePage, false).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -213,7 +215,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
 
         val application =
           applicationBuilder(userAnswers = Some(answer1))
@@ -233,7 +235,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       "must redirect to Journey Recovery when user answers are empty" in {
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-        when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+        when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
 
         val application =
           applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -260,10 +262,10 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
       when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
-      when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+      when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
       when(dateService.startOfCurrentQuarter) thenReturn now
       when(dateService.lastDayOfCalendarQuarter) thenReturn now
-      when(dateService.startOfNextQuarter)thenReturn now
+      when(dateService.startOfNextQuarter())thenReturn now
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
@@ -287,10 +289,10 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
 
       when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
-      when(dateService.startOfNextQuarter) thenReturn arbitraryStartDate
+      when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
       when(dateService.startOfCurrentQuarter) thenReturn now
       when(dateService.lastDayOfCalendarQuarter) thenReturn now
-      when(dateService.startOfNextQuarter)thenReturn now
+      when(dateService.startOfNextQuarter())thenReturn now
 
       val application =
         applicationBuilder(userAnswers = Some(answers))

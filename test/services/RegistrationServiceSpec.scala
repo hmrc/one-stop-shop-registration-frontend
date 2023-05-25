@@ -22,7 +22,12 @@ import controllers.routes
 import models.domain.PreviousSchemeNumbers
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
+import models.domain.returns.VatReturn
 import models.requests.AuthenticatedDataRequest
+import models.responses.NotFound
+import org.mockito.MockitoSugar.when
+import org.mockito.ArgumentMatchers.any
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -38,6 +43,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RegistrationServiceSpec
   extends SpecBase
@@ -104,7 +110,6 @@ class RegistrationServiceSpec
       .set(BankDetailsPage, BankDetails("Account name", Some(Bic("ABCDGB2A").get), Iban("GB33BUKB20201555555555").
         getOrElse(throw new Exception("TODO")))).success.value
 
-      .set(IsPlanningFirstEligibleSalePage, true).success.value
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
@@ -167,9 +172,12 @@ class RegistrationServiceSpec
 
   ".isEligibleSalesAmendable" - {
     "return true when registrations is amendable" in {
+      when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
+      when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
+      when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration)).futureValue
 
       result mustBe true
     }
@@ -177,15 +185,17 @@ class RegistrationServiceSpec
     "return true when no registration provided" in {
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(None)
+      val result = service.isEligibleSalesAmendable(None).futureValue
 
       result mustBe true
     }
 
-    "return false when not amendable" in {
+    "return false when vat return has been submitted not amendable" in {
+      val vatReturn = arbitrary[VatReturn].sample.value
+      when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration)).futureValue
 
       result mustBe false
     }
