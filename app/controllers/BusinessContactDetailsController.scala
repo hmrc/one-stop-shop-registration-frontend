@@ -17,7 +17,6 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.RegistrationConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
 import logging.Logging
@@ -38,7 +37,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
-                                                  registrationConnector: RegistrationConnector,
                                                   saveForLaterService: SaveForLaterService,
                                                   emailVerificationService: EmailVerificationService,
                                                   formProvider: BusinessContactDetailsFormProvider,

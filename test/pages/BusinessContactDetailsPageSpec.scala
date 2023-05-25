@@ -52,7 +52,7 @@ class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Amend mode" - {
 
-      "to Check Your Answers" in {
+      "to Change Your Registration" in {
 
         BusinessContactDetailsPage.navigate(AmendMode, emptyUserAnswers)
           .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
