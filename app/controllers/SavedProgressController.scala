@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SavedProgressView
 
-import java.time.ZoneId
+import java.time.{Clock, ZoneId}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -38,7 +38,8 @@ class SavedProgressController @Inject()(
                                          view: SavedProgressView,
                                          connector: SaveForLaterConnector,
                                          appConfig: FrontendAppConfig,
-                                         registrationConnector: RegistrationConnector
+                                         registrationConnector: RegistrationConnector,
+                                         clock: Clock
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -47,7 +48,7 @@ class SavedProgressController @Inject()(
     implicit request =>
       val dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
       val answersExpiry = request.userAnswers.lastUpdated.plus(appConfig.saveForLaterTtl, ChronoUnit.DAYS)
-        .atZone(ZoneId.systemDefault()).toLocalDate.format(dateTimeFormatter)
+        .atZone(clock.getZone).toLocalDate.format(dateTimeFormatter)
       Future.fromTry(request.userAnswers.set(SavedProgressPage, continueUrl)).flatMap {
         updatedAnswers =>
           val s4LRequest = SaveForLaterRequest(updatedAnswers, request.vrn)

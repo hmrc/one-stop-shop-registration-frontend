@@ -19,7 +19,7 @@ package config
 import com.google.inject.AbstractModule
 import controllers.actions._
 
-import java.time.{Clock, ZoneOffset}
+import java.time.{Clock, Instant, ZoneId, ZoneOffset}
 
 class Module extends AbstractModule {
 
@@ -28,7 +28,10 @@ class Module extends AbstractModule {
     bind(classOf[CheckNiProtocolFilter]).to(classOf[CheckNiProtocolFilterImpl]).asEagerSingleton()
     bind(classOf[VrnAllowListFilter]).to(classOf[VrnAllowListFilterImpl]).asEagerSingleton()
 
-    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    val instant = Instant.ofEpochMilli(1712695478000L)
+    val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+
+    bind(classOf[Clock]).toInstance(stubClock)
 
     bind(classOf[AuthenticatedControllerComponents]).to(classOf[DefaultAuthenticatedControllerComponents]).asEagerSingleton()
     bind(classOf[UnauthenticatedControllerComponents]).to(classOf[DefaultUnauthenticatedControllerComponents]).asEagerSingleton()

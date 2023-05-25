@@ -18,7 +18,7 @@ package controllers.actions
 
 import connectors.RegistrationConnector
 import controllers.routes
-import models.{AmendMode, Mode}
+import models.{AmendLoopMode, AmendMode, Mode}
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
@@ -43,7 +43,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
       case Some(data) if data.data.value.isEmpty =>
         Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
       case Some(data) =>
-        if (mode.contains(AmendMode)) {
+        if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
           val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.session)
           registrationConnector.getRegistration()(hc) flatMap {
             case Some(registration) =>
