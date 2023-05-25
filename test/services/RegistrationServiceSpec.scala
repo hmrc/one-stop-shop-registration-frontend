@@ -18,15 +18,20 @@ package services
 
 import base.SpecBase
 import connectors.returns.VatReturnConnector
+import controllers.routes
 import models.domain.PreviousSchemeNumbers
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, PreviousScheme, UserAnswers}
+import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
+import models.requests.AuthenticatedDataRequest
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import pages.euDetails._
 import pages.previousRegistrations._
+import play.api.mvc.AnyContent
+import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
 import queries.{AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -113,6 +118,9 @@ class RegistrationServiceSpec
   private val mockVatReturnConnector: VatReturnConnector = mock[VatReturnConnector]
   private val instant = Instant.now
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+
+  private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
+  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
