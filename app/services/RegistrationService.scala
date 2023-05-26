@@ -295,21 +295,15 @@ class RegistrationService @Inject()(
   }
 
   def isEligibleSalesAmendable(maybeRegistration: Option[Registration])
-                              (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Boolean] = {
+                              (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Boolean = {
 
     maybeRegistration match {
       case Some(registration) =>
-        val firstReturnPeriod = periodService.getFirstReturnPeriod(registration.commencementDate)
-        vatReturnConnector.get(firstReturnPeriod).map {
-          case Right(_) =>
-            false
-          case _ =>
-            val today = LocalDate.now(clock)
-            val finalDay = dateService.calculateFinalAmendmentDate(registration.commencementDate)
-            finalDay.isAfter(today) || finalDay.isEqual(today)
-        }
+        val today = LocalDate.now(clock)
+        val finalDay = dateService.calculateFinalAmendmentDate(registration.commencementDate)
+        finalDay.isAfter(today) || finalDay.isEqual(today)
       case _ =>
-        Future.successful(true)
+        true
     }
   }
 
@@ -327,11 +321,5 @@ class RegistrationService @Inject()(
         Future.successful(None)
     }
   }
-
-  /* TODO this to be used for the last day that is possible to make a sale
-  val today = LocalDate.now(clock)
-  today.isBefore(firstReturnPeriod.lastDay)
-   */
-
 
 }
