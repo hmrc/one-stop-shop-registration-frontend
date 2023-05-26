@@ -834,3 +834,10 @@ errorSubmittingAmendment.heading = We cannot update your registration
 errorSubmittingAmendment.tryAgainLater = You can <a class="govuk-link" href="{0}">try again later</a>.
 errorSubmittingAmendment.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 errorSubmittingAmendment.yourAccount = Back to your account
+
+deleteAllFixedEstablishment.title = Delete your fixed establishment information
+deleteAllFixedEstablishment.heading = Delete your fixed establishment information
+deleteAllFixedEstablishment.paragraph = Your business is now registered as part of a VAT group. To comply with EU law, we cannot hold information about fixed establishments.
+deleteAllFixedEstablishment.contactUs = If you have any questions, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+deleteAllFixedEstablishment.oneFixedEstablishment = You can re-register this as a dispatch warehouse, by updating your registration from your One Stop Shop account page.
+deleteAllFixedEstablishment.moreThanOneFixedEstablishment = You can re-register these as a dispatch warehouses, by updating your registration from your One Stop Shop account page.
