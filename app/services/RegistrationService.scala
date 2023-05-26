@@ -294,7 +294,7 @@ class RegistrationService @Inject()(
     }
   }
 
-  def isEligibleSalesAmendable(maybeRegistration: Option[Registration])
+  def isDateOfFirstSaleAmendable(maybeRegistration: Option[Registration])
                               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Boolean = {
 
     maybeRegistration match {
@@ -307,7 +307,7 @@ class RegistrationService @Inject()(
     }
   }
 
-  def isDateOfFirstSaleAmendable(maybeRegistration: Option[Registration])
+  def isEligibleSalesAmendable(maybeRegistration: Option[Registration])
                               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Boolean] = {
 
     maybeRegistration match {
