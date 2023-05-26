@@ -113,10 +113,17 @@ class ChangeYourRegistrationController @Inject()(
     implicit request =>
       registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
         case Valid(registration) =>
-          registrationConnector.amendRegistration(registration).flatMap {
+          val registrationWithOriginalSubmissionReceived = registration.copy(submissionReceived = request.registration.flatMap(_.submissionReceived))
+          registrationConnector.amendRegistration(registrationWithOriginalSubmissionReceived).flatMap {
             case Right(_) =>
-              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, request))
-              sendEmailConfirmation(request, registration)
+              auditService.audit(
+                RegistrationAuditModel.build(
+                  RegistrationAuditType.AmendRegistration,
+                  registrationWithOriginalSubmissionReceived,
+                  SubmissionResult.Success,
+                  request
+                ))
+              sendEmailConfirmation(request, registrationWithOriginalSubmissionReceived)
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
