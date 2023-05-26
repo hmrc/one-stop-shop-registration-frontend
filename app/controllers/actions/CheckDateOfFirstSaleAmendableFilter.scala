@@ -40,9 +40,10 @@ class CheckDateOfFirstSaleAmendableFilterImpl(mode: Option[Mode],
 
     mode match {
       case Some(AmendMode) =>
-        registrationService.isDateOfFirstSaleAmendable(request.registration).map {
-          case false => Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url))
-          case _ => None
+        if (!registrationService.isDateOfFirstSaleAmendable(request.registration)) {
+          Future.successful(Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url)))
+        } else {
+          Future.successful(None)
         }
       case _ => Future.successful(None)
     }
