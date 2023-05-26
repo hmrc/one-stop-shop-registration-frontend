@@ -40,10 +40,9 @@ class CheckEligibleSalesAmendableFilterImpl(mode: Option[Mode],
 
     mode match {
       case Some(AmendMode) =>
-        if(!registrationService.isEligibleSalesAmendable(request.registration)) {
-          Future.successful(Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url)))
-        } else {
-          Future.successful(None)
+        registrationService.isEligibleSalesAmendable(request.registration).map {
+          case false => Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url))
+          case _ => None
         }
       case _ => Future.successful(None)
     }
