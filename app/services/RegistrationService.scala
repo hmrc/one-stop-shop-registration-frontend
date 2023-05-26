@@ -307,6 +307,27 @@ class RegistrationService @Inject()(
     }
   }
 
+  def isDateOfFirstSaleAmendable(maybeRegistration: Option[Registration])
+                              (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Boolean] = {
+
+    maybeRegistration match {
+      case Some(registration) =>
+        val firstReturnPeriod = periodService.getFirstReturnPeriod(registration.commencementDate)
+        vatReturnConnector.get(firstReturnPeriod).map {
+          case Right(_) =>
+            false
+          case _ =>
+            val today = LocalDate.now(clock)
+            val finalDay = dateService.calculateFinalAmendmentDate(registration.commencementDate)
+            finalDay.isAfter(today) || finalDay.isEqual(today)
+        }
+      case _ =>
+        Future.successful(true)
+    }
+  }
+
+
+
   def getLastPossibleDateOfFirstSale(maybeRegistration: Option[Registration])(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[LocalDate]] = {
     maybeRegistration match {
       case Some(registration) =>
