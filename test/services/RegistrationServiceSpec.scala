@@ -171,13 +171,13 @@ class RegistrationServiceSpec
     }
   }
 
-  ".isEligibleSalesAmendable" - {
+  ".isDateOfFirstSaleAmendable" - {
     "return true when registrations is amendable" in {
       when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
+      val result = service.isDateOfFirstSaleAmendable(Some(RegistrationData.registration))
 
       result mustBe true
     }
@@ -185,7 +185,7 @@ class RegistrationServiceSpec
     "return true when no registration provided" in {
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(None)
+      val result = service.isDateOfFirstSaleAmendable(None)
 
       result mustBe true
     }
@@ -196,20 +196,20 @@ class RegistrationServiceSpec
       val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
+      val result = service.isDateOfFirstSaleAmendable(Some(RegistrationData.registration))
 
       result mustBe false
     }
   }
 
-  ".isDateOfFirstSaleAmendable" - {
+  ".isEligibleSalesAmendable" - {
     "return true when registrations is amendable" in {
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
       when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isDateOfFirstSaleAmendable(Some(RegistrationData.registration)).futureValue
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration)).futureValue
 
       result mustBe true
     }
@@ -217,7 +217,7 @@ class RegistrationServiceSpec
     "return true when no registration provided" in {
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isDateOfFirstSaleAmendable(None).futureValue
+      val result = service.isEligibleSalesAmendable(None).futureValue
 
       result mustBe true
     }
@@ -227,7 +227,7 @@ class RegistrationServiceSpec
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isDateOfFirstSaleAmendable(Some(RegistrationData.registration)).futureValue
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration)).futureValue
 
       result mustBe false
     }
