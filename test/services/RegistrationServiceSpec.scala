@@ -42,6 +42,7 @@ import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
+import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -172,12 +173,11 @@ class RegistrationServiceSpec
 
   ".isEligibleSalesAmendable" - {
     "return true when registrations is amendable" in {
-      when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
       when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration)).futureValue
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
 
       result mustBe true
     }
@@ -185,17 +185,18 @@ class RegistrationServiceSpec
     "return true when no registration provided" in {
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(None).futureValue
+      val result = service.isEligibleSalesAmendable(None)
 
       result mustBe true
     }
 
-    "return false when vat return has been submitted not amendable" in {
-      val vatReturn = arbitrary[VatReturn].sample.value
-      when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
+    "return false when today is passed the amendable date" in {
+      val daysToAdd = 100
+      val instant = Instant.now.plus(daysToAdd, ChronoUnit.DAYS)
+      val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration)).futureValue
+      val result = service.isEligibleSalesAmendable(Some(RegistrationData.registration))
 
       result mustBe false
     }
