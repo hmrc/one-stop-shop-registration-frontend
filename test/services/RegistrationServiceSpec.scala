@@ -202,4 +202,35 @@ class RegistrationServiceSpec
     }
   }
 
+  ".isDateOfFirstSaleAmendable" - {
+    "return true when registrations is amendable" in {
+      when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
+      when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
+      when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+
+      val result = service.isDateOfFirstSaleAmendable(Some(RegistrationData.registration)).futureValue
+
+      result mustBe true
+    }
+
+    "return true when no registration provided" in {
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+
+      val result = service.isDateOfFirstSaleAmendable(None).futureValue
+
+      result mustBe true
+    }
+
+    "return false when vat return has been submitted not amendable" in {
+      val vatReturn = arbitrary[VatReturn].sample.value
+      when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+
+      val result = service.isDateOfFirstSaleAmendable(Some(RegistrationData.registration)).futureValue
+
+      result mustBe false
+    }
+  }
+
 }
