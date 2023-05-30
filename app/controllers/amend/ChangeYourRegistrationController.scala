@@ -21,15 +21,13 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import controllers.amend.{routes => amendRoutes}
-import controllers.routes
 import logging.Logging
-import models.{AmendMode, NormalMode, UserAnswers}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
+import models.{AmendMode, NormalMode}
 import pages.amend.ChangeYourRegistrationPage
-import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 import queries.EmailConfirmationQuery
@@ -39,13 +37,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
 import utils.FutureSyntax._
-import viewmodels.checkAnswers.{CommencementDateSummary, _}
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
+import viewmodels.checkAnswers._
 import viewmodels.govuk.summarylist._
 import views.html.amend.ChangeYourRegistrationView
 
-import java.time.{Clock, Instant}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,8 +55,7 @@ class ChangeYourRegistrationController @Inject()(
                                                   view: ChangeYourRegistrationView,
                                                   emailService: EmailService,
                                                   commencementDateSummary: CommencementDateSummary,
-                                                  frontendAppConfig: FrontendAppConfig,
-                                                  clock: Clock
+                                                  frontendAppConfig: FrontendAppConfig
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -100,49 +96,49 @@ class ChangeYourRegistrationController @Inject()(
         val bankDetailsBicSummaryRow = BankDetailsSummary.rowBIC(request.userAnswers, AmendMode)
         val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(request.userAnswers, AmendMode)
 
-        val list = SummaryListViewModel(
-          rows = Seq(
-            hasTradingNameSummaryRow.map(sr =>
-              if(tradingNameSummaryRow.isDefined) {
-                sr.withCssClass("govuk-summary-list__row--no-border")
-              } else {
-                sr
-              }),
-            tradingNameSummaryRow,
-            hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")), //TODO - this one?
-            isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")), //TODO - this one?
-            dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")), //TODO - this one?
-            commencementDateSummaryRow,
-            previouslyRegisteredSummaryRow.map(sr =>
-            if(previousRegistrationSummaryRow.isDefined) {
-              sr.withCssClass("govuk-summary-list__row--no-border") //TODO - Check UA with no prevReg's
-            } else {
-              sr
-            }),
-            previousRegistrationSummaryRow,
-            taxRegisteredInEuSummaryRow.map(sr =>
-            if(euDetailsSummaryRow.isDefined) {
-              sr.withCssClass("govuk-summary-list__row--no-border")
-            } else {
-              sr
-            }),
-            euDetailsSummaryRow,
-            isOnlineMarketplaceSummaryRow,
-            hasWebsiteSummaryRow.map(sr =>
-            if(websiteSummaryRow.isDefined) {
-              sr.withCssClass("govuk-summary-list__row--no-border")
-            } else {
-              sr
-            }),
-            websiteSummaryRow,
-            businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-            businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-            businessContactDetailsEmailSummaryRow,
-            bankDetailsAccountNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-            bankDetailsBicSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-            bankDetailsIbanSummaryRow
-          ).flatten
-        )
+          val list = SummaryListViewModel(
+            rows = Seq(
+              hasTradingNameSummaryRow.map(sr =>
+                if (tradingNameSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }),
+              tradingNameSummaryRow,
+              hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              commencementDateSummaryRow,
+              previouslyRegisteredSummaryRow.map(sr =>
+                if (previousRegistrationSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }),
+              previousRegistrationSummaryRow,
+              taxRegisteredInEuSummaryRow.map(sr =>
+                if (euDetailsSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }),
+              euDetailsSummaryRow,
+              isOnlineMarketplaceSummaryRow,
+              hasWebsiteSummaryRow.map(sr =>
+                if (websiteSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }),
+              websiteSummaryRow,
+              businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              businessContactDetailsEmailSummaryRow,
+              bankDetailsAccountNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              bankDetailsBicSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              bankDetailsIbanSummaryRow
+            ).flatten
+          )
 
         val isValid = validate()
         Ok(view(vatRegistrationDetailsList, list, isValid, AmendMode))
