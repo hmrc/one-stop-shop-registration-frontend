@@ -152,7 +152,8 @@ class CheckYourAnswersController @Inject()(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
         registration.commencementDate,
-        registration.contactDetails.emailAddress
+        registration.contactDetails.emailAddress,
+        NormalMode
       ) flatMap {
         emailConfirmationResult =>
           val emailSent = EMAIL_ACCEPTED == emailConfirmationResult

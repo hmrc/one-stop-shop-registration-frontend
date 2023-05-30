@@ -323,7 +323,8 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               eqTo(registration.contactDetails.fullName),
               eqTo(registration.registeredCompanyName),
               eqTo(registration.commencementDate),
-              eqTo(registration.contactDetails.emailAddress)
+              eqTo(registration.contactDetails.emailAddress),
+              eqTo(AmendMode)
             )(any(), any())) thenReturn Future.successful(EMAIL_ACCEPTED)
 
             val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
@@ -336,7 +337,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             redirectLocation(result).value mustEqual ChangeYourRegistrationPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
 
             verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any())(any(), any())
+              .sendConfirmationEmail(any(), any(), any(), any(), any())(any(), any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
             verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
