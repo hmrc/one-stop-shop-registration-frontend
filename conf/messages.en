@@ -807,3 +807,9 @@ deleteAllEuDetails.heading = Remove all your EU tax information from this scheme
 deleteAllEuDetails.warning = This will delete all the countries you have added tax information for.
 deleteAllEuDetails.error.required = Select yes if you want to remove all the countries you have added tax information for
 deleteAllEuDetails.change.hidden = Remove all the countries you have added tax information for
+
+deleteAllPreviousRegistrations.title = deleteAllPreviousRegistrations
+deleteAllPreviousRegistrations.heading = deleteAllPreviousRegistrations
+deleteAllPreviousRegistrations.checkYourAnswersLabel = deleteAllPreviousRegistrations
+deleteAllPreviousRegistrations.error.required = Select yes if deleteAllPreviousRegistrations
+deleteAllPreviousRegistrations.change.hidden = DeleteAllPreviousRegistrations

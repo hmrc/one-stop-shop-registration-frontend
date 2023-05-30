@@ -24,6 +24,9 @@ import pages.previousRegistrations._
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryDeleteAllPreviousRegistrationsPage: Arbitrary[DeleteAllPreviousRegistrationsPage.type] =
+    Arbitrary(DeleteAllPreviousRegistrationsPage)
+
   implicit lazy val arbitraryDeleteAllEuDetailsPage: Arbitrary[DeleteAllEuDetailsPage.type] =
     Arbitrary(DeleteAllEuDetailsPage)
 
