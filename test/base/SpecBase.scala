@@ -39,14 +39,16 @@ import play.api.test.FakeRequest
 import services.{DateService, RegistrationService}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.{IsPlanningFirstEligibleSaleSummary, _}
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.PreviouslyRegisteredSummary
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait SpecBase
   extends AnyFreeSpec
@@ -67,7 +69,7 @@ trait SpecBase
   def period: Period = Period(2021, Quarter.Q3)
 
   val userAnswersId: String = "12345-credId"
-  val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
+  val contactDetails: BusinessContactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
 
   val vatCustomerInfo: VatCustomerInfo =
     VatCustomerInfo(
@@ -107,7 +109,7 @@ trait SpecBase
     .set(PreviouslyRegisteredPage, false).success.value
     .set(IsOnlineMarketplacePage, false).success.value
     .set(HasWebsitePage, false).success.value
-  val invalidUserAnswers = completeUserAnswers
+  val invalidUserAnswers: UserAnswers = completeUserAnswers
     .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
@@ -136,7 +138,7 @@ trait SpecBase
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  def getCYAVatRegistrationDetailsSummaryList(answers: UserAnswers)(implicit msgs: Messages) = {
+  def getCYAVatRegistrationDetailsSummaryList(answers: UserAnswers)(implicit msgs: Messages): Seq[SummaryListRow] = {
     Seq(
       VatRegistrationDetailsSummary.rowBusinessName(answers),
       VatRegistrationDetailsSummary.rowPartOfVatUkGroup(answers),
@@ -146,25 +148,67 @@ trait SpecBase
   }
 
   def getCYASummaryList(answers: UserAnswers, dateService: DateService, registrationService: RegistrationService, mode: Mode)
-                       (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]) = {
+                       (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
     new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
+      val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode)
+      val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode)
+      val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode)
+      val isPlanningFirstEligibleSaleSummaryRow = IsPlanningFirstEligibleSaleSummary.row(answers, mode)
+      val commencementDateSummaryRow = Some(commencementDateSummary)
+      val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(answers, mode)
+      val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, Seq.empty, mode)
+      val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(answers, mode)
+      val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(answers, mode)
+      val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(answers, mode)
+      val hasWebsiteSummaryRow = HasWebsiteSummary.row(answers, mode)
+      val websiteSummaryRow = WebsiteSummary.checkAnswersRow(answers, mode)
+      val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(answers, mode)
+      val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(answers, mode)
+      val businessContactDetailsEmailSummaryRow= BusinessContactDetailsSummary.rowEmailAddress(answers, mode)
+      val bankDetailsAccountNameSummaryRow = BankDetailsSummary.rowAccountName(answers, mode)
+      val bankDetailsBicSummaryRow = BankDetailsSummary.rowBIC(answers, mode)
+      val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(answers, mode)
+
       Seq(
-        new HasTradingNameSummary().row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        HasMadeSalesSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        IsPlanningFirstEligibleSaleSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        Some(commencementDateSummary),
-        PreviouslyRegisteredSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        TaxRegisteredInEuSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        EuDetailsSummary.checkAnswersRow(answers, mode),
-        IsOnlineMarketplaceSummary.row(answers, mode),
-        HasWebsiteSummary.row(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BusinessContactDetailsSummary.rowContactName(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BusinessContactDetailsSummary.rowTelephoneNumber(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BusinessContactDetailsSummary.rowEmailAddress(answers, mode),
-        BankDetailsSummary.rowAccountName(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BankDetailsSummary.rowBIC(answers, mode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-        BankDetailsSummary.rowIBAN(answers, mode)
+        hasTradingNameSummaryRow.map(sr =>
+        if(tradingNameSummaryRow.isDefined) {
+          sr.withCssClass("govuk-summary-list__row--no-border")
+        } else {
+          sr
+        }),
+        tradingNameSummaryRow,
+        hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        commencementDateSummaryRow,
+        previouslyRegisteredSummaryRow.map(sr =>
+        if (previousRegistrationSummaryRow.isDefined) {
+          sr.withCssClass("govuk-summary-list__row--no-border")
+        } else {
+          sr
+        }),
+        previousRegistrationSummaryRow,
+        taxRegisteredInEuSummaryRow.map(sr =>
+        if (euDetailsSummaryRow.isDefined) {
+          sr.withCssClass("govuk-summary-list__row--no-border")
+        } else {
+          sr
+        }),
+        euDetailsSummaryRow,
+        isOnlineMarketplaceSummaryRow,
+        hasWebsiteSummaryRow.map(sr =>
+        if(websiteSummaryRow.isDefined) {
+          sr.withCssClass("govuk-summary-list__row--no-border")
+        } else {
+          sr
+        }),
+        websiteSummaryRow,
+        businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        businessContactDetailsEmailSummaryRow,
+        bankDetailsAccountNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        bankDetailsBicSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        bankDetailsIbanSummaryRow
       ).flatten
     }
   }
