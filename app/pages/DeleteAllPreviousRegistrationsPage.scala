@@ -16,11 +16,20 @@
 
 package pages
 
+import models.UserAnswers
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import controllers.routes
 
 case object DeleteAllPreviousRegistrationsPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "deleteAllPreviousRegistrations"
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    answers.get(DeleteAllPreviousRegistrationsPage) match {
+      case Some(_) => routes.CheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

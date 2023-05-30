@@ -17,7 +17,11 @@
 package pages
 
 import base.SpecBase
+import controllers.routes
+import models.previousRegistrations.PreviousSchemeNumbers
+import models.{CheckMode, Country, Index}
 import pages.behaviours.PageBehaviours
+import pages.previousRegistrations._
 
 class DeleteAllPreviousRegistrationsPageSpec extends SpecBase with PageBehaviours {
 
@@ -28,5 +32,40 @@ class DeleteAllPreviousRegistrationsPageSpec extends SpecBase with PageBehaviour
     beSettable[Boolean](DeleteAllPreviousRegistrationsPage)
 
     beRemovable[Boolean](DeleteAllPreviousRegistrationsPage)
+
+    "must navigate in CheckMode" - {
+
+      "to Check Your Answers Page when the user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
+          .set(DeleteAllPreviousRegistrationsPage, true).success.value
+
+        DeleteAllPreviousRegistrationsPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Check Your Answers Page when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("ES", "Spain")).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("ES123", None)).success.value
+          .set(DeleteAllPreviousRegistrationsPage, false).success.value
+
+        DeleteAllPreviousRegistrationsPage.navigate(CheckMode, answers)
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+
+      "to Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+          .set(PreviousEuCountryPage(Index(0)), Country("EE", "Estonia")).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("EE123", None)).success.value
+
+        DeleteAllPreviousRegistrationsPage.navigate(CheckMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
   }
 }

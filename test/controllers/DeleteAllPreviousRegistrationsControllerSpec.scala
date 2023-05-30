@@ -18,14 +18,17 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteAllPreviousRegistrationsFormProvider
-import models.{NormalMode, UserAnswers}
+import models.previousRegistrations.PreviousSchemeNumbers
+import models.{CheckMode, Country, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DeleteAllPreviousRegistrationsPage
+import pages.previousRegistrations._
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.DeleteAllPreviousRegistrationsView
 
@@ -36,13 +39,17 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
   private val formProvider = new DeleteAllPreviousRegistrationsFormProvider()
   private val form = formProvider()
 
-  private lazy val deleteAllPreviousRegistrationsRoute = routes.DeleteAllPreviousRegistrationsController.onPageLoad(NormalMode).url
+  private lazy val deleteAllPreviousRegistrationsRoute = routes.DeleteAllPreviousRegistrationsController.onPageLoad().url
+
+  private val userAnswers = basicUserAnswersWithVatInfo
+    .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+    .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
 
   "DeleteAllPreviousRegistrations Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, deleteAllPreviousRegistrationsRoute)
@@ -52,36 +59,18 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
         val view = application.injector.instanceOf[DeleteAllPreviousRegistrationsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(DeleteAllPreviousRegistrationsPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteAllPreviousRegistrationsRoute)
-
-        val view = application.injector.instanceOf[DeleteAllPreviousRegistrationsView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must save the answer and redirect to the next page when valid data is submitted" in {
+    "must delete all previous registration answers and redirect to the next page when the user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -91,17 +80,46 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
-        val expectedAnswers = emptyUserAnswers.set(DeleteAllPreviousRegistrationsPage, true).success.value
+        val expectedAnswers = userAnswers
+          .set(DeleteAllPreviousRegistrationsPage, true).success.value
+          .remove(AllPreviousRegistrationsQuery).success.value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllPreviousRegistrationsPage.navigate(NormalMode, expectedAnswers).url
+        redirectLocation(result).value mustEqual DeleteAllPreviousRegistrationsPage.navigate(CheckMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must not delete all previous registration answers and redirect to the next page when the user answers No" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteAllPreviousRegistrationsRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+        val expectedAnswers = userAnswers
+          .set(DeleteAllPreviousRegistrationsPage, false).success.value
+          .set(PreviouslyRegisteredPage, true).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DeleteAllPreviousRegistrationsPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request =
@@ -115,7 +133,7 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, CheckMode)(request, messages(application)).toString
       }
     }
 

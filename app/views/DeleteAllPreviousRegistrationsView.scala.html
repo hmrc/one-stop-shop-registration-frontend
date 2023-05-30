@@ -14,19 +14,23 @@
  * limitations under the License.
  *@
 
+@import views.html.components.ButtonGroup
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    button: ButtonGroup,
+    govukWarningText: GovukWarningText
 )
+
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("deleteAllPreviousRegistrations.title"))) {
 
-    @formHelper(action = routes.DeleteAllPreviousRegistrationsController.onSubmit(mode), 'autoComplete -> "off") {
+    @formHelper(action = routes.DeleteAllPreviousRegistrationsController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -39,8 +43,12 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        @govukWarningText(WarningText(
+            iconFallbackText = messages("site.warning"),
+            content = Text(messages("deleteAllPreviousRegistrations.warning"))
+        ))
+
+        @button("site.continue", routes.DeleteAllPreviousRegistrationsController.onPageLoad().url)
+
     }
 }

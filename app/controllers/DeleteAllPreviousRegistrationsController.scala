@@ -18,14 +18,17 @@ package controllers
 
 import controllers.actions._
 import forms.DeleteAllPreviousRegistrationsFormProvider
-import javax.inject.Inject
 import models.Mode
+import models.requests.AuthenticatedDataRequest
 import pages.DeleteAllPreviousRegistrationsPage
+import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeleteAllPreviousRegistrationsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DeleteAllPreviousRegistrationsController @Inject()(
@@ -57,10 +60,24 @@ class DeleteAllPreviousRegistrationsController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAllPreviousRegistrationsPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(DeleteAllPreviousRegistrationsPage.navigate(mode, updatedAnswers))
+
+          determineRemoveAllPreviousRegistrationsAndRedirect(mode, value)
       )
+  }
+
+  private def determineRemoveAllPreviousRegistrationsAndRedirect(
+                                                                  mode: Mode,
+                                                                  value: Boolean
+                                                                )(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    val removeAllPreviousRegistrations = if(value) {
+      request.userAnswers.remove(AllPreviousRegistrationsQuery)
+    } else {
+      request.userAnswers.set(PreviouslyRegisteredPage, true)
+    }
+    for {
+      updatedAnswers <- Future.fromTry(removeAllPreviousRegistrations)
+      calculatedAnswers <- Future.fromTry(updatedAnswers.set(DeleteAllPreviousRegistrationsPage, value))
+      _ <- cc.sessionRepository.set(calculatedAnswers)
+    } yield Redirect(DeleteAllPreviousRegistrationsPage.navigate(mode, calculatedAnswers))
   }
 }

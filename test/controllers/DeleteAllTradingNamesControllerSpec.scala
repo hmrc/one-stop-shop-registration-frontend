@@ -82,8 +82,6 @@ class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
           .set(DeleteAllTradingNamesPage, true).success.value
           .remove(AllTradingNames).success.value
 
-        println("EXPECTED_ANSWERS: " + expectedAnswers)
-
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
