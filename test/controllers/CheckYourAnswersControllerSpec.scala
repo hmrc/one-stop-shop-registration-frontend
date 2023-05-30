@@ -87,7 +87,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
       "must return OK and the correct view when answers are complete" in {
         val commencementDate = LocalDate.of(2022, 1, 1)
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
-        when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
         when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
@@ -103,7 +103,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, CheckMode).futureValue)
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, true, CheckMode)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = true, CheckMode)(request, messages(application)).toString
         }
       }
 
