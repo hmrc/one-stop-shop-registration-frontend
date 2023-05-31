@@ -41,7 +41,7 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.checkAnswers.{IsPlanningFirstEligibleSaleSummary, _}
+import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.summarylist._
@@ -171,37 +171,41 @@ trait SpecBase
       val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(answers, mode)
 
       Seq(
-        hasTradingNameSummaryRow.map(sr =>
-        if(tradingNameSummaryRow.isDefined) {
-          sr.withCssClass("govuk-summary-list__row--no-border")
-        } else {
-          sr
-        }),
+        hasTradingNameSummaryRow.map { sr =>
+          if (tradingNameSummaryRow.isDefined) {
+            sr.withCssClass("govuk-summary-list__row--no-border")
+          } else {
+            sr
+          }
+        },
         tradingNameSummaryRow,
         hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
         isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
         commencementDateSummaryRow,
-        previouslyRegisteredSummaryRow.map(sr =>
-        if (previousRegistrationSummaryRow.isDefined) {
-          sr.withCssClass("govuk-summary-list__row--no-border")
-        } else {
-          sr
-        }),
+        previouslyRegisteredSummaryRow.map { sr =>
+          if (previousRegistrationSummaryRow.isDefined) {
+            sr.withCssClass("govuk-summary-list__row--no-border")
+          } else {
+            sr
+          }
+        },
         previousRegistrationSummaryRow,
-        taxRegisteredInEuSummaryRow.map(sr =>
-        if (euDetailsSummaryRow.isDefined) {
-          sr.withCssClass("govuk-summary-list__row--no-border")
-        } else {
-          sr
-        }),
+        taxRegisteredInEuSummaryRow.map { sr =>
+          if (euDetailsSummaryRow.isDefined) {
+            sr.withCssClass("govuk-summary-list__row--no-border")
+          } else {
+            sr
+          }
+        },
         euDetailsSummaryRow,
         isOnlineMarketplaceSummaryRow,
-        hasWebsiteSummaryRow.map(sr =>
-        if(websiteSummaryRow.isDefined) {
-          sr.withCssClass("govuk-summary-list__row--no-border")
-        } else {
-          sr
-        }),
+        hasWebsiteSummaryRow.map { sr =>
+          if (websiteSummaryRow.isDefined) {
+            sr.withCssClass("govuk-summary-list__row--no-border")
+          } else {
+            sr
+          }
+        },
         websiteSummaryRow,
         businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
         businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
