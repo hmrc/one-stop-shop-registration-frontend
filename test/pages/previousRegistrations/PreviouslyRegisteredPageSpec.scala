@@ -19,8 +19,8 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{CheckMode, Country, Index, NormalMode}
 import models.previousRegistrations.PreviousSchemeNumbers
+import models.{CheckMode, Country, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -100,9 +100,21 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check Your Answers" in {
+        "to Delete All Previous Registrations when there are previous registrations in the user's answers" in {
 
-          val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, false).success.value
+          val answers = emptyUserAnswers
+            .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+            .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
+            .set(PreviouslyRegisteredPage, false).success.value
+
+          PreviouslyRegisteredPage.navigate(CheckMode, answers)
+            .mustEqual(routes.DeleteAllPreviousRegistrationsController.onPageLoad())
+        }
+
+        "to Check Your Answers when there are no previous registrations in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(PreviouslyRegisteredPage, false).success.value
 
           PreviouslyRegisteredPage.navigate(CheckMode, answers)
             .mustEqual(routes.CheckYourAnswersController.onPageLoad())
@@ -117,32 +129,6 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
             .mustEqual(routes.JourneyRecoveryController.onPageLoad())
         }
       }
-    }
-
-    "must remove all previous registrations when the answer is no" in {
-
-      val answers =
-        emptyUserAnswers
-          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
-
-      val result = answers.set(PreviouslyRegisteredPage, false).success.value
-
-      result.get(PreviousEuCountryPage(Index(0))) must not be defined
-      result.get(PreviousOssNumberPage(Index(0), Index(0))) must not be defined
-    }
-
-    "must leave all previous registrations in place when the answer is yes" in {
-
-      val answers =
-        emptyUserAnswers
-          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
-
-      val result = answers.set(PreviouslyRegisteredPage, true).success.value
-
-      result.get(PreviousEuCountryPage(Index(0))).value mustEqual Country("FR", "France")
-      result.get(PreviousOssNumberPage(Index(0), Index(0))).value mustEqual PreviousSchemeNumbers("123", None)
     }
   }
 }
