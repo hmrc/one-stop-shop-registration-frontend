@@ -56,7 +56,7 @@ To log in using the Authority Wizard provide "continue url", "affinity group" an
 
 ![image](https://user-images.githubusercontent.com/48218839/145842926-c318cb10-70c3-4186-a839-b1928c8e2625.png)
   
-  The VRN can be any 9-digit number.
+The VRN can be any 9-digit number.
 
 To successfully register go through the journey providing the answers as follows:
   1.
