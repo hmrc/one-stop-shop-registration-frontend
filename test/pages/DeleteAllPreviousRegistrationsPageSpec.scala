@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import models.{CheckMode, Country, Index}
 import pages.behaviours.PageBehaviours
 import pages.previousRegistrations._
