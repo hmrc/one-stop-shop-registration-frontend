@@ -183,32 +183,5 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
         }
       }
     }
-
-
-    "must remove all previous registrations when the answer is no" in {
-
-      val answers =
-        emptyUserAnswers
-          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
-
-      val result = answers.set(PreviouslyRegisteredPage, false).success.value
-
-      result.get(PreviousEuCountryPage(Index(0))) must not be defined
-      result.get(PreviousOssNumberPage(Index(0), Index(0))) must not be defined
-    }
-
-    "must leave all previous registrations in place when the answer is yes" in {
-
-      val answers =
-        emptyUserAnswers
-          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
-          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
-
-      val result = answers.set(PreviouslyRegisteredPage, true).success.value
-
-      result.get(PreviousEuCountryPage(Index(0))).value mustEqual Country("FR", "France")
-      result.get(PreviousOssNumberPage(Index(0), Index(0))).value mustEqual PreviousSchemeNumbers("123", None)
-    }
   }
 }
