@@ -18,13 +18,12 @@ package forms
 
 import forms.mappings.Mappings
 import play.api.data.Form
-
 import javax.inject.Inject
 
 class CancelAmendRegFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(): Form[String] =
     Form(
-      "value" -> boolean("cancelAmendRegistration.error.required")
+      "value" -> text("cancelAmendRegistration.error.required")
     )
 }
