@@ -24,7 +24,7 @@
 
 @layout(pageTitle = titleNoForm(messages("cannotAddCountry.title"))) {
 
-    @formHelper(action = controllers.euDetails.routes.CannotAddCountryController.onSubmit(countryIndex), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.euDetails.routes.CannotAddCountryController.onSubmit(mode, countryIndex), Symbol("autoComplete") -> "off") {
 
         <h1 class="govuk-heading-xl">@messages("cannotAddCountry.heading")</h1>
 
