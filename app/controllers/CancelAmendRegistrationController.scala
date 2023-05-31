@@ -19,35 +19,36 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import models.Mode
-
+import logging.Logging
+import forms.CancelAmendRegFormProvider
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CancelAmendRegistrationView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CancelAmendRegistrationController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
+                                       formProvider: CancelAmendRegFormProvider,
                                        appConfig: FrontendAppConfig,
                                        view: CancelAmendRegistrationView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging{
+  private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(continueUrl: String, mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)){
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)){
     implicit request =>
-
-      Ok(view(continueUrl))
+      Ok(view(form, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      cc.sessionRepository
-        .clear(request.userId)
-        .map(
-          _ => Ok(view(appConfig.ossYourAccountUrl))
-        )
+      for {
+        _ <- cc.sessionRepository.clear(request.userId)
+      } yield Redirect(appConfig.ossYourAccountUrl)
+
   }
 }
