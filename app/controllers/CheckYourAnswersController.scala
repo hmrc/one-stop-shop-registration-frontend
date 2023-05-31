@@ -96,38 +96,42 @@ class CheckYourAnswersController @Inject()(
 
           val list = SummaryListViewModel(
             rows = Seq(
-              hasTradingNameSummaryRow.map(sr =>
+              hasTradingNameSummaryRow.map { sr =>
                 if (tradingNameSummaryRow.isDefined) {
                   sr.withCssClass("govuk-summary-list__row--no-border")
                 } else {
                   sr
-                }),
+                }
+              },
               tradingNameSummaryRow,
               hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
               isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
               dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
               commencementDateSummaryRow,
-              previouslyRegisteredSummaryRow.map(sr =>
+              previouslyRegisteredSummaryRow.map { sr =>
                 if (previousRegistrationSummaryRow.isDefined) {
                   sr.withCssClass("govuk-summary-list__row--no-border")
                 } else {
                   sr
-                }),
+                }
+              },
               previousRegistrationSummaryRow,
-              taxRegisteredInEuSummaryRow.map(sr =>
+              taxRegisteredInEuSummaryRow.map { sr =>
                 if (euDetailsSummaryRow.isDefined) {
                   sr.withCssClass("govuk-summary-list__row--no-border")
                 } else {
                   sr
-                }),
+                }
+              },
               euDetailsSummaryRow,
               isOnlineMarketplaceSummaryRow,
-              hasWebsiteSummaryRow.map(sr =>
+              hasWebsiteSummaryRow.map { sr =>
                 if (websiteSummaryRow.isDefined) {
                   sr.withCssClass("govuk-summary-list__row--no-border")
                 } else {
                   sr
-                }),
+                }
+              },
               websiteSummaryRow,
               businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
               businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
