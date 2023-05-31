@@ -438,6 +438,10 @@ POST        /first-amend-sells-goods-to-eu-consumer-method/:countryIndex        
 
 GET         /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /amend-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
 
 GET         /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)

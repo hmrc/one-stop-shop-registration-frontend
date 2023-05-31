@@ -506,7 +506,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.CannotAddCountryController.onPageLoad(countryIndex).url
+          redirectLocation(result).value mustEqual routes.CannotAddCountryController.onPageLoad(CheckMode, countryIndex).url
         }
       }
     }

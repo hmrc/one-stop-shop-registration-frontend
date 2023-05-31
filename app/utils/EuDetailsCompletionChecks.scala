@@ -16,12 +16,12 @@
 
 package utils
 
+import models.{Index, Mode}
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
 import models.requests.AuthenticatedDataRequest
-import models.{CheckMode, Index, Mode}
 import pages.euDetails._
-import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.Results.Redirect
 import queries.{AllEuOptionalDetailsQuery, EuOptionalDetailsQuery}
 
 case object EuDetailsCompletionChecks extends CompletionChecks {
@@ -131,7 +131,7 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
                                           incompleteCountry: (EuOptionalDetails, Int)
                                         )(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
     if (isPartOfVatGroup) {
-      Some(Redirect(controllers.euDetails.routes.CannotAddCountryController.onPageLoad(Index(incompleteCountry._2))))
+      Some(Redirect(controllers.euDetails.routes.CannotAddCountryController.onPageLoad(mode, Index(incompleteCountry._2))))
     } else {
       request.userAnswers.get(RegistrationTypePage(Index(incompleteCountry._2))) match {
         case Some(RegistrationType.VatNumber) =>
