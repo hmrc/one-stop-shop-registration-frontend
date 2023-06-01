@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import forms.CancelAmendRegFormProvider
 import models.AmendMode
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -28,6 +29,7 @@ import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.CancelAmendRegistrationView
 import play.api.inject.bind
+import testutils.RegistrationData
 import uk.gov.hmrc.http.SessionKeys
 
 import scala.concurrent.Future
@@ -36,14 +38,19 @@ class CancelAmendRegistrationControllerSpec extends SpecBase {
 
   private val formProvider = new CancelAmendRegFormProvider
   private val form = formProvider()
-
   private lazy val CancelAmendRoute = routes.CancelAmendRegistrationController.onPageLoad().url
+
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   "CancelAmendRegistration Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, CancelAmendRoute)
@@ -58,14 +65,17 @@ class CancelAmendRegistrationControllerSpec extends SpecBase {
     }
 
     "must delete the amended answers and return OK and the yourAccount view for a POST" in {
+
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
       when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
+
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(
-            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
       running(application) {
