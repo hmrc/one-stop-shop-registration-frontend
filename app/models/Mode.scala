@@ -28,11 +28,6 @@ case object CheckLoopMode extends Mode
 case object AmendMode extends Mode
 case object AmendLoopMode extends Mode
 
-case object AmendMode extends Mode
-
-case object AmendLoopMode extends Mode
-
-
 object Mode {
 
   implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
