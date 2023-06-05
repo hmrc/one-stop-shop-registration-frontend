@@ -860,3 +860,4 @@ cancelAmendRegistration.warning = This will delete any changes that you have not
 cancelAmendRegistration.link = Cancel
 cancelAmendRegistration.button.continue = Continue
 cancelAmendRegistration.button.btr = Back
+cancelAmendRegistration.error.required = Select yes if you want to remove your amended changes from this scheme
