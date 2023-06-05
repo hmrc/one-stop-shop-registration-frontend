@@ -22,8 +22,8 @@ import javax.inject.Inject
 
 class CancelAmendRegFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(): Form[Boolean] =
     Form(
-      "value" -> text("cancelAmendRegistration.error.required")
+      "value" -> boolean("cancelAmendRegistration.error.required")
     )
 }
