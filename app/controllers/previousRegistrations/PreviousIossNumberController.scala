@@ -40,9 +40,7 @@ class PreviousIossNumberController @Inject()(
                                               coreRegistrationValidationService: CoreRegistrationValidationService,
                                               formProvider: PreviousIossRegistrationNumberFormProvider,
                                               appConfig: FrontendAppConfig,
-                                              view: PreviousIossNumberView,
-                                              iossHintText: String,
-                                              intermediaryHintText: String
+                                              view: PreviousIossNumberView
                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc

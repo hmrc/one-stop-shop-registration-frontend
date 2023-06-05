@@ -16,20 +16,23 @@
 
 package forms.previousRegistrations
 
-import forms.mappings.{EuVatNumberConstraints, Mappings}
-import models.Country
+import forms.mappings.{EuVatNumberConstraints, Mappings, PreviousRegistrationSchemeConstraint}
+import models.{Country, PreviousScheme}
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class PreviousOssNumberFormProvider @Inject() extends Mappings with EuVatNumberConstraints {
+class PreviousOssNumberFormProvider @Inject() extends Mappings with EuVatNumberConstraints with PreviousRegistrationSchemeConstraint {
 
-  def apply(country: Country): Form[String] =
+  def apply(country: Country, previousSchemes: Seq[PreviousScheme]): Form[String] =
     Form(
       "value" -> text("previousOssNumber.error.required", Seq(country.name))
         .verifying(
           validateEuVatNumberOrEu(country.code, "previousOssNumber.error.invalid")
         )
-        .transform[String](_.toUpperCase, value => value),
+        .transform[String](_.toUpperCase, value => value)
+        .verifying(
+          validatePreviousOssScheme(country, previousSchemes, "previousScheme.oss.exceed.error")
+        )
     )
 }

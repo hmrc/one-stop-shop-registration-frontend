@@ -17,7 +17,7 @@
 package forms.mappings
 
 import config.Constants.{maxIossSchemes, maxOssSchemes}
-import models.{Index, PreviousScheme, PreviousSchemeType}
+import models.{Country, Index, PreviousScheme, PreviousSchemeType}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
 trait PreviousRegistrationSchemeConstraint {
@@ -60,4 +60,17 @@ trait PreviousRegistrationSchemeConstraint {
     }
   }
 
+  def validatePreviousOssScheme(country: Country, existingAnswers: Seq[PreviousScheme], errorKeyOss: String): Constraint[String] = {
+    Constraint {
+      input =>
+        input match {
+          case string if string.startsWith("EU") && existingAnswers.contains(PreviousScheme.OSSNU) =>
+            Invalid(errorKeyOss, country.name)
+          case string if string.startsWith(country.code) && existingAnswers.contains(PreviousScheme.OSSU) =>
+            Invalid(errorKeyOss, country.name)
+          case _ =>
+            Valid
+        }
+    }
+  }
 }

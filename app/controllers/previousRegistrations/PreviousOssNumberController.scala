@@ -22,7 +22,7 @@ import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
 import models.requests.AuthenticatedDataRequest
-import models.{CountryWithValidationDetails, Index, Mode, PreviousScheme}
+import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme, WithName}
 import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -52,7 +52,15 @@ class PreviousOssNumberController @Inject()(
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
 
-          val form = formProvider(country)
+          val form = request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
+            case Some(previousSchemeDetails) =>
+
+              val previousSchemes = previousSchemeDetails.flatMap(_.previousScheme)
+              formProvider(country, previousSchemes)
+
+            case None =>
+              formProvider(country, Seq.empty)
+          }
 
           val preparedForm = request.userAnswers.get(PreviousOssNumberPage(countryIndex, schemeIndex)) match {
             case None => form
@@ -71,7 +79,16 @@ class PreviousOssNumberController @Inject()(
         country =>
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
-          val form = formProvider(country)
+
+          val form = request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
+            case Some(previousSchemeDetails) =>
+
+              val previousSchemes = previousSchemeDetails.flatMap(_.previousScheme)
+              formProvider(country, previousSchemes)
+
+            case None =>
+              formProvider(country, Seq.empty)
+          }
 
           form.bindFromRequest().fold(
             formWithErrors =>
@@ -86,28 +103,38 @@ class PreviousOssNumberController @Inject()(
               } else {
                 PreviousScheme.OSSU
               }
-
-              if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
-
-                coreRegistrationValidationService.searchScheme(
-                  searchNumber = value,
-                  previousScheme = previousScheme,
-                  intermediaryNumber = None,
-                  countryCode = country.code
-                ).flatMap {
-                  case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
-                    Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(activeMatch.memberState)))
-                  case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
-                    Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad()))
-                  case _ =>
-                    saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
-                }
-              } else {
-                saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
-              }
+              searchSchemeThenSaveAndRedirect(mode, countryIndex, schemeIndex, country, value, previousScheme)
             }
           )
       }
+  }
+
+  private def searchSchemeThenSaveAndRedirect(
+                                               mode: Mode,
+                                               countryIndex: Index,
+                                               schemeIndex: Index,
+                                               country: Country,
+                                               value: String,
+                                               previousScheme: WithName with PreviousScheme
+                                             )(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
+
+      coreRegistrationValidationService.searchScheme(
+        searchNumber = value,
+        previousScheme = previousScheme,
+        intermediaryNumber = None,
+        countryCode = country.code
+      ).flatMap {
+        case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
+          Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(activeMatch.memberState)))
+        case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
+          Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad()))
+        case _ =>
+          saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+      }
+    } else {
+      saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+    }
   }
 
   private def saveAndRedirect(countryIndex: Index, schemeIndex: Index, registrationNumber: String, previousScheme: PreviousScheme, mode: Mode)
@@ -138,7 +165,7 @@ class PreviousOssNumberController @Inject()(
     request.userAnswers
       .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)) match {
       case Some(previousSchemesDetails) =>
-        previousSchemesDetails.flatMap(_.previousScheme).headOption
+        previousSchemesDetails.flatMap(_.previousScheme).find(previousScheme => previousScheme == PreviousScheme.OSSU)
       case None =>
         None
     }
