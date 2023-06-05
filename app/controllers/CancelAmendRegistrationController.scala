@@ -41,14 +41,24 @@ class CancelAmendRegistrationController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)){
     implicit request =>
+      
       Ok(view(form, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      for {
-        _ <- cc.sessionRepository.clear(request.userId)
-      } yield Redirect(appConfig.ossYourAccountUrl)
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode))),
 
+        value =>
+          if (value) {
+            for {
+              _ <- cc.sessionRepository.clear(request.userId)
+            } yield Redirect(appConfig.ossYourAccountUrl)
+          } else {
+            Future.successful(Redirect(controllers.amend.routes.ChangeYourRegistrationController.onPageLoad()))
+          }
+      )
   }
 }

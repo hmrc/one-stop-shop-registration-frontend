@@ -14,17 +14,20 @@
  * limitations under the License.
  *@
 
+@import components.ButtonGroup
+
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
-        govukWarningText: GovukWarningText
+        govukRadios: GovukRadios,
+        govukWarningText: GovukWarningText,
+        button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("cancelAmendRegistration.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("cancelAmendRegistration.title")), showBackLink = true) {
 
     @formHelper(action = routes.CancelAmendRegistrationController.onSubmit(), Symbol("autoComplete") -> "off") {
 
@@ -32,21 +35,18 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("cancelAmendRegistration.heading")</h1>
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("cancelAmendRegistration.heading")).asPageHeading()
+            )
+        )
 
         @govukWarningText(WarningText(
             iconFallbackText = messages("site.warning"),
             content = Text(messages("cancelAmendRegistration.warning"))
         ))
-        <input type="hidden" value="true"/>
-        <div class="govuk-button-group">
-            @govukButton(
-            ButtonViewModel(messages("site.continue")).withAttribute(("id", "continue"))
-            )
 
-            <a id="continueToYourReturn" role="button" href="@controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                @messages("cancelAmendRegistration.button.btr")
-            </a>
-        </div>
+        @button("site.continue",  routes.CancelAmendRegistrationController.onPageLoad().url, mode)
     }
 }

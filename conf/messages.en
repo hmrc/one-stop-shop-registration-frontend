@@ -854,9 +854,9 @@ deleteAllFixedEstablishment.contactUs = If you have any questions, contact <a cl
 deleteAllFixedEstablishment.oneFixedEstablishment = You can re-register this as a dispatch warehouse, by updating your registration from your One Stop Shop account page.
 deleteAllFixedEstablishment.moreThanOneFixedEstablishment = You can re-register these as dispatch warehouses, by updating your registration from your One Stop Shop account page.
 
-cancelAmendRegistration.title = Delete your changes
-cancelAmendRegistration.heading = Delete your changes
-cancelAmendRegistration.warning = This will remove any changes that you have not saved.
+cancelAmendRegistration.title = Do you want to delete your changes?
+cancelAmendRegistration.heading = Do you want to delete your changes?
+cancelAmendRegistration.warning = This will delete any changes that you have not saved.
 cancelAmendRegistration.link = Cancel
 cancelAmendRegistration.button.continue = Continue
 cancelAmendRegistration.button.btr = Back
