@@ -22,7 +22,7 @@ import connectors.RegistrationConnector
 import forms.CancelAmendRegFormProvider
 import models.AmendMode
 import org.scalatestplus.mockito.MockitoSugar.mock
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -64,7 +64,7 @@ class CancelAmendRegistrationControllerSpec extends SpecBase {
       }
     }
 
-    "must delete the amended answers and return OK and the yourAccount view for a POST" in {
+    "must delete the amended answers and redirect to yourAccount page when the user answers Yes" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -83,6 +83,7 @@ class CancelAmendRegistrationControllerSpec extends SpecBase {
         val request =
           FakeRequest(POST, CancelAmendRoute)
             .withSession(SessionKeys.sessionId -> sessionId)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -93,5 +94,35 @@ class CancelAmendRegistrationControllerSpec extends SpecBase {
         verify(mockSessionRepository, times(1)).clear(eqTo(sessionId))
       }
     }
+
+    "must NOT delete the amended answers and returns user to ChangeYourRegistration page when the user answers No" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+      when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
+
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+      running(application) {
+        val sessionId = "12345-credId"
+        val request =
+          FakeRequest(POST, CancelAmendRoute)
+            .withSession(SessionKeys.sessionId -> sessionId)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+        verify(mockSessionRepository, never()).set(eqTo(basicUserAnswersWithVatInfo))
+      }
+    }
+
   }
 }
