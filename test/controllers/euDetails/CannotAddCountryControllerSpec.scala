@@ -38,7 +38,7 @@ class CannotAddCountryControllerSpec extends SpecBase {
   private val countryIndex1: Index = Index(1)
   private val country = Country.euCountries.head
 
-  private lazy val cannotAddCountryRoute = routes.CannotAddCountryController.onSubmit(countryIndex).url
+  private lazy val cannotAddCountryRoute = routes.CannotAddCountryController.onSubmit(NormalMode, countryIndex).url
 
   private val answers =
     basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
@@ -54,7 +54,7 @@ class CannotAddCountryControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CannotAddCountryController.onPageLoad(countryIndex).url)
+        val request = FakeRequest(GET, routes.CannotAddCountryController.onPageLoad(NormalMode, countryIndex).url)
 
         val result = route(application, request).value
 
