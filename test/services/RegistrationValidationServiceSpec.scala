@@ -30,11 +30,11 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import queries.previousRegistration.AllPreviousRegistrationsRawQuery
 import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
+import queries.previousRegistration.AllPreviousRegistrationsRawQuery
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -161,37 +161,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
           registeredCompanyName = "bar",
           commencementDate = arbitraryDate
-        )
-
-      registration mustEqual Valid(expectedRegistration)
-    }
-
-    "must return a Registration when user answers are provided and PreviouslyRegisteredPage is false and user is not part of vat group" in {
-
-      val regDate = LocalDate.of(2000, 1, 1)
-      val address = DesAddress("Line 1", None, None, None, None, Some("BB22 2BB"), "GB")
-      val vatInfo = VatCustomerInfo(
-        registrationDate = regDate,
-        address = address,
-        partOfVatGroup = false,
-        organisationName = Some("bar"),
-        individualName = Some("a b c"),
-        singleMarketIndicator = Some(true)
-      )
-
-      val userAnswers =
-        answersNotPartOfVatGroup.copy(vatInfo = Some(vatInfo))
-          .set(PreviouslyRegisteredPage, false).success.value
-
-      val registration = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
-
-      val expectedRegistration =
-        RegistrationData.registration.copy(
-          dateOfFirstSale = Some(arbitraryDate),
-          vatDetails = VatDetails(regDate, address, false, VatDetailSource.Etmp),
-          registeredCompanyName = "bar",
-          commencementDate = arbitraryDate,
-          previousRegistrations = Seq.empty
         )
 
       registration mustEqual Valid(expectedRegistration)
@@ -438,6 +407,14 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllTradingNames)))
       }
 
+      "when Has Trading Name is false, but there are trading names" in {
+
+        val userAnswers = answersNotPartOfVatGroup.set(HasTradingNamePage, false).success.value
+        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
+      }
+
       "when both Date of First Sale and Is Planning First Eligible Sale are missing" in {
 
         val userAnswers = answersNotPartOfVatGroup
@@ -483,6 +460,17 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllWebsites)))
+      }
+
+      "when Has Website is false, but there are websites" in {
+
+        val userAnswers =
+          answersNotPartOfVatGroup
+            .set(HasWebsitePage, false).success.value
+
+        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
       }
 
       "when Is Online Marketplace is missing" in {
@@ -532,12 +520,32 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         }
       }
 
+      "when Previously Registered is false and there are previous registrations" in {
+        val userAnswers =
+          answersNotPartOfVatGroup
+            .set(PreviouslyRegisteredPage, false).success.value
+
+        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(AllPreviousRegistrationsRawQuery)))
+      }
+
       "when Tax Registered in EU is missing" in {
 
         val userAnswers = answersNotPartOfVatGroup.remove(TaxRegisteredInEuPage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(TaxRegisteredInEuPage)))
+      }
+
+      "when Tax Registered in EU is false and there are EU countries" in {
+        val userAnswers =
+          answersNotPartOfVatGroup
+            .set(TaxRegisteredInEuPage, false).success.value
+
+        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
+
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(AllEuDetailsRawQuery)))
       }
 
       "when Tax Registered in EU is true" - {

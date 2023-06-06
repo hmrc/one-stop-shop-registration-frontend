@@ -107,7 +107,10 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
         }
 
       case Some(false) =>
-        List.empty.validNec
+        answers.get(AllTradingNames) match {
+          case Some(Nil) | None => List.empty.validNec
+          case Some(_) => DataMissingError(HasTradingNamePage).invalidNec
+        }
 
       case None =>
         DataMissingError(HasTradingNamePage).invalidNec
@@ -165,7 +168,10 @@ class RegistrationValidationService @Inject()(dateService: DateService) extends 
         }
 
       case Some(false) =>
-        List.empty.validNec
+        answers.get(AllWebsites) match {
+          case Some(Nil) | None => List.empty.validNec
+          case Some(_) => DataMissingError(HasWebsitePage).invalidNec
+        }
 
       case None =>
         DataMissingError(HasWebsitePage).invalidNec

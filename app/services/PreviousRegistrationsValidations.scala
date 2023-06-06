@@ -40,7 +40,10 @@ trait PreviousRegistrationsValidations {
         }
 
       case Some(false) =>
-        List.empty.validNec
+        answers.get(AllPreviousRegistrationsRawQuery) match {
+          case Some(_) => DataMissingError(AllPreviousRegistrationsRawQuery).invalidNec
+          case None => List.empty.validNec
+        }
 
       case None =>
         DataMissingError(PreviouslyRegisteredPage).invalidNec
