@@ -40,7 +40,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
   private val country = Country("SI", "Slovenia")
   private val countryWithValidation = CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == "SI").value
   private val formProvider = new PreviousOssNumberFormProvider()
-  private val form = formProvider(country)
+  private val form = formProvider(country, Seq.empty)
 
   private lazy val previousOssNumberRoute = routes.PreviousOssNumberController.onPageLoad(NormalMode, index, index).url
 

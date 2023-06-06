@@ -16,6 +16,7 @@
 
 package forms.mappings
 
+import models.previousRegistrations.PreviousSchemeNumbers
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -25,15 +26,13 @@ class PreviousRegistrationSchemeConstraintSpec extends AnyFreeSpec with Matchers
 
   private val country = Country.euCountries.head
 
-  "validatePreviousRegistrationScheme" - {
+  ".validatePreviousRegistrationScheme" - {
 
     "existing OSS schemes" - {
 
       "must return Valid when there's no existing OSS scheme" in {
 
-        val existingSchemes: Seq[PreviousScheme] = Seq(
-          PreviousScheme.OSSU
-        )
+        val existingSchemes: Seq[PreviousScheme] = Seq.empty
         val result = validatePreviousRegistrationSchemes(country.name, existingSchemes,
           "previousScheme.oss.exceed.error", "previousScheme.ioss.exceed.error", Index(0))(PreviousSchemeType.OSS)
         result mustEqual Valid
@@ -84,7 +83,7 @@ class PreviousRegistrationSchemeConstraintSpec extends AnyFreeSpec with Matchers
 
     }
 
-    "exiting IOSS schemes" - {
+    "existing IOSS schemes" - {
 
       "must return Valid when there's one existing IOSS scheme" in {
 
@@ -117,6 +116,62 @@ class PreviousRegistrationSchemeConstraintSpec extends AnyFreeSpec with Matchers
         result mustEqual Valid
       }
 
+    }
+  }
+
+  ".validatePreviousOssScheme" - {
+
+    "must return Invalid if PreviousScheme.OSSNU already exists" in {
+
+      val existingPreviousSchemes = Seq(PreviousScheme.OSSNU, PreviousScheme.IOSSWOI)
+
+      val ossnuSchemeNumber = PreviousSchemeNumbers("EU23627834", None).previousSchemeNumber
+
+      val result = validatePreviousOssScheme(country, existingPreviousSchemes, "previousScheme.oss.exceed.error")(ossnuSchemeNumber)
+
+      result mustBe Invalid("previousScheme.oss.exceed.error", country.name)
+    }
+
+    "must return Invalid if PreviousScheme.OSSU already exists" in {
+
+      val existingPreviousScheme = Seq(PreviousScheme.OSSU, PreviousScheme.IOSSWI)
+
+      val ossuSchemeNumber = PreviousSchemeNumbers(country.code + "123456781", None).previousSchemeNumber
+
+      val result = validatePreviousOssScheme(country, existingPreviousScheme, "previousScheme.oss.exceed.error")(ossuSchemeNumber)
+
+      result mustBe Invalid("previousScheme.oss.exceed.error", country.name)
+    }
+
+    "must return Invalid if duplicate OSS previous schemes exist" in {
+
+      val existingPreviousScheme = Seq(PreviousScheme.OSSU, PreviousScheme.OSSNU)
+
+      val ossuSchemeNumber = PreviousSchemeNumbers(country.code + "234567812", None).previousSchemeNumber
+
+      val result = validatePreviousOssScheme(country, existingPreviousScheme, "previousScheme.oss.exceed.error")(ossuSchemeNumber)
+
+      result mustBe Invalid("previousScheme.oss.exceed.error", country.name)
+    }
+
+    "must return Valid if no duplicate OSS previous schemes exist" in {
+
+      val existingPreviousScheme = Seq(PreviousScheme.OSSU, PreviousScheme.OSSNU)
+
+      val iosswiSchemeNumbers = PreviousSchemeNumbers(country.code + "123456781", Some("123456782")).previousIntermediaryNumber.get
+
+      val result = validatePreviousOssScheme(country, existingPreviousScheme, "previousScheme.oss.exceed.error")(iosswiSchemeNumbers)
+
+      result mustBe Valid
+    }
+
+    "must return Valid if no previous schemes exist" in {
+
+      val existingPreviousScheme = Seq.empty
+
+      val result = validatePreviousOssScheme(country, existingPreviousScheme, "previousScheme.oss.exceed.error")("")
+
+      result mustBe Valid
     }
   }
 

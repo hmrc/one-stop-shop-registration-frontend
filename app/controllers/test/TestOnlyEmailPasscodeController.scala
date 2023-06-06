@@ -18,7 +18,6 @@ package controllers.test
 
 import connectors.test.TestOnlyEmailPasscodeConnector
 import controllers.actions.AuthenticatedControllerComponents
-import logging.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
@@ -32,11 +31,10 @@ class TestOnlyEmailPasscodeController @Inject()(
                                                  cc: AuthenticatedControllerComponents,
                                                  testOnlyEmailPasscodeConnector: TestOnlyEmailPasscodeConnector,
                                                  emailVerificationService: EmailVerificationService
-                                               )(implicit ec: ExecutionContext) extends FrontendController(cc) with I18nSupport with Logging {
+                                               )(implicit ec: ExecutionContext) extends FrontendController(cc) with I18nSupport {
 
   def testOnlyGetPasscodes(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      logger.info("REQUEST: " + request)
       testOnlyEmailPasscodeConnector.getTestOnlyPasscode().flatMap {
         case Right(response) =>
           val firstValue = response.passcodes.headOption.map(_.passcode).getOrElse("")
