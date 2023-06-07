@@ -20,11 +20,12 @@ import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
-import models.UserAnswers
+import models.{AmendLoopMode, AmendMode, UserAnswers}
 import models.requests.AuthenticatedIdentifierRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
+import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -35,13 +36,14 @@ import play.api.test.Helpers._
 import services.DataMigrationService
 import testutils.RegistrationData
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness(connector: RegistrationConnector, config:FrontendAppConfig, migrationService: DataMigrationService)
+  class Harness(connector: RegistrationConnector, config: FrontendAppConfig, migrationService: DataMigrationService)
     extends CheckRegistrationFilterImpl(None, connector, config, migrationService) {
     def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
@@ -62,6 +64,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
       )
     )
   )
+
   override def beforeEach(): Unit = {
     Mockito.reset(mockConnector)
   }
@@ -124,6 +127,64 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
         val result = controller.callFilter(request).futureValue
 
         result.value mustEqual Redirect(routes.AlreadyRegisteredController.onPageLoad())
+      }
+    }
+
+    "must return None when an existing registration is found and mode is either AmendMode or AmendLoopMode" in {
+
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+      val gen = Gen.oneOf(AmendMode, AmendLoopMode)
+
+      forAll(gen) {
+        mode =>
+          class Harness(connector: RegistrationConnector, config: FrontendAppConfig, migrationService: DataMigrationService)
+            extends CheckRegistrationFilterImpl(Some(mode), connector, config, migrationService) {
+            def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
+          }
+
+          val app = applicationBuilder(None, mode = Some(mode))
+            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+            .build()
+
+          running(app) {
+            val config = app.injector.instanceOf[FrontendAppConfig]
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val controller = new Harness(mockConnector, config, mockService)
+
+            val result = controller.callFilter(request).futureValue
+
+            result must not be defined
+          }
+      }
+    }
+
+    "must redirect to Not Registered Controller when a registration is not found and mode is either AmendMode or AmendLoopMode" in {
+
+      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
+
+      val gen = Gen.oneOf(AmendMode, AmendLoopMode)
+
+      forAll(gen) {
+        mode =>
+          class Harness(connector: RegistrationConnector, config: FrontendAppConfig, migrationService: DataMigrationService)
+            extends CheckRegistrationFilterImpl(Some(mode), connector, config, migrationService) {
+            def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
+          }
+
+          val app = applicationBuilder(None, mode = Some(mode))
+            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+            .build()
+
+          running(app) {
+            val config = app.injector.instanceOf[FrontendAppConfig]
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val controller = new Harness(mockConnector, config, mockService)
+
+            val result = controller.callFilter(request).futureValue
+
+            result.value mustBe Redirect(routes.NotRegisteredController.onPageLoad())
+          }
       }
     }
   }

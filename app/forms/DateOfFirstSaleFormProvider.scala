@@ -17,14 +17,13 @@
 package forms
 
 import formats.Format.dateFormatter
-
-import java.time.{Clock, LocalDate, ZoneId}
 import forms.mappings.Mappings
 import models.requests.AuthenticatedDataRequest
-
-import javax.inject.Inject
 import play.api.data.Form
 import services.DateService
+
+import java.time.{Clock, LocalDate}
+import javax.inject.Inject
 
 class DateOfFirstSaleFormProvider @Inject()(
                                              dateService: DateService,

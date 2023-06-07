@@ -19,10 +19,8 @@ package connectors.returns
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
 import models.domain.returns.VatReturn
-import models.external.ExternalEntryUrl
 import models.responses._
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalatest.EitherValues
 import play.api.Application
 import play.api.http.Status._

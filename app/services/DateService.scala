@@ -21,13 +21,12 @@ import logging.Logging
 import models.core.{Match, MatchType}
 import models.requests.AuthenticatedDataRequest
 import models.{PreviousScheme, UserAnswers}
-import models.domain.Registration
 import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.Month._
-import java.time.{Clock, Instant, LocalDate, ZoneId}
+import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

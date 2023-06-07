@@ -22,11 +22,11 @@ import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
-import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
+import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -40,7 +40,6 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.mvc.AnyContent
-import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
 import queries.EmailConfirmationQuery
