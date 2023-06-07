@@ -44,7 +44,8 @@ case class RegistrationTypePage(countryIndex: Index) extends QuestionPage[Regist
       case Some(RegistrationType.VatNumber) =>
         userAnswers.remove(EuTaxReferencePage(countryIndex))
       case Some(RegistrationType.TaxId) =>
-        userAnswers.remove(EuVatNumberPage(countryIndex))
+        userAnswers.remove(VatRegisteredPage(countryIndex))
+          .flatMap(_.remove(EuVatNumberPage(countryIndex)))
       case None => super.cleanup(value, userAnswers)
     }
   }
