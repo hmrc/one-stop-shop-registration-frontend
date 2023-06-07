@@ -22,11 +22,10 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 import java.net.URI
-import java.time.Clock
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
+class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
