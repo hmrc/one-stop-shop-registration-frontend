@@ -32,7 +32,7 @@ class PreviousOssNumberFormProvider @Inject() extends Mappings with EuVatNumberC
         )
         .transform[String](_.toUpperCase, value => value)
         .verifying(
-          validatePreviousOssScheme(country, previousSchemes, "previousScheme.oss.exceed.error")
+          validatePreviousOssScheme(country, previousSchemes, "previousScheme.oss.schemes.exceed.error")
         )
     )
 }

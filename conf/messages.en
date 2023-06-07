@@ -412,6 +412,7 @@ previousScheme.checkYourAnswersLabel = Scheme
 previousScheme.error.required = Select which scheme did your business register for
 previousScheme.change.hidden = which scheme did your business register for
 previousScheme.oss.exceed.error = Cannot select another OSS registration for {0}
+previousScheme.oss.schemes.exceed.error = Cannot select another {0} OSS registration for {1}
 previousScheme.ioss.exceed.error = Cannot select another IOSS registration for {0}
 
 previousIossScheme.title = Did you use an intermediary?

@@ -65,9 +65,9 @@ trait PreviousRegistrationSchemeConstraint {
       input =>
         input match {
           case string if string.startsWith("EU") && existingAnswers.contains(PreviousScheme.OSSNU) =>
-            Invalid(errorKeyOss, country.name)
+            Invalid(errorKeyOss, "non-union", country.name)
           case string if string.startsWith(country.code) && existingAnswers.contains(PreviousScheme.OSSU) =>
-            Invalid(errorKeyOss, country.name)
+            Invalid(errorKeyOss, "union", country.name)
           case _ =>
             Valid
         }
