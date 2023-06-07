@@ -490,3 +490,13 @@ GET         /no-longer-amendable                                                
 
 GET         /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onPageLoad()
 POST        /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onSubmit()
+
+
+GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
+
+GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
+POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
+
+GET        /cancel-amend-registration                                             controllers.CancelAmendRegistrationController.onPageLoad(mode: Mode = AmendMode)
+POST       /cancel-amend-registration                                             controllers.CancelAmendRegistrationController.onSubmit(mode: Mode = AmendMode)
+
