@@ -19,20 +19,19 @@ package controllers
 import controllers.actions._
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
-
-import javax.inject.Inject
-import models.{AmendMode, Mode}
 import models.requests.AuthenticatedDataRequest
+import models.{AmendMode, Mode}
 import pages.DateOfFirstSalePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{DateService, PeriodService, RegistrationService}
+import services.{DateService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DateOfFirstSaleView
 
-import java.time.{Clock, LocalDate, ZoneId}
 import java.time.format.DateTimeFormatter
+import java.time.{Clock, LocalDate}
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DateOfFirstSaleController @Inject()(
