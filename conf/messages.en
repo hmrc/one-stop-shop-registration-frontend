@@ -862,3 +862,6 @@ cancelAmendRegistration.link = Cancel
 cancelAmendRegistration.button.continue = Continue
 cancelAmendRegistration.button.btr = Back
 cancelAmendRegistration.error.required = Select yes if you want to remove your amended changes from this scheme
+
+cannotRemoveExistingPreviousRegistrations.title = You cannot delete previous OSS or IOSS registrations that you''ve already added
+cannotRemoveExistingPreviousRegistrations.heading = You cannot delete previous OSS or IOSS registrations that you''ve already added

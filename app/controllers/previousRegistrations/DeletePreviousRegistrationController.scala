@@ -47,10 +47,14 @@ class DeletePreviousRegistrationController @Inject()(
       getPreviousRegistration(index) {
         details =>
 
-          val existingPreviousRegistrations = checkExistingRegistration.previousRegistrations
+          if (mode == AmendMode) {
+            val existingPreviousRegistrations = checkExistingRegistration.previousRegistrations
 
-          if (mode == AmendMode && existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
-            Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad())) //TODO new page?
+            if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
+              Future.successful(Redirect(routes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()))
+            } else {
+              Future.successful(Ok(view(form, mode, index, details.previousEuCountry.name)))
+            }
           } else {
             Future.successful(Ok(view(form, mode, index, details.previousEuCountry.name)))
           }
@@ -62,34 +66,41 @@ class DeletePreviousRegistrationController @Inject()(
       getPreviousRegistration(index) {
         details =>
 
-          val existingPreviousRegistrations = checkExistingRegistration.previousRegistrations
+          if (mode == AmendMode) {
+            val existingPreviousRegistrations = checkExistingRegistration.previousRegistrations
 
-          if (mode == AmendMode && existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
-            Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad()))//TODO new page?
+            if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
+              Future.successful(Redirect(routes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()))
+            } else {
+              saveAndRedirect(mode, index, details.previousEuCountry.name)
+            }
           } else {
-
-            form.bindFromRequest().fold(
-              formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, index, details.previousEuCountry.name))),
-
-              value =>
-                if (value) {
-                  for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.remove(PreviousRegistrationQuery(index)))
-                    _ <- cc.sessionRepository.set(updatedAnswers)
-                  } yield Redirect(DeletePreviousRegistrationPage(index).navigate(mode, updatedAnswers))
-                } else {
-                  Future.successful(Redirect(DeletePreviousRegistrationPage(index).navigate(mode, request.userAnswers)))
-                }
-            )
+            saveAndRedirect(mode, index, details.previousEuCountry.name)
           }
       }
   }
 
 
+  private def saveAndRedirect(mode: Mode, index: Index, countryName: String)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    form.bindFromRequest().fold(
+      formWithErrors =>
+        Future.successful(BadRequest(view(formWithErrors, mode, index, countryName))),
+
+      value =>
+        if (value) {
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.remove(PreviousRegistrationQuery(index)))
+            _ <- cc.sessionRepository.set(updatedAnswers)
+          } yield Redirect(DeletePreviousRegistrationPage(index).navigate(mode, updatedAnswers))
+        } else {
+          Future.successful(Redirect(DeletePreviousRegistrationPage(index).navigate(mode, request.userAnswers)))
+        }
+    )
+  }
+
   private def getPreviousRegistration(index: Index)
-                             (block: PreviousRegistrationDetailsWithOptionalVatNumber => Future[Result])
-                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+                                     (block: PreviousRegistrationDetailsWithOptionalVatNumber => Future[Result])
+                                     (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousRegistrationWithOptionalVatNumberQuery(index)).map {
       details =>
         block(details)
