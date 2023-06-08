@@ -24,7 +24,6 @@ import play.api.mvc.AnyContent
 
 object CheckExistingRegistrations extends Logging {
 
-  // TODO test???
   def checkExistingRegistration()(implicit request: AuthenticatedDataRequest[AnyContent]): Registration = {
     val registration: Registration = checkRegistration(request)
 
@@ -37,7 +36,6 @@ object CheckExistingRegistrations extends Logging {
     registration
   }
 
-  // TODO test???
   def getExistingRegistrationSchemes(country: Country)(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousScheme] = {
     val registration: Registration = checkRegistration(request)
 
@@ -62,7 +60,6 @@ object CheckExistingRegistrations extends Logging {
     registration
   }
 
-  // TODO test???
   def existingPreviousRegistration(country: Country, existingPreviousRegistration: Seq[PreviousRegistration]): Boolean = {
     existingPreviousRegistration.exists {
       case previousRegistrationNew: PreviousRegistrationNew => previousRegistrationNew.country == country
