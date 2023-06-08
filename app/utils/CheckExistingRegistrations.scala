@@ -17,13 +17,14 @@
 package utils
 
 import logging.Logging
-import models.domain.{PreviousRegistrationLegacy, PreviousRegistrationNew, Registration}
+import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew, Registration}
 import models.requests.AuthenticatedDataRequest
 import models.{Country, PreviousScheme}
 import play.api.mvc.AnyContent
 
 object CheckExistingRegistrations extends Logging {
 
+  // TODO test???
   def checkExistingRegistration()(implicit request: AuthenticatedDataRequest[AnyContent]): Registration = {
     val registration: Registration = checkRegistration(request)
 
@@ -36,6 +37,7 @@ object CheckExistingRegistrations extends Logging {
     registration
   }
 
+  // TODO test???
   def getExistingRegistrationSchemes(country: Country)(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousScheme] = {
     val registration: Registration = checkRegistration(request)
 
@@ -58,5 +60,13 @@ object CheckExistingRegistrations extends Logging {
         throw exception
     }
     registration
+  }
+
+  // TODO test???
+  def existingPreviousRegistration(country: Country, existingPreviousRegistration: Seq[PreviousRegistration]): Boolean = {
+    existingPreviousRegistration.exists {
+      case previousRegistrationNew: PreviousRegistrationNew => previousRegistrationNew.country == country
+      case previousRegistrationLegacy: PreviousRegistrationLegacy => previousRegistrationLegacy.country == country
+    }
   }
 }

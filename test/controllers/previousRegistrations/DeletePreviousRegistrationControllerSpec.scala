@@ -18,11 +18,11 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
-import models.domain.{PreviousSchemeNumbers, PreviousSchemeDetails}
+import models.domain.{PreviousSchemeDetails, PreviousSchemeNumbers}
 import models.previousRegistrations.PreviousRegistrationDetails
-import models.{Country, Index, NormalMode, PreviousScheme}
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.{never, times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations._
 import play.api.inject.bind
@@ -40,6 +40,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
   private val form = formProvider()
 
   private val index = Index(0)
+  private val index1 = Index(1)
   private val country = Country.euCountries.head
   private val previousSchemeNumbers = PreviousSchemeNumbers("VAT Number", None)
   private val previousScheme = PreviousSchemeDetails(PreviousScheme.OSSU, previousSchemeNumbers)
@@ -96,7 +97,6 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
-
 
     "must not delete a record and redirect to the next page when the user answers No" in {
 
@@ -183,6 +183,41 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "in AmendMode" - {
+
+      "must not be able to delete an existing previous registration when the user answers Yes" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(baseUserAnswers
+              .set(PreviousEuCountryPage(index1), Country("DE", "Germany")).success.value
+              .set(PreviousSchemePage(index1, index), PreviousScheme.OSSU).success.value
+              .set(PreviousOssNumberPage(index1, index), previousSchemeNumbers).success.value
+            ), mode = Some(AmendMode))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, deletePreviousRegistrationRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+          val expectedAnswers =
+            baseUserAnswers
+              .remove(PreviousRegistrationQuery(index)).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index).navigate(AmendMode, expectedAnswers).url
+          verify(mockSessionRepository, never()).set(any())
+        }
       }
     }
   }

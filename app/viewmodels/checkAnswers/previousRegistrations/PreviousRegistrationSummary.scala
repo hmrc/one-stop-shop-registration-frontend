@@ -18,13 +18,14 @@ package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
 import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew}
-import models.{AmendMode, Country, Index, Mode, UserAnswers}
+import models.{AmendMode, Index, Mode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
+import utils.CheckExistingRegistrations.existingPreviousRegistration
 import viewmodels.ListItemWrapper
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -55,13 +56,6 @@ object PreviousRegistrationSummary {
           )
         }
     }
-
-  private def existingPreviousRegistration(country: Country, existingPreviousRegistration: Seq[PreviousRegistration]): Boolean = {
-    existingPreviousRegistration.exists {
-      case previousRegistrationNew: PreviousRegistrationNew => previousRegistrationNew.country == country
-      case previousRegistrationLegacy: PreviousRegistrationLegacy => previousRegistrationLegacy.country == country
-    }
-  }
 
   def checkAnswersRow(
                        answers: UserAnswers,
