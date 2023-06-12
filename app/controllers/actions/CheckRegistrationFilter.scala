@@ -19,6 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
+import logging.Logging
 import models.requests.AuthenticatedIdentifierRequest
 import models.{AmendLoopMode, AmendMode, Mode}
 import play.api.mvc.Results.Redirect
@@ -36,28 +37,29 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
                                   config: FrontendAppConfig,
                                   migrationService: DataMigrationService)
                                  (implicit val executionContext: ExecutionContext)
-  extends ActionFilter[AuthenticatedIdentifierRequest] {
+  extends ActionFilter[AuthenticatedIdentifierRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
-      Future.successful(None)
-    } else {
-      for {
-        registration <- connector.getRegistration()
-      } yield {
+    for {
+      mayBeRegistration <- connector.getRegistration()
+    } yield {
 
-        if (registration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
-          request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
-            migrationService
-              .migrate(sessionId, request.userId)
-          )
-          Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
-        } else {
-          None
+      if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
+        mayBeRegistration match {
+          case Some(_) => None
+          case _ => Some(Redirect(routes.NotRegisteredController.onPageLoad()))
         }
+      } else if (mayBeRegistration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
+        request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
+          migrationService
+            .migrate(sessionId, request.userId)
+        )
+        Some(Redirect(routes.AlreadyRegisteredController.onPageLoad()))
+      } else {
+        None
       }
     }
   }

@@ -17,7 +17,6 @@
 package controllers
 
 import controllers.actions._
-import models.AmendMode
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -33,7 +32,7 @@ class NotRegisteredController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetOptionalData(Some(AmendMode)) {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
       Ok(view())
   }
