@@ -50,7 +50,7 @@ class PreviousOssNumberController @Inject()(
       getPreviousCountry(countryIndex) {
         country =>
 
-          val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
+          val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex)
 
           val form = request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
             case Some(previousSchemeDetails) =>
@@ -78,7 +78,7 @@ class PreviousOssNumberController @Inject()(
       getPreviousCountry(countryIndex) {
         country =>
 
-          val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex, schemeIndex)
+          val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex)
 
           val form = request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
             case Some(previousSchemeDetails) =>
@@ -152,42 +152,18 @@ class PreviousOssNumberController @Inject()(
     } yield Redirect(PreviousOssNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswersWithScheme))
   }
 
-  private def determinePreviousSchemeHintText(countryIndex: Index,
-                                              schemeIndex: Index
-                                             )(implicit request: AuthenticatedDataRequest[AnyContent]): PreviousSchemeHintText = {
-
-    getPreviousSchemeHintText(request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex)),
-      checkPreviousSchemeForCountry(countryIndex))
-  }
-
-  private def checkPreviousSchemeForCountry(index: Index)
-                                           (implicit request: AuthenticatedDataRequest[AnyContent]): Option[PreviousScheme] = {
-    request.userAnswers
-      .get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)) match {
-      case Some(previousSchemesDetails) =>
-        previousSchemesDetails.flatMap(_.previousScheme).find(previousScheme => previousScheme == PreviousScheme.OSSU)
-      case None =>
-        None
-    }
-  }
-
-  private def getPreviousSchemeHintText(currentPreviousScheme: Option[PreviousScheme],
-                                        otherSelectedScheme: Option[PreviousScheme]): PreviousSchemeHintText = {
-    currentPreviousScheme match {
-      case Some(value) => value match {
-        case PreviousScheme.OSSNU => PreviousSchemeHintText.OssNonUnion
-        case PreviousScheme.OSSU => PreviousSchemeHintText.OssUnion
-        case _ => PreviousSchemeHintText.Both
-      }
-      case None => otherSelectedScheme match {
-        case Some(value) => value match {
-          case PreviousScheme.OSSNU => PreviousSchemeHintText.OssUnion
-          case PreviousScheme.OSSU => PreviousSchemeHintText.OssNonUnion
-          case _ => PreviousSchemeHintText.Both
+  private def determinePreviousSchemeHintText(countryIndex: Index)(implicit request: AuthenticatedDataRequest[AnyContent]): PreviousSchemeHintText = {
+    request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
+      case Some(listSchemeDetails) =>
+        val previousSchemes = listSchemeDetails.flatMap(_.previousScheme)
+        if (previousSchemes.contains(PreviousScheme.OSSU)) {
+          PreviousSchemeHintText.OssNonUnion
+        } else if (previousSchemes.contains(PreviousScheme.OSSNU)) {
+          PreviousSchemeHintText.OssUnion
+        } else {
+          PreviousSchemeHintText.Both
         }
-        case None => PreviousSchemeHintText.Both
-      }
+      case _ => PreviousSchemeHintText.Both
     }
-
   }
 }

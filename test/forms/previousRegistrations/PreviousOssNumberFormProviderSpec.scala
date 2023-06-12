@@ -25,7 +25,7 @@ class PreviousOssNumberFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "previousOssNumber.error.required"
   private val invalidKey = "previousOssNumber.error.invalid"
-  private val invalidOssSchemeKey = "previousScheme.oss.exceed.error"
+  private val invalidOssSchemeKey = "previousScheme.oss.schemes.exceed.error"
 
   private val country: Country = arbitrary[Country].sample.value
 
@@ -166,8 +166,13 @@ class PreviousOssNumberFormProviderSpec extends StringFieldBehaviours {
           previousScheme =>
             s"must not bind invalid duplicate previous scheme $previousScheme for ${country.name}" in {
               val form = formProvider(country, existingPreviousSchemes)
+              val schemeType = if (previousScheme.startsWith("EU")) {
+                "non-union"
+              } else {
+                "union"
+              }
               val result = form.bind(Map(fieldName -> previousScheme)).apply(fieldName)
-              result.errors mustBe Seq(FormError(fieldName, invalidOssSchemeKey, Seq(country.name)))
+              result.errors mustBe Seq(FormError(fieldName, invalidOssSchemeKey, Seq(schemeType, country.name)))
             }
         }
     }
