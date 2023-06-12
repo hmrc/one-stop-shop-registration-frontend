@@ -17,10 +17,11 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
-import models.domain.{PreviousSchemeNumbers, PreviousSchemeDetails}
+import models.domain.{PreviousSchemeDetails, PreviousSchemeNumbers}
 import models.previousRegistrations.PreviousRegistrationDetails
-import models.{Country, Index, NormalMode, PreviousScheme}
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.previousRegistration.PreviousRegistrationQuery
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
 import scala.concurrent.Future
@@ -40,11 +42,14 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
   private val form = formProvider()
 
   private val index = Index(0)
+  private val index1 = Index(1)
   private val country = Country.euCountries.head
   private val previousSchemeNumbers = PreviousSchemeNumbers("VAT Number", None)
   private val previousScheme = PreviousSchemeDetails(PreviousScheme.OSSU, previousSchemeNumbers)
   private val previousRegistration = PreviousRegistrationDetails(country, List(previousScheme))
   private lazy val deletePreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url
+
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
@@ -96,7 +101,6 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
-
 
     "must not delete a record and redirect to the next page when the user answers No" in {
 
@@ -184,6 +188,89 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "in AmendMode" - {
+
+      "must not delete an existing previous registration and redirect to Cannot Remove Existing Previous Registrations when the user answers Yes" in {
+
+        lazy val deleteAmendPreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index).url
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(basicUserAnswersWithVatInfo
+              .set(PreviousEuCountryPage(index), Country("DE", "Germany")).success.value
+              .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+              .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
+              .set(PreviousEuCountryPage(index1), Country("FR", "France")).success.value
+              .set(PreviousSchemePage(index1, index), PreviousScheme.OSSNU).success.value
+              .set(PreviousOssNumberPage(index1, index), previousSchemeNumbers).success.value
+            ), mode = Some(AmendMode))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, deleteAmendPreviousRegistrationRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad().url
+          verify(mockSessionRepository, never()).set(any())
+        }
+      }
+
+      "must delete a new previous registration and redirect to the next page when the user answers Yes" in {
+
+        lazy val deleteAmendPreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index1).url
+
+        val answers = basicUserAnswersWithVatInfo
+          .set(PreviousEuCountryPage(index), Country("DE", "Germany")).success.value
+          .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+          .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
+          .set(PreviousEuCountryPage(index1), Country("FR", "France")).success.value
+          .set(PreviousSchemePage(index1, index), PreviousScheme.OSSNU).success.value
+          .set(PreviousOssNumberPage(index1, index), previousSchemeNumbers).success.value
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(answers), mode = Some(AmendMode))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, deleteAmendPreviousRegistrationRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val expectedAnswers = answers
+            .remove(PreviousRegistrationQuery(index1)).success.value
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index1).navigate(AmendMode, answers).url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+
+        }
+      }
+
     }
   }
 }

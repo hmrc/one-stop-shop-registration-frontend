@@ -17,7 +17,7 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.{RegistrationConnector, SavedUserAnswers, SaveForLaterConnector}
+import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.requests.SaveForLaterRequest
@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SavedProgressView
 
-import java.time.{Clock, ZoneId}
+import java.time.Clock
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
