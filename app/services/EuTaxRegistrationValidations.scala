@@ -42,7 +42,10 @@ trait EuTaxRegistrationValidations {
         }
 
       case Some(false) =>
-        List.empty.validNec
+        answers.get(AllEuDetailsRawQuery) match {
+          case Some(_) => DataMissingError(AllEuDetailsRawQuery).invalidNec
+          case None => List.empty.validNec
+        }
 
       case None =>
         DataMissingError(TaxRegisteredInEuPage).invalidNec

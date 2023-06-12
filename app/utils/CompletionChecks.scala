@@ -80,7 +80,7 @@ trait CompletionChecks {
   def isTradingNamesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasTradingNamePage).exists {
       case true => request.userAnswers.get(AllTradingNames).getOrElse(List.empty).nonEmpty
-      case false => true
+      case false => request.userAnswers.get(AllTradingNames).getOrElse(List.empty).isEmpty
     }
   }
 
@@ -94,14 +94,14 @@ trait CompletionChecks {
   def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasWebsitePage).exists {
       case true => request.userAnswers.get(AllWebsites).getOrElse(List.empty).nonEmpty
-      case false => true
+      case false => request.userAnswers.get(AllWebsites).getOrElse(List.empty).isEmpty
     }
   }
 
   def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
       case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
-      case false => true
+      case false => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).isEmpty
     }
   }
 
