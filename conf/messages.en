@@ -865,3 +865,9 @@ cancelAmendRegistration.error.required = Select yes if you want to remove your a
 
 cannotRemoveExistingPreviousRegistrations.title = You cannot delete previous OSS or IOSS registrations that you''ve already added
 cannotRemoveExistingPreviousRegistrations.heading = You cannot delete previous OSS or IOSS registrations that you''ve already added
+
+cannotAddCountryWithoutVatNumber.title = cannotAddCountryWithoutVatNumber
+cannotAddCountryWithoutVatNumber.heading = cannotAddCountryWithoutVatNumber
+cannotAddCountryWithoutVatNumber.checkYourAnswersLabel = cannotAddCountryWithoutVatNumber
+cannotAddCountryWithoutVatNumber.error.required = Select yes if cannotAddCountryWithoutVatNumber
+cannotAddCountryWithoutVatNumber.change.hidden = CannotAddCountryWithoutVatNumber

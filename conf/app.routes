@@ -495,3 +495,8 @@ GET         /cancel-amend-registration                                          
 POST        /cancel-amend-registration                                          controllers.CancelAmendRegistrationController.onSubmit(mode: Mode = AmendMode)
 
 GET         /cannot-delete-previous-registrations                               controllers.previousRegistrations.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()
+
+GET        /cannotAddCountryWithoutVatNumber                        controllers.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /cannotAddCountryWithoutVatNumber                        controllers.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeCannotAddCountryWithoutVatNumber                  controllers.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeCannotAddCountryWithoutVatNumber                  controllers.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = CheckMode)
