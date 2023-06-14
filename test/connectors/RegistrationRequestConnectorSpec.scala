@@ -276,4 +276,24 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
       }
     }
   }
+
+  ".enrolUser" - {
+
+    "must return 204 when successful response" in {
+
+      val url = s"/one-stop-shop-registration/confirm-enrolment"
+      val app = application
+
+      running(app) {
+        val connector = app.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(post(urlEqualTo(url)).willReturn(noContent()))
+
+        val result = connector.enrolUser().futureValue
+
+        result.status mustEqual NO_CONTENT
+      }
+
+    }
+  }
 }

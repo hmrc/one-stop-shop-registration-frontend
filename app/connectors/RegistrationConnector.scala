@@ -19,11 +19,11 @@ package connectors
 import config.Service
 import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, ExternalEntryUrlResponseReads}
 import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
-import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponseReads, AmendRegistrationResultResponse}
+import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponse, AmendRegistrationResultResponseReads}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
 import play.api.Configuration
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import javax.inject.Inject
@@ -53,5 +53,8 @@ class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpCli
   def amendRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[AmendRegistrationResultResponse] = {
     httpClient.POST[Registration, AmendRegistrationResultResponse](s"$baseUrl/amend", registration)
   }
+
+  def enrolUser()(implicit hc: HeaderCarrier): Future[HttpResponse] =
+    httpClient.POSTEmpty[HttpResponse](s"$baseUrl/confirm-enrolment")
 
 }

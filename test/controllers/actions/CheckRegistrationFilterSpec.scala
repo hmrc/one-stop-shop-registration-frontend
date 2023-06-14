@@ -35,6 +35,7 @@ import play.api.test.Helpers._
 import services.DataMigrationService
 import testutils.RegistrationData
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -139,9 +140,11 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
           def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
         }
 
-        s"must return None when an existing registration is found" in {
+        s"must return None when an existing registration is found without enrolments" in {
 
           when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(mockConnector.enrolUser()(any())) thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
+
 
           val app = applicationBuilder(None, mode = Some(mode))
             .overrides(bind[RegistrationConnector].toInstance(mockConnector))
@@ -150,6 +153,31 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
             val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val controller = new AmendHarness(mockConnector, config, mockService)
+
+            val result = controller.callFilter(request).futureValue
+
+            result must not be defined
+          }
+        }
+
+        s"must return None when an existing registration is found with enrolments" in {
+
+          when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(mockConnector.enrolUser()(any())) thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
+
+
+          val app = applicationBuilder(None, mode = Some(mode))
+            .configure(
+              "features.enrolments-enabled" -> true,
+              "oss-enrolment" -> "HMRC-OSS-ORG"
+            )
+            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+            .build()
+
+          running(app) {
+            val config = app.injector.instanceOf[FrontendAppConfig]
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment)
             val controller = new AmendHarness(mockConnector, config, mockService)
 
             val result = controller.callFilter(request).futureValue
