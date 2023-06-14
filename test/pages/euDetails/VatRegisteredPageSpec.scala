@@ -48,12 +48,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check EU Details Answers for the same index" in {
+        "to Cannot Add Country Without Vat Number for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index))
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(NormalMode, index))
         }
       }
 
@@ -99,12 +99,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check EU Details Answers" in {
+        "to Cannot Add Country Without Vat Number for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(CheckMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index))
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(CheckMode, index))
         }
       }
 
@@ -150,12 +150,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check EU Details Answers" in {
+        "to Cannot Add Country Without Vat Number for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(CheckLoopMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index))
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(CheckLoopMode, index))
         }
       }
 
@@ -201,12 +201,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check EU Details Answers" in {
+        "to Cannot Add Country Without Vat Number for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(AmendMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index))
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendMode, index))
         }
       }
 
@@ -252,12 +252,12 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
-        "to Check EU Details Answers" in {
+        "to Cannot Add Country Without Vat Number for the same index" in {
 
           val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
 
           VatRegisteredPage(index).navigate(AmendLoopMode, answers)
-            .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, index))
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendLoopMode, index))
         }
       }
 

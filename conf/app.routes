@@ -496,7 +496,13 @@ POST        /cancel-amend-registration                                          
 
 GET         /cannot-delete-previous-registrations                               controllers.previousRegistrations.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()
 
-GET        /cannotAddCountryWithoutVatNumber                        controllers.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /cannotAddCountryWithoutVatNumber                        controllers.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /changeCannotAddCountryWithoutVatNumber                  controllers.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeCannotAddCountryWithoutVatNumber                  controllers.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = CheckMode)
+GET         /no-vat-number-for-eu-country/:countryIndex                         controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+POST        /no-vat-number-for-eu-country/:countryIndex                         controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /first-check-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
+POST        /first-check-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
+GET         /amend-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
+GET         /first-amend-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
+POST        /first-amend-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)

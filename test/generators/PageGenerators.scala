@@ -24,9 +24,6 @@ import pages.previousRegistrations._
 
 trait PageGenerators {
 
-  implicit lazy val arbitraryCannotAddCountryWithoutVatNumberPage: Arbitrary[CannotAddCountryWithoutVatNumberPage.type] =
-    Arbitrary(CannotAddCountryWithoutVatNumberPage)
-
   implicit lazy val arbitraryDeleteAllPreviousRegistrationsPage: Arbitrary[DeleteAllPreviousRegistrationsPage.type] =
     Arbitrary(DeleteAllPreviousRegistrationsPage)
 
