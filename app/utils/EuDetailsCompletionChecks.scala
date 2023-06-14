@@ -22,7 +22,7 @@ import models.requests.AuthenticatedDataRequest
 import pages.euDetails._
 import play.api.mvc.{AnyContent, Result}
 import play.api.mvc.Results.Redirect
-import queries.{AllEuOptionalDetailsQuery, EuOptionalDetailsQuery}
+import queries.{AllEuOptionalDetailsQuery, DeriveNumberOfEuRegistrations, EuOptionalDetailsQuery}
 
 case object EuDetailsCompletionChecks extends CompletionChecks {
 

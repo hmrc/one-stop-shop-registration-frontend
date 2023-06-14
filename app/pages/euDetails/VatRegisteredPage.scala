@@ -34,7 +34,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(VatRegisteredPage(index)) match {
       case Some(true)  => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
-      case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(NormalMode, index)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -47,7 +47,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
         }
       case Some(false) =>
-          euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+          euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(CheckMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }
@@ -61,7 +61,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(AmendMode, index)
         }
       case Some(false) =>
-        euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
+        euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }
@@ -75,7 +75,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
         }
       case Some(false) =>
-          euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index)
+          euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(CheckLoopMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }
@@ -89,7 +89,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(AmendLoopMode, index)
         }
       case Some(false) =>
-        euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, index)
+        euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendLoopMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }

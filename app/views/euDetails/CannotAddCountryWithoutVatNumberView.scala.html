@@ -22,25 +22,18 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(mode: Mode, countryIndex: Index, country: Country)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("cannotAddCountryWithoutVatNumber.title"))) {
+    @layout(pageTitle = titleNoForm(messages("cannotAddCountryWithoutVatNumber.title", country.name))) {
 
-    @formHelper(action = routes.CannotAddCountryWithoutVatNumberController.onSubmit(mode), 'autoComplete -> "off") {
+        @formHelper(action = controllers.euDetails.routes.CannotAddCountryWithoutVatNumberController.onSubmit(mode, countryIndex), Symbol("autoComplete") -> "off") {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
+            <h1 class="govuk-heading-xl">@messages("cannotAddCountryWithoutVatNumber.heading", country.name)</h1>
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("cannotAddCountryWithoutVatNumber.heading")).asPageHeading()
+            <p class="govuk-body">@messages("cannotAddCountryWithoutVatNumber.paragraph")</p>
+
+            @govukButton(
+                ButtonViewModel(messages("site.continue")).withAttribute("id", "continue")
             )
-        )
-
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        }
     }
-}
