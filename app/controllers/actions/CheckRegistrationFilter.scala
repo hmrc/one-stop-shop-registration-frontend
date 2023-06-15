@@ -78,11 +78,11 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
   private def enrolRegisteredUser(vrn: Vrn)
                                            (implicit hc: HeaderCarrier): Future[Option[Result]] = {
 
-    connector.enrolUser().flatMap { response =>
+    connector.enrolUser().map { response =>
       response.status match {
         case NO_CONTENT =>
           logger.info(s"Successfully retrospectively enrolled user ${vrn.vrn}")
-          None.toFuture
+          None
         case status =>
           logger.error(s"Failure enrolling an existing user, got status $status from registration service")
           throw new IllegalStateException("Existing user didn't have enrolment and was unable to enrol user")
