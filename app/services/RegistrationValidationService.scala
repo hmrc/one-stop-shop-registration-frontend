@@ -43,6 +43,7 @@ class RegistrationValidationService @Inject()(
                        hc: HeaderCarrier,
                        request: AuthenticatedDataRequest[_]
                      ): Future[ValidationResult[Registration]] = {
+    println("fromUserAnswers")
     getCommencementDate(answers).map { validationCommencementDate =>
       (
         getCompanyName(answers),

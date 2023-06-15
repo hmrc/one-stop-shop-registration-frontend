@@ -84,25 +84,21 @@ class RegistrationServiceSpec
       .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
       .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
 
-      .set(EuCountryPage(Index(3)), Country("HR", "Croatia")).success.value
-      .set(SellsGoodsToEUConsumersPage(Index(3)), false).success.value
-      .set(VatRegisteredPage(Index(3)), false).success.value
+      .set(EuCountryPage(Index(3)), Country("ES", "Spain")).success.value
+      .set(SellsGoodsToEUConsumersPage(Index(3)), true).success.value
+      .set(SellsGoodsToEUConsumerMethodPage(Index(3)), EuConsumerSalesMethod.FixedEstablishment).success.value
+      .set(RegistrationTypePage(Index(3)), RegistrationType.VatNumber).success.value
+      .set(EuVatNumberPage(Index(3)), "ES123456789").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(3)), "Spanish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(3)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
 
-      .set(EuCountryPage(Index(4)), Country("ES", "Spain")).success.value
+      .set(EuCountryPage(Index(4)), Country("DK", "Denmark")).success.value
       .set(SellsGoodsToEUConsumersPage(Index(4)), true).success.value
       .set(SellsGoodsToEUConsumerMethodPage(Index(4)), EuConsumerSalesMethod.FixedEstablishment).success.value
-      .set(RegistrationTypePage(Index(4)), RegistrationType.VatNumber).success.value
-      .set(EuVatNumberPage(Index(4)), "ES123456789").success.value
-      .set(FixedEstablishmentTradingNamePage(Index(4)), "Spanish trading name").success.value
-      .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
-
-      .set(EuCountryPage(Index(5)), Country("DK", "Denmark")).success.value
-      .set(SellsGoodsToEUConsumersPage(Index(5)), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(Index(5)), EuConsumerSalesMethod.FixedEstablishment).success.value
-      .set(RegistrationTypePage(Index(5)), RegistrationType.TaxId).success.value
-      .set(EuTaxReferencePage(Index(5)), "DK123456789").success.value
-      .set(FixedEstablishmentTradingNamePage(Index(5)), "Danish trading name").success.value
-      .set(FixedEstablishmentAddressPage(Index(5)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
+      .set(RegistrationTypePage(Index(4)), RegistrationType.TaxId).success.value
+      .set(EuTaxReferencePage(Index(4)), "DK123456789").success.value
+      .set(FixedEstablishmentTradingNamePage(Index(4)), "Danish trading name").success.value
+      .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
 
       .set(IsOnlineMarketplacePage, false).success.value
       .set(HasWebsitePage, true).success.value

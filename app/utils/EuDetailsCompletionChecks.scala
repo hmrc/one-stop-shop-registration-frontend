@@ -16,13 +16,13 @@
 
 package utils
 
-import models.{Index, Mode}
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
 import models.requests.AuthenticatedDataRequest
+import models.{Index, Mode}
 import pages.euDetails._
-import play.api.mvc.{AnyContent, Result}
 import play.api.mvc.Results.Redirect
-import queries.{AllEuOptionalDetailsQuery, DeriveNumberOfEuRegistrations, EuOptionalDetailsQuery}
+import play.api.mvc.{AnyContent, Result}
+import queries.{AllEuOptionalDetailsQuery, EuOptionalDetailsQuery}
 
 case object EuDetailsCompletionChecks extends CompletionChecks {
 
@@ -68,7 +68,7 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
 
   private def notSellingToEuConsumers(details: EuOptionalDetails): Boolean = {
     details.sellsGoodsToEUConsumers.isEmpty ||
-      (details.sellsGoodsToEUConsumers.contains(false) && details.vatRegistered.isEmpty) ||
+      (details.sellsGoodsToEUConsumers.contains(false) && !details.vatRegistered.contains(true)) ||
       (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty)
   }
 
