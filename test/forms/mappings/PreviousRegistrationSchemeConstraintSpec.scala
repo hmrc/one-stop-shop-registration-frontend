@@ -16,8 +16,8 @@
 
 package forms.mappings
 
-import models.previousRegistrations.PreviousSchemeNumbers
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
+import models.domain.PreviousSchemeNumbers
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.data.validation.{Invalid, Valid}
