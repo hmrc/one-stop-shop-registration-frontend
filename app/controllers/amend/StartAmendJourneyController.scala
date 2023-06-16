@@ -41,7 +41,7 @@ class StartAmendJourneyController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetOptionalData(Some(AmendMode)).async { // TODO require HMRC-OSS-ORG enrolment key
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetOptionalData(Some(AmendMode)).async {
     implicit request =>
       (for {
         maybeRegistration <- registrationConnector.getRegistration()
@@ -55,7 +55,7 @@ class StartAmendJourneyController @Inject()(
                   _ <- authenticatedUserAnswersRepository.set(userAnswers)
                 } yield Redirect(routes.ChangeYourRegistrationController.onPageLoad().url)
 
-              case Left(error) => val exception = new Exception(s"TODO ${error}") // TODO
+              case Left(error) => val exception = new Exception(s"Failed to retrieve VAT information when starting amend $error")
                 logger.error(exception.getMessage, exception)
                 throw exception
             }
