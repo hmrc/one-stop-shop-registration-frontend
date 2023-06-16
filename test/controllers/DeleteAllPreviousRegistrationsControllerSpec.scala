@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.DeleteAllPreviousRegistrationsFormProvider
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
 import models.{CheckMode, Country, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}

@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import models.previousRegistrations.PreviousRegistrationDetails
 @import components.ButtonGroup
 
 @this(
@@ -42,6 +41,6 @@
             )
         )
 
-        @button("site.continue",  controllers.previousRegistrations.routes.DeletePreviousRegistrationController.onPageLoad(mode, index).url)
+        @button("site.continue",  controllers.previousRegistrations.routes.DeletePreviousRegistrationController.onPageLoad(mode, index).url, mode)
     }
 }

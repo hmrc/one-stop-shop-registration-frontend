@@ -18,7 +18,8 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -42,5 +43,12 @@ case object AddEuDetailsPage extends QuestionPage[Boolean] {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(CheckMode, Index(size))
       case (Some(false), _)         => routes.CheckYourAnswersController.onPageLoad()
       case _                        => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
+      case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(AmendMode, Index(size))
+      case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
 }

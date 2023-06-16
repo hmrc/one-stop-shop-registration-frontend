@@ -18,8 +18,8 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, Index, NormalMode}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
+import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
@@ -48,9 +48,22 @@ class PreviousOssNumberPageSpec extends SpecBase with PageBehaviours {
       "to Add Previous Registration when the VAT number for this index has been answered" in {
 
         val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
+
         PreviousOssNumberPage(index, index).navigate(CheckMode, answers)
           .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(CheckMode, index))
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to Add Previous Registration when the VAT number for this index has been answered" in {
+
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
+
+        PreviousOssNumberPage(index, index).navigate(AmendMode, answers)
+          .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index))
+      }
+    }
+
   }
 }

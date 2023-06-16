@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.previousRegistrations
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
 
-import play.api.libs.json.{Json, OFormat}
+@()(implicit request: Request[_], messages: Messages)
 
-case class PreviousSchemeNumbers(
-                              previousSchemeNumber: String,
-                              previousIntermediaryNumber: Option[String]
-                            )
+@layout(pageTitle = titleNoForm(messages("notRegistered.title"))) {
 
-object PreviousSchemeNumbers {
-  implicit val format: OFormat[PreviousSchemeNumbers] = Json.format[PreviousSchemeNumbers]
+    <h1 class="govuk-heading-xl">@messages("notRegistered.heading")</h1>
+
+    <p class="govuk-body">@Html(messages("notRegistered.label"))</p>
 }

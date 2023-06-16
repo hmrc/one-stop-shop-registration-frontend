@@ -24,11 +24,15 @@ GET         /have-uk-trading-name                                               
 POST        /have-uk-trading-name                                               controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET         /check-have-uk-trading-name                                         controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-have-uk-trading-name                                         controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-have-uk-trading-name                                         controllers.HasTradingNameController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-have-uk-trading-name                                         controllers.HasTradingNameController.onSubmit(mode: Mode = AmendMode)
 
 GET         /uk-trading-name/:index                                             controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /uk-trading-name/:index                                             controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-uk-trading-name/:index                                       controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-uk-trading-name/:index                                       controllers.TradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-uk-trading-name/:index                                       controllers.TradingNameController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-uk-trading-name/:index                                       controllers.TradingNameController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /eu-vat-number/:index                                               controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-vat-number/:index                                               controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -36,6 +40,10 @@ GET         /check-eu-vat-number/:index                                         
 POST        /check-eu-vat-number/:index                                         controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-vat-number/:index                                   controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-vat-number/:index                                   controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-vat-number/:index                                         controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-vat-number/:index                                         controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-vat-number/:index                                   controllers.euDetails.EuVatNumberController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-vat-number/:index                                   controllers.euDetails.EuVatNumberController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /eu-tax/:index                                                      controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-tax/:index                                                      controllers.euDetails.EuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -43,6 +51,8 @@ GET         /check-eu-tax/:index                                                
 POST        /check-eu-tax/:index                                                controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-tax/:index                                          controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-tax/:index                                          controllers.euDetails.EuCountryController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-tax/:index                                                controllers.euDetails.EuCountryController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-tax/:index                                                controllers.euDetails.EuCountryController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /eu-vat/:index                                                      controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-vat/:index                                                      controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -50,11 +60,17 @@ GET         /check-eu-vat/:index                                                
 POST        /check-eu-vat/:index                                                controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-vat/:index                                          controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-vat/:index                                          controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-vat/:index                                                controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-vat/:index                                                controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-vat/:index                                          controllers.euDetails.VatRegisteredController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-vat/:index                                          controllers.euDetails.VatRegisteredController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /add-tax-details                                                    controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /add-tax-details                                                    controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
 GET         /check-add-tax-details                                              controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-tax-details                                              controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
+GET         /amend-add-tax-details                                              controllers.euDetails.AddEuDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-add-tax-details                                              controllers.euDetails.AddEuDetailsController.onSubmit(mode: Mode = AmendMode, incompletePromptShown: Boolean)
 
 GET         /remove-tax-details/:index                                          controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-tax-details/:index                                          controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -62,12 +78,15 @@ GET         /check-remove-tax-details/:index                                    
 POST        /check-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
-
+GET         /amend-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-remove-tax-details/:index                                    controllers.euDetails.DeleteEuDetailsController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /business-contact-details                                           controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /business-contact-details                                           controllers.BusinessContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /check-business-contact-details                                     controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-business-contact-details                                     controllers.BusinessContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-business-contact-details                                     controllers.BusinessContactDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-business-contact-details                                     controllers.BusinessContactDetailsController.onSubmit(mode: Mode = AmendMode)
 
 GET         /successful                                                         controllers.ApplicationCompleteController.onPageLoad()
 
@@ -75,26 +94,36 @@ GET         /remove-uk-trading-name/:index                                      
 POST        /remove-uk-trading-name/:index                                      controllers.DeleteTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-remove-uk-trading-name/:index                                controllers.DeleteTradingNameController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /add-uk-trading-name                                                controllers.AddTradingNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /add-uk-trading-name                                                controllers.AddTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET         /check-add-uk-trading-name                                          controllers.AddTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-uk-trading-name                                          controllers.AddTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-add-uk-trading-name                                          controllers.AddTradingNameController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-add-uk-trading-name                                          controllers.AddTradingNameController.onSubmit(mode: Mode = AmendMode)
 
 GET         /website-address/:index                                             controllers.WebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /website-address/:index                                             controllers.WebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-website-address/:index                                       controllers.WebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-website-address/:index                                       controllers.WebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-website-address/:index                                       controllers.WebsiteController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-website-address/:index                                       controllers.WebsiteController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /add-website-address                                                controllers.AddWebsiteController.onPageLoad(mode: Mode = NormalMode)
 POST        /add-website-address                                                controllers.AddWebsiteController.onSubmit(mode: Mode = NormalMode)
 GET         /check-add-website-address                                          controllers.AddWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-add-website-address                                          controllers.AddWebsiteController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-add-website-address                                          controllers.AddWebsiteController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-add-website-address                                          controllers.AddWebsiteController.onSubmit(mode: Mode = AmendMode)
 
 GET         /remove-website-address/:index                                      controllers.DeleteWebsiteController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-website-address/:index                                      controllers.DeleteWebsiteController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-remove-website-address/:index                                controllers.DeleteWebsiteController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-remove-website-address/:index                                controllers.DeleteWebsiteController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-remove-website-address/:index                                controllers.DeleteWebsiteController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-remove-website-address/:index                                controllers.DeleteWebsiteController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /identity-complete                                                  controllers.auth.IdentityVerificationController.handleIvFailure(continueURL: String, journeyId: Option[String])
 GET         /identity-problem                                                   controllers.auth.IdentityVerificationController.identityError(continueUrl: String)
@@ -134,6 +163,10 @@ GET         /check-eu-fixed-establishment-address/:index                        
 POST        /check-eu-fixed-establishment-address/:index                        controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-fixed-establishment-address/:index                  controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-fixed-establishment-address/:index                  controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-fixed-establishment-address/:index                        controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-fixed-establishment-address/:index                        controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-fixed-establishment-address/:index                  controllers.euDetails.FixedEstablishmentAddressController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-fixed-establishment-address/:index                  controllers.euDetails.FixedEstablishmentAddressController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /eu-trading-name/:index                                             controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-trading-name/:index                                             controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -141,6 +174,10 @@ GET         /check-eu-trading-name/:index                                       
 POST        /check-eu-trading-name/:index                                       controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-trading-name/:index                                       controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-trading-name/:index                                       controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-trading-name/:index                                 controllers.euDetails.FixedEstablishmentTradingNameController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /check-tax-details/:index                                           controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /check-tax-details/:index                                           controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = NormalMode, index: Index, incompletePromptShown: Boolean)
@@ -148,6 +185,10 @@ GET         /change-check-tax-details/:index                                    
 POST        /change-check-tax-details/:index                                    controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckMode, index: Index, incompletePromptShown: Boolean)
 GET         /first-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = CheckLoopMode, index: Index, incompletePromptShown: Boolean)
+GET         /amend-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-check-tax-details/:index                                     controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = AmendMode, index: Index, incompletePromptShown: Boolean)
+GET         /first-amend-check-tax-details/:index                               controllers.euDetails.CheckEuDetailsAnswersController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-check-tax-details/:index                               controllers.euDetails.CheckEuDetailsAnswersController.onSubmit(mode: Mode = AmendLoopMode, index: Index, incompletePromptShown: Boolean)
 
 GET         /already-registered                                                 controllers.AlreadyRegisteredController.onPageLoad()
 
@@ -155,36 +196,50 @@ GET         /previous-schemes-overview                                          
 POST        /previous-schemes-overview                                          controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = NormalMode, incompletePromptShown: Boolean)
 GET         /check-previous-schemes-overview                                    controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-previous-schemes-overview                                    controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = CheckMode, incompletePromptShown: Boolean)
+GET         /amend-previous-schemes-overview                                    controllers.previousRegistrations.AddPreviousRegistrationController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-previous-schemes-overview                                    controllers.previousRegistrations.AddPreviousRegistrationController.onSubmit(mode: Mode = AmendMode, incompletePromptShown: Boolean)
 
 GET         /previous-oss                                                       controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = NormalMode)
 POST        /previous-oss                                                       controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = NormalMode)
 GET         /check-previous-oss                                                 controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-previous-oss                                                 controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-previous-oss                                                 controllers.previousRegistrations.PreviouslyRegisteredController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-previous-oss                                                 controllers.previousRegistrations.PreviouslyRegisteredController.onSubmit(mode: Mode = AmendMode)
 
 GET         /previous-country/:index                                            controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /previous-country/:index                                            controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-previous-country/:index                                      controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-previous-country/:index                                      controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-previous-country/:index                                      controllers.previousRegistrations.PreviousEuCountryController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-previous-country/:index                                      controllers.previousRegistrations.PreviousEuCountryController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /previous-oss-scheme-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 POST        /previous-oss-scheme-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 GET         /check-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 POST        /check-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+GET         /amend-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
+POST        /amend-previous-oss-scheme-number/:countryIndex/:schemeIndex        controllers.previousRegistrations.PreviousOssNumberController.onSubmit(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
 
 GET         /previous-scheme/:countryIndex/:schemeIndex                         controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 POST        /previous-scheme/:countryIndex/:schemeIndex                         controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 GET         /check-previous-scheme/:countryIndex/:schemeIndex                   controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 POST        /check-previous-scheme/:countryIndex/:schemeIndex                   controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+GET         /amend-previous-scheme/:countryIndex/:schemeIndex                   controllers.previousRegistrations.PreviousSchemeController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
+POST        /amend-previous-scheme/:countryIndex/:schemeIndex                   controllers.previousRegistrations.PreviousSchemeController.onSubmit(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
 
 GET         /previous-ioss-scheme/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 POST        /previous-ioss-scheme/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 GET         /check-previous-ioss-scheme/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 POST        /check-previous-ioss-scheme/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+GET         /amend-previous-ioss-scheme/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossSchemeController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
+POST        /amend-previous-ioss-scheme/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossSchemeController.onSubmit(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
 
 GET         /previous-ioss-number/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 POST        /previous-ioss-number/:countryIndex/:schemeIndex                    controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 GET         /check-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 POST        /check-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+GET         /amend-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
+POST        /amend-previous-ioss-number/:countryIndex/:schemeIndex              controllers.previousRegistrations.PreviousIossNumberController.onSubmit(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
 
 GET         /scheme-still-active                                                controllers.previousRegistrations.SchemeStillActiveController.onPageLoad(countryCode: String)
 GET         /scheme-quarantined                                                 controllers.previousRegistrations.SchemeQuarantinedController.onPageLoad()
@@ -193,16 +248,22 @@ GET         /previous-scheme-answers/:index                                     
 POST        /previous-scheme-answers/:index                                     controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-previous-scheme-answers/:index                               controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-previous-scheme-answers/:index                               controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-previous-scheme-answers/:index                               controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-previous-scheme-answers/:index                               controllers.previousRegistrations.CheckPreviousSchemeAnswersController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /remove-deregistration/:index                                       controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /remove-deregistration/:index                                       controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = NormalMode, index: Index)
 GET         /check-remove-deregistration/:index                                 controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = CheckMode, index: Index)
 POST        /check-remove-deregistration/:index                                 controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = CheckMode, index: Index)
+GET         /amend-remove-deregistration/:index                                 controllers.previousRegistrations.DeletePreviousRegistrationController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-remove-deregistration/:index                                 controllers.previousRegistrations.DeletePreviousRegistrationController.onSubmit(mode: Mode = AmendMode, index: Index)
 
 GET         /bank-details                                                       controllers.BankDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /bank-details                                                       controllers.BankDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /check-bank-details                                                 controllers.BankDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-bank-details                                                 controllers.BankDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-bank-details                                                 controllers.BankDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-bank-details                                                 controllers.BankDetailsController.onSubmit(mode: Mode = AmendMode)
 
 GET         /eu-tax-number/:index                                               controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-tax-number/:index                                               controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -210,11 +271,17 @@ GET         /check-eu-tax-number/:index                                         
 POST        /check-eu-tax-number/:index                                         controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-tax-number/:index                                         controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-tax-number/:index                                         controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /give-website-address                                               controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
 POST        /give-website-address                                               controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
 GET         /check-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = AmendMode)
 
 GET         /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onPageLoad()
 POST        /sell-from-northern-ireland                                         controllers.SellsGoodsFromNiController.onSubmit()
@@ -225,6 +292,8 @@ GET         /tax-in-eu                                                          
 POST        /tax-in-eu                                                          controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = NormalMode)
 GET         /check-tax-in-eu                                                    controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-tax-in-eu                                                    controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-tax-in-eu                                                    controllers.euDetails.TaxRegisteredInEuController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-tax-in-eu                                                    controllers.euDetails.TaxRegisteredInEuController.onSubmit(mode: Mode = AmendMode)
 
 GET         /update-vat-details                                                 controllers.UpdateVatDetailsController.onPageLoad()
 
@@ -234,6 +303,8 @@ GET         /start-date                                                         
 POST        /start-date                                                         controllers.CommencementDateController.onSubmit(mode: Mode = NormalMode)
 GET         /check-start-date                                                   controllers.CommencementDateController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-start-date                                                   controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-start-date                                                   controllers.CommencementDateController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-start-date                                                   controllers.CommencementDateController.onSubmit(mode: Mode = AmendMode)
 
 GET         /register-later                                                     controllers.RegisterLaterController.onPageLoad()
 
@@ -246,16 +317,22 @@ GET         /date-of-first-sale                                                 
 POST        /date-of-first-sale                                                 controllers.DateOfFirstSaleController.onSubmit(mode: Mode = NormalMode)
 GET         /check-date-of-first-sale                                           controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-date-of-first-sale                                           controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-date-of-first-sale                                           controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-date-of-first-sale                                           controllers.DateOfFirstSaleController.onSubmit(mode: Mode = AmendMode)
 
 GET         /already-made-sales                                                 controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
 POST        /already-made-sales                                                 controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
 GET         /check-already-made-sales                                           controllers.HasMadeSalesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-already-made-sales                                           controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-already-made-sales                                           controllers.HasMadeSalesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-already-made-sales                                           controllers.HasMadeSalesController.onSubmit(mode: Mode = AmendMode)
 
 GET         /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
 POST        /online-marketplace                                                 controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
 GET         /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-online-marketplace                                           controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-online-marketplace                                           controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-online-marketplace                                           controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = AmendMode)
 
 GET         /northern-ireland-business                                          controllers.BusinessBasedInNiController.onPageLoad()
 POST        /northern-ireland-business                                          controllers.BusinessBasedInNiController.onSubmit()
@@ -280,6 +357,8 @@ GET         /planned-first-sale                                                 
 POST        /planned-first-sale                                                 controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
 GET         /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-planned-first-sale                                           controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = AmendMode)
 
 GET         /no-welsh-service                                                   controllers.external.NoMoreWelshController.onPageLoad()
 GET         /cannot-register-ni-protocol                                        controllers.NiProtocolRejectionController.onPageLoad()
@@ -302,6 +381,10 @@ GET         /check-eu-send-goods-trading-name/:index                            
 POST        /check-eu-send-goods-trading-name/:index                            controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-send-goods-trading-name/:index                      controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-send-goods-trading-name/:index                      controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-send-goods-trading-name/:index                            controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-send-goods-trading-name/:index                            controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-send-goods-trading-name/:index                      controllers.euDetails.EuSendGoodsTradingNameController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-send-goods-trading-name/:index                      controllers.euDetails.EuSendGoodsTradingNameController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /eu-send-goods-address/:index                                       controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /eu-send-goods-address/:index                                       controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = NormalMode, index: Index)
@@ -309,6 +392,10 @@ GET         /check-eu-send-goods-address/:index                                 
 POST        /check-eu-send-goods-address/:index                                 controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckMode, index: Index)
 GET         /first-check-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = CheckLoopMode, index: Index)
 POST        /first-check-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = CheckLoopMode, index: Index)
+GET         /amend-eu-send-goods-address/:index                                 controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = AmendMode, index: Index)
+POST        /amend-eu-send-goods-address/:index                                 controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = AmendMode, index: Index)
+GET         /first-amend-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onPageLoad(mode: Mode = AmendLoopMode, index: Index)
+POST        /first-amend-eu-send-goods-address/:index                           controllers.euDetails.EuSendGoodsAddressController.onSubmit(mode: Mode = AmendLoopMode, index: Index)
 
 GET         /email-verification-codes-and-emails-exceeded                       controllers.EmailVerificationCodesAndEmailsExceededController.onPageLoad()
 
@@ -324,6 +411,8 @@ GET         /remove-previous-scheme/:countryIndex/:schemeIndex                  
 POST        /remove-previous-scheme/:countryIndex/:schemeIndex                  controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index, schemeIndex: Index)
 GET         /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
 POST        /check-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index, schemeIndex: Index)
+GET         /amend-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
+POST        /amend-remove-previous-scheme/:countryIndex/:schemeIndex            controllers.previousRegistrations.DeletePreviousSchemeController.onSubmit(mode: Mode = AmendMode, countryIndex: Index, schemeIndex: Index)
 
 GET         /sells-goods-to-eu-consumers/:countryIndex                          controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /sells-goods-to-eu-consumers/:countryIndex                          controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
@@ -331,6 +420,10 @@ GET         /check-sells-goods-to-eu-consumers/:countryIndex                    
 POST        /check-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 GET         /first-check-sells-goods-to-eu-consumers/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
 POST        /first-check-sells-goods-to-eu-consumers/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
+GET         /amend-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-sells-goods-to-eu-consumers/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
+GET         /first-amend-sells-goods-to-eu-consumers/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumersController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
+POST        /first-amend-sells-goods-to-eu-consumers/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumersController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
 
 GET         /sells-goods-to-eu-consumer-method/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /sells-goods-to-eu-consumer-method/:countryIndex                    controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
@@ -338,9 +431,17 @@ GET         /check-sells-goods-to-eu-consumer-method/:countryIndex              
 POST        /check-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 GET         /first-check-sells-goods-to-eu-consumer-method/:countryIndex        controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
 POST        /first-check-sells-goods-to-eu-consumer-method/:countryIndex        controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
+GET         /amend-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-sells-goods-to-eu-consumer-method/:countryIndex              controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
+GET         /first-amend-sells-goods-to-eu-consumer-method/:countryIndex        controllers.euDetails.SellsGoodsToEUConsumerMethodController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
+POST        /first-amend-sells-goods-to-eu-consumer-method/:countryIndex        controllers.euDetails.SellsGoodsToEUConsumerMethodController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
 
 GET         /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /no-fixed-establishments-required/:countryIndex                     controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /amend-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-no-fixed-establishments-required/:countryIndex               controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
 
 GET         /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /registration-type/:countryIndex                                    controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
@@ -348,17 +449,60 @@ GET         /check-registration-type/:countryIndex                              
 POST        /check-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
 GET         /first-check-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
 POST        /first-check-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
+GET         /amend-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-registration-type/:countryIndex                              controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
+GET         /first-amend-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
+POST        /first-amend-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+GET         /amend-sales-declaration-not-required/:countryIndex                 controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+
+GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()
+
+GET         /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onPageLoad()
+POST        /change-your-registration                                           controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
 
 GET         /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = AmendMode)
 
 GET         /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-remove-all-trading-names                                     controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = AmendMode)
 
 GET         /check-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-remove-all-eu-details                                        controllers.euDetails.DeleteAllEuDetailsController.onSubmit(mode: Mode = AmendMode)
 
 GET         /check-remove-all-previous-registrations                            controllers.DeleteAllPreviousRegistrationsController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-previous-registrations                            controllers.DeleteAllPreviousRegistrationsController.onSubmit(mode: Mode = CheckMode)
+
+GET         /successful-amend                                                   controllers.amend.AmendCompleteController.onPageLoad()
+
+GET         /cannot-use-not-registered                                          controllers.NotRegisteredController.onPageLoad()
+
+GET         /error-submitting-amendment                                         controllers.amend.ErrorSubmittingAmendmentController.onPageLoad()
+
+GET         /no-longer-amendable                                                controllers.amend.NoLongerAmendableController.onPageLoad()
+
+GET         /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onPageLoad()
+POST        /delete-all-fixed-establishment                                     controllers.DeleteAllFixedEstablishmentController.onSubmit()
+
+GET         /cancel-amend-registration                                          controllers.CancelAmendRegistrationController.onPageLoad(mode: Mode = AmendMode)
+POST        /cancel-amend-registration                                          controllers.CancelAmendRegistrationController.onSubmit(mode: Mode = AmendMode)
+
+GET         /cannot-delete-previous-registrations                               controllers.previousRegistrations.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()
+
+GET         /no-vat-number-for-eu-country/:countryIndex                         controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+POST        /no-vat-number-for-eu-country/:countryIndex                         controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
+POST        /check-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /first-check-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
+POST        /first-check-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
+GET         /amend-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
+POST        /amend-no-vat-number-for-eu-country/:countryIndex                   controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
+GET         /first-amend-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
+POST        /first-amend-no-vat-number-for-eu-country/:countryIndex             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)

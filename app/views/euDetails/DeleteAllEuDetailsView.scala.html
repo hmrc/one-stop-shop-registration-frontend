@@ -30,7 +30,7 @@
 
 @layout(pageTitle = title(form, messages("deleteAllEuDetails.title"))) {
 
-    @formHelper(action = routes.DeleteAllEuDetailsController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.DeleteAllEuDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -48,6 +48,6 @@
             content = Text(messages("deleteAllEuDetails.warning"))
         ))
 
-        @button("site.continue", routes.DeleteAllEuDetailsController.onPageLoad().url)
+        @button("site.continue", routes.DeleteAllEuDetailsController.onPageLoad(mode).url, mode)
     }
 }

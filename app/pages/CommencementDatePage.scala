@@ -17,6 +17,7 @@
 package pages
 
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.{NormalMode, UserAnswers}
 import play.api.mvc.Call
@@ -28,4 +29,7 @@ case object CommencementDatePage extends Page {
 
   override def navigateInCheckMode(answers: UserAnswers): Call =
     routes.CheckYourAnswersController.onPageLoad()
+
+  override def navigateInAmendMode(answers: UserAnswers): Call =
+    amendRoutes.ChangeYourRegistrationController.onPageLoad()
 }

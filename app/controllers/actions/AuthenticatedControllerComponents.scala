@@ -17,6 +17,7 @@
 package controllers.actions
 
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
+import models.Mode
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
@@ -32,35 +33,37 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def identify: AuthenticatedIdentifierAction
   def getData: AuthenticatedDataRetrievalAction
   def requireData: AuthenticatedDataRequiredAction
-  def checkRegistration: CheckRegistrationFilter
+  def checkRegistration: CheckRegistrationFilterProvider
   def checkVrnAllowList: VrnAllowListFilter
   def limitIndex: MaximumIndexFilterProvider
   def features: FeatureFlagService
   def checkNiProtocol: CheckNiProtocolFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
   def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
-  def checkEmailVerificationStatus: CheckEmailVerificationFilter
+  def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
+  def checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider
+  def checkDateOfFirstSaleAmendable: CheckDateOfFirstSaleAmendableFilterProvider
 
-  def authAndGetData(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
-      checkRegistration andThen
+      checkRegistration(mode) andThen
       getData andThen
-      requireData andThen
+      requireData(mode) andThen
       checkNiProtocol andThen
       checkOtherCountryRegistration
 
-  def authAndGetOptionalData: ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
+  def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
-      checkRegistration andThen
+      checkRegistration(mode) andThen
       getData
 
-  def authAndGetDataAndCheckVerifyEmail(): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
-    authAndGetData() andThen
-      checkEmailVerificationStatus
+  def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+    authAndGetData(mode) andThen
+      checkEmailVerificationStatus(mode)
 
 }
 
@@ -75,7 +78,7 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                sessionRepository: AuthenticatedUserAnswersRepository,
                                                                identify: AuthenticatedIdentifierAction,
                                                                checkVrnAllowList: VrnAllowListFilter,
-                                                               checkRegistration: CheckRegistrationFilter,
+                                                               checkRegistration: CheckRegistrationFilterProvider,
                                                                getData: AuthenticatedDataRetrievalAction,
                                                                requireData: AuthenticatedDataRequiredAction,
                                                                limitIndex: MaximumIndexFilterProvider,
@@ -83,5 +86,7 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkNiProtocol: CheckNiProtocolFilter,
                                                                retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
                                                                checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
-                                                               checkEmailVerificationStatus: CheckEmailVerificationFilter
+                                                               checkEmailVerificationStatus: CheckEmailVerificationFilterProvider,
+                                                               checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider,
+                                                               checkDateOfFirstSaleAmendable: CheckDateOfFirstSaleAmendableFilterProvider
                                                              ) extends AuthenticatedControllerComponents

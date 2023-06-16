@@ -22,11 +22,19 @@ import play.api.data.Form
 import services.DateService
 import formats.Format.dateFormatter
 
-class IsPlanningFirstEligibleSaleFormProvider @Inject()(dateService: DateService) extends Mappings {
+import java.time.{Clock, LocalDate}
 
-  def apply(): Form[Boolean] = {
+class IsPlanningFirstEligibleSaleFormProvider @Inject()(dateService: DateService, clock: Clock) extends Mappings {
 
-    val firstDayOfNextCalendarQuarter = dateService.startOfNextQuarter
+  def apply(maybeRegistrationDate: Option[LocalDate]): Form[Boolean] = {
+
+    val firstDayOfNextCalendarQuarter =
+      maybeRegistrationDate match {
+        case Some(registrationDate) =>
+          dateService.startOfNextQuarter(registrationDate)
+        case _ =>
+          dateService.startOfNextQuarter(LocalDate.now(clock))
+      }
 
     Form(
       "value" -> boolean(

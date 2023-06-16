@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.{ListItem, Long}
-@import viewmodels.LegendSize
 @import components.ButtonGroup
-
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.Long
+@import viewmodels.{LegendSize, ListItemWrapper}
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
@@ -28,7 +27,7 @@
         govukWarningText: GovukWarningText
 )
 
-@(form: Form[_], mode: Mode, list: Seq[ListItem], canAddCountries: Boolean, incompleteCountries: Seq[EuOptionalDetails] = List.empty)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: Seq[ListItemWrapper], canAddCountries: Boolean, incompleteCountries: Seq[EuOptionalDetails] = List.empty)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
     @layout(pageTitle = title(form, messages("addEuDetails.title" + messageSuffix, list.size))) {
@@ -37,7 +36,7 @@
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
 
-            @if(!incompleteCountries.isEmpty) {
+            @if(incompleteCountries.nonEmpty) {
                 @govukWarningText(WarningText(
                     iconFallbackText = messages("site.warning"),
                     content = Text(messages("error.missing_answers"))
@@ -48,7 +47,7 @@
 
             @addToList(list, Long, "addEuDetails.change.hidden", "addEuDetails.remove.hidden")
             @if(incompleteCountries.isEmpty) {
-                @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, false), Symbol("autoComplete") -> "off") {
+                @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, incompletePromptShown = false), Symbol("autoComplete") -> "off") {
                     @if(canAddCountries) {
                         @govukRadios(
                             RadiosViewModel.yesNo(
@@ -63,15 +62,15 @@
                         <input type="hidden" name="value" id="value" value="false"/>
                     }
 
-                    @button("site.continue",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
+                    @button("site.continue",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url, mode)
                 }
             } else {
                 <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
                 <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.map(_.euCountry.name).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.euCountry.name} else {incompleteCountries.head.euCountry.name})</p>
 
-                @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, true)) {
+                @formHelper(action = controllers.euDetails.routes.AddEuDetailsController.onSubmit(mode, incompletePromptShown = true)) {
 
-                    @button("error.resolve_missing_answers",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
+                    @button("error.resolve_missing_answers",  controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url, mode)
                 }
             }
     }

@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{BankDetails, CheckMode, NormalMode}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, BankDetails, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class BankDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -48,5 +49,15 @@ class BankDetailsPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to Change Your Registration" in {
+
+        BankDetailsPage.navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+    }
+
   }
 }

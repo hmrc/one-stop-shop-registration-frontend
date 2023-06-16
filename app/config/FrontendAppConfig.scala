@@ -22,11 +22,10 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 import java.net.URI
-import java.time.Clock
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
+class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
@@ -46,6 +45,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
   val ivUpliftUrl: String      = configuration.get[String]("urls.ivUplift")
   val emailVerificationUrl: String      = configuration.get[String]("urls.emailVerificationUrl")
   val ossCompleteReturnUrl: String = configuration.get[String]("urls.ossCompleteReturnGuidanceUrl")
+  val ossYourAccountUrl: String = configuration.get[String]("urls.yourAccountUrl")
 
   val ivEvidenceStatusUrl: String =
     s"${configuration.get[Service]("microservice.services.identity-verification").baseUrl}/disabled-evidences?origin=$origin"
@@ -76,6 +76,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, clock: Clock) {
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
   val enrolmentsEnabled: Boolean = configuration.get[Boolean]("features.enrolments-enabled")
   val ossEnrolment: String       = configuration.get[String]("oss-enrolment")
+  val amendmentEmailEnabled: Boolean = configuration.get[Boolean]("features.amend.email-enabled")
 
   val saveForLaterTtl: Int = configuration.get[Int]("mongodb.saveForLaterTTLInDays")
 

@@ -16,7 +16,8 @@
 
 package pages.previousRegistrations
 
-import models.{CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import controllers.previousRegistrations.routes
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -28,9 +29,12 @@ case class PreviousIossSchemePage(countryIndex: Index, schemeIndex: Index) exten
   override def toString: String = "withIntermediary"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, countryIndex, schemeIndex)
+    routes.PreviousIossNumberController.onPageLoad(NormalMode, countryIndex, schemeIndex)
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex)
+    routes.PreviousIossNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex)
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    routes.PreviousIossNumberController.onPageLoad(AmendMode, countryIndex, schemeIndex)
 
 }

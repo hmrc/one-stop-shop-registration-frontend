@@ -17,9 +17,11 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, PreviousSchemeNumbers, SchemeDetailsWithOptionalVatNumber}
-import models.{Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +31,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
 import views.html.previousRegistrations.AddPreviousRegistrationView
 
@@ -53,6 +56,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
 
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   "AddPreviousRegistration Controller" - {
 
     "must return OK and the correct view for a GET when answers are complete" in {
@@ -66,7 +71,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, NormalMode)
+        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -84,7 +89,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, NormalMode)
+        val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, Seq.empty, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
@@ -100,6 +105,32 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
               )
             )
           )(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when there are existing previous registrations in Amend mode" in {
+
+      val addPreviousRegistrationRouteAmend = routes.AddPreviousRegistrationController.onPageLoad(AmendMode).url
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+      val existingPreviousRegistrations = RegistrationData.registration.previousRegistrations
+
+      val application = applicationBuilder(userAnswers = Some(baseAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, addPreviousRegistrationRouteAmend)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[AddPreviousRegistrationView]
+        implicit val msgs: Messages = messages(application)
+        val list = PreviousRegistrationSummary.addToListRows(baseAnswers, existingPreviousRegistrations, AmendMode)
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -141,7 +172,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, NormalMode)
+        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
 
         val result = route(application, request).value
 

@@ -18,14 +18,17 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.{Country, Mode}
+import logging.Logging
+import models.domain.Registration
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
+import models.{AmendMode, Country, Mode}
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
@@ -39,18 +42,25 @@ class AddPreviousRegistrationController @Inject()(
                                                    cc: AuthenticatedControllerComponents,
                                                    formProvider: AddPreviousRegistrationFormProvider,
                                                    view: AddPreviousRegistrationView
-                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
+                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport with Logging {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
+
       getNumberOfPreviousRegistrations {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
-          val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers, mode)
+
+          val previousRegistrations = if (mode == AmendMode) {
+            val registration: Registration = checkExistingRegistration
+            PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
+          } else {
+            PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
+          }
 
           withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
             data = getAllIncompleteDeregisteredDetails,
@@ -62,7 +72,7 @@ class AddPreviousRegistrationController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
         data = getAllIncompleteDeregisteredDetails,
@@ -77,8 +87,15 @@ class AddPreviousRegistrationController @Inject()(
         }) {
         getNumberOfPreviousRegistrations {
           number =>
+
             val canAddCountries = number < Country.euCountries.size
-            val previousRegistrations = PreviousRegistrationSummary.addToListRows(request.userAnswers, mode)
+
+            val previousRegistrations = if (mode == AmendMode) {
+              val registration: Registration = checkExistingRegistration
+              PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
+            } else {
+              PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
+            }
 
             form.bindFromRequest().fold(
               formWithErrors =>

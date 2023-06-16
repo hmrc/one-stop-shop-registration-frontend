@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode}
 
 class CommencementDatePageSpec extends SpecBase {
 
@@ -36,5 +37,12 @@ class CommencementDatePageSpec extends SpecBase {
       CommencementDatePage.navigate(CheckMode, emptyUserAnswers)
         .mustEqual(routes.CheckYourAnswersController.onPageLoad())
     }
+
+    "must navigate in Amend mode to Change Your Registration" in {
+
+      CommencementDatePage.navigate(AmendMode, emptyUserAnswers)
+        .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+    }
+
   }
 }

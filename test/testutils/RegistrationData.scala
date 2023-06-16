@@ -19,7 +19,6 @@ package testutils
 import generators.Generators
 import models.domain._
 import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, PreviousScheme}
-import models.previousRegistrations.PreviousSchemeNumbers
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
 
@@ -74,7 +73,7 @@ object RegistrationData extends Generators with EitherValues {
           ))
         ),
         RegistrationWithoutTaxId(
-          Country("CR", "Croatia")
+          Country("HR", "Croatia")
         ),
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
@@ -91,7 +90,7 @@ object RegistrationData extends Generators with EitherValues {
       websites = Seq("website1", "website2"),
       commencementDate = LocalDate.now(),
       previousRegistrations = Seq(
-        PreviousRegistration(
+        PreviousRegistrationNew(
           country = Country("DE", "Germany"),
           previousSchemesDetails = Seq(
             PreviousSchemeDetails(

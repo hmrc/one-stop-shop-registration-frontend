@@ -38,10 +38,10 @@ class IsPlanningFirstEligibleSaleControllerSpec extends SpecBase with MockitoSug
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   private val dateService = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
-  private val dateFormatted = dateService.startOfNextQuarter.format(dateFormatter)
+  private val dateFormatted = dateService.startOfNextQuarter().format(dateFormatter)
 
-  private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService)
-  private val form = formProvider()
+  private val formProvider = new IsPlanningFirstEligibleSaleFormProvider(dateService, stubClockAtArbitraryDate)
+  private val form = formProvider(None)
 
   private lazy val isPlanningFirstEligibleSaleRoute = routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode).url
 

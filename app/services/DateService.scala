@@ -35,24 +35,23 @@ class DateService @Inject()(
                              coreRegistrationValidationService: CoreRegistrationValidationService
                            ) extends Logging {
 
-  def startOfNextQuarter: LocalDate = {
-    val today                    = LocalDate.now(clock)
-    val lastMonthOfQuarter       = (((today.getMonthValue - 1) / 3) + 1) * 3
-    val dateInLastMonthOfQuarter = today.withMonth(lastMonthOfQuarter)
-    val lastDayOfCurrentQuarter  = dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
+  def startOfNextQuarter(registrationDate: LocalDate = LocalDate.now(clock)): LocalDate = {
+    val lastMonthOfQuarter = (((registrationDate.getMonthValue - 1) / 3) + 1) * 3
+    val dateInLastMonthOfQuarter = registrationDate.withMonth(lastMonthOfQuarter)
+    val lastDayOfCurrentQuarter = dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
 
     lastDayOfCurrentQuarter.plusDays(1)
   }
 
   def lastDayOfNextCalendarQuarter: LocalDate = {
-    val lastMonthOfNextQuarter = startOfNextQuarter.plusMonths(3).minusDays(1)
+    val lastMonthOfNextQuarter = startOfNextQuarter().plusMonths(3).minusDays(1)
     val lengthOfMonth = lastMonthOfNextQuarter.lengthOfMonth()
 
     lastMonthOfNextQuarter.withDayOfMonth(lengthOfMonth)
   }
 
   def lastDayOfMonthAfterNextCalendarQuarter: LocalDate = {
-    val startOfQuarterAfterNextQuarter = startOfNextQuarter.plusMonths(3)
+    val startOfQuarterAfterNextQuarter = startOfNextQuarter().plusMonths(3)
     val lengthOfMonth = startOfQuarterAfterNextQuarter.lengthOfMonth()
 
     startOfQuarterAfterNextQuarter.withDayOfMonth(lengthOfMonth)
@@ -61,30 +60,30 @@ class DateService @Inject()(
   private def startDateBasedOnFirstSale(dateOfFirstSale: LocalDate): LocalDate = {
     val lastDayOfNotification = dateOfFirstSale.plusMonths(1).withDayOfMonth(10)
     if (lastDayOfNotification.isBefore(LocalDate.now(clock))) {
-      startOfNextQuarter
+      startOfNextQuarter()
     } else {
       dateOfFirstSale
     }
   }
 
   def lastDayOfCalendarQuarter: LocalDate = {
-    startOfNextQuarter.minusDays(1)
+    startOfNextQuarter().minusDays(1)
   }
 
   def startOfCurrentQuarter: LocalDate = {
-    startOfNextQuarter.minusMonths(3)
+    startOfNextQuarter().minusMonths(3)
   }
 
   def lastDayOfMonthAfterCalendarQuarter: LocalDate = {
-    startOfNextQuarter.withDayOfMonth(startOfNextQuarter.lengthOfMonth)
+    startOfNextQuarter().withDayOfMonth(startOfNextQuarter().lengthOfMonth)
   }
 
   def isDOFSDifferentToCommencementDate(dateOfFirstSale: Option[LocalDate], commencementDate: LocalDate): Boolean = {
-    if(dateOfFirstSale.isDefined) dateOfFirstSale.get != commencementDate else false
+    if (dateOfFirstSale.isDefined) dateOfFirstSale.get != commencementDate else false
   }
 
   def getVatReturnEndDate(commencementDate: LocalDate): LocalDate = {
-    val lastMonthOfQuarter       = (((commencementDate.getMonthValue - 1) / 3) + 1) * 3
+    val lastMonthOfQuarter = (((commencementDate.getMonthValue - 1) / 3) + 1) * 3
     val dateInLastMonthOfQuarter = commencementDate.withMonth(lastMonthOfQuarter)
 
     dateInLastMonthOfQuarter.withDayOfMonth(dateInLastMonthOfQuarter.lengthOfMonth)
@@ -96,16 +95,15 @@ class DateService @Inject()(
     startOfNextQuarterAfterEndDate.withDayOfMonth(startOfNextQuarterAfterEndDate.lengthOfMonth)
   }
 
-  def earliestSaleAllowed: LocalDate = {
+  def earliestSaleAllowed(registrationDate: LocalDate = LocalDate.now(clock)): LocalDate = {
     val quarterStartMonths = Set(JANUARY, APRIL, JULY, OCTOBER)
-    val today = LocalDate.now(clock)
 
-    if (today.isBefore(schemeStartDate.plusMonths(1))) {
+    if (registrationDate.isBefore(schemeStartDate.plusMonths(1))) {
       schemeStartDate
-    } else if (quarterStartMonths.contains(today.getMonth) && today.getDayOfMonth < 11) {
-      today.minusMonths(1).withDayOfMonth(1)
+    } else if (quarterStartMonths.contains(registrationDate.getMonth) && registrationDate.getDayOfMonth < 11) {
+      registrationDate.minusMonths(1).withDayOfMonth(1)
     } else {
-      startOfNextQuarter.minusMonths(3)
+      startOfNextQuarter(registrationDate).minusMonths(3)
     }
   }
 
@@ -121,7 +119,7 @@ class DateService @Inject()(
       case Some(allPreviousRegistrationDetails) =>
 
         val schemesToSearch = allPreviousRegistrationDetails.flatMap { countryPreviousRegistrations =>
-          val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU.toString)
+          val countriesIdsToSearch = countryPreviousRegistrations.previousSchemesDetails.filter(_.previousScheme == PreviousScheme.OSSU)
           val idToSearch = countriesIdsToSearch.map(_.previousSchemeNumbers.previousSchemeNumber)
           idToSearch.map((countryPreviousRegistrations.previousEuCountry.code, _))
         }
@@ -149,7 +147,6 @@ class DateService @Inject()(
       allMatches <- searchPreviousRegistrationSchemes(userAnswers)
     } yield {
       val findTransferringMsid = allMatches.find(_.matchType == MatchType.TransferringMSID)
-
       findTransferringMsid match {
         case Some(matchedTransferringMsid) =>
           matchedTransferringMsid.exclusionEffectiveDate match {
@@ -170,8 +167,12 @@ class DateService @Inject()(
             case Some(true) =>
               getDateOfFirstSale(userAnswers)
             case Some(false) =>
-              LocalDate.now(clock)
+              val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
 
+              maybeRegistrationDate match {
+                case Some(registrationDate) => startOfNextQuarter(registrationDate)
+                case _ => startOfNextQuarter()
+              }
             case _ =>
               val exception = new IllegalStateException("Must answer Has Made Sales")
               logger.error(exception.getMessage, exception)
@@ -190,5 +191,21 @@ class DateService @Inject()(
         logger.error(exception.getMessage, exception)
         throw exception
     }
+  }
+
+  def calculateFinalAmendmentDate(commencementDate: LocalDate)(implicit request: AuthenticatedDataRequest[_]): LocalDate = {
+    val daysIntoReturnForAmendment = 10
+    val maybeSubmissionReceivedInLocalDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
+    maybeSubmissionReceivedInLocalDate match {
+      case Some(submissionReceived) if !submissionReceivedIsInSamePeriodWithCommencementDate(submissionReceived, commencementDate) =>
+        getVatReturnEndDate(submissionReceived).plusDays(daysIntoReturnForAmendment)
+      case _ =>
+        getVatReturnEndDate(commencementDate).plusDays(daysIntoReturnForAmendment)
+    }
+  }
+
+  private def submissionReceivedIsInSamePeriodWithCommencementDate(submissionReceived: LocalDate, commencementDate: LocalDate): Boolean = {
+    val lastDateOfPeriodInRegistrationDate = getVatReturnEndDate(submissionReceived)
+    lastDateOfPeriodInRegistrationDate == getVatReturnEndDate(commencementDate)
   }
 }

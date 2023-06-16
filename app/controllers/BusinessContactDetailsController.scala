@@ -17,13 +17,12 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.SaveForLaterConnector
 import controllers.actions._
 import forms.BusinessContactDetailsFormProvider
 import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
-import models.{BusinessContactDetails, CheckMode, Mode, NormalMode}
+import models.{AmendMode, BusinessContactDetails, CheckMode, Mode, NormalMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -38,7 +37,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessContactDetailsController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
-                                                  saveForLaterConnector: SaveForLaterConnector,
                                                   saveForLaterService: SaveForLaterService,
                                                   emailVerificationService: EmailVerificationService,
                                                   formProvider: BusinessContactDetailsFormProvider,
@@ -50,7 +48,7 @@ class BusinessContactDetailsController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BusinessContactDetailsPage) match {
@@ -61,16 +59,10 @@ class BusinessContactDetailsController @Inject()(
       Ok(view(preparedForm, mode, config.enrolmentsEnabled))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
       val messages = messagesApi.preferred(request)
-
-      val continueUrl = if (mode == CheckMode) {
-        routes.CheckYourAnswersController.onPageLoad().url
-      } else {
-        routes.BankDetailsController.onPageLoad(NormalMode).url
-      }
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -78,7 +70,25 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          if (config.emailVerificationEnabled) {
+          val emailAddress = value.emailAddress
+          val isMatchingEmailAddress = request.registration match {
+            case Some(registration) if mode == AmendMode =>
+              registration.contactDetails.emailAddress.contains(emailAddress)
+            case _ =>
+              false
+          }
+
+          val continueUrl = if (mode == CheckMode) {
+            routes.CheckYourAnswersController.onPageLoad().url
+          } else if (mode == AmendMode) {
+            controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          } else {
+            routes.BankDetailsController.onPageLoad(NormalMode).url
+          }
+
+          if (mode == AmendMode && config.emailVerificationEnabled && !isMatchingEmailAddress) {
+            verifyEmailAndRedirect(mode, messages, continueUrl, value)
+          } else if (mode != AmendMode && config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else {
             for {
@@ -131,7 +141,7 @@ class BusinessContactDetailsController @Inject()(
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
-            case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+            case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(mode).url))
           }
     }
   }

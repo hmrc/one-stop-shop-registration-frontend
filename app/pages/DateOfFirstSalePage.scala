@@ -18,7 +18,7 @@ package pages
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -35,4 +35,7 @@ case object DateOfFirstSalePage extends QuestionPage[LocalDate] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     routes.CommencementDateController.onPageLoad(CheckMode)
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    routes.CommencementDateController.onPageLoad(AmendMode)
 }

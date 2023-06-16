@@ -17,23 +17,29 @@
 package forms
 
 import formats.Format.dateFormatter
-
-import java.time.{Clock, LocalDate}
 import forms.mappings.Mappings
-
-import javax.inject.Inject
+import models.requests.AuthenticatedDataRequest
 import play.api.data.Form
 import services.DateService
+
+import java.time.{Clock, LocalDate}
+import javax.inject.Inject
 
 class DateOfFirstSaleFormProvider @Inject()(
                                              dateService: DateService,
                                              clock: Clock
                                            ) extends Mappings {
 
-  def apply(): Form[LocalDate] = {
+  def apply(maximumDate: LocalDate = LocalDate.now(clock))(implicit request: AuthenticatedDataRequest[_]): Form[LocalDate] = {
 
-    val minimumDate = dateService.earliestSaleAllowed
-    val today       = LocalDate.now(clock)
+    val minimumDate = request.registration.flatMap(_.submissionReceived) match {
+      case Some(submissionReceived) =>
+        dateService.earliestSaleAllowed(submissionReceived.atZone(clock.getZone).toLocalDate)
+      case _ =>
+        dateService.earliestSaleAllowed()
+    }
+
+    val today = LocalDate.now(clock)
 
     Form(
       "value" -> localDate(
@@ -41,8 +47,21 @@ class DateOfFirstSaleFormProvider @Inject()(
         allRequiredKey = "dateOfFirstSale.error.required.all",
         twoRequiredKey = "dateOfFirstSale.error.required.two",
         requiredKey = "dateOfFirstSale.error.required"
-      ).verifying(minDate(minimumDate, "dateOfFirstSale.error.minMax", minimumDate.format(dateFormatter)))
-        .verifying(maxDate(today, "dateOfFirstSale.error.minMax", minimumDate.format(dateFormatter)))
+      )
+        .verifying(
+          if (maximumDate != today) {
+            minDate(minimumDate, "dateOfFirstSale.error.minMax", minimumDate.format(dateFormatter), maximumDate.format(dateFormatter))
+          } else {
+            minDate(minimumDate, "dateOfFirstSale.error.minMaxToday", minimumDate.format(dateFormatter))
+          }
+        )
+        .verifying(
+          if (maximumDate != today) {
+            maxDate(maximumDate, "dateOfFirstSale.error.minMax", minimumDate.format(dateFormatter), maximumDate.format(dateFormatter))
+          } else {
+            maxDate(today, "dateOfFirstSale.error.minMaxToday", minimumDate.format(dateFormatter))
+          }
+        )
     )
   }
 }

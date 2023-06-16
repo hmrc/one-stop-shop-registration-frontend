@@ -20,7 +20,8 @@ import config.FrontendAppConfig
 import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.previousRegistrations.{PreviousSchemeHintText, PreviousSchemeNumbers}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.PreviousSchemeHintText
 import models.requests.AuthenticatedDataRequest
 import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme, WithName}
 import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
@@ -45,7 +46,7 @@ class PreviousOssNumberController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getPreviousCountry(countryIndex) {
         country =>
@@ -73,7 +74,7 @@ class PreviousOssNumberController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getPreviousCountry(countryIndex) {
         country =>

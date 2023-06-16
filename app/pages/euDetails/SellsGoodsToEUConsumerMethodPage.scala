@@ -34,7 +34,7 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
   override def navigate(mode: Mode, answers: UserAnswers): Call = {
     (answers.vatInfo.exists(_.partOfVatGroup), answers.get(this)) match {
       case (true, Some(EuConsumerSalesMethod.FixedEstablishment)) =>
-        euRoutes.CannotAddCountryController.onPageLoad(countryIndex)
+        euRoutes.CannotAddCountryController.onPageLoad(mode, countryIndex)
       case (true, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.RegistrationTypeController.onPageLoad(mode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.FixedEstablishment)) =>

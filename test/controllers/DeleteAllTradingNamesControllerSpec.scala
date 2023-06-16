@@ -17,8 +17,9 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.DeleteAllTradingNamesFormProvider
-import models.{CheckMode, Index}
+import models.{AmendMode, CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,6 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.DeleteAllTradingNamesView
 
 import scala.concurrent.Future
@@ -37,132 +39,156 @@ class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new DeleteAllTradingNamesFormProvider()
   private val form = formProvider()
 
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+
   private val userAnswers = basicUserAnswersWithVatInfo
     .set(TradingNamePage(Index(0)), "foo trading name").success.value
     .set(TradingNamePage(Index(1)), "bar trading name").success.value
 
-  private lazy val deleteAllTradingNamesRoute = routes.DeleteAllTradingNamesController.onPageLoad().url
 
   "DeleteAllTradingNames Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    Seq(CheckMode, AmendMode).foreach {
+      mode =>
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      lazy val deleteAllTradingNamesRoute = routes.DeleteAllTradingNamesController.onPageLoad(mode).url
 
-      running(application) {
-        val request = FakeRequest(GET, deleteAllTradingNamesRoute)
+        s"$mode" - {
 
-        val result = route(application, request).value
+          "must return OK and the correct view for a GET" in {
 
-        val view = application.injector.instanceOf[DeleteAllTradingNamesView]
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
-      }
-    }
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo), mode = Some(mode))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
-    "must delete all trading names answers and redirect to the next page when user answers Yes" in {
+            running(application) {
+              val request = FakeRequest(GET, deleteAllTradingNamesRoute)
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+              val result = route(application, request).value
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+              val view = application.injector.instanceOf[DeleteAllTradingNamesView]
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(form, mode)(request, messages(application)).toString
+            }
+          }
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllTradingNamesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          "must delete all trading names answers and redirect to the next page when user answers Yes" in {
 
-        val result = route(application, request).value
-        val expectedAnswers = userAnswers
-          .set(DeleteAllTradingNamesPage, true).success.value
-          .remove(AllTradingNames).success.value
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-      }
-    }
+            val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-    "must not delete all trading names answers and redirect to the next page when user answers No" in {
+            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+            val application =
+              applicationBuilder(userAnswers = Some(userAnswers), mode = Some(mode))
+                .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+                .build()
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllTradingNamesRoute)
+                  .withFormUrlEncodedBody(("value", "true"))
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+              val result = route(application, request).value
+              val expectedAnswers = userAnswers
+                .set(DeleteAllTradingNamesPage, true).success.value
+                .remove(AllTradingNames).success.value
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllTradingNamesRoute)
-            .withFormUrlEncodedBody(("value", "false"))
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(mode, expectedAnswers).url
+              verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
 
-        val result = route(application, request).value
-        val expectedAnswers = userAnswers
-          .set(DeleteAllTradingNamesPage, false).success.value
-          .set(HasTradingNamePage, true).success.value
+          "must not delete all trading names answers and redirect to the next page when user answers No" in {
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(CheckMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-      }
-    }
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+            val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllTradingNamesRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            val application =
+              applicationBuilder(userAnswers = Some(userAnswers), mode = Some(mode))
+                .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+                .build()
 
-        val boundForm = form.bind(Map("value" -> ""))
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllTradingNamesRoute)
+                  .withFormUrlEncodedBody(("value", "false"))
 
-        val view = application.injector.instanceOf[DeleteAllTradingNamesView]
+              val result = route(application, request).value
+              val expectedAnswers = userAnswers
+                .set(DeleteAllTradingNamesPage, false).success.value
+                .set(HasTradingNamePage, true).success.value
 
-        val result = route(application, request).value
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual DeleteAllTradingNamesPage.navigate(mode, expectedAnswers).url
+              verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, CheckMode)(request, messages(application)).toString
-      }
-    }
+          "must return a Bad Request and errors when invalid data is submitted" in {
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-      val application = applicationBuilder(userAnswers = None).build()
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo), mode = Some(mode))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
-      running(application) {
-        val request = FakeRequest(GET, deleteAllTradingNamesRoute)
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllTradingNamesRoute)
+                  .withFormUrlEncodedBody(("value", ""))
 
-        val result = route(application, request).value
+              val boundForm = form.bind(Map("value" -> ""))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
+              val view = application.injector.instanceOf[DeleteAllTradingNamesView]
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+              val result = route(application, request).value
 
-      val application = applicationBuilder(userAnswers = None).build()
+              status(result) mustEqual BAD_REQUEST
+              contentAsString(result) mustEqual view(boundForm, mode)(request, messages(application)).toString
+            }
+          }
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllTradingNamesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-        val result = route(application, request).value
+            val application = applicationBuilder(userAnswers = None, mode = Some(mode)).build()
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
+            running(application) {
+              val request = FakeRequest(GET, deleteAllTradingNamesRoute)
+
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            }
+          }
+
+          "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+            val application = applicationBuilder(userAnswers = None, mode = Some(mode)).build()
+
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllTradingNamesRoute)
+                  .withFormUrlEncodedBody(("value", "true"))
+
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            }
+          }
+        }
     }
   }
 }

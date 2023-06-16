@@ -21,8 +21,8 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.NormalMode
-import models.audit.{RegistrationAuditModel, SubmissionResult}
+import models.{CheckMode, NormalMode}
+import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
@@ -53,7 +53,7 @@ class CheckYourAnswersController @Inject()(
                                             auditService: AuditService,
                                             view: CheckYourAnswersView,
                                             emailService: EmailService,
-                                            dateService: DateService,
+                                            commencementDateSummary: CommencementDateSummary,
                                             saveForLaterService: SaveForLaterService,
                                             frontendAppConfig: FrontendAppConfig
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
@@ -72,34 +72,78 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      new CommencementDateSummary(dateService).row(request.userAnswers).map { commencementDateSummary =>
+        commencementDateSummary.row(request.userAnswers).map { cds =>
 
-        val list = SummaryListViewModel(
-          rows = Seq(
-            new HasTradingNameSummary().row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            TradingNameSummary.checkAnswersRow(request.userAnswers),
-            HasMadeSalesSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            IsPlanningFirstEligibleSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            DateOfFirstSaleSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            PreviouslyRegisteredSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            PreviousRegistrationSummary.checkAnswersRow(request.userAnswers),
-            Some(commencementDateSummary),
-            TaxRegisteredInEuSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            EuDetailsSummary.checkAnswersRow(request.userAnswers),
-            IsOnlineMarketplaceSummary.row(request.userAnswers),
-            HasWebsiteSummary.row(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            WebsiteSummary.checkAnswersRow(request.userAnswers),
-            BusinessContactDetailsSummary.rowContactName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers),
-            BankDetailsSummary.rowAccountName(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BankDetailsSummary.rowBIC(request.userAnswers).map(_.withCssClass("govuk-summary-list__row--no-border")),
-            BankDetailsSummary.rowIBAN(request.userAnswers)
-          ).flatten
-        )
+          val hasTradingNameSummaryRow = new HasTradingNameSummary().row(request.userAnswers, CheckMode)
+          val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode)
+          val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(request.userAnswers, CheckMode)
+          val isPlanningFirstEligibleSaleSummaryRow = IsPlanningFirstEligibleSaleSummary.row(request.userAnswers, CheckMode)
+          val dateOfFirstSaleSummaryRow = DateOfFirstSaleSummary.row(request.userAnswers, CheckMode)
+          val commencementDateSummaryRow = Some(cds)
+          val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode)
+          val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode)
+          val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode)
+          val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, CheckMode)
+          val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode)
+          val hasWebsiteSummaryRow = HasWebsiteSummary.row(request.userAnswers, CheckMode)
+          val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, CheckMode)
+          val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(request.userAnswers, CheckMode)
+          val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, CheckMode)
+          val businessContactDetailsEmailSummaryRow = BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers, CheckMode)
+          val bankDetailsAccountNameSummaryRow = BankDetailsSummary.rowAccountName(request.userAnswers, CheckMode)
+          val bankDetailsBicSummaryRow = BankDetailsSummary.rowBIC(request.userAnswers, CheckMode)
+          val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(request.userAnswers, CheckMode)
+
+          val list = SummaryListViewModel(
+            rows = Seq(
+              hasTradingNameSummaryRow.map { sr =>
+                if (tradingNameSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }
+              },
+              tradingNameSummaryRow,
+              hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              commencementDateSummaryRow,
+              previouslyRegisteredSummaryRow.map { sr =>
+                if (previousRegistrationSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }
+              },
+              previousRegistrationSummaryRow,
+              taxRegisteredInEuSummaryRow.map { sr =>
+                if (euDetailsSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }
+              },
+              euDetailsSummaryRow,
+              isOnlineMarketplaceSummaryRow,
+              hasWebsiteSummaryRow.map { sr =>
+                if (websiteSummaryRow.isDefined) {
+                  sr.withCssClass("govuk-summary-list__row--no-border")
+                } else {
+                  sr
+                }
+              },
+              websiteSummaryRow,
+              businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              businessContactDetailsEmailSummaryRow,
+              bankDetailsAccountNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              bankDetailsBicSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+              bankDetailsIbanSummaryRow
+            ).flatten
+          )
 
         val isValid = validate()
-        Ok(view(vatRegistrationDetailsList, list, isValid))
+        Ok(view(vatRegistrationDetailsList, list, isValid, CheckMode))
       }
   }
 
@@ -109,15 +153,15 @@ class CheckYourAnswersController @Inject()(
         case Valid(registration) =>
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Success, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, request))
               sendEmailConfirmation(request, registration)
             case Left(ConflictFound) =>
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Duplicate, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Duplicate, request))
               Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
 
             case Left(e) =>
               logger.error(s"Unexpected result on submit: ${e.toString}")
-              auditService.audit(RegistrationAuditModel.build(registration, SubmissionResult.Failure, request))
+              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Failure, request))
               saveForLaterService.saveAnswers(
                 routes.ErrorSubmittingRegistrationController.onPageLoad(),
                 routes.CheckYourAnswersController.onPageLoad()
@@ -125,7 +169,7 @@ class CheckYourAnswersController @Inject()(
           }
 
         case Invalid(errors) =>
-          getFirstValidationErrorRedirect().map(
+          getFirstValidationErrorRedirect(CheckMode).map(
             errorRedirect => if (incompletePrompt) {
               errorRedirect.toFuture
             } else {
@@ -152,7 +196,8 @@ class CheckYourAnswersController @Inject()(
         registration.contactDetails.fullName,
         registration.registeredCompanyName,
         registration.commencementDate,
-        registration.contactDetails.emailAddress
+        registration.contactDetails.emailAddress,
+        NormalMode
       ) flatMap {
         emailConfirmationResult =>
           val emailSent = EMAIL_ACCEPTED == emailConfirmationResult

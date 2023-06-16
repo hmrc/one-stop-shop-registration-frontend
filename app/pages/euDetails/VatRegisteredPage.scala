@@ -18,7 +18,7 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -34,7 +34,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(VatRegisteredPage(index)) match {
       case Some(true)  => euRoutes.EuVatNumberController.onPageLoad(NormalMode, index)
-      case Some(false) => euRoutes.CheckEuDetailsAnswersController.onPageLoad(NormalMode, index)
+      case Some(false) => euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(NormalMode, index)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 
@@ -47,7 +47,21 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(CheckMode, index)
         }
       case Some(false) =>
-          euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, index)
+          euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(CheckMode, index)
+      case None =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(AmendMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(AmendMode, index)
+        }
+      case Some(false) =>
+        euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }
@@ -61,7 +75,21 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
           euRoutes.EuVatNumberController.onPageLoad(CheckLoopMode, index)
         }
       case Some(false) =>
-          euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, index)
+          euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(CheckLoopMode, index)
+      case None =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(AmendLoopMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(AmendLoopMode, index)
+        }
+      case Some(false) =>
+        euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendLoopMode, index)
       case None =>
         routes.JourneyRecoveryController.onPageLoad()
     }

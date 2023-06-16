@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, Index, NormalMode, PreviousSchemeType, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, PreviousSchemeType, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -42,6 +42,14 @@ case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) exten
       prevRegRoutes.PreviousOssNumberController.onPageLoad(CheckMode, countryIndex, schemeIndex)
     } else {
       prevRegRoutes.PreviousIossSchemeController.onPageLoad(CheckMode, countryIndex, schemeIndex)
+    }
+  }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call = {
+    if (answers.get(this).contains(PreviousSchemeType.OSS)) {
+      prevRegRoutes.PreviousOssNumberController.onPageLoad(AmendMode, countryIndex, schemeIndex)
+    } else {
+      prevRegRoutes.PreviousIossSchemeController.onPageLoad(AmendMode, countryIndex, schemeIndex)
     }
   }
 

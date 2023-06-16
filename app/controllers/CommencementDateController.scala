@@ -38,10 +38,11 @@ class CommencementDateController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       for {
         calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        finalDayOfDateAmendment = dateService.calculateFinalAmendmentDate(calculatedCommencementDate)
       } yield {
         request.userAnswers.get(HasMadeSalesPage) match {
           case Some(true) =>
@@ -51,12 +52,13 @@ class CommencementDateController @Inject()(
                 val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
                 val isDateInCurrentQuarter = calculatedCommencementDate.isBefore(endOfCurrentQuarter) || endOfCurrentQuarter == calculatedCommencementDate
                 val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-                val startOfNextQuarter = dateService.startOfNextQuarter
+                val startOfNextQuarter = dateService.startOfNextQuarter()
 
                 Ok(
                   view(
                     mode,
                     calculatedCommencementDate.format(dateFormatter),
+                    finalDayOfDateAmendment.format(dateFormatter),
                     isDateInCurrentQuarter,
                     Some(startOfCurrentQuarter.format(dateFormatter)),
                     Some(endOfCurrentQuarter.format(dateFormatter)),
@@ -68,7 +70,15 @@ class CommencementDateController @Inject()(
           case Some(false) =>
             request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
               case Some(true) =>
-                Ok(view(mode, calculatedCommencementDate.format(dateFormatter), isDateInCurrentQuarter = true, None, None, None))
+                Ok(view(
+                  mode,
+                  calculatedCommencementDate.format(dateFormatter),
+                  finalDayOfDateAmendment.format(dateFormatter),
+                  isDateInCurrentQuarter = true,
+                  None,
+                  None,
+                  None
+                ))
               case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
               case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
             }
@@ -78,7 +88,7 @@ class CommencementDateController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData() {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
       Redirect(CommencementDatePage.navigate(mode, request.userAnswers))
   }

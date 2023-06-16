@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{BusinessContactDetails, CheckMode, NormalMode}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, BusinessContactDetails, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -46,6 +47,15 @@ class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
 
         BusinessContactDetailsPage.navigate(CheckMode, emptyUserAnswers)
           .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "to Change Your Registration" in {
+
+        BusinessContactDetailsPage.navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
       }
     }
   }

@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Vrn
 import ModelHelpers._
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 
 final case class Registration(
                                vrn: Vrn,
@@ -36,26 +36,28 @@ final case class Registration(
                                bankDetails: BankDetails,
                                isOnlineMarketplace: Boolean,
                                niPresence: Option[NiPresence],
-                               dateOfFirstSale: Option[LocalDate]
+                               dateOfFirstSale: Option[LocalDate],
+                               submissionReceived: Option[Instant] = None
                              )
 
 object Registration {
 
   implicit val format: OFormat[Registration] = Json.format[Registration]
 
-  def apply( vrn: Vrn,
-             registeredCompanyName: String,
-             tradingNames: Seq[String],
-             vatDetails: VatDetails,
-             euRegistrations: Seq[EuTaxRegistration],
-             contactDetails: BusinessContactDetails,
-             websites: Seq[String],
-             commencementDate: LocalDate,
-             previousRegistrations: Seq[PreviousRegistration],
-             bankDetails: BankDetails,
-             isOnlineMarketplace: Boolean,
-             niPresence: Option[NiPresence],
-             dateOfFirstSale: Option[LocalDate]): Registration = new Registration(
+  def apply(vrn: Vrn,
+            registeredCompanyName: String,
+            tradingNames: Seq[String],
+            vatDetails: VatDetails,
+            euRegistrations: Seq[EuTaxRegistration],
+            contactDetails: BusinessContactDetails,
+            websites: Seq[String],
+            commencementDate: LocalDate,
+            previousRegistrations: Seq[PreviousRegistration],
+            bankDetails: BankDetails,
+            isOnlineMarketplace: Boolean,
+            niPresence: Option[NiPresence],
+            dateOfFirstSale: Option[LocalDate],
+            submissionReceived: Option[Instant] = None): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
     tradingNames.map(normaliseSpaces),
@@ -68,6 +70,8 @@ object Registration {
     bankDetails,
     isOnlineMarketplace,
     niPresence,
-    dateOfFirstSale)
+    dateOfFirstSale,
+    submissionReceived
+  )
 
 }

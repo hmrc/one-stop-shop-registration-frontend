@@ -77,28 +77,28 @@ trait CompletionChecks {
       .find(indexedDetails => incompleteCountries.contains(indexedDetails._1.euCountry))
   }
 
-  def isTradingNamesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def isTradingNamesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasTradingNamePage).exists {
       case true => request.userAnswers.get(AllTradingNames).getOrElse(List.empty).nonEmpty
       case false => request.userAnswers.get(AllTradingNames).getOrElse(List.empty).isEmpty
     }
   }
 
-  def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasMadeSalesPage).exists {
       case true => request.userAnswers.get(DateOfFirstSalePage).isDefined
       case false => request.userAnswers.get(IsPlanningFirstEligibleSalePage).isDefined
     }
   }
 
-  def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasWebsitePage).exists {
       case true => request.userAnswers.get(AllWebsites).getOrElse(List.empty).nonEmpty
       case false => request.userAnswers.get(AllWebsites).getOrElse(List.empty).isEmpty
     }
   }
 
-  def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+  private def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
       case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
       case false => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).isEmpty
@@ -115,14 +115,14 @@ trait CompletionChecks {
       isDeregisteredPopulated()
   }
 
-  def getFirstValidationErrorRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
-    (incompleteTradingNameRedirect() ++
-      incompleteEligibleSalesRedirect() ++
-      emptyEuDetailsRedirect() ++
-      incompleteEuDetailsRedirect() ++
-      emptyDeregisteredRedirect() ++
-      incompletePreviousRegistrationRedirect(CheckMode) ++
-      incompleteWebsiteUrlsRedirect()
+  def getFirstValidationErrorRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
+    (incompleteTradingNameRedirect(mode) ++
+      incompleteEligibleSalesRedirect(mode) ++
+      emptyEuDetailsRedirect(mode) ++
+      incompleteEuDetailsRedirect(mode) ++
+      emptyDeregisteredRedirect(mode) ++
+      incompletePreviousRegistrationRedirect(mode) ++
+      incompleteWebsiteUrlsRedirect(mode)
       ).headOption
   }
 
@@ -157,26 +157,26 @@ trait CompletionChecks {
       case None => None
     }
 
-  private def incompleteTradingNameRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isTradingNamesValid()) {
-    Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(CheckMode)))
+  private def incompleteTradingNameRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isTradingNamesValid()) {
+    Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(mode)))
   } else {
     None
   }
 
-  private def incompleteEligibleSalesRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isAlreadyMadeSalesValid()) {
-    Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(CheckMode)))
+  private def incompleteEligibleSalesRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isAlreadyMadeSalesValid()) {
+    Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(mode)))
   } else {
     None
   }
 
-  private def incompleteWebsiteUrlsRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!hasWebsiteValid()) {
-    Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(CheckMode)))
+  private def incompleteWebsiteUrlsRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!hasWebsiteValid()) {
+    Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(mode)))
   } else {
     None
   }
 
-  private def emptyDeregisteredRedirect()(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isDeregisteredPopulated()) {
-    Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode)))
+  private def emptyDeregisteredRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isDeregisteredPopulated()) {
+    Some(Redirect(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(mode)))
   } else {
     None
   }

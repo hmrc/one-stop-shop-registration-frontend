@@ -17,8 +17,9 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.DeleteAllWebsitesFormProvider
-import models.{CheckMode, Index}
+import models.{AmendMode, CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,6 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.AllWebsites
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.DeleteAllWebsitesView
 
 import scala.concurrent.Future
@@ -37,132 +39,154 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new DeleteAllWebsitesFormProvider()
   private val form = formProvider()
 
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+
   private val userAnswers = basicUserAnswersWithVatInfo
     .set(WebsitePage(Index(0)), "foo").success.value
     .set(WebsitePage(Index(1)), "bar").success.value
 
-  private lazy val deleteAllWebsitesRoute = routes.DeleteAllWebsitesController.onPageLoad().url
-
   "DeleteAllWebsites Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    Seq(CheckMode, AmendMode).foreach {
+      mode =>
+        lazy val deleteAllWebsitesRoute = routes.DeleteAllWebsitesController.onPageLoad(mode).url
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+        s"$mode" - {
 
-      running(application) {
-        val request = FakeRequest(GET, deleteAllWebsitesRoute)
+          "must return OK and the correct view for a GET" in {
 
-        val result = route(application, request).value
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-        val view = application.injector.instanceOf[DeleteAllWebsitesView]
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
-      }
-    }
+            running(application) {
+              val request = FakeRequest(GET, deleteAllWebsitesRoute)
 
-    "must delete all websites answers and redirect to the next page when user answers Yes" in {
+              val result = route(application, request).value
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+              val view = application.injector.instanceOf[DeleteAllWebsitesView]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(form, mode)(request, messages(application)).toString
+            }
+          }
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+          "must delete all websites answers and redirect to the next page when user answers Yes" in {
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-        val result = route(application, request).value
-        val expectedAnswers = userAnswers
-          .set(DeleteAllWebsitesPage, true).success.value
-          .remove(AllWebsites).success.value
+            val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(CheckMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-      }
-    }
+            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-    "must not delete all websites answers and redirect to the next page when user answers No" in {
+            val application =
+              applicationBuilder(userAnswers = Some(userAnswers))
+                .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+                .build()
 
-      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllWebsitesRoute)
+                  .withFormUrlEncodedBody(("value", "true"))
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+              val result = route(application, request).value
+              val expectedAnswers = userAnswers
+                .set(DeleteAllWebsitesPage, true).success.value
+                .remove(AllWebsites).success.value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-          .build()
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(mode, expectedAnswers).url
+              verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
-            .withFormUrlEncodedBody(("value", "false"))
+          "must not delete all websites answers and redirect to the next page when user answers No" in {
 
-        val result = route(application, request).value
-        val expectedAnswers = userAnswers
-          .set(DeleteAllWebsitesPage, false).success.value
-          .set(HasWebsitePage, true).success.value
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(CheckMode, expectedAnswers).url
-        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-      }
-    }
+            val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+            val application =
+              applicationBuilder(userAnswers = Some(userAnswers))
+                .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+                .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllWebsitesRoute)
+                  .withFormUrlEncodedBody(("value", "false"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+              val result = route(application, request).value
+              val expectedAnswers = userAnswers
+                .set(DeleteAllWebsitesPage, false).success.value
+                .set(HasWebsitePage, true).success.value
 
-        val view = application.injector.instanceOf[DeleteAllWebsitesView]
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual DeleteAllWebsitesPage.navigate(mode, expectedAnswers).url
+              verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
 
-        val result = route(application, request).value
+          "must return a Bad Request and errors when invalid data is submitted" in {
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, CheckMode)(request, messages(application)).toString
-      }
-    }
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+            val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .build()
 
-      val application = applicationBuilder(userAnswers = None).build()
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllWebsitesRoute)
+                  .withFormUrlEncodedBody(("value", ""))
 
-      running(application) {
-        val request = FakeRequest(GET, deleteAllWebsitesRoute)
+              val boundForm = form.bind(Map("value" -> ""))
 
-        val result = route(application, request).value
+              val view = application.injector.instanceOf[DeleteAllWebsitesView]
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
+              val result = route(application, request).value
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+              status(result) mustEqual BAD_REQUEST
+              contentAsString(result) mustEqual view(boundForm, mode)(request, messages(application)).toString
+            }
+          }
 
-      val application = applicationBuilder(userAnswers = None).build()
+          "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllWebsitesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            val application = applicationBuilder(userAnswers = None).build()
 
-        val result = route(application, request).value
+            running(application) {
+              val request = FakeRequest(GET, deleteAllWebsitesRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            }
+          }
+
+          "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+            val application = applicationBuilder(userAnswers = None).build()
+
+            running(application) {
+              val request =
+                FakeRequest(POST, deleteAllWebsitesRoute)
+                  .withFormUrlEncodedBody(("value", "true"))
+
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            }
+          }
+        }
     }
   }
 }

@@ -19,9 +19,10 @@ package generators
 import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, TradeDetails}
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, PreviousSchemeNumbers, TradeDetails}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.returns.{PaymentReference, ReturnReference, SalesDetails, SalesFromEuCountry, SalesToCountry, VatOnSales, VatRate, VatRateType, VatReturn}
+import models.domain.returns.VatOnSalesChoice.Standard
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
@@ -29,6 +30,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
 
 import java.time.Instant
+import scala.math.BigDecimal.RoundingMode
 
 trait ModelGenerators {
 
@@ -178,10 +180,9 @@ trait ModelGenerators {
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
     for {
-      prefix <- Gen.oneOf("", "GB")
       chars  <- Gen.listOfN(9, Gen.numChar)
     } yield {
-      Vrn(prefix + chars.mkString(""))
+      Vrn(chars.mkString(""))
     }
   }
 
@@ -233,5 +234,59 @@ trait ModelGenerators {
         year <- Gen.choose(2022, 2099)
         quarter <- Gen.oneOf(Quarter.values)
       } yield Period(year, quarter)
+    }
+
+  implicit val arbitraryVatRate: Arbitrary[VatRate] =
+    Arbitrary {
+      for {
+        vatRateType <- Gen.oneOf(VatRateType.values)
+        rate <- Gen.choose(BigDecimal(0), BigDecimal(100))
+      } yield VatRate(rate.setScale(2, RoundingMode.HALF_EVEN), vatRateType)
+    }
+
+
+  implicit val arbitrarySalesDetails: Arbitrary[SalesDetails] =
+    Arbitrary {
+      for {
+        vatRate <- arbitrary[VatRate]
+        taxableAmount <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
+        vatAmount <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
+      } yield SalesDetails(
+        vatRate,
+        taxableAmount.setScale(2, RoundingMode.HALF_EVEN),
+        VatOnSales(Standard, vatAmount.setScale(2, RoundingMode.HALF_EVEN))
+      )
+    }
+
+  implicit val arbitrarySalesToCountry: Arbitrary[SalesToCountry] =
+    Arbitrary {
+      for {
+        country <- arbitrary[Country]
+        number <- Gen.choose(1, 2)
+        amounts <- Gen.listOfN(number, arbitrary[SalesDetails])
+      } yield SalesToCountry(country, amounts)
+    }
+
+  implicit val arbitrarySalesFromEuCountry: Arbitrary[SalesFromEuCountry] =
+    Arbitrary {
+      for {
+        country <- arbitrary[Country]
+        taxIdentifier <- Gen.option(arbitrary[EuTaxIdentifier])
+        number <- Gen.choose(1, 3)
+        amounts <- Gen.listOfN(number, arbitrary[SalesToCountry])
+      } yield SalesFromEuCountry(country, taxIdentifier, amounts)
+    }
+
+  implicit val arbitraryVatReturn: Arbitrary[VatReturn] =
+    Arbitrary {
+      for {
+        vrn <- arbitrary[Vrn]
+        period <- arbitrary[Period]
+        niSales <- Gen.choose(1, 3)
+        euSales <- Gen.choose(1, 3)
+        salesFromNi <- Gen.listOfN(niSales, arbitrary[SalesToCountry])
+        salesFromEu <- Gen.listOfN(euSales, arbitrary[SalesFromEuCountry])
+        now = Instant.now
+      } yield VatReturn(vrn, period, ReturnReference(vrn, period), PaymentReference(vrn, period), None, None, salesFromNi, salesFromEu, now, now)
     }
 }

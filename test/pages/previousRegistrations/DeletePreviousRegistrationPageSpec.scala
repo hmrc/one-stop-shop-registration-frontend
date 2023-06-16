@@ -18,8 +18,8 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, Country, Index, NormalMode}
-import models.previousRegistrations.PreviousSchemeNumbers
+import models.domain.PreviousSchemeNumbers
+import models.{AmendMode, CheckMode, Country, Index, NormalMode}
 
 class DeletePreviousRegistrationPageSpec extends SpecBase {
 
@@ -78,5 +78,33 @@ class DeletePreviousRegistrationPageSpec extends SpecBase {
         }
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "when there are still some previous registrations" - {
+
+        "to Add Previous Registration" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+              .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("FR123", None)).success.value
+
+          DeletePreviousRegistrationPage(Index(0)).navigate(AmendMode, answers)
+            .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(AmendMode))
+        }
+      }
+
+
+      "when there are no previous registrations left" - {
+
+        "to Previously Registered" in {
+
+          DeletePreviousRegistrationPage(Index(0)).navigate(AmendMode, emptyUserAnswers)
+            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(AmendMode))
+        }
+      }
+    }
+
   }
 }

@@ -21,7 +21,8 @@ import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
-import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation, PreviousSchemeNumbers}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
@@ -45,7 +46,7 @@ class PreviousIossNumberController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getPreviousCountry(countryIndex) { country =>
 
@@ -63,7 +64,7 @@ class PreviousIossNumberController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getPreviousCountry(countryIndex) { country =>
 
