@@ -18,15 +18,17 @@ package controllers.previousRegistrations
 
 import controllers.actions._
 import forms.previousRegistrations.PreviouslyRegisteredFormProvider
-import models.Mode
+import models.{Mode, UserAnswers}
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, DeriveNumberOfPreviousRegistrations}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviouslyRegisteredView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class PreviouslyRegisteredController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -59,8 +61,18 @@ class PreviouslyRegisteredController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviouslyRegisteredPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(PreviouslyRegisteredPage.navigate(mode, updatedAnswers))
+            finalAnswers <- Future.fromTry(cleanup(updatedAnswers))
+            _ <- cc.sessionRepository.set(finalAnswers)
+          } yield {
+            Redirect(PreviouslyRegisteredPage.navigate(mode, finalAnswers))
+          }
       )
+  }
+
+  private def cleanup(answers: UserAnswers): Try[UserAnswers] = {
+    answers.get(DeriveNumberOfPreviousRegistrations) match {
+      case Some(n) if n == 0 => answers.remove(AllPreviousRegistrationsRawQuery)
+      case _ => Try(answers)
+    }
   }
 }
