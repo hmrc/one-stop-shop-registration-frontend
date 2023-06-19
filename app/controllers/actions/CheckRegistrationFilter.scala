@@ -52,11 +52,7 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
 
       if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
         mayBeRegistration match {
-
-          case Some(_) if hasRegistrationEnrolment(request.enrolments) => None.toFuture
-
-          case Some(_) => enrolRegisteredUser(request.vrn)
-
+          case Some(_) => None.toFuture
           case _ => Some(Redirect(routes.NotRegisteredController.onPageLoad())).toFuture
         }
       } else if (mayBeRegistration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
