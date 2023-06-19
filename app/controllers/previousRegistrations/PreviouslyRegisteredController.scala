@@ -22,7 +22,7 @@ import models.Mode
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
+import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, DeriveNumberOfPreviousRegistrations}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.cleanup
 import views.html.previousRegistrations.PreviouslyRegisteredView
@@ -61,7 +61,7 @@ class PreviouslyRegisteredController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviouslyRegisteredPage, value))
-            finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfPreviousRegistrations))
+            finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfPreviousRegistrations, AllPreviousRegistrationsRawQuery))
             _ <- cc.sessionRepository.set(finalAnswers)
           } yield {
             Redirect(PreviouslyRegisteredPage.navigate(mode, finalAnswers))
