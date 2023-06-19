@@ -72,9 +72,6 @@ object RegistrationData extends Generators with EitherValues {
             Country("IE", "Ireland")
           ))
         ),
-        RegistrationWithoutTaxId(
-          Country("HR", "Croatia")
-        ),
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
           EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("ES123456789")),

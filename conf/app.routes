@@ -455,6 +455,7 @@ GET         /first-amend-registration-type/:countryIndex                        
 POST        /first-amend-registration-type/:countryIndex                        controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
 
 GET         /sales-declaration-not-required/:countryIndex                       controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
+GET         /check-sales-declaration-not-required/:countryIndex                 controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
 GET         /amend-sales-declaration-not-required/:countryIndex                 controllers.euDetails.SalesDeclarationNotRequiredController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
 
 GET         /start-amend-journey                                                controllers.amend.StartAmendJourneyController.onPageLoad()

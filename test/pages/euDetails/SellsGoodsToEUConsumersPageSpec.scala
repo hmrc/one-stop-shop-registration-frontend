@@ -68,7 +68,7 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
 
         SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
-          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex))
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(CheckMode, countryIndex))
       }
     }
 

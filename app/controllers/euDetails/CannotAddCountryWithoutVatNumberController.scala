@@ -21,7 +21,7 @@ import controllers.actions._
 import models.{Index, Mode, UserAnswers}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{DeriveNumberOfEuRegistrations, EuDetailsQuery}
+import queries.{AllEuDetailsRawQuery, DeriveNumberOfEuRegistrations, EuDetailsQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.euDetails.CannotAddCountryWithoutVatNumberView
 
@@ -52,18 +52,24 @@ class CannotAddCountryWithoutVatNumberController @Inject()(
       for {
         updatedAnswers <- Future.fromTry(request.userAnswers.remove(EuDetailsQuery(countryIndex)))
         _ <- cc.sessionRepository.set(updatedAnswers)
+        result <- determineRedirect(mode, updatedAnswers)
       } yield {
-        determineRedirect(mode, updatedAnswers)
+        result
       }
   }
 
 
-  private def determineRedirect(mode: Mode, updatedAnswers: UserAnswers): Result = {
+  private def determineRedirect(mode: Mode, updatedAnswers: UserAnswers): Future[Result] = {
     updatedAnswers.get(DeriveNumberOfEuRegistrations) match {
       case Some(n) if n > 0 =>
-        Redirect(controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url)
+        Future.successful(Redirect(controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url))
       case _ =>
-        Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(mode).url)
+        for {
+          emptyAnswers <- Future.fromTry(updatedAnswers.remove(AllEuDetailsRawQuery))
+          _ <- cc.sessionRepository.set(emptyAnswers)
+        } yield {
+          Redirect(controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(mode).url)
+        }
     }
   }
 }

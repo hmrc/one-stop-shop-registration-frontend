@@ -45,7 +45,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(true) =>
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex)
       case Some(false) =>
-        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex)
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(CheckMode, countryIndex)
       case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
     }
   }

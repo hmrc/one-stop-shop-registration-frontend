@@ -16,7 +16,6 @@
 
 package services
 
-import cats.data.Validated
 import cats.implicits._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
@@ -90,10 +89,8 @@ trait EuTaxRegistrationValidations {
         getEuVatNumber(answers, index).map(
           vatNumber => EuVatRegistration(country, vatNumber)
         )
-      case Some(false) =>
-        Validated.Valid(RegistrationWithoutTaxId(country))
 
-      case None =>
+      case _ =>
         DataMissingError(VatRegisteredPage(index)).invalidNec
     }
   }
