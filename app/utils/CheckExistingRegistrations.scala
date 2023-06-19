@@ -19,8 +19,13 @@ package utils
 import logging.Logging
 import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew, Registration}
 import models.requests.AuthenticatedDataRequest
-import models.{Country, PreviousScheme}
+import models.{Country, PreviousScheme, UserAnswers}
+import play.api.libs.json.JsObject
 import play.api.mvc.AnyContent
+import queries.Derivable
+import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, DeriveNumberOfPreviousRegistrations}
+
+import scala.util.Try
 
 object CheckExistingRegistrations extends Logging {
 
@@ -64,6 +69,13 @@ object CheckExistingRegistrations extends Logging {
     existingPreviousRegistration.exists {
       case previousRegistrationNew: PreviousRegistrationNew => previousRegistrationNew.country == country
       case previousRegistrationLegacy: PreviousRegistrationLegacy => previousRegistrationLegacy.country == country
+    }
+  }
+
+  def cleanup(answers: UserAnswers, derivable: Derivable[List[JsObject], Int]): Try[UserAnswers] = {
+    answers.get(derivable) match {
+      case Some(n) if n == 0 => answers.remove(AllPreviousRegistrationsRawQuery)
+      case _ => Try(answers)
     }
   }
 }
