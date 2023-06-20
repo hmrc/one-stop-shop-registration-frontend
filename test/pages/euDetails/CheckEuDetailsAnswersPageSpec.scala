@@ -50,7 +50,7 @@ class CheckEuDetailsAnswersPageSpec extends SpecBase {
 
     "must navigate in Amend mode" - {
 
-      "to Add EU Details in Check mode" - {
+      "to Add EU Details in Amend mode" - {
         CheckEuDetailsAnswersPage.navigate(AmendMode, emptyUserAnswers)
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(AmendMode))
       }
@@ -58,7 +58,7 @@ class CheckEuDetailsAnswersPageSpec extends SpecBase {
 
     "must navigate in Amend Loop mode" - {
 
-      "to Add EU Details in Normal mode (because the user has now finished checking this country)" in {
+      "to Add EU Details in Amend mode (because the user has now finished checking this country)" in {
         CheckEuDetailsAnswersPage.navigate(AmendLoopMode, emptyUserAnswers)
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(AmendMode))
       }
