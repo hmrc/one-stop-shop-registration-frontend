@@ -22,7 +22,9 @@ import models.Mode
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.{AllEuDetailsRawQuery, DeriveNumberOfEuRegistrations}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckExistingRegistrations.cleanup
 import views.html.euDetails.TaxRegisteredInEuView
 
 import javax.inject.Inject
@@ -58,8 +60,9 @@ class TaxRegisteredInEuController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
-            _ <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(TaxRegisteredInEuPage.navigate(mode, updatedAnswers))
+            finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfEuRegistrations, AllEuDetailsRawQuery))
+            _ <- cc.sessionRepository.set(finalAnswers)
+          } yield Redirect(TaxRegisteredInEuPage.navigate(mode, finalAnswers))
       )
   }
 }
