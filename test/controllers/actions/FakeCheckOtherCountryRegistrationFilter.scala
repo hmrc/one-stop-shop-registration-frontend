@@ -35,8 +35,6 @@ class FakeCheckOtherCountryRegistrationFilterImpl() extends CheckOtherCountryReg
     Future.successful(None)
   }
 
-//  override protected def executionContext: ExecutionContext =
-//    scala.concurrent.ExecutionContext.Implicits.global
 }
 
 class FakeCheckOtherCountryRegistrationFilter()
