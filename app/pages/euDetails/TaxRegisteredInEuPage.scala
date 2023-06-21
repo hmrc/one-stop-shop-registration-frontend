@@ -32,8 +32,8 @@
 
 package pages.euDetails
 
-import controllers.euDetails.{routes => euRoutes}
 import controllers.amend.{routes => amendRoutes}
+import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
 import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage

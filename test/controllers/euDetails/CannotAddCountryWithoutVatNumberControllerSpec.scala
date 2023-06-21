@@ -17,8 +17,9 @@
 package controllers.euDetails
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import controllers.euDetails.{routes => euDetailsRoutes}
-import models.{Country, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito.{times, verify, when}
@@ -29,6 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EuDetailsQuery
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.euDetails.CannotAddCountryWithoutVatNumberView
 
 import scala.concurrent.Future
@@ -47,6 +49,7 @@ class CannotAddCountryWithoutVatNumberControllerSpec extends SpecBase with Mocki
       .set(VatRegisteredPage(countryIndex), false).success.value
 
   private lazy val cannotAddCountryWithoutVatNumberRoute = euDetailsRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(NormalMode, countryIndex).url
+  private lazy val amendCannotAddCountryWithoutVatNumberRoute = euDetailsRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendMode, countryIndex).url
 
   "CannotAddCountryWithoutVatNumber Controller" - {
 
@@ -116,6 +119,57 @@ class CannotAddCountryWithoutVatNumberControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.euDetails.routes.AddEuDetailsController.onPageLoad(NormalMode).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must delete a record and redirect to next page in NormalMode if current mode is CheckLoopMode" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers), mode = Some(CheckLoopMode))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, cannotAddCountryWithoutVatNumberRoute)
+
+        val result = route(application, request).value
+        val expectedAnswers = answers.remove(EuDetailsQuery(countryIndex)).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(NormalMode).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must delete a record and redirect to next page in AmendMode if current mode is AmendLoopMode" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+      val mockRegistrationConnector = mock[RegistrationConnector]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers), mode = Some(AmendLoopMode))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, amendCannotAddCountryWithoutVatNumberRoute)
+
+        val result = route(application, request).value
+        val expectedAnswers = answers.remove(EuDetailsQuery(countryIndex)).success.value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(AmendMode).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }

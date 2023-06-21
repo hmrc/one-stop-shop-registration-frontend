@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import controllers.GetCountry
 import controllers.actions._
-import models.{Index, Mode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, Index, Mode, NormalMode, UserAnswers}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{AllEuDetailsRawQuery, DeriveNumberOfEuRegistrations, EuDetailsQuery}
@@ -59,7 +59,14 @@ class CannotAddCountryWithoutVatNumberController @Inject()(
   }
 
 
-  private def determineRedirect(mode: Mode, updatedAnswers: UserAnswers): Future[Result] = {
+  private def determineRedirect(currentMode: Mode, updatedAnswers: UserAnswers): Future[Result] = {
+
+    val mode = currentMode match {
+      case AmendLoopMode => AmendMode
+      case CheckLoopMode => NormalMode
+      case _ => currentMode
+    }
+
     updatedAnswers.get(DeriveNumberOfEuRegistrations) match {
       case Some(n) if n > 0 =>
         Future.successful(Redirect(controllers.euDetails.routes.AddEuDetailsController.onPageLoad(mode).url))
