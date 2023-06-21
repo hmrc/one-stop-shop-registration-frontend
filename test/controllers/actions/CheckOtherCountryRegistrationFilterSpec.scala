@@ -52,7 +52,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
   )
 
   class Harness(service: CoreRegistrationValidationService, appConfig: FrontendAppConfig) extends
-    CheckOtherCountryRegistrationFilterImpl(service, appConfig) {
+    CheckOtherCountryRegistrationFilterImpl(None, service, appConfig) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 

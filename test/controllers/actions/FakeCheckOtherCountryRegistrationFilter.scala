@@ -16,17 +16,31 @@
 
 package controllers.actions
 
+import config.FrontendAppConfig
+import models.Mode
 import models.requests.AuthenticatedDataRequest
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.Result
+import services.CoreRegistrationValidationService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeCheckOtherCountryRegistrationFilter extends CheckOtherCountryRegistrationFilter {
+class FakeCheckOtherCountryRegistrationFilterImpl() extends CheckOtherCountryRegistrationFilterImpl(
+  mock[Option[Mode]],
+  mock[CoreRegistrationValidationService],
+  mock[FrontendAppConfig]
+)(ExecutionContext.Implicits.global) {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
     Future.successful(None)
   }
 
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+}
+
+class FakeCheckOtherCountryRegistrationFilter()
+extends CheckOtherCountryRegistrationFilter(
+  mock[CoreRegistrationValidationService],
+  mock[FrontendAppConfig]
+)(ExecutionContext.Implicits.global) {
+  override def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = new FakeCheckOtherCountryRegistrationFilterImpl
 }
