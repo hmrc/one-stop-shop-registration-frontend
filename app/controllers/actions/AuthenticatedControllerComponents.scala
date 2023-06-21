@@ -52,7 +52,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       getData andThen
       requireData(mode) andThen
       checkNiProtocol andThen
-      checkOtherCountryRegistration
+      checkOtherCountryRegistration(mode)
 
   def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
     actionBuilder andThen

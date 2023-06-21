@@ -19,6 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
+import models.{AmendMode, Mode}
 import models.core.MatchType
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Results.Redirect
@@ -30,11 +31,11 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckOtherCountryRegistrationFilterImpl @Inject()(
+class CheckOtherCountryRegistrationFilterImpl @Inject()(mode: Option[Mode],
                                                          service: CoreRegistrationValidationService,
                                                          appConfig: FrontendAppConfig
                                                        )(implicit val executionContext: ExecutionContext)
-  extends CheckOtherCountryRegistrationFilter with Logging {
+  extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   private val exclusionStatusCode = 4
 
@@ -42,7 +43,7 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    if (appConfig.otherCountryRegistrationValidationEnabled) {
+    if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode)) {
       service.searchUkVrn(request.vrn)(hc, request).map {
 
         case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
@@ -70,4 +71,11 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
   }
 }
 
-trait CheckOtherCountryRegistrationFilter extends ActionFilter[AuthenticatedDataRequest]
+class CheckOtherCountryRegistrationFilter @Inject()(
+                                                     service: CoreRegistrationValidationService,
+                                                     appConfig: FrontendAppConfig
+                                                   )(implicit val executionContext: ExecutionContext) {
+  def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = {
+    new CheckOtherCountryRegistrationFilterImpl(mode, service,appConfig)
+  }
+}
