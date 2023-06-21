@@ -441,7 +441,6 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
     }
   }
 
-
   "insufficientEnrolments" - {
 
     "must return OK and the correct view" in {

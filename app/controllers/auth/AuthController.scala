@@ -51,26 +51,26 @@ class AuthController @Inject()(
       answers.get(SavedProgressPage).map {
         savedUrl => Future.successful(Redirect(controllers.routes.ContinueRegistrationController.onPageLoad()))
       }.getOrElse(
-      answers.get(VatApiCallResultQuery) match {
-        case Some(_) =>
-          Redirect(controllers.routes.CheckVatDetailsController.onPageLoad()).toFuture
+        answers.get(VatApiCallResultQuery) match {
+          case Some(vatApiCallResult) if vatApiCallResult == VatApiCallResult.Success =>
+            Redirect(controllers.routes.CheckVatDetailsController.onPageLoad()).toFuture
 
-        case None =>
-          connector.getVatCustomerInfo().flatMap {
-            case Right(vatInfo) =>
-              for {
-                updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(controllers.routes.CheckVatDetailsController.onPageLoad())
+          case _ =>
+            connector.getVatCustomerInfo().flatMap {
+              case Right(vatInfo) =>
+                for {
+                  updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
+                  _ <- cc.sessionRepository.set(updatedAnswers)
+                } yield Redirect(controllers.routes.CheckVatDetailsController.onPageLoad())
 
-            case _ =>
+              case _ =>
                 for {
                   updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.Error))
-                  _              <- cc.sessionRepository.set(updatedAnswers)
+                  _ <- cc.sessionRepository.set(updatedAnswers)
                 } yield Redirect(controllers.routes.VatApiDownController.onPageLoad())
 
-          }
-      }
+            }
+        }
       )
   }
 
