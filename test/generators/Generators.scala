@@ -17,7 +17,6 @@
 package generators
 
 import java.time.{Instant, LocalDate, ZoneOffset}
-
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
 import org.scalacheck.{Gen, Shrink}
@@ -193,8 +192,9 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
   def commonFieldString(maxLength: Int): Gen[String] = (for {
     length <- choose(1, maxLength)
     chars  <- listOfN(length, commonFieldSafeInputs)
-  } yield chars.mkString).suchThat(_.trim.nonEmpty)
+  } yield chars.mkString).suchThat(_.trim.nonEmpty).retryUntil(_.matches(retryUntilString))
 
+  val retryUntilString = """^(?!^[’'"])(?:[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-])(?<![’'"]$)$"""
   def alphaNumStringWithLength(minLength: Int, maxLength: Int): Gen[String] = (
     for {
       length <- choose(minLength, maxLength)
