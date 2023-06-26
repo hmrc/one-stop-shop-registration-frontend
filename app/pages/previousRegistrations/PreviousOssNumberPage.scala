@@ -20,8 +20,7 @@ import controllers.previousRegistrations.{routes => prevRegRoutes}
 import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import play.api.mvc.Call
 
-case class PreviousOssNumberPage(countryIndex: Index, schemeIndex: Index)
-  extends PreviousSchemeNumbersPage {
+case class PreviousOssNumberPage(countryIndex: Index, schemeIndex: Index) extends PreviousSchemeNumbersPage {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, countryIndex)

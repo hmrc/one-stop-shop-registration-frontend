@@ -17,31 +17,156 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import models.Country
+import models.domain.PreviousSchemeNumbers
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.previousRegistrations._
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.previousRegistration.PreviousSchemeForCountryQuery
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.previousRegistrations.SchemeStillActiveView
+
+import scala.concurrent.Future
 
 class SchemeStillActiveControllerSpec extends SpecBase {
 
+  private val country: Country = Country.euCountries.head
+
+  private val index: Index = Index(0)
+  private val index1: Index = Index(1)
+
+  private val answers: UserAnswers = basicUserAnswersWithVatInfo
+    .set(PreviouslyRegisteredPage, true).success.value
+    .set(PreviousEuCountryPage(index), country).success.value
+    .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+    .set(PreviousSchemeTypePage(index, index), PreviousSchemeType.OSS).success.value
+    .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers(s"${country.code}123", None)).success.value
+
   "SchemeStillActiveController Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    ".onPageLoad" - {
 
-      val country = Country.getCountryName("EE")
+      "must return OK and the correct view for a GET in NormalMode" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val country = Country.getCountryName("EE")
 
-      running(application) {
-        val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad("EE").url)
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-        val result = route(application, request).value
+        running(application) {
+          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(NormalMode, "EE", index, index).url)
 
-        val view = application.injector.instanceOf[SchemeStillActiveView]
+          val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(country)(request, messages(application)).toString
+          val view = application.injector.instanceOf[SchemeStillActiveView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(NormalMode, country, index, index)(request, messages(application)).toString
+        }
       }
+
+      "must return OK and the correct view for a GET in AmendMode" in {
+
+        val country = Country.getCountryName("EE")
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), mode = Some(AmendMode)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(AmendMode, "EE", index, index).url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[SchemeStillActiveView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(AmendMode, country, index, index)(request, messages(application)).toString
+        }
+      }
+
+    }
+
+    ".deleteAndRedirect" - {
+
+      "must delete the scheme for the country and redirect to Change Your Registration" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application = applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeStillActiveController.deleteAndRedirect(index, index).url)
+
+          val result = route(application, request).value
+
+          val expectedAnswers = answers.remove(PreviousSchemeForCountryQuery(index, index)).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+
+        }
+      }
+
+      "must delete the correct scheme when there is more than one for the country and redirect to Change Your Registration" in {
+
+        val additionalAnswers = answers
+          .set(PreviousSchemePage(index, index1), PreviousScheme.OSSNU).success.value
+          .set(PreviousSchemeTypePage(index, index1), PreviousSchemeType.OSS).success.value
+          .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers(s"${country.code}234", None)).success.value
+
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application = applicationBuilder(userAnswers = Some(additionalAnswers))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeStillActiveController.deleteAndRedirect(index, index1).url)
+
+          val result = route(application, request).value
+
+          val expectedAnswers = additionalAnswers.remove(PreviousSchemeForCountryQuery(index, index1)).success.value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+
+        }
+      }
+
+      "must redirect to Journey Recovery if no answers present" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeStillActiveController.deleteAndRedirect(index, index).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+          verifyNoInteractions(mockSessionRepository)
+
+        }
+      }
+
     }
   }
 }

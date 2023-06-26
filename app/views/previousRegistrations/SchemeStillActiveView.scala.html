@@ -19,7 +19,7 @@
         govukButton: GovukButton
 )
 
-@(country: String)(implicit request: Request[_], messages: Messages)
+@(mode: Mode, country: String, countryIndex: Index, schemeIndex: Index)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("schemeStillActive.title"))) {
 
@@ -31,5 +31,9 @@
 
     <p class="govuk-body">@Html(messages("schemeStillActive.contactUs"))</p>
 
-    <p class="govuk-body">@Html(messages("schemeStillActive.returnToRegistration"))</p>
+    @if(mode == AmendMode) {
+        <p class="govuk-body">@Html(messages("schemeStillActive.returnToChangeYourRegistration", controllers.previousRegistrations.routes.SchemeStillActiveController.deleteAndRedirect(countryIndex, schemeIndex)))</p>
+    } else {
+        <p class="govuk-body">@Html(messages("schemeStillActive.returnToRegistration"))</p>
+    }
 }
