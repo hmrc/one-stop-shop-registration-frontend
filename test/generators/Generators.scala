@@ -194,7 +194,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
     chars  <- listOfN(length, commonFieldSafeInputs)
   } yield chars.mkString).suchThat(_.trim.nonEmpty).retryUntil(_.matches(retryUntilString))
 
-  val retryUntilString = """^(?!^[’'"]).*(?<![’'"]$)$"""
+  val retryUntilString = """^(?!^[’'"])(?:[A-Za-z0-9À-ÿ \!\)\(.,_/’'"&-])(?<![’'"]$)$"""
   def alphaNumStringWithLength(minLength: Int, maxLength: Int): Gen[String] = (
     for {
       length <- choose(minLength, maxLength)

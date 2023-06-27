@@ -58,6 +58,12 @@ class BusinessContactDetailsFormProviderSpec extends StringFieldBehaviours {
       val result = form.bind(Map(fieldName -> invalidFullName)).apply(fieldName)
       result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
     }
+
+    "must not allow single double quotes, a curly apostrophe or a regular apostrophe at start of string but allow within the string" in {
+      val newFullName = "’Tom O'Brian’"
+      val result = form.bind(Map(fieldName -> newFullName)).apply(fieldName)
+      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(commonTextPattern)))
+    }
   }
 
   ".telephoneNumber" - {
