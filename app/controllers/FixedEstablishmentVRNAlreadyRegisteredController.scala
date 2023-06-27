@@ -17,22 +17,41 @@
 package controllers
 
 import controllers.actions._
-import javax.inject.Inject
+import models.{Index, Mode}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.EuDetailsQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.FixedEstablishmentVRNAlreadyRegisteredView
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class FixedEstablishmentVRNAlreadyRegisteredController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
                                        view: FixedEstablishmentVRNAlreadyRegisteredView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                     )(implicit executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      Ok(view())
+      Ok(view(mode, countryIndex))
+  }
+
+  def deleteAndRedirect(countryIndex: Index): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData).async {
+    implicit request =>
+
+      request.userAnswers.map {
+        answers =>
+
+          for {
+            updatedAnswers <- Future.fromTry(answers.remove(EuDetailsQuery(countryIndex)))
+            _ <- cc.sessionRepository.set(updatedAnswers)
+          } yield {
+            Redirect(controllers.amend.routes.ChangeYourRegistrationController.onPageLoad())
+          }
+      }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url)))
   }
 }

@@ -19,7 +19,7 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(mode: Mode, countryIndex: Index, schemeIndex: Index)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("schemeQuarantined.title"))) {
 
@@ -29,5 +29,9 @@
 
     <p class="govuk-body">@Html(messages("schemeQuarantined.contactUs"))</p>
 
-    <p class="govuk-body">@Html(messages("schemeQuarantined.returnToRegistration"))</p>
+    @if(mode == AmendMode) {
+        <p class="govuk-body">@Html(messages("schemeQuarantined.returnToChangeYourRegistration", controllers.previousRegistrations.routes.SchemeQuarantinedController.deleteAndRedirect(countryIndex, schemeIndex: Index)))</p>
+    } else {
+        <p class="govuk-body">@Html(messages("schemeQuarantined.returnToRegistration"))</p>
+    }
 }

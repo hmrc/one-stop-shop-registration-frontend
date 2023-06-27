@@ -466,12 +466,14 @@ schemeStillActive.paragraph = This One Stop Shop registration in {0} is still ac
 schemeStillActive.paragraph.deregister = Deregister from the OSS service in {0} and try again.
 schemeStillActive.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 schemeStillActive.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
+schemeStillActive.returnToChangeYourRegistration = <a class="govuk-link" href="{0}">Change your registration</a>
 
 schemeQuarantined.title = Your account is quarantined
 schemeQuarantined.heading = Your account is quarantined
 schemeQuarantined.paragraph = You cannot use this registration number
 schemeQuarantined.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 schemeQuarantined.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
+schemeQuarantined.returnToChangeYourRegistration = <a class="govuk-link" href="{0}">Change your registration</a>
 
 bankDetails.title = Enter your bank or building society account details
 bankDetails.heading = Enter your bank or building society account details
@@ -757,6 +759,7 @@ fixedEstablishmentVRNAlreadyRegistered.heading = You cannot register using this 
 fixedEstablishmentVRNAlreadyRegistered.paragraph = This fixed establishment is already registered on a One Stop Shop service.
 fixedEstablishmentVRNAlreadyRegistered.contactUs = For more information, contact us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 fixedEstablishmentVRNAlreadyRegistered.returnToRegistration = <a class="govuk-link" href="https://www.gov.uk/guidance/register-to-report-and-pay-vat-on-distance-sales-of-goods-from-northern-ireland-to-the-eu" rel="noreferrer noopener">Return to registration</a>
+fixedEstablishmentVRNAlreadyRegistered.returnToChangeYourRegistration = <a class="govuk-link" href="{0}">Change your registration</a>
 
 excludedVRN.title = You cannot register using this VAT number
 excludedVRN.heading = You cannot register using this VAT number

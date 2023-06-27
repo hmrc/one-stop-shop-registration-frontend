@@ -17,25 +17,44 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
-import models.Country
+import logging.Logging
+import models.{Country, Index, Mode}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.previousRegistration.PreviousSchemeForCountryQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.SchemeStillActiveView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeStillActiveController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
                                        view: SchemeStillActiveView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                     )(implicit executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(countryCode: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onPageLoad(mode: Mode, countryCode: String, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
 
-      Ok(view(Country.getCountryName(countryCode)))
+      Ok(view(mode, Country.getCountryName(countryCode), countryIndex, schemeIndex))
   }
+
+  def deleteAndRedirect(countryIndex: Index, schemeIndex: Index): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData).async {
+    implicit request =>
+
+      request.userAnswers.map {
+        answers =>
+
+          for {
+            updatedAnswers <- Future.fromTry(answers.remove(PreviousSchemeForCountryQuery(countryIndex, schemeIndex)))
+            _ <- cc.sessionRepository.set(updatedAnswers)
+          } yield {
+            Redirect(controllers.amend.routes.ChangeYourRegistrationController.onPageLoad())
+          }
+      }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url)))
+  }
+
 }

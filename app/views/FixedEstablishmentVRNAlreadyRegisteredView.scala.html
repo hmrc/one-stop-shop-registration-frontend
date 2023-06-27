@@ -19,7 +19,7 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(mode: Mode, countryIndex: Index)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fixedEstablishmentVRNAlreadyRegistered.title"))) {
 
@@ -29,5 +29,11 @@
 
     <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.contactUs"))</p>
 
-    <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.returnToRegistration"))</p>
+    @if(mode == AmendMode) {
+        <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.returnToChangeYourRegistration", controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.deleteAndRedirect(countryIndex)))</p>
+
+    } else {
+        <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.returnToRegistration"))</p>
+
+    }
 }
