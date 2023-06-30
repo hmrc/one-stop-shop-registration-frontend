@@ -514,3 +514,5 @@ GET         /amend-no-vat-number-for-eu-country/:countryIndex                   
 POST        /amend-no-vat-number-for-eu-country/:countryIndex                       controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
 GET         /first-amend-no-vat-number-for-eu-country/:countryIndex                 controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
 POST        /first-amend-no-vat-number-for-eu-country/:countryIndex                 controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
+
+GET         /amend-there-is-a-problem                                               controllers.AmendJourneyRecoveryController.onPageLoad()
