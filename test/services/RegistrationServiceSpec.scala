@@ -19,9 +19,9 @@ package services
 import base.SpecBase
 import connectors.returns.VatReturnConnector
 import controllers.routes
-import models.domain.PreviousSchemeNumbers
+import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, EuVatRegistration, PreviousSchemeNumbers, RegistrationWithFixedEstablishment, RegistrationWithoutFixedEstablishmentWithTradeDetails, TradeDetails, VatDetailSource, VatDetails}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
+import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
 import models.domain.returns.VatReturn
 import models.requests.AuthenticatedDataRequest
 import models.responses.NotFound
@@ -57,8 +57,8 @@ class RegistrationServiceSpec
       vatInfo = Some(vatCustomerInfo)
     )
       .set(BusinessBasedInNiPage, true).success.value
-      .set(DateOfFirstSalePage, LocalDate.now).success.value
       .set(HasMadeSalesPage, true).success.value
+      .set(DateOfFirstSalePage, LocalDate.now).success.value
       .set(HasTradingNamePage, true).success.value
       .set(AllTradingNames, List("single", "double")).success.value
       .set(TaxRegisteredInEuPage, true).success.value
@@ -107,13 +107,13 @@ class RegistrationServiceSpec
       .set(BankDetailsPage, BankDetails("Account name", Some(Bic("ABCDGB2A").get), Iban("GB33BUKB20201555555555").
         getOrElse(throw new Exception("TODO")))).success.value
 
-      .set(
-        BusinessContactDetailsPage,
-        BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
+      .set(
+        BusinessContactDetailsPage,
+        BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
 
   private val mockDateService: DateService = mock[DateService]
   private val mockPeriodService: PeriodService = mock[PeriodService]
@@ -132,7 +132,50 @@ class RegistrationServiceSpec
 
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.toUserAnswers(userAnswersId, RegistrationData.registration, vatCustomerInfo).futureValue
+      val originalRegistrationData = RegistrationData.registration
+      val modifiedRegistrationData =
+        originalRegistrationData.copy(
+          euRegistrations = Seq(
+            RegistrationWithoutFixedEstablishmentWithTradeDetails(Country("FR", "France"),
+              EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
+              TradeDetails(
+                "French trading name",
+                InternationalAddress(
+                  line1 = "Line 1",
+                  line2 = None,
+                  townOrCity = "Town",
+                  stateOrRegion = None,
+                  None,
+                  Country("FR", "France")))),
+            EuVatRegistration(Country("DE", "Germany"), "123456789"),
+            RegistrationWithoutFixedEstablishmentWithTradeDetails(
+              Country("IE", "Ireland"),
+              EuTaxIdentifier(EuTaxIdentifierType.Other, Some("IE123456789")),
+              TradeDetails(
+                "Irish trading name",
+                InternationalAddress(
+                  line1 = "Line 1",
+                  line2 = None,
+                  townOrCity = "Town",
+                  stateOrRegion = None,
+                  None,
+                  Country("IE", "Ireland")
+                ))
+            ),
+            RegistrationWithFixedEstablishment(
+              Country("ES", "Spain"),
+              EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
+              TradeDetails("Spanish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain")))
+            ),
+            RegistrationWithFixedEstablishment(
+              Country("DK", "Denmark"),
+              EuTaxIdentifier(EuTaxIdentifierType.Other, Some("DK123456789")),
+              TradeDetails("Danish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark")))
+            ),
+          )
+      )
+
+      val result = service.toUserAnswers(userAnswersId, modifiedRegistrationData, vatCustomerInfo).futureValue
 
       result mustBe answersPartOfVatGroup.copy(lastUpdated = result.lastUpdated)
     }
