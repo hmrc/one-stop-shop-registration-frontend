@@ -105,40 +105,84 @@ class RegistrationService @Inject()(
   }
 
   private def getEuDetailsForEuVatRegistration(euVatRegistration: EuVatRegistration): EuOptionalDetails = {
-    EuOptionalDetails(euCountry = euVatRegistration.country, sellsGoodsToEUConsumers = Some(false),
+    EuOptionalDetails(
+      euCountry = euVatRegistration.country,
+      sellsGoodsToEUConsumers = Some(false),
       vatRegistered = if (Some(euVatRegistration.vatNumber).isDefined) Some(true) else Some(false),
-      sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = Some(euVatRegistration.vatNumber),
-      euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
-      euSendGoodsTradingName = None, euSendGoodsAddress = None)
+      sellsGoodsToEUConsumerMethod = None,
+      registrationType = None,
+      euVatNumber = Some(s"${euVatRegistration.country.code}${euVatRegistration.vatNumber}"),
+      euTaxReference = None,
+      fixedEstablishmentTradingName = None,
+      fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = None,
+      euSendGoodsAddress = None
+    )
   }
 
   private def getEuDetailsForRegistrationWithFixedEstablishment(registrationWithFE: RegistrationWithFixedEstablishment): EuOptionalDetails = {
-    EuOptionalDetails(euCountry = registrationWithFE.country, sellsGoodsToEUConsumers = Some(true), vatRegistered = None,
+    EuOptionalDetails(
+      euCountry = registrationWithFE.country,
+      sellsGoodsToEUConsumers = Some(true),
+      vatRegistered = None,
       sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.FixedEstablishment),
       registrationType = getRegistrationType(registrationWithFE.taxIdentifier.identifierType),
-      euVatNumber = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) registrationWithFE.taxIdentifier.value else None,
+      euVatNumber = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) convertTaxIdentifierForAmend(registrationWithFE.taxIdentifier.value, registrationWithFE.country.code) else None,
       euTaxReference = if (registrationWithFE.taxIdentifier.identifierType == EuTaxIdentifierType.Other) registrationWithFE.taxIdentifier.value else None,
       fixedEstablishmentTradingName = Some(registrationWithFE.fixedEstablishment.tradingName),
-      fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address), euSendGoodsTradingName = None, euSendGoodsAddress = None)
+      fixedEstablishmentAddress = Some(registrationWithFE.fixedEstablishment.address),
+      euSendGoodsTradingName = None,
+      euSendGoodsAddress = None
+    )
   }
 
   private def getEuDetailsForRegistrationWithoutFEWithTradeDetails(
                                                                     registrationWithoutFE: RegistrationWithoutFixedEstablishmentWithTradeDetails
                                                                   ): EuOptionalDetails = {
-    EuOptionalDetails(euCountry = registrationWithoutFE.country, sellsGoodsToEUConsumers = Some(true), vatRegistered = None,
+    EuOptionalDetails(
+      euCountry = registrationWithoutFE.country,
+      sellsGoodsToEUConsumers = Some(true),
+      vatRegistered = None,
       sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.DispatchWarehouse),
       registrationType = getRegistrationType(registrationWithoutFE.taxIdentifier.identifierType),
-      euVatNumber = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) registrationWithoutFE.taxIdentifier.value else None,
+      euVatNumber = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Vat) convertTaxIdentifierForAmend(registrationWithoutFE.taxIdentifier.value, registrationWithoutFE.country.code) else None,
       euTaxReference = if (registrationWithoutFE.taxIdentifier.identifierType == EuTaxIdentifierType.Other) registrationWithoutFE.taxIdentifier.value else None,
-      fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
-      euSendGoodsTradingName = Some(registrationWithoutFE.tradeDetails.tradingName), euSendGoodsAddress = Some(registrationWithoutFE.tradeDetails.address))
+      fixedEstablishmentTradingName = None,
+      fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = Some(registrationWithoutFE.tradeDetails.tradingName),
+      euSendGoodsAddress = Some(registrationWithoutFE.tradeDetails.address)
+    )
   }
 
   private def getEuDetailsForRegistrationWithoutTaxId(registrationWithoutTaxID: RegistrationWithoutTaxId): EuOptionalDetails = {
-    EuOptionalDetails(euCountry = registrationWithoutTaxID.country, sellsGoodsToEUConsumers = Some(false), vatRegistered = Some(false),
-      sellsGoodsToEUConsumerMethod = None, registrationType = None, euVatNumber = None,
-      euTaxReference = None, fixedEstablishmentTradingName = None, fixedEstablishmentAddress = None,
-      euSendGoodsTradingName = None, euSendGoodsAddress = None)
+    EuOptionalDetails(
+      euCountry = registrationWithoutTaxID.country,
+      sellsGoodsToEUConsumers = Some(false),
+      vatRegistered = Some(false),
+      sellsGoodsToEUConsumerMethod = None,
+      registrationType = None,
+      euVatNumber = None,
+      euTaxReference = None,
+      fixedEstablishmentTradingName = None,
+      fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = None,
+      euSendGoodsAddress = None)
+  }
+
+  private def convertTaxIdentifierForAmend(identifier: Option[String], countryCode: String): Option[String] = {
+    CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == countryCode) match {
+      case Some(countryValidationDetails) =>
+        identifier match {
+          case value if value.get.matches(countryValidationDetails.vrnRegex) =>
+            value
+          case value =>
+            Some(value.get.prependedAll(countryCode))
+        }
+
+      case _ =>
+        logger.error("Error occurred while getting country code regex, unable to convert identifier")
+        throw new IllegalStateException("Error occurred while getting country code regex, unable to convert identifier")
+    }
   }
 
   private def getRegistrationType(identifierType: EuTaxIdentifierType): Option[RegistrationType] = {
