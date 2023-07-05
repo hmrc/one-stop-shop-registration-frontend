@@ -29,7 +29,7 @@
 
 @(form: Form[_], mode: Mode, lists: Seq[SummaryList], index: Index, country: Country, canAddScheme: Boolean)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkPreviousSchemeAnswers.title", country.name))) {
+@layout(pageTitle = title(form, messages("checkPreviousSchemeAnswers.title", country.name))) {
 
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummaryViewModel(form))
