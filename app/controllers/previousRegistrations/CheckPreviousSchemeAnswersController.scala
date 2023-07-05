@@ -59,9 +59,9 @@ class CheckPreviousSchemeAnswersController @Inject()(
               SummaryListViewModel(
                 rows = Seq(
                  if (mode == AmendMode) {
-                    PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), existingSchemes, mode)
+                    PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, existingSchemes, mode)
                   } else {
-                    PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), Seq.empty, mode)
+                    PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, Seq.empty, mode)
                   },
                   PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
                   PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
@@ -93,9 +93,9 @@ class CheckPreviousSchemeAnswersController @Inject()(
             SummaryListViewModel(
               rows = Seq(
                 if (mode == AmendMode) {
-                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), existingSchemes, mode)
+                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, existingSchemes, mode)
                 } else {
-                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), Seq.empty, mode)
+                  PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country,  Seq.empty, mode)
                 },
                 PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
                 PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
-import models.{Index, Mode, PreviousScheme, UserAnswers}
+import models.{Country, Index, Mode, PreviousScheme, UserAnswers}
 import pages.previousRegistrations.PreviousSchemePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,7 @@ import viewmodels.implicits._
 
 object PreviousSchemeSummary {
 
-  def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index, existingPreviousSchemes: Seq[PreviousScheme], mode: Mode)
+  def row(answers: UserAnswers, countryIndex: Index, schemeIndex: Index, country: Country, existingPreviousSchemes: Seq[PreviousScheme], mode: Mode)
          (implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PreviousSchemePage(countryIndex, schemeIndex)).map {
       answer =>
@@ -47,7 +47,7 @@ object PreviousSchemeSummary {
           actions = if (!isExistingScheme) {
             Seq(
               ActionItemViewModel("site.remove", routes.DeletePreviousSchemeController.onPageLoad(mode, countryIndex, schemeIndex).url)
-                .withVisuallyHiddenText(messages("site.remove.hidden"))
+                .withVisuallyHiddenText(messages("previousScheme.remove.hidden",country.name,HtmlFormat.escape(messages(s"previousScheme.$answer"))))
             )
           } else {
             Seq.empty
