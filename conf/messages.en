@@ -417,6 +417,7 @@ previousScheme.change.hidden = which scheme did your business register for
 previousScheme.oss.exceed.error = Cannot select another OSS registration for {0}
 previousScheme.oss.schemes.exceed.error = Cannot select another {0} OSS registration for {1}
 previousScheme.ioss.exceed.error = Cannot select another IOSS registration for {0}
+previousScheme.remove.hidden = Remove tax details for {0} {1} scheme
 
 previousIossScheme.title = Did you use an intermediary?
 previousIossScheme.heading = Did you use an intermediary?

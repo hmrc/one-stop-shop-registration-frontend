@@ -47,7 +47,7 @@ object PreviousSchemeSummary {
           actions = if (!isExistingScheme) {
             Seq(
               ActionItemViewModel("site.remove", routes.DeletePreviousSchemeController.onPageLoad(mode, countryIndex, schemeIndex).url)
-                .withVisuallyHiddenText(messages("site.remove.hidden", country.name))
+                .withVisuallyHiddenText(messages("previousScheme.remove.hidden",country.name,HtmlFormat.escape(messages(s"previousScheme.$answer"))))
             )
           } else {
             Seq.empty
