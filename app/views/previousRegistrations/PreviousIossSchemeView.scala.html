@@ -29,7 +29,7 @@
     @formHelper(action = controllers.previousRegistrations.routes.PreviousIossSchemeController.onSubmit(mode, countryIndex, schemeIndex), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value")))
         }
 
         @govukRadios(
