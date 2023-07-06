@@ -811,6 +811,7 @@ amendComplete.info = You changed the following details:
 amendComplete.link.BTA = Manage your One Stop Shop returns in your account.
 amendComplete.link.yourAccount = Manage your One Stop Shop returns in your account.
 amendComplete.contact.text = We will contact you if we need to check any information.
+amendComplete.returns.text = You can begin your {0} return on {1}. Include any sales from {2}.
 amendComplete.feedback.link.text = What did you think of this service?
 amendComplete.feedback.30seconds = (takes 30 seconds)
 
