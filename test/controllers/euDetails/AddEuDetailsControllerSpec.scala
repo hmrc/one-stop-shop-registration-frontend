@@ -73,9 +73,9 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[AddEuDetailsView]
+        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -111,9 +111,9 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[AddEuDetailsView]
+        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(incompleteAnswers, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(incompleteAnswers, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true,
@@ -178,9 +178,9 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view                    = application.injector.instanceOf[AddEuDetailsView]
+        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 

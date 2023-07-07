@@ -85,13 +85,13 @@ object EuDetailsSummary {
         answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
         case (euVatDetails, index) =>
 
-          val value = euVatDetails.euVatNumber.getOrElse("")
+          val value = euVatDetails.euVatNumber.getOrElse("") + euVatDetails.euTaxReference.getOrElse("")
 
           SummaryListRowViewModel(
             key = euVatDetails.euCountry.name,
             value = ValueViewModel(HtmlContent(value)),
             actions = Seq(
-              ActionItemViewModel("site.change", routes.EuVatNumberController.onPageLoad(changeLinkMode, Index(index)).url)
+              ActionItemViewModel("site.change", routes.CheckEuDetailsAnswersController.onPageLoad(changeLinkMode, Index(index)).url)
                 .withVisuallyHiddenText(messages("change.euVatNumber.hidden", euVatDetails.euCountry.name)),
               ActionItemViewModel("site.remove", routes.DeleteEuDetailsController.onPageLoad(currentMode, Index(index)).url)
                 .withVisuallyHiddenText(messages("site.remove.hidden", euVatDetails.euCountry.name))
