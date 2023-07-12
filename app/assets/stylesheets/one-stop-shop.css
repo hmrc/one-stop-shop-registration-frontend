@@ -42,3 +42,13 @@
 }
 
 /* End of dynamic spinner */
+
+/* Fix for accessibility Audit Non-breaking space */
+.govuk-visually-hidden:before {
+    content: " ";
+}
+
+.govuk-visually-hidden:after {
+    content: " ";
+}
+/* End of Fix for accessibility Audit */
