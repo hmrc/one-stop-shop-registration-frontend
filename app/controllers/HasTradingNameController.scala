@@ -25,6 +25,8 @@ import pages.HasTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.FutureSyntax.FutureOps
 import views.html.HasTradingNameView
 
 import javax.inject.Inject
@@ -41,7 +43,7 @@ class HasTradingNameController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCompanyName {
+      getCompanyName(mode) {
         companyName =>
 
           val form = formProvider()
@@ -57,7 +59,7 @@ class HasTradingNameController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCompanyName {
+      getCompanyName(mode) {
         companyName =>
 
           val form = formProvider()
@@ -75,7 +77,7 @@ class HasTradingNameController @Inject()(
       }
   }
 
-  private def getCompanyName(block: String => Future[Result])
+  private def getCompanyName(mode: Mode)(block: String => Future[Result])
                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.vatInfo match {
       case Some(vatInfo) if(vatInfo.organisationName.isDefined) =>
@@ -92,7 +94,7 @@ class HasTradingNameController @Inject()(
           throw exception
         }
         block(name)
-      case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case _ => determineJourneyRecoveryMode(Some(mode)).toFuture
     }
   }
 }

@@ -38,7 +38,7 @@ class CannotAddCountryWithoutVatNumberController @Inject()(
 
   def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCountry(countryIndex) {
+      getCountry(mode, countryIndex) {
 
         country =>
 

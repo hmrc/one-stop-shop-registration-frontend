@@ -17,8 +17,9 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.DeleteTradingNameFormProvider
-import models.{Index, NormalMode}
+import models.{AmendMode, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,6 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.DeleteTradingNameView
 
 import scala.concurrent.Future
@@ -38,11 +40,15 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private val index = Index(0)
   private val tradingName = "foo"
+
   private lazy val deleteTradingNameRoute = routes.DeleteTradingNameController.onPageLoad(NormalMode, index).url
+  private lazy val deleteTradingNameAmendRoute = routes.DeleteTradingNameController.onPageLoad(AmendMode, index).url
 
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(TradingNamePage(index), tradingName).success.value
 
-  "DeleteEuVatDetails Controller" - {
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
+  "DeleteTradingName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -86,7 +92,6 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
-
 
     "must not delete a record and redirect to the next page when the user answers Yes" in {
 
@@ -177,5 +182,59 @@ class DeleteTradingNameControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "in AmendMode" - {
+
+      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None)
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, deleteTradingNameAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if the trading name is not found" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, deleteTradingNameAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, deleteTradingNameAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+    }
   }
+
 }

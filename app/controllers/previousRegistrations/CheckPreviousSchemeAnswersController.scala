@@ -27,7 +27,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.getExistingRegistrationSchemes
+import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
 import utils.CompletionChecks
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations._
 import viewmodels.govuk.summarylist._
 import views.html.previousRegistrations.CheckPreviousSchemeAnswersView
@@ -47,7 +49,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousCountry(index) {
+      getPreviousCountry(mode, index) {
         country =>
           request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).map { previousSchemes =>
 
@@ -73,7 +75,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
             Future.successful(Ok(view(form, mode, lists, index, country, canAddScheme)))
 
-          }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+          }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
 
       }
   }
@@ -81,7 +83,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
-      getPreviousCountry(index) { country =>
+      getPreviousCountry(mode, index) { country =>
 
         request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(index)).map { previousSchemes =>
 
@@ -115,7 +117,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, updatedAnswers))
           )
-        }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+        }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
       }
   }
 

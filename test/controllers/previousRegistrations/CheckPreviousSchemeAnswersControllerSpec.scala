@@ -110,7 +110,6 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
       }
     }
 
-
     "must redirect to Journey Recovery if user answers are empty" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
@@ -121,6 +120,23 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery if user answers are empty in AmendMode" in {
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo),  mode = Some(AmendMode))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index).url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -176,6 +192,42 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
           status(result) mustEqual BAD_REQUEST
           contentAsString(result) mustEqual view(boundForm, NormalMode, list, index, country, canAddScheme = true)(request, implicitly).toString
+        }
+      }
+
+      "must redirect to Journey Recovery if user answers are empty" in {
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onSubmit(NormalMode, index).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        }
+      }
+
+      "must redirect to Journey Recovery if user answers are empty in AmendMode" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onSubmit(AmendMode, index).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+
         }
       }
 

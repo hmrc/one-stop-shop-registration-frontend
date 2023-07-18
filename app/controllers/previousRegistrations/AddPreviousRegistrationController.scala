@@ -29,6 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
+import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
@@ -50,7 +51,7 @@ class AddPreviousRegistrationController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
-      getNumberOfPreviousRegistrations {
+      getNumberOfPreviousRegistrations(mode) {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
@@ -80,18 +81,18 @@ class AddPreviousRegistrationController @Inject()(
           if (incompletePromptShown) {
             incompletePreviousRegistrationRedirect(mode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture
-            ).getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+            ).getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
           } else {
             Future.successful(Redirect(routes.AddPreviousRegistrationController.onPageLoad(mode)))
           }
         }) {
-        getNumberOfPreviousRegistrations {
+        getNumberOfPreviousRegistrations(mode) {
           number =>
 
             val canAddCountries = number < Country.euCountries.size
 
             val previousRegistrations = if (mode == AmendMode) {
-              val registration: Registration = checkExistingRegistration
+              val registration: Registration = checkExistingRegistration()
               PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
             } else {
               PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
@@ -111,10 +112,10 @@ class AddPreviousRegistrationController @Inject()(
       }
   }
 
-  private def getNumberOfPreviousRegistrations(block: Int => Future[Result])
+  private def getNumberOfPreviousRegistrations(mode: Mode)(block: Int => Future[Result])
                                               (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfPreviousRegistrations).map {
       number =>
         block(number)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
 }

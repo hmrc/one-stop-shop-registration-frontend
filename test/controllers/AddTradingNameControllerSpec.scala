@@ -17,8 +17,9 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.AddTradingNameFormProvider
-import models.{Index, NormalMode}
+import models.{AmendMode, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,6 +29,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
 
@@ -38,7 +40,11 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new AddTradingNameFormProvider()
   private val form = formProvider()
   private val baseAnswers = basicUserAnswersWithVatInfo.set(TradingNamePage(Index(0)), "foo").success.value
+
   private lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(NormalMode).url
+  private lazy val addTradingNameAmendRoute = routes.AddTradingNameController.onPageLoad(AmendMode).url
+
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   "AddTradingName Controller" - {
 
@@ -203,6 +209,58 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "in AmendMode" - {
+
+      "must redirect to Amend Journey Recovery and the correct view for a GET when cannot derive number of trading names" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addTradingNameAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addTradingNameAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, addTradingNameAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
   }
 }

@@ -24,6 +24,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{DateService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
 import views.html.CommencementDateView
 
 import javax.inject.Inject
@@ -82,10 +83,10 @@ class CommencementDateController @Inject()(
                     None
                   ))
                 case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
-                case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+                case _ => determineJourneyRecoveryMode(Some(mode))
               }
 
-            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case _ => determineJourneyRecoveryMode(Some(mode))
           }
         } else {
           Redirect(CommencementDatePage.navigate(mode, request.userAnswers))

@@ -24,6 +24,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
 import utils.FutureSyntax._
 
 import javax.inject.Inject
@@ -39,8 +40,9 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
 
     request.userAnswers match {
       case None =>
-        Left(Redirect(routes.JourneyRecoveryController.onPageLoad())).toFuture
+        Left(determineJourneyRecoveryMode(mode)).toFuture
       case Some(data) if data.data.value.isEmpty =>
+        //TODO - Check in Amend mode - getReg but user somehow deletes user answers
         Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
       case Some(data) =>
         if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
@@ -49,8 +51,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
             case Some(registration) =>
               Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, Some(registration), data)).toFuture
             case None =>
-              // TODO - Redirect to new controller when created
-              Left(Redirect(routes.JourneyRecoveryController.onPageLoad())).toFuture
+              Left(Redirect(routes.AmendJourneyRecoveryController.onPageLoad())).toFuture
           }
 
         } else {

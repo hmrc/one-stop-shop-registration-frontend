@@ -89,12 +89,12 @@ class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
       }
 
-      "to Journey Recovery Page when the user submits no answer" in {
+      "to Amend Journey Recovery Page when the user submits no answer" in {
 
         val answers = emptyUserAnswers
 
         DeleteAllTradingNamesPage.navigate(AmendMode, answers)
-          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+          .mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
   }

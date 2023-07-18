@@ -24,6 +24,8 @@ import pages.{DeleteTradingNamePage, TradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.FutureSyntax.FutureOps
 import views.html.DeleteTradingNameView
 
 import javax.inject.Inject
@@ -41,7 +43,7 @@ class DeleteTradingNameController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getTradingName(index) {
+      getTradingName(mode, index) {
         tradingName =>
           Future.successful(Ok(view(form, mode, index, tradingName)))
       }
@@ -50,7 +52,7 @@ class DeleteTradingNameController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getTradingName(index) {
+      getTradingName(mode, index) {
         tradingName =>
           form.bindFromRequest().fold(
             formWithErrors =>
@@ -69,11 +71,11 @@ class DeleteTradingNameController @Inject()(
       }
   }
 
-  private def getTradingName(index: Index)
+  private def getTradingName(mode: Mode, index: Index)
                             (block: String => Future[Result])
                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(TradingNamePage(index)).map {
       name =>
         block(name)
-    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
 }

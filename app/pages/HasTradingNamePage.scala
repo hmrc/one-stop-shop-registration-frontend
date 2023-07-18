@@ -51,6 +51,6 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
       case (Some(true), _)                                            => routes.TradingNameController.onPageLoad(AmendMode, Index(0))
       case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(AmendMode)
       case (Some(false), _)                                           => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _                                                          => routes.JourneyRecoveryController.onPageLoad()
+      case _                                                          => routes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

@@ -17,8 +17,10 @@
 package controllers
 
 import base.SpecBase
+import controllers.amend.{routes => amendRoutes}
+import connectors.RegistrationConnector
 import formats.Format.dateFormatter
-import models.{CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.reset
 import org.mockito.MockitoSugar.when
@@ -29,6 +31,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{CoreRegistrationValidationService, DateService, RegistrationService}
+import testutils.RegistrationData
 import views.html.CommencementDateView
 
 import java.time.LocalDate
@@ -40,9 +43,12 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
   private val registrationService: RegistrationService = mock[RegistrationService]
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
+ private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   override def beforeEach(): Unit = {
     reset(dateService)
     reset(registrationService)
+    reset(mockRegistrationConnector)
   }
 
   "CommencementDate Controller" - {
@@ -286,6 +292,86 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
+      }
+
+      "in AmendMode" - {
+
+        "must redirect to Amend Journey Recovery for a GET when DateOfFirstSale is missing" in {
+
+          val now = LocalDate.now()
+          val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
+
+          val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, true).success.value
+
+          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
+          when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+          when(dateService.startOfCurrentQuarter) thenReturn now
+          when(dateService.lastDayOfCalendarQuarter) thenReturn now
+          when(dateService.startOfNextQuarter()) thenReturn now
+
+          val application =
+            applicationBuilder(userAnswers = Some(answer1))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .overrides(bind[DateService].toInstance(dateService))
+              .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
+              .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(AmendMode).url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustBe amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to Amend Journey Recovery when user answers no to hasMadeSales and Is Planning First Eligible Sale is empty" in {
+
+          val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
+
+          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
+          when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+
+          val application =
+            applicationBuilder(userAnswers = Some(answer1))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .overrides(bind[DateService].toInstance(dateService))
+              .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
+              .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(AmendMode).url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustBe amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to Amend Journey Recovery when user answers are empty" in {
+
+          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
+          when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
+
+          val application =
+            applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+              .overrides(bind[DateService].toInstance(dateService))
+              .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
+              .build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(AmendMode).url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustBe amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          }
+        }
+
       }
 
     }
