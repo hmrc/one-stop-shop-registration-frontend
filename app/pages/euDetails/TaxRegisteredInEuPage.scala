@@ -91,7 +91,7 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
         }
 
       case None =>
-        routes.JourneyRecoveryController.onPageLoad()
+        amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
   }
 

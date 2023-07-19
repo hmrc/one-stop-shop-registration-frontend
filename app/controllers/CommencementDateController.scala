@@ -28,7 +28,7 @@ import utils.CheckJourneyRecovery.determineJourneyRecovery
 import views.html.CommencementDateView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class CommencementDateController @Inject()(
                                             override val messagesApi: MessagesApi,

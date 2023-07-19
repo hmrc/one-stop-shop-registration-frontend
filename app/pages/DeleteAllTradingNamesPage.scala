@@ -37,6 +37,6 @@ case object DeleteAllTradingNamesPage extends QuestionPage[Boolean] {
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     answers.get(DeleteAllTradingNamesPage) match {
       case Some(_) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _ => routes.AmendJourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

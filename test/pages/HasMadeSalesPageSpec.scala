@@ -18,6 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendMode, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -101,7 +102,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
       "to AmendJourneyRecoveryController and answer is empty" in {
         HasMadeSalesPage.navigate(AmendMode, basicUserAnswersWithVatInfo)
-          .mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 

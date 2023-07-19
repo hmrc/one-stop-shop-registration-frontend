@@ -17,7 +17,9 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{Index, Mode, UserAnswers}
+import controllers.amend.{routes => amendRoutes}
+import controllers.routes
+import models.{AmendLoopMode, AmendMode, Index, Mode, UserAnswers}
 import models.euDetails.EuConsumerSalesMethod
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -41,7 +43,11 @@ case class SellsGoodsToEUConsumerMethodPage(countryIndex: Index) extends Questio
         euRoutes.RegistrationTypeController.onPageLoad(mode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.RegistrationTypeController.onPageLoad(mode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => if (mode == AmendMode || mode == AmendLoopMode) {
+        amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+      } else {
+        routes.JourneyRecoveryController.onPageLoad()
+      }
     }
   }
 

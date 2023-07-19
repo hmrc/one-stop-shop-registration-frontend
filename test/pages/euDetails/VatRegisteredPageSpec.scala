@@ -18,6 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -212,10 +213,10 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is empty" - {
 
-        "to Journey recovery" in {
+        "to Amend Journey recovery" in {
 
           VatRegisteredPage(index).navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }
@@ -263,10 +264,10 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is empty" - {
 
-        "to Journey recovery" in {
+        "to Amend Journey recovery" in {
 
           VatRegisteredPage(index).navigate(AmendLoopMode, emptyUserAnswers)
-            .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

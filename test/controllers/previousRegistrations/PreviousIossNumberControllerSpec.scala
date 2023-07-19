@@ -17,6 +17,9 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import controllers.routes
+import controllers.amend.{routes => amendRoutes}
+import controllers.previousRegistrations.{routes => prevRoutes}
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
 import models.core.{Match, MatchType}
@@ -196,7 +199,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(NormalMode, index, index).url
+          redirectLocation(result).value mustEqual prevRoutes.SchemeQuarantinedController.onPageLoad(NormalMode, index, index).url
         }
       }
     }
@@ -238,7 +241,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -252,7 +255,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -268,7 +271,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -284,7 +287,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
       }
     }
 

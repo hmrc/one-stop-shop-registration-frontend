@@ -140,7 +140,7 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
       "when the answer is none" - {
         "to Amend Journey recovery" in {
           AddTradingNamePage.navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

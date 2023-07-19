@@ -18,6 +18,8 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
+import controllers.routes
 import models.{AmendMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -51,6 +53,14 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex))
       }
 
+      "to Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(NormalMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+
     }
 
     "must navigate in Check Mode" - {
@@ -70,6 +80,15 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
         SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
           .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(CheckMode, countryIndex))
       }
+
+      "to Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+
     }
 
     "must navigate in Amend Mode" - {
@@ -90,7 +109,16 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex))
       }
 
+      "to Amend Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendMode, answers)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+
     }
+
   }
 
 }

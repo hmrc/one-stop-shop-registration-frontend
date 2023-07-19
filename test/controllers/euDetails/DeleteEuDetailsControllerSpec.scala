@@ -17,6 +17,9 @@
 package controllers.euDetails
 
 import base.SpecBase
+import controllers.routes
+import controllers.euDetails.{routes => euDetailsRoutes}
+import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
 import forms.euDetails.DeleteEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
@@ -43,8 +46,8 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
     EuDetails(
       country, sellsGoodsToEUConsumers = true, Some(EuConsumerSalesMethod.DispatchWarehouse), Some(RegistrationType.TaxId), vatRegistered = Some(false), None, Some("12345678"), None, None, None, None)
 
-  private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
-  private lazy val deleteEuVatDetailsAmendRoute = routes.DeleteEuDetailsController.onPageLoad(AmendMode, countryIndex).url
+  private lazy val deleteEuVatDetailsRoute = euDetailsRoutes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
+  private lazy val deleteEuVatDetailsAmendRoute = euDetailsRoutes.DeleteEuDetailsController.onPageLoad(AmendMode, countryIndex).url
 
   private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
@@ -159,7 +162,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -173,7 +176,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -189,7 +192,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -205,7 +208,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -223,7 +226,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -239,7 +242,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 

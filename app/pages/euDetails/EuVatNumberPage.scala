@@ -17,6 +17,8 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
+import controllers.routes
 import models.euDetails.EuConsumerSalesMethod
 import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
@@ -41,7 +43,7 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
         euRoutes.FixedEstablishmentTradingNameController.onPageLoad(NormalMode, countryIndex)
       case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -66,7 +68,7 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
         }
       case (_, Some(false), _) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -91,7 +93,7 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
         }
       case (_, Some(false), _) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(CheckLoopMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -107,7 +109,7 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
         euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex)
       case (false, Some(true), Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -132,7 +134,7 @@ case class EuVatNumberPage(countryIndex: Index) extends QuestionPage[String] {
         }
       case (_, Some(false), _) =>
         euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendLoopMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
   }
 

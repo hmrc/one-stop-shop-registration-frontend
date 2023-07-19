@@ -94,7 +94,7 @@ class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers
 
         DeleteAllTradingNamesPage.navigate(AmendMode, answers)
-          .mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
   }

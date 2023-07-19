@@ -17,6 +17,7 @@
 package controllers.previousRegistrations
 
 import controllers.actions._
+import controllers.amend.routes
 import models.{Index, Mode}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -50,8 +51,8 @@ class SchemeQuarantinedController @Inject()(
             updatedAnswers <- Future.fromTry(answers.remove(PreviousSchemeForCountryQuery(countryIndex, schemeIndex)))
             _ <- cc.sessionRepository.set(updatedAnswers)
           } yield {
-            Redirect(controllers.amend.routes.ChangeYourRegistrationController.onPageLoad())
+            Redirect(routes.ChangeYourRegistrationController.onPageLoad())
           }
-      }.getOrElse(Future.successful(Redirect(controllers.routes.AmendJourneyRecoveryController.onPageLoad().url)))
+      }.getOrElse(Future.successful(Redirect(routes.AmendJourneyRecoveryController.onPageLoad().url)))
   }
 }

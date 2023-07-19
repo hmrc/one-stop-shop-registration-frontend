@@ -17,6 +17,8 @@
 package controllers.actions
 
 import base.SpecBase
+import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import models.{AmendMode, Mode, NormalMode}
@@ -75,7 +77,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
+            result mustBe Left(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
           }
         }
 
@@ -92,7 +94,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(controllers.routes.JourneyRecoveryController.onMissingAnswers().url))
+            result mustBe Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers().url))
           }
         }
 
@@ -155,7 +157,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(controllers.routes.AmendJourneyRecoveryController.onPageLoad().url))
+            result mustBe Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
             verify(connector, times(1)).getRegistration()(any())
           }
         }
@@ -202,7 +204,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
           val result = action.callRefine(UnauthenticatedOptionalDataRequest(request, testCredentials.providerId, None)).futureValue
 
-          result mustBe Left(Redirect(controllers.routes.RegisteredForOssInEuController.onPageLoad().url))
+          result mustBe Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad().url))
         }
       }
 

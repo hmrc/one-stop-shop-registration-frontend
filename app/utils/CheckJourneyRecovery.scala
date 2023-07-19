@@ -17,6 +17,7 @@
 package utils
 
 import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendLoopMode, AmendMode, Mode}
 import play.api.mvc.Call
 
@@ -24,7 +25,7 @@ object CheckJourneyRecovery {
 
   def determineJourneyRecovery(mode: Option[Mode]): Call = {
     if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
-      routes.AmendJourneyRecoveryController.onPageLoad()
+      amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     } else {
       routes.JourneyRecoveryController.onPageLoad()
     }

@@ -18,6 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import models.euDetails.EuConsumerSalesMethod
 import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
@@ -265,7 +266,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers
 
         EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
-          .mustEqual(controllers.routes.AmendJourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 
@@ -338,7 +339,7 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers
 
         EuTaxReferencePage(countryIndex).navigate(AmendLoopMode, answers)
-          .mustEqual(controllers.routes.AmendJourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 

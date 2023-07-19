@@ -143,7 +143,7 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
         "must be Amend Journey recovery" in {
 
           AddEuDetailsPage.navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

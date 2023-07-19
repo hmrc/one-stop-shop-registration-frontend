@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.amend
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.AmendJourneyRecoveryView
+import views.html.amend.AmendJourneyRecoveryView
 
 class AmendJourneyRecoveryControllerSpec extends SpecBase {
 

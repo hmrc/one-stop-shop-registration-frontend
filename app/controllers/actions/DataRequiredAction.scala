@@ -18,6 +18,7 @@ package controllers.actions
 
 import connectors.RegistrationConnector
 import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendLoopMode, AmendMode, Mode}
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import play.api.mvc.Results.Redirect
@@ -51,7 +52,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
             case Some(registration) =>
               Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, Some(registration), data)).toFuture
             case None =>
-              Left(Redirect(routes.AmendJourneyRecoveryController.onPageLoad())).toFuture
+              Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
           }
 
         } else {

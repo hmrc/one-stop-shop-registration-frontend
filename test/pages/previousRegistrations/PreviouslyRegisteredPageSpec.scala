@@ -157,8 +157,8 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
 
             val answers = emptyUserAnswers.set(PreviouslyRegisteredPage, true).success.value
 
-            PreviouslyRegisteredPage.navigate(CheckMode, answers)
-              .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(0)))
+            PreviouslyRegisteredPage.navigate(AmendMode, answers)
+              .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0)))
           }
         }
       }
@@ -176,10 +176,10 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is empty" - {
 
-        "to Journey recovery" in {
+        "to Amend Journey recovery" in {
 
           PreviouslyRegisteredPage.navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

@@ -176,7 +176,7 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
         "to Journey recovery" in {
 
           HasTradingNamePage.navigate(AmendMode, emptyUserAnswers)
-            .mustBe(routes.AmendJourneyRecoveryController.onPageLoad())
+            .mustBe(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

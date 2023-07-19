@@ -19,6 +19,7 @@ package pages
 import base.SpecBase
 import controllers.routes
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendMode, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
@@ -97,7 +98,7 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
       "to Amend Journey recovery when answer is empty" in {
 
         IsPlanningFirstEligibleSalePage.navigate(
-          AmendMode, emptyUserAnswers).mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
+          AmendMode, emptyUserAnswers).mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 

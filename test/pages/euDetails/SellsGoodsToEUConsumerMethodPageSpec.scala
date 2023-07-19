@@ -18,8 +18,10 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.routes
+import controllers.{routes => recoveryRoute}
+import controllers.amend.{routes => amendRoute}
 import models.euDetails.EuConsumerSalesMethod
-import models.{AmendMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours {
@@ -77,6 +79,14 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
         SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
           .mustEqual(routes.RegistrationTypeController.onPageLoad(NormalMode, countryIndex))
       }
+
+      "to Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(NormalMode, answers)
+          .mustEqual(recoveryRoute.JourneyRecoveryController.onPageLoad())
+      }
     }
 
     "must navigate in Amend Mode" - {
@@ -122,6 +132,70 @@ class SellsGoodsToEUConsumerMethodPageSpec extends SpecBase with PageBehaviours 
         SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendMode, answers)
           .mustEqual(routes.RegistrationTypeController.onPageLoad(AmendMode, countryIndex))
       }
+
+      "to Amend Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendMode, answers)
+          .mustEqual(amendRoute.AmendJourneyRecoveryController.onPageLoad())
+      }
+
     }
+
+    "must navigate in Amend Loop Mode" - {
+
+      "when user is part of VAT group" - {
+
+        "to Cannot Add Country when user answers Fixed Establishment" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+
+          SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendLoopMode, answers)
+            .mustEqual(routes.CannotAddCountryController.onPageLoad(AmendLoopMode, countryIndex))
+        }
+
+        "to Registration Type when user answers Dispatch Warehouse" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendLoopMode, answers)
+            .mustEqual(routes.RegistrationTypeController.onPageLoad(AmendLoopMode, countryIndex))
+        }
+      }
+
+      "when user is not part of VAT group" - {
+
+        "to Registration Type when user answers Fixed Establishment" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendLoopMode, answers)
+            .mustEqual(routes.RegistrationTypeController.onPageLoad(AmendLoopMode, countryIndex))
+        }
+      }
+
+      "to Registration Type when user answers Dispatch Warehouse" in {
+
+        val answers = emptyUserAnswers
+          .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(routes.RegistrationTypeController.onPageLoad(AmendLoopMode, countryIndex))
+      }
+
+      "to Amend Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumerMethodPage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(amendRoute.AmendJourneyRecoveryController.onPageLoad())
+      }
+
+    }
+
   }
 }

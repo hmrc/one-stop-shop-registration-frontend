@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
 import forms.DeleteWebsiteFormProvider
 import models.{AmendMode, Index, NormalMode}
@@ -195,7 +196,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -213,7 +214,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -229,7 +230,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 

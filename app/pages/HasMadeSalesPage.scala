@@ -17,6 +17,7 @@
 package pages
 
 import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -44,7 +45,7 @@ case object HasMadeSalesPage extends QuestionPage[Boolean] {
   override protected def navigateInAmendMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)  => routes.DateOfFirstSaleController.onPageLoad(AmendMode)
     case Some(false) => routes.IsPlanningFirstEligibleSaleController.onPageLoad(AmendMode)
-    case _           => routes.AmendJourneyRecoveryController.onPageLoad()
+    case _           => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
   }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {

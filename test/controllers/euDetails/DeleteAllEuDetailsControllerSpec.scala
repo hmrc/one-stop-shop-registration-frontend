@@ -19,11 +19,10 @@ package controllers.euDetails
 import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.euDetails.{routes => euRoutes}
-import controllers.routes
 import forms.euDetails.DeleteAllEuDetailsFormProvider
 import models.domain.Registration
-import models.{AmendMode, CheckMode, Country, Index, InternationalAddress}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
+import models.{AmendMode, CheckMode, Country, Index, InternationalAddress}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar

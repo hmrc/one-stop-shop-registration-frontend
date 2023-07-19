@@ -46,6 +46,6 @@ case class CheckPreviousSchemeAnswersPage(index: Index) extends QuestionPage[Boo
     (answers.get(CheckPreviousSchemeAnswersPage(index)), answers.get(DeriveNumberOfPreviousSchemes(index))) match {
       case (Some(true), Some(size)) => controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(AmendMode, index, Index(size))
       case (Some(false), _) => controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(AmendMode)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => controllers.amend.routes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

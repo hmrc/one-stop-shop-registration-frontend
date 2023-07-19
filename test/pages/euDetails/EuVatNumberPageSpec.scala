@@ -18,6 +18,7 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import models.euDetails.EuConsumerSalesMethod
 import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
 import pages.behaviours.PageBehaviours
@@ -108,6 +109,14 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+
+      "to Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuVatNumberPage(countryIndex).navigate(NormalMode, answers)
+          .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+
     }
 
     "must navigate in Check mode" - {
@@ -216,6 +225,14 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+
+      "to Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuVatNumberPage(countryIndex).navigate(CheckMode, answers)
+          .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+
 
     }
 
@@ -326,6 +343,14 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
 
       }
 
+      "to Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuVatNumberPage(countryIndex).navigate(CheckLoopMode, answers)
+          .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+
+
     }
 
     "must navigate in Amend mode" - {
@@ -401,6 +426,14 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+
+      "to Amend Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuVatNumberPage(countryIndex).navigate(AmendMode, answers)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+
     }
 
     "must navigate in Amend Loop mode" - {
@@ -509,6 +542,14 @@ class EuVatNumberPageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+
+      "to Amend Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuVatNumberPage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+
 
     }
 

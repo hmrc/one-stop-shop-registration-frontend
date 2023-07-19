@@ -17,6 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
@@ -48,6 +49,6 @@ case object AddPreviousRegistrationPage extends QuestionPage[Boolean] {
     (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
       case (Some(true), Some(size)) => prevRegRoutes.PreviousEuCountryController.onPageLoad(AmendMode, Index(size))
       case (Some(false), _) => routes.CommencementDateController.onPageLoad(AmendMode)
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 }
