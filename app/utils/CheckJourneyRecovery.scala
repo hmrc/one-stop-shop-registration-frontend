@@ -17,19 +17,16 @@
 package utils
 
 import controllers.routes
-import models.{AmendMode, Mode}
-import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
+import models.{AmendLoopMode, AmendMode, Mode}
+import play.api.mvc.Call
 
 object CheckJourneyRecovery {
 
-  def determineJourneyRecoveryMode(mode: Option[Mode]): Result = {
-    if (mode.contains(AmendMode)) {
-      println(s"MODE: $mode")
-      Redirect(routes.AmendJourneyRecoveryController.onPageLoad())
+  def determineJourneyRecovery(mode: Option[Mode]): Call = {
+    if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
+      routes.AmendJourneyRecoveryController.onPageLoad()
     } else {
-      println(s"MODE: $mode")
-      Redirect(routes.JourneyRecoveryController.onPageLoad())
+      routes.JourneyRecoveryController.onPageLoad()
     }
   }
 

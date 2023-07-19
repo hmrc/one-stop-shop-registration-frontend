@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfWebsites
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.WebsiteSummary
 import views.html.AddWebsiteView
@@ -79,5 +79,5 @@ class AddWebsiteController @Inject()(
     request.userAnswers.get(DeriveNumberOfWebsites).map {
       number =>
         block(number)
-    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

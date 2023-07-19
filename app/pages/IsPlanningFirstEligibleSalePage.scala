@@ -44,6 +44,6 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
   override protected def navigateInAmendMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
     case Some(true)  => routes.CommencementDateController.onPageLoad(AmendMode)
     case Some(false) => routes.RegisterLaterController.onPageLoad()
-    case _           => routes.JourneyRecoveryController.onPageLoad()
+    case _           => routes.AmendJourneyRecoveryController.onPageLoad()
   }
 }

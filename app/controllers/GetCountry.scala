@@ -20,8 +20,9 @@ import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode}
 import pages.euDetails.EuCountryPage
 import pages.previousRegistrations.PreviousEuCountryPage
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
 
 import scala.concurrent.Future
@@ -34,7 +35,7 @@ trait GetCountry {
     request.userAnswers.get(EuCountryPage(index)).map {
       country =>
         block(country)
-    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 
   def getPreviousCountry(mode: Mode, index: Index)
                         (block: Country => Future[Result])
@@ -42,5 +43,5 @@ trait GetCountry {
     request.userAnswers.get(PreviousEuCountryPage(index)).map {
       country =>
         block(country)
-    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

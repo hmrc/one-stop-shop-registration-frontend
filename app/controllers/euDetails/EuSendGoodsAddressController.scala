@@ -26,6 +26,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import views.html.euDetails.EuSendGoodsAddressView
 
 import javax.inject.Inject
@@ -42,8 +44,8 @@ class EuSendGoodsAddressController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getData(EuCountryPage(index)) { country =>
-        getData(EuSendGoodsTradingNamePage(index)) { tradingName =>
+      getData(mode, EuCountryPage(index)) { country =>
+        getData(mode, EuSendGoodsTradingNamePage(index)) { tradingName =>
           val form = formProvider(country)
           val preparedForm = request.userAnswers.get(EuSendGoodsAddressPage(index)) match {
             case None => form
@@ -56,8 +58,8 @@ class EuSendGoodsAddressController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getData(EuCountryPage(index)) { country =>
-        getData(EuSendGoodsTradingNamePage(index)) { tradingName =>
+      getData(mode, EuCountryPage(index)) { country =>
+        getData(mode, EuSendGoodsTradingNamePage(index)) { tradingName =>
           val form = formProvider(country)
           form.bindFromRequest().fold(
             hasErrors = formWithErrors =>
@@ -72,8 +74,8 @@ class EuSendGoodsAddressController @Inject()(
       }
   }
 
-  private def getData[A](page: QuestionPage[A])(block: A => Future[Result])
+  private def getData[A](mode: Mode, page: QuestionPage[A])(block: A => Future[Result])
                         (implicit request: AuthenticatedDataRequest[AnyContent], rds: Reads[A]): Future[Result] =
     request.userAnswers.get(page) map block getOrElse
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      Redirect(determineJourneyRecovery(Some(mode))).toFuture
 }

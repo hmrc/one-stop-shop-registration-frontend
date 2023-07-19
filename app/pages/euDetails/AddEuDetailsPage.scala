@@ -49,6 +49,6 @@ case object AddEuDetailsPage extends QuestionPage[Boolean] {
     (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(AmendMode, Index(size))
       case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

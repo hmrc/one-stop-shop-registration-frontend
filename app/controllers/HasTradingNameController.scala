@@ -25,7 +25,7 @@ import pages.HasTradingNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
 import views.html.HasTradingNameView
 
@@ -94,7 +94,7 @@ class HasTradingNameController @Inject()(
           throw exception
         }
         block(name)
-      case _ => determineJourneyRecoveryMode(Some(mode)).toFuture
+      case _ => Redirect(determineJourneyRecovery(Some(mode))).toFuture
     }
   }
 }

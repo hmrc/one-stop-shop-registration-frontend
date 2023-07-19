@@ -16,13 +16,13 @@
 
 package controllers.previousRegistrations
 
+import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousSchemeTypeFormProvider
-import models.{Country, Index, Mode}
-import models.requests.AuthenticatedDataRequest
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemeTypePage}
+import models.{Index, Mode}
+import pages.previousRegistrations.PreviousSchemeTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.previousRegistrations.PreviousSchemeView
@@ -35,13 +35,13 @@ class PreviousSchemeController @Inject()(
                                           cc: AuthenticatedControllerComponents,
                                           formProvider: PreviousSchemeTypeFormProvider,
                                           view: PreviousSchemeView
-                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCountry(countryIndex) {
+      getPreviousCountry(mode, countryIndex) {
         country =>
 
           val form = request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
@@ -65,7 +65,7 @@ class PreviousSchemeController @Inject()(
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCountry(countryIndex) {
+      getPreviousCountry(mode, countryIndex) {
         country =>
           val form = request.userAnswers.get(AllPreviousSchemesForCountryWithOptionalVatNumberQuery(countryIndex)) match {
             case Some(previousSchemesDetails) =>
@@ -90,11 +90,4 @@ class PreviousSchemeController @Inject()(
       }
   }
 
-  private def getCountry(index: Index)
-                        (block: Country => Future[Result])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousEuCountryPage(index)).map {
-      country =>
-        block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 }

@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import queries.AllWebsites
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import views.html.DeleteAllWebsitesView
 
 import scala.concurrent.Future
@@ -157,7 +158,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
             }
           }
 
-          "must redirect to Journey Recovery for a GET if no existing data is found" in {
+          s"must redirect to Journey Recovery in $mode for a GET if no existing data is found" in {
 
             val application = applicationBuilder(userAnswers = None).build()
 
@@ -167,11 +168,11 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+              redirectLocation(result).value mustEqual determineJourneyRecovery(Some(mode)).url
             }
           }
 
-          "must redirect to Journey Recovery for a POST if no existing data is found" in {
+          s"must redirect to Journey Recovery in $mode for a POST if no existing data is found" in {
 
             val application = applicationBuilder(userAnswers = None).build()
 
@@ -183,7 +184,7 @@ class DeleteAllWebsitesControllerSpec extends SpecBase with MockitoSugar {
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+              redirectLocation(result).value mustEqual determineJourneyRecovery(Some(mode)).url
             }
           }
         }

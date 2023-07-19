@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfTradingNames
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
@@ -79,5 +79,5 @@ class AddTradingNameController @Inject()(
     request.userAnswers.get(DeriveNumberOfTradingNames).map {
       number =>
         block(number)
-    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

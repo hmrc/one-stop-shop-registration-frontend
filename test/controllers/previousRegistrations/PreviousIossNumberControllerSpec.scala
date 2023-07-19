@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
-import models.{Country, Index, NormalMode, PreviousScheme}
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
 import models.core.{Match, MatchType}
 import models.domain.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -47,6 +47,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
     .set(PreviousIossSchemePage(index, index), false).success.value
 
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
+  private lazy val previousIossNumberAmendRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(AmendMode, index, index).url
 
   private val hasIntermediary: Boolean = false
 
@@ -241,6 +242,20 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Amend Journey Recovery for a GET if no existing data is found in AmendMode" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, previousIossNumberAmendRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
@@ -256,5 +271,22 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to Amend Journey Recovery for a POST if no existing data is found in AmendMode" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, previousIossNumberAmendRoute)
+            .withFormUrlEncodedBody(("previousSchemeNumber", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+      }
+    }
+
   }
 }

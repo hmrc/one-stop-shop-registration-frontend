@@ -17,9 +17,10 @@
 package controllers.euDetails
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.euDetails.DeleteEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
-import models.{Country, Index, NormalMode}
+import models.{AmendMode, Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EuDetailsQuery
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import views.html.euDetails.DeleteEuDetailsView
 
 import scala.concurrent.Future
@@ -40,7 +42,11 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val euVatDetails =
     EuDetails(
       country, sellsGoodsToEUConsumers = true, Some(EuConsumerSalesMethod.DispatchWarehouse), Some(RegistrationType.TaxId), vatRegistered = Some(false), None, Some("12345678"), None, None, None, None)
+
   private lazy val deleteEuVatDetailsRoute = routes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
+  private lazy val deleteEuVatDetailsAmendRoute = routes.DeleteEuDetailsController.onPageLoad(AmendMode, countryIndex).url
+
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   private val formProvider = new DeleteEuDetailsFormProvider()
   private val form = formProvider(euVatDetails.euCountry.name)
@@ -185,6 +191,58 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "in AmendMode" - {
+
+      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, deleteEuVatDetailsAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if no EU VAT details exist" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, deleteEuVatDetailsAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, deleteEuVatDetailsAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
   }
 }

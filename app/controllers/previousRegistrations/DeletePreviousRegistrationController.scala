@@ -27,6 +27,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.{checkExistingRegistration, existingPreviousRegistration}
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.DeletePreviousRegistrationView
 
 import javax.inject.Inject
@@ -44,7 +46,7 @@ class DeletePreviousRegistrationController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousRegistration(index) {
+      getPreviousRegistration(mode, index) {
         details =>
 
           if (mode == AmendMode) {
@@ -63,7 +65,7 @@ class DeletePreviousRegistrationController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousRegistration(index) {
+      getPreviousRegistration(mode, index) {
         details =>
 
           if (mode == AmendMode) {
@@ -98,11 +100,11 @@ class DeletePreviousRegistrationController @Inject()(
     )
   }
 
-  private def getPreviousRegistration(index: Index)
+  private def getPreviousRegistration(mode: Mode, index: Index)
                                      (block: PreviousRegistrationDetailsWithOptionalVatNumber => Future[Result])
                                      (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousRegistrationWithOptionalVatNumberQuery(index)).map {
       details =>
         block(details)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

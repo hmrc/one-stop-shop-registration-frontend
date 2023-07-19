@@ -19,7 +19,7 @@ package pages
 import base.SpecBase
 import controllers.routes
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
@@ -77,5 +77,29 @@ class IsPlanningFirstEligibleSalePageSpec extends SpecBase with PageBehaviours {
           CheckMode, emptyUserAnswers).mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to Previously Registered page when true is submitted" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          AmendMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, true).success.value
+        ).mustEqual(routes.CommencementDateController.onPageLoad(AmendMode))
+      }
+
+      "to Register Later page when false is submitted" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          AmendMode, emptyUserAnswers.set(IsPlanningFirstEligibleSalePage, false).success.value
+        ).mustEqual(routes.RegisterLaterController.onPageLoad())
+      }
+
+      "to Amend Journey recovery when answer is empty" in {
+
+        IsPlanningFirstEligibleSalePage.navigate(
+          AmendMode, emptyUserAnswers).mustEqual(routes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
   }
 }

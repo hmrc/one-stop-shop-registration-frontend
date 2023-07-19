@@ -17,9 +17,10 @@
 package controllers.euDetails
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
-import models.{CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
 import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
 
@@ -42,7 +44,12 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val country = Country.euCountries.head
 
   private lazy val addEuVatDetailsRoute = routes.AddEuDetailsController.onPageLoad(NormalMode).url
+  private lazy val addEuVatDetailsAmendRoute = routes.AddEuDetailsController.onPageLoad(AmendMode).url
   private def addEuVatDetailsPostRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
+  private def addEuVatDetailsPostAmendRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(AmendMode, prompt).url
+
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   private val baseAnswers =
     basicUserAnswersWithVatInfo
       .set(TaxRegisteredInEuPage, true).success.value
@@ -509,6 +516,58 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           redirectLocation(result).value mustEqual routes.CannotAddCountryController.onPageLoad(CheckMode, countryIndex).url
         }
       }
+    }
+
+    "in AmendMode" - {
+
+      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addEuVatDetailsAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if user answers are empty" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addEuVatDetailsAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, addEuVatDetailsPostAmendRoute())
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
 
   }

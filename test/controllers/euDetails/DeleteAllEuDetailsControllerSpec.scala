@@ -30,10 +30,11 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails._
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{POST, _}
+import play.api.test.Helpers._
 import queries.EuDetailsTopLevelNode
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import views.html.euDetails.DeleteAllEuDetailsView
 
 import scala.concurrent.Future
@@ -170,7 +171,7 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
             }
           }
 
-          "must redirect to Journey Recovery for a GET if no existing data is found" in {
+          s"must redirect to Journey Recovery in $mode for a GET if no existing data is found" in {
 
             val application = applicationBuilder(userAnswers = None).build()
 
@@ -180,11 +181,11 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+              redirectLocation(result).value mustEqual determineJourneyRecovery(Some(mode)).url
             }
           }
 
-          "must redirect to Journey Recovery for a POST if no existing data is found" in {
+          s"must redirect to Journey Recovery in $mode for a POST if no existing data is found" in {
 
             val application = applicationBuilder(userAnswers = None).build()
 
@@ -196,7 +197,7 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+              redirectLocation(result).value mustEqual determineJourneyRecovery(Some(mode)).url
             }
           }
 

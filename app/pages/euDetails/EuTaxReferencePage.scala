@@ -89,7 +89,7 @@ case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] 
         euRoutes.FixedEstablishmentTradingNameController.onPageLoad(AmendMode, countryIndex)
       case (false, Some(EuConsumerSalesMethod.DispatchWarehouse)) =>
         euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex)
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.AmendJourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
@@ -109,7 +109,7 @@ case class EuTaxReferencePage(countryIndex: Index) extends QuestionPage[String] 
           case Some(_) => EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers)
           case None => euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex)
         }
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.AmendJourneyRecoveryController.onPageLoad()
     }
 
 }

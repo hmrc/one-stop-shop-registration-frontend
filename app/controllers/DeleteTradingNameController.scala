@@ -24,7 +24,7 @@ import pages.{DeleteTradingNamePage, TradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
 import views.html.DeleteTradingNameView
 
@@ -77,5 +77,5 @@ class DeleteTradingNameController @Inject()(
     request.userAnswers.get(TradingNamePage(index)).map {
       name =>
         block(name)
-    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

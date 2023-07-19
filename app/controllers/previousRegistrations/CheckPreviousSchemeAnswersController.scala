@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.getExistingRegistrationSchemes
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations._
@@ -75,7 +75,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
             Future.successful(Ok(view(form, mode, lists, index, country, canAddScheme)))
 
-          }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+          }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 
       }
   }
@@ -117,7 +117,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CheckPreviousSchemeAnswersPage(index).navigate(mode, updatedAnswers))
           )
-        }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+        }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
       }
   }
 

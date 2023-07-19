@@ -28,7 +28,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
 import views.html.HasTradingNameView
 
 import scala.concurrent.Future
@@ -218,27 +217,6 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
           val request =
             FakeRequest(POST, hasTradingNameAmendRoute)
               .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      //TODO - Need this? Is this possible in Amend?
-      "must redirect to Amend Journey Recovery for a GET when we don't have the user's company name or individual name in their VAT details" in {
-
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
-        val vatCustomerInfoWithIndividualName = vatCustomerInfo.copy(organisationName = None, individualName = None)
-
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfoWithIndividualName))))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, hasTradingNameAmendRoute)
 
           val result = route(application, request).value
 

@@ -24,11 +24,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{DateService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import views.html.CommencementDateView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CommencementDateController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -68,7 +68,7 @@ class CommencementDateController @Inject()(
                       Some(startOfNextQuarter.format(dateFormatter))
                     )
                   )
-              }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+              }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))))
 
             case Some(false) =>
               request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
@@ -83,10 +83,10 @@ class CommencementDateController @Inject()(
                     None
                   ))
                 case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
-                case _ => determineJourneyRecoveryMode(Some(mode))
+                case _ => Redirect(determineJourneyRecovery(Some(mode)))
               }
 
-            case _ => determineJourneyRecoveryMode(Some(mode))
+            case _ => Redirect(determineJourneyRecovery(Some(mode)))
           }
         } else {
           Redirect(CommencementDatePage.navigate(mode, request.userAnswers))

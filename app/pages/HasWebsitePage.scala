@@ -50,6 +50,6 @@ case object HasWebsitePage extends QuestionPage[Boolean] {
       case (Some(true), _)                                    => routes.WebsiteController.onPageLoad(AmendMode, Index(0))
       case (Some(false), Some(websites)) if websites.nonEmpty => routes.DeleteAllWebsitesController.onPageLoad(AmendMode)
       case (Some(false), _)                                   => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _                                                  => routes.JourneyRecoveryController.onPageLoad()
+      case _                                                  => routes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

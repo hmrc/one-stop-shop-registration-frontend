@@ -54,7 +54,7 @@ class SchemeStillActiveController @Inject()(
           } yield {
             Redirect(controllers.amend.routes.ChangeYourRegistrationController.onPageLoad())
           }
-      }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url)))
+      }.getOrElse(Future.successful(Redirect(controllers.routes.AmendJourneyRecoveryController.onPageLoad().url)))
   }
 
 }

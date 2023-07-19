@@ -29,7 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
-import utils.CheckJourneyRecovery.determineJourneyRecoveryMode
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
@@ -81,7 +81,7 @@ class AddPreviousRegistrationController @Inject()(
           if (incompletePromptShown) {
             incompletePreviousRegistrationRedirect(mode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture
-            ).getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+            ).getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
           } else {
             Future.successful(Redirect(routes.AddPreviousRegistrationController.onPageLoad(mode)))
           }
@@ -117,5 +117,5 @@ class AddPreviousRegistrationController @Inject()(
     request.userAnswers.get(DeriveNumberOfPreviousRegistrations).map {
       number =>
         block(number)
-    }.getOrElse(determineJourneyRecoveryMode(Some(mode)).toFuture)
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

@@ -44,7 +44,7 @@ case object HasMadeSalesPage extends QuestionPage[Boolean] {
   override protected def navigateInAmendMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)  => routes.DateOfFirstSaleController.onPageLoad(AmendMode)
     case Some(false) => routes.IsPlanningFirstEligibleSaleController.onPageLoad(AmendMode)
-    case _           => routes.JourneyRecoveryController.onPageLoad()
+    case _           => routes.AmendJourneyRecoveryController.onPageLoad()
   }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {

@@ -69,6 +69,13 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex))
         }
       }
+
+      "to Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(NormalMode, answers)
+          .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
     "must navigate in Check mode" - {
@@ -134,6 +141,13 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers))
         }
 
+      }
+
+      "to Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
+          .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
 
     }
@@ -202,6 +216,13 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
         }
 
       }
+
+      "to Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
+          .mustEqual(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
     "must navigate in Amend mode" - {
@@ -235,9 +256,16 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
             .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
-          EuTaxReferencePage(countryIndex).navigate(NormalMode, answers)
-            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(NormalMode, countryIndex))
+          EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendMode, countryIndex))
         }
+      }
+
+      "to Amend Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(AmendMode, answers)
+          .mustEqual(controllers.routes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 
@@ -304,6 +332,13 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
             .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers))
         }
 
+      }
+
+      "to Amend Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(controllers.routes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 
