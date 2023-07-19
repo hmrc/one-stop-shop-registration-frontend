@@ -37,7 +37,8 @@ final case class Registration(
                                isOnlineMarketplace: Boolean,
                                niPresence: Option[NiPresence],
                                dateOfFirstSale: Option[LocalDate],
-                               submissionReceived: Option[Instant] = None
+                               submissionReceived: Option[Instant] = None,
+                               adminUse: AdminUse = AdminUse(None)
                              )
 
 object Registration {
@@ -57,7 +58,8 @@ object Registration {
             isOnlineMarketplace: Boolean,
             niPresence: Option[NiPresence],
             dateOfFirstSale: Option[LocalDate],
-            submissionReceived: Option[Instant] = None): Registration = new Registration(
+            submissionReceived: Option[Instant] = None,
+            adminUse: AdminUse = AdminUse(None)): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
     tradingNames.map(normaliseSpaces),
@@ -71,7 +73,8 @@ object Registration {
     isOnlineMarketplace,
     niPresence,
     dateOfFirstSale,
-    submissionReceived
+    submissionReceived,
+    adminUse
   )
 
 }
