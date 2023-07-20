@@ -24,6 +24,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json._
 
+import java.time.LocalDateTime
+
 class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators with OptionValues {
 
   "Registration" - {
@@ -159,7 +161,10 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |  },
                    |  "isOnlineMarketplace" : false,
                    |  "niPresence" : "principalPlaceOfBusinessInNi",
-                   |  "dateOfFirstSale" : "2022-04-21"
+                   |  "dateOfFirstSale" : "2022-04-21",
+                   |  "adminUse": {
+                   |    "changeDate" : "${LocalDateTime.now()}"
+                   |  }
                    |}""".stripMargin
 
       val registration = Json.parse(json).as[Registration]
