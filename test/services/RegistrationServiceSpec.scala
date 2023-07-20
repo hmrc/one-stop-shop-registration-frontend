@@ -122,7 +122,8 @@ class RegistrationServiceSpec
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
-  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
+  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
+    AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 

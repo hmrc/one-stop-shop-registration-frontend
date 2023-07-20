@@ -200,7 +200,11 @@ class DateService @Inject()(
       case Some(submissionReceived) if !submissionReceivedIsInSamePeriodWithCommencementDate(submissionReceived, commencementDate) =>
         getVatReturnEndDate(submissionReceived).plusDays(daysIntoReturnForAmendment)
       case _ =>
-        getVatReturnEndDate(commencementDate).plusDays(daysIntoReturnForAmendment)
+        if(commencementDate.isAfter(LocalDate.now(clock))) {
+          getVatReturnEndDate(LocalDate.now(clock)).plusDays(daysIntoReturnForAmendment)
+        } else {
+          getVatReturnEndDate(commencementDate).plusDays(daysIntoReturnForAmendment)
+        }
     }
   }
 
