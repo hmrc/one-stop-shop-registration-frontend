@@ -161,28 +161,23 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
             verify(connector, times(1)).getRegistration()(any())
           }
         }
-// TODO
-//        "must redirect to Amend Journey Recovery when a registration has been retrieved but user answers are deleted" in {
-//
-//          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-//
-//          val application =
-//            applicationBuilder()
-//              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-//              .build()
-//
-//          running(application) {
-//
-//            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
-//            val connector = application.injector.instanceOf[RegistrationConnector]
-//            val action = new Harness(AmendMode, connector)
-//
-//            val result = action.callRefine(request).futureValue
-//
-//            result mustBe Left(Redirect(controllers.routes.AmendJourneyRecoveryController.onPageLoad().url))
-//            verify(connector, times(1)).getRegistration()(any())
-//          }
-//        }
+
+        "must redirect to Amend Journey Recovery when there are empty userAnswers present" in {
+
+          val application =
+            applicationBuilder().build()
+
+          running(application) {
+
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(emptyUserAnswers))
+            val connector = application.injector.instanceOf[RegistrationConnector]
+            val action = new Harness(AmendMode, connector)
+
+            val result = action.callRefine(request).futureValue
+
+            result mustBe Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
+          }
+        }
 
       }
     }

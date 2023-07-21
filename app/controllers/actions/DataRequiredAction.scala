@@ -43,8 +43,11 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
       case None =>
         Left(Redirect(determineJourneyRecovery(mode))).toFuture
       case Some(data) if data.data.value.isEmpty =>
-        //TODO - Check in Amend mode - getReg but user somehow deletes user answers
-        Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
+        if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
+          Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
+        } else {
+          Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
+        }
       case Some(data) =>
         if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
           val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.session)
