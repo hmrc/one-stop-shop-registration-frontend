@@ -26,13 +26,14 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{JourneyRecoveryContinueView, JourneyRecoveryMissingUserAnswersStartAgainView, JourneyRecoveryStartAgainView}
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class JourneyRecoveryController @Inject()(
                                            cc: AuthenticatedControllerComponents,
                                            continueView: JourneyRecoveryContinueView,
                                            startAgainView: JourneyRecoveryStartAgainView,
                                            missingUserAnswersView: JourneyRecoveryMissingUserAnswersStartAgainView
-                                         ) extends FrontendBaseController with I18nSupport with Logging {
+                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -55,9 +56,11 @@ class JourneyRecoveryController @Inject()(
         .getOrElse(Ok(startAgainView()))
   }
 
-  def onMissingAnswers(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onMissingAnswers(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-    Ok(missingUserAnswersView())
+
+      cc.sessionRepository.clear(request.userId)
+        .map(_ => Ok(missingUserAnswersView()))
   }
 }
 
