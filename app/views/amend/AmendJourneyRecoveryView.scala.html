@@ -19,10 +19,19 @@
         govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(redirectLink: String)(implicit request: Request[_], messages: Messages)
 
- @layout(pageTitle = titleNoForm(messages("amendJourneyRecovery.title"))) {
+@layout(pageTitle = titleNoForm(messages("amendJourneyRecovery.title"))) {
 
-  <h1 class="govuk-heading-xl">@messages("amendJourneyRecovery.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("amendJourneyRecovery.heading")</h1>
 
- }
+    <p class="govuk-body">@messages("amendJourneyRecovery.guidance")</p>
+
+    <p class="govuk-body">
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+               .asLink(redirectLink)
+        )
+    </p>
+
+}

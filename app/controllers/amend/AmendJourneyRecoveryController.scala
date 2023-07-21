@@ -16,6 +16,7 @@
 
 package controllers.amend
 
+import config.FrontendAppConfig
 import controllers.actions._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -24,19 +25,22 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.amend.AmendJourneyRecoveryView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class AmendJourneyRecoveryController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        cc: AuthenticatedControllerComponents,
+                                       appConfig: FrontendAppConfig,
                                        view: AmendJourneyRecoveryView
-                                     ) extends FrontendBaseController with I18nSupport with Logging {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
 
-  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 
-      Ok(view())
+      cc.sessionRepository.clear(request.userId)
+        .map(_ => Ok(view(appConfig.ossYourAccountUrl)))
   }
 }

@@ -877,3 +877,4 @@ cannotAddCountryWithoutVatNumber.change.hidden = Cannot add {0}
 
 amendJourneyRecovery.title = Sorry, there is a problem with the service
 amendJourneyRecovery.heading = Sorry, there is a problem with the service
+amendJourneyRecovery.guidance = For your security, we deleted your answers.

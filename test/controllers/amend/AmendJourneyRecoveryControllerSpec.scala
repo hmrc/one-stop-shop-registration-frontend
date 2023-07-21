@@ -17,28 +17,50 @@
 package controllers.amend
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{times, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.AuthenticatedUserAnswersRepository
 import views.html.amend.AmendJourneyRecoveryView
+import uk.gov.hmrc.http.SessionKeys
+import testutils.WireMockHelper
 
-class AmendJourneyRecoveryControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class AmendJourneyRecoveryControllerSpec extends SpecBase with WireMockHelper {
+
+  private val redirectUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
 
   "AmendJourneyRecovery Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must delete all user answers and return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
 
       running(application) {
+        val sessionId = userAnswersId
         val request = FakeRequest(GET, routes.AmendJourneyRecoveryController.onPageLoad().url)
+          .withSession(SessionKeys.sessionId -> sessionId)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[AmendJourneyRecoveryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(redirectUrl)(request, messages(application)).toString
+        verify(mockSessionRepository, times(1)).clear(eqTo(sessionId))
       }
     }
+
   }
 }
