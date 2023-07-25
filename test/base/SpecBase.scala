@@ -127,7 +127,7 @@ trait SpecBase
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[CheckRegistrationFilterProvider].toInstance(new FakeCheckRegistrationFilterProvider()),
-        bind[CheckNiProtocolFilter].toInstance(new FakeCheckNiProtocolFilter()),
+        bind[CheckNiProtocolFilterImpl].toInstance(new FakeCheckNiProtocolFilterImpl()),
         bind[CheckEmailVerificationFilterProvider].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
         bind[AuthenticatedDataRequiredActionImpl].toInstance(new FakeAuthenticatedDataRequiredAction(userAnswers, mode = mode)),

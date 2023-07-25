@@ -19,6 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
+import models.{AmendMode, Mode}
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.{ActionFilter, Result}
 import play.api.mvc.Results.Redirect
@@ -26,9 +27,10 @@ import play.api.mvc.Results.Redirect
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
-                                         (implicit val executionContext: ExecutionContext)
-  extends CheckNiProtocolFilter with Logging {
+class CheckNiProtocolFilterImpl(mode: Option[Mode],
+                                appConfig: FrontendAppConfig)
+                               (implicit val executionContext: ExecutionContext)
+  extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
@@ -37,7 +39,12 @@ class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
         case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
           case Some(true) => Future.successful(None)
 
-          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolRejectionController.onPageLoad())))
+          case Some(false) =>
+            if (!mode.contains(AmendMode)){
+              Future.successful(Some(Redirect(routes.NiProtocolRejectionController.onPageLoad())))
+            } else {
+              Future.successful(None)
+            }
 
           case _ =>
             logger.error("Illegal state cause by SingleMarketIndicator missing")
@@ -51,4 +58,10 @@ class CheckNiProtocolFilterImpl @Inject()(appConfig: FrontendAppConfig)
   }
 }
 
-trait CheckNiProtocolFilter extends ActionFilter[AuthenticatedDataRequest]
+class CheckNiProtocolFilter @Inject()(appConfig: FrontendAppConfig)
+                                     (implicit val executionContext: ExecutionContext) {
+
+  def apply(mode: Option[Mode]): CheckNiProtocolFilterImpl = {
+    new CheckNiProtocolFilterImpl(mode, appConfig)
+  }
+}

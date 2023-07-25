@@ -18,7 +18,9 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
+import controllers.actions.FakeAuthenticatedDataRetrievalAction.mockSessionRepository
 import controllers.routes
+import models.AmendMode
 import models.requests.AuthenticatedDataRequest
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -26,13 +28,15 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.AuthenticatedUserAnswersRepository
+import play.api.inject.bind
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness(appConfig: FrontendAppConfig) extends CheckNiProtocolFilterImpl(appConfig) {
+  class Harness(appConfig: FrontendAppConfig) extends CheckNiProtocolFilterImpl(None, appConfig) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -69,6 +73,28 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
 
         val userAnswersWithSingleMarketIndicatorFalse = basicUserAnswersWithVatInfo copy(vatInfo =
           Some(vatCustomerInfo copy(singleMarketIndicator = Some(false))))
+
+        running(app) {
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse)
+          val config = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(config)
+
+          val result = controller.callFilter(request).futureValue
+
+          result.value mustEqual Redirect(routes.NiProtocolRejectionController.onPageLoad())
+        }
+      }
+
+      "must redirect to Start Amend Journey page when singleMarketIndicator is false and is in Amend Mode" in {
+
+        val app = applicationBuilder(None, mode = Some(AmendMode))
+          .configure(
+            "features.reg-validation-enabled" -> true
+          )
+          .build()
+
+        val userAnswersWithSingleMarketIndicatorFalse = basicUserAnswersWithVatInfo copy (vatInfo =
+          Some(vatCustomerInfo copy (singleMarketIndicator = Some(false))))
 
         running(app) {
           val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse)
