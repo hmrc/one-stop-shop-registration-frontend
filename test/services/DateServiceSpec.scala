@@ -32,10 +32,11 @@ import pages.{DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSale
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
+import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.Month._
-import java.time.{Clock, LocalDate, Year, ZoneId}
+import java.time.{Clock, Instant, LocalDate, Year, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -599,6 +600,73 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       val commencementDate = LocalDate.of(2023, 3, 20)
 
       val expectedFinalAmendmentDate = LocalDate.of(2023, 4, 10)
+
+      val dateService = new DateService(stubClock, coreRegistrationValidationService)
+
+      val result = dateService.calculateFinalAmendmentDate(commencementDate)
+
+      result mustBe expectedFinalAmendmentDate
+    }
+
+    "must return 10th October given commencement date is 14th July" in {
+      val stubClock = getStubClock(LocalDate.of(2023, 7, 14))
+      val commencementDate = LocalDate.of(2023, 7, 14)
+
+      val expectedFinalAmendmentDate = LocalDate.of(2023, 10, 10)
+
+      val dateService = new DateService(stubClock, coreRegistrationValidationService)
+
+      val result = dateService.calculateFinalAmendmentDate(commencementDate)
+
+      result mustBe expectedFinalAmendmentDate
+    }
+
+    "must return 10th October given commencement date is 14th July if today is 11th November" in {
+      val stubClock = getStubClock(LocalDate.of(2023, 11, 11))
+      val commencementDate = LocalDate.of(2023, 7, 14)
+
+      val expectedFinalAmendmentDate = LocalDate.of(2023, 10, 10)
+
+      val dateService = new DateService(stubClock, coreRegistrationValidationService)
+
+      val result = dateService.calculateFinalAmendmentDate(commencementDate)
+
+      result mustBe expectedFinalAmendmentDate
+    }
+
+    "must return 10th July given commencement date is 1st Jult if today is 19th June" in {
+
+      val stubClock = getStubClock(LocalDate.of(2023, 6, 19))
+      val commencementDate = LocalDate.of(2023, 7, 1)
+
+      val expectedFinalAmendmentDate = LocalDate.of(2023, 7, 10)
+
+      val dateService = new DateService(stubClock, coreRegistrationValidationService)
+
+      val result = dateService.calculateFinalAmendmentDate(commencementDate)
+
+      result mustBe expectedFinalAmendmentDate
+    }
+
+    "must return 10th OCtober given commencement date is 1st July if today is 1st July and there is a registration already which was today" in {
+
+      implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
+        AuthenticatedDataRequest(
+          request,
+          testCredentials,
+          vrn,
+          Some(
+            RegistrationData.registration.copy(
+              submissionReceived = Some(Instant.parse("2023-07-01T12:00:00Z"))
+            )
+          ),
+          emptyUserAnswers
+        )
+
+      val stubClock = getStubClock(LocalDate.of(2023, 7, 1))
+      val commencementDate = LocalDate.of(2023, 7, 1)
+
+      val expectedFinalAmendmentDate = LocalDate.of(2023, 10, 10)
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 

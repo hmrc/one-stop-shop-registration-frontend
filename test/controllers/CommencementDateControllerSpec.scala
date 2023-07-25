@@ -28,7 +28,7 @@ import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPla
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.{CoreRegistrationValidationService, DateService}
+import services.{CoreRegistrationValidationService, DateService, RegistrationService}
 import views.html.CommencementDateView
 
 import java.time.LocalDate
@@ -36,11 +36,13 @@ import scala.concurrent.Future
 
 class CommencementDateControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
- private val dateService: DateService = mock[DateService]
- private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+  private val dateService: DateService = mock[DateService]
+  private val registrationService: RegistrationService = mock[RegistrationService]
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   override def beforeEach(): Unit = {
     reset(dateService)
+    reset(registrationService)
   }
 
   "CommencementDate Controller" - {
@@ -62,11 +64,13 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.startOfNextQuarter()) thenReturn now
         when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
         when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
+            .overrides(bind[RegistrationService].toInstance(registrationService))
             .build()
 
         running(application) {
@@ -87,6 +91,38 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         }
       }
 
+      "must redirect to next page if eligible sales is not amendable" in {
+        val now = LocalDate.now()
+        val dateOfFirstSale = LocalDate.now().withDayOfMonth(1)
+        val dateOfLastAmendment = LocalDate.now().plusMonths(1).withDayOfMonth(10)
+
+        val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, true).success.value
+        val answers = answer1.set(DateOfFirstSalePage, dateOfFirstSale).success.value
+
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(dateOfFirstSale)
+        when(dateService.startOfCurrentQuarter) thenReturn now
+        when(dateService.lastDayOfCalendarQuarter) thenReturn now
+        when(dateService.startOfNextQuarter()) thenReturn now
+        when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
+        when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(false)
+
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
+            .overrides(bind[RegistrationService].toInstance(registrationService))
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual CommencementDatePage.navigate(NormalMode, answers).url
+        }
+      }
+
       "must redirect to Journey Recovery for a GET when DateOfFirstSale is missing" in {
         val now = LocalDate.now()
         val dateOfFirstSale = LocalDate.now().withDayOfMonth(5)
@@ -97,7 +133,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
-        when(dateService.startOfNextQuarter())thenReturn now
+        when(dateService.startOfNextQuarter()) thenReturn now
 
         val application =
           applicationBuilder(userAnswers = Some(answer1))
@@ -128,7 +164,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
         when(dateService.startOfCurrentQuarter) thenReturn now
         when(dateService.lastDayOfCalendarQuarter) thenReturn now
-        when(dateService.startOfNextQuarter())thenReturn now
+        when(dateService.startOfNextQuarter()) thenReturn now
         when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
 
         val application =
@@ -265,7 +301,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
       when(dateService.startOfCurrentQuarter) thenReturn now
       when(dateService.lastDayOfCalendarQuarter) thenReturn now
-      when(dateService.startOfNextQuarter())thenReturn now
+      when(dateService.startOfNextQuarter()) thenReturn now
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
@@ -292,7 +328,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
       when(dateService.startOfCurrentQuarter) thenReturn now
       when(dateService.lastDayOfCalendarQuarter) thenReturn now
-      when(dateService.startOfNextQuarter())thenReturn now
+      when(dateService.startOfNextQuarter()) thenReturn now
 
       val application =
         applicationBuilder(userAnswers = Some(answers))

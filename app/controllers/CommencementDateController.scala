@@ -22,7 +22,7 @@ import models.Mode
 import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.DateService
+import services.{DateService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CommencementDateView
 
@@ -33,7 +33,8 @@ class CommencementDateController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             cc: AuthenticatedControllerComponents,
                                             view: CommencementDateView,
-                                            dateService: DateService
+                                            dateService: DateService,
+                                            registrationService: RegistrationService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -42,48 +43,52 @@ class CommencementDateController @Inject()(
     implicit request =>
       for {
         calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        isEligibleSalesAmendable <- registrationService.isEligibleSalesAmendable()
         finalDayOfDateAmendment = dateService.calculateFinalAmendmentDate(calculatedCommencementDate)
       } yield {
-        request.userAnswers.get(HasMadeSalesPage) match {
-          case Some(true) =>
-            request.userAnswers.get(DateOfFirstSalePage).map {
-              date =>
+        if (isEligibleSalesAmendable) {
+          request.userAnswers.get(HasMadeSalesPage) match {
+            case Some(true) =>
+              request.userAnswers.get(DateOfFirstSalePage).map {
+                date =>
+                  val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
+                  val isDateInCurrentQuarter = calculatedCommencementDate.isBefore(endOfCurrentQuarter) || endOfCurrentQuarter == calculatedCommencementDate
+                  val startOfCurrentQuarter = dateService.startOfCurrentQuarter
+                  val startOfNextQuarter = dateService.startOfNextQuarter()
 
-                val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
-                val isDateInCurrentQuarter = calculatedCommencementDate.isBefore(endOfCurrentQuarter) || endOfCurrentQuarter == calculatedCommencementDate
-                val startOfCurrentQuarter = dateService.startOfCurrentQuarter
-                val startOfNextQuarter = dateService.startOfNextQuarter()
+                  Ok(
+                    view(
+                      mode,
+                      calculatedCommencementDate.format(dateFormatter),
+                      finalDayOfDateAmendment.format(dateFormatter),
+                      isDateInCurrentQuarter,
+                      Some(startOfCurrentQuarter.format(dateFormatter)),
+                      Some(endOfCurrentQuarter.format(dateFormatter)),
+                      Some(startOfNextQuarter.format(dateFormatter))
+                    )
+                  )
+              }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 
-                Ok(
-                  view(
+            case Some(false) =>
+              request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
+                case Some(true) =>
+                  Ok(view(
                     mode,
                     calculatedCommencementDate.format(dateFormatter),
                     finalDayOfDateAmendment.format(dateFormatter),
-                    isDateInCurrentQuarter,
-                    Some(startOfCurrentQuarter.format(dateFormatter)),
-                    Some(endOfCurrentQuarter.format(dateFormatter)),
-                    Some(startOfNextQuarter.format(dateFormatter))
-                  )
-                )
-            }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+                    isDateInCurrentQuarter = true,
+                    None,
+                    None,
+                    None
+                  ))
+                case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
+                case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+              }
 
-          case Some(false) =>
-            request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
-              case Some(true) =>
-                Ok(view(
-                  mode,
-                  calculatedCommencementDate.format(dateFormatter),
-                  finalDayOfDateAmendment.format(dateFormatter),
-                  isDateInCurrentQuarter = true,
-                  None,
-                  None,
-                  None
-                ))
-              case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
-              case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
-
-          case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
+        } else {
+          Redirect(CommencementDatePage.navigate(mode, request.userAnswers))
         }
       }
   }
