@@ -40,7 +40,7 @@ class CheckEligibleSalesAmendableFilterImpl(mode: Option[Mode],
 
     mode match {
       case Some(AmendMode) =>
-        registrationService.isEligibleSalesAmendable(request.registration).map {
+        registrationService.isEligibleSalesAmendable().map {
           case false => Some(Redirect(controllers.amend.routes.NoLongerAmendableController.onPageLoad().url))
           case _ => None
         }
