@@ -113,12 +113,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) mustEqual view(
             vrn,
             config.feedbackUrl(request),
-            commencementDate.format(dateFormatter),
             None,
             yourAccountUrl,
             "Company name",
-            periodOfFirstReturn.displayShortText,
-            firstDayOfNextPeriod.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }
@@ -161,12 +158,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) mustEqual view(
             vrn,
             config.feedbackUrl(request),
-            commencementDate.format(dateFormatter),
             None,
             yourAccountUrl,
             "Company name",
-            periodOfFirstReturn.displayShortText,
-            firstDayOfNextPeriod.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }
@@ -208,12 +202,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) mustEqual view(
             vrn,
             config.feedbackUrl(request),
-            commencementDate.format(dateFormatter),
             None,
             yourAccountUrl,
             "Company name",
-            periodOfFirstReturn.displayShortText,
-            firstDayOfNextPeriod.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }
@@ -260,12 +251,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) mustEqual view(
             vrn,
             config.feedbackUrl(request),
-            commencementDate.format(dateFormatter),
             None,
             yourAccountUrl,
             "Company name",
-            periodOfFirstReturn.displayShortText,
-            firstDayOfNextPeriod.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }
@@ -308,12 +296,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) mustEqual view(
             vrn,
             config.feedbackUrl(request),
-            commencementDate.format(dateFormatter),
             None,
             yourAccountUrl,
             "Company name",
-            periodOfFirstReturn.displayShortText,
-            firstDayOfNextPeriod.format(dateFormatter)
           )(request, messages(application)).toString
         }
       }

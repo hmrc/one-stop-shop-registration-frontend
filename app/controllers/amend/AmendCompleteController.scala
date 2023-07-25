@@ -37,8 +37,6 @@ class AmendCompleteController @Inject()(
                                                cc: AuthenticatedControllerComponents,
                                                view: AmendCompleteView,
                                                frontendAppConfig: FrontendAppConfig,
-                                               dateService: DateService,
-                                               periodService: PeriodService,
                                                registrationConnector: RegistrationConnector,
                                                clock: Clock
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -50,25 +48,18 @@ class AmendCompleteController @Inject()(
 
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()
-        calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
       } yield {
           {for {
             organisationName <- getOrganisationName(request.userAnswers)
           } yield {
             val savedUrl = externalEntryUrl.fold(_ => None, _.url)
-            val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
-            val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-            val firstDayOfNextPeriod = nextPeriod.firstDay
               Ok(
                 view(
                   request.vrn,
                   frontendAppConfig.feedbackUrl,
-                  calculatedCommencementDate.format(dateFormatter),
                   savedUrl,
                   frontendAppConfig.ossYourAccountUrl,
-                  organisationName,
-                  periodOfFirstReturn.displayShortText,
-                  firstDayOfNextPeriod.format(dateFormatter)
+                  organisationName
                 )
               )
           }}.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
