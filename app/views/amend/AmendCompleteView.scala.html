@@ -24,12 +24,9 @@
 @(
     vrn: Vrn,
     feedbackLink: String,
-    commencementDate: String,
     externalUrl: Option[String] = None,
     yourAccountUrl: String,
-    organisationName: String,
-    periodOfFirstReturn: String,
-    firstDayOfNextPeriod: String
+    organisationName: String
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("amendComplete.title")), showBackLink = false) {
