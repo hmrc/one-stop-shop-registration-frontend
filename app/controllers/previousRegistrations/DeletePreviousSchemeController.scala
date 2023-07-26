@@ -47,7 +47,7 @@ class DeletePreviousSchemeController @Inject()(
 
       val isLastPreviousScheme = request.userAnswers.get(DeriveNumberOfPreviousSchemes(countryIndex)).get == lastSchemeForCountry
 
-      getPreviousCountry(countryIndex) {
+      getPreviousCountry(mode, countryIndex) {
         country =>
 
           val list =
@@ -75,7 +75,7 @@ class DeletePreviousSchemeController @Inject()(
 
       val isLastPreviousScheme = request.userAnswers.get(DeriveNumberOfPreviousSchemes(countryIndex)).get == lastSchemeForCountry
 
-      getPreviousCountry(countryIndex) {
+      getPreviousCountry(mode, countryIndex) {
         country =>
 
           val list =

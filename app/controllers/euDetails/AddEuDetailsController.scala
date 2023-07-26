@@ -26,6 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.CompletionChecks
 import utils.EuDetailsCompletionChecks.{getAllIncompleteEuDetails, incompleteCheckEuDetailsRedirect}
 import utils.FutureSyntax.FutureOps
@@ -49,7 +50,7 @@ class AddEuDetailsController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
-      getNumberOfEuCountries {
+      getNumberOfEuCountries(mode) {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
@@ -75,12 +76,12 @@ class AddEuDetailsController @Inject()(
           if (incompletePromptShown) {
             incompleteCheckEuDetailsRedirect(CheckMode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture
-            ).getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+            ).getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
           } else {
             Future.successful(Redirect(routes.AddEuDetailsController.onPageLoad(mode)))
           }
         }) {
-        getNumberOfEuCountries {
+        getNumberOfEuCountries(mode) {
           number =>
             val canAddCountries = number < Country.euCountries.size
             form.bindFromRequest().fold(
@@ -100,10 +101,10 @@ class AddEuDetailsController @Inject()(
 
   }
 
-  private def getNumberOfEuCountries(block: Int => Future[Result])
+  private def getNumberOfEuCountries(mode: Mode)(block: Int => Future[Result])
                                     (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfEuRegistrations).map {
       number =>
         block(number)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

@@ -30,6 +30,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.CoreRegistrationValidationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousIossNumberView
 
 import javax.inject.Inject
@@ -48,9 +50,9 @@ class PreviousIossNumberController @Inject()(
 
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousCountry(countryIndex) { country =>
+      getPreviousCountry(mode, countryIndex) { country =>
 
-        getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
+        getHasIntermediary(mode, countryIndex, schemeIndex) { hasIntermediary =>
 
           val form = formProvider(country, hasIntermediary)
 
@@ -66,10 +68,10 @@ class PreviousIossNumberController @Inject()(
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousCountry(countryIndex) { country =>
+      getPreviousCountry(mode, countryIndex) { country =>
 
-        getHasIntermediary(countryIndex, schemeIndex) { hasIntermediary =>
-          getPreviousScheme(countryIndex, schemeIndex) { previousScheme =>
+        getHasIntermediary(mode, countryIndex, schemeIndex) { hasIntermediary =>
+          getPreviousScheme(mode, countryIndex, schemeIndex) { previousScheme =>
 
             val form = formProvider(country, hasIntermediary)
 
@@ -107,7 +109,7 @@ class PreviousIossNumberController @Inject()(
     } yield Redirect(PreviousIossNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
   }
 
-  private def getHasIntermediary(countryIndex: Index, schemeIndex: Index)
+  private def getHasIntermediary(mode: Mode, countryIndex: Index, schemeIndex: Index)
                                 (block: Boolean => Future[Result])
                                 (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousIossSchemePage(countryIndex, schemeIndex)).map {
@@ -115,10 +117,10 @@ class PreviousIossNumberController @Inject()(
         block(hasIntermediary)
     }.getOrElse {
       logger.error("Failed to get intermediary")
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      Redirect(determineJourneyRecovery(Some(mode))).toFuture
     }
 
-  private def getPreviousScheme(countryIndex: Index, schemeIndex: Index)
+  private def getPreviousScheme(mode: Mode, countryIndex: Index, schemeIndex: Index)
                                (block: PreviousScheme => Future[Result])
                                (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousSchemePage(countryIndex, schemeIndex)).map {
@@ -126,7 +128,7 @@ class PreviousIossNumberController @Inject()(
         block(previousScheme)
     }.getOrElse {
       logger.error("Failed to get previous scheme")
-      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      Redirect(determineJourneyRecovery(Some(mode))).toFuture
     }
 
   private def getIossHintText(country: Country): String = {

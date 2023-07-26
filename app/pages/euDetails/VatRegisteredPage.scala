@@ -17,6 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
 import pages.QuestionPage
@@ -63,7 +64,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
       case Some(false) =>
         euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendMode, index)
       case None =>
-        routes.JourneyRecoveryController.onPageLoad()
+        amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 
   override protected def navigateInCheckLoopMode(answers: UserAnswers): Call =
@@ -91,7 +92,7 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
       case Some(false) =>
         euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendLoopMode, index)
       case None =>
-        routes.JourneyRecoveryController.onPageLoad()
+        amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {

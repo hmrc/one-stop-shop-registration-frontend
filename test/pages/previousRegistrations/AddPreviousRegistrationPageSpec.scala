@@ -18,6 +18,7 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, CheckMode, Country, Index, NormalMode}
@@ -159,10 +160,10 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is empty" - {
 
-        "to Journey recovery" in {
+        "to Amend Journey recovery" in {
 
           AddPreviousRegistrationPage.navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

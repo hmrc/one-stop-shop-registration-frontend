@@ -17,6 +17,9 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import controllers.routes
+import controllers.previousRegistrations.{routes => prevRoutes}
+import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
 import models.domain.{PreviousSchemeDetails, PreviousSchemeNumbers}
@@ -47,7 +50,9 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
   private val previousSchemeNumbers = PreviousSchemeNumbers("VAT Number", None)
   private val previousScheme = PreviousSchemeDetails(PreviousScheme.OSSU, previousSchemeNumbers)
   private val previousRegistration = PreviousRegistrationDetails(country, List(previousScheme))
-  private lazy val deletePreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url
+
+  private lazy val deletePreviousRegistrationRoute = prevRoutes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url
+  private lazy val deletePreviousRegistrationAmendRoute = prevRoutes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index).url
 
   private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
@@ -156,7 +161,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -170,7 +175,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -194,8 +199,6 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
       "must not delete an existing previous registration and redirect to Cannot Remove Existing Previous Registrations when the user answers Yes" in {
 
-        lazy val deleteAmendPreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index).url
-
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -218,20 +221,20 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         running(application) {
           val request =
-            FakeRequest(POST, deleteAmendPreviousRegistrationRoute)
+            FakeRequest(POST, deletePreviousRegistrationAmendRoute)
               .withFormUrlEncodedBody(("value", "true"))
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad().url
+          redirectLocation(result).value mustEqual prevRoutes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad().url
           verify(mockSessionRepository, never()).set(any())
         }
       }
 
       "must delete a new previous registration and redirect to the next page when the user answers Yes" in {
 
-        lazy val deleteAmendPreviousRegistrationRoute = routes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index1).url
+        lazy val deleteAmendPreviousRegistrationAmendRoute = prevRoutes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index1).url
 
         val answers = basicUserAnswersWithVatInfo
           .set(PreviousEuCountryPage(index), Country("DE", "Germany")).success.value
@@ -256,7 +259,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         running(application) {
           val request =
-            FakeRequest(POST, deleteAmendPreviousRegistrationRoute)
+            FakeRequest(POST, deleteAmendPreviousRegistrationAmendRoute)
               .withFormUrlEncodedBody(("value", "true"))
 
           val expectedAnswers = answers
@@ -268,6 +271,54 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
           redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index1).navigate(AmendMode, answers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
 
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, deletePreviousRegistrationAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if no EU VAT details exist" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, deletePreviousRegistrationAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, deletePreviousRegistrationAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 

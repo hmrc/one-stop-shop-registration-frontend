@@ -47,6 +47,6 @@ case object AddTradingNamePage extends QuestionPage[Boolean] {
     (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(AmendMode, Index(size))
       case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

@@ -41,7 +41,7 @@ class RegistrationTypeController @Inject()(
   def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
-      getCountry(countryIndex) {
+      getCountry(mode, countryIndex) {
 
         country =>
 
@@ -58,7 +58,7 @@ class RegistrationTypeController @Inject()(
   def onSubmit(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
-      getCountry(countryIndex) {
+      getCountry(mode, countryIndex) {
 
         country =>
 

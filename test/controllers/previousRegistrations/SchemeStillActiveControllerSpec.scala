@@ -145,7 +145,7 @@ class SchemeStillActiveControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery if no answers present" in {
+      "must redirect to Amend Journey Recovery if no answers present" in {
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -161,7 +161,7 @@ class SchemeStillActiveControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustBe controllers.amend.routes.AmendJourneyRecoveryController.onPageLoad().url
           verifyNoInteractions(mockSessionRepository)
 
         }

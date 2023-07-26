@@ -122,9 +122,9 @@ class AddWebsitePageSpec extends SpecBase with PageBehaviours {
         }
       }
 
-      "to Journey recovery when the answer is none" in {
+      "to Amend Journey recovery when the answer is none" in {
         AddWebsitePage.navigate(AmendMode, emptyUserAnswers)
-          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 

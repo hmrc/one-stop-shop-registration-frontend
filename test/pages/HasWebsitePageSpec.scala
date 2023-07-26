@@ -153,10 +153,10 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
         }
       }
 
-      "to Journey recovery when the answer is empty" in {
+      "to Amend Journey recovery when the answer is empty" in {
 
-        HasWebsitePage.navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        HasWebsitePage.navigate(AmendMode, emptyUserAnswers)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
   }

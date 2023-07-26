@@ -17,9 +17,12 @@
 package controllers.euDetails
 
 import base.SpecBase
+import controllers.routes
+import controllers.euDetails.{routes => euDetailsRoutes}
+import controllers.amend.{routes => amendRoutes}
 import forms.euDetails.EuSendGoodsAddressFormProvider
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.{Country, Index, InternationalAddress, NormalMode}
+import models.{AmendMode, Country, Index, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -44,7 +47,8 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new EuSendGoodsAddressFormProvider()
   private val form = formProvider(country)
 
-  private lazy val euSendGoodsAddressRoute = routes.EuSendGoodsAddressController.onPageLoad(NormalMode, index).url
+  private lazy val euSendGoodsAddressRoute = euDetailsRoutes.EuSendGoodsAddressController.onPageLoad(NormalMode, index).url
+  private lazy val euSendGoodsAddressAmendRoute = euDetailsRoutes.EuSendGoodsAddressController.onPageLoad(AmendMode, index).url
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo.set(TaxRegisteredInEuPage, true).success.value
@@ -149,7 +153,21 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Amend Journey Recovery for a GET if no existing data is found in AmendMode" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, euSendGoodsAddressAmendRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -165,7 +183,23 @@ class EuSendGoodsAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Amend Journey Recovery for a POST if no existing data is found in AmendMode" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, euSendGoodsAddressAmendRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
       }
     }
   }

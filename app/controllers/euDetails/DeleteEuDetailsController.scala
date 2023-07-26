@@ -26,6 +26,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{EuDetailsQuery, EuOptionalDetailsQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import views.html.euDetails.DeleteEuDetailsView
 
 import javax.inject.Inject
@@ -43,7 +45,7 @@ class DeleteEuDetailsController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getEuVatDetails(index) {
+      getEuVatDetails(mode, index) {
         details =>
 
           val form = formProvider(details.euCountry.name)
@@ -54,7 +56,7 @@ class DeleteEuDetailsController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getEuVatDetails(index) {
+      getEuVatDetails(mode, index) {
         details =>
 
           val form = formProvider(details.euCountry.name)
@@ -77,11 +79,11 @@ class DeleteEuDetailsController @Inject()(
   }
 
 
-  private def getEuVatDetails(index: Index)
+  private def getEuVatDetails(mode: Mode, index: Index)
                              (block: EuOptionalDetails => Future[Result])
                              (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(EuOptionalDetailsQuery(index)).map {
       details =>
         block(details)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

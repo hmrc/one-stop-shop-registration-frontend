@@ -17,8 +17,10 @@
 package controllers
 
 import base.SpecBase
+import controllers.amend.{routes => amendRoutes}
+import connectors.RegistrationConnector
 import forms.AddWebsiteFormProvider
-import models.{Index, NormalMode}
+import models.{AmendMode, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,6 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import viewmodels.checkAnswers.WebsiteSummary
 import views.html.AddWebsiteView
 
@@ -39,8 +42,12 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider()
 
   private lazy val addWebsiteRoute = routes.AddWebsiteController.onPageLoad(NormalMode).url
+  private lazy val addWebsiteAmendRoute = routes.AddWebsiteController.onPageLoad(AmendMode).url
 
   private val baseAnswers = basicUserAnswersWithVatInfo.set(WebsitePage(Index(0)), "foo").success.value
+
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
 
   "AddWebsite Controller" - {
 
@@ -204,6 +211,58 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+
+    "in AmendMode" - {
+
+      "must redirect to Amend Journey Recovery and the correct view for a GET when cannot derive number of websites" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addWebsiteAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addWebsiteAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, addWebsiteAmendRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
   }
 }

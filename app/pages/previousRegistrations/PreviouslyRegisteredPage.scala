@@ -52,7 +52,7 @@ case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
       case (Some(true), Some(size)) if size > 0 => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case (Some(true), _) => prevRegRoutes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0))
       case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 
 }

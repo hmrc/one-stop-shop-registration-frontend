@@ -24,6 +24,8 @@ import pages.{DeleteWebsitePage, WebsitePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import views.html.DeleteWebsiteView
 
 import javax.inject.Inject
@@ -41,7 +43,7 @@ class DeleteWebsiteController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getWebsite(index) {
+      getWebsite(mode, index) {
         website =>
           Future.successful(Ok(view(form, mode, index, website)))
       }
@@ -50,7 +52,7 @@ class DeleteWebsiteController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getWebsite(index) {
+      getWebsite(mode, index) {
         website =>
           form.bindFromRequest().fold(
             formWithErrors =>
@@ -69,11 +71,11 @@ class DeleteWebsiteController @Inject()(
       }
   }
 
-  private def getWebsite(index: Index)
+  private def getWebsite(mode: Mode, index: Index)
                         (block: String => Future[Result])
                         (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(WebsitePage(index)).map {
       name =>
         block(name)
-    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

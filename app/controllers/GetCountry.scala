@@ -17,29 +17,31 @@
 package controllers
 
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index}
+import models.{Country, Index, Mode}
 import pages.euDetails.EuCountryPage
 import pages.previousRegistrations.PreviousEuCountryPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 
 import scala.concurrent.Future
 
 trait GetCountry {
 
-  def getCountry(index: Index)
+  def getCountry(mode: Mode, index: Index)
                 (block: Country => Future[Result])
                 (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(EuCountryPage(index)).map {
       country =>
         block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 
-  def getPreviousCountry(index: Index)
+  def getPreviousCountry(mode: Mode, index: Index)
                         (block: Country => Future[Result])
                         (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(PreviousEuCountryPage(index)).map {
       country =>
         block(country)
-    }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

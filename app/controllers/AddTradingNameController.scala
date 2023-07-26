@@ -26,6 +26,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfTradingNames
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
 
@@ -44,7 +46,7 @@ class AddTradingNameController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getNumberOfTradingNames {
+      getNumberOfTradingNames(mode) {
         number =>
           val canAddTradingNames = number < Constants.maxTradingNames
           Future.successful(Ok(view(form, mode, TradingNameSummary.addToListRows(request.userAnswers, mode), canAddTradingNames)))
@@ -53,7 +55,7 @@ class AddTradingNameController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getNumberOfTradingNames {
+      getNumberOfTradingNames(mode) {
         number =>
           val canAddTradingNames = number < Constants.maxTradingNames
 
@@ -72,10 +74,10 @@ class AddTradingNameController @Inject()(
       }
   }
 
-  private def getNumberOfTradingNames(block: Int => Future[Result])
+  private def getNumberOfTradingNames(mode: Mode)(block: Int => Future[Result])
                                      (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfTradingNames).map {
       number =>
         block(number)
-    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

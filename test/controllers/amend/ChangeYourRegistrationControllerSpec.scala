@@ -21,7 +21,6 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import controllers.amend.{routes => amendRoutes}
-import controllers.routes
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
@@ -385,7 +384,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
       "when the user has not answered all necessary data" - {
 
-        "the user is redirected to Journey Recovery Page" in {
+        "the user is redirected to Amend Journey Recovery Page" in {
 
           when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
             Future.successful(Invalid(NonEmptyChain(DataMissingError(HasWebsitePage))))
@@ -398,7 +397,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
           }
         }
 

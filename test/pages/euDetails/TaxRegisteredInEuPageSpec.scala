@@ -59,7 +59,7 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is empty" - {
 
-        "to Previously Registered" in {
+        "to Journey Recovery" in {
 
           TaxRegisteredInEuPage.navigate(NormalMode, emptyUserAnswers)
             .mustEqual(routes.JourneyRecoveryController.onPageLoad())
@@ -184,10 +184,10 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is empty" - {
 
-        "to Previously Registered" in {
+        "to Amend Journey Recovery" in {
 
           TaxRegisteredInEuPage.navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

@@ -48,7 +48,7 @@ class PreviousOssNumberController @Inject()(
 
   def onPageLoad(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousCountry(countryIndex) {
+      getPreviousCountry(mode, countryIndex) {
         country =>
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex)
@@ -76,7 +76,7 @@ class PreviousOssNumberController @Inject()(
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getPreviousCountry(countryIndex) {
+      getPreviousCountry(mode, countryIndex) {
         country =>
 
           val previousSchemeHintText = determinePreviousSchemeHintText(countryIndex)

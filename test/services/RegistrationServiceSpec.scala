@@ -19,14 +19,14 @@ package services
 import base.SpecBase
 import connectors.returns.VatReturnConnector
 import controllers.routes
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, EuVatRegistration, PreviousSchemeNumbers, RegistrationWithFixedEstablishment, RegistrationWithoutFixedEstablishmentWithTradeDetails, TradeDetails, VatDetailSource, VatDetails}
-import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
 import models.domain.returns.VatReturn
+import models.domain._
+import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
 import models.responses.NotFound
-import org.mockito.MockitoSugar.when
+import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.MockitoSugar.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
@@ -41,8 +41,8 @@ import queries.{AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.{Clock, Instant, LocalDate, ZoneId}
 import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

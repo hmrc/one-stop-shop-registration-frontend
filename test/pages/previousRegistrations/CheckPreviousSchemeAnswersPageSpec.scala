@@ -18,6 +18,7 @@ package pages.previousRegistrations
 
 import base.SpecBase
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, CheckMode, Country, Index, NormalMode}
@@ -119,12 +120,12 @@ class CheckPreviousSchemeAnswersPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(AmendMode))
       }
 
-      "to Journey Recovery Page when user does not answer" in {
+      "to Amend Journey Recovery Page when user does not answer" in {
 
         val answers = emptyUserAnswers
 
         CheckPreviousSchemeAnswersPage(Index(0)).navigate(AmendMode, answers)
-          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
 
     }

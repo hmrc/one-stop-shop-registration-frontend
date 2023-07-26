@@ -44,7 +44,7 @@ class EuTaxReferenceController @Inject()(
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCountry(index) {
+      getCountry(mode, index) {
         country =>
 
           val form = formProvider(country)
@@ -60,7 +60,7 @@ class EuTaxReferenceController @Inject()(
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      getCountry(index) {
+      getCountry(mode, index) {
         country =>
 
           val form = formProvider(country)

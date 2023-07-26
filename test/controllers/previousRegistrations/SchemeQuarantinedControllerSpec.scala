@@ -17,6 +17,8 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import controllers.previousRegistrations.{routes => prevRoutes}
+import controllers.amend.{routes => amendRoutes}
 import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -56,7 +58,7 @@ class SchemeQuarantinedControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
-          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(NormalMode, index, index).url)
+          val request = FakeRequest(GET, prevRoutes.SchemeQuarantinedController.onPageLoad(NormalMode, index, index).url)
 
           val result = route(application, request).value
 
@@ -72,7 +74,7 @@ class SchemeQuarantinedControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), mode = Some(AmendMode)).build()
 
         running(application) {
-          val request = FakeRequest(GET, controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(AmendMode, index, index).url)
+          val request = FakeRequest(GET, prevRoutes.SchemeQuarantinedController.onPageLoad(AmendMode, index, index).url)
 
           val result = route(application, request).value
 
@@ -105,7 +107,7 @@ class SchemeQuarantinedControllerSpec extends SpecBase {
           val expectedAnswers = answers.remove(PreviousSchemeForCountryQuery(index, index)).success.value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          redirectLocation(result).value mustBe amendRoutes.ChangeYourRegistrationController.onPageLoad().url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
 
         }
@@ -134,13 +136,13 @@ class SchemeQuarantinedControllerSpec extends SpecBase {
           val expectedAnswers = additionalAnswers.remove(PreviousSchemeForCountryQuery(index, index)).success.value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          redirectLocation(result).value mustBe amendRoutes.ChangeYourRegistrationController.onPageLoad().url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
 
         }
       }
 
-      "must redirect to Journey Recovery if no answers present" in {
+      "must redirect to Amend Journey Recovery if no answers present" in {
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
@@ -156,7 +158,7 @@ class SchemeQuarantinedControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustBe amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
           verifyNoInteractions(mockSessionRepository)
 
         }

@@ -140,10 +140,10 @@ class AddEuDetailsPageSpec extends SpecBase with PageBehaviours {
 
       "when the user answers empty" - {
 
-        "must be Journey recovery" in {
+        "must be Amend Journey recovery" in {
 
           AddEuDetailsPage.navigate(AmendMode, emptyUserAnswers)
-            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }

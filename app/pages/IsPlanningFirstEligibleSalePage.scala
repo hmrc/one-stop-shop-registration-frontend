@@ -18,6 +18,7 @@ package pages
 
 import controllers.routes
 import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.amend.{routes => amendRoutes}
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -44,6 +45,6 @@ case object IsPlanningFirstEligibleSalePage extends QuestionPage[Boolean] {
   override protected def navigateInAmendMode(answers: UserAnswers): Call = answers.get(IsPlanningFirstEligibleSalePage) match {
     case Some(true)  => routes.CommencementDateController.onPageLoad(AmendMode)
     case Some(false) => routes.RegisterLaterController.onPageLoad()
-    case _           => routes.JourneyRecoveryController.onPageLoad()
+    case _           => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
   }
 }

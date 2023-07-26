@@ -17,9 +17,13 @@
 package controllers.euDetails
 
 import base.SpecBase
+import controllers.routes
+import controllers.euDetails.{routes => euDetailsRoutes}
+import controllers.amend.{routes => amendRoutes}
+import connectors.RegistrationConnector
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
-import models.{CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +33,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.RegistrationData
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
 import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
 
@@ -41,8 +46,13 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val countryIndex = Index(0)
   private val country = Country.euCountries.head
 
-  private lazy val addEuVatDetailsRoute = routes.AddEuDetailsController.onPageLoad(NormalMode).url
-  private def addEuVatDetailsPostRoute(prompt: Boolean = false) = routes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
+  private lazy val addEuVatDetailsRoute = euDetailsRoutes.AddEuDetailsController.onPageLoad(NormalMode).url
+  private lazy val addEuVatDetailsAmendRoute = euDetailsRoutes.AddEuDetailsController.onPageLoad(AmendMode).url
+  private def addEuVatDetailsPostRoute(prompt: Boolean = false) = euDetailsRoutes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
+  private def addEuVatDetailsPostAmendRoute(prompt: Boolean = false) = euDetailsRoutes.AddEuDetailsController.onSubmit(AmendMode, prompt).url
+
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   private val baseAnswers =
     basicUserAnswersWithVatInfo
       .set(TaxRegisteredInEuPage, true).success.value
@@ -237,7 +247,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -253,7 +263,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -269,7 +279,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.AddEuDetailsController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.AddEuDetailsController.onPageLoad(NormalMode).url
       }
     }
 
@@ -285,7 +295,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -303,7 +313,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -322,7 +332,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -342,7 +352,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -362,7 +372,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.EuTaxReferenceController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.EuTaxReferenceController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -383,7 +393,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -405,7 +415,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.FixedEstablishmentAddressController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.FixedEstablishmentAddressController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -426,7 +436,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -448,7 +458,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.EuSendGoodsAddressController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.EuSendGoodsAddressController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -466,7 +476,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.VatRegisteredController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.VatRegisteredController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -485,7 +495,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
+        redirectLocation(result).value mustEqual euDetailsRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -506,9 +516,61 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.CannotAddCountryController.onPageLoad(CheckMode, countryIndex).url
+          redirectLocation(result).value mustEqual euDetailsRoutes.CannotAddCountryController.onPageLoad(CheckMode, countryIndex).url
         }
       }
+    }
+
+    "in AmendMode" - {
+
+      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addEuVatDetailsAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if user answers are empty" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addEuVatDetailsAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, addEuVatDetailsPostAmendRoute())
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
 
   }

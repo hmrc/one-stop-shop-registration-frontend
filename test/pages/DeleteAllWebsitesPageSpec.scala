@@ -89,12 +89,12 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
       }
 
-      "to Journey Recovery Page when the user submits no answer" in {
+      "to Amend Journey Recovery Page when the user submits no answer" in {
 
         val answers = emptyUserAnswers
 
         DeleteAllWebsitesPage.navigate(AmendMode, answers)
-          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
       }
     }
 

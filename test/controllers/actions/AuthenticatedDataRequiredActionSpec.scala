@@ -17,6 +17,8 @@
 package controllers.actions
 
 import base.SpecBase
+import controllers.routes
+import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import models.{AmendMode, Mode, NormalMode}
@@ -75,7 +77,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
+            result mustBe Left(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
           }
         }
 
@@ -92,7 +94,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(controllers.routes.JourneyRecoveryController.onMissingAnswers().url))
+            result mustBe Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers().url))
           }
         }
 
@@ -138,7 +140,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
           }
         }
 
-        "must redirect to Journey Recovery when there is data present but no registration has been retrieved" in {
+        "must redirect to Amend Journey Recovery when there is data present but no registration has been retrieved" in {
 
           when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
@@ -155,10 +157,28 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
+            result mustBe Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
             verify(connector, times(1)).getRegistration()(any())
           }
         }
+
+        "must redirect to Amend Journey Recovery when there are empty userAnswers present" in {
+
+          val application =
+            applicationBuilder().build()
+
+          running(application) {
+
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(emptyUserAnswers))
+            val connector = application.injector.instanceOf[RegistrationConnector]
+            val action = new Harness(AmendMode, connector)
+
+            val result = action.callRefine(request).futureValue
+
+            result mustBe Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
+          }
+        }
+
       }
     }
   }
@@ -179,7 +199,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
           val result = action.callRefine(UnauthenticatedOptionalDataRequest(request, testCredentials.providerId, None)).futureValue
 
-          result mustBe Left(Redirect(controllers.routes.RegisteredForOssInEuController.onPageLoad().url))
+          result mustBe Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad().url))
         }
       }
 

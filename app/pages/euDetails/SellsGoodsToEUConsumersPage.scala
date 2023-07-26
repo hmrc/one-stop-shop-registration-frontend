@@ -17,6 +17,8 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.{routes => amendRoutes}
+import controllers.routes
 import models._
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -36,7 +38,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(NormalMode, countryIndex)
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -46,17 +48,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex)
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(CheckMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
-  }
-
-  override protected def navigateInAmendMode(answers: UserAnswers): Call = {
-    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
-      case Some(true) =>
-        euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendMode, countryIndex)
-      case Some(false) =>
-        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -66,7 +58,17 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckLoopMode, countryIndex)
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(true) =>
+        euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendMode, countryIndex)
+      case Some(false) =>
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex)
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
   }
 
@@ -76,7 +78,7 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
         euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendLoopMode, countryIndex)
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex)
-      case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _ =>amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
   }
 

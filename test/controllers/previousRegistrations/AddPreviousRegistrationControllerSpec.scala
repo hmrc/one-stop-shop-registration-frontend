@@ -17,6 +17,9 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import controllers.routes
+import controllers.previousRegistrations.{routes => prevRoutes}
+import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
 import models.domain.PreviousSchemeNumbers
@@ -25,7 +28,7 @@ import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSc
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -42,8 +45,10 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new AddPreviousRegistrationFormProvider()
   private val form = formProvider()
 
-  private lazy val addPreviousRegistrationRoute = routes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
-  private def addPreviousRegistrationRoutePost(prompt: Boolean) = routes.AddPreviousRegistrationController.onSubmit(NormalMode, prompt).url
+  private lazy val addPreviousRegistrationRoute = prevRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+  private lazy val addPreviousRegistrationAmendRoute = prevRoutes.AddPreviousRegistrationController.onPageLoad(AmendMode).url
+  private def addPreviousRegistrationRoutePost(prompt: Boolean) = prevRoutes.AddPreviousRegistrationController.onSubmit(NormalMode, prompt).url
+  private def addPreviousRegistrationRouteAmendPost(prompt: Boolean) = prevRoutes.AddPreviousRegistrationController.onSubmit(AmendMode, prompt).url
 
   private val baseAnswers =
     basicUserAnswersWithVatInfo
@@ -108,32 +113,6 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return OK and the correct view for a GET when there are existing previous registrations in Amend mode" in {
-
-      val addPreviousRegistrationRouteAmend = routes.AddPreviousRegistrationController.onPageLoad(AmendMode).url
-
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
-      val existingPreviousRegistrations = RegistrationData.registration.previousRegistrations
-
-      val application = applicationBuilder(userAnswers = Some(baseAnswers))
-        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, addPreviousRegistrationRouteAmend)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[AddPreviousRegistrationView]
-        implicit val msgs: Messages = messages(application)
-        val list = PreviousRegistrationSummary.addToListRows(baseAnswers, existingPreviousRegistrations, AmendMode)
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode, list, canAddCountries = true)(request, implicitly).toString
-      }
-    }
-
     "must save the answer and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -191,7 +170,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -205,7 +184,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -221,7 +200,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -237,7 +216,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual prevRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
       }
     }
 
@@ -255,7 +234,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        redirectLocation(result).value mustEqual prevRoutes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -275,7 +254,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PreviousIossNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        redirectLocation(result).value mustEqual prevRoutes.PreviousIossNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -294,7 +273,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PreviousIossSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        redirectLocation(result).value mustEqual prevRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -312,9 +291,92 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PreviousSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        redirectLocation(result).value mustEqual prevRoutes.PreviousSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
+    "in AmendMode" - {
+
+      "must return OK and the correct view for a GET when there are existing previous registrations" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val existingPreviousRegistrations = RegistrationData.registration.previousRegistrations
+
+        val application = applicationBuilder(userAnswers = Some(baseAnswers))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addPreviousRegistrationAmendRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AddPreviousRegistrationView]
+          implicit val msgs: Messages = messages(application)
+          val list = PreviousRegistrationSummary.addToListRows(baseAnswers, existingPreviousRegistrations, AmendMode)
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form, AmendMode, list, canAddCountries = true)(request, implicitly).toString
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addPreviousRegistrationAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a GET if user answers are empty" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, addPreviousRegistrationAmendRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, addPreviousRegistrationRouteAmendPost(false))
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+    }
   }
 }

@@ -18,7 +18,8 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import controllers.amend.{routes => amendRoutes}
+import models.{AmendMode, CheckMode, NormalMode}
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -80,6 +81,31 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }
+
+    "must navigate in Amend mode" - {
+
+      "to DateOfFirstSalePage and answer is Some(true)" in {
+        val userAnswers = basicUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, true).success.value
+
+        HasMadeSalesPage.navigate(AmendMode, userAnswers)
+          .mustEqual(routes.DateOfFirstSaleController.onPageLoad(AmendMode))
+      }
+
+      "to IsPlanningFirstEligibleSaleController and answer is Some(true)" in {
+        val userAnswers = basicUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, false).success.value
+
+        HasMadeSalesPage.navigate(AmendMode, userAnswers)
+          .mustEqual(routes.IsPlanningFirstEligibleSaleController.onPageLoad(AmendMode))
+      }
+
+      "to AmendJourneyRecoveryController and answer is empty" in {
+        HasMadeSalesPage.navigate(AmendMode, basicUserAnswersWithVatInfo)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
 
     "cleanup" - {
 

@@ -874,3 +874,7 @@ cannotAddCountryWithoutVatNumber.title = You cannot add {0}
 cannotAddCountryWithoutVatNumber.heading = You cannot add {0}
 cannotAddCountryWithoutVatNumber.paragraph = You do not need to tell us about countries if you only sell services to them and do not have a VAT number.
 cannotAddCountryWithoutVatNumber.change.hidden = Cannot add {0}
+
+amendJourneyRecovery.title = Sorry, there is a problem with the service
+amendJourneyRecovery.heading = Sorry, there is a problem with the service
+amendJourneyRecovery.guidance = For your security, we deleted your answers.

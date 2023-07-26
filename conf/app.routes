@@ -447,8 +447,12 @@ GET         /no-fixed-establishments-required/:countryIndex                     
 POST        /no-fixed-establishments-required/:countryIndex                         controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
 GET         /check-no-fixed-establishments-required/:countryIndex                   controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = CheckMode, countryIndex: Index)
 POST        /check-no-fixed-establishments-required/:countryIndex                   controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = CheckMode, countryIndex: Index)
+GET         /first-check-no-fixed-establishments-required/:countryIndex             controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = CheckLoopMode, countryIndex: Index)
+POST        /first-check-no-fixed-establishments-required/:countryIndex             controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = CheckLoopMode, countryIndex: Index)
 GET         /amend-no-fixed-establishments-required/:countryIndex                   controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = AmendMode, countryIndex: Index)
 POST        /amend-no-fixed-establishments-required/:countryIndex                   controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
+GET         /first-amend-no-fixed-establishments-required/:countryIndex             controllers.euDetails.CannotAddCountryController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
+POST        /first-amend-no-fixed-establishments-required/:countryIndex             controllers.euDetails.CannotAddCountryController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
 
 GET         /registration-type/:countryIndex                                        controllers.euDetails.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /registration-type/:countryIndex                                        controllers.euDetails.RegistrationTypeController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
@@ -514,3 +518,5 @@ GET         /amend-no-vat-number-for-eu-country/:countryIndex                   
 POST        /amend-no-vat-number-for-eu-country/:countryIndex                       controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendMode, countryIndex: Index)
 GET         /first-amend-no-vat-number-for-eu-country/:countryIndex                 controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = AmendLoopMode, countryIndex: Index)
 POST        /first-amend-no-vat-number-for-eu-country/:countryIndex                 controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = AmendLoopMode, countryIndex: Index)
+
+GET         /amend-there-is-a-problem                                               controllers.amend.AmendJourneyRecoveryController.onPageLoad()

@@ -37,7 +37,7 @@ case object DeleteAllWebsitesPage extends QuestionPage[Boolean] {
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     answers.get(DeleteAllWebsitesPage) match {
       case Some(_) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
-      case _ => routes.JourneyRecoveryController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 
 }

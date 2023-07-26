@@ -121,8 +121,8 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
               .set(TradingNamePage(Index(1)), "bar").success.value
               .set(AddTradingNamePage, true).success.value
 
-          AddTradingNamePage.navigate(CheckMode, answers)
-            .mustEqual(routes.TradingNameController.onPageLoad(CheckMode, Index(2)))
+          AddTradingNamePage.navigate(AmendMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(AmendMode, Index(2)))
         }
       }
 
@@ -138,9 +138,9 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
       }
 
       "when the answer is none" - {
-        "to Journey recovery" in {
-          AddTradingNamePage.navigate(CheckMode, emptyUserAnswers)
-            .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+        "to Amend Journey recovery" in {
+          AddTradingNamePage.navigate(AmendMode, emptyUserAnswers)
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
         }
       }
     }
