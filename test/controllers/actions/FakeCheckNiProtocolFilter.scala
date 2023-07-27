@@ -16,17 +16,27 @@
 
 package controllers.actions
 
+import config.FrontendAppConfig
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Result
+import models.Mode
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeCheckNiProtocolFilter() extends CheckNiProtocolFilter {
+class FakeCheckNiProtocolFilterImpl() extends CheckNiProtocolFilterImpl(
+  mock[Option[Mode]],
+  mock[FrontendAppConfig]
+)(ExecutionContext.Implicits.global) {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
     Future.successful(None)
   }
-
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
 }
+  class FakeCheckNiProtocolFilter()
+  extends CheckNiProtocolFilter(
+    mock[FrontendAppConfig]
+  )(ExecutionContext.Implicits.global) {
+    override def apply(mode: Option[Mode]): CheckNiProtocolFilterImpl = new FakeCheckNiProtocolFilterImpl
+  }
+
