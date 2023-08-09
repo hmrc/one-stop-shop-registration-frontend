@@ -56,6 +56,9 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
       val fixedEstablishmentAddressTownCity = "     Town      "
       val expectedFixedEstablishmentAddressTownCity = "Town"
 
+      val bankDetailsAccountName = "     Account name      "
+      val expectedBankDetailsAccountName = "Account name"
+
       val json = s"""{
                    |  "vrn" : "123456789",
                    |  "registeredCompanyName" : "$registeredCompanyName",
@@ -155,7 +158,7 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |    } ]
                    |  } ],
                    |  "bankDetails" : {
-                   |    "accountName" : "Account name",
+                   |    "accountName" : "$bankDetailsAccountName",
                    |    "bic" : "ABCDGB2A",
                    |    "iban" : "GB33BUKB20201555555555"
                    |  },
@@ -172,6 +175,7 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
       registration.registeredCompanyName mustEqual expectedRegisteredCompanyName
       registration.tradingNames mustEqual expectedTradingNames
       registration.contactDetails.fullName mustEqual expectedBusinessContactName
+      registration.bankDetails.accountName mustEqual expectedBankDetailsAccountName
 
       val euTaxRegistrations = registration.euRegistrations
         .filter(_.isInstanceOf[RegistrationWithFixedEstablishment])
