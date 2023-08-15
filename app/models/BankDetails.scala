@@ -17,9 +17,16 @@
 package models
 
 import play.api.libs.json._
+import domain.ModelHelpers._
+
+import scala.util.Either
+
 
 case class BankDetails (accountName: String, bic: Option[Bic], iban: Iban)
 
 object BankDetails {
   implicit val format: OFormat[BankDetails] = Json.format[BankDetails]
+
+  def apply(accountName: String, bic: Option[Bic], iban: Iban): BankDetails =
+    new BankDetails(normaliseSpaces(accountName), bic, iban)
 }
