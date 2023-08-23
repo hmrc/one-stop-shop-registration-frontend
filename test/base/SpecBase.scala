@@ -78,7 +78,8 @@ trait SpecBase
       partOfVatGroup = false,
       organisationName = Some("Company name"),
       singleMarketIndicator = Some(true),
-      individualName = None
+      individualName = None,
+      deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
     )
 
   val verifyEmail: VerifyEmail = VerifyEmail(

@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax._
 import views.html.auth._
 
-import java.time.{Clock, Instant}
+import java.time.{Clock, Instant, LocalDate}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,11 +58,14 @@ class AuthController @Inject()(
           case _ =>
             connector.getVatCustomerInfo().flatMap {
               case Right(vatInfo) =>
-                for {
-                  updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
-                  _ <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(controllers.routes.CheckVatDetailsController.onPageLoad())
-
+                if (vatInfo.deregistrationDecisionDate.exists(!_.isBefore(LocalDate.now(clock)))) {
+                  Redirect(controllers.auth.routes.InvalidVrnDateController.onPageLoad()).toFuture
+                } else {
+                  for {
+                    updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))
+                    _ <- cc.sessionRepository.set(updatedAnswers)
+                  } yield Redirect(controllers.routes.CheckVatDetailsController.onPageLoad())
+                }
               case _ =>
                 for {
                   updatedAnswers <- Future.fromTry(answers.set(VatApiCallResultQuery, VatApiCallResult.Error))
@@ -132,4 +135,5 @@ class AuthController @Inject()(
     implicit request =>
       Ok(unsupportedCredentialRoleView())
   }
+
 }

@@ -64,7 +64,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         partOfVatGroup = true,
         Some("foo"),
         Some("a b c"),
-        Some(true)
+        Some(true),
+        Some(LocalDate.now)
       ))
     )
       .set(BusinessBasedInNiPage, true).success.value
@@ -110,7 +111,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         partOfVatGroup = false,
         organisationName = Some("foo"),
         individualName = None,
-        singleMarketIndicator = Some(true)
+        singleMarketIndicator = Some(true),
+        Some(LocalDate.now)
       ))
     )
       .set(EuCountryPage(Index(3)), Country("ES", "Spain")).success.value
@@ -144,7 +146,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         partOfVatGroup = false,
         organisationName = Some("bar"),
         individualName = Some("a b c"),
-        singleMarketIndicator = Some(true)
+        singleMarketIndicator = Some(true),
+        deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
       )
 
       val userAnswers =
@@ -203,7 +206,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         partOfVatGroup = false,
         organisationName = Some("bar"),
         individualName = Some("a b c"),
-        singleMarketIndicator = Some(true)
+        singleMarketIndicator = Some(true),
+        deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
       )
 
       val userAnswers =
@@ -237,7 +241,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         partOfVatGroup = false,
         organisationName = Some("bar"),
         individualName = Some("a b c"),
-        singleMarketIndicator = Some(true)
+        singleMarketIndicator = Some(true),
+        deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
       )
 
       val userAnswers =

@@ -22,7 +22,7 @@ import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswer
 import models.{UserAnswers, VatApiCallResult, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.{never, times, verify, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.SavedProgressPage
@@ -34,7 +34,7 @@ import repositories.AuthenticatedUserAnswersRepository
 import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView, UnsupportedAuthProviderView, UnsupportedCredentialRoleView}
 
 import java.net.URLEncoder
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
@@ -105,24 +105,59 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
         "and we can find their VAT details" - {
 
-          "must create user answers with their VAT details, then redirect to the next page" in {
+          "and the de-registration date is not before today" - {
 
-            val application = appBuilder(Some(emptyUserAnswers)).build()
+            "must redirect to Invalid VRN date kick-out page" in {
 
-            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-            when(mockRepository.set(any())) thenReturn Future.successful(true)
-            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+              val application = appBuilder(None).build()
+              val validVrnVatInfo = vatCustomerInfo.copy(
+                deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
+              )
 
-            running(application) {
+              when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(validVrnVatInfo))
+              when(mockRepository.set(any())) thenReturn Future.successful(true)
+              when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
-              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
-              val result = route(application, request).value
+              running(application) {
+                val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+                val result = route(application, request).value
 
-              val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+                status(result) mustBe SEE_OTHER
+                redirectLocation(result).value mustEqual controllers.auth.routes.InvalidVrnDateController.onPageLoad().url
+                verifyNoInteractions(mockRepository)
 
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
-              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+              }
+
+
+            }
+          }
+
+          "and the de-registration date is before today" - {
+
+            "must create user answers with their VAT details, then redirect to the next page" in {
+
+              val application = appBuilder(Some(emptyUserAnswers)).build()
+              val validVrnVatInfo = vatCustomerInfo.copy(
+                deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1))
+              )
+
+              when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(validVrnVatInfo))
+              when(mockRepository.set(any())) thenReturn Future.successful(true)
+              when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+
+              running(application) {
+
+                val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+                val result = route(application, request).value
+
+                val expectedAnswers = emptyUserAnswersWithVatInfo
+                  .copy(vatInfo = Some(validVrnVatInfo))
+                  .set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+
+                status(result) mustEqual SEE_OTHER
+                redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
+                verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+              }
             }
           }
         }
@@ -187,26 +222,57 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
       "and we can find their VAT details" - {
 
-        "must create user answers with their VAT details, then redirect to the next page" in {
+        "and the de-registration date is not before today" - {
 
-          val application = appBuilder(None).build()
+          "must redirect to the Invalid VRN date page" in {
+            val application = appBuilder(None).build()
+            val invalidVrnVatInfo = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate)))
 
-          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-          when(mockRepository.set(any())) thenReturn Future.successful(true)
-          when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(invalidVrnVatInfo))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
-          running(application) {
+            running(application) {
 
-            val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
-            val result = route(application, request).value
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
 
-            val expectedAnswers = emptyUserAnswersWithVatInfo.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
-            verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.auth.routes.InvalidVrnDateController.onPageLoad().url
+              verifyNoInteractions(mockRepository)
+            }
           }
         }
+
+        " and the de-registration date is before today" - {
+
+          "must create user answers with their VAT details, then redirect to the next page" in {
+
+            val application = appBuilder(None).build()
+            val validVrnVatInfo = vatCustomerInfo.copy(
+              deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1))
+            )
+
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(validVrnVatInfo))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+
+            running(application) {
+
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
+
+              val expectedAnswers = emptyUserAnswersWithVatInfo
+                .copy(vatInfo = Some(validVrnVatInfo))
+                .set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
+              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
+            }
+          }
+        }
+
       }
 
       "and we cannot find their VAT details" - {
