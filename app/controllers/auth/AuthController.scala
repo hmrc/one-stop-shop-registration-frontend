@@ -59,7 +59,7 @@ class AuthController @Inject()(
             connector.getVatCustomerInfo().flatMap {
               case Right(vatInfo) =>
                 if (vatInfo.deregistrationDecisionDate.exists(!_.isBefore(LocalDate.now(clock)))) {
-                  Redirect(controllers.auth.routes.InvalidVrnDateController.onPageLoad()).toFuture
+                  Redirect(controllers.routes.InvalidVrnDateController.onPageLoad()).toFuture
                 } else {
                   for {
                     updatedAnswers <- Future.fromTry(answers.copy(vatInfo = Some(vatInfo)).set(VatApiCallResultQuery, VatApiCallResult.Success))

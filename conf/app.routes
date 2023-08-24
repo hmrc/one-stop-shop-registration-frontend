@@ -148,7 +148,7 @@ GET         /cannot-use-agent                                                   
 GET         /account/provider-unsupported                                           controllers.auth.AuthController.unsupportedAuthProvider(continueUrl: String)
 GET         /account/credential-unsupported                                         controllers.auth.AuthController.insufficientEnrolments()
 GET         /account/role-unsupported                                               controllers.auth.AuthController.unsupportedCredentialRole()
-GET         /account/invalid-vrn-date                                               controllers.auth.InvalidVrnDateController.onPageLoad()
+GET         /invalid-vrn-date                                                       controllers.InvalidVrnDateController.onPageLoad()
 
 GET         /on-sign-in                                                             controllers.auth.AuthController.onSignIn()
 GET         /continue-on-sign-in                                                    controllers.auth.AuthController.continueOnSignIn()

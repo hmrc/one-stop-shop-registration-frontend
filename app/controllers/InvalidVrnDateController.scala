@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.auth
+package controllers
 
-import play.api.i18n.I18nSupport
+import controllers.actions.AuthenticatedControllerComponents
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.auth.InvalidVrnDateView
@@ -24,9 +25,12 @@ import views.html.auth.InvalidVrnDateView
 import javax.inject.Inject
 
 class InvalidVrnDateController @Inject()(
-                                     val controllerComponents: MessagesControllerComponents,
-                                     view: InvalidVrnDateView
+                                          override val messagesApi: MessagesApi,
+                                          cc: AuthenticatedControllerComponents,
+                                          view: InvalidVrnDateView
                                    ) extends FrontendBaseController with I18nSupport {
+
+  protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())

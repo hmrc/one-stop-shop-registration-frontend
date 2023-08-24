@@ -123,7 +123,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
                 val result = route(application, request).value
 
                 status(result) mustBe SEE_OTHER
-                redirectLocation(result).value mustEqual controllers.auth.routes.InvalidVrnDateController.onPageLoad().url
+                redirectLocation(result).value mustEqual controllers.routes.InvalidVrnDateController.onPageLoad().url
                 verifyNoInteractions(mockRepository)
 
               }
@@ -238,7 +238,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
               val result = route(application, request).value
 
               status(result) mustBe SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.auth.routes.InvalidVrnDateController.onPageLoad().url
+              redirectLocation(result).value mustEqual controllers.routes.InvalidVrnDateController.onPageLoad().url
               verifyNoInteractions(mockRepository)
             }
           }
