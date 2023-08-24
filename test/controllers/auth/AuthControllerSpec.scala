@@ -105,13 +105,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
         "and we can find their VAT details" - {
 
-          "and the de-registration date is not before today" - {
+          "and the de-registration date is before today" - {
 
             "must redirect to Invalid VRN date kick-out page" in {
 
               val application = appBuilder(None).build()
               val validVrnVatInfo = vatCustomerInfo.copy(
-                deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
+                deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1))
               )
 
               when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(validVrnVatInfo))
@@ -132,13 +132,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
             }
           }
 
-          "and the de-registration date is before today" - {
+          "and the de-registration date is not before today" - {
 
             "must create user answers with their VAT details, then redirect to the next page" in {
 
               val application = appBuilder(Some(emptyUserAnswers)).build()
               val validVrnVatInfo = vatCustomerInfo.copy(
-                deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1))
+                deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
               )
 
               when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(validVrnVatInfo))
@@ -222,11 +222,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
       "and we can find their VAT details" - {
 
-        "and the de-registration date is not before today" - {
+        "and the de-registration date is before today" - {
 
           "must redirect to the Invalid VRN date page" in {
             val application = appBuilder(None).build()
-            val invalidVrnVatInfo = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate)))
+            val invalidVrnVatInfo = vatCustomerInfo.copy(
+              deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1))
+            )
 
             when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(invalidVrnVatInfo))
             when(mockRepository.set(any())) thenReturn Future.successful(true)
@@ -244,13 +246,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
           }
         }
 
-        " and the de-registration date is before today" - {
+        " and the de-registration date is not before today" - {
 
           "must create user answers with their VAT details, then redirect to the next page" in {
 
             val application = appBuilder(None).build()
             val validVrnVatInfo = vatCustomerInfo.copy(
-              deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1))
+              deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
             )
 
             when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(validVrnVatInfo))
