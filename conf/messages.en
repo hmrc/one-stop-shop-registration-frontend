@@ -253,6 +253,11 @@ insufficientEnrolments.goToManageAccount = Go to ''Manage account'', then ''Get 
 insufficientEnrolments.yourBusinessIsNotRegistered = If your business is not registered for UK VAT
 insufficientEnrolments.registerForUkVat = Register for UK VAT (opens in new tab)
 
+invalidVrnDate.title = The VAT number for this account is no longer valid
+invalidVrnDate.heading = The VAT number for this account is no longer valid
+invalidVrnDate.link = <a href="https://www.gov.uk/register-for-vat/how-register-for-vat" class="govuk-link" rel="noreferrer noopener" target="_blank">Apply for a new VAT number to use this service</a>
+
+
 ivError.title = Sorry, there is a problem with the service
 ivError.heading = Sorry, there is a problem with the service
 
