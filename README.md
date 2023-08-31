@@ -30,9 +30,9 @@ and
 sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes
 ```
 
-### Running correct version of mongo
+### Running the correct version of mongo
 We have introduced a transaction to the call to be able to ensure that both the vatreturn and correction get submitted to mongo.
-Your local mongo is unlikely to be running a latest enough version and probably not in a replica set.
+Your local mongo is unlikely to be running a new enough version and probably not in a replica set.
 To do this, you'll need to stop your current mongo instance (docker ps to get the name of your mongo docker then docker stop <name> to stop)
 Run at least 4.0 with a replica set:
 ```  
@@ -54,11 +54,19 @@ To log in using the Authority Wizard provide "continue url", "affinity group" an
   
 ![image](https://user-images.githubusercontent.com/48218839/145985763-ffb28570-7679-46a9-96fa-e93996f03c23.png)
 
+* http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register
+
 ![image](https://user-images.githubusercontent.com/48218839/145842926-c318cb10-70c3-4186-a839-b1928c8e2625.png)
-  
+
+**Values in image**
+
+* HMRC-MTD-VAT
+* VRN
+* 22222222
+
 The VRN can be any 9-digit number.
 
-To successfully register go through the journey providing the answers as follows:
+To successfully register, go through the journey providing the answers as follows:
   1.
   ![image](https://user-images.githubusercontent.com/48218839/145986022-f387e3d0-0a41-47d7-9d39-f3b290b8e3ea.png)
   
@@ -84,7 +92,7 @@ To successfully register go through the journey providing the answers as follows
 Open a new tab and paste this url:
   8. 
   ```
-  /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-passcodes
+  http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-passcodes
   ```
 
   This will generate a passcode to enter into the email verification page.
@@ -95,8 +103,15 @@ you will need to change the port in the url back to 10200 in order to redirect t
   9.
   ![image](https://user-images.githubusercontent.com/36073378/203573868-4809d4c5-8728-4b2f-bcce-3d8ad8f0e2c3.png)
 
+  http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/bank-details  
+
+
   10.
   ![image](https://user-images.githubusercontent.com/36073378/203574605-b3a54885-bf3f-45e0-b58c-9c2d7b0cfa4d.png)
+
+  **Example IBAN**
+
+  GB33BUKB2020155555555
 
 Unit and Integration Tests
 ------------
@@ -139,4 +154,4 @@ it:testOnly *AuthenticatedSessionRepositorySpec
 
 ### License
 
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+This code is open source software licensed under the [Apache 2.0 Licence]("http://www.apache.org/licenses/LICENSE-2.0.html").
