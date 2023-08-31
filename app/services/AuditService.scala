@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuditService @Inject()(
                               appConfig: FrontendAppConfig,
@@ -34,8 +34,22 @@ class AuditService @Inject()(
 
   def audit(dataSource: JsonAuditModel)(implicit hc: HeaderCarrier, request: Request[_]): Unit = {
     val event = toExtendedDataEvent(dataSource, request.path)
+    // This will discard failures and also potentially not finish execution before the result is shown
     auditConnector.sendExtendedEvent(event)
   }
+
+  // Future[Unit] hides things like Future[Future[Unit]] leading to errors not cascading properly, race conditions in
+  // tests as .futureValue will only wait for the outer future. A bit pedantic but can lead to confusion.
+  def audit2(dataSource: JsonAuditModel)(implicit hc: HeaderCarrier, request: Request[_]): Future[Boolean] = {
+    val event = toExtendedDataEvent(dataSource, request.path)
+    auditConnector.sendExtendedEvent(event).map(_ => true).recover {
+      // explicit discarding of error, also we can add a comment why we do not care about the error not being able to
+      // actually be visible with a 500 or whatever.
+      case   _: Throwable => true
+    }
+  }
+
+
 
   private def toExtendedDataEvent(auditModel: JsonAuditModel, path: String)(implicit hc: HeaderCarrier): ExtendedDataEvent =
     ExtendedDataEvent(

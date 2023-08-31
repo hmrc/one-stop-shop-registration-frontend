@@ -82,9 +82,11 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue.get
+      val maybeMatch = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
 
-      value equals genericMatch
+      //I will remove the meow, it is an example mustBe is really Object.equals and does not actually assert
+      maybeMatch equals Some("meow")
+      maybeMatch mustBe Some(genericMatch)
     }
 
     "must return None when no active match found" in {
@@ -96,9 +98,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
+      val maybeMatch = coreRegistrationValidationService.searchUkVrn(vrn).futureValue
 
-      value mustBe None
+      maybeMatch mustBe None
     }
 
     "must return exception when server responds with an error" in {
@@ -128,9 +130,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue.get
+      val maybeMatch = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue
 
-      value equals genericMatch
+      maybeMatch mustBe Some(genericMatch)
     }
 
     "must return None when no match found" in {
@@ -143,9 +145,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue
+      val maybeMatch = coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue
 
-      value mustBe None
+      maybeMatch mustBe None
     }
 
     "must return exception when server responds with an error" in {
@@ -162,6 +164,13 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val response = intercept[Exception](coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).futureValue)
 
       response.getMessage must include("Error while validating core registration")
+
+
+      // alternative approach, exception class type > message. We have a typed error which is informative by type
+      // and is also useful for any recover/recoverWith actions.
+      //
+      // On a side note to log errors on a future you can use .failed.foreach
+      coreRegistrationValidationService.searchEuTaxId(taxRefNo, countryCode).failed.futureValue mustBe a[CoreRegistrationValidationException]
     }
   }
 
@@ -176,9 +185,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countrycode).futureValue.get
+      val maybeMatch = coreRegistrationValidationService.searchEuVrn(euVrn, countrycode).futureValue
 
-      value equals genericMatch
+      maybeMatch mustBe Some(genericMatch)
     }
 
     "must return None when no match found" in {
@@ -225,9 +234,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue.get
+      val maybeMatch = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue
 
-      value equals genericMatch
+      maybeMatch mustBe Some(genericMatch)
     }
 
     "call searchScheme with correct ioss number with intermediary and must return match data" in {
@@ -241,9 +250,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, Some(intermediaryNumber), countryCode).futureValue.get
+      val maybeMatch = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, Some(intermediaryNumber), countryCode).futureValue
 
-      value equals genericMatch
+      maybeMatch mustBe Some(genericMatch)
     }
 
     "must return None when no match found" in {
@@ -257,9 +266,9 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue
+      val maybeMatch = coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue
 
-      value mustBe None
+      maybeMatch mustBe None
     }
 
     "must return exception when server responds with an error" in {
@@ -286,9 +295,14 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val response = coreRegistrationValidationService.isActiveTrader(genericMatch)
+      val isActiveTrader = coreRegistrationValidationService.isActiveTrader(genericMatch)
 
-      response equals true
+      //I would say this adds legibility? response is not really communicative.
+      // Also this logic is probably better suited on MatchType as looking at the implementation of isActiveTrader
+      // it is wholly concerned with the innards of MatchType (https://refactoring.guru/smells/feature-envy).
+      // Either approaches habe the same outcome, though dealing with feature envy helps with the speed
+      // business logic can be discovered and understood when inheriting or being onboarded onto applications.
+      isActiveTrader mustBe true
     }
 
     "call isActiveTrader with matchType = TraderIdActiveNETP and must return true" in {
@@ -298,7 +312,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
       val response = coreRegistrationValidationService.isActiveTrader(newMatch)
 
-      response equals true
+      response mustBe true
     }
 
     "call isActiveTrader with matchType = OtherMSNETPActiveNETP and must return true" in {
@@ -308,7 +322,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
       val response = coreRegistrationValidationService.isActiveTrader(newMatch)
 
-      response equals true
+      response mustBe true
     }
 
     "call isActiveTrader with matchType = FixedEstablishmentQuarantinedNETP and must return false" in {
@@ -318,7 +332,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
       val response = coreRegistrationValidationService.isActiveTrader(newMatch)
 
-      response equals false
+      response mustBe false
     }
   }
 
@@ -331,7 +345,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
-      response equals true
+      response mustBe true
     }
 
     "call isExcludedTrader with matchType = TraderIdQuarantinedNETP and must return true" in {
@@ -341,7 +355,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
-      response equals true
+      response mustBe true
     }
 
     "call isExcludedTrader with matchType = OtherMSNETPQuarantinedNETP and must return true" in {
@@ -351,7 +365,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
-      response equals true
+      response mustBe true
     }
 
     "call isExcludedTrader with matchType = FixedEstablishmentActiveNETP and must return false" in {
@@ -361,7 +375,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentActiveNETP)
       val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
 
-      response equals false
+      response mustBe false
     }
   }
 }

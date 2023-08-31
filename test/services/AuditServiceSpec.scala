@@ -18,6 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
@@ -45,6 +46,7 @@ class AuditServiceSpec extends AnyFreeSpec with MockitoSugar with ScalaFutures w
   ".audit" - {
 
     "must send Extended Event for create" in {
+
       when(auditConnector.sendExtendedEvent(any())(any(), any())) thenReturn Future.successful(AuditResult.Success)
 
       val service = new AuditService(mockAppConfig, auditConnector)
@@ -73,5 +75,22 @@ class AuditServiceSpec extends AnyFreeSpec with MockitoSugar with ScalaFutures w
       ))(hc, FakeRequest("POST", "test"))
       verify(auditConnector, times(1)).sendExtendedEvent(any())(any(), any())
     }
+
+    "not raise error on failure" in {
+      when(auditConnector.sendExtendedEvent(any())(any(), any())) thenReturn Future.failed(new RuntimeException("kitty goes boom"))
+
+      val service = new AuditService(mockAppConfig, auditConnector)
+
+      service.audit(RegistrationAuditModel(
+        registrationAuditType = RegistrationAuditType.AmendRegistration,
+        credId = "test",
+        userAgent = "test",
+        registration = registration,
+        result = SubmissionResult.Success
+      ))(hc, FakeRequest("POST", "test"))
+      verify(auditConnector, times(1)).sendExtendedEvent(any())(any(), any())
+    }
+
+
   }
 }

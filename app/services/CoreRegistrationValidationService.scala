@@ -42,6 +42,8 @@ class CoreRegistrationValidationService @Inject()(
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
       case Right(coreRegistrationResponse) =>
+        // audit actually uses a future underneath in sendExtendedEvent. If that fails there will be no negative outcome
+        // as the error will be swallowed. Is that desired?
         auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
         coreRegistrationResponse.matches.headOption
 
