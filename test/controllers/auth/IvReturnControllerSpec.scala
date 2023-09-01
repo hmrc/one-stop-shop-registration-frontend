@@ -35,11 +35,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvErrorView]
-          val request = FakeRequest(GET, routes.IvReturnController.error().url)
+          val request = FakeRequest(GET, routes.IvReturnController.error(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -86,11 +86,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvIncompleteView]
-          val request = FakeRequest(GET, routes.IvReturnController.incomplete().url)
+          val request = FakeRequest(GET, routes.IvReturnController.incomplete(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -103,11 +103,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvInsufficientEvidenceView]
-          val request = FakeRequest(GET, routes.IvReturnController.insufficientEvidence().url)
+          val request = FakeRequest(GET, routes.IvReturnController.insufficientEvidence(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -120,11 +120,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvLockedOutView]
-          val request = FakeRequest(GET, routes.IvReturnController.lockedOut().url)
+          val request = FakeRequest(GET, routes.IvReturnController.lockedOut(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -137,11 +137,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvNotEnoughEvidenceSourcesView]
-          val request = FakeRequest(GET, routes.IvReturnController.notEnoughEvidenceSources().url)
+          val request = FakeRequest(GET, routes.IvReturnController.notEnoughEvidenceSources(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -154,11 +154,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvPreconditionFailedView]
-          val request = FakeRequest(GET, routes.IvReturnController.preconditionFailed().url)
+          val request = FakeRequest(GET, routes.IvReturnController.preconditionFailed(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -171,11 +171,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvTechnicalIssueView]
-          val request = FakeRequest(GET, routes.IvReturnController.technicalIssue().url)
+          val request = FakeRequest(GET, routes.IvReturnController.technicalIssue(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
@@ -188,11 +188,11 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvTimeoutView]
-          val request = FakeRequest(GET, routes.IvReturnController.timeout().url)
+          val request = FakeRequest(GET, routes.IvReturnController.timeout(continueUrl).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view()(request, messages(app)).toString
+          contentAsString(result) mustEqual view(continueUrl)(request, messages(app)).toString
         }
       }
     }
