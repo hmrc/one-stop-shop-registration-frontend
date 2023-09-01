@@ -39,9 +39,9 @@ class IvReturnController @Inject()(
                                     userAbortedView: IvUserAbortedView
                                   ) extends FrontendBaseController with I18nSupport {
 
-  def error: Action[AnyContent] = Action {
+  def error(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(errorView())
+      Ok(errorView(continueUrl))
   }
 
   def failedMatching(continueUrl: String): Action[AnyContent] = Action {
@@ -54,39 +54,39 @@ class IvReturnController @Inject()(
       Ok(failedView(continueUrl))
   }
 
-  def incomplete: Action[AnyContent] = Action {
+  def incomplete(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(incompleteView())
+      Ok(incompleteView(continueUrl))
   }
 
-  def insufficientEvidence: Action[AnyContent] = Action {
+  def insufficientEvidence(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(insufficientEvidenceView())
+      Ok(insufficientEvidenceView(continueUrl))
   }
 
-  def lockedOut: Action[AnyContent] = Action {
+  def lockedOut(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(lockedOutView())
+      Ok(lockedOutView(continueUrl))
   }
 
-  def notEnoughEvidenceSources: Action[AnyContent] = Action {
+  def notEnoughEvidenceSources(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(notEnoughEvidenceSourcesView())
+      Ok(notEnoughEvidenceSourcesView(continueUrl))
   }
 
-  def preconditionFailed: Action[AnyContent] = Action {
+  def preconditionFailed(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(preconditionFailedView())
+      Ok(preconditionFailedView(continueUrl))
   }
 
-  def technicalIssue: Action[AnyContent] = Action {
+  def technicalIssue(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(technicalIssueView())
+      Ok(technicalIssueView(continueUrl))
   }
 
-  def timeout: Action[AnyContent] = Action {
+  def timeout(continueUrl: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(timeoutView())
+      Ok(timeoutView(continueUrl))
   }
 
   def userAborted(continueUrl: String): Action[AnyContent] = Action {
