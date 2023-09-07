@@ -24,6 +24,8 @@ import pages.SavedProgressPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.VatApiCallResultQuery
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax._
 import views.html.auth._
@@ -40,8 +42,11 @@ class AuthController @Inject()(
                                 insufficientEnrolmentsView: InsufficientEnrolmentsView,
                                 unsupportedAffinityGroupView: UnsupportedAffinityGroupView,
                                 unsupportedAuthProviderView: UnsupportedAuthProviderView,
-                                unsupportedCredentialRoleView: UnsupportedCredentialRoleView
+                                unsupportedCredentialRoleView: UnsupportedCredentialRoleView,
+                                frontendAppConfig: FrontendAppConfig
                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  private val redirectPolicy = AbsoluteWithHostnameFromAllowlist(frontendAppConfig.allowedRedirectUrls: _*)
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -87,23 +92,23 @@ class AuthController @Inject()(
       )
   }
 
-  def redirectToRegister(continueUrl: String): Action[AnyContent] = Action {
-      Redirect(
-        config.registerUrl,
-        Map(
-          "origin"      -> Seq(config.origin),
-          "continueUrl" -> Seq(continueUrl),
-          "accountType" -> Seq("Organisation"))
-      )
+  def redirectToRegister(continueUrl: RedirectUrl): Action[AnyContent] = Action {
+    Redirect(
+      config.registerUrl,
+      Map(
+        "origin"      -> Seq(config.origin),
+        "continueUrl" -> Seq(continueUrl.get(redirectPolicy).url),
+        "accountType" -> Seq("Organisation"))
+    )
   }
 
-  def redirectToLogin(continueUrl: String): Action[AnyContent] = Action {
-        Redirect(config.loginUrl,
-          Map(
-            "origin"   -> Seq(config.origin),
-            "continue" -> Seq(continueUrl)
-          )
-        )
+  def redirectToLogin(continueUrl: RedirectUrl): Action[AnyContent] = Action {
+    Redirect(config.loginUrl,
+      Map(
+        "origin"   -> Seq(config.origin),
+        "continue" -> Seq(continueUrl.get(redirectPolicy).url)
+      )
+    )
   }
 
   def signOut(): Action[AnyContent] = Action {
@@ -121,7 +126,7 @@ class AuthController @Inject()(
       Ok(unsupportedAffinityGroupView())
   }
 
-  def unsupportedAuthProvider(continueUrl: String): Action[AnyContent] = Action {
+  def unsupportedAuthProvider(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
       Ok(unsupportedAuthProviderView(continueUrl))
   }
