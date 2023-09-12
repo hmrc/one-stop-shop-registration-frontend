@@ -208,9 +208,6 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
-            println(appConfig.loginContinueUrl)
-            println(appConfig.ivUpliftUrl)
-
             when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(testCredentials) ~ vatEnrolment ~ Some(Individual) ~ ConfidenceLevel.L50 ~ None))
 
@@ -295,7 +292,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new MissingBearerToken), appConfig, urlBuilder)
             val controller = new Harness(authAction, actionBuilder)
-            val result = controller.onPageLoad()(FakeRequest())
+            val result = controller.onPageLoad()(FakeRequest("", "/endpoint"))
 
             status(result) mustBe SEE_OTHER
             redirectLocation(result).value must startWith(appConfig.loginUrl)
@@ -344,10 +341,10 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAuthProvider), appConfig, urlBuilder)
             val controller = new Harness(authAction, actionBuilder)
-            val result = controller.onPageLoad()(FakeRequest())
+            val result = controller.onPageLoad()(FakeRequest("", "/endpoint"))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(FakeRequest())).url
+            redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(FakeRequest("", "/endpoint"))).url
           }
         }
       }
@@ -655,7 +652,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new MissingBearerToken), appConfig, urlBuilder)
             val controller = new Harness(authAction, actionBuilder)
-            val result = controller.onPageLoad()(FakeRequest())
+            val result = controller.onPageLoad()(FakeRequest("", "/endpoint"))
 
             status(result) mustBe SEE_OTHER
             redirectLocation(result).value must startWith(appConfig.loginUrl)
@@ -702,10 +699,10 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAuthProvider), appConfig, urlBuilder)
             val controller = new Harness(authAction, actionBuilder)
-            val result = controller.onPageLoad()(FakeRequest())
+            val result = controller.onPageLoad()(FakeRequest("", "/endpoint"))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(FakeRequest())).url
+            redirectLocation(result).value mustBe controllers.auth.routes.AuthController.unsupportedAuthProvider(urlBuilder.loginContinueUrl(FakeRequest("", "/endpoint"))).url
           }
         }
       }

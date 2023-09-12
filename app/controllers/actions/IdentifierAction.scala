@@ -48,7 +48,7 @@ class AuthenticatedIdentifierAction @Inject()(
     with AuthorisedFunctions
     with Logging {
 
-  private lazy val redirectPolicy = AbsoluteWithHostnameFromAllowlist(config.allowedRedirectUrls: _*)
+  private lazy val redirectPolicy = (OnlyRelative | AbsoluteWithHostnameFromAllowlist(config.allowedRedirectUrls: _*))
 
   private type IdentifierActionResult[A] = Future[Either[Result, AuthenticatedIdentifierRequest[A]]]
 

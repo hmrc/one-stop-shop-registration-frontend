@@ -37,12 +37,10 @@ class UrlBuilderService @Inject()(config: FrontendAppConfig) {
       .orElse(hc.sessionId.map(_.value))
       .map(sessionId => config.loginContinueUrl + request.path + "?k=" + sessionId)
       .getOrElse {
-        println(s"test ${request.uri}")
         request.uri
       }
     )
 
-    println(s"return url ${returnUrl}")
     returnUrl
   }
 
