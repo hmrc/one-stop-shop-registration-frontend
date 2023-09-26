@@ -16,8 +16,11 @@
 
 package controllers.auth
 
+import config.FrontendAppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, RedirectUrl}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.iv._
 
@@ -36,61 +39,64 @@ class IvReturnController @Inject()(
                                     preconditionFailedView: IvPreconditionFailedView,
                                     technicalIssueView: IvTechnicalIssueView,
                                     timeoutView: IvTimeoutView,
-                                    userAbortedView: IvUserAbortedView
+                                    userAbortedView: IvUserAbortedView,
+                                    frontendAppConfig: FrontendAppConfig
                                   ) extends FrontendBaseController with I18nSupport {
 
-  def error(continueUrl: String): Action[AnyContent] = Action {
+  private val redirectPolicy = AbsoluteWithHostnameFromAllowlist(frontendAppConfig.allowedRedirectUrls: _*)
+
+  def error(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(errorView(continueUrl))
+      Ok(errorView(continueUrl.get(redirectPolicy).url))
   }
 
-  def failedMatching(continueUrl: String): Action[AnyContent] = Action {
+  def failedMatching(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(failedMatchingView(continueUrl))
+      Ok(failedMatchingView(continueUrl.get(redirectPolicy).url))
   }
 
-  def failed(continueUrl: String): Action[AnyContent] = Action {
+  def failed(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(failedView(continueUrl))
+      Ok(failedView(continueUrl.get(redirectPolicy).url))
   }
 
-  def incomplete(continueUrl: String): Action[AnyContent] = Action {
+  def incomplete(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(incompleteView(continueUrl))
+      Ok(incompleteView(continueUrl.get(redirectPolicy).url))
   }
 
-  def insufficientEvidence(continueUrl: String): Action[AnyContent] = Action {
+  def insufficientEvidence(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(insufficientEvidenceView(continueUrl))
+      Ok(insufficientEvidenceView(continueUrl.get(redirectPolicy).url))
   }
 
-  def lockedOut(continueUrl: String): Action[AnyContent] = Action {
+  def lockedOut(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(lockedOutView(continueUrl))
+      Ok(lockedOutView(continueUrl.get(redirectPolicy).url))
   }
 
-  def notEnoughEvidenceSources(continueUrl: String): Action[AnyContent] = Action {
+  def notEnoughEvidenceSources(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(notEnoughEvidenceSourcesView(continueUrl))
+      Ok(notEnoughEvidenceSourcesView(continueUrl.get(redirectPolicy).url))
   }
 
-  def preconditionFailed(continueUrl: String): Action[AnyContent] = Action {
+  def preconditionFailed(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(preconditionFailedView(continueUrl))
+      Ok(preconditionFailedView(continueUrl.get(redirectPolicy).url))
   }
 
-  def technicalIssue(continueUrl: String): Action[AnyContent] = Action {
+  def technicalIssue(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(technicalIssueView(continueUrl))
+      Ok(technicalIssueView(continueUrl.get(redirectPolicy).url))
   }
 
-  def timeout(continueUrl: String): Action[AnyContent] = Action {
+  def timeout(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(timeoutView(continueUrl))
+      Ok(timeoutView(continueUrl.get(redirectPolicy).url))
   }
 
-  def userAborted(continueUrl: String): Action[AnyContent] = Action {
+  def userAborted(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
-      Ok(userAbortedView(continueUrl))
+      Ok(userAbortedView(continueUrl.get(redirectPolicy).url))
   }
 }

@@ -20,21 +20,28 @@ import controllers.auth.{routes => authRoutes}
 import config.FrontendAppConfig
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 
 class UrlBuilderService @Inject()(config: FrontendAppConfig) {
 
-  def loginContinueUrl(request: Request[_]): String = {
+  def loginContinueUrl(request: Request[_]): RedirectUrl = {
     val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    request.queryString
+    val returnUrl = RedirectUrl(
+      request.queryString
       .get("k")
       .flatMap(_.headOption)
       .orElse(hc.sessionId.map(_.value))
       .map(sessionId => config.loginContinueUrl + request.path + "?k=" + sessionId)
-      .getOrElse(request.uri)
+      .getOrElse {
+        request.uri
+      }
+    )
+
+    returnUrl
   }
 
   def ivFailureUrl(request: Request[_]): String =

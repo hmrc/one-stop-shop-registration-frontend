@@ -19,11 +19,12 @@ package controllers.auth
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.iv._
 
 class IvReturnControllerSpec extends SpecBase {
 
-  private val continueUrl = "foo"
+  private val continueUrl = "http://localhost/foo"
 
   "Iv Return Controller" - {
 
@@ -35,7 +36,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvErrorView]
-          val request = FakeRequest(GET, routes.IvReturnController.error(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.error(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -52,7 +53,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvFailedMatchingView]
-          val request = FakeRequest(GET, routes.IvReturnController.failedMatching(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.failedMatching(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -69,7 +70,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvFailedView]
-          val request = FakeRequest(GET, routes.IvReturnController.failed(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.failed(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -86,7 +87,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvIncompleteView]
-          val request = FakeRequest(GET, routes.IvReturnController.incomplete(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.incomplete(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -103,7 +104,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvInsufficientEvidenceView]
-          val request = FakeRequest(GET, routes.IvReturnController.insufficientEvidence(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.insufficientEvidence(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -120,7 +121,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvLockedOutView]
-          val request = FakeRequest(GET, routes.IvReturnController.lockedOut(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.lockedOut(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -137,7 +138,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvNotEnoughEvidenceSourcesView]
-          val request = FakeRequest(GET, routes.IvReturnController.notEnoughEvidenceSources(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.notEnoughEvidenceSources(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -154,7 +155,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvPreconditionFailedView]
-          val request = FakeRequest(GET, routes.IvReturnController.preconditionFailed(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.preconditionFailed(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -171,7 +172,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvTechnicalIssueView]
-          val request = FakeRequest(GET, routes.IvReturnController.technicalIssue(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.technicalIssue(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -188,7 +189,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvTimeoutView]
-          val request = FakeRequest(GET, routes.IvReturnController.timeout(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.timeout(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK
@@ -205,7 +206,7 @@ class IvReturnControllerSpec extends SpecBase {
 
         running(app) {
           val view = app.injector.instanceOf[IvUserAbortedView]
-          val request = FakeRequest(GET, routes.IvReturnController.userAborted(continueUrl).url)
+          val request = FakeRequest(GET, routes.IvReturnController.userAborted(RedirectUrl("http://localhost/foo")).url)
           val result = route(app, request).value
 
           status(result) mustEqual OK

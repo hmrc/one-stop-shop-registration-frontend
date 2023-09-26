@@ -30,6 +30,8 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative}
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.FutureSyntax._
 
@@ -45,6 +47,8 @@ class AuthenticatedIdentifierAction @Inject()(
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
     with AuthorisedFunctions
     with Logging {
+
+  private lazy val redirectPolicy = (OnlyRelative | AbsoluteWithHostnameFromAllowlist(config.allowedRedirectUrls: _*))
 
   private type IdentifierActionResult[A] = Future[Either[Result, AuthenticatedIdentifierRequest[A]]]
 
@@ -92,7 +96,7 @@ class AuthenticatedIdentifierAction @Inject()(
     } recoverWith {
       case _: NoActiveSession =>
         logger.info("No active session")
-        Left(Redirect(config.loginUrl, Map("continue" -> Seq(urlBuilder.loginContinueUrl(request))))).toFuture
+        Left(Redirect(config.loginUrl, Map("continue" -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url)))).toFuture
 
       case _: UnsupportedAffinityGroup =>
         logger.info("Unsupported affinity group")
@@ -144,7 +148,7 @@ class AuthenticatedIdentifierAction @Inject()(
       config.mfaUpliftUrl,
       Map(
         "origin"      -> Seq(config.origin),
-        "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request))
+        "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url)
       )
     )).toFuture
 
@@ -154,7 +158,7 @@ class AuthenticatedIdentifierAction @Inject()(
       Map(
         "origin"          -> Seq(config.origin),
         "confidenceLevel" -> Seq(ConfidenceLevel.L200.toString),
-        "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request)),
+        "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url),
         "failureURL"      -> Seq(urlBuilder.ivFailureUrl(request))
       )
     )).toFuture

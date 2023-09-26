@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+
 @this(
         layout: templates.Layout
 )
@@ -31,7 +33,7 @@
     <p class="govuk-body">@messages("insufficientEnrolments.enteredWrongGGUserID")</p>
 
     <p class="govuk-body">
-        <a href="@controllers.auth.routes.AuthController.redirectToLogin(routes.IndexController.onPageLoad().url).url" class="govuk-link">
+        <a href="@controllers.auth.routes.AuthController.redirectToLogin(RedirectUrl(routes.IndexController.onPageLoad().url)).url" class="govuk-link">
             @messages("insufficientEnrolments.signInWithYourGGUserID.link.text")</a>
         @messages("insufficientEnrolments.usedToSeeVATReturns")
     </p>

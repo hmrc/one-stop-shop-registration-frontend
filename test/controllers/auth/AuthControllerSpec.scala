@@ -31,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.VatApiCallResultQuery
 import repositories.AuthenticatedUserAnswersRepository
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.auth.{InsufficientEnrolmentsView, UnsupportedAffinityGroupView, UnsupportedAuthProviderView, UnsupportedCredentialRoleView}
 
 import java.net.URLEncoder
@@ -39,8 +40,7 @@ import scala.concurrent.Future
 
 class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  private val continueUrl = "continueUrl"
-
+  private val continueUrl = "http://localhost/foo"
 
   private val mockConnector  = mock[RegistrationConnector]
   private val mockRepository = mock[AuthenticatedUserAnswersRepository]
@@ -417,13 +417,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       val application = applicationBuilder(Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.AuthController.redirectToRegister(continueUrl).url)
+        val request = FakeRequest(GET, routes.AuthController.redirectToRegister(RedirectUrl("http://localhost/foo")).url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual "http://localhost:9553/bas-gateway/register?origin=OSS&continueUrl=continueUrl&accountType=Organisation"
+        redirectLocation(result).value mustEqual "http://localhost:9553/bas-gateway/register?origin=OSS&continueUrl=http%3A%2F%2Flocalhost%2Ffoo&accountType=Organisation"
       }
     }
   }
@@ -435,13 +435,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.AuthController.redirectToLogin(continueUrl).url)
+        val request = FakeRequest(GET, routes.AuthController.redirectToLogin(RedirectUrl("http://localhost/foo")).url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual "http://localhost:9553/bas-gateway/sign-in?origin=OSS&continue=continueUrl"
+        redirectLocation(result).value mustEqual "http://localhost:9553/bas-gateway/sign-in?origin=OSS&continue=http%3A%2F%2Flocalhost%2Ffoo"
       }
     }
   }
@@ -453,7 +453,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.AuthController.unsupportedAuthProvider(continueUrl).url)
+        val request = FakeRequest(GET, routes.AuthController.unsupportedAuthProvider(RedirectUrl("http://localhost/foo")).url)
 
         val result = route(application, request).value
 
@@ -462,7 +462,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(continueUrl)(request, messages(application)).toString
+          view(RedirectUrl(continueUrl))(request, messages(application)).toString
       }
     }
   }

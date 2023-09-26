@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class UrlBuilderServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
@@ -31,13 +32,13 @@ class UrlBuilderServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar 
     "must add an existing session Id as a querystring parameter" in {
 
       val config = mock[FrontendAppConfig]
-      when(config.loginContinueUrl) thenReturn "server_name"
+      when(config.loginContinueUrl) thenReturn "http://localhost"
 
       val service = new UrlBuilderService(config)
 
       val result = service.loginContinueUrl(FakeRequest(GET, "/foo?k=session-id"))
 
-      result mustEqual "server_name/foo?k=session-id"
+      result mustEqual RedirectUrl("http://localhost/foo?k=session-id")
     }
   }
 }

@@ -47,6 +47,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val ossCompleteReturnUrl: String = configuration.get[String]("urls.ossCompleteReturnGuidanceUrl")
   val ossYourAccountUrl: String = configuration.get[String]("urls.yourAccountUrl")
 
+  val allowedRedirectUrls: Seq[String] = configuration.get[Seq[String]]("urls.allowedRedirects")
+
   val ivEvidenceStatusUrl: String =
     s"${configuration.get[Service]("microservice.services.identity-verification").baseUrl}/disabled-evidences?origin=$origin"
 
