@@ -75,13 +75,16 @@ class CheckEuDetailsAnswersController @Inject()(
   def onSubmit(mode: Mode, countryIndex: Index, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
       val incomplete = getIncompleteEuDetails(countryIndex)
-      if(incomplete.isEmpty) {
+      if (incomplete.isEmpty) {
         Redirect(CheckEuDetailsAnswersPage.navigate(mode, request.userAnswers))
       } else {
-        if(!incompletePromptShown) {
+        if (!incompletePromptShown) {
           Redirect(routes.CheckEuDetailsAnswersController.onPageLoad(mode, countryIndex))
-        } else{
-          Redirect(routes.EuCountryController.onPageLoad(mode, countryIndex))
+        } else {
+          incompleteCountryEuDetailsRedirect(mode).map {
+            redirectIncompletePage =>
+              redirectIncompletePage
+          }.getOrElse(Redirect(routes.EuCountryController.onPageLoad(mode, countryIndex)))
         }
       }
   }
