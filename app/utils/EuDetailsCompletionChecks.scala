@@ -18,7 +18,7 @@ package utils
 
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
 import models.requests.AuthenticatedDataRequest
-import models.{Index, Mode}
+import models.{CountryWithValidationDetails, Index, Mode}
 import pages.euDetails._
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
@@ -59,11 +59,13 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
   }
 
   private def partOfVatGroup(isPartOfVatGroup: Boolean, details: EuOptionalDetails): Boolean = {
-    isPartOfVatGroup && notSellingToEuConsumers(details) || sellsToEuConsumers(isPartOfVatGroup, details)
+    isPartOfVatGroup && notSellingToEuConsumers(details) || sellsToEuConsumers(isPartOfVatGroup, details) ||
+      checkVatNumber(details)
   }
 
   private def notPartOfVatGroup(isPartOfVatGroup: Boolean, details: EuOptionalDetails): Boolean = {
-    !isPartOfVatGroup && notSellingToEuConsumers(details) || sellsToEuConsumers(isPartOfVatGroup, details)
+    !isPartOfVatGroup && notSellingToEuConsumers(details) || sellsToEuConsumers(isPartOfVatGroup, details) ||
+      checkVatNumber(details)
   }
 
   private def notSellingToEuConsumers(details: EuOptionalDetails): Boolean = {
@@ -72,12 +74,23 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
       (details.vatRegistered.contains(true) && details.euVatNumber.isEmpty)
   }
 
+  private def checkVatNumber(details: EuOptionalDetails): Boolean = {
+    details.euVatNumber.nonEmpty && (details.euVatNumber.exists { euVatNumber =>
+      CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == details.euCountry.code) match {
+        case Some(validationRule) =>
+          !euVatNumber.matches(validationRule.vrnRegex)
+        case _ => true
+      }
+    })
+  }
+
   private def sellsToEuConsumers(isPartOfVatGroup: Boolean, details: EuOptionalDetails): Boolean = {
     (details.sellsGoodsToEUConsumers.contains(true) && details.sellsGoodsToEUConsumerMethod.isEmpty) ||
       (details.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.DispatchWarehouse) && details.registrationType.isEmpty) ||
       (details.registrationType.contains(RegistrationType.VatNumber) && details.euVatNumber.isEmpty) ||
       (details.registrationType.contains(RegistrationType.TaxId) && details.euTaxReference.isEmpty) ||
-      fixedEstablishment(isPartOfVatGroup, details) || sendsGoods(details)
+      fixedEstablishment(isPartOfVatGroup, details) ||
+      sendsGoods(details)
   }
 
   private def sendsGoods(details: EuOptionalDetails): Boolean = {

@@ -77,7 +77,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
       .set(SellsGoodsToEUConsumerMethodPage(Index(0)), EuConsumerSalesMethod.DispatchWarehouse).success.value
       .set(RegistrationTypePage(Index(0)), RegistrationType.VatNumber).success.value
-      .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
+      .set(EuVatNumberPage(Index(0)), "FRAA123456789").success.value
       .set(EuSendGoodsTradingNamePage(Index(0)), "French trading name").success.value
       .set(EuSendGoodsAddressPage(Index(0)), InternationalAddress("Line 1", None, "Town", None, None, Country("FR", "France"))).success.value
       .set(EuCountryPage(Index(1)), Country("DE", "Germany")).success.value
@@ -88,7 +88,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(SellsGoodsToEUConsumersPage(Index(2)), true).success.value
       .set(SellsGoodsToEUConsumerMethodPage(Index(2)), EuConsumerSalesMethod.DispatchWarehouse).success.value
       .set(RegistrationTypePage(Index(2)), RegistrationType.TaxId).success.value
-      .set(EuTaxReferencePage(Index(2)), "IE123456789").success.value
+      .set(EuTaxReferencePage(Index(2)), "IE1234567AB").success.value
       .set(EuSendGoodsTradingNamePage(Index(2)), "Irish trading name").success.value
       .set(EuSendGoodsAddressPage(Index(2)), InternationalAddress("Line 1", None, "Town", None, None, Country("IE", "Ireland"))).success.value
       .set(
@@ -119,14 +119,14 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(SellsGoodsToEUConsumersPage(Index(3)), true).success.value
       .set(SellsGoodsToEUConsumerMethodPage(Index(3)), EuConsumerSalesMethod.FixedEstablishment).success.value
       .set(RegistrationTypePage(Index(3)), RegistrationType.VatNumber).success.value
-      .set(EuVatNumberPage(Index(3)), "ES123456789").success.value
+      .set(EuVatNumberPage(Index(3)), "ESA1234567A").success.value
       .set(FixedEstablishmentTradingNamePage(Index(3)), "Spanish trading name").success.value
       .set(FixedEstablishmentAddressPage(Index(3)), InternationalAddress("Line 1", None, "Town", None, None, Country("ES", "Spain"))).success.value
       .set(EuCountryPage(Index(4)), Country("DK", "Denmark")).success.value
       .set(SellsGoodsToEUConsumersPage(Index(4)), true).success.value
       .set(SellsGoodsToEUConsumerMethodPage(Index(4)), EuConsumerSalesMethod.FixedEstablishment).success.value
       .set(RegistrationTypePage(Index(4)), RegistrationType.TaxId).success.value
-      .set(EuTaxReferencePage(Index(4)), "DK123456789").success.value
+      .set(EuTaxReferencePage(Index(4)), "DK12345678").success.value
       .set(FixedEstablishmentTradingNamePage(Index(4)), "Danish trading name").success.value
       .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
 
@@ -278,7 +278,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
           .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
           .set(VatRegisteredPage(Index(0)), true).success.value
-          .set(EuVatNumberPage(Index(0)), "FR123456789").success.value
+          .set(EuVatNumberPage(Index(0)), "FRAA123456789").success.value
           .set(
             BusinessContactDetailsPage,
             BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
@@ -303,7 +303,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           commencementDate = arbitraryDate,
           previousRegistrations = Seq.empty,
           euRegistrations = Seq(
-            EuVatRegistration(Country("FR", "France"), "FR123456789")
+            EuVatRegistration(Country("FR", "France"), "FRAA123456789")
           )
         )
       }

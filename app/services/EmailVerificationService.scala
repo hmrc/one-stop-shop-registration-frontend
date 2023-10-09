@@ -89,8 +89,8 @@ class EmailVerificationService @Inject()(
             NotVerified
         }
 
-      case _ =>
-        logger.warn("Received an unexpected verification status")
+      case unknownStatus =>
+        logger.warn(s"Received an unexpected verification status $unknownStatus")
         NotVerified
     }
   }

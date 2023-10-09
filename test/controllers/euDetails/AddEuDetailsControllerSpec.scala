@@ -95,7 +95,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET when answers are complete and user is part of Vat Group" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-        .set(EuVatNumberPage(countryIndex), "12345").success.value
+        .set(EuVatNumberPage(countryIndex), "ATU12345678").success.value
       )).build()
 
       running(application) {
@@ -105,7 +105,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "12345").success.value, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "ATU12345678").success.value, NormalMode)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
@@ -202,7 +202,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted and user is part of vat group" in {
 
       val application = applicationBuilder(userAnswers = Some(baseAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
-        .set(EuVatNumberPage(countryIndex), "12345").success.value
+        .set(EuVatNumberPage(countryIndex), "ATU12345678").success.value
       )).build()
 
       running(application) {
@@ -214,7 +214,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "12345").success.value, NormalMode)
+        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "ATU12345678").success.value, NormalMode)
 
         val result = route(application, request).value
 

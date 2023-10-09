@@ -57,9 +57,9 @@ trait CompletionChecks {
   def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
     request.userAnswers
       .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
-      _.filter(scheme =>
-        scheme.previousSchemesDetails.isEmpty || scheme.previousSchemesDetails.getOrElse(List.empty).exists(_.previousSchemeNumbers.isEmpty))
-    ).getOrElse(List.empty)
+        _.filter(scheme =>
+          scheme.previousSchemesDetails.isEmpty || scheme.previousSchemesDetails.getOrElse(List.empty).exists(_.previousSchemeNumbers.isEmpty))
+      ).getOrElse(List.empty)
   }
 
   def firstIndexedIncompleteDeregisteredCountry(incompleteCountries: Seq[Country])
@@ -156,6 +156,26 @@ trait CompletionChecks {
 
       case None => None
     }
+
+  def incompleteCountryEuDetailsRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
+
+    firstIndexedIncompleteEuDetails(getAllIncompleteEuDetails().map(_.euCountry)) match {
+      case Some((incompleteCountry, index)) =>
+        val defaultRedirect = Some(Redirect(controllers.euDetails.routes.EuCountryController.onPageLoad(mode, Index(index))))
+
+        incompleteCountry.euVatNumber match {
+          case Some(vatNumber) =>
+            CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == incompleteCountry.euCountry.code) match {
+              case Some(validationRule) if !vatNumber.matches(validationRule.vrnRegex) =>
+                Some(Redirect(controllers.euDetails.routes.EuVatNumberController.onPageLoad(mode, Index(index))))
+              case _ => defaultRedirect
+            }
+          case _ => defaultRedirect
+        }
+      case _ => None
+    }
+
+  }
 
   private def incompleteTradingNameRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isTradingNamesValid()) {
     Some(Redirect(controllers.routes.HasTradingNameController.onPageLoad(mode)))

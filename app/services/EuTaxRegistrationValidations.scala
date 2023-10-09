@@ -20,7 +20,7 @@ import cats.implicits._
 import models.domain.EuTaxIdentifierType.{Other, Vat}
 import models.domain._
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.{Country, DataMissingError, GenericError, Index, InternationalAddress, UserAnswers, ValidationResult}
+import models.{Country, CountryWithValidationDetails, DataMissingError, GenericError, Index, InternationalAddress, UserAnswers, ValidationResult}
 import pages.euDetails._
 import queries.AllEuDetailsRawQuery
 
@@ -138,11 +138,20 @@ trait EuTaxRegistrationValidations {
     }
   }
 
-  private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] =
-    answers.get(EuVatNumberPage(index)) match {
-      case Some(vatNumber) => vatNumber.validNec
-      case None => DataMissingError(EuVatNumberPage(index)).invalidNec
+  private def getEuVatNumber(answers: UserAnswers, index: Index): ValidationResult[String] = {
+    val country = answers.get(EuCountryPage(index))
+    val euVatNumber = answers.get(EuVatNumberPage(index))
+    (euVatNumber, country) match {
+      case (Some(vatNumber), Some(country)) =>
+        CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == country.code) match {
+          case Some(validationRule) if vatNumber.matches(validationRule.vrnRegex) =>
+            vatNumber.validNec
+          case _ =>
+            DataMissingError(EuVatNumberPage(index)).invalidNec
+        }
+      case (None, _) => DataMissingError(EuVatNumberPage(index)).invalidNec
     }
+  }
 
   private def getEuTaxId(answers: UserAnswers, index: Index): ValidationResult[String] =
     answers.get(EuTaxReferencePage(index)) match {
