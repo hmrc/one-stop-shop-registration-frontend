@@ -43,7 +43,7 @@ class IdentityVerificationController @Inject()(
                                               )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
 
-  private val redirectPolicy = AbsoluteWithHostnameFromAllowlist(frontendAppConfig.allowedRedirectUrls: _*)
+  private val redirectPolicy = OnlyRelative | AbsoluteWithHostnameFromAllowlist(frontendAppConfig.allowedRedirectUrls: _*)
 
   def identityError(continueUrl: RedirectUrl): Action[AnyContent] = Action {
     implicit request =>
