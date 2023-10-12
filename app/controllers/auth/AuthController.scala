@@ -46,7 +46,7 @@ class AuthController @Inject()(
                                 frontendAppConfig: FrontendAppConfig
                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val redirectPolicy = AbsoluteWithHostnameFromAllowlist(frontendAppConfig.allowedRedirectUrls: _*)
+  private val redirectPolicy = OnlyRelative | AbsoluteWithHostnameFromAllowlist(frontendAppConfig.allowedRedirectUrls: _*)
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
