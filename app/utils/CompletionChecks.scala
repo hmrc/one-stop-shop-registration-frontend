@@ -152,7 +152,7 @@ trait CompletionChecks {
 
       case Some(incompleteCountry) =>
         Some(Redirect(controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(
-          mode, Index(incompleteCountry._2), Index(incompleteCountry._2))))
+          mode, Index(incompleteCountry._2), Index(0))))
 
       case None => None
     }
