@@ -449,8 +449,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           }
 
           "to Tax Registered In EU when it has the 'yes' answer but all countries were removed" in {
-            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
-              Future.successful(Invalid(NonEmptyChain(DataMissingError(TaxRegisteredInEuPage))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
             val answers = completeUserAnswers
@@ -459,7 +457,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               .remove(EuDetailsQuery(Index(0))).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
               .build()
 
