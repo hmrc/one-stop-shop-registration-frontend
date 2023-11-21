@@ -17,8 +17,7 @@
 package connectors.test
 
 import config.Service
-import connectors.test.TestOnlyExternalResponseHttpParser.ExternalResponseResponse
-import connectors.test.TestOnlyExternalResponseHttpParser.ExternalResponseReads
+import connectors.test.TestOnlyExternalResponseHttpParser.{ExternalResponseReads, ExternalResponseResponse}
 import models.external.ExternalRequest
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}

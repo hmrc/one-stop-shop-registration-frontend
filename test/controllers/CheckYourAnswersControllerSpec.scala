@@ -20,11 +20,11 @@ import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
-import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
+import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -32,7 +32,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -40,7 +40,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
-import queries.EmailConfirmationQuery
+import queries.{EmailConfirmationQuery, EuDetailsQuery}
 import repositories.AuthenticatedUserAnswersRepository
 import services._
 import testutils.RegistrationData
@@ -422,6 +422,29 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(CheckMode, Index(0)).url
+
+            }
+
+          }
+
+          "to Tax Registered In EU when it has the 'yes' answer but all countries were removed" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+
+            val answers = completeUserAnswers
+              .set(TaxRegisteredInEuPage, true).success.value
+              .set(EuCountryPage(Index(0)), country).success.value
+              .remove(EuDetailsQuery(Index(0))).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(CheckMode).url
 
             }
 
