@@ -448,7 +448,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
           }
 
-          "to Tax Registered In EU when it has the 'yes' answer but all countries were removed" in {
+          "to Tax Registered In EU when it has a 'yes' answer but all countries were removed" in {
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
 
             val answers = completeUserAnswers

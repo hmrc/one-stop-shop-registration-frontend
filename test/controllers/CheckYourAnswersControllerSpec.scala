@@ -427,7 +427,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           }
 
-          "to Tax Registered In EU when it has the 'yes' answer but all countries were removed" in {
+          "to Tax Registered In EU when it has a 'yes' answer but all countries were removed" in {
             val answers = completeUserAnswers
               .set(TaxRegisteredInEuPage, true).success.value
               .set(EuCountryPage(Index(0)), country).success.value
