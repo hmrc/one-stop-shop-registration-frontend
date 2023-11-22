@@ -41,7 +41,7 @@ import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, _}
-import queries.EmailConfirmationQuery
+import queries.{EmailConfirmationQuery, EuDetailsQuery}
 import repositories.AuthenticatedUserAnswersRepository
 import services._
 import testutils.RegistrationData
@@ -448,7 +448,31 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
           }
 
-          "to Previous Eu Vat Number when one of the previously registered countries is incomplete" in {
+          "to Tax Registered In EU when it has a 'yes' answer but all countries were removed" in {
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers
+              .set(TaxRegisteredInEuPage, true).success.value
+              .set(EuCountryPage(Index(0)), country).success.value
+              .remove(EuDetailsQuery(Index(0))).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(AmendMode).url
+
+            }
+
+          }
+
+        "to Previous Eu Vat Number when one of the previously registered countries is incomplete" in {
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
