@@ -77,7 +77,6 @@ hasTradingName.title = Does your business trade using a different name in the UK
 hasTradingName.heading = Does your business trade using a name that is different from {0} in the UK?
 hasTradingName.checkYourAnswersLabel = Have a different UK trading name
 hasTradingName.error.required = Select yes if you use a different trading name in the UK
-hasTradingName.error.usedReservedWord = Trading name must not include ‘limited’, ‘ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’, or ‘plc’
 hasTradingName.change.hidden = if you have a different UK trading name
 
 tradingName.title = What is your UK trading name?
@@ -86,6 +85,7 @@ tradingName.hint = You cannot include ‘limited’, ‘Ltd’, ‘limited liabi
 tradingName.error.required = Enter your UK trading name
 tradingName.error.length = Trading name must be 100 characters or less
 tradingName.error.duplicate = You have entered this trading name already. Enter a different one.
+tradingName.error.usedReservedWord = Trading name must not include ‘limited’, ‘ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’, or ‘plc’
 tradingName.error.invalid = Trading name must only include letters, numbers, hyphens, spaces and apostrophes
 tradingName.change.hidden = your UK trading name
 
