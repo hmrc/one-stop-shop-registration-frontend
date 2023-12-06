@@ -26,6 +26,7 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
   val requiredKey = "tradingName.error.required"
   val lengthKey = "tradingName.error.length"
   val invalidKey = "tradingName.error.invalid"
+  val invalidReservedWordKey = "tradingName.error.usedReservedWord"
   val maxLength = 100
   val index = Index(0)
   val emptyExistingAnswers = Seq.empty[String]
@@ -78,7 +79,7 @@ class TradingNameFormProviderSpec extends StringFieldBehaviours {
 
           val invalidTradingName = s"Business $tradingNameReservedWords"
           val result = form.bind(Map(fieldName -> invalidTradingName)).apply(fieldName)
-          result.errors mustBe Seq(FormError(fieldName, invalidKey))
+          result.errors mustBe Seq(FormError(fieldName, invalidReservedWordKey))
       }
     }
   }
