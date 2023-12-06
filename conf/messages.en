@@ -77,7 +77,7 @@ hasTradingName.title = Does your business trade using a different name in the UK
 hasTradingName.heading = Does your business trade using a name that is different from {0} in the UK?
 hasTradingName.checkYourAnswersLabel = Have a different UK trading name
 hasTradingName.error.required = Select yes if you use a different trading name in the UK
-hasTradingName.error.usedReservedWord = Select yes if you use a different trading name in the UK
+hasTradingName.error.usedReservedWord = Trading name must not include ‘limited’, ‘ltd’, ‘limited liability partnership’, ‘LLP’, ‘public limited company’, or ‘plc’
 hasTradingName.change.hidden = if you have a different UK trading name
 
 tradingName.title = What is your UK trading name?
