@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,7 +176,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countrycode).futureValue.get
+      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countrycode, isOtherMS = false).futureValue.get
 
       value equals genericMatch
     }
@@ -191,7 +191,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue
+      val value = coreRegistrationValidationService.searchEuVrn(euVrn, countryCode, isOtherMS = false).futureValue
 
       value mustBe None
     }
@@ -207,7 +207,7 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
       val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
 
-      val response = intercept[Exception](coreRegistrationValidationService.searchEuVrn(euVrn, countryCode).futureValue)
+      val response = intercept[Exception](coreRegistrationValidationService.searchEuVrn(euVrn, countryCode, isOtherMS = false).futureValue)
 
       response.getMessage must include("Error while validating core registration")
     }

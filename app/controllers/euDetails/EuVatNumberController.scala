@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuVatNumberFormProvider
 import models.{CountryWithValidationDetails, Index, Mode}
-import pages.euDetails.EuVatNumberPage
+import pages.euDetails.{EuVatNumberPage, SellsGoodsToEUConsumersPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.CoreRegistrationValidationService
@@ -79,7 +79,9 @@ class EuVatNumberController @Inject()(
             value =>
 
               if (appConfig.otherCountryRegistrationValidationEnabled) {
-                coreRegistrationValidationService.searchEuVrn(value, country.code).flatMap {
+                val isOtherMS = !request.userAnswers.get(SellsGoodsToEUConsumersPage(index)).getOrElse(false)
+
+                coreRegistrationValidationService.searchEuVrn(value, country.code, isOtherMS).flatMap {
 
                   case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
                     Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
