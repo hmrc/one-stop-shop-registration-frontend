@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,7 +207,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(genericMatch))
 
           when(mockCoreRegistrationValidationService.isActiveTrader(genericMatch)) thenReturn true
@@ -240,7 +240,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
@@ -273,7 +273,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
@@ -305,7 +305,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
@@ -336,7 +336,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
@@ -367,7 +367,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
@@ -398,7 +398,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.TransferringMSID)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn false
@@ -431,7 +431,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val expectedResponse = genericMatch.copy(matchType = MatchType.TransferringMSID)
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
           when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn false
@@ -462,7 +462,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code))(any(), any())) thenReturn
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(None)
 
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
