@@ -154,7 +154,7 @@ class DateService @Inject()(
               if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
                 exclusionEffectiveDate
               } else {
-                getDateOfFirstSale(userAnswers)
+                getCommencementDate(userAnswers, request)
               }
             case _ =>
               val exception = new IllegalStateException("Transferring MSID match didn't have an expected exclusion effective date")
@@ -163,22 +163,26 @@ class DateService @Inject()(
           }
 
         case _ =>
-          userAnswers.get(HasMadeSalesPage) match {
-            case Some(true) =>
-              getDateOfFirstSale(userAnswers)
-            case Some(false) =>
-              val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
-
-              maybeRegistrationDate match {
-                case Some(registrationDate) => startOfNextQuarter(registrationDate)
-                case _ => startOfNextQuarter()
-              }
-            case _ =>
-              val exception = new IllegalStateException("Must answer Has Made Sales")
-              logger.error(exception.getMessage, exception)
-              throw exception
-          }
+          getCommencementDate(userAnswers, request)
       }
+    }
+  }
+
+  private def getCommencementDate(userAnswers: UserAnswers, request: AuthenticatedDataRequest[_]) = {
+    userAnswers.get(HasMadeSalesPage) match {
+      case Some(true) =>
+        getDateOfFirstSale(userAnswers)
+      case Some(false) =>
+        val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
+
+        maybeRegistrationDate match {
+          case Some(registrationDate) => startOfNextQuarter(registrationDate)
+          case _ => startOfNextQuarter()
+        }
+      case _ =>
+        val exception = new IllegalStateException("Must answer Has Made Sales")
+        logger.error(exception.getMessage, exception)
+        throw exception
     }
   }
 
