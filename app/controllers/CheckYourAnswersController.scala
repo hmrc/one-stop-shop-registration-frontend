@@ -77,7 +77,6 @@ class CheckYourAnswersController @Inject()(
           val hasTradingNameSummaryRow = new HasTradingNameSummary().row(request.userAnswers, CheckMode)
           val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode)
           val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(request.userAnswers, CheckMode)
-          val isPlanningFirstEligibleSaleSummaryRow = IsPlanningFirstEligibleSaleSummary.row(request.userAnswers, CheckMode)
           val dateOfFirstSaleSummaryRow = DateOfFirstSaleSummary.row(request.userAnswers, CheckMode)
           val commencementDateSummaryRow = Some(cds)
           val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode)
@@ -105,7 +104,6 @@ class CheckYourAnswersController @Inject()(
               },
               tradingNameSummaryRow,
               hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
               dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
               commencementDateSummaryRow,
               previouslyRegisteredSummaryRow.map { sr =>

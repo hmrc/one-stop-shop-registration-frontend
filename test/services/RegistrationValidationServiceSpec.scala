@@ -377,13 +377,13 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         result mustEqual Valid(expectedRegistration)
       }
 
-      "when Date Of First Sale is missing and Is Planning First Eligible Sale is true" in {
+      "when Date Of First Sale is missing and previously registered is true" in {
 
         when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers = answersNotPartOfVatGroup
           .remove(DateOfFirstSalePage).success.value
-          .set(IsPlanningFirstEligibleSalePage, true).success.value
+          .set(PreviouslyRegisteredPage, true).success.value
 
         val expectedRegistration =
           RegistrationData.registration copy(
@@ -438,17 +438,17 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
       }
 
-      "when both Date of First Sale and Is Planning First Eligible Sale are missing" in {
+      "when both Date of First Sale and previously registered are missing" in {
 
         when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val userAnswers = answersNotPartOfVatGroup
           .remove(DateOfFirstSalePage).success.value
-          .remove(IsPlanningFirstEligibleSalePage).success.value
+          .remove(PreviouslyRegisteredPage).success.value
 
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(IsPlanningFirstEligibleSalePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(PreviouslyRegisteredPage)))
       }
 
       "when Contact Details are missing" in {

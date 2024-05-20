@@ -44,12 +44,12 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           ).success.value) mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(NormalMode)
       }
 
-      "must navigate to Is Planning First Eligible Sale page when the answer is no" in {
+      "must navigate to Previously Registered page when the answer is no" in {
         HasMadeSalesPage.navigate(NormalMode,
           emptyUserAnswers.set(
             HasMadeSalesPage,
             false
-          ).success.value) mustEqual controllers.routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
+          ).success.value) mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(NormalMode)
       }
 
       "to JourneyRecoveryController and answer is empty" in {
@@ -68,12 +68,12 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.DateOfFirstSaleController.onPageLoad(CheckMode))
       }
 
-      "to IsPlanningFirstEligibleSaleController and answer is Some(true)" in {
+      "to PreviouslyRegisteredController and answer is Some(true)" in {
         val userAnswers = basicUserAnswersWithVatInfo
           .set(HasMadeSalesPage, false).success.value
 
         HasMadeSalesPage.navigate(CheckMode, userAnswers)
-          .mustEqual(routes.IsPlanningFirstEligibleSaleController.onPageLoad(CheckMode))
+          .mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode))
       }
 
       "to JourneyRecoveryController and answer is empty" in {
@@ -92,12 +92,12 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           .mustEqual(routes.DateOfFirstSaleController.onPageLoad(AmendMode))
       }
 
-      "to IsPlanningFirstEligibleSaleController and answer is Some(true)" in {
+      "to PreviouslyRegisteredController and answer is Some(true)" in {
         val userAnswers = basicUserAnswersWithVatInfo
           .set(HasMadeSalesPage, false).success.value
 
         HasMadeSalesPage.navigate(AmendMode, userAnswers)
-          .mustEqual(routes.IsPlanningFirstEligibleSaleController.onPageLoad(AmendMode))
+          .mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(AmendMode))
       }
 
       "to AmendJourneyRecoveryController and answer is empty" in {
@@ -108,14 +108,6 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
 
 
     "cleanup" - {
-
-      "must remove IsPlanningFirstEligibleSalePage when HasMadeSales is true" in {
-        val userAnswers = basicUserAnswersWithVatInfo
-          .set(IsPlanningFirstEligibleSalePage, true).success.value
-        val result = HasMadeSalesPage.cleanup(Some(true), userAnswers).success.value
-
-        result mustBe basicUserAnswersWithVatInfo
-      }
 
       "must remove DateOfFirstSalePage when HasMadeSales is false" in {
         val userAnswers = basicUserAnswersWithVatInfo

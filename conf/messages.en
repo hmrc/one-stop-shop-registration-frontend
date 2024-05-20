@@ -635,12 +635,6 @@ salesChannels.caption = Online marketplaces are websites or mobile apps where di
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
 
-isPlanningFirstEligibleSale.title = Do you plan on making your first eligible sale before {0}?
-isPlanningFirstEligibleSale.heading = Do you plan on making your first eligible sale before {0}?
-isPlanningFirstEligibleSale.error.required = Select yes if you plan on making your first eligible sale before {0}
-isPlanningFirstEligibleSale.checkYourAnswersLabel = Planning to make first eligible sale
-isPlanningFirstEligibleSale.change.hidden = if planning to make first eligible sale
-
 error.missing_answers = Some of your information is missing. You must complete this before you can submit your changes.
 error.missing_answers_header = Some information is missing.
 error.missing_answers_prompt = You need to complete the missing information for {0} before you continue.
