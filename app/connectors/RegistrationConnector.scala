@@ -17,44 +17,40 @@
 package connectors
 
 import config.Service
+import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponse, AmendRegistrationResultResponseReads}
 import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, ExternalEntryUrlResponseReads}
 import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
-import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponse, AmendRegistrationResultResponseReads}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
 import play.api.Configuration
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions, HttpResponse}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationConnector @Inject()(config: Configuration, httpClient: HttpClient)
+class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpClientV2)
                                      (implicit ec: ExecutionContext) extends HttpErrorFunctions {
 
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
 
-  def submitRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[RegistrationResultResponse] = {
-    val url = s"$baseUrl/create"
-
-    httpClient.POST[Registration, RegistrationResultResponse](url, registration)
- }
+  def submitRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[RegistrationResultResponse] =
+    httpClientV2.post(url"$baseUrl/create").withBody(Json.toJson(registration)).execute[RegistrationResultResponse]
 
   def getRegistration()(implicit hc: HeaderCarrier): Future[Option[Registration]] =
-    httpClient.GET[Option[Registration]](s"$baseUrl/registration")
+    httpClientV2.get(url"$baseUrl/registration").execute[Option[Registration]]
 
   def getVatCustomerInfo()(implicit hc: HeaderCarrier): Future[VatCustomerInfoResponse] =
-    httpClient.GET[VatCustomerInfoResponse](s"$baseUrl/vat-information")
+    httpClientV2.get(url"$baseUrl/vat-information").execute[VatCustomerInfoResponse]
 
-  def getSavedExternalEntry()(implicit hc: HeaderCarrier): Future[ExternalEntryUrlResponse] = {
-    httpClient.GET[ExternalEntryUrlResponse](s"$baseUrl/external-entry")
-  }
+  def getSavedExternalEntry()(implicit hc: HeaderCarrier): Future[ExternalEntryUrlResponse] =
+    httpClientV2.get(url"$baseUrl/external-entry").execute[ExternalEntryUrlResponse]
 
-  def amendRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[AmendRegistrationResultResponse] = {
-    httpClient.POST[Registration, AmendRegistrationResultResponse](s"$baseUrl/amend", registration)
-  }
+  def amendRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[AmendRegistrationResultResponse] =
+    httpClientV2.post(url"$baseUrl/amend").withBody(Json.toJson(registration)).execute[AmendRegistrationResultResponse]
 
   def enrolUser()(implicit hc: HeaderCarrier): Future[HttpResponse] =
-    httpClient.POSTEmpty[HttpResponse](s"$baseUrl/confirm-enrolment")
-
+    httpClientV2.post(url"$baseUrl/confirm-enrolment").execute[HttpResponse]
 }
