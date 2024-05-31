@@ -103,7 +103,7 @@ trait ModelGenerators {
         "GB79ABBY09012603367219",
         "GB21SCBL60910417068859",
         "GB42CPBK08005470328725"
-      ).map(v => Iban(v).right.get)
+      ).map(v => Iban(v).toOption.get)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =

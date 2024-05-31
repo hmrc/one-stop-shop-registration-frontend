@@ -29,9 +29,6 @@ import play.api.test.Helpers.running
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.Instant
-import java.util.UUID
-
 class VatReturnConnectorSpec extends SpecBase with WireMockHelper with EitherValues {
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
@@ -41,13 +38,6 @@ class VatReturnConnectorSpec extends SpecBase with WireMockHelper with EitherVal
     applicationBuilder()
       .configure("microservice.services.one-stop-shop-returns.port" -> server.port)
       .build()
-
-  private val coreErrorResponse = CoreErrorResponse(
-    Instant.now(),
-    Some(UUID.randomUUID()),
-    "error",
-    "Error message"
-  )
 
   ".get" - {
 
