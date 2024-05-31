@@ -28,7 +28,7 @@ import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
+import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -566,7 +566,6 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val userAnswers = emptyUserAnswers
         .set(HasMadeSalesPage, false).success.value
-        .set(IsPlanningFirstEligibleSalePage, true).success.value
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 

@@ -185,7 +185,6 @@ class ChangeYourRegistrationController @Inject()(
   private def getSalesRows(cds: SummaryListRow)(implicit request: AuthenticatedDataRequest[_]) = {
     Seq(
       HasMadeSalesSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      IsPlanningFirstEligibleSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
       DateOfFirstSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
       Some(cds)
     )

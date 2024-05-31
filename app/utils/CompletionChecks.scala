@@ -87,7 +87,7 @@ trait CompletionChecks {
   private def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasMadeSalesPage).exists {
       case true => request.userAnswers.get(DateOfFirstSalePage).isDefined
-      case false => request.userAnswers.get(IsPlanningFirstEligibleSalePage).isDefined
+      case false => request.userAnswers.get(PreviouslyRegisteredPage).isDefined
     }
   }
 

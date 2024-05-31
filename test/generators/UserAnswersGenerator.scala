@@ -41,7 +41,6 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(PreviousSchemeNumbersPage, JsValue)] ::
     arbitrary[(PreviousIossSchemePage, JsValue)] ::
     arbitrary[(EuSendGoodsTradingNamePage, JsValue)] ::
-    arbitrary[(IsPlanningFirstEligibleSalePage.type, JsValue)] ::
     arbitrary[(SalesChannelsPage.type, JsValue)] ::
     arbitrary[(HasFixedEstablishmentInNiPage.type, JsValue)] ::
     arbitrary[(BusinessBasedInNiPage.type, JsValue)] ::

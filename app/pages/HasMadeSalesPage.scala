@@ -17,8 +17,10 @@
 package pages
 
 import controllers.routes
+import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.amend.{routes => amendRoutes}
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -32,25 +34,24 @@ case object HasMadeSalesPage extends QuestionPage[Boolean] {
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)  => routes.DateOfFirstSaleController.onPageLoad(NormalMode)
-    case Some(false) => routes.IsPlanningFirstEligibleSaleController.onPageLoad(NormalMode)
+    case Some(false) => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(NormalMode)
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)  => routes.DateOfFirstSaleController.onPageLoad(CheckMode)
-    case Some(false) => routes.IsPlanningFirstEligibleSaleController.onPageLoad(CheckMode)
+    case Some(false) => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(CheckMode)
     case _           => routes.JourneyRecoveryController.onPageLoad()
   }
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)  => routes.DateOfFirstSaleController.onPageLoad(AmendMode)
-    case Some(false) => routes.IsPlanningFirstEligibleSaleController.onPageLoad(AmendMode)
+    case Some(false) => prevRegRoutes.PreviouslyRegisteredController.onPageLoad(AmendMode)
     case _           => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
   }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {
     value match {
-      case Some(true)  => userAnswers.remove(IsPlanningFirstEligibleSalePage)
       case Some(false) => userAnswers.remove(DateOfFirstSalePage)
       case _           => super.cleanup(value, userAnswers)
     }

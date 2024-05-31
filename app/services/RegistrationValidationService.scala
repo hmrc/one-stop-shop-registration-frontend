@@ -143,23 +143,21 @@ class RegistrationValidationService @Inject()(
                                    request: AuthenticatedDataRequest[_]
                                  ): Future[ValidationResult[LocalDate]] = {
 
-    if (answers.get(DateOfFirstSalePage).isEmpty && answers.get(IsPlanningFirstEligibleSalePage).isEmpty) {
-      Future.successful(DataMissingError(IsPlanningFirstEligibleSalePage).invalidNec)
-    } else {
-      if (registrationService.eligibleSalesDifference(request.registration, answers)) {
-        dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
-          calculatedCommencementDate.validNec
-        }
-      } else {
-        request.registration match {
-          case Some(registration) => Future.successful(registration.commencementDate.validNec)
-          case _ => val exception = new IllegalStateException("We were expecting a registration here")
-            logger.error(exception.getMessage, exception)
-            throw exception
-        }
-      }
 
+    if (registrationService.eligibleSalesDifference(request.registration, answers)) {
+      dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
+        calculatedCommencementDate.validNec
+      }
+    } else {
+      request.registration match {
+        case Some(registration) => Future.successful(registration.commencementDate.validNec)
+        case _ => val exception = new IllegalStateException("We were expecting a registration here")
+          logger.error(exception.getMessage, exception)
+          throw exception
+      }
     }
+
+
   }
 
   private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =

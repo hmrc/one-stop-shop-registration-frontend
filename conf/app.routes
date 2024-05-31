@@ -359,13 +359,6 @@ POST        /sales-on-marketplaces                                              
 
 GET         /answers-deleted                                                        controllers.AnswersDeletedController.onPageLoad()
 
-GET         /planned-first-sale                                                     controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = NormalMode)
-POST        /planned-first-sale                                                     controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = NormalMode)
-GET         /check-planned-first-sale                                               controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-planned-first-sale                                               controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = CheckMode)
-GET         /amend-planned-first-sale                                               controllers.IsPlanningFirstEligibleSaleController.onPageLoad(mode: Mode = AmendMode)
-POST        /amend-planned-first-sale                                               controllers.IsPlanningFirstEligibleSaleController.onSubmit(mode: Mode = AmendMode)
-
 GET         /no-welsh-service                                                       controllers.external.NoMoreWelshController.onPageLoad()
 GET         /cannot-register-ni-protocol                                            controllers.NiProtocolRejectionController.onPageLoad()
 
