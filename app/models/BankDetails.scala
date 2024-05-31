@@ -16,10 +16,8 @@
 
 package models
 
+import models.domain.ModelHelpers._
 import play.api.libs.json._
-import domain.ModelHelpers._
-
-import scala.util.Either
 
 
 case class BankDetails (accountName: String, bic: Option[Bic], iban: Iban)

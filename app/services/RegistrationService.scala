@@ -42,7 +42,7 @@ class RegistrationService @Inject()(
                                      clock: Clock
                                    ) extends Logging {
 
-  def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo)(implicit ec: ExecutionContext): Future[UserAnswers] = {
+  def toUserAnswers(userId: String, registration: Registration, vatCustomerInfo: VatCustomerInfo): Future[UserAnswers] = {
 
     val userAnswers = for {
       businessBasedInNiUA <- UserAnswers(userId,
