@@ -316,11 +316,7 @@ class RegistrationService @Inject()(
           Try(hasMadeSalesUA)
       }
       firstEligibleSaleUA <-
-        if (registration.dateOfFirstSale.isEmpty) {
-          dateOfFirstSaleUA.set(IsPlanningFirstEligibleSalePage, true)
-        } else {
           Try(dateOfFirstSaleUA)
-        }
 
     } yield firstEligibleSaleUA
   }

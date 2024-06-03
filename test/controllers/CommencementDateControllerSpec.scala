@@ -26,7 +26,8 @@ import org.mockito.Mockito.reset
 import org.mockito.MockitoSugar.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
+import pages.previousRegistrations.PreviouslyRegisteredPage
+import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -197,10 +198,10 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         }
       }
 
-      "must return OK and the correct view when user answers no to hasMadeSales and yes to Is Planning First Eligible Sale" in {
+      "must return OK and the correct view when user answers no to hasMadeSales and no to Previously Registered" in {
         val nowFormatted = LocalDate.now(stubClockAtArbitraryDate).format(dateFormatter)
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
-        val answers = answer1.set(IsPlanningFirstEligibleSalePage, true).success.value
+        val answers = answer1.set(PreviouslyRegisteredPage, false).success.value
         val startDateNow = LocalDate.now(stubClockAtArbitraryDate)
         val dateOfLastAmendment = LocalDate.now() // TODO
 
@@ -232,9 +233,9 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         }
       }
 
-      "must return OK and the correct view when user answers no to hasMadeSales and no to Is Planning First Eligible Sale" in {
+      "must return OK and the correct view when user answers no to hasMadeSales and yes to previously registered" in {
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
-        val answers = answer1.set(IsPlanningFirstEligibleSalePage, false).success.value
+        val answers = answer1.set(PreviouslyRegisteredPage, true).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
         when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
@@ -253,7 +254,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         }
       }
 
-      "must redirect to Journey Recovery when user answers no to hasMadeSales and Is Planning First Eligible Sale is empty" in {
+      "must redirect to Journey Recovery when user answers no to hasMadeSales and previously registered is empty" in {
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
@@ -328,9 +329,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           }
         }
 
-        "must redirect to Amend Journey Recovery when user answers no to hasMadeSales and Is Planning First Eligible Sale is empty" in {
-
-          val now = LocalDate.now()
+        "must redirect to Amend Journey Recovery when user answers no to hasMadeSales and previously registered is empty" in {
 
           val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
 
@@ -338,7 +337,6 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
           when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
           when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
-
 
           val application =
             applicationBuilder(userAnswers = Some(answer1))

@@ -2,11 +2,11 @@ service.name = Register to pay VAT on distance sales of goods from Northern Irel
 
 site.back = Back
 site.remove = Remove
-site.remove.hidden = Remove tax details for {0}
+site.remove.hidden = tax details for {0}
 site.change = Change
 site.add = Add
-site.change.hidden = Change tax details for {0}
-change.euVatNumber.hidden = Change VAT registration number for {0}
+site.change.hidden = tax details for {0}
+change.euVatNumber.hidden = VAT registration number for {0}
 site.deregistered.hidden = Change if you have deregistered from the VAT One Stop Shop for goods in {0}
 site.no = No
 site.yes = Yes
@@ -123,8 +123,8 @@ addEuDetails.title = You added details for {0} EU countries
 addEuDetails.heading = You added details for {0} EU countries
 addEuDetails.maximumReached = You have added details for every EU country
 addEuDetails.error.required = Select yes if you need to add VAT details for another EU country
-addEuDetails.change.hidden = Change tax details for {0}
-addEuDetails.remove.hidden = Remove tax details for {0}
+addEuDetails.change.hidden = tax details for {0}
+addEuDetails.remove.hidden = tax details for {0}
 addEuDetails.addAnother = Add tax details for another EU country?
 addEuDetails.addAnother.hint = You must tell us your tax details for all EU countries.
 
@@ -192,8 +192,8 @@ addTradingName.title = You have added {0} UK trading names
 addTradingName.heading = You have added {0} UK trading names
 addTradingName.maximumReached = You have added the maximum number of trading names.
 addTradingName.error.required = Select yes if you need to add another UK trading name
-addTradingName.change.hidden = Change {0}
-addTradingName.remove.hidden = Remove {0}
+addTradingName.change.hidden = {0}
+addTradingName.remove.hidden = {0}
 addTradingName.addAnother = Add another trading name?
 addTradingName.addAnother.hint = You can add up to 10 trading names.
 
@@ -220,8 +220,8 @@ addWebsite.maximumReached = You have added the maximum number of website address
 addWebsite.addAnother = Add another website address?
 addWebsite.error.required = Select yes if you need to add a website address
 addWebsite.addAnother.hint = You can add up to 10 websites that you use to sell your goods.
-addWebsite.change.hidden = Change {0}
-addWebsite.remove.hidden = Remove {0}
+addWebsite.change.hidden = {0}
+addWebsite.remove.hidden = {0}
 
 unsupportedAffinityGroup.title = You cannot use this service
 unsupportedAffinityGroup.heading = You cannot use this service
@@ -387,7 +387,7 @@ addPreviousRegistration.heading = You added registration details for {0} countri
 addPreviousRegistration.maximumReached = You have added details for every country
 addPreviousRegistration.error.required = Select yes if you need to add another registration
 addPreviousRegistration.change.hidden = if you have registered in {0}
-addPreviousRegistration.remove.hidden = Remove registration details in {0}
+addPreviousRegistration.remove.hidden = registration details in {0}
 addPreviousRegistration.addAnother = Add another registration?
 addPreviousRegistration.addAnother.hint = You must tell us about all previous and current registrations from all One Stop Shop schemes.
 
@@ -425,7 +425,7 @@ previousScheme.change.hidden = which scheme did your business register for
 previousScheme.oss.exceed.error = Cannot select another OSS registration for {0}
 previousScheme.oss.schemes.exceed.error = Cannot select another {0} OSS registration for {1}
 previousScheme.ioss.exceed.error = Cannot select another IOSS registration for {0}
-previousScheme.remove.hidden = Remove tax details for {0} {1} scheme
+previousScheme.remove.hidden = tax details for {0} {1} scheme
 
 previousIossScheme.title = Did you use an intermediary?
 previousIossScheme.heading = Did you use an intermediary?
@@ -465,7 +465,7 @@ previousRegistrations.add.hidden = Countries registered in
 checkPreviousSchemeAnswers.title = Check your answers for {0}
 checkPreviousSchemeAnswers.heading = Check your answers for {0}
 checkPreviousSchemeAnswers.error.required = Select yes if you need to add another scheme registration for {0}
-checkPreviousSchemeAnswers.remove.hidden = Remove {0}
+checkPreviousSchemeAnswers.remove.hidden = {0}
 checkPreviousSchemeAnswers.addAnother = Add another scheme registration from {0}?
 checkPreviousSchemeAnswers.maximumReached = You have added details for every scheme in {0}
 
@@ -549,7 +549,7 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
 commencementDate.p1 = You must include all eligible sales from {0} in your first return.
-commencementDate.p2 = You can change your sales information up to {0}.
+commencementDate.p2 = If you make your first sale before {0} you must amend your registration to tell us.
 commencementDate.checkYourAnswersLabel = Include sales from this date
 
 commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
@@ -634,12 +634,6 @@ salesChannels.caption = Online marketplaces are websites or mobile apps where di
 
 answersDeleted.title = For your security, we deleted your answers
 answersDeleted.heading = For your security, we deleted your answers
-
-isPlanningFirstEligibleSale.title = Do you plan on making your first eligible sale before {0}?
-isPlanningFirstEligibleSale.heading = Do you plan on making your first eligible sale before {0}?
-isPlanningFirstEligibleSale.error.required = Select yes if you plan on making your first eligible sale before {0}
-isPlanningFirstEligibleSale.checkYourAnswersLabel = Planning to make first eligible sale
-isPlanningFirstEligibleSale.change.hidden = if planning to make first eligible sale
 
 error.missing_answers = Some of your information is missing. You must complete this before you can submit your changes.
 error.missing_answers_header = Some information is missing.

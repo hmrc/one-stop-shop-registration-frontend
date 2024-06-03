@@ -17,9 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
 import forms.HasTradingNameFormProvider
 import models.{AmendMode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -44,8 +42,6 @@ class HasTradingNameControllerSpec extends SpecBase with MockitoSugar {
   private lazy val hasTradingNameAmendRoute = routes.HasTradingNameController.onPageLoad(AmendMode).url
 
   private val baseUserAnswers = basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfo))
-
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   "HasTradingName Controller" - {
 

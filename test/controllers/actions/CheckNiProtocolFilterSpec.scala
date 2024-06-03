@@ -18,7 +18,6 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.actions.FakeAuthenticatedDataRetrievalAction.mockSessionRepository
 import controllers.routes
 import models.AmendMode
 import models.requests.AuthenticatedDataRequest
@@ -28,8 +27,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.AuthenticatedUserAnswersRepository
-import play.api.inject.bind
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

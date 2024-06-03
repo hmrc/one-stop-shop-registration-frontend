@@ -27,7 +27,7 @@ import models.{Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
+import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -70,7 +70,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
@@ -110,7 +109,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithoutEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, false).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
@@ -150,7 +148,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val answers = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(IsPlanningFirstEligibleSalePage, true).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers))

@@ -19,7 +19,8 @@ package controllers
 import controllers.actions._
 import formats.Format.dateFormatter
 import models.Mode
-import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage, IsPlanningFirstEligibleSalePage}
+import pages.previousRegistrations.PreviouslyRegisteredPage
+import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{DateService, RegistrationService}
@@ -50,8 +51,7 @@ class CommencementDateController @Inject()(
         if (isEligibleSalesAmendable) {
           request.userAnswers.get(HasMadeSalesPage) match {
             case Some(true) =>
-              request.userAnswers.get(DateOfFirstSalePage).map {
-                date =>
+              request.userAnswers.get(DateOfFirstSalePage).map { _ =>
                   val endOfCurrentQuarter = dateService.lastDayOfCalendarQuarter
                   val isDateInCurrentQuarter = calculatedCommencementDate.isBefore(endOfCurrentQuarter) || endOfCurrentQuarter == calculatedCommencementDate
                   val startOfCurrentQuarter = dateService.startOfCurrentQuarter
@@ -71,8 +71,8 @@ class CommencementDateController @Inject()(
               }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))))
 
             case Some(false) =>
-              request.userAnswers.get(IsPlanningFirstEligibleSalePage) match {
-                case Some(true) =>
+              request.userAnswers.get(PreviouslyRegisteredPage) match {
+                case Some(false) =>
                   Ok(view(
                     mode,
                     calculatedCommencementDate.format(dateFormatter),
@@ -82,7 +82,7 @@ class CommencementDateController @Inject()(
                     None,
                     None
                   ))
-                case Some(false) => Redirect(routes.RegisterLaterController.onPageLoad())
+                case Some(true) => Redirect(routes.RegisterLaterController.onPageLoad())
                 case _ => Redirect(determineJourneyRecovery(Some(mode)))
               }
 

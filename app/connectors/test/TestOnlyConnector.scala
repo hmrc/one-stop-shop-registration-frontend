@@ -22,7 +22,7 @@ import models.external.ExternalRequest
 import play.api.Configuration
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import java.net.URL
 import javax.inject.Inject
@@ -34,10 +34,6 @@ class TestOnlyConnector @Inject()(
                                  )(implicit ec: ExecutionContext) {
 
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
-
-  private lazy val dropAccountsUrl: URL = url"$baseUrl/test-only/delete-accounts"
-
-  def dropAccounts()(implicit hc: HeaderCarrier): Future[HttpResponse] = httpClientV2.delete(dropAccountsUrl).execute[HttpResponse]
 
   def externalEntry(externalRequest: ExternalRequest, maybeLang: Option[String])(implicit hc: HeaderCarrier): Future[ExternalResponseResponse] = {
     val url: URL = maybeLang match {

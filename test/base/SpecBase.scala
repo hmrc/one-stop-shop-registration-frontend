@@ -105,7 +105,6 @@ trait SpecBase
   val completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
     .set(HasTradingNamePage, false).success.value
     .set(HasMadeSalesPage, false).success.value
-    .set(IsPlanningFirstEligibleSalePage, true).success.value
     .set(TaxRegisteredInEuPage, false).success.value
     .set(PreviouslyRegisteredPage, false).success.value
     .set(IsOnlineMarketplacePage, false).success.value
@@ -155,7 +154,6 @@ trait SpecBase
       val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode)
       val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode)
       val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode)
-      val isPlanningFirstEligibleSaleSummaryRow = IsPlanningFirstEligibleSaleSummary.row(answers, mode)
       val commencementDateSummaryRow = Some(commencementDateSummary)
       val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(answers, mode)
       val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, Seq.empty, mode)
@@ -181,7 +179,6 @@ trait SpecBase
         },
         tradingNameSummaryRow,
         hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-        isPlanningFirstEligibleSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
         commencementDateSummaryRow,
         previouslyRegisteredSummaryRow.map { sr =>
           if (previousRegistrationSummaryRow.isDefined) {
