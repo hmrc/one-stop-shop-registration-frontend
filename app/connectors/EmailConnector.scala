@@ -30,10 +30,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailConnector @Inject()(
-                                config: Configuration,
-                                httpClientV2: HttpClientV2
-) extends Logging {
+class EmailConnector @Inject()(config: Configuration, httpClientV2: HttpClientV2) extends Logging {
 
   private val baseUrl = config.get[Service]("microservice.services.email")
 
