@@ -25,7 +25,7 @@ import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, Period,
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
+import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages._
 import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.PreviouslyRegisteredPage
@@ -55,6 +55,7 @@ trait SpecBase
     with Matchers
     with TryValues
     with OptionValues
+    with EitherValues
     with ScalaFutures
     with IntegrationPatience
     with Generators {

@@ -156,7 +156,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
 
         val result = connector.validateCoreRegistration(coreRegistrationRequest).futureValue
 
-        val errorResponse = result.swap.toOption.get.asInstanceOf[EisError].eisErrorResponse
+        val errorResponse = result.left.value.asInstanceOf[EisError].eisErrorResponse
 
         val expectedResponse = EisError(
           EisErrorResponse(
@@ -228,7 +228,7 @@ class ValidateCoreRegistrationConnectorSpec extends SpecBase with WireMockHelper
         whenReady(connector.validateCoreRegistration(coreRegistrationRequest), Timeout(Span(timeout, Seconds))) {
           exp =>
             exp.isLeft mustBe true
-            exp.swap.toOption.get mustBe a[EisError]
+            exp.left.value mustBe a[EisError]
         }
       }
     }
