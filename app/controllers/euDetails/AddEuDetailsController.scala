@@ -49,14 +49,13 @@ class AddEuDetailsController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       getNumberOfEuCountries(mode) {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
 
           withCompleteDataAsync[EuOptionalDetails](
-            data = getAllIncompleteEuDetails,
+            data = getAllIncompleteEuDetails _,
             onFailure = (incomplete: Seq[EuOptionalDetails]) => {
               val list = EuDetailsSummary.countryAndVatNumberList(request.userAnswers, mode)
               Future.successful(Ok(viewPartOfVatGroup(form, mode, list, canAddCountries, incomplete)))
@@ -69,10 +68,9 @@ class AddEuDetailsController @Inject()(
 
   def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      val vatOnly = request.userAnswers.vatInfo.exists(_.partOfVatGroup)
       withCompleteDataAsync[EuOptionalDetails](
-        data = getAllIncompleteEuDetails,
-        onFailure = (incomplete: Seq[EuOptionalDetails]) => {
+        data = getAllIncompleteEuDetails _,
+        onFailure = (_: Seq[EuOptionalDetails]) => {
           if (incompletePromptShown) {
             incompleteCheckEuDetailsRedirect(CheckMode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture

@@ -161,7 +161,7 @@ class ChangeYourRegistrationController @Inject()(
       rows = (getTradingNameRows() ++
         getSalesRows(cds) ++
         getPreviouslyRegisteredRows(existingPreviousRegistrations) ++
-        getRegisteredInEuRows ++
+        getRegisteredInEuRows() ++
         Seq(IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode)) ++
         getWebsiteRows() ++
         getBusinessContactDetailsRows() ++

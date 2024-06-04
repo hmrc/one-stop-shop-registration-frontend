@@ -19,30 +19,25 @@ package controllers.amend
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import formats.Format.dateFormatter
-import models.{Period, UserAnswers}
-import models.Quarter.{Q1, Q4}
-import models.external.ExternalEntryUrl
-import models.requests.AuthenticatedDataRequest
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
+import models.Quarter.{Q1, Q4}
+import models.external.ExternalEntryUrl
+import models.{Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage}
-import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.Json
-import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.amend.AmendCompleteView
 
 import java.time.{Clock, LocalDate, ZoneId}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 
 class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
@@ -51,11 +46,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockDateService = mock[DateService]
-
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
   private  val userAnswers = UserAnswers(
     userAnswersId,
@@ -98,15 +88,10 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
-          implicit val msgs: Messages = messages(application)
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
-          val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
@@ -142,14 +127,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
-          implicit val msgs: Messages = messages(application)
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
           val view = application.injector.instanceOf[AmendCompleteView]
 
           status(result) mustEqual OK
@@ -185,14 +165,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
-          implicit val msgs: Messages = messages(application)
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
 
           val view = application.injector.instanceOf[AmendCompleteView]
           status(result) mustEqual OK
@@ -233,15 +208,10 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
 
         running(application) {
-          implicit val msgs: Messages = messages(application)
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
-          val commencementDate = LocalDate.now()
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
 
           status(result) mustEqual OK
 
@@ -278,15 +248,10 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             .build()
 
         running(application) {
-          implicit val msgs: Messages = messages(application)
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
-          val commencementDate = LocalDate.of(2021, 10, 1)
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
 
           status(result) mustEqual OK
 

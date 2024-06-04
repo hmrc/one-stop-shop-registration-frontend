@@ -80,7 +80,7 @@ class DeleteAllFixedEstablishmentControllerSpec extends SpecBase with MockitoSug
 
       when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-      when(mockRegistrationService.toUserAnswers(any(), any(), any())(any())) thenReturn Future.successful(baseUserAnswers)
+      when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn Future.successful(baseUserAnswers)
       when(mockRegistrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn Future.successful(true)
 

@@ -20,20 +20,17 @@ import config.Service
 import connectors.returns.VatReturnHttpParser.{VatReturnReads, VatReturnResponse}
 import models.Period
 import play.api.Configuration
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpErrorFunctions}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VatReturnConnector @Inject()(config: Configuration, httpClient: HttpClient)
+class VatReturnConnector @Inject()(config: Configuration, httpClientV2: HttpClientV2)
                                   (implicit ec: ExecutionContext) extends HttpErrorFunctions {
 
   private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-returns")
 
-  def get(period: Period)(implicit hc: HeaderCarrier): Future[VatReturnResponse] = {
-    val url = s"$baseUrl/vat-returns/period/${period.toString}"
-
-    httpClient.GET[VatReturnResponse](url)
-  }
-
+  def get(period: Period)(implicit hc: HeaderCarrier): Future[VatReturnResponse] =
+    httpClientV2.get(url"$baseUrl/vat-returns/period/$period").execute[VatReturnResponse]
 }

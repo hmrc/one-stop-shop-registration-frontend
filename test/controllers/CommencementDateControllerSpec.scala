@@ -331,15 +331,12 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
 
         "must redirect to Amend Journey Recovery when user answers no to hasMadeSales and previously registered is empty" in {
 
-          val now = LocalDate.now()
-
           val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
 
           when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
           when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
           when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
-
 
           val application =
             applicationBuilder(userAnswers = Some(answer1))

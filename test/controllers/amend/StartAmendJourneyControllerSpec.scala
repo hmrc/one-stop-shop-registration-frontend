@@ -56,7 +56,7 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
 
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-        when(mockRegistrationService.toUserAnswers(any(), any(), any())(any())) thenReturn Future.successful(completeUserAnswers)
+        when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn Future.successful(completeUserAnswers)
         when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn Future.successful(true)
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))

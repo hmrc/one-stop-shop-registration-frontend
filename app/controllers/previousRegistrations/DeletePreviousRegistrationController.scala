@@ -50,7 +50,7 @@ class DeletePreviousRegistrationController @Inject()(
         details =>
 
           if (mode == AmendMode) {
-            val existingPreviousRegistrations = checkExistingRegistration.previousRegistrations
+            val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
 
             if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
               Future.successful(Redirect(routes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()))
@@ -69,7 +69,7 @@ class DeletePreviousRegistrationController @Inject()(
         details =>
 
           if (mode == AmendMode) {
-            val existingPreviousRegistrations = checkExistingRegistration.previousRegistrations
+            val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
 
             if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
               Future.successful(Redirect(routes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()))

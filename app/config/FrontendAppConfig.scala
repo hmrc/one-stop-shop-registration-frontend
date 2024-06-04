@@ -19,9 +19,10 @@ package config
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
-import java.net.URI
+import java.net.URL
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -49,13 +50,13 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val allowedRedirectUrls: Seq[String] = configuration.get[Seq[String]]("urls.allowedRedirects")
 
-  val ivEvidenceStatusUrl: String =
-    s"${configuration.get[Service]("microservice.services.identity-verification").baseUrl}/disabled-evidences?origin=$origin"
+  val ivEvidenceStatusUrl: URL =
+    url"${configuration.get[Service]("microservice.services.identity-verification").baseUrl}/disabled-evidences?origin=$origin"
 
   val ivJourneyServiceUrl: String =
     s"${configuration.get[Service]("microservice.services.identity-verification").baseUrl}/journey/"
 
-  def ivJourneyResultUrl(journeyId: String): String = new URI(s"$ivJourneyServiceUrl$journeyId").toString
+  def ivJourneyResultUrl(journeyId: String): URL = url"$ivJourneyServiceUrl$journeyId"
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host") + configuration.get[String]("feedback-frontend.url")
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/${origin.toLowerCase}"

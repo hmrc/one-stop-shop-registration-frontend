@@ -17,29 +17,26 @@
 package connectors
 
 import config.Service
+import connectors.EmailHttpParser._
+import logging.Logging
 import models.emails.EmailSendingResult.EMAIL_NOT_SENT
 import models.emails.{EmailSendingResult, EmailToSendRequest}
 import play.api.Configuration
-import connectors.EmailHttpParser._
-import logging.Logging
-import uk.gov.hmrc.http.{BadGatewayException, GatewayTimeoutException, HeaderCarrier, HttpClient}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{BadGatewayException, GatewayTimeoutException, HeaderCarrier, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailConnector @Inject()(
-  config: Configuration,
-  client: HttpClient
-) extends Logging {
+class EmailConnector @Inject()(config: Configuration, httpClientV2: HttpClientV2) extends Logging {
 
   private val baseUrl = config.get[Service]("microservice.services.email")
 
   def send(email: EmailToSendRequest)
           (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[EmailSendingResult] = {
-    client.POST[EmailToSendRequest, EmailSendingResult](
-      s"${baseUrl}hmrc/email", email
-    ).recover {
+    httpClientV2.post(url"${baseUrl}hmrc/email").withBody(Json.toJson(email)).execute[EmailSendingResult].recover {
       case e: BadGatewayException =>
         logger.warn("There was an error sending the email: " + e.message + " " + e.responseCode)
         EMAIL_NOT_SENT

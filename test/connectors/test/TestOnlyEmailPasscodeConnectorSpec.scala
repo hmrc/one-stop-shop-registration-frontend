@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class TestOnlyEmailPasscodeConnectorSpec extends SpecBase with WireMockHelper {
 
-  private implicit val hc = HeaderCarrier()
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val url = "/test-only/passcodes"
 

@@ -57,14 +57,14 @@ class AddPreviousRegistrationController @Inject()(
           val canAddCountries = number < Country.euCountries.size
 
           val previousRegistrations = if (mode == AmendMode) {
-            val registration: Registration = checkExistingRegistration
+            val registration: Registration = checkExistingRegistration()
             PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
           } else {
             PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
           }
 
           withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
-            data = getAllIncompleteDeregisteredDetails,
+            data = getAllIncompleteDeregisteredDetails _,
             onFailure = (incomplete: Seq[PreviousRegistrationDetailsWithOptionalVatNumber]) => {
               Future.successful(Ok(view(form, mode, previousRegistrations, canAddCountries, incomplete)))
             }) {
@@ -76,8 +76,8 @@ class AddPreviousRegistrationController @Inject()(
   def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
-        data = getAllIncompleteDeregisteredDetails,
-        onFailure = (incomplete: Seq[PreviousRegistrationDetailsWithOptionalVatNumber]) => {
+        data = getAllIncompleteDeregisteredDetails _,
+        onFailure = (_: Seq[PreviousRegistrationDetailsWithOptionalVatNumber]) => {
           if (incompletePromptShown) {
             incompletePreviousRegistrationRedirect(mode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture

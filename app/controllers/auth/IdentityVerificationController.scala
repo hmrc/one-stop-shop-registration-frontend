@@ -21,18 +21,17 @@ import connectors.IdentityVerificationConnector
 import models.iv.IdentityVerificationResult._
 import models.iv._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.FutureSyntax._
 import views.html.iv.IdentityProblemView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import utils.FutureSyntax._
 
 class IdentityVerificationController @Inject()(
                                                 override val messagesApi: MessagesApi,
