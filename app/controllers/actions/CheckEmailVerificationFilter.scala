@@ -52,21 +52,21 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
               Future(Option.empty[Result])
             case LockedTooManyLockedEmails =>
               logger.info("CheckEmailVerificationFilter - LockedTooManyLockedEmails")
-              Future(Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url)))
+              Future.successful(Option(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url)))
             case LockedPasscodeForSingleEmail =>
               logger.info("CheckEmailVerificationFilter - LockedPasscodeForSingleEmail")
               saveForLaterService.saveAnswers(
                 controllers.routes.EmailVerificationCodesExceededController.onPageLoad(),
                 Call(GET, request.uri)
-              )(request, executionContext, hc).map(Some(_))
+              )(request, executionContext, hc).map(Option(_))
             case _ =>
               logger.info("CheckEmailVerificationFilter - Not Verified")
-              Future(Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
+              Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
           }
-        case None => Future.successful(None)
+        case None => Future.successful(Option.empty[Result])
       }
     } else {
-      Future.successful(None)
+      Future.successful(Option.empty[Result])
     }
   }
 }
