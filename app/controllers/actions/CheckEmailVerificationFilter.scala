@@ -22,10 +22,11 @@ import models.{AmendMode, Mode, NormalMode}
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, Verified}
 import models.requests.AuthenticatedDataRequest
 import pages.BusinessContactDetailsPage
-import play.api.mvc.{ActionFilter, Result}
+import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.mvc.Results.Redirect
-import services.EmailVerificationService
+import services.{EmailVerificationService, SaveForLaterService}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
@@ -33,7 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckEmailVerificationFilterImpl(mode: Option[Mode],
                                        frontendAppConfig: FrontendAppConfig,
-                                       emailVerificationService: EmailVerificationService
+                                       emailVerificationService: EmailVerificationService,
+                                       saveForLaterService: SaveForLaterService
                                       )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
@@ -44,36 +46,38 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
     if (frontendAppConfig.emailVerificationEnabled && !mode.contains(AmendMode)) {
       request.userAnswers.get(BusinessContactDetailsPage) match {
         case Some(contactDetails) =>
-          emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).map {
+          emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).flatMap {
             case Verified =>
               logger.info("CheckEmailVerificationFilter - Verified")
-              None
+              Future(Option.empty[Result])
             case LockedTooManyLockedEmails =>
               logger.info("CheckEmailVerificationFilter - LockedTooManyLockedEmails")
-              Some(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url))
-
+              Future.successful(Option(Redirect(controllers.routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url)))
             case LockedPasscodeForSingleEmail =>
               logger.info("CheckEmailVerificationFilter - LockedPasscodeForSingleEmail")
-              Some(Redirect(controllers.routes.EmailVerificationCodesExceededController.onPageLoad().url))
-
+              saveForLaterService.saveAnswers(
+                controllers.routes.EmailVerificationCodesExceededController.onPageLoad(),
+                Call(GET, request.uri)
+              )(request, executionContext, hc).map(Option(_))
             case _ =>
               logger.info("CheckEmailVerificationFilter - Not Verified")
-              Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url))
+              Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
           }
-        case None => Future.successful(None)
+        case None => Future.successful(Option.empty[Result])
       }
     } else {
-      Future.successful(None)
+      Future.successful(Option.empty[Result])
     }
   }
 }
 
 class CheckEmailVerificationFilterProvider @Inject()(
                                                       frontendAppConfig: FrontendAppConfig,
-                                                      emailVerificationService: EmailVerificationService
+                                                      emailVerificationService: EmailVerificationService,
+                                                      saveForLaterService: SaveForLaterService
                                                     )(implicit val executionContext: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckEmailVerificationFilterImpl = {
-    new CheckEmailVerificationFilterImpl(mode, frontendAppConfig, emailVerificationService)
+    new CheckEmailVerificationFilterImpl(mode, frontendAppConfig, emailVerificationService, saveForLaterService)
   }
 }
 

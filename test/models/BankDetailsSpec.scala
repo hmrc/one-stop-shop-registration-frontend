@@ -32,6 +32,7 @@ class BankDetailsSpec extends AnyFreeSpec with Matchers {
             bic = Bic("ABCDEF2A"),
             iban = iban
           )
+          case Left(_) => new Exception("Bad Match")
         }
 
         val json = Json.obj(
