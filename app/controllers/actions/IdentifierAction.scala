@@ -65,19 +65,15 @@ class AuthenticatedIdentifierAction @Inject()(
       Retrievals.credentials and
         Retrievals.allEnrolments and
         Retrievals.affinityGroup and
-        Retrievals.confidenceLevel and
-        Retrievals.credentialRole) {
+        Retrievals.confidenceLevel) {
 
-      case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == User =>
+      case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ =>
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments)).toFuture
           case _      => throw InsufficientEnrolments()
         }
 
-      case _ ~ _ ~ Some(Organisation) ~ _ ~ Some(credentialRole) if credentialRole == Assistant =>
-        throw UnsupportedCredentialRole()
-
-      case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence ~ _ =>
+      case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence =>
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) =>
             if (confidence >= ConfidenceLevel.L200) {
