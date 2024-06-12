@@ -25,13 +25,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.amend.ErrorSubmittingAmendment
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class ErrorSubmittingAmendmentController @Inject()(
-                                                       cc: AuthenticatedControllerComponents,
-                                                       appConfig: FrontendAppConfig,
-                                                       view: ErrorSubmittingAmendment
-                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                                    cc: AuthenticatedControllerComponents,
+                                                    appConfig: FrontendAppConfig,
+                                                    view: ErrorSubmittingAmendment
+                                                  ) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -39,8 +38,6 @@ class ErrorSubmittingAmendmentController @Inject()(
     implicit request =>
 
       Ok(view(appConfig.ossYourAccountUrl))
-
   }
-
 }
 
