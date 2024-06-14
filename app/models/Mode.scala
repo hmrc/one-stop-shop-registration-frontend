@@ -27,6 +27,7 @@ case object NormalMode extends Mode
 case object CheckLoopMode extends Mode
 case object AmendMode extends Mode
 case object AmendLoopMode extends Mode
+case object RejoinMode extends Mode
 
 object Mode {
 
@@ -37,6 +38,7 @@ object Mode {
       case CheckLoopMode => "CheckLoopMode"
       case AmendMode     => "AmendMode"
       case AmendLoopMode => "AmendLoopMode"
+      case RejoinMode    => "RejoinMode"
     }
   }
 }

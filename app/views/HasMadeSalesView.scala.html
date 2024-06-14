@@ -34,17 +34,25 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        @if(mode == RejoinMode) {
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("hasMadeSales.rejoin.heading")).asPageHeading(),
+                ).withHint(HintViewModel(HtmlContent(Html(messages("hasMadeSales.caption.youCanStillRegister")))))
+            )
+        } else {
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
+                ).withHint(HintViewModel(HtmlContent(Html(
+                        if(hintTextFlag) {messages("hasMadeSales.caption") + messages("hasMadeSales.caption.youCanStillRegister") + messages("hasMadeSales.caption.excludeSales")}
+                        else {messages("hasMadeSales.caption") + messages("hasMadeSales.caption.youCanStillRegister")}
+                    ))))
+            )
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = form("value"),
-                legend = LegendViewModel(messages("hasMadeSales.heading")).asPageHeading(),
-            ).withHint(HintViewModel(HtmlContent(Html(
-                    if(hintTextFlag) {messages("hasMadeSales.caption") + messages("hasMadeSales.caption.youCanStillRegister") + messages("hasMadeSales.caption.excludeSales")}
-                    else {messages("hasMadeSales.caption") + messages("hasMadeSales.caption.youCanStillRegister")}
-                ))))
-        )
-
+        }
 
         @button("site.continue",  routes.HasMadeSalesController.onPageLoad(mode).url, mode)
     }

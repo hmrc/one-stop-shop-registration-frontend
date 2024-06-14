@@ -311,6 +311,8 @@ GET         /check-start-date                                                   
 POST        /check-start-date                                                       controllers.CommencementDateController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-start-date                                                       controllers.CommencementDateController.onPageLoad(mode: Mode = AmendMode)
 POST        /amend-start-date                                                       controllers.CommencementDateController.onSubmit(mode: Mode = AmendMode)
+GET         /rejoin-start-date                                                      controllers.CommencementDateController.onPageLoad(mode: Mode = RejoinMode)
+POST        /rejoin-start-date                                                      controllers.CommencementDateController.onSubmit(mode: Mode = RejoinMode)
 
 GET         /register-later                                                         controllers.RegisterLaterController.onPageLoad()
 
@@ -325,6 +327,8 @@ GET         /check-date-of-first-sale                                           
 POST        /check-date-of-first-sale                                               controllers.DateOfFirstSaleController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-date-of-first-sale                                               controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = AmendMode)
 POST        /amend-date-of-first-sale                                               controllers.DateOfFirstSaleController.onSubmit(mode: Mode = AmendMode)
+GET         /rejoin-date-of-first-sale                                              controllers.DateOfFirstSaleController.onPageLoad(mode: Mode = RejoinMode)
+POST        /rejoin-date-of-first-sale                                              controllers.DateOfFirstSaleController.onSubmit(mode: Mode = RejoinMode)
 
 GET         /already-made-sales                                                     controllers.HasMadeSalesController.onPageLoad(mode: Mode = NormalMode)
 POST        /already-made-sales                                                     controllers.HasMadeSalesController.onSubmit(mode: Mode = NormalMode)
@@ -332,6 +336,8 @@ GET         /check-already-made-sales                                           
 POST        /check-already-made-sales                                               controllers.HasMadeSalesController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-already-made-sales                                               controllers.HasMadeSalesController.onPageLoad(mode: Mode = AmendMode)
 POST        /amend-already-made-sales                                               controllers.HasMadeSalesController.onSubmit(mode: Mode = AmendMode)
+GET         /rejoin-already-made-sales                                              controllers.HasMadeSalesController.onPageLoad(mode: Mode = RejoinMode)
+POST        /rejoin-already-made-sales                                              controllers.HasMadeSalesController.onSubmit(mode: Mode = RejoinMode)
 
 GET         /online-marketplace                                                     controllers.IsOnlineMarketplaceController.onPageLoad(mode: Mode = NormalMode)
 POST        /online-marketplace                                                     controllers.IsOnlineMarketplaceController.onSubmit(mode: Mode = NormalMode)
@@ -515,3 +521,14 @@ POST        /first-amend-no-vat-number-for-eu-country/:countryIndex             
 
 GET         /amend-there-is-a-problem                                               controllers.amend.AmendJourneyRecoveryController.onPageLoad()
 
+
+GET        /start-rejoin-journey                                                    controllers.rejoin.StartRejoinJourneyController.onPageLoad()
+
+GET        /cannot-rejoin                                                           controllers.rejoin.CannotRejoinController.onPageLoad()
+
+GET        /rejoin-registration                                                     controllers.rejoin.RejoinRegistrationController.onPageLoad()
+POST       /rejoin-registration                                                     controllers.rejoin.RejoinRegistrationController.onSubmit(incompletePrompt: Boolean)
+
+GET        /error-submitting-rejoin                                                 controllers.rejoin.ErrorSubmittingRejoinController.onPageLoad()
+
+GET        /successful-rejoin                                                       controllers.rejoin.RejoinCompleteController.onPageLoad()

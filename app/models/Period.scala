@@ -16,6 +16,7 @@
 
 package models
 
+import models.Quarter.{Q1, Q2, Q3, Q4}
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.{PathBindable, QueryStringBindable}
@@ -43,6 +44,19 @@ case class Period(year: Int, quarter: Quarter) {
     s"${firstDay.format(firstMonthFormatter)} ${messages("site.to")} ${lastDay.format(lastMonthYearFormatter)}"
 
   override def toString: String = s"$year-${quarter.toString}"
+
+  def getPreviousPeriod: Period = {
+    quarter match {
+      case Q4 =>
+        Period(year, Q3)
+      case Q3 =>
+        Period(year, Q2)
+      case Q2 =>
+        Period(year, Q1)
+      case Q1 =>
+        Period(year - 1, Q4)
+    }
+  }
 }
 
 object Period {
