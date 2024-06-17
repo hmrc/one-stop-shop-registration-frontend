@@ -22,6 +22,7 @@ import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.{AmendMode, BusinessContactDetails, Index}
 import models.requests.AuthenticatedDataRequest
+import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito
@@ -379,6 +380,40 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinCompleteController.onPageLoad().url
           verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+        }
+      }
+
+      "when the submission fails because of a technical issue" - {
+
+        "the user is redirected to the Error Submitting Rejoin Controller" in {
+
+          val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
+
+          when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          doNothing().when(auditService).audit(any())(any(), any())
+
+          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+            .overrides(
+              bind[RegistrationValidationService].toInstance(registrationValidationService),
+              bind[RegistrationConnector].toInstance(registrationConnector),
+              bind[RejoinRegistrationService].toInstance(rejoinRegistrationService),
+              bind[AuditService].toInstance(auditService)
+            ).build()
+
+          running(application) {
+            val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(false).url)
+            val result = route(application, request).value
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+            val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, dataRequest)
+
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.rejoin.routes.ErrorSubmittingRejoinController.onPageLoad().url
+            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+          }
         }
       }
     }
