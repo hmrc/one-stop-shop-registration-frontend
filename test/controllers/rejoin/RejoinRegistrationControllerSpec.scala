@@ -65,13 +65,11 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
   private val commencementDate = LocalDate.of(2022, 1, 1)
 
   override def beforeEach(): Unit = {
-    Mockito.reset(
-      registrationConnector,
-      registrationValidationService,
-      rejoinRegistrationService,
-      auditService,
-      dateService
-    )
+    Mockito.reset(registrationConnector)
+    Mockito.reset(registrationValidationService)
+    Mockito.reset(rejoinRegistrationService)
+    Mockito.reset(auditService)
+    Mockito.reset(dateService)
   }
 
   "RejoinRegistration Controller" - {

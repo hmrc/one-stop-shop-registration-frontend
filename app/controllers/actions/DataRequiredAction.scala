@@ -46,7 +46,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
         if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
           Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
         } else if (mode.contains(RejoinMode)) {
-          Left(Redirect(controllers.rejoin.routes.RejoinJourneyRecoveryController.onPageLoad())).toFuture
+          Left(Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad())).toFuture
         } else {
           Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
         }

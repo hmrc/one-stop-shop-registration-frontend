@@ -533,4 +533,4 @@ GET        /error-submitting-rejoin                                             
 
 GET        /successful-rejoin                                                       controllers.rejoin.RejoinCompleteController.onPageLoad()
 
-GET        /rejoinJourneyRecovery                       controllers.rejoin.RejoinJourneyRecoveryController.onPageLoad()
+GET        /rejoin-journey-recovery                                                 controllers.rejoin.RejoinJourneyRecoveryController.onPageLoad()
