@@ -17,7 +17,6 @@
 package controllers.rejoin
 
 import base.SpecBase
-import controllers.routes
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito.{times, verify, when}

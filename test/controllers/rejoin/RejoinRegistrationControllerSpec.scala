@@ -17,18 +17,370 @@
 package controllers.rejoin
 
 import base.SpecBase
-import controllers.routes
+import cats.data.Validated.Valid
+import connectors.RegistrationConnector
+import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
+import models.{AmendMode, BusinessContactDetails, Index}
+import models.requests.AuthenticatedDataRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.Mockito
+import org.mockito.Mockito.{doNothing, times, verify, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
+import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage}
+import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.AuthenticatedUserAnswersRepository
+import services._
+import testutils.RegistrationData
+import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.govuk.SummaryListFluency
 import views.html.rejoin.RejoinRegistrationView
 
-class RejoinRegistrationControllerSpec extends SpecBase {
+import java.time.LocalDate
+import scala.concurrent.Future
+
+class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
+
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+
+  private val registration = RegistrationData.registration
+
+  private val registrationValidationService = mock[RegistrationValidationService]
+  private val registrationService = mock[RegistrationService]
+  private val registrationConnector = mock[RegistrationConnector]
+  private val rejoinRegistrationService = mock[RejoinRegistrationService]
+  private val auditService = mock[AuditService]
+  private val dateService = mock[DateService]
+  private val country = arbitraryCountry.arbitrary.sample.value
+  private val commencementDate = LocalDate.of(2022, 1, 1)
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(
+      registrationConnector,
+      registrationValidationService,
+      rejoinRegistrationService,
+      auditService,
+      dateService
+    )
+  }
 
   "RejoinRegistration Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "GET" - {
+
+      "must redirect to Cannot rejoin if can rejoin is false" in {
+
+        val commencementDate = LocalDate.of(2022, 1, 1)
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
+        when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
 
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[DateService].toInstance(dateService))
+          .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+          .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
+        }
+      }
+
+      "must return OK and the correct view for a GET" in {
+
+        val commencementDate = LocalDate.of(2022, 1, 1)
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
+        when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[DateService].toInstance(dateService))
+          .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+          .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[RejoinRegistrationView]
+          implicit val msgs: Messages = messages(application)
+          val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, AmendMode).futureValue)
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = true, AmendMode )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and view with invalid prompt when" - {
+        "trading name is missing" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode )(request, messages(application)).toString
+          }
+        }
+
+        "websites are missing" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode )(request, messages(application)).toString
+          }
+        }
+
+        "eligible sales is not populated correctly" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode )(request, messages(application)).toString
+          }
+        }
+
+        "tax registered in eu is not populated correctly" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+          }
+        }
+
+        "previous registrations is not populated correctly" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+          }
+        }
+
+        "tax registered in eu has a country with missing data" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers
+            .set(TaxRegisteredInEuPage, true).success.value
+            .set(EuCountryPage(Index(0)), country).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+          }
+        }
+
+        "previous registrations has a country with missing data" in {
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+
+          val answers = completeUserAnswers
+            .set(PreviouslyRegisteredPage, true).success.value
+            .set(PreviousEuCountryPage(Index(0)), country).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[DateService].toInstance(dateService))
+            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[RejoinRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+          }
+        }
+      }
+    }
+
+    "on submit" - {
+
+      "must audit the event and redirect to the next page and successfully" in {
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
+        when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Right(()))
+        when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+        doNothing().when(auditService).audit(any())(any(), any())
+
+        val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
+        val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[RegistrationValidationService].toInstance(registrationValidationService),
+            bind[RegistrationConnector].toInstance(registrationConnector),
+            bind[RejoinRegistrationService].toInstance(rejoinRegistrationService),
+            bind[AuditService].toInstance(auditService),
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
+          ).build()
+
+        running(application) {
+          val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(false).url)
+          val result = route(application, request).value
+          val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers)
+          val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, dataRequest)
+
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinCompleteController.onPageLoad().url
+          verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
+        }
+      }
     }
   }
 }
