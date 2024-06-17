@@ -532,3 +532,5 @@ POST       /rejoin-registration                                                 
 GET        /error-submitting-rejoin                                                 controllers.rejoin.ErrorSubmittingRejoinController.onPageLoad()
 
 GET        /successful-rejoin                                                       controllers.rejoin.RejoinCompleteController.onPageLoad()
+
+GET        /rejoinJourneyRecovery                       controllers.rejoin.RejoinJourneyRecoveryController.onPageLoad()

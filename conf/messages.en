@@ -892,7 +892,7 @@ rejoinRegistration.preSubmitNote.line2 = After registering, do not use the Back 
 
 errorSubmittingRejoin.title = We have a problem with our service right now
 errorSubmittingRejoin.heading = Your registration is not submitted
-errorSubmittingRejoin.tryAgainLater = You can try again later.
+errorSubmittingRejoin.tryAgainLater = You can <a class="govuk-link" href="{0}">try again later</a>.
 errorSubmittingRejoin.contactUs = If the problem continues, you can email us at <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
 errorSubmittingRejoin.yourAccount = Back to your account
 
@@ -912,3 +912,7 @@ rejoinComplete.manageReturnsLink = <a href="{0}" class="govuk-link">Manage your 
 rejoinComplete.contactYou = We will contact you if we need to check any information.
 rejoinComplete.feedback.link.text = What did you think of this service?
 rejoinComplete.feedback.30seconds = (takes 30 seconds)
+
+rejoinJourneyRecovery.title = Sorry, there is a problem with the service
+rejoinJourneyRecovery.heading = Sorry, there is a problem with the service
+rejoinJourneyRecovery.guidance = For your security, we deleted your answers.
