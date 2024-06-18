@@ -36,8 +36,10 @@ object EuDetailsSummary {
       case NormalMode => NormalMode
       case CheckMode => CheckMode
       case AmendMode => AmendMode
+      case RejoinMode => RejoinMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
       case AmendLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Amend Loop Mode")
+      case RejoinLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Rejoin Loop Mode")
     }
 
     answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {

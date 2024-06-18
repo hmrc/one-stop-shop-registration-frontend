@@ -40,7 +40,6 @@ class AlreadyRegisteredController @Inject()(
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 
-      println("Hellooooo")
       for {
         savedExternalEntry <- connector.getSavedExternalEntry()
         registrationData <- connector.getRegistration()
