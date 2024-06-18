@@ -36,7 +36,10 @@ object PreviouslyRegisteredSummary {
         SummaryListRowViewModel(
           key = "previouslyRegistered.checkYourAnswersLabel",
           value = ValueViewModel(value),
-          actions = if((mode != AmendMode && mode != RejoinMode) || (mode == AmendMode && answers.get(AllPreviousRegistrationsQuery).isEmpty)) {
+          actions = if((mode != AmendMode && mode != RejoinMode) ||
+            (mode == AmendMode && answers.get(AllPreviousRegistrationsQuery).isEmpty) ||
+          (mode == RejoinMode && answers.get(AllPreviousRegistrationsQuery).isEmpty))
+          {
             Seq(
               ActionItemViewModel("site.change", routes.PreviouslyRegisteredController.onPageLoad(mode).url)
                 .withVisuallyHiddenText(messages("previouslyRegistered.change.hidden"))
