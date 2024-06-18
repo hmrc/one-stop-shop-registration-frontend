@@ -56,7 +56,7 @@ case object AddPreviousRegistrationPage extends QuestionPage[Boolean] {
   override protected def navigateInRejoinMode(answers: UserAnswers): Call =
     (answers.get(AddPreviousRegistrationPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
       case (Some(true), Some(size)) => prevRegRoutes.PreviousEuCountryController.onPageLoad(RejoinMode, Index(size))
-      case (Some(false), _) => routes.CommencementDateController.onPageLoad(RejoinMode)
+      case (Some(false), _) => rejoinRoutes.RejoinRegistrationController.onPageLoad()
       case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
 }
