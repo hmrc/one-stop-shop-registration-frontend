@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{AmendMode, CheckMode, Country, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -36,4 +36,7 @@ case class PreviousEuCountryPage(index: Index) extends QuestionPage[Country] {
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     prevRegRoutes.PreviousSchemeController.onPageLoad(AmendMode, index, Index(0))
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    prevRegRoutes.PreviousSchemeController.onPageLoad(RejoinMode, index, Index(0))
 }

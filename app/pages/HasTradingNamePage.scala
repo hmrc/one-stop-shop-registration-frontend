@@ -18,7 +18,8 @@ package pages
 
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import controllers.rejoin.{routes => rejoinRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllTradingNames
@@ -52,5 +53,14 @@ case object HasTradingNamePage extends QuestionPage[Boolean] {
       case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(AmendMode)
       case (Some(false), _)                                           => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _                                                          => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(HasTradingNamePage), answers.get(AllTradingNames)) match {
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty  => routes.AddTradingNameController.onPageLoad(RejoinMode)
+      case (Some(true), _)                                            => routes.TradingNameController.onPageLoad(RejoinMode, Index(0))
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(RejoinMode)
+      case (Some(false), _)                                           => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case _                                                          => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
 }

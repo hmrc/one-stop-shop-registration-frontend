@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.mvc.Call
 import queries.DeriveNumberOfWebsites
 
@@ -39,5 +39,11 @@ case class DeleteWebsitePage(index: Index) extends Page {
     answers.get(DeriveNumberOfWebsites) match {
       case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(AmendMode)
       case _ => routes.HasWebsiteController.onPageLoad(AmendMode)
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    answers.get(DeriveNumberOfWebsites) match {
+      case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(RejoinMode)
+      case _ => routes.HasWebsiteController.onPageLoad(RejoinMode)
     }
 }

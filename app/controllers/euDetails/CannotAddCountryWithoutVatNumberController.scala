@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import controllers.GetCountry
 import controllers.actions._
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, Index, Mode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{AllEuDetailsRawQuery, DeriveNumberOfEuRegistrations, EuDetailsQuery}
@@ -64,6 +64,7 @@ class CannotAddCountryWithoutVatNumberController @Inject()(
     val mode = currentMode match {
       case AmendLoopMode => AmendMode
       case CheckLoopMode => NormalMode
+      case RejoinLoopMode => RejoinMode
       case _ => currentMode
     }
 

@@ -18,6 +18,7 @@ package pages
 
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import models.{BusinessContactDetails, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -36,4 +37,7 @@ case object BusinessContactDetailsPage extends QuestionPage[BusinessContactDetai
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     amendRoutes.ChangeYourRegistrationController.onPageLoad()
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    rejoinRoutes.RejoinRegistrationController.onPageLoad()
 }

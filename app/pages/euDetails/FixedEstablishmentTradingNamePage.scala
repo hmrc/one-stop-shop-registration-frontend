@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -53,6 +53,16 @@ case class FixedEstablishmentTradingNamePage(index: Index) extends QuestionPage[
       FixedEstablishmentAddressPage(index).navigate(AmendLoopMode, answers)
     } else {
       euRoutes.FixedEstablishmentAddressController.onPageLoad(AmendLoopMode, index)
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    euRoutes.FixedEstablishmentAddressController.onPageLoad(RejoinMode, index)
+
+  override protected def navigateInRejoinLoopMode(answers: UserAnswers): Call =
+    if (answers.get(FixedEstablishmentAddressPage(index)).isDefined) {
+      FixedEstablishmentAddressPage(index).navigate(RejoinLoopMode, answers)
+    } else {
+      euRoutes.FixedEstablishmentAddressController.onPageLoad(RejoinLoopMode, index)
     }
 
 }

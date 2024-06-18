@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.mvc.Call
 import queries.DeriveNumberOfTradingNames
 
@@ -40,6 +40,13 @@ case class DeleteTradingNamePage(index: Index) extends Page {
     answers.get(DeriveNumberOfTradingNames) match {
       case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(AmendMode)
       case _ => routes.HasTradingNameController.onPageLoad(AmendMode)
+    }
+  }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
+    answers.get(DeriveNumberOfTradingNames) match {
+      case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(RejoinMode)
+      case _ => routes.HasTradingNameController.onPageLoad(RejoinMode)
     }
   }
 }

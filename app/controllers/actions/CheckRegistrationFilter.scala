@@ -21,7 +21,7 @@ import connectors.RegistrationConnector
 import controllers.routes
 import logging.Logging
 import models.requests.AuthenticatedIdentifierRequest
-import models.{AmendLoopMode, AmendMode, Mode, RejoinMode}
+import models.{AmendLoopMode, AmendMode, Mode, RejoinLoopMode, RejoinMode}
 import play.api.http.Status.NO_CONTENT
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
@@ -50,7 +50,7 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
       mayBeRegistration <- connector.getRegistration()
     } yield {
 
-      if (mode.contains(AmendMode) || mode.contains(AmendLoopMode) || mode.contains(RejoinMode)) {
+      if (mode.contains(AmendMode) || mode.contains(AmendLoopMode) || mode.contains(RejoinMode) || mode.contains(RejoinLoopMode)) {
         mayBeRegistration match {
           case Some(_) if hasRegistrationEnrolment(request.enrolments) => None.toFuture
 

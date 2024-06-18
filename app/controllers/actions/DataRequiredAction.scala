@@ -19,7 +19,7 @@ package controllers.actions
 import connectors.RegistrationConnector
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendLoopMode, AmendMode, Mode, RejoinMode}
+import models.{AmendLoopMode, AmendMode, Mode, RejoinLoopMode, RejoinMode}
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
@@ -45,7 +45,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
       case Some(data) if data.data.value.isEmpty =>
         if (mode.contains(AmendMode) || mode.contains(AmendLoopMode)) {
           Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
-        } else if (mode.contains(RejoinMode)) {
+        } else if (mode.contains(RejoinMode) || mode.contains(RejoinLoopMode)) {
           Left(Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad())).toFuture
         } else {
           Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture

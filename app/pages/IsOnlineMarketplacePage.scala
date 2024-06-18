@@ -17,6 +17,7 @@
 package pages
 
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.routes
 import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
@@ -36,4 +37,7 @@ case object IsOnlineMarketplacePage extends QuestionPage[Boolean] {
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     amendRoutes.ChangeYourRegistrationController.onPageLoad()
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    rejoinRoutes.RejoinRegistrationController.onPageLoad()
 }

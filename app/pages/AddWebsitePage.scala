@@ -18,7 +18,8 @@ package pages
 
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import controllers.rejoin.{routes => rejoinRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.DeriveNumberOfWebsites
@@ -49,4 +50,11 @@ case object AddWebsitePage extends QuestionPage[Boolean] {
     case (Some(false), _)         => amendRoutes.ChangeYourRegistrationController.onPageLoad()
     case _                        => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
   }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(AddWebsitePage), answers.get(DeriveNumberOfWebsites)) match {
+      case (Some(true), Some(size)) => routes.WebsiteController.onPageLoad(RejoinMode, Index(size))
+      case (Some(false), _)         => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case _                        => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
+    }
 }

@@ -17,9 +17,10 @@
 package pages.euDetails
 
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.euDetails.{routes => euRoutes}
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -50,5 +51,12 @@ case object AddEuDetailsPage extends QuestionPage[Boolean] {
       case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(AmendMode, Index(size))
       case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(AddEuDetailsPage), answers.get(DeriveNumberOfEuRegistrations)) match {
+      case (Some(true), Some(size)) => euRoutes.EuCountryController.onPageLoad(RejoinMode, Index(size))
+      case (Some(false), _) => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
 }

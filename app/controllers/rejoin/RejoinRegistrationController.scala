@@ -155,7 +155,7 @@ class RejoinRegistrationController @Inject()(
             getSalesRows(cds) ++
             getPreviouslyRegisteredRows() ++
             getRegisteredInEuRows() ++
-            Seq(IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode)) ++
+            Seq(IsOnlineMarketplaceSummary.row(request.userAnswers, RejoinMode)) ++
             getWebsiteRows() ++
             getBusinessContactDetailsRows() ++
             getBankDetailsRows()
@@ -164,8 +164,8 @@ class RejoinRegistrationController @Inject()(
   }
 
   private def getTradingNameRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
-    val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, AmendMode)
-    Seq(new HasTradingNameSummary().row(request.userAnswers, AmendMode).map { sr =>
+    val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, RejoinMode)
+    Seq(new HasTradingNameSummary().row(request.userAnswers, RejoinMode).map { sr =>
       if (tradingNameSummaryRow.isDefined) {
         sr.withCssClass("govuk-summary-list__row--no-border")
       } else {
@@ -177,8 +177,8 @@ class RejoinRegistrationController @Inject()(
 
   private def getSalesRows(cds: SummaryListRow)(implicit request: AuthenticatedDataRequest[_]) = {
     Seq(
-      HasMadeSalesSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      DateOfFirstSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      HasMadeSalesSummary.row(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      DateOfFirstSaleSummary.row(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
       Some(cds)
     )
   }
@@ -196,11 +196,11 @@ class RejoinRegistrationController @Inject()(
     val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(
       request.userAnswers,
       existingPreviousRegistrations,
-      AmendMode
+      RejoinMode
     )
 
     Seq(
-      PreviouslyRegisteredSummary.row(request.userAnswers, AmendMode).map { sr =>
+      PreviouslyRegisteredSummary.row(request.userAnswers, RejoinMode).map { sr =>
         if (previousRegistrationSummaryRow.isDefined) {
           sr.withCssClass("govuk-summary-list__row--no-border")
         } else {
@@ -212,9 +212,9 @@ class RejoinRegistrationController @Inject()(
   }
 
   private def getRegisteredInEuRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
-    val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, AmendMode)
+    val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, RejoinMode)
     Seq(
-      TaxRegisteredInEuSummary.row(request.userAnswers, AmendMode).map { sr =>
+      TaxRegisteredInEuSummary.row(request.userAnswers, RejoinMode).map { sr =>
         if (euDetailsSummaryRow.isDefined) {
           sr.withCssClass("govuk-summary-list__row--no-border")
         } else {
@@ -226,9 +226,9 @@ class RejoinRegistrationController @Inject()(
   }
 
   private def getWebsiteRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
-    val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, AmendMode)
+    val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, RejoinMode)
     Seq(
-      HasWebsiteSummary.row(request.userAnswers, AmendMode).map { sr =>
+      HasWebsiteSummary.row(request.userAnswers, RejoinMode).map { sr =>
         if (websiteSummaryRow.isDefined) {
           sr.withCssClass("govuk-summary-list__row--no-border")
         } else {
@@ -241,17 +241,17 @@ class RejoinRegistrationController @Inject()(
 
   private def getBusinessContactDetailsRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
     Seq(
-      BusinessContactDetailsSummary.rowContactName(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers, AmendMode)
+      BusinessContactDetailsSummary.rowContactName(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers, RejoinMode)
     )
   }
 
   private def getBankDetailsRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
     Seq(
-      BankDetailsSummary.rowAccountName(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      BankDetailsSummary.rowBIC(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      BankDetailsSummary.rowIBAN(request.userAnswers, AmendMode)
+      BankDetailsSummary.rowAccountName(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BankDetailsSummary.rowBIC(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      BankDetailsSummary.rowIBAN(request.userAnswers, RejoinMode)
     )
   }
 }

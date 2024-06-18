@@ -18,7 +18,8 @@ package pages
 
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import controllers.rejoin.{routes => rejoinRoutes}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.DeriveNumberOfTradingNames
@@ -47,6 +48,13 @@ case object AddTradingNamePage extends QuestionPage[Boolean] {
     (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
       case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(AmendMode, Index(size))
       case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(AddTradingNamePage), answers.get(DeriveNumberOfTradingNames)) match {
+      case (Some(true), Some(size)) => routes.TradingNameController.onPageLoad(RejoinMode, Index(size))
+      case (Some(false), _) => rejoinRoutes.RejoinRegistrationController.onPageLoad()
       case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
     }
 }

@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, PreviousSchemeType, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, PreviousSchemeType, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -50,6 +50,14 @@ case class PreviousSchemeTypePage(countryIndex: Index, schemeIndex: Index) exten
       prevRegRoutes.PreviousOssNumberController.onPageLoad(AmendMode, countryIndex, schemeIndex)
     } else {
       prevRegRoutes.PreviousIossSchemeController.onPageLoad(AmendMode, countryIndex, schemeIndex)
+    }
+  }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
+    if (answers.get(this).contains(PreviousSchemeType.OSS)) {
+      prevRegRoutes.PreviousOssNumberController.onPageLoad(RejoinMode, countryIndex, schemeIndex)
+    } else {
+      prevRegRoutes.PreviousIossSchemeController.onPageLoad(RejoinMode, countryIndex, schemeIndex)
     }
   }
 

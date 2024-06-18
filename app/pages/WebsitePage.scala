@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllWebsites
@@ -38,6 +38,9 @@ case class WebsitePage(index: Index) extends QuestionPage[String] {
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     routes.AddWebsiteController.onPageLoad(AmendMode)
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    routes.AddWebsiteController.onPageLoad(RejoinMode)
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] = {
     if (userAnswers.get(AllWebsites).exists(_.isEmpty)) {

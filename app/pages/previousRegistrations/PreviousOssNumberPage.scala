@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.mvc.Call
 
 case class PreviousOssNumberPage(countryIndex: Index, schemeIndex: Index) extends PreviousSchemeNumbersPage {
@@ -30,4 +30,7 @@ case class PreviousOssNumberPage(countryIndex: Index, schemeIndex: Index) extend
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, countryIndex)
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(RejoinMode, countryIndex)
 }

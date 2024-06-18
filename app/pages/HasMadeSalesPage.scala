@@ -17,6 +17,7 @@
 package pages
 
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
 import models.{AmendMode, CheckMode, NormalMode, RejoinMode, UserAnswers}
@@ -52,7 +53,7 @@ case object HasMadeSalesPage extends QuestionPage[Boolean] {
   override protected def navigateInRejoinMode(answers: UserAnswers): Call = answers.get(HasMadeSalesPage) match {
     case Some(true)  => routes.DateOfFirstSaleController.onPageLoad(RejoinMode)
     case Some(false) => routes.CommencementDateController.onPageLoad(RejoinMode)
-    case _           => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    case _           => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
 
   }
 

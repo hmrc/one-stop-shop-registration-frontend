@@ -18,6 +18,7 @@ package pages
 
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import models.UserAnswers
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -38,6 +39,12 @@ case object DeleteAllWebsitesPage extends QuestionPage[Boolean] {
     answers.get(DeleteAllWebsitesPage) match {
       case Some(_) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    answers.get(DeleteAllWebsitesPage) match {
+      case Some(_) => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
 
 }

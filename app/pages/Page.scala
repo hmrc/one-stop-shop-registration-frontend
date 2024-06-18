@@ -16,7 +16,7 @@
 
 package pages
 
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Mode, NormalMode, RejoinMode, UserAnswers}
+import models._
 import play.api.mvc.Call
 
 import scala.language.implicitConversions
@@ -30,6 +30,7 @@ trait Page {
     case AmendMode => navigateInAmendMode(answers)
     case AmendLoopMode => navigateInAmendLoopMode(answers)
     case RejoinMode => navigateInRejoinMode(answers)
+    case RejoinLoopMode => navigateInRejoinLoopMode(answers)
   }
 
   protected def navigateInNormalMode(answers: UserAnswers): Call =
@@ -49,6 +50,9 @@ trait Page {
 
   protected def navigateInRejoinMode(answers: UserAnswers): Call =
     throw new NotImplementedError("navigateInRejoinMode is not implemented on this page")
+
+  protected def navigateInRejoinLoopMode(answers: UserAnswers): Call =
+    throw new NotImplementedError("navigateInRejoinLoopMode is not implemented on this page")
 }
 
 object Page {

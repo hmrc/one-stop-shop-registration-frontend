@@ -28,17 +28,19 @@ case object CheckLoopMode extends Mode
 case object AmendMode extends Mode
 case object AmendLoopMode extends Mode
 case object RejoinMode extends Mode
+case object RejoinLoopMode extends Mode
 
 object Mode {
 
   implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
     override def to(value: Mode): String = value match {
-      case NormalMode    => "NormalMode"
-      case CheckMode     => "CheckMode"
-      case CheckLoopMode => "CheckLoopMode"
-      case AmendMode     => "AmendMode"
-      case AmendLoopMode => "AmendLoopMode"
-      case RejoinMode    => "RejoinMode"
+      case NormalMode     => "NormalMode"
+      case CheckMode      => "CheckMode"
+      case CheckLoopMode  => "CheckLoopMode"
+      case AmendMode      => "AmendMode"
+      case AmendLoopMode  => "AmendLoopMode"
+      case RejoinMode     => "RejoinMode"
+      case RejoinLoopMode => "RejoinLoopMode"
     }
   }
 }
