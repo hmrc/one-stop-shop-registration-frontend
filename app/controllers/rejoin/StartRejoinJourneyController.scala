@@ -20,6 +20,7 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import logging.Logging
 import models.RejoinMode
+import pages.HasMadeSalesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AuthenticatedUserAnswersRepository
@@ -29,7 +30,7 @@ import utils.FutureSyntax.FutureOps
 
 import java.time.{Clock, LocalDate}
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class StartRejoinJourneyController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -55,7 +56,8 @@ class StartRejoinJourneyController @Inject()(
               case Right(vatInfo) =>
                 for {
                   userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                  _ <- authenticatedUserAnswersRepository.set(userAnswers)
+                  updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                  _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
                 } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
 
               case Left(error) =>
