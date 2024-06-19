@@ -18,7 +18,10 @@ package models
 
 import play.api.mvc.JavascriptLiteral
 
-sealed trait Mode
+sealed trait Mode {
+  def isInAmendOrRejoin: Boolean =
+    this == AmendMode || this == AmendLoopMode || this == RejoinMode || this == RejoinLoopMode
+}
 
 case object CheckMode extends Mode
 

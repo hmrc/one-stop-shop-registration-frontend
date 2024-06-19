@@ -22,7 +22,7 @@ import logging.Logging
 import models.domain.Registration
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
-import models.{AmendMode, Country, Mode}
+import models.{AmendMode, Country, Mode, RejoinMode}
 import pages.previousRegistrations.AddPreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -56,7 +56,7 @@ class AddPreviousRegistrationController @Inject()(
 
           val canAddCountries = number < Country.euCountries.size
 
-          val previousRegistrations = if (mode == AmendMode) {
+          val previousRegistrations = if (mode == AmendMode || mode == RejoinMode) {
             val registration: Registration = checkExistingRegistration()
             PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
           } else {
@@ -91,7 +91,7 @@ class AddPreviousRegistrationController @Inject()(
 
             val canAddCountries = number < Country.euCountries.size
 
-            val previousRegistrations = if (mode == AmendMode) {
+            val previousRegistrations = if (mode == AmendMode || mode == RejoinMode) {
               val registration: Registration = checkExistingRegistration()
               PreviousRegistrationSummary.addToListRows(request.userAnswers, registration.previousRegistrations, mode)
             } else {

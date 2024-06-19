@@ -18,7 +18,6 @@ package controllers.rejoin
 
 import config.FrontendAppConfig
 import controllers.actions._
-import models.RejoinMode
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -36,7 +35,7 @@ class ErrorSubmittingRejoinController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData(Some(RejoinMode)) {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
       Ok(view(appConfig.ossYourAccountUrl))
   }

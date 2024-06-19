@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
-import models.{RejoinMode, UserAnswers}
+import models.UserAnswers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{DateService, PeriodService}
@@ -42,7 +42,7 @@ class RejoinCompleteController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData(Some(RejoinMode)).async {
+  def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData(None)).async {
     implicit request =>
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()

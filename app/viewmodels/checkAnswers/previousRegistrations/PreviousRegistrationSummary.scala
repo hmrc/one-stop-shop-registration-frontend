@@ -35,8 +35,7 @@ object PreviousRegistrationSummary {
   def addToListRows(answers: UserAnswers, existingPreviousRegistrations: Seq[PreviousRegistration], mode: Mode): Seq[ListItemWrapper] =
     answers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
-        if (mode == AmendMode) {
-
+        if (mode == AmendMode || mode == RejoinMode) {
           ListItemWrapper(
             ListItem(
               name = HtmlFormat.escape(details.previousEuCountry.name).toString,

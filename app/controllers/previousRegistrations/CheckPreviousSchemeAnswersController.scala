@@ -55,7 +55,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
             val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
-            val existingSchemes = if (mode == AmendMode) getExistingRegistrationSchemes(country) else Seq.empty
+            val existingSchemes = if (mode == AmendMode || mode == RejoinMode) getExistingRegistrationSchemes(country) else Seq.empty
 
             val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
               SummaryListViewModel(
@@ -89,12 +89,12 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
           val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
-          val existingSchemes = if (mode == AmendMode) getExistingRegistrationSchemes(country) else Seq.empty
+          val existingSchemes = if (mode == AmendMode || mode == RejoinMode) getExistingRegistrationSchemes(country) else Seq.empty
 
           val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
             SummaryListViewModel(
               rows = Seq(
-                if (mode == AmendMode) {
+                if (mode == AmendMode || mode == RejoinMode) {
                   PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, existingSchemes, mode)
                 } else {
                   PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country,  Seq.empty, mode)

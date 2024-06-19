@@ -188,8 +188,9 @@ class RejoinRegistrationController @Inject()(
 
     val previousRegistrationDetails: List[PreviousRegistrationDetails] =
       request.userAnswers.get(AllPreviousRegistrationsQuery).getOrElse(List.empty)
-
+      println(s"previousRegistrationDetails: $previousRegistrationDetails")
     val existingPreviousRegistrations: Seq[PreviousRegistration] = previousRegistrationDetails.map { details =>
+      println(s"details: $details")
       PreviousRegistrationNew(details.previousEuCountry, details.previousSchemesDetails)
     }
 
