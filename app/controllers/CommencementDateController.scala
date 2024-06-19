@@ -45,7 +45,7 @@ class CommencementDateController @Inject()(
     implicit request =>
       for {
         calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
-        isEligibleSalesAmendable <- registrationService.isEligibleSalesAmendable()
+        isEligibleSalesAmendable <- registrationService.isEligibleSalesAmendable(mode)
         finalDayOfDateAmendment = dateService.calculateFinalAmendmentDate(calculatedCommencementDate)
       } yield {
         if (isEligibleSalesAmendable) {
