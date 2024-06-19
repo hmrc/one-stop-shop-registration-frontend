@@ -21,7 +21,7 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import logging.Logging
 import models.domain.{PreviousRegistration, PreviousRegistrationNew}
-import models.{AmendMode, RejoinMode}
+import models.RejoinMode
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.AuthenticatedDataRequest

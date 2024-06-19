@@ -107,13 +107,13 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
       case Some(false) =>
         if (answers.get(EuCountryPage(Index(0))).isDefined) {
-          euRoutes.DeleteAllEuDetailsController.onPageLoad(AmendMode)
+          euRoutes.DeleteAllEuDetailsController.onPageLoad(RejoinMode)
         } else {
-          amendRoutes.ChangeYourRegistrationController.onPageLoad()
+          rejoinRoutes.RejoinRegistrationController.onPageLoad()
         }
 
       case None =>
-        amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+        rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
   }
 
