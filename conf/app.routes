@@ -587,6 +587,8 @@ GET         /check-remove-all-websites                                          
 POST        /check-remove-all-websites                                              controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
 GET         /amend-remove-all-websites                                              controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = AmendMode)
 POST        /amend-remove-all-websites                                              controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = AmendMode)
+GET         /rejoin-amend-remove-all-websites                                       controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = RejoinMode)
+POST        /rejoin-amend-remove-all-websites                                       controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = RejoinMode)
 
 GET         /check-remove-all-trading-names                                         controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-trading-names                                         controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)
@@ -620,6 +622,7 @@ GET         /cancel-amend-registration                                          
 POST        /cancel-amend-registration                                              controllers.CancelAmendRegistrationController.onSubmit(mode: Mode = AmendMode)
 
 GET         /cannot-delete-previous-registrations                                   controllers.previousRegistrations.CannotRemoveExistingPreviousRegistrationsController.onPageLoad()
+GET         /cannot-delete-previous-schemes                                         controllers.previousRegistrations.CannotRemoveExistingPreviousSchemesController.onPageLoad()
 
 GET         /no-vat-number-for-eu-country/:countryIndex                             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onPageLoad(mode: Mode = NormalMode, countryIndex: Index)
 POST        /no-vat-number-for-eu-country/:countryIndex                             controllers.euDetails.CannotAddCountryWithoutVatNumberController.onSubmit(mode: Mode = NormalMode, countryIndex: Index)
