@@ -29,7 +29,7 @@
 
     <p class="govuk-body">@Html(messages("schemeQuarantined.contactUs"))</p>
 
-    @if(mode == AmendMode) {
+    @if(mode == AmendMode || mode == RejoinMode) {
         <p class="govuk-body">@Html(messages("schemeQuarantined.returnToChangeYourRegistration", controllers.previousRegistrations.routes.SchemeQuarantinedController.deleteAndRedirect(countryIndex, schemeIndex: Index)))</p>
     } else {
         <p class="govuk-body">@Html(messages("schemeQuarantined.returnToRegistration"))</p>

@@ -20,7 +20,7 @@ import controllers.actions._
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
 import models.requests.AuthenticatedDataRequest
-import models.{AmendMode, Mode}
+import models.{AmendMode, Mode, RejoinMode}
 import pages.DateOfFirstSalePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -93,7 +93,7 @@ class DateOfFirstSaleController @Inject()(
   }
 
   private def getEarliestDateAllowed(mode: Mode, dateTimeFormatter: DateTimeFormatter)(implicit request: AuthenticatedDataRequest[AnyContent]) = {
-    if (mode == AmendMode) {
+    if (mode == AmendMode || mode == RejoinMode) {
       request.registration.flatMap(_.submissionReceived) match {
         case Some(submissionReceived) =>
           dateService.earliestSaleAllowed(submissionReceived.atZone(clock.getZone).toLocalDate).format(dateTimeFormatter)

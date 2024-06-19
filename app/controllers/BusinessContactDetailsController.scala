@@ -88,9 +88,9 @@ class BusinessContactDetailsController @Inject()(
             routes.BankDetailsController.onPageLoad(NormalMode).url
           }
 
-          if (mode == AmendMode && config.emailVerificationEnabled && !isMatchingEmailAddress) {
+          if ((mode == AmendMode || mode == RejoinMode) && config.emailVerificationEnabled && !isMatchingEmailAddress) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
-          } else if (mode != AmendMode && config.emailVerificationEnabled) {
+          } else if ((mode != AmendMode || mode != RejoinMode) && config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else {
             for {

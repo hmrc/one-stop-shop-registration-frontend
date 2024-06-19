@@ -29,7 +29,7 @@
 
     <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.contactUs"))</p>
 
-    @if(mode == AmendMode) {
+    @if(mode == AmendMode || mode == RejoinMode) {
         <p class="govuk-body">@Html(messages("fixedEstablishmentVRNAlreadyRegistered.returnToChangeYourRegistration", controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.deleteAndRedirect(countryIndex)))</p>
 
     } else {
