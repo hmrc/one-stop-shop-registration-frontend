@@ -24,8 +24,9 @@ import models.domain._
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
 import models.responses.NotFound
-import models.{BankDetails, Bic, BusinessContactDetails, Country, Iban, Index, InternationalAddress, NormalMode, PreviousScheme, UserAnswers}
+import models._
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.MockitoSugar.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
@@ -220,7 +221,7 @@ class RegistrationServiceSpec
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable().futureValue
+      val result = service.isEligibleSalesAmendable(any()).futureValue
 
       result mustBe true
     }
@@ -229,8 +230,9 @@ class RegistrationServiceSpec
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
         AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+      val mode = AmendMode
 
-      val result = service.isEligibleSalesAmendable().futureValue
+      val result = service.isEligibleSalesAmendable(mode).futureValue
 
       result mustBe true
     }
@@ -241,14 +243,14 @@ class RegistrationServiceSpec
       val daysToAdd = 100
       val instant = Instant.now.plus(daysToAdd, ChronoUnit.DAYS)
       val adjustedStubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+      val mode = AmendMode
 
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
 
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, adjustedStubClock)
 
-
-      val result = service.isEligibleSalesAmendable().futureValue
+      val result = service.isEligibleSalesAmendable(mode).futureValue
 
       result mustBe false
     }
@@ -260,10 +262,23 @@ class RegistrationServiceSpec
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
-      val result = service.isEligibleSalesAmendable().futureValue
+      val result = service.isEligibleSalesAmendable(any()).futureValue
 
       result mustBe false
     }
+
+    "return true when in Rejoin Mode" in {
+      implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
+      val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
+      val mode = RejoinMode
+
+      val result = service.isEligibleSalesAmendable(mode).futureValue
+
+      result mustBe true
+    }
   }
+
+
 
 }

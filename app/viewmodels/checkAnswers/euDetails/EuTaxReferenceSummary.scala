@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import pages.euDetails.EuTaxReferencePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -30,11 +30,13 @@ object EuTaxReferenceSummary {
   def row(answers: UserAnswers, index: Index, currentMode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
 
     val changeLinkMode = currentMode match {
-      case NormalMode    => CheckLoopMode
-      case CheckMode     => CheckMode
-      case AmendMode     => AmendLoopMode
-      case CheckLoopMode => CheckLoopMode
-      case AmendLoopMode => AmendLoopMode
+      case NormalMode     => CheckLoopMode
+      case CheckMode      => CheckMode
+      case AmendMode      => AmendLoopMode
+      case CheckLoopMode  => CheckLoopMode
+      case AmendLoopMode  => AmendLoopMode
+      case RejoinMode     => RejoinMode
+      case RejoinLoopMode => RejoinLoopMode
     }
 
     answers.get(EuTaxReferencePage(index)).map {

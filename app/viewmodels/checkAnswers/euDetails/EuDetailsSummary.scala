@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuOptionalDetailsQuery
@@ -36,8 +36,10 @@ object EuDetailsSummary {
       case NormalMode => NormalMode
       case CheckMode => CheckMode
       case AmendMode => AmendMode
+      case RejoinMode => RejoinMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
       case AmendLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Amend Loop Mode")
+      case RejoinLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Rejoin Loop Mode")
     }
 
     answers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty).zipWithIndex.map {
@@ -79,6 +81,8 @@ object EuDetailsSummary {
       case AmendMode => AmendMode
       case CheckLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Check Loop Mode")
       case AmendLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Amend Loop Mode")
+      case RejoinMode     => RejoinMode
+      case RejoinLoopMode => throw new IllegalArgumentException("EuDetailsSummary.addToListRows cannot be rendered in Rejoin Loop Mode")
     }
 
       SummaryList(

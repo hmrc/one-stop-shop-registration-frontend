@@ -18,8 +18,9 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.routes
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -93,6 +94,34 @@ case class VatRegisteredPage(index: Index) extends QuestionPage[Boolean] {
         euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendLoopMode, index)
       case None =>
         amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(RejoinMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(RejoinMode, index)
+        }
+      case Some(false) =>
+        euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(RejoinMode, index)
+      case None =>
+        rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinLoopMode(answers: UserAnswers): Call =
+    answers.get(VatRegisteredPage(index)) match {
+      case Some(true) =>
+        if (answers.get(EuVatNumberPage(index)).isDefined) {
+          EuVatNumberPage(index).navigate(RejoinLoopMode, answers)
+        } else {
+          euRoutes.EuVatNumberController.onPageLoad(RejoinLoopMode, index)
+        }
+      case Some(false) =>
+        euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(RejoinLoopMode, index)
+      case None =>
+        rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = {

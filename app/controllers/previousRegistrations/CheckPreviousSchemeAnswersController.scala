@@ -20,7 +20,7 @@ import config.Constants
 import controllers.GetCountry
 import controllers.actions.AuthenticatedControllerComponents
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
-import models.{AmendMode, Index, Mode}
+import models.{AmendMode, Index, Mode, RejoinMode}
 import pages.previousRegistrations.CheckPreviousSchemeAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,12 +55,12 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
             val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
-            val existingSchemes = if (mode == AmendMode) getExistingRegistrationSchemes(country) else Seq.empty
+            val existingSchemes = if (mode == AmendMode || mode == RejoinMode) getExistingRegistrationSchemes(country) else Seq.empty
 
             val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
               SummaryListViewModel(
                 rows = Seq(
-                 if (mode == AmendMode) {
+                 if (mode == AmendMode || mode == RejoinMode) {
                     PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, existingSchemes, mode)
                   } else {
                     PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, Seq.empty, mode)
@@ -89,12 +89,12 @@ class CheckPreviousSchemeAnswersController @Inject()(
 
           val canAddScheme = previousSchemes.size < Constants.maxSchemes
 
-          val existingSchemes = if (mode == AmendMode) getExistingRegistrationSchemes(country) else Seq.empty
+          val existingSchemes = if (mode == AmendMode || mode == RejoinMode) getExistingRegistrationSchemes(country) else Seq.empty
 
           val lists = previousSchemes.zipWithIndex.map { case (_, schemeIndex) =>
             SummaryListViewModel(
               rows = Seq(
-                if (mode == AmendMode) {
+                if (mode == AmendMode || mode == RejoinMode) {
                   PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, existingSchemes, mode)
                 } else {
                   PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country,  Seq.empty, mode)

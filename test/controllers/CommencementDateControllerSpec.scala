@@ -71,7 +71,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.startOfNextQuarter()) thenReturn now
         when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
         when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
-        when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
+        when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(true)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -112,7 +112,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         when(dateService.startOfNextQuarter()) thenReturn now
         when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
         when(coreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
-        when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(false)
+        when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(false)
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -310,7 +310,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           when(dateService.startOfCurrentQuarter) thenReturn now
           when(dateService.lastDayOfCalendarQuarter) thenReturn now
           when(dateService.startOfNextQuarter()) thenReturn now
-          when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
+          when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(true)
 
           val application =
             applicationBuilder(userAnswers = Some(answer1))
@@ -336,7 +336,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
           when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
-          when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
+          when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(true)
 
           val application =
             applicationBuilder(userAnswers = Some(answer1))
@@ -360,7 +360,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
           when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
-          when(registrationService.isEligibleSalesAmendable()(any(), any(), any())) thenReturn Future.successful(true)
+          when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(true)
 
           val application =
             applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))

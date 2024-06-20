@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
 import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew}
-import models.{AmendMode, Index, Mode, UserAnswers}
+import models.{AmendMode, Index, Mode, RejoinMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
@@ -35,8 +35,7 @@ object PreviousRegistrationSummary {
   def addToListRows(answers: UserAnswers, existingPreviousRegistrations: Seq[PreviousRegistration], mode: Mode): Seq[ListItemWrapper] =
     answers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).zipWithIndex.map {
       case (details, index) =>
-        if (mode == AmendMode) {
-
+        if (mode == AmendMode || mode == RejoinMode) {
           ListItemWrapper(
             ListItem(
               name = HtmlFormat.escape(details.previousEuCountry.name).toString,
@@ -83,7 +82,7 @@ object PreviousRegistrationSummary {
         SummaryListRowViewModel(
           key = "previousRegistrations.checkYourAnswersLabel",
           value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(if (mode == AmendMode && sameListOfCountries) {
+          actions = Seq(if ((mode == AmendMode || mode == RejoinMode) && sameListOfCountries) {
             ActionItemViewModel("site.add", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.add.hidden"))
           } else {

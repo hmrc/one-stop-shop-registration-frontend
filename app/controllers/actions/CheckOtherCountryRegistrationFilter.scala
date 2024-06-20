@@ -19,7 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
-import models.{AmendMode, Mode}
+import models.{AmendMode, Mode, RejoinMode}
 import models.core.MatchType
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Results.Redirect
@@ -43,7 +43,7 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(mode: Option[Mode],
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode)) {
+    if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode) || !mode.contains(RejoinMode)) {
       service.searchUkVrn(request.vrn)(hc, request).map {
 
         case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>

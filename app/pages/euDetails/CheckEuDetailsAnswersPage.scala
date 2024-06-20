@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode, UserAnswers}
 import pages.Page
 import play.api.mvc.Call
 
@@ -37,4 +37,10 @@ case object CheckEuDetailsAnswersPage extends Page {
 
   override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
     euRoutes.AddEuDetailsController.onPageLoad(AmendMode)
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    euRoutes.AddEuDetailsController.onPageLoad(RejoinMode)
+
+  override protected def navigateInRejoinLoopMode(answers: UserAnswers): Call =
+    euRoutes.AddEuDetailsController.onPageLoad(RejoinMode)
 }

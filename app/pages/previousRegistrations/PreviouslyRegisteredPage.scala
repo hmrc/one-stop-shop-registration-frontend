@@ -18,8 +18,9 @@ package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -53,6 +54,14 @@ case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
       case (Some(true), _) => prevRegRoutes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0))
       case (Some(false), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
       case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(PreviouslyRegisteredPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
+      case (Some(true), Some(size)) if size > 0 => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case (Some(true), _) => prevRegRoutes.PreviousEuCountryController.onPageLoad(RejoinMode, Index(0))
+      case (Some(false), _) => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
 
 }

@@ -53,4 +53,11 @@ case class EuCountryPage(countryIndex: Index) extends QuestionPage[Country] {
     }
   }
 
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(_) => SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinMode, answers)
+      case None => euRoutes.SellsGoodsToEUConsumersController.onPageLoad(RejoinMode, countryIndex)
+    }
+  }
+
 }

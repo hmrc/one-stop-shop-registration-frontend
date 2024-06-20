@@ -31,7 +31,7 @@
 
     <p class="govuk-body">@Html(messages("schemeStillActive.contactUs"))</p>
 
-    @if(mode == AmendMode) {
+    @if(mode == AmendMode || mode == RejoinMode) {
         <p class="govuk-body">@Html(messages("schemeStillActive.returnToChangeYourRegistration", controllers.previousRegistrations.routes.SchemeStillActiveController.deleteAndRedirect(countryIndex, schemeIndex)))</p>
     } else {
         <p class="govuk-body">@Html(messages("schemeStillActive.returnToRegistration"))</p>

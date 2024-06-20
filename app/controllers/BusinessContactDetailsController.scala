@@ -22,7 +22,7 @@ import forms.BusinessContactDetailsFormProvider
 import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
-import models.{AmendMode, BusinessContactDetails, CheckMode, Mode, NormalMode}
+import models.{AmendMode, BusinessContactDetails, CheckMode, Mode, NormalMode, RejoinMode}
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -72,7 +72,7 @@ class BusinessContactDetailsController @Inject()(
 
           val emailAddress = value.emailAddress
           val isMatchingEmailAddress = request.registration match {
-            case Some(registration) if mode == AmendMode =>
+            case Some(registration) if mode == AmendMode || mode == RejoinMode =>
               registration.contactDetails.emailAddress.contains(emailAddress)
             case _ =>
               false
@@ -82,13 +82,15 @@ class BusinessContactDetailsController @Inject()(
             routes.CheckYourAnswersController.onPageLoad().url
           } else if (mode == AmendMode) {
             controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+          } else if (mode == RejoinMode){
+            controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url
           } else {
             routes.BankDetailsController.onPageLoad(NormalMode).url
           }
 
-          if (mode == AmendMode && config.emailVerificationEnabled && !isMatchingEmailAddress) {
+          if ((mode == AmendMode || mode == RejoinMode) && config.emailVerificationEnabled && !isMatchingEmailAddress) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
-          } else if (mode != AmendMode && config.emailVerificationEnabled) {
+          } else if ((mode != AmendMode || mode != RejoinMode) && config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else {
             for {

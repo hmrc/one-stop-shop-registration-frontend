@@ -18,7 +18,7 @@ package pages
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
 import controllers.routes
-import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -38,4 +38,7 @@ case object DateOfFirstSalePage extends QuestionPage[LocalDate] {
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     routes.CommencementDateController.onPageLoad(AmendMode)
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    routes.CommencementDateController.onPageLoad(RejoinMode)
 }

@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import formats.Format.dateFormatter
-import models.Mode
+import models.{Mode, RejoinMode}
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -45,7 +45,7 @@ class CommencementDateController @Inject()(
     implicit request =>
       for {
         calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
-        isEligibleSalesAmendable <- registrationService.isEligibleSalesAmendable()
+        isEligibleSalesAmendable <- registrationService.isEligibleSalesAmendable(mode)
         finalDayOfDateAmendment = dateService.calculateFinalAmendmentDate(calculatedCommencementDate)
       } yield {
         if (isEligibleSalesAmendable) {
@@ -82,7 +82,20 @@ class CommencementDateController @Inject()(
                     None,
                     None
                   ))
-                case Some(true) => Redirect(routes.RegisterLaterController.onPageLoad())
+                case Some(true) =>
+                  if(mode == RejoinMode) {
+                    Ok(view(
+                      mode,
+                      calculatedCommencementDate.format(dateFormatter),
+                      finalDayOfDateAmendment.format(dateFormatter),
+                      isDateInCurrentQuarter = true,
+                      None,
+                      None,
+                      None
+                    ))
+                  } else {
+                    Redirect(routes.RegisterLaterController.onPageLoad())
+                  }
                 case _ => Redirect(determineJourneyRecovery(Some(mode)))
               }
 

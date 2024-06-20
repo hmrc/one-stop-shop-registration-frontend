@@ -18,12 +18,13 @@ package controllers
 
 import controllers.actions._
 import forms.HasMadeSalesFormProvider
-import models.{Mode, UserAnswers}
+import models.{Mode, RejoinMode, UserAnswers}
 import models.SalesChannels.Mixed
-import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
+import pages.{BusinessBasedInNiPage, DateOfFirstSalePage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.HasMadeSalesView
 
 import javax.inject.Inject
@@ -58,10 +59,24 @@ class HasMadeSalesController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, showHintText(request.userAnswers)))),
 
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
-          } yield Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers))
+          if (mode == RejoinMode) {
+            val updatedAnswersFuture = for {
+              updateAnswers <- Future.fromTry(request.userAnswers.remove(DateOfFirstSalePage))
+              updatedAnswers <- Future.fromTry(updateAnswers.set(HasMadeSalesPage, value))
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield updatedAnswers
+
+            updatedAnswersFuture.flatMap { updatedAnswers =>
+              Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers)).toFuture
+            }
+          } else {
+            val updatedAnswersFuture = for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
+              _ <- cc.sessionRepository.set(updatedAnswers)
+            } yield updatedAnswers
+
+            updatedAnswersFuture.map(updatedAnswers => Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers)))
+          }
       )
   }
 

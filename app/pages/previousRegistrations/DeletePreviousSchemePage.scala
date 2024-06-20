@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import controllers.previousRegistrations.{routes => prevRegRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -57,6 +57,16 @@ case class DeletePreviousSchemePage(countryIndex: Index) extends QuestionPage[Bo
         prevRegRoutes.AddPreviousRegistrationController.onPageLoad(AmendMode)
       case _ =>
         prevRegRoutes.PreviouslyRegisteredController.onPageLoad(AmendMode)
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(DeriveNumberOfPreviousRegistrations), answers.get(DeriveNumberOfPreviousSchemes(countryIndex))) match {
+      case (_, Some(numberOfSchemes)) if numberOfSchemes > 0 =>
+        prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(RejoinMode, countryIndex)
+      case (Some(numberOfCountries), _) if numberOfCountries > 0 =>
+        prevRegRoutes.AddPreviousRegistrationController.onPageLoad(RejoinMode)
+      case _ =>
+        prevRegRoutes.PreviouslyRegisteredController.onPageLoad(RejoinMode)
     }
 
 }

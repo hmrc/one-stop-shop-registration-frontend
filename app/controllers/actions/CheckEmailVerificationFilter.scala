@@ -18,7 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import logging.Logging
-import models.{AmendMode, Mode, NormalMode}
+import models.{AmendMode, Mode, NormalMode, RejoinMode}
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, Verified}
 import models.requests.AuthenticatedDataRequest
 import pages.BusinessContactDetailsPage
@@ -43,7 +43,7 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    if (frontendAppConfig.emailVerificationEnabled && !mode.contains(AmendMode)) {
+    if (frontendAppConfig.emailVerificationEnabled && !mode.contains(AmendMode) && !mode.contains(RejoinMode)) {
       request.userAnswers.get(BusinessContactDetailsPage) match {
         case Some(contactDetails) =>
           emailVerificationService.isEmailVerified(contactDetails.emailAddress, request.userId).flatMap {

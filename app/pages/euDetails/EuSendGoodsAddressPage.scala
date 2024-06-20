@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
-import models.{AmendMode, CheckMode, Index, InternationalAddress, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, InternationalAddress, NormalMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -42,4 +42,10 @@ case class EuSendGoodsAddressPage(index: Index) extends QuestionPage[Internation
 
   override protected def navigateInAmendLoopMode(answers: UserAnswers): Call =
     euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, index)
+
+  override protected def navigateInRejoinLoopMode(answers: UserAnswers): Call =
+    euRoutes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, index)
 }

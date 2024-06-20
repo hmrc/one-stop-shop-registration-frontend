@@ -1,0 +1,86 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.domain.Vrn
+@import java.time.LocalDate
+@import formats.Format
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(
+    vrn: String,
+    feedbackLink: String,
+    externalUrl: Option[String] = None,
+    yourAccountUrl: String,
+    organisationName: String,
+    commencementDate: String,
+    periodOfFirstReturn: String,
+    firstDayOfNextPeriod: String
+)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("rejoinComplete.title")), showBackLink = false) {
+
+    <div class="grid-row column-two-thirds" id="application_complete_id">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">@messages("rejoinComplete.heading")</h1>
+            <div class="govuk-panel__body"> @Html(messages("rejoinComplete.ossReference", vrn))</div>
+        </div>
+
+        <p class="govuk-body">
+            @Html(messages("rejoinComplete.organisationName", organisationName))
+        </p>
+
+        <p class="govuk-body">
+            @messages("rejoinComplete.para1")
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("rejoinComplete.para1.bullet1")</li>
+            <li>@messages("rejoinComplete.para1.bullet2")</li>
+        </ul>
+
+        <h2 class="govuk-heading-s">@messages("rejoinComplete.completingVatReturn")</h2>
+
+        <p class="govuk-body">
+            @messages(
+            "rejoinComplete.nextReturnDates",
+            periodOfFirstReturn,
+            firstDayOfNextPeriod,
+            commencementDate
+            )
+        </p>
+
+        <p class="govuk-body">@Html(messages("rejoinComplete.guidance"))</p>
+
+        <h2 class="govuk-heading-m">@messages("rejoinComplete.happensNext")</h2>
+
+        @externalUrl.map(
+        url => Html(
+        s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("rejoinComplete.link.BTA") + "</a></p>"
+        ))
+
+        <p class="govuk-body">
+            @messages("rejoinComplete.contactYou")
+        </p>
+
+        <p class="govuk-body">
+            <a href="@feedbackLink" class="govuk-link">@messages("rejoinComplete.feedback.link.text")</a>
+            @messages("rejoinComplete.feedback.30seconds")
+        </p>
+    </div>
+}

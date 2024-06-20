@@ -20,13 +20,14 @@ import controllers.actions._
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
 import models.requests.AuthenticatedDataRequest
-import models.{AmendMode, Mode}
+import models.{AmendMode, Mode, RejoinMode}
 import pages.DateOfFirstSalePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{DateService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.DateOfFirstSaleView
 
 import java.time.format.DateTimeFormatter
@@ -44,12 +45,16 @@ class DateOfFirstSaleController @Inject()(
                                            clock: Clock
                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private def createFutureForm()(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Form[LocalDate]] = {
-    registrationService.getLastPossibleDateOfFirstSale(request.registration).map {
-      case Some(lastPossibleDateOfFirstSale) =>
-        formProvider(lastPossibleDateOfFirstSale)
-      case _ =>
-        formProvider()
+  private def createFutureForm(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Form[LocalDate]] = {
+    if (mode == AmendMode) {
+      registrationService.getLastPossibleDateOfFirstSale(request.registration).map {
+        case Some(lastPossibleDateOfFirstSale) =>
+          formProvider(lastPossibleDateOfFirstSale)
+        case _ =>
+          formProvider()
+      }
+    } else {
+      formProvider().toFuture
     }
   }
 
@@ -58,7 +63,7 @@ class DateOfFirstSaleController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
-      createFutureForm().map { form =>
+      createFutureForm(mode).map { form =>
         val preparedForm = request.userAnswers.get(DateOfFirstSalePage) match {
           case None => form
           case Some(value) => form.fill(value)
@@ -73,7 +78,7 @@ class DateOfFirstSaleController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
-      createFutureForm().flatMap { form =>
+      createFutureForm(mode).flatMap { form =>
         form.bindFromRequest().fold(
           formWithErrors => {
 
@@ -93,7 +98,7 @@ class DateOfFirstSaleController @Inject()(
   }
 
   private def getEarliestDateAllowed(mode: Mode, dateTimeFormatter: DateTimeFormatter)(implicit request: AuthenticatedDataRequest[AnyContent]) = {
-    if (mode == AmendMode) {
+    if (mode == AmendMode || mode == RejoinMode) {
       request.registration.flatMap(_.submissionReceived) match {
         case Some(submissionReceived) =>
           dateService.earliestSaleAllowed(submissionReceived.atZone(clock.getZone).toLocalDate).format(dateTimeFormatter)

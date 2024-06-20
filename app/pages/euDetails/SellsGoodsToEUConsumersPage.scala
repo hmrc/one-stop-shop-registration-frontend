@@ -18,6 +18,7 @@ package pages.euDetails
 
 import controllers.euDetails.{routes => euRoutes}
 import controllers.amend.{routes => amendRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.routes
 import models._
 import pages.QuestionPage
@@ -79,6 +80,26 @@ case class SellsGoodsToEUConsumersPage(countryIndex: Index) extends QuestionPage
       case Some(false) =>
         euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex)
       case _ =>amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(true) =>
+        euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(RejoinMode, countryIndex)
+      case Some(false) =>
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(RejoinMode, countryIndex)
+      case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override protected def navigateInRejoinLoopMode(answers: UserAnswers): Call = {
+    answers.get(SellsGoodsToEUConsumersPage(countryIndex)) match {
+      case Some(true) =>
+        euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(RejoinLoopMode, countryIndex)
+      case Some(false) =>
+        euRoutes.SalesDeclarationNotRequiredController.onPageLoad(RejoinMode, countryIndex)
+      case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
   }
 

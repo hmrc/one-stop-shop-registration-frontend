@@ -34,8 +34,9 @@ package pages.euDetails
 
 import controllers.amend.{routes => amendRoutes}
 import controllers.euDetails.{routes => euRoutes}
+import controllers.rejoin.{routes => rejoinRoutes}
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -92,6 +93,27 @@ case object TaxRegisteredInEuPage extends QuestionPage[Boolean] {
 
       case None =>
         amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
+    answers.get(TaxRegisteredInEuPage) match {
+      case Some(true) =>
+        if (answers.get(EuCountryPage(Index(0))).isDefined) {
+          rejoinRoutes.RejoinRegistrationController.onPageLoad()
+        } else {
+          euRoutes.EuCountryController.onPageLoad(RejoinMode, Index(0))
+        }
+
+      case Some(false) =>
+        if (answers.get(EuCountryPage(Index(0))).isDefined) {
+          euRoutes.DeleteAllEuDetailsController.onPageLoad(RejoinMode)
+        } else {
+          rejoinRoutes.RejoinRegistrationController.onPageLoad()
+        }
+
+      case None =>
+        rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
     }
   }
 

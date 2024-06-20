@@ -20,12 +20,13 @@ import config.Constants.lastSchemeForCountry
 import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.DeletePreviousSchemeFormProvider
-import models.{Index, Mode}
+import models.{AmendMode, Index, Mode, RejoinMode}
 import pages.previousRegistrations.DeletePreviousSchemePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.{DeriveNumberOfPreviousSchemes, PreviousSchemeForCountryQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.CheckExistingRegistrations.getExistingRegistrationSchemes
 import viewmodels.checkAnswers.previousRegistrations.{DeletePreviousSchemeSummary, PreviousIntermediaryNumberSummary, PreviousSchemeNumberSummary}
 import viewmodels.govuk.summarylist._
 import views.html.previousRegistrations.DeletePreviousSchemeView
@@ -66,7 +67,16 @@ class DeletePreviousSchemeController @Inject()(
             case Some(value) => form.fill(value)
           }
 
-          Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, list, isLastPreviousScheme)))
+          if (mode == RejoinMode || mode == AmendMode) {
+            val existingSchemes = getExistingRegistrationSchemes(country)
+            if (existingSchemes.nonEmpty) {
+              Future.successful(Redirect(routes.CannotRemoveExistingPreviousSchemesController.onPageLoad()))
+            } else {
+              Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, list, isLastPreviousScheme)))
+            }
+          } else {
+            Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, list, isLastPreviousScheme)))
+          }
       }
   }
 
@@ -100,7 +110,16 @@ class DeletePreviousSchemeController @Inject()(
                   _ <- cc.sessionRepository.set(updatedAnswers)
                 } yield Redirect(DeletePreviousSchemePage(countryIndex).navigate(mode, updatedAnswers))
               } else {
-                Future.successful(Redirect(DeletePreviousSchemePage(countryIndex).navigate(mode, request.userAnswers)))
+                if (mode == RejoinMode || mode == AmendMode) {
+                  val existingSchemes = getExistingRegistrationSchemes(country)
+                  if (existingSchemes.nonEmpty) {
+                    Future.successful(Redirect(routes.CannotRemoveExistingPreviousSchemesController.onPageLoad()))
+                  } else {
+                    Future.successful(Redirect(DeletePreviousSchemePage(countryIndex).navigate(mode, request.userAnswers)))
+                  }
+                } else {
+                  Future.successful(Redirect(DeletePreviousSchemePage(countryIndex).navigate(mode, request.userAnswers)))
+                }
               }
           )
       }

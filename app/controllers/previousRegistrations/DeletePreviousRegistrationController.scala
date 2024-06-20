@@ -20,7 +20,7 @@ import controllers.actions._
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
 import models.requests.AuthenticatedDataRequest
-import models.{AmendMode, Index, Mode}
+import models.{AmendMode, Index, Mode, RejoinMode}
 import pages.previousRegistrations.DeletePreviousRegistrationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -49,7 +49,7 @@ class DeletePreviousRegistrationController @Inject()(
       getPreviousRegistration(mode, index) {
         details =>
 
-          if (mode == AmendMode) {
+          if (mode == AmendMode || mode == RejoinMode) {
             val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
 
             if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
@@ -68,7 +68,7 @@ class DeletePreviousRegistrationController @Inject()(
       getPreviousRegistration(mode, index) {
         details =>
 
-          if (mode == AmendMode) {
+          if (mode == AmendMode || mode == RejoinMode) {
             val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
 
             if (existingPreviousRegistration(details.previousEuCountry, existingPreviousRegistrations)) {
