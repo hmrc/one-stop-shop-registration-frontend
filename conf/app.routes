@@ -445,6 +445,7 @@ GET         /answers-deleted                                                    
 
 GET         /no-welsh-service                                                       controllers.external.NoMoreWelshController.onPageLoad()
 GET         /cannot-register-ni-protocol                                            controllers.NiProtocolRejectionController.onPageLoad()
+GET         /ni-protocol-expired                                                    controllers.NiProtocolExpiredController.onPageLoad()
 
 GET         /progress-saved                                                         controllers.SavedProgressController.onPageLoad(continueUrl: RedirectUrl)
 

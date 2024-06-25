@@ -689,6 +689,11 @@ niProtocolRejection.heading = Register to trade under the Northern Ireland Proto
 niProtocolRejection.paragraph = You need a VAT number starting with ''XI'' to use this service.
 niProtocolRejection.guidance = <a class="govuk-link" href="https://www.gov.uk/register-for-vat/selling-or-moving-goods-between-northern-ireland-and-the-eu">Find out more and register</a>
 
+niProtocolExpired.title = You cannot rejoin this service
+niProtocolExpired.heading = You cannot rejoin this service
+niProtocolExpired.paragraph = Your business is no longer registered to trade under the Northern Ireland Protocol.
+niProtocolExpired.guidance = <a class="govuk-link" href="https://www.gov.uk/register-for-vat/selling-or-moving-goods-between-northern-ireland-and-the-eu">Register for the Northern Ireland Protocol</a>
+
 applicationComplete.enrolment.heading = We''ve received your registration request
 applicationComplete.enrolment.title = We''ve received your registration request
 applicationComplete.enrolment.confirmation = We''ll send a confirmation to <span class="govuk-body govuk-!-font-weight-bold">{0}</span> when your registration is complete.
