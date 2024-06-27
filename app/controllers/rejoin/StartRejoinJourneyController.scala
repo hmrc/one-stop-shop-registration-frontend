@@ -33,14 +33,14 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class StartRejoinJourneyController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
-                                       registrationConnector: RegistrationConnector,
-                                       registrationService: RegistrationService,
-                                       rejoinRegistrationService: RejoinRegistrationService,
-                                       authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
-                                       clock: Clock
-                                     )(implicit ec: ExecutionContext)
+                                              override val messagesApi: MessagesApi,
+                                              cc: AuthenticatedControllerComponents,
+                                              registrationConnector: RegistrationConnector,
+                                              registrationService: RegistrationService,
+                                              rejoinRegistrationService: RejoinRegistrationService,
+                                              authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
+                                              clock: Clock
+                                            )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc

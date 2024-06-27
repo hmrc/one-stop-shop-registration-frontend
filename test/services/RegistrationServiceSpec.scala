@@ -19,14 +19,13 @@ package services
 import base.SpecBase
 import connectors.returns.VatReturnConnector
 import controllers.routes
-import models.domain.returns.VatReturn
+import models._
 import models.domain._
+import models.domain.returns.VatReturn
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
 import models.responses.NotFound
-import models._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.MockitoSugar.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues

@@ -20,9 +20,9 @@ import base.SpecBase
 import cats.data.Validated.Valid
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
-import models.{AmendMode, BusinessContactDetails, Index, RejoinMode}
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
+import models.{BusinessContactDetails, Index, RejoinMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito
