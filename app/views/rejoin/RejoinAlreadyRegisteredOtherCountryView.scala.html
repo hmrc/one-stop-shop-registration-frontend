@@ -19,11 +19,11 @@
         govukButton: GovukButton
 )
 
-@(ossYourAccountUrl: String, country: String)(implicit request: Request[_], messages: Messages)
+@(ossYourAccountUrl: String, countryName: String)(implicit request: Request[_], messages: Messages)
 
-  @layout(pageTitle = titleNoForm(messages("rejoinAlreadyRegisteredOtherCountry.title", country))) {
+  @layout(pageTitle = titleNoForm(messages("rejoinAlreadyRegisteredOtherCountry.title", countryName))) {
 
-    <h1 class="govuk-heading-l">@messages("rejoinAlreadyRegisteredOtherCountry.heading", country)</h1>
+    <h1 class="govuk-heading-l">@messages("rejoinAlreadyRegisteredOtherCountry.heading", countryName)</h1>
 
     <p class="govuk-body">@messages("rejoinAlreadyRegisteredOtherCountry.p1")</p>
 
