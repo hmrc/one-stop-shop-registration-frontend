@@ -19,33 +19,23 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
-import models.{AmendMode, Mode}
-import models.requests.AuthenticatedDataRequest
-import play.api.mvc.{ActionFilter, Result}
+import models.requests.AuthenticatedOptionalDataRequest
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Result}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolFilterImpl(mode: Option[Mode],
-                                appConfig: FrontendAppConfig)
-                               (implicit val executionContext: ExecutionContext)
-  extends ActionFilter[AuthenticatedDataRequest] with Logging {
+class CheckNiProtocolExpiredFilterImpl(appConfig: FrontendAppConfig)(implicit val executionContext: ExecutionContext)
+  extends ActionFilter[AuthenticatedOptionalDataRequest] with Logging {
 
-  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedOptionalDataRequest[A]): Future[Option[Result]] = {
 
     if (appConfig.registrationValidationEnabled) {
-      request.userAnswers.vatInfo match {
+      request.userAnswers.flatMap(_.vatInfo) match {
         case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
           case Some(true) => Future.successful(None)
-
-          case Some(false) =>
-            if (!mode.contains(AmendMode)){
-              Future.successful(Some(Redirect(routes.NiProtocolRejectionController.onPageLoad())))
-            } else {
-              Future.successful(None)
-            }
-
+          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
           case _ =>
             logger.error("Illegal state cause by SingleMarketIndicator missing")
             throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
@@ -58,10 +48,8 @@ class CheckNiProtocolFilterImpl(mode: Option[Mode],
   }
 }
 
-class CheckNiProtocolFilter @Inject()(appConfig: FrontendAppConfig)
-                                     (implicit val executionContext: ExecutionContext) {
+class CheckNiProtocolExpiredFilter @Inject()(appConfig: FrontendAppConfig)
+                                            (implicit val executionContext: ExecutionContext) {
 
-  def apply(mode: Option[Mode]): CheckNiProtocolFilterImpl = {
-    new CheckNiProtocolFilterImpl(mode, appConfig)
-  }
+  def apply(): CheckNiProtocolExpiredFilterImpl = new CheckNiProtocolExpiredFilterImpl(appConfig)
 }

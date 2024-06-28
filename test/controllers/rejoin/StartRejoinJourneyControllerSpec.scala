@@ -103,5 +103,22 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
       }
     }
+
+    "must redirect to Ni Protocol Expired Page when singleMarketIndicator is false" in {
+
+      val vatCustomerInfoNoSingleMarket = vatCustomerInfo.copy(singleMarketIndicator = Some(false))
+      val userAnswersNoSingleMarket = basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatCustomerInfoNoSingleMarket))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersNoSingleMarket)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.rejoin.routes.StartRejoinJourneyController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.NiProtocolExpiredController.onPageLoad().url
+      }
+    }
   }
 }
