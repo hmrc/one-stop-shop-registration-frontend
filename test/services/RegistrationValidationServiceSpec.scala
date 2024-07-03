@@ -180,7 +180,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           .remove(AllWebsites).success.value
 
       val expectedRegistration =
-        RegistrationData.registration copy(
+        RegistrationData.registration.copy(
           dateOfFirstSale = Some(arbitraryDate),
           tradingNames = Seq.empty,
           euRegistrations = Seq.empty,
@@ -291,7 +291,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
       val expectedRegistration = {
-        RegistrationData.registration copy(
+        RegistrationData.registration.copy(
           dateOfFirstSale = Some(arbitraryDate),
           registeredCompanyName = "Company name",
           vatDetails = VatDetails(
@@ -320,7 +320,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         val userAnswers = answersNotPartOfVatGroup.remove(BusinessBasedInNiPage).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy(
+          RegistrationData.registration.copy(
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
             niPresence = None,
@@ -342,7 +342,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
             .remove(HasFixedEstablishmentInNiPage).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy(
+          RegistrationData.registration.copy(
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
             niPresence = None,
@@ -365,7 +365,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
             .remove(SalesChannelsPage).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy(
+          RegistrationData.registration.copy(
             dateOfFirstSale = Some(arbitraryDate),
             vatDetails = RegistrationData.registration.vatDetails,
             niPresence = None,
@@ -386,7 +386,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           .set(PreviouslyRegisteredPage, true).success.value
 
         val expectedRegistration =
-          RegistrationData.registration copy(
+          RegistrationData.registration.copy(
             vatDetails = RegistrationData.registration.vatDetails,
             dateOfFirstSale = None,
             commencementDate = arbitraryDate
