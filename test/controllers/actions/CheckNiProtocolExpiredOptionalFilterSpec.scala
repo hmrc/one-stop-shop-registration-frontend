@@ -20,7 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes
 import models.RejoinMode
-import models.requests.AuthenticatedDataRequest
+import models.requests.AuthenticatedOptionalDataRequest
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
@@ -31,10 +31,10 @@ import play.api.test.Helpers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class CheckNiProtocolExpiredOptionalFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness(appConfig: FrontendAppConfig) extends CheckNiProtocolExpiredFilterImpl(appConfig, Some(RejoinMode)) {
-    def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
+  class Harness(appConfig: FrontendAppConfig) extends CheckNiProtocolExpiredOptionalFilterImpl(appConfig, Some(RejoinMode)) {
+    def callFilter(request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   ".filter" - {
@@ -50,7 +50,7 @@ class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with B
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -72,7 +72,7 @@ class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with B
           Some(vatCustomerInfo.copy(singleMarketIndicator = Some(false))))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse)
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(userAnswersWithSingleMarketIndicatorFalse))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -90,17 +90,36 @@ class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with B
           )
           .build()
 
-        val userAnswersWithSingleMarketIndicatorNone = basicUserAnswersWithVatInfo.copy(
-          vatInfo = Some(vatCustomerInfo.copy(singleMarketIndicator = None)))
+        val userAnswersWithSingleMarketIndicatorNone = basicUserAnswersWithVatInfo.copy(vatInfo =
+          Some(vatCustomerInfo.copy(singleMarketIndicator = None)))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorNone)
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(userAnswersWithSingleMarketIndicatorNone))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
           val result = intercept[Exception](controller.callFilter(request).futureValue)
 
           result.getMessage must include("Illegal State Exception")
+        }
+      }
+
+      "must return None when UserAnswers is not present" in {
+
+        val app = applicationBuilder(None)
+          .configure(
+            "features.reg-validation-enabled" -> true
+          )
+          .build()
+
+        running(app) {
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None)
+          val config = app.injector.instanceOf[FrontendAppConfig]
+          val controller = new Harness(config)
+
+          val result = controller.callFilter(request).futureValue
+
+          result must not be defined
         }
       }
 
@@ -115,7 +134,7 @@ class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with B
         val userAnswersWithVatCustomerInfoNone = basicUserAnswersWithVatInfo.copy(vatInfo = None)
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithVatCustomerInfoNone)
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(userAnswersWithVatCustomerInfoNone))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -136,7 +155,7 @@ class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with B
           ).build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 

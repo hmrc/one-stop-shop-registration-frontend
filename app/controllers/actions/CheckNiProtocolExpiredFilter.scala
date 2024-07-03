@@ -19,9 +19,8 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
-import models.{Mode, RejoinLoopMode, RejoinMode}
-import models.domain.VatCustomerInfo
 import models.requests.AuthenticatedDataRequest
+import models.{Mode, RejoinLoopMode, RejoinMode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 
@@ -32,16 +31,11 @@ class CheckNiProtocolExpiredFilterImpl(appConfig: FrontendAppConfig, mode: Optio
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
-    println("-- In CheckNiProtocolExpiredFilterImpl")
     if (appConfig.registrationValidationEnabled && mode.exists(Seq(RejoinMode, RejoinLoopMode).contains)) {
       request.userAnswers.vatInfo match {
         case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
-          case Some(true) =>
-            println("In Some(true)")
-            Future.successful(None)
-          case Some(false) =>
-            println("In Some(false)")
-            Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
+          case Some(true) => Future.successful(None)
+          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
           case _ =>
             logger.error("Illegal state cause by SingleMarketIndicator missing")
             throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
