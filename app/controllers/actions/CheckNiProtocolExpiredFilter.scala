@@ -19,23 +19,29 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
-import models.requests.AuthenticatedOptionalDataRequest
+import models.{Mode, RejoinLoopMode, RejoinMode}
+import models.domain.VatCustomerInfo
+import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolExpiredFilterImpl(appConfig: FrontendAppConfig)(implicit val executionContext: ExecutionContext)
-  extends ActionFilter[AuthenticatedOptionalDataRequest] with Logging {
+class CheckNiProtocolExpiredFilterImpl(appConfig: FrontendAppConfig, mode: Option[Mode])(implicit val executionContext: ExecutionContext)
+  extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
-  override protected def filter[A](request: AuthenticatedOptionalDataRequest[A]): Future[Option[Result]] = {
-
-    if (appConfig.registrationValidationEnabled) {
-      request.userAnswers.flatMap(_.vatInfo) match {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
+    println("-- In CheckNiProtocolExpiredFilterImpl")
+    if (appConfig.registrationValidationEnabled && mode.exists(Seq(RejoinMode, RejoinLoopMode).contains)) {
+      request.userAnswers.vatInfo match {
         case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
-          case Some(true) => Future.successful(None)
-          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
+          case Some(true) =>
+            println("In Some(true)")
+            Future.successful(None)
+          case Some(false) =>
+            println("In Some(false)")
+            Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
           case _ =>
             logger.error("Illegal state cause by SingleMarketIndicator missing")
             throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
@@ -51,5 +57,5 @@ class CheckNiProtocolExpiredFilterImpl(appConfig: FrontendAppConfig)(implicit va
 class CheckNiProtocolExpiredFilter @Inject()(appConfig: FrontendAppConfig)
                                             (implicit val executionContext: ExecutionContext) {
 
-  def apply(): CheckNiProtocolExpiredFilterImpl = new CheckNiProtocolExpiredFilterImpl(appConfig)
+  def apply(mode: Option[Mode]): CheckNiProtocolExpiredFilterImpl = new CheckNiProtocolExpiredFilterImpl(appConfig, mode)
 }

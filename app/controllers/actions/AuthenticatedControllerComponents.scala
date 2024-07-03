@@ -39,6 +39,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def features: FeatureFlagService
   def checkNiProtocol: CheckNiProtocolFilter
   def checkNiProtocolExpired: CheckNiProtocolExpiredFilter
+  def checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
   def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
   def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
@@ -51,6 +52,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       getData andThen
       requireData(mode) andThen
       checkNiProtocol(mode) andThen
+      checkNiProtocolExpired(mode) andThen
       checkOtherCountryRegistration(mode)
 
   def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
@@ -59,7 +61,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
       getData andThen
-      checkNiProtocolExpired()
+      checkNiProtocolExpiredOptional(mode)
 
   def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     authAndGetData(mode) andThen
@@ -85,6 +87,7 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                features: FeatureFlagService,
                                                                checkNiProtocol: CheckNiProtocolFilter,
                                                                checkNiProtocolExpired: CheckNiProtocolExpiredFilter,
+                                                               checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter,
                                                                retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
                                                                checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
                                                                checkEmailVerificationStatus: CheckEmailVerificationFilterProvider,
