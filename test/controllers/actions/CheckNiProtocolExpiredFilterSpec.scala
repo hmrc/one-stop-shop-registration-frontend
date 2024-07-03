@@ -27,13 +27,14 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.NiProtocolExpiredService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness(appConfig: FrontendAppConfig) extends CheckNiProtocolExpiredFilterImpl(appConfig, Some(RejoinMode)) {
+  class Harness(appConfig: FrontendAppConfig) extends CheckNiProtocolExpiredFilterImpl(new NiProtocolExpiredService(appConfig), Some(RejoinMode)) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -79,28 +80,6 @@ class CheckNiProtocolExpiredFilterSpec extends SpecBase with MockitoSugar with B
           val result = controller.callFilter(request).futureValue
 
           result.value mustEqual Redirect(routes.NiProtocolExpiredController.onPageLoad())
-        }
-      }
-
-      "must throw an Exception when SingleMarketIndicator is None" in {
-
-        val app = applicationBuilder(None)
-          .configure(
-            "features.reg-validation-enabled" -> true
-          )
-          .build()
-
-        val userAnswersWithSingleMarketIndicatorNone = basicUserAnswersWithVatInfo.copy(
-          vatInfo = Some(vatCustomerInfo.copy(singleMarketIndicator = None)))
-
-        running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorNone)
-          val config = app.injector.instanceOf[FrontendAppConfig]
-          val controller = new Harness(config)
-
-          val result = intercept[Exception](controller.callFilter(request).futureValue)
-
-          result.getMessage must include("Illegal State Exception")
         }
       }
 

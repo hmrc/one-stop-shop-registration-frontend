@@ -16,40 +16,32 @@
 
 package controllers.actions
 
-import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
+import models.Mode
 import models.requests.AuthenticatedDataRequest
-import models.{Mode, RejoinLoopMode, RejoinMode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
+import services.NiProtocolExpiredService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolExpiredFilterImpl(appConfig: FrontendAppConfig, mode: Option[Mode])(implicit val executionContext: ExecutionContext)
+class CheckNiProtocolExpiredFilterImpl(niProtocolExpiredService: NiProtocolExpiredService, mode: Option[Mode])
+                                      (implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
-    if (appConfig.registrationValidationEnabled && mode.exists(Seq(RejoinMode, RejoinLoopMode).contains)) {
-      request.userAnswers.vatInfo match {
-        case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
-          case Some(true) => Future.successful(None)
-          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
-          case _ =>
-            logger.error("Illegal state cause by SingleMarketIndicator missing")
-            throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
-        }
-        case _ => Future.successful(None)
-      }
+    if (niProtocolExpiredService.isNiProtocolExpired(mode, request.userAnswers.vatInfo.flatMap(_.singleMarketIndicator))) {
+      Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
     } else {
       Future.successful(None)
     }
   }
 }
 
-class CheckNiProtocolExpiredFilter @Inject()(appConfig: FrontendAppConfig)
+class CheckNiProtocolExpiredFilter @Inject()(checkNiProtocolExpiredService: NiProtocolExpiredService)
                                             (implicit val executionContext: ExecutionContext) {
 
-  def apply(mode: Option[Mode]): CheckNiProtocolExpiredFilterImpl = new CheckNiProtocolExpiredFilterImpl(appConfig, mode)
+  def apply(mode: Option[Mode]): CheckNiProtocolExpiredFilterImpl = new CheckNiProtocolExpiredFilterImpl(checkNiProtocolExpiredService, mode)
 }

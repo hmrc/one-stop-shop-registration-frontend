@@ -16,40 +16,32 @@
 
 package controllers.actions
 
-import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
+import models.Mode
 import models.requests.AuthenticatedOptionalDataRequest
-import models.{Mode, RejoinLoopMode, RejoinMode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
+import services.NiProtocolExpiredService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckNiProtocolExpiredOptionalFilterImpl(appConfig: FrontendAppConfig, mode: Option[Mode])(implicit val executionContext: ExecutionContext)
+class CheckNiProtocolExpiredOptionalFilterImpl(niProtocolExpiredService: NiProtocolExpiredService, mode: Option[Mode])
+                                              (implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedOptionalDataRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedOptionalDataRequest[A]): Future[Option[Result]] = {
-    if (appConfig.registrationValidationEnabled && mode.exists(Seq(RejoinMode, RejoinLoopMode).contains)) {
-      request.userAnswers.flatMap(_.vatInfo) match {
-        case Some(vatCustomerInfo) => vatCustomerInfo.singleMarketIndicator match {
-          case Some(true) => Future.successful(None)
-          case Some(false) => Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
-          case _ =>
-            logger.error("Illegal state cause by SingleMarketIndicator missing")
-            throw new IllegalStateException("Illegal State Exception while processing the request for SingleMarketIndicator")
-        }
-        case _ => Future.successful(None)
-      }
+    if (niProtocolExpiredService.isNiProtocolExpired(mode, request.userAnswers.flatMap(_.vatInfo.flatMap(_.singleMarketIndicator)))) {
+      Future.successful(Some(Redirect(routes.NiProtocolExpiredController.onPageLoad())))
     } else {
       Future.successful(None)
     }
   }
 }
 
-class CheckNiProtocolExpiredOptionalFilter @Inject()(appConfig: FrontendAppConfig)
+class CheckNiProtocolExpiredOptionalFilter @Inject()(checkNiProtocolExpiredService: NiProtocolExpiredService)
                                                     (implicit val executionContext: ExecutionContext) {
 
-  def apply(mode: Option[Mode]): CheckNiProtocolExpiredOptionalFilterImpl = new CheckNiProtocolExpiredOptionalFilterImpl(appConfig, mode)
+  def apply(mode: Option[Mode]): CheckNiProtocolExpiredOptionalFilterImpl = new CheckNiProtocolExpiredOptionalFilterImpl(checkNiProtocolExpiredService, mode)
 }
