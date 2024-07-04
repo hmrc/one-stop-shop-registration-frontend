@@ -445,6 +445,7 @@ GET         /answers-deleted                                                    
 
 GET         /no-welsh-service                                                       controllers.external.NoMoreWelshController.onPageLoad()
 GET         /cannot-register-ni-protocol                                            controllers.NiProtocolRejectionController.onPageLoad()
+GET         /ni-protocol-expired                                                    controllers.NiProtocolExpiredController.onPageLoad()
 
 GET         /progress-saved                                                         controllers.SavedProgressController.onPageLoad(continueUrl: RedirectUrl)
 
@@ -643,15 +644,15 @@ POST        /rejoin-first-amend-no-vat-number-for-eu-country/:countryIndex      
 GET         /amend-there-is-a-problem                                               controllers.amend.AmendJourneyRecoveryController.onPageLoad()
 
 
-GET        /start-rejoin-journey                                                    controllers.rejoin.StartRejoinJourneyController.onPageLoad()
+GET         /start-rejoin-journey                                                   controllers.rejoin.StartRejoinJourneyController.onPageLoad()
 
-GET        /cannot-rejoin                                                           controllers.rejoin.CannotRejoinController.onPageLoad()
+GET         /cannot-rejoin                                                          controllers.rejoin.CannotRejoinController.onPageLoad()
 
-GET        /rejoin-registration                                                     controllers.rejoin.RejoinRegistrationController.onPageLoad()
-POST       /rejoin-registration                                                     controllers.rejoin.RejoinRegistrationController.onSubmit(incompletePrompt: Boolean)
+GET         /rejoin-registration                                                    controllers.rejoin.RejoinRegistrationController.onPageLoad()
+POST        /rejoin-registration                                                    controllers.rejoin.RejoinRegistrationController.onSubmit(incompletePrompt: Boolean)
 
-GET        /error-submitting-rejoin                                                 controllers.rejoin.ErrorSubmittingRejoinController.onPageLoad()
+GET         /error-submitting-rejoin                                                controllers.rejoin.ErrorSubmittingRejoinController.onPageLoad()
 
-GET        /successful-rejoin                                                       controllers.rejoin.RejoinCompleteController.onPageLoad()
+GET         /successful-rejoin                                                      controllers.rejoin.RejoinCompleteController.onPageLoad()
 
-GET        /rejoin-journey-recovery                                                 controllers.rejoin.RejoinJourneyRecoveryController.onPageLoad()
+GET         /rejoin-journey-recovery                                                controllers.rejoin.RejoinJourneyRecoveryController.onPageLoad()

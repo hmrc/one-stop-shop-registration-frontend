@@ -19,10 +19,10 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
-import models.{AmendMode, Mode}
 import models.requests.AuthenticatedDataRequest
-import play.api.mvc.{ActionFilter, Result}
+import models.{AmendMode, Mode}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Result}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
