@@ -38,6 +38,8 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def limitIndex: MaximumIndexFilterProvider
   def features: FeatureFlagService
   def checkNiProtocol: CheckNiProtocolFilter
+  def checkNiProtocolExpired: CheckNiProtocolExpiredFilter
+  def checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
   def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
   def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
@@ -49,6 +51,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkRegistration(mode) andThen
       getData andThen
       requireData(mode) andThen
+      checkNiProtocolExpired(mode) andThen
       checkNiProtocol(mode) andThen
       checkOtherCountryRegistration(mode)
 
@@ -57,7 +60,8 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       identify andThen
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
-      getData
+      getData andThen
+      checkNiProtocolExpiredOptional(mode)
 
   def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     authAndGetData(mode) andThen
@@ -82,6 +86,8 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                limitIndex: MaximumIndexFilterProvider,
                                                                features: FeatureFlagService,
                                                                checkNiProtocol: CheckNiProtocolFilter,
+                                                               checkNiProtocolExpired: CheckNiProtocolExpiredFilter,
+                                                               checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter,
                                                                retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
                                                                checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
                                                                checkEmailVerificationStatus: CheckEmailVerificationFilterProvider,
