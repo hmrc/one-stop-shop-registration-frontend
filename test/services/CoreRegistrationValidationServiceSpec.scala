@@ -20,7 +20,7 @@ import base.SpecBase
 import connectors.ValidateCoreRegistrationConnector
 import models.PreviousScheme
 import models.core.{CoreRegistrationValidationResult, Match, MatchType}
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
 import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,7 +30,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
-import play.api.mvc.AnyContent
+import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -70,7 +70,10 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
 
   private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
 
+
   implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+  implicit val authenticatedOptionalDataRequest: AuthenticatedOptionalDataRequest[AnyContent] =
+    AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(emptyUserAnswers))
 
   "coreRegistrationValidationService.searchUkVrn" - {
 

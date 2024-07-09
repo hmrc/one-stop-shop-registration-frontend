@@ -28,7 +28,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.{RegistrationService, RejoinRegistrationService}
+import services.{CoreRegistrationValidationService, RegistrationService, RejoinRegistrationService}
 import testutils.RegistrationData
 import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
@@ -42,13 +42,14 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
   private val mockRegistrationService = mock[RegistrationService]
   private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
   private val mockAuthenticatedUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
-
+  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockRegistrationConnector)
     Mockito.reset(mockRegistrationService)
     Mockito.reset(mockRejoinRegistrationService)
     Mockito.reset(mockAuthenticatedUserAnswersRepository)
+    Mockito.reset(mockCoreRegistrationValidationService)
   }
 
   "StartRejoinJourney Controller" - {
@@ -60,12 +61,14 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+      when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
         .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+        .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
         .build()
 
       running(application) {
@@ -85,12 +88,14 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+      when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
         .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+        .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
         .build()
 
       running(application) {
