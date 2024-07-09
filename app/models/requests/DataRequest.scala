@@ -16,25 +16,19 @@
 
 package models.requests
 
-import play.api.mvc.{Request, WrappedRequest}
 import models.UserAnswers
 import models.domain.Registration
+import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
 
-sealed abstract class AuthenticatedRequest[+A](
-                                                val request: Request[A],
-                                                val credentials: Credentials,
-                                                val vrn: Vrn
-                                              ) extends WrappedRequest[A](request)
-
 case class AuthenticatedOptionalDataRequest[A](
-                                                override val request: Request[A],
-                                                override val credentials: Credentials,
-                                                override val vrn: Vrn,
+                                                request: Request[A],
+                                                credentials: Credentials,
+                                                vrn: Vrn,
                                                 userAnswers: Option[UserAnswers]
-                                              ) extends AuthenticatedRequest[A](request, credentials, vrn) {
+                                              ) extends WrappedRequest[A](request) {
 
   val userId: String = credentials.providerId
 }
@@ -46,12 +40,12 @@ case class UnauthenticatedOptionalDataRequest[A](
                                                 ) extends WrappedRequest[A](request)
 
 case class AuthenticatedDataRequest[A](
-                                        override val request: Request[A],
-                                        override val credentials: Credentials,
-                                        override val vrn: Vrn,
+                                        request: Request[A],
+                                        credentials: Credentials,
+                                        vrn: Vrn,
                                         registration: Option[Registration],
                                         userAnswers: UserAnswers
-                          ) extends AuthenticatedRequest[A](request, credentials, vrn) {
+                          ) extends WrappedRequest[A](request) {
 
   val userId: String = credentials.providerId
 

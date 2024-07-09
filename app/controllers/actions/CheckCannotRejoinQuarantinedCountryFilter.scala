@@ -19,7 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import logging.Logging
 import models.core.MatchType
-import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest}
+import models.requests.AuthenticatedOptionalDataRequest
 import models.{Mode, RejoinLoopMode, RejoinMode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}

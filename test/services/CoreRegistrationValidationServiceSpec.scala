@@ -18,8 +18,8 @@ package services
 
 import base.SpecBase
 import connectors.ValidateCoreRegistrationConnector
-import models.core.{CoreRegistrationValidationResult, Match, MatchType}
 import models.PreviousScheme
+import models.core.{CoreRegistrationValidationResult, Match, MatchType}
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any

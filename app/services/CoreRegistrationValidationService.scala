@@ -18,10 +18,10 @@ package services
 
 import connectors.ValidateCoreRegistrationConnector
 import logging.Logging
-import models.{CountryWithValidationDetails, PreviousScheme}
 import models.audit.CoreRegistrationAuditModel
 import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
-import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, AuthenticatedRequest}
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
+import models.{CountryWithValidationDetails, PreviousScheme}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -58,7 +58,7 @@ class CoreRegistrationValidationService @Inject()(
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
       case Right(coreRegistrationResponse) =>
-        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse)(request.toAuthenticatedOptionalDataRequest))
         coreRegistrationResponse.matches.headOption
 
       case _ => throw CoreRegistrationValidationException("Error while validating core registration")
@@ -80,7 +80,7 @@ class CoreRegistrationValidationService @Inject()(
     connector.validateCoreRegistration(coreRegistrationRequest).map {
 
       case Right(coreRegistrationResponse) =>
-        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+        auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse)(request.toAuthenticatedOptionalDataRequest))
         coreRegistrationResponse.matches.headOption
 
       case _ => throw CoreRegistrationValidationException("Error while validating core registration")
@@ -112,7 +112,7 @@ class CoreRegistrationValidationService @Inject()(
 
       connector.validateCoreRegistration(coreRegistrationRequest).map {
         case Right(coreRegistrationResponse) =>
-          auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
+          auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse)(request.toAuthenticatedOptionalDataRequest))
           coreRegistrationResponse.matches.headOption
         case _ => throw CoreRegistrationValidationException("Error while validating core registration")
       }
