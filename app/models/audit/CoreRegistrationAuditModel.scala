@@ -17,8 +17,8 @@
 package models.audit
 
 import models.core.{CoreRegistrationRequest, CoreRegistrationValidationResult}
-import models.requests.AuthenticatedDataRequest
-import play.api.libs.json.{Json, JsValue}
+import models.requests.AuthenticatedRequest
+import play.api.libs.json.{JsValue, Json}
 
 case class CoreRegistrationAuditModel(
                                        credId: String,
@@ -47,7 +47,7 @@ object CoreRegistrationAuditModel {
   def build(
              coreRegistrationRequest: CoreRegistrationRequest,
              coreRegistrationValidationResult: CoreRegistrationValidationResult
-           )(implicit request: AuthenticatedDataRequest[_]): CoreRegistrationAuditModel =
+           )(implicit request: AuthenticatedRequest[_]): CoreRegistrationAuditModel =
     CoreRegistrationAuditModel(
       credId = request.credentials.providerId,
       userAgent = request.headers.get("user-agent").getOrElse(""),

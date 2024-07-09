@@ -42,6 +42,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
   def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
+  def checkCannotRejoinQuarantinedCountry: CheckCannotRejoinQuarantinedCountryFilter
   def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
   def checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider
   def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
@@ -61,7 +62,8 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
       getData andThen
-      checkNiProtocolExpiredOptional(mode)
+      checkNiProtocolExpiredOptional(mode) andThen
+      checkCannotRejoinQuarantinedCountry(mode)
 
   def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     authAndGetData(mode) andThen
@@ -90,6 +92,7 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter,
                                                                retrieveSavedAnswers: SavedAnswersRetrievalActionProvider,
                                                                checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
+                                                               checkCannotRejoinQuarantinedCountry: CheckCannotRejoinQuarantinedCountryFilter,
                                                                checkEmailVerificationStatus: CheckEmailVerificationFilterProvider,
                                                                checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider
                                                              ) extends AuthenticatedControllerComponents

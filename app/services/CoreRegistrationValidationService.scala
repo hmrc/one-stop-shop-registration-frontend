@@ -21,7 +21,7 @@ import logging.Logging
 import models.{CountryWithValidationDetails, PreviousScheme}
 import models.audit.CoreRegistrationAuditModel
 import models.core.{CoreRegistrationRequest, Match, MatchType, SourceType}
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, AuthenticatedRequest}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -35,7 +35,7 @@ class CoreRegistrationValidationService @Inject()(
                                                  (implicit ec: ExecutionContext) extends Logging {
 
   def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier,
-                            request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
+                            request: AuthenticatedOptionalDataRequest[_]): Future[Option[Match]] = {
 
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 

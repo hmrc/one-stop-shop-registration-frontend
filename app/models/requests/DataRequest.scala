@@ -22,12 +22,19 @@ import models.domain.Registration
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
+
+sealed abstract class AuthenticatedRequest[+A](
+                                                val request: Request[A],
+                                                val credentials: Credentials,
+                                                val vrn: Vrn
+                                              ) extends WrappedRequest[A](request)
+
 case class AuthenticatedOptionalDataRequest[A](
-                                                request: Request[A],
-                                                credentials: Credentials,
-                                                vrn: Vrn,
+                                                override val request: Request[A],
+                                                override val credentials: Credentials,
+                                                override val vrn: Vrn,
                                                 userAnswers: Option[UserAnswers]
-                                              ) extends WrappedRequest[A](request) {
+                                              ) extends AuthenticatedRequest[A](request, credentials, vrn) {
 
   val userId: String = credentials.providerId
 }
@@ -39,14 +46,22 @@ case class UnauthenticatedOptionalDataRequest[A](
                                                 ) extends WrappedRequest[A](request)
 
 case class AuthenticatedDataRequest[A](
-                            request: Request[A],
-                            credentials: Credentials,
-                            vrn: Vrn,
-                            registration: Option[Registration],
-                            userAnswers: UserAnswers
-                          ) extends WrappedRequest[A](request) {
+                                        override val request: Request[A],
+                                        override val credentials: Credentials,
+                                        override val vrn: Vrn,
+                                        registration: Option[Registration],
+                                        userAnswers: UserAnswers
+                          ) extends AuthenticatedRequest[A](request, credentials, vrn) {
 
   val userId: String = credentials.providerId
+
+  def toAuthenticatedOptionalDataRequest: AuthenticatedOptionalDataRequest[A] =
+    AuthenticatedOptionalDataRequest(
+      request,
+      credentials,
+      vrn,
+      Some(userAnswers)
+    )
 }
 
 case class UnauthenticatedDataRequest[A](
