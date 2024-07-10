@@ -30,10 +30,10 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckCannotRejoinQuarantinedCountryFilterImpl(mode: Option[Mode],
+class CheckRejoinOtherCountryRegistrationFilterImpl(mode: Option[Mode],
                                                     coreRegistrationValidationService: CoreRegistrationValidationService,
                                                     appConfig: FrontendAppConfig)
-                                      (implicit val executionContext: ExecutionContext)
+                                                   (implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedOptionalDataRequest] with Logging {
 
   private val exclusionStatusCode = 4
@@ -43,6 +43,9 @@ class CheckCannotRejoinQuarantinedCountryFilterImpl(mode: Option[Mode],
 
     if (appConfig.otherCountryRegistrationValidationEnabled && Seq(RejoinMode, RejoinLoopMode).exists(mode.contains)) {
       coreRegistrationValidationService.searchUkVrn(request.vrn)(hc, request).map {
+        case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
+          Some(Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
+
         case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(exclusionStatusCode) ||
             activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
             activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
@@ -64,9 +67,9 @@ class CheckCannotRejoinQuarantinedCountryFilterImpl(mode: Option[Mode],
   }
 }
 
-class CheckCannotRejoinQuarantinedCountryFilter @Inject()(coreRegistrationValidationService: CoreRegistrationValidationService, appConfig: FrontendAppConfig)
-                                            (implicit val executionContext: ExecutionContext) {
+class CheckRejoinOtherCountryRegistrationFilter @Inject()(coreRegistrationValidationService: CoreRegistrationValidationService, appConfig: FrontendAppConfig)
+                                                         (implicit val executionContext: ExecutionContext) {
 
-  def apply(mode: Option[Mode]): CheckCannotRejoinQuarantinedCountryFilterImpl = new CheckCannotRejoinQuarantinedCountryFilterImpl(mode, coreRegistrationValidationService, appConfig)
+  def apply(mode: Option[Mode]): CheckRejoinOtherCountryRegistrationFilterImpl = new CheckRejoinOtherCountryRegistrationFilterImpl(mode, coreRegistrationValidationService, appConfig)
 }
 

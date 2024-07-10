@@ -35,9 +35,8 @@ class RejoinAlreadyRegisteredOtherCountryController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(countryCode: String): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(countryCode: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-
       Ok(view(frontendAppConfig.ossYourAccountUrl, getCountryName(countryCode)))
   }
 }
