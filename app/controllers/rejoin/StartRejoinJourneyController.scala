@@ -54,11 +54,16 @@ class StartRejoinJourneyController @Inject()(
           case Some(registration) if rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) =>
             registrationConnector.getVatCustomerInfo().flatMap {
               case Right(vatInfo) =>
-                for {
-                  userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                  updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                  _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
-                } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+                vatInfo.deregistrationDecisionDate match {
+                  case Some(date) if !date.isAfter(LocalDate.now(clock)) =>
+                    Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+                  case _ =>
+                    for {
+                      userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                      updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                      _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
+                    } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+                }
 
               case Left(error) =>
                 val exception = new Exception(error.body)
