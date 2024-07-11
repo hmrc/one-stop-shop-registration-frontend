@@ -55,9 +55,9 @@ class StartRejoinJourneyController @Inject()(
             registrationConnector.getVatCustomerInfo().flatMap {
               case Right(vatInfo) =>
                 vatInfo.deregistrationDecisionDate match {
-                  case Some(date) if !date.isAfter(LocalDate.now(clock)) =>
+                  case Some(_) =>
                     Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
-                  case _ =>
+                  case None =>
                     for {
                       userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
                       updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
