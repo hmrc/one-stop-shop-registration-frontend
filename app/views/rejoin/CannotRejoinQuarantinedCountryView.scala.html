@@ -19,13 +19,13 @@
         govukButton: GovukButton
 )
 
-@(ossYourAccountUrl: String, countryName: String, earliestRejoinDate: String)(implicit request: Request[_], messages: Messages)
+@(ossYourAccountUrl: String, countryName: String, exclusionDate: String)(implicit request: Request[_], messages: Messages)
 
   @layout(pageTitle = titleNoForm(messages("cannotRejoinQuarantinedCountry.title"))) {
 
     <h1 class="govuk-heading-l">@messages("cannotRejoinQuarantinedCountry.heading")</h1>
 
-    <p class="govuk-body">@messages("cannotRejoinQuarantinedCountry.p1", countryName, earliestRejoinDate)</p>
+    <p class="govuk-body">@messages("cannotRejoinQuarantinedCountry.p1", countryName, exclusionDate)</p>
 
     <p class="govuk-body">@Html(messages("cannotRejoinQuarantinedCountry.contact"))</p>
 

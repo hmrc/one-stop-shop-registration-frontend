@@ -17,6 +17,7 @@
 package controllers.rejoin
 
 import base.SpecBase
+import config.Constants.addQuarantineYears
 import config.FrontendAppConfig
 import formats.Format.dateFormatter
 import models.Country.getCountryName
@@ -30,7 +31,8 @@ class CannotRejoinQuarantinedCountryControllerSpec extends SpecBase {
 
   private val countryCode: String = arbitraryCountry.arbitrary.sample.value.code
   private val countryName: String = getCountryName(countryCode)
-  private val earliestRejoinDate: String = LocalDate.now().format(dateFormatter)
+  private val effectiveDecisionDate: String = "2022-10-10"
+  private val formattedEffectiveDecisionDate: String = LocalDate.parse(effectiveDecisionDate).plusYears(addQuarantineYears).format(dateFormatter)
 
   "CannotRejoinQuarantinedCountry Controller" - {
 
@@ -41,14 +43,14 @@ class CannotRejoinQuarantinedCountryControllerSpec extends SpecBase {
       running(application) {
         val config = application.injector.instanceOf[FrontendAppConfig]
 
-        val request = FakeRequest(GET, routes.CannotRejoinQuarantinedCountryController.onPageLoad(countryCode, earliestRejoinDate).url)
+        val request = FakeRequest(GET, routes.CannotRejoinQuarantinedCountryController.onPageLoad(countryCode, effectiveDecisionDate).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CannotRejoinQuarantinedCountryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(config.ossYourAccountUrl, countryName, earliestRejoinDate)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(config.ossYourAccountUrl, countryName, formattedEffectiveDecisionDate)(request, messages(application)).toString
       }
     }
   }

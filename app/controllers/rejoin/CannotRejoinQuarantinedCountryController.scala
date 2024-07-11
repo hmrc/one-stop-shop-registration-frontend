@@ -16,14 +16,17 @@
 
 package controllers.rejoin
 
+import config.Constants.addQuarantineYears
 import config.FrontendAppConfig
 import controllers.actions._
+import formats.Format.dateFormatter
 import models.Country.getCountryName
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.rejoin.CannotRejoinQuarantinedCountryView
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class CannotRejoinQuarantinedCountryController @Inject()(
@@ -35,7 +38,9 @@ class CannotRejoinQuarantinedCountryController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(countryCode: String, earliestRejoinDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) { implicit request =>
-    Ok(view(frontendAppConfig.ossYourAccountUrl, getCountryName(countryCode), earliestRejoinDate))
+  def onPageLoad(countryCode: String, exclusionDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) { implicit request =>
+    val exclusionDateFormatted = LocalDate.parse(exclusionDate).plusYears(addQuarantineYears).format(dateFormatter)
+
+    Ok(view(frontendAppConfig.ossYourAccountUrl, getCountryName(countryCode), exclusionDateFormatted))
   }
 }
