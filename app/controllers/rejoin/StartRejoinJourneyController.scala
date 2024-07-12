@@ -20,7 +20,7 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import logging.Logging
 import models.RejoinMode
-import pages.HasMadeSalesPage
+import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AuthenticatedUserAnswersRepository
@@ -61,7 +61,8 @@ class StartRejoinJourneyController @Inject()(
                     for {
                       userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
                       updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                      _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
+                      updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
+                  _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
                     } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
                 }
 
