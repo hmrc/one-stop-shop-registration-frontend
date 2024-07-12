@@ -125,7 +125,7 @@ class PreviousOssNumberController @Inject()(
         previousScheme = previousScheme,
         intermediaryNumber = None,
         countryCode = country.code
-      ).flatMap {
+      )(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
         case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
           Future.successful(
             Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))

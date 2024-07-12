@@ -24,7 +24,7 @@ import pages.HasMadeSalesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.AuthenticatedUserAnswersRepository
-import services.{RegistrationService, RejoinRegistrationService}
+import services.{RegistrationService, RejoinPreviousRegistrationValidationService, RejoinRegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
 
@@ -38,6 +38,7 @@ class StartRejoinJourneyController @Inject()(
                                               registrationConnector: RegistrationConnector,
                                               registrationService: RegistrationService,
                                               rejoinRegistrationService: RejoinRegistrationService,
+                                              rejoinPreviousRegistrationValidationService: RejoinPreviousRegistrationValidationService,
                                               authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
                                               clock: Clock
                                             )(implicit ec: ExecutionContext)
@@ -52,6 +53,9 @@ class StartRejoinJourneyController @Inject()(
       } yield {
         maybeRegistration match {
           case Some(registration) if rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) =>
+            // Use validation result
+            rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations)
+
             registrationConnector.getVatCustomerInfo().flatMap {
               case Right(vatInfo) =>
                 for {

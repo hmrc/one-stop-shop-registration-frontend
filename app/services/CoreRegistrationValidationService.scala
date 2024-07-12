@@ -88,7 +88,7 @@ class CoreRegistrationValidationService @Inject()(
   }
 
   def searchScheme(searchNumber: String, previousScheme: PreviousScheme, intermediaryNumber: Option[String], countryCode: String)
-                  (implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Match]] = {
+                  (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Match]] = {
 
     if (previousScheme == PreviousScheme.OSSNU) {
       Future.successful(None)
@@ -112,7 +112,7 @@ class CoreRegistrationValidationService @Inject()(
 
       connector.validateCoreRegistration(coreRegistrationRequest).map {
         case Right(coreRegistrationResponse) =>
-          auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse)(request.toAuthenticatedOptionalDataRequest))
+          auditService.audit(CoreRegistrationAuditModel.build(coreRegistrationRequest, coreRegistrationResponse))
           coreRegistrationResponse.matches.headOption
         case _ => throw CoreRegistrationValidationException("Error while validating core registration")
       }

@@ -130,7 +130,7 @@ class DateService @Inject()(
             PreviousScheme.OSSU,
             None,
             countryCode
-          )
+          )(hc, request.toAuthenticatedOptionalDataRequest)
 
         }
       case None =>

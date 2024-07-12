@@ -45,7 +45,7 @@ case class AuthenticatedDataRequest[A](
                                         vrn: Vrn,
                                         registration: Option[Registration],
                                         userAnswers: UserAnswers
-                          ) extends WrappedRequest[A](request) {
+                                      ) extends WrappedRequest[A](request) {
 
   val userId: String = credentials.providerId
 
