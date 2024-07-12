@@ -33,10 +33,14 @@ import testutils.RegistrationData
 import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
 
+import java.time.LocalDate
+
 
 class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach{
 
   private val registration = RegistrationData.registration
+  private val futureVatCustomerInfo = vatCustomerInfo.copy(deregistrationDecisionDate = None)
+  private val deregisteredVatCustomerInfo = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1)))
 
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockRegistrationService = mock[RegistrationService]
@@ -56,7 +60,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
     "must redirect to Has Already Made Sales when a registration has been successfully retrieved and it passes exclusion checks" in {
 
       when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
-      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(futureVatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
@@ -119,6 +123,33 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.NiProtocolExpiredController.onPageLoad().url
       }
+    }
+
+    "must redirect to Kick-out Page when Trader is Deregistered from VAT" in {
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
+      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(deregisteredVatCustomerInfo).toFuture
+      when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
+      when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+      when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
+        .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
+        .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.rejoin.routes.StartRejoinJourneyController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
+      }
+
     }
   }
 }
