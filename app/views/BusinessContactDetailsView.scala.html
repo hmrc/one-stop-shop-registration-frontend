@@ -18,62 +18,63 @@
 @import components.ButtonGroup
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    button: ButtonGroup
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, enrolmentsEnabled: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("businessContactDetails.title"))) {
 
-    @formHelper(action = routes.BusinessContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+  @formHelper(action = routes.BusinessContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
-
-        <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
-        @if(enrolmentsEnabled) {
-          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetailsWithBta.p1")</p>
-          <p class="govuk-body govuk-!-margin-bottom-9">@Html(messages("businessContactDetailsWithBta.p2"))</p>
-        } else {
-          <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.caption")</p>
-        }
-
-        @govukInput(
-            InputViewModel(
-                field = form("fullName"),
-                label = LabelViewModel(messages("businessContactDetails.fullName")).withCssClass("govuk-label--m")
-            )
-            .withWidth(Full)
-            .withAutocomplete("name")
-            .withSpellcheck(on = false)
-        )
-
-        @govukInput(
-            InputViewModel(
-                field = form("telephoneNumber"),
-                label = LabelViewModel(messages("businessContactDetails.telephoneNumber")).withCssClass("govuk-label--m")
-            )
-            .withWidth(Fixed20)
-            .withInputType("tel")
-            .withInputMode("numeric")
-            .withAutocomplete("tel")
-        )
-
-        @govukInput(
-            InputViewModel(
-                field = form("emailAddress"),
-                label = LabelViewModel(messages("businessContactDetails.emailAddress")).withCssClass("govuk-label--m")
-            )
-            .withWidth(Full)
-            .withHint(HintViewModel(messages("businessContactDetails.emailHint")))
-            .asEmail()
-        )
-
-        @button("businessContactDetails.button.sendCode", routes.BusinessContactDetailsController.onPageLoad(mode).url, mode)
+    @if(form.errors.nonEmpty) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
+
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
+    @if(enrolmentsEnabled) {
+      <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetailsWithBta.p1")</p>
+      <p class="govuk-body govuk-!-margin-bottom-9">@Html(messages("businessContactDetailsWithBta.p2"))</p>
+    } else {
+      <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.caption")</p>
+    }
+
+    @govukInput(
+      InputViewModel(
+        field = form("fullName"),
+        label = LabelViewModel(messages("businessContactDetails.fullName")).withCssClass("govuk-label--m")
+      )
+      .withWidth(Full)
+      .withAutocomplete("name")
+      .withSpellcheck(on = false)
+    )
+
+    @govukInput(
+      InputViewModel(
+        field = form("telephoneNumber"),
+        label = LabelViewModel(messages("businessContactDetails.telephoneNumber")).withCssClass("govuk-label--m")
+      )
+      .withWidth(Fixed20)
+      .withInputType("tel")
+      .withInputMode("numeric")
+      .withAutocomplete("tel")
+    )
+
+    @govukInput(
+      InputViewModel(
+        field = form("emailAddress"),
+        label = LabelViewModel(messages("businessContactDetails.emailAddress")).withCssClass("govuk-label--m")
+      )
+      .withWidth(Full)
+      .asEmail()
+    )
+
+    <p class="govuk-body">@messages("businessContactDetails.emailHint")</p>
+
+    @button("businessContactDetails.button.sendCode", routes.BusinessContactDetailsController.onPageLoad(mode).url, mode)
+  }
 }
