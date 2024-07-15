@@ -62,6 +62,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
       when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -89,6 +90,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
       when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))

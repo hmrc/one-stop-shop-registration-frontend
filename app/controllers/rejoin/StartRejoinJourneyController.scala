@@ -53,22 +53,25 @@ class StartRejoinJourneyController @Inject()(
       } yield {
         maybeRegistration match {
           case Some(registration) if rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) =>
-            // Use validation result
-            rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations)
 
-            registrationConnector.getVatCustomerInfo().flatMap {
-              case Right(vatInfo) =>
-                for {
-                  userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                  updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                  _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
-                } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+            rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations).flatMap {
+              case Some(redirect) => Future.successful(redirect)
 
-              case Left(error) =>
-                val exception = new Exception(error.body)
-                logger.error(exception.getMessage, exception)
-                throw exception
+              case None => registrationConnector.getVatCustomerInfo().flatMap {
+                case Right(vatInfo) =>
+                  for {
+                    userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                    updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                    _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
+                  } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+
+                case Left(error) =>
+                  val exception = new Exception(error.body)
+                  logger.error(exception.getMessage, exception)
+                  throw exception
+              }
             }
+
           case _ =>
             Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
         }
