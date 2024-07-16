@@ -136,7 +136,7 @@ businessContactDetails.title = Business contact details
 businessContactDetails.heading = Business contact details
 businessContactDetails.caption = We’'ll only use this to send you information about your VAT returns for this scheme.
 businessContactDetailsWithBta.p1 = We''ll use these if we need to send you information about your account.
-businessContactDetailsWithBta.p2 = We''ll only contact you by email or through your <a href="https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account" class="govuk-link" rel="noreferrer noopener" target="_blank">Business tax account (opens in new tab)</a>.
+businessContactDetailsWithBta.p2 = We''ll only contact you by email or through your business tax account.
 businessContactDetails.fullName = Contact name or business department
 businessContactDetails.telephoneNumber = Telephone number
 businessContactDetails.emailAddress = Email address
