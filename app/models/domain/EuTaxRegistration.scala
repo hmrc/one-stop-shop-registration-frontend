@@ -19,7 +19,9 @@ package models.domain
 import models.Country
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
-sealed trait EuTaxRegistration
+sealed trait EuTaxRegistration {
+  def country: Country
+}
 
 object EuTaxRegistration {
 
