@@ -357,7 +357,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         doNothing().when(auditService).audit(any())(any(), any())
 
         val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-        val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+        val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -393,7 +393,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
