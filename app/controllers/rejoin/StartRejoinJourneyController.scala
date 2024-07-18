@@ -20,11 +20,14 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import logging.Logging
 import models.RejoinMode
+import models.domain.Registration
+import models.requests.AuthenticatedOptionalDataRequest
 import pages.HasMadeSalesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AuthenticatedUserAnswersRepository
-import services.{RegistrationService, RejoinPreviousRegistrationValidationService, RejoinRegistrationService}
+import services.{RegistrationService, RejoinEuRegistrationValidationService, RejoinPreviousRegistrationValidationService, RejoinRegistrationService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
 
@@ -39,6 +42,7 @@ class StartRejoinJourneyController @Inject()(
                                               registrationService: RegistrationService,
                                               rejoinRegistrationService: RejoinRegistrationService,
                                               rejoinPreviousRegistrationValidationService: RejoinPreviousRegistrationValidationService,
+                                              rejoinEuRegistrationValidationService: RejoinEuRegistrationValidationService,
                                               authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
                                               clock: Clock
                                             )(implicit ec: ExecutionContext)
@@ -48,34 +52,36 @@ class StartRejoinJourneyController @Inject()(
 
   def onPageLoad: Action[AnyContent] = cc.authAndGetOptionalData(Some(RejoinMode)).async {
     implicit request =>
-      (for {
-        maybeRegistration <- registrationConnector.getRegistration()
-      } yield {
-        maybeRegistration match {
-          case Some(registration) if rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) =>
+      registrationConnector.getRegistration().flatMap {
+        case Some(registration) if rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) =>
+          validateRegistration(registration).flatMap {
+            case Some(redirect) => redirect.toFuture
+            case None => registrationConnector.getVatCustomerInfo().flatMap {
+              case Right(vatInfo) =>
+                for {
+                  userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                  updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                  _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
+                } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
 
-            rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations).flatMap {
-              case Some(redirect) => Future.successful(redirect)
-
-              case None => registrationConnector.getVatCustomerInfo().flatMap {
-                case Right(vatInfo) =>
-                  for {
-                    userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                    updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                    _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
-                  } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
-
-                case Left(error) =>
-                  val exception = new Exception(error.body)
-                  logger.error(exception.getMessage, exception)
-                  throw exception
-              }
+              case Left(error) =>
+                val exception = new Exception(error.body)
+                logger.error(exception.getMessage, exception)
+                throw exception
             }
+          }
+        case _ =>
+          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+      }
+  }
 
-          case _ =>
-            Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
-        }
-      }).flatten
+
+  private def validateRegistration(registration: Registration)
+                                  (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+    rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations).flatMap {
+      case Some(redirect) => Some(redirect).toFuture
+      case None => rejoinEuRegistrationValidationService.validateEuRegistrations(registration.euRegistrations)
+    }
   }
 
 }

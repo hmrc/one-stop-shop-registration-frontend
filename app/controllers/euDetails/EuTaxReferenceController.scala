@@ -71,12 +71,12 @@ class EuTaxReferenceController @Inject()(
 
             value =>
               if (appConfig.otherCountryRegistrationValidationEnabled) {
-                coreRegistrationValidationService.searchEuTaxId(value, country.code).flatMap {
+                coreRegistrationValidationService.searchEuTaxId(value, country.code)(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
 
-                  case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
+                  case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
                     Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
 
-                  case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
+                  case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
                     Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
                   case _ => for {

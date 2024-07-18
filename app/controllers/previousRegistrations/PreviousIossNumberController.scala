@@ -87,7 +87,7 @@ class PreviousIossNumberController @Inject()(
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
                   )(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
-                    case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
+                    case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
                       Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
                     case _ =>
                       saveAndRedirect(countryIndex, schemeIndex, value, mode)

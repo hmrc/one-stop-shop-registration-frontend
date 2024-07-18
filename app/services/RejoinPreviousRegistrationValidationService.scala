@@ -21,7 +21,6 @@ import models.Country
 import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew, PreviousSchemeDetails}
 import models.requests.AuthenticatedOptionalDataRequest
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -68,20 +67,6 @@ class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationVali
       previousScheme = previousSchemeDetails.previousScheme,
       intermediaryNumber = previousSchemeDetails.previousSchemeNumbers.previousIntermediaryNumber,
       countryCode = country.code
-    ).map {
-      case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
-        Some(Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
-      case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
-        Some(Redirect(
-          controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
-            case Some(date) => date.toString
-            case _ =>
-              val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
-              logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
-              throw e
-          })
-        ))
-      case _ => None
-    }
+    ).map(RejoinRedirectService.redirectOnMatch)
   }
 }

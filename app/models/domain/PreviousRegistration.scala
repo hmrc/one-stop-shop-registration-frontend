@@ -19,7 +19,9 @@ package models.domain
 import models.{Country, PreviousScheme}
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
-sealed trait PreviousRegistration
+sealed trait PreviousRegistration {
+  def country: Country
+}
 
 object PreviousRegistration {
 
