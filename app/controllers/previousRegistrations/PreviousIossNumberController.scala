@@ -28,7 +28,7 @@ import models.{Country, Index, Mode, PreviousScheme}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.CoreRegistrationValidationService
+import services.{CoreRegistrationValidationService, RejoinRedirectService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
@@ -86,11 +86,9 @@ class PreviousIossNumberController @Inject()(
                     previousScheme = previousScheme,
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
-                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
-                    case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
-                      Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
-                    case _ =>
-                      saveAndRedirect(countryIndex, schemeIndex, value, mode)
+                  )(hc, request.toAuthenticatedOptionalDataRequest).map(RejoinRedirectService.redirectOnMatch).flatMap {
+                    case Some(redirect) => redirect.toFuture
+                    case None => saveAndRedirect(countryIndex, schemeIndex, value, mode)
                   }
                 } else {
                   saveAndRedirect(countryIndex, schemeIndex, value, mode)

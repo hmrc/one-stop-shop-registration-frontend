@@ -28,8 +28,9 @@ import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
-import services.CoreRegistrationValidationService
+import services.{CoreRegistrationValidationService, RejoinRedirectService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousOssNumberView
 
 import javax.inject.Inject
@@ -119,20 +120,20 @@ class PreviousOssNumberController @Inject()(
                                                previousScheme: WithName with PreviousScheme
                                              )(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
-
       coreRegistrationValidationService.searchScheme(
         searchNumber = value,
         previousScheme = previousScheme,
         intermediaryNumber = None,
         countryCode = country.code
-      )(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
-        case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+      )(hc, request.toAuthenticatedOptionalDataRequest).map(RejoinRedirectService.redirectOnMatch).flatMap {
+        case Some(redirect) => redirect.toFuture
+        case None => saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+        /*case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
           Future.successful(
             Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))
         case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
           Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
-        case _ =>
-          saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+        case _ =>*/
       }
     } else {
       saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
