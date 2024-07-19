@@ -18,13 +18,12 @@ package controllers
 
 import controllers.actions._
 import forms.HasMadeSalesFormProvider
-import models.{Mode, RejoinMode, UserAnswers}
 import models.SalesChannels.Mixed
-import pages.{BusinessBasedInNiPage, DateOfFirstSalePage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
+import models.{Mode, UserAnswers}
+import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FutureSyntax.FutureOps
 import views.html.HasMadeSalesView
 
 import javax.inject.Inject
