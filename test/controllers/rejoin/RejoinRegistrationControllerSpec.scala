@@ -17,26 +17,28 @@
 package controllers.rejoin
 
 import base.SpecBase
-import cats.data.Validated.Valid
+import cats.data.NonEmptyChain
+import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
-import models.{BusinessContactDetails, Index, RejoinMode}
+import models.{BusinessContactDetails, DataMissingError, Index, PreviousScheme, PreviousSchemeType, RejoinMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage}
-import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage}
+import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
+import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.EuDetailsQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services._
 import testutils.RegistrationData
@@ -357,7 +359,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         doNothing().when(auditService).audit(any())(any(), any())
 
         val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-        val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+        val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -393,7 +395,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -414,6 +416,198 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           }
         }
       }
+
+      "when the user has not answered all necessary data" - {
+
+        "the user is redirected when the incomplete prompt is shown" - {
+
+          "to Check EU Details when one of the tax registered countries is incomplete" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers
+              .set(TaxRegisteredInEuPage, true).success.value
+              .set(EuCountryPage(Index(0)), country).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, Index(0)).url
+
+            }
+
+          }
+
+          "to Tax Registered In EU when it has a 'yes' answer but all countries were removed" in {
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers
+              .set(TaxRegisteredInEuPage, true).success.value
+              .set(EuCountryPage(Index(0)), country).success.value
+              .remove(EuDetailsQuery(Index(0))).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+          "to Previous Eu Vat Number when one of the previously registered countries is incomplete" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers
+              .set(PreviouslyRegisteredPage, true).success.value
+              .set(PreviousEuCountryPage(Index(0)), country).success.value
+              .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
+              .set(PreviousSchemeTypePage(Index(0), Index(0)), PreviousSchemeType.OSS).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual
+                controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(RejoinMode, Index(0), Index(0)).url
+
+            }
+          }
+
+          "to Has Trading Name when trading names are not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasTradingNameController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+          "to Has Made Sales when eligible sales are not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+          "to Has Website when websites are not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasWebsiteController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+          "to Tax Registered In Eu when eu details are not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.euDetails.routes.TaxRegisteredInEuController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+
+          "to Previously Registered when previous registrations are not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+
+            val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(RejoinMode).url
+
+            }
+          }
+        }
+      }
+
     }
   }
 }
