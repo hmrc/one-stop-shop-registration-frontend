@@ -18,6 +18,7 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import models.NormalMode
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
@@ -42,17 +43,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with EitherValues {
 
-  class Harness(frontendAppConfig: FrontendAppConfig, emailVerificationService: EmailVerificationService, saveForLaterService: SaveForLaterService)
-    extends CheckEmailVerificationFilterImpl(None, frontendAppConfig, emailVerificationService, saveForLaterService) {
+  class Harness(
+                 frontendAppConfig: FrontendAppConfig,
+                 emailVerificationService: EmailVerificationService,
+                 saveForLaterService: SaveForLaterService,
+                 registrationConnector: RegistrationConnector
+               )
+    extends CheckEmailVerificationFilterImpl(None, frontendAppConfig, emailVerificationService, saveForLaterService, registrationConnector) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
   private val mockEmailVerificationService = mock[EmailVerificationService]
   private val validEmailAddressUserAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
   private val saveForLaterService: SaveForLaterService = mock[SaveForLaterService]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   private lazy val globalController = (frontendAppConfig: FrontendAppConfig) =>
-    new Harness(frontendAppConfig, mockEmailVerificationService, saveForLaterService)
+    new Harness(frontendAppConfig, mockEmailVerificationService, saveForLaterService, mockRegistrationConnector)
 
   ".filter" - {
 
