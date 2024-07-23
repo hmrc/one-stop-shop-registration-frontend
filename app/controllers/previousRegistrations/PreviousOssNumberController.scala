@@ -20,10 +20,11 @@ import config.FrontendAppConfig
 import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousOssNumberFormProvider
+import models.core.Match
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.PreviousSchemeHintText
 import models.requests.AuthenticatedDataRequest
-import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme, WithName}
+import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme, RejoinMode, WithName}
 import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -119,24 +120,31 @@ class PreviousOssNumberController @Inject()(
                                                value: String,
                                                previousScheme: WithName with PreviousScheme
                                              )(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
+    lazy val defaultResult: Future[Result] = saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+
     if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
       coreRegistrationValidationService.searchScheme(
         searchNumber = value,
         previousScheme = previousScheme,
         intermediaryNumber = None,
         countryCode = country.code
-      )(hc, request.toAuthenticatedOptionalDataRequest).map(RejoinRedirectService.redirectOnMatch).flatMap {
-        case Some(redirect) => redirect.toFuture
-        case None => saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
-        /*case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
-          Future.successful(
-            Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))
-        case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
-          Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
-        case _ =>*/
+      )(hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch: Option[Match] =>
+        if (mode == RejoinMode) {
+          RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult)
+        } else {
+          maybeMatch match {
+            case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+              Future.successful(Redirect(
+                controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))
+            case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+              Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
+            case _ =>
+              defaultResult
+          }
+        }
       }
     } else {
-      saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+      defaultResult
     }
   }
 
