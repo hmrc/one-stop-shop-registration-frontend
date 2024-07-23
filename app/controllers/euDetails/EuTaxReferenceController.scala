@@ -20,12 +20,14 @@ import config.FrontendAppConfig
 import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuTaxReferenceFormProvider
-import models.{Index, Mode}
+import models.core.Match
+import models.{Index, Mode, RejoinMode}
 import pages.euDetails.EuTaxReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.CoreRegistrationValidationService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{CoreRegistrationValidationService, RejoinRedirectService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.euDetails.EuTaxReferenceView
 
 import javax.inject.Inject
@@ -65,34 +67,40 @@ class EuTaxReferenceController @Inject()(
 
           val form = formProvider(country)
 
+
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
 
-            value =>
+            value => {
+              lazy val successResult: Future[Result] = for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuTaxReferencePage(index), value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(EuTaxReferencePage(index).navigate(mode, updatedAnswers))
+
               if (appConfig.otherCountryRegistrationValidationEnabled) {
-                coreRegistrationValidationService.searchEuTaxId(value, country.code)(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
+                coreRegistrationValidationService.searchEuTaxId(value, country.code)(
+                  hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch: Option[Match] =>
+                  if (mode == RejoinMode) {
+                    RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(successResult)
+                  } else {
+                    maybeMatch match {
+                      case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+                        Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
 
-                  case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
-                    Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
+                      case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                        Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
-                  case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
-                    Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
-
-                  case _ => for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.set(EuTaxReferencePage(index), value))
-                    _ <- cc.sessionRepository.set(updatedAnswers)
-                  } yield Redirect(EuTaxReferencePage(index).navigate(mode, updatedAnswers))
+                      case _ => successResult
+                    }
+                  }
                 }
               } else {
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(EuTaxReferencePage(index), value))
-                  _ <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(EuTaxReferencePage(index).navigate(mode, updatedAnswers))
+                successResult
               }
+            }
           )
       }
   }
-
 }
 
