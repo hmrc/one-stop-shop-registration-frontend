@@ -21,10 +21,11 @@ import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
+import models.core.Match
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode, PreviousScheme}
+import models.{Country, Index, Mode, PreviousScheme, RejoinMode}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -77,22 +78,33 @@ class PreviousIossNumberController @Inject()(
 
             form.bindFromRequest().fold(
               formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
+                Future.successful(BadRequest(
+                  view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
+              value => {
+                lazy val defaultResult: Future[Result] = saveAndRedirect(countryIndex, schemeIndex, value, mode)
 
-              value =>
                 if (appConfig.otherCountryRegistrationValidationEnabled) {
                   coreRegistrationValidationService.searchScheme(
                     searchNumber = value.previousSchemeNumber,
                     previousScheme = previousScheme,
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
-                  )(hc, request.toAuthenticatedOptionalDataRequest).map(RejoinRedirectService.redirectOnMatch).flatMap {
-                    case Some(redirect) => redirect.toFuture
-                    case None => saveAndRedirect(countryIndex, schemeIndex, value, mode)
+                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch: Option[Match] =>
+                    if (mode == RejoinMode) {
+                      RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult)
+                    } else {
+                      maybeMatch match {
+                        case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                          Future.successful(Redirect(
+                            controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
+                        case _ => defaultResult
+                      }
+                    }
                   }
                 } else {
-                  saveAndRedirect(countryIndex, schemeIndex, value, mode)
+                  defaultResult
                 }
+              }
             )
           }
         }
