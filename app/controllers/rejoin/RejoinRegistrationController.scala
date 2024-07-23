@@ -20,9 +20,9 @@ import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import controllers.actions._
 import logging.Logging
-import models.domain.{PreviousRegistration, PreviousRegistrationNew}
 import models.RejoinMode
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
+import models.domain.{PreviousRegistration, PreviousRegistrationNew}
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.AuthenticatedDataRequest
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -33,9 +33,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
+import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
-import viewmodels.checkAnswers._
 import viewmodels.govuk.all.{FluentSummaryListRow, SummaryListViewModel}
 import views.html.rejoin.RejoinRegistrationView
 
