@@ -95,9 +95,11 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
         logger.info("CheckEmailVerificationFilter - Not Verified")
         if (mode.contains(AmendMode)) {
           Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(AmendMode).url)))
+        } else if (mode.contains(RejoinMode)) {
+          Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(RejoinMode).url)))
         } else {
-          Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
-        }
+        Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
+      }
     }
   }
 }
