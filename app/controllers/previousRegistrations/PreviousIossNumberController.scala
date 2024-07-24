@@ -28,7 +28,9 @@ import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode, PreviousScheme, RejoinMode}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.RejoinRedirectService.logger
 import services.{CoreRegistrationValidationService, RejoinRedirectService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckJourneyRecovery.determineJourneyRecovery
@@ -89,17 +91,22 @@ class PreviousIossNumberController @Inject()(
                     previousScheme = previousScheme,
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
-                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch =>
-                    if (mode == RejoinMode) {
-                      RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult)
-                    } else {
-                      maybeMatch match {
-                        case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
-                          Future.successful(Redirect(
-                            controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
-                        case _ => defaultResult
+                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
+                    case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                      if (mode == RejoinMode) {
+                        Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+                          activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
+                            case Some(date) => date.toString
+                            case _ =>
+                              val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
+                              logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
+                              throw e
+                          })).toFuture
+                      } else {
+                        Future.successful(Redirect(
+                          controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
                       }
-                    }
+                    case _ => defaultResult
                   }
                 } else {
                   defaultResult
