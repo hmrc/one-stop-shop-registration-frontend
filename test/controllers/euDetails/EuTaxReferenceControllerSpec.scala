@@ -273,9 +273,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          //when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
-
+          
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
 
