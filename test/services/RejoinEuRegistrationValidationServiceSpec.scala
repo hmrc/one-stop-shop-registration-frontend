@@ -53,6 +53,38 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
     None
   )
 
+  val euVatRegistration = EuVatRegistration(Country("AT", "Austria"), "123456789")
+
+  val registrationWithFixedEstablishment = RegistrationWithFixedEstablishment(
+    Country("AT", "Austria"),
+    EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
+    TradeDetails(
+      "Irish trading name",
+      InternationalAddress(
+        line1 = "Line 1",
+        line2 = None,
+        townOrCity = "Town",
+        stateOrRegion = None,
+        None,
+        Country("IE", "Ireland")
+      ))
+  )
+
+  val registrationWithoutFixedEstablishmentWithTradeDetails = RegistrationWithoutFixedEstablishmentWithTradeDetails(
+    Country("AT", "Austria"),
+    EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
+    TradeDetails(
+      "Irish trading name",
+      InternationalAddress(
+        line1 = "Line 1",
+        line2 = None,
+        townOrCity = "Town",
+        stateOrRegion = None,
+        None,
+        Country("IE", "Ireland")
+      ))
+  )
+
   override def beforeEach() = {
     reset(coreRegistrationValidationService)
   }
@@ -63,8 +95,6 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
       val quarantinedTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
 
       "when the EU VAT registration matches to a quarantined trader" in {
-        val euVatRegistration = EuVatRegistration(Country("AT", "Austria"), "123456789")
-
         when(coreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())).thenReturn(Some(quarantinedTraderMatch).toFuture)
 
         val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(euVatRegistration)).futureValue.value
@@ -73,21 +103,6 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
       }
 
       "when the registration with fixed establishment matches to a quarantined trader" in {
-        val registrationWithFixedEstablishment = RegistrationWithFixedEstablishment(
-          Country("AT", "Austria"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
-          TradeDetails(
-            "Irish trading name",
-            InternationalAddress(
-              line1 = "Line 1",
-              line2 = None,
-              townOrCity = "Town",
-              stateOrRegion = None,
-              None,
-              Country("IE", "Ireland")
-            ))
-        )
-
         when(coreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())).thenReturn(Some(quarantinedTraderMatch).toFuture)
 
         val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(registrationWithFixedEstablishment)).futureValue.value
@@ -96,29 +111,12 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
       }
 
       "when the registration without fixed establishment matches to a quarantined trader" in {
-        val registrationWithoutFixedEstablishmentWithTradeDetails = RegistrationWithoutFixedEstablishmentWithTradeDetails(
-          Country("AT", "Austria"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
-          TradeDetails(
-            "Irish trading name",
-            InternationalAddress(
-              line1 = "Line 1",
-              line2 = None,
-              townOrCity = "Town",
-              stateOrRegion = None,
-              None,
-              Country("IE", "Ireland")
-            ))
-        )
-
         when(coreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())).thenReturn(Some(quarantinedTraderMatch).toFuture)
 
         val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(registrationWithoutFixedEstablishmentWithTradeDetails)).futureValue.value
         result mustBe Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
           genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString))
       }
-
-
     }
 
     "must redirect to RejoinAlreadyRegisteredOtherCountryController" - {
@@ -135,21 +133,6 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
       }
 
       "when the registration with fixed establishment matches to an active trader" in {
-        val registrationWithFixedEstablishment = RegistrationWithFixedEstablishment(
-          Country("AT", "Austria"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
-          TradeDetails(
-            "Irish trading name",
-            InternationalAddress(
-              line1 = "Line 1",
-              line2 = None,
-              townOrCity = "Town",
-              stateOrRegion = None,
-              None,
-              Country("IE", "Ireland")
-            ))
-        )
-
         when(coreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())).thenReturn(Some(activeTraderMatch).toFuture)
 
         val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(registrationWithFixedEstablishment)).futureValue.value
@@ -157,25 +140,34 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
       }
 
       "when the registration without fixed establishment matches to an active trader" in {
-        val registrationWithoutFixedEstablishmentWithTradeDetails = RegistrationWithoutFixedEstablishmentWithTradeDetails(
-          Country("AT", "Austria"),
-          EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
-          TradeDetails(
-            "Irish trading name",
-            InternationalAddress(
-              line1 = "Line 1",
-              line2 = None,
-              townOrCity = "Town",
-              stateOrRegion = None,
-              None,
-              Country("IE", "Ireland")
-            ))
-        )
-
         when(coreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())).thenReturn(Some(activeTraderMatch).toFuture)
 
         val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(registrationWithoutFixedEstablishmentWithTradeDetails)).futureValue.value
         result mustBe Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState))
+      }
+    }
+
+    "must not redirect" - {
+
+      "when the EU VAT registration matches to no trader" in {
+        when(coreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())).thenReturn(None.toFuture)
+
+        val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(euVatRegistration)).futureValue
+        result mustBe None
+      }
+
+      "when the registration with fixed establishment matches to no trader" in {
+        when(coreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())).thenReturn(None.toFuture)
+
+        val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(registrationWithFixedEstablishment)).futureValue
+        result mustBe None
+      }
+
+      "when the registration without fixed establishment matches to no trader" in {
+        when(coreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())).thenReturn(None.toFuture)
+
+        val result = rejoinEuRegistrationValidationService.validateEuRegistrations(Seq(registrationWithoutFixedEstablishmentWithTradeDetails)).futureValue
+        result mustBe None
       }
     }
   }
