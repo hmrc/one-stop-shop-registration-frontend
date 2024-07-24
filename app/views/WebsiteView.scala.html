@@ -41,6 +41,7 @@
                 label = LabelViewModel(messages("website.heading")).asPageHeading()
             )
             .withWidth(Full)
+            .withHint(HintViewModel(HtmlContent(Html(messages("website.hint")))))
         )
 
     @button("site.continue",  routes.WebsiteController.onPageLoad(mode, index).url, mode)
