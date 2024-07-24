@@ -63,6 +63,8 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
       when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
+      when(mockCoreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())) thenReturn None.toFuture
+      when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -76,7 +78,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         val request = FakeRequest(GET, controllers.rejoin.routes.StartRejoinJourneyController.onPageLoad().url)
 
         val result = route(application, request).value
-
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url
@@ -104,7 +105,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         val request = FakeRequest(GET, controllers.rejoin.routes.StartRejoinJourneyController.onPageLoad().url)
 
         val result = route(application, request).value
-
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
