@@ -216,8 +216,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(genericMatch))
 
-          when(mockCoreRegistrationValidationService.isActiveTrader(genericMatch)) thenReturn true
-
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
 
@@ -246,8 +244,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
 
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
@@ -278,7 +274,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
+          //when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
 
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
@@ -310,8 +306,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
-
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
 
@@ -340,8 +334,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
 
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
@@ -372,8 +364,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
-
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
 
@@ -402,8 +392,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn false
 
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))
@@ -435,8 +423,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn false
 
           val request = FakeRequest(POST, euTaxReferenceSubmitRoute)
             .withFormUrlEncodedBody(("value", taxReferenceNumber))

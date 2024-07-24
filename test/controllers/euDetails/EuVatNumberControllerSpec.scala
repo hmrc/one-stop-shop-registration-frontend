@@ -210,8 +210,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(genericMatch))
 
-          when(mockCoreRegistrationValidationService.isActiveTrader(genericMatch)) thenReturn true
-
           val request =
             FakeRequest(POST, euVatNumberSubmitRoute)
               .withFormUrlEncodedBody(("value", euVrn))
@@ -242,8 +240,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
 
           val request =
             FakeRequest(POST, euVatNumberSubmitRoute)
@@ -276,8 +272,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn true
-
           val request =
             FakeRequest(POST, euVatNumberSubmitRoute)
               .withFormUrlEncodedBody(("value", euVrn))
@@ -308,8 +302,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
-
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))
 
@@ -338,8 +330,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
 
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))
@@ -370,8 +360,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn true
-
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))
 
@@ -400,8 +388,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isActiveTrader(expectedResponse)) thenReturn false
 
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))
@@ -433,8 +419,6 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
-
-          when(mockCoreRegistrationValidationService.isQuarantinedTrader(expectedResponse)) thenReturn false
 
           val request = FakeRequest(POST, euVatNumberSubmitRoute)
             .withFormUrlEncodedBody(("value", euVrn))

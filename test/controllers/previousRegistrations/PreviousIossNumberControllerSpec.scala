@@ -146,7 +146,6 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Some(genericMatch))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -179,8 +178,6 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
-        when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
