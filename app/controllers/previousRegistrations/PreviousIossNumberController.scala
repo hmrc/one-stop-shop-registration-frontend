@@ -89,7 +89,7 @@ class PreviousIossNumberController @Inject()(
                     previousScheme = previousScheme,
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
-                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch: Option[Match] =>
+                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch =>
                     if (mode == RejoinMode) {
                       RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult)
                     } else {

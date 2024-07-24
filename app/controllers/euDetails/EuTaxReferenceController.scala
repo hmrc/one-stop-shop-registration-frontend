@@ -80,7 +80,7 @@ class EuTaxReferenceController @Inject()(
 
               if (appConfig.otherCountryRegistrationValidationEnabled) {
                 coreRegistrationValidationService.searchEuTaxId(value, country.code)(
-                  hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch: Option[Match] =>
+                  hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch =>
                   if (mode == RejoinMode) {
                     RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(successResult)
                   } else {
