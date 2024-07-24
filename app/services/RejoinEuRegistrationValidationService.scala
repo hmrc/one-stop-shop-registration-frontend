@@ -28,8 +28,7 @@ class RejoinEuRegistrationValidationService @Inject()(coreRegistrationValidation
 
   def validateEuRegistrations(euRegistrations: Seq[EuTaxRegistration])
                              (implicit hc: HeaderCarrier,
-                              request: AuthenticatedOptionalDataRequest[_],
-                              ec: ExecutionContext): Future[Option[Result]] = {
+                              request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
     euRegistrations match {
       case head +: tail => validateSingleEuTaxRegistration(head).flatMap {
         case None => validateEuRegistrations(tail)
