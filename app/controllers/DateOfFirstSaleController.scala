@@ -20,17 +20,17 @@ import controllers.actions._
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
 import models.requests.AuthenticatedDataRequest
-import models.{AmendMode, Mode, RejoinMode}
+import models.{AmendMode, Mode}
 import pages.DateOfFirstSalePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{DateService, RegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DateOfFirstSaleUtil
 import utils.FutureSyntax.FutureOps
 import views.html.DateOfFirstSaleView
 
-import java.time.format.DateTimeFormatter
 import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,10 +40,11 @@ class DateOfFirstSaleController @Inject()(
                                            cc: AuthenticatedControllerComponents,
                                            formProvider: DateOfFirstSaleFormProvider,
                                            view: DateOfFirstSaleView,
-                                           dateService: DateService,
+                                           val dateService: DateService,
                                            registrationService: RegistrationService,
-                                           clock: Clock
-                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                           val clock: Clock
+                                         )(implicit ec: ExecutionContext) extends FrontendBaseController
+  with I18nSupport with DateOfFirstSaleUtil {
 
   private def createFutureForm(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Form[LocalDate]] = {
     if (mode == AmendMode) {
@@ -96,17 +97,4 @@ class DateOfFirstSaleController @Inject()(
         )
       }
   }
-
-  private def getEarliestDateAllowed(mode: Mode, dateTimeFormatter: DateTimeFormatter)(implicit request: AuthenticatedDataRequest[AnyContent]) = {
-    if (mode == AmendMode || mode == RejoinMode) {
-      request.registration.flatMap(_.submissionReceived) match {
-        case Some(submissionReceived) =>
-          dateService.earliestSaleAllowed(submissionReceived.atZone(clock.getZone).toLocalDate).format(dateTimeFormatter)
-        case _ => dateService.earliestSaleAllowed().format(dateTimeFormatter)
-      }
-    } else {
-      dateService.earliestSaleAllowed().format(dateTimeFormatter)
-    }
-  }
-
 }
