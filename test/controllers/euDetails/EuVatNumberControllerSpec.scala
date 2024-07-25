@@ -17,23 +17,28 @@
 package controllers.euDetails
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.euDetails.EuVatNumberFormProvider
 import models.core.{Match, MatchType}
-import models.{Country, CountryWithValidationDetails, Index, NormalMode}
+import models.{Country, CountryWithValidationDetails, Index, Mode, NormalMode, RejoinMode}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuVatNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.CoreRegistrationValidationService
+import services.{CoreRegistrationValidationService, RejoinRegistrationService}
+import testutils.RegistrationData.registration
 import views.html.euDetails.EuVatNumberView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
-class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
+class EuVatNumberControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val index = Index(0)
 
@@ -44,11 +49,10 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val euVatNumberRoute = routes.EuVatNumberController.onPageLoad(NormalMode, index).url
 
-  private lazy val euVatNumberSubmitRoute = routes.EuVatNumberController.onSubmit(NormalMode, index).url
+  private def euVatNumberSubmitRoute(mode: Mode = NormalMode): String =
+    routes.EuVatNumberController.onSubmit(mode, index).url
 
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
-
-  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   private val genericMatch = Match(
     MatchType.FixedEstablishmentActiveNETP,
@@ -57,10 +61,20 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
     "DE",
     None,
     None,
-    None,
+    exclusionEffectiveDate = Some(LocalDate.now),
     None,
     None
   )
+
+  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+  private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
+
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockCoreRegistrationValidationService)
+    Mockito.reset(mockRegistrationConnector)
+    Mockito.reset(mockRejoinRegistrationService)
+  }
 
   "EuVatNumber Controller" - {
 
@@ -211,7 +225,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
             Future.successful(Option(genericMatch))
 
           val request =
-            FakeRequest(POST, euVatNumberSubmitRoute)
+            FakeRequest(POST, euVatNumberSubmitRoute())
               .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -242,7 +256,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
             Future.successful(Option(expectedResponse))
 
           val request =
-            FakeRequest(POST, euVatNumberSubmitRoute)
+            FakeRequest(POST, euVatNumberSubmitRoute())
               .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -273,7 +287,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
             Future.successful(Option(expectedResponse))
 
           val request =
-            FakeRequest(POST, euVatNumberSubmitRoute)
+            FakeRequest(POST, euVatNumberSubmitRoute())
               .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -302,7 +316,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -331,7 +345,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -360,7 +374,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -389,7 +403,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -420,7 +434,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -449,7 +463,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
           when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
             Future.successful(None)
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value
@@ -458,6 +472,215 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual EuVatNumberPage(index).navigate(NormalMode, expectedAnswers).url
+        }
+      }
+
+      "must redirect to RejoinAlreadyRegisteredOtherCountryController page when matchType=FixedEstablishmentActiveNETP and mode=RejoinMode" in {
+
+        val euVrn: String = "SI33333333"
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService),
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService)
+          ).build()
+
+        running(application) {
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
+            Future.successful(Option(genericMatch))
+
+          val request =
+            FakeRequest(POST, euVatNumberSubmitRoute(RejoinMode))
+              .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url
+        }
+      }
+
+      "must redirect to RejoinAlreadyRegisteredOtherCountryController page when matchType=TraderIdActiveNETP and mode=RejoinMode" in {
+
+        val euVrn: String = "SI33333333"
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService),
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request =
+            FakeRequest(POST, euVatNumberSubmitRoute(RejoinMode))
+              .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url
+        }
+      }
+
+      "must redirect to RejoinAlreadyRegisteredOtherCountryController page when matchType=OtherMSNETPActiveNETP and mode=RejoinMode" in {
+
+        val euVrn: String = "SI33333333"
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService),
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request =
+            FakeRequest(POST, euVatNumberSubmitRoute(RejoinMode))
+              .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url
+        }
+      }
+
+      "must redirect to CannotRejoinQuarantinedCountryController page when the vat number is excluded for match FixedEstablishmentQuarantinedNETP and mode=RejoinMode" in {
+
+        val euVrn: String = "SI33333333"
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService),
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute(RejoinMode))
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+            expectedResponse.memberState, expectedResponse.exclusionEffectiveDate.mkString).url
+        }
+      }
+
+      "must redirect to CannotRejoinQuarantinedCountryController page when the vat number is excluded for match TraderIdQuarantinedNETP and mode=RejoinMode" in {
+
+        val euVrn: String = "SI33333333"
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService),
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute(RejoinMode))
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+            expectedResponse.memberState, expectedResponse.exclusionEffectiveDate.mkString).url
+        }
+      }
+
+      "must redirect to CannotRejoinQuarantinedCountryController page when the vat number is excluded for match OtherMSNETPQuarantinedNETP and mode=RejoinMode" in {
+
+        val euVrn: String = "SI33333333"
+
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application = applicationBuilder(userAnswers = Some(baseUserAnswers))
+          .configure(
+            "features.other-country-reg-validation-enabled" -> true
+          )
+          .overrides(
+            bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService),
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService)
+          ).build()
+
+        running(application) {
+
+          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euVrn), eqTo(country.code), any())(any(), any())) thenReturn
+            Future.successful(Option(expectedResponse))
+
+          val request = FakeRequest(POST, euVatNumberSubmitRoute(RejoinMode))
+            .withFormUrlEncodedBody(("value", euVrn))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+            expectedResponse.memberState, expectedResponse.exclusionEffectiveDate.mkString).url
         }
       }
     }
@@ -478,7 +701,7 @@ class EuVatNumberControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          val request = FakeRequest(POST, euVatNumberSubmitRoute)
+          val request = FakeRequest(POST, euVatNumberSubmitRoute())
             .withFormUrlEncodedBody(("value", euVrn))
 
           val result = route(application, request).value

@@ -48,8 +48,6 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
 
-  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
-
   private val genericMatch = Match(
     MatchType.FixedEstablishmentActiveNETP,
     "333333333",
@@ -62,13 +60,14 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
     None
   )
 
-  private val mockRegistrationConnector = mock[RegistrationConnector]
-  private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
-
   private lazy val euTaxReferenceRoute: String = routes.EuTaxReferenceController.onPageLoad(NormalMode, index).url
 
   private def euTaxReferenceSubmitRoute(mode: Mode = NormalMode): String =
     routes.EuTaxReferenceController.onSubmit(mode, index).url
+
+  private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
+  private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockCoreRegistrationValidationService)
