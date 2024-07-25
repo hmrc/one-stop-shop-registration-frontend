@@ -16,7 +16,6 @@
 
 package models
 
-import models.etmp.SchemeType
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
@@ -24,24 +23,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 sealed trait PreviousScheme
 
 object PreviousScheme extends Enumerable.Implicits {
-
-  def fromEmtpSchemeType(etmpSchemeType: SchemeType): PreviousScheme = {
-    etmpSchemeType match {
-      case SchemeType.OSSUnion => OSSU
-      case SchemeType.OSSNonUnion => OSSNU
-      case SchemeType.IOSSWithoutIntermediary => IOSSWOI
-      case SchemeType.IOSSWithIntermediary => IOSSWI
-    }
-  }
-
-  def toEmtpSchemaType(previousScheme: PreviousScheme): SchemeType = {
-    previousScheme match {
-      case OSSU => SchemeType.OSSUnion
-      case OSSNU => SchemeType.OSSNonUnion
-      case IOSSWOI => SchemeType.IOSSWithoutIntermediary
-      case IOSSWI => SchemeType.IOSSWithIntermediary
-    }
-  }
 
   case object OSSU extends WithName("ossu") with PreviousScheme
 
@@ -60,15 +41,6 @@ object PreviousScheme extends Enumerable.Implicits {
   )
 
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
-      RadioItem(
-        content = Text(messages(s"previousScheme.${value.toString}")),
-        value = Some(value.toString),
-        id = Some(s"value_$index")
-      )
-  }
-
-  def iossOptions(implicit messages: Messages): Seq[RadioItem] = iossValues.zipWithIndex.map {
     case (value, index) =>
       RadioItem(
         content = Text(messages(s"previousScheme.${value.toString}")),
