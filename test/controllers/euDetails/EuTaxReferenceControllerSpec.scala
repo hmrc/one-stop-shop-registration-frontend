@@ -65,8 +65,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
 
-  private def euTaxReferenceRoute(mode: Mode = NormalMode): String =
-    routes.EuTaxReferenceController.onPageLoad(mode, index).url
+  private lazy val euTaxReferenceRoute: String = routes.EuTaxReferenceController.onPageLoad(NormalMode, index).url
 
   private def euTaxReferenceSubmitRoute(mode: Mode = NormalMode): String =
     routes.EuTaxReferenceController.onSubmit(mode, index).url
@@ -88,7 +87,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, euTaxReferenceRoute())
+        val request = FakeRequest(GET, euTaxReferenceRoute)
 
         val result = route(application, request).value
 
@@ -110,7 +109,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, euTaxReferenceRoute())
+        val request = FakeRequest(GET, euTaxReferenceRoute)
 
         val view = application.injector.instanceOf[EuTaxReferenceView]
 
@@ -137,7 +136,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
       running(application) {
         val request =
-          FakeRequest(POST, euTaxReferenceRoute())
+          FakeRequest(POST, euTaxReferenceRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
@@ -155,7 +154,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
       running(application) {
         val request =
-          FakeRequest(POST, euTaxReferenceRoute())
+          FakeRequest(POST, euTaxReferenceRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -174,7 +173,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, euTaxReferenceRoute())
+        val request = FakeRequest(GET, euTaxReferenceRoute)
 
         val result = route(application, request).value
 
@@ -188,7 +187,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
-        val request = FakeRequest(GET, euTaxReferenceRoute())
+        val request = FakeRequest(GET, euTaxReferenceRoute)
 
         val result = route(application, request).value
 
@@ -203,7 +202,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
       running(application) {
         val request =
-          FakeRequest(POST, euTaxReferenceRoute())
+          FakeRequest(POST, euTaxReferenceRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
