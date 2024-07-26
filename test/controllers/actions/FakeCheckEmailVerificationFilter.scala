@@ -25,6 +25,5 @@ import scala.concurrent.ExecutionContext
 class FakeCheckEmailVerificationFilter extends CheckEmailVerificationFilterProvider(
   mock[FrontendAppConfig],
   mock[EmailVerificationService],
-  mock[SaveForLaterService],
-  mock[RegistrationConnector])(ExecutionContext.Implicits.global) {
+  mock[SaveForLaterService])(ExecutionContext.Implicits.global) {
 }

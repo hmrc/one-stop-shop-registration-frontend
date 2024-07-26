@@ -17,7 +17,6 @@
 package controllers.actions
 
 import config.FrontendAppConfig
-import connectors.RegistrationConnector
 import logging.Logging
 import models.{AmendMode, BusinessContactDetails, Mode, NormalMode, RejoinMode}
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
@@ -38,7 +37,6 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
                                        frontendAppConfig: FrontendAppConfig,
                                        emailVerificationService: EmailVerificationService,
                                        saveForLaterService: SaveForLaterService,
-                                       registrationConnector: RegistrationConnector
                                       )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
@@ -50,7 +48,7 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
       request.userAnswers.get(BusinessContactDetailsPage) match {
         case Some(contactDetails) =>
           if (mode.contains(AmendMode) || mode.contains(RejoinMode)) {
-            registrationConnector.getRegistration()(hc).flatMap {
+            request.registration match {
               case Some(registration) =>
                 if (registration.contactDetails.emailAddress != contactDetails.emailAddress) {
                   checkVerificationStatusAndGetRedirect(request, contactDetails)
@@ -108,10 +106,9 @@ class CheckEmailVerificationFilterProvider @Inject()(
                                                       frontendAppConfig: FrontendAppConfig,
                                                       emailVerificationService: EmailVerificationService,
                                                       saveForLaterService: SaveForLaterService,
-                                                      registrationConnector: RegistrationConnector
                                                     )(implicit val executionContext: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckEmailVerificationFilterImpl = {
-    new CheckEmailVerificationFilterImpl(mode, frontendAppConfig, emailVerificationService, saveForLaterService, registrationConnector)
+    new CheckEmailVerificationFilterImpl(mode, frontendAppConfig, emailVerificationService, saveForLaterService)
   }
 }
 
