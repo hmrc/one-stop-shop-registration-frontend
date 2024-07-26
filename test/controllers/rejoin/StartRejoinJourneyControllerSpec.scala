@@ -19,30 +19,48 @@ package controllers.rejoin
 import base.SpecBase
 import connectors.RegistrationConnector
 import models.RejoinMode
+import models.core.{Match, MatchType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
+import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.{CoreRegistrationValidationService, RegistrationService, RejoinRegistrationService}
+import services._
 import testutils.RegistrationData
 import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
+
+import java.time.LocalDate
 
 
 class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach{
 
   private val registration = RegistrationData.registration
 
+  private val genericMatch = Match(
+    MatchType.FixedEstablishmentActiveNETP,
+    "33333333",
+    None,
+    "DE",
+    None,
+    None,
+    exclusionEffectiveDate = Some(LocalDate.now),
+    None,
+    None
+  )
+
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockRegistrationService = mock[RegistrationService]
   private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
   private val mockAuthenticatedUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+  private val mockRejoinPreviousRegistrationValidationService = mock[RejoinPreviousRegistrationValidationService]
+  private val mockRejoinEuRegistrationValidationService = mock[RejoinEuRegistrationValidationService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockRegistrationConnector)
@@ -50,6 +68,8 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
     Mockito.reset(mockRejoinRegistrationService)
     Mockito.reset(mockAuthenticatedUserAnswersRepository)
     Mockito.reset(mockCoreRegistrationValidationService)
+    Mockito.reset(mockRejoinPreviousRegistrationValidationService)
+    Mockito.reset(mockRejoinEuRegistrationValidationService)
   }
 
   "StartRejoinJourney Controller" - {
@@ -125,6 +145,72 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.NiProtocolExpiredController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the page returned by previous registration validation" in {
+      val redirectPage = controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+        genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString)
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
+      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+      when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
+      when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+      when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+      when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
+      when(mockRejoinPreviousRegistrationValidationService.validatePreviousRegistrations(any())(any(), any())) thenReturn Some(Redirect(redirectPage)).toFuture
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
+        .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
+        .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+        .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+        .overrides(bind[RejoinPreviousRegistrationValidationService].toInstance(mockRejoinPreviousRegistrationValidationService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.rejoin.routes.StartRejoinJourneyController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe redirectPage.url
+      }
+    }
+
+    "must redirect to the page returned by EU Registration validation" in {
+      val redirectPage = controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(
+        genericMatch.memberState)
+
+      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
+      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+      when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
+      when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+      when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+      when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+      when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
+      when(mockRejoinPreviousRegistrationValidationService.validatePreviousRegistrations(any())(any(), any())) thenReturn None.toFuture
+      when(mockRejoinEuRegistrationValidationService.validateEuRegistrations(any())(any(), any())) thenReturn Some(Redirect(redirectPage)).toFuture
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
+        .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
+        .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+        .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+        .overrides(bind[RejoinPreviousRegistrationValidationService].toInstance(mockRejoinPreviousRegistrationValidationService))
+        .overrides(bind[RejoinEuRegistrationValidationService].toInstance(mockRejoinEuRegistrationValidationService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.rejoin.routes.StartRejoinJourneyController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe redirectPage.url
       }
     }
   }

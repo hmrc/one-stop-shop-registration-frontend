@@ -60,7 +60,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
     reset(coreRegistrationValidationService)
   }
 
-  ".validateEuRegistrations" - {
+  ".validatePreviousRegistrations" - {
 
     "must redirect to CannotRejoinQuarantinedCountryController when the previous registration matches to a quarantined trader" in {
       val quarantinedTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
