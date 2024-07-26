@@ -17,15 +17,19 @@
 package controllers
 
 import controllers.actions._
+import formats.Format.dateFormatter
 import forms.HasMadeSalesFormProvider
 import models.SalesChannels.Mixed
 import models.{Mode, UserAnswers}
 import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.DateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DateOfFirstSaleUtil
 import views.html.HasMadeSalesView
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,8 +37,11 @@ class HasMadeSalesController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: HasMadeSalesFormProvider,
-                                        view: HasMadeSalesView
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        view: HasMadeSalesView,
+                                        val dateService: DateService,
+                                        val clock: Clock
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController
+  with I18nSupport with DateOfFirstSaleUtil {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -47,7 +54,7 @@ class HasMadeSalesController @Inject()(
         case None => form
       }
 
-      Ok(view(preparedForm, mode, showHintText(request.userAnswers)))
+      Ok(view(preparedForm, mode, showHintText(request.userAnswers), getEarliestDateAllowed(mode, dateFormatter)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
@@ -55,7 +62,10 @@ class HasMadeSalesController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, showHintText(request.userAnswers)))),
+          Future.successful(BadRequest(view(
+            formWithErrors, mode, showHintText(request.userAnswers),
+            getEarliestDateAllowed(mode, dateFormatter)
+          ))),
 
         value => {
           val updatedAnswersFuture = for {

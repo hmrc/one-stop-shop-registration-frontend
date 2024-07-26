@@ -587,7 +587,7 @@ dateOfFirstSale.change.hidden = date your sales start to be included in this sch
 
 hasMadeSales.title = Have you already made eligible sales?
 hasMadeSales.heading = Have you already made eligible sales?
-hasMadeSales.rejoin.heading = Have you made eligible sales since 1 April 2024?
+hasMadeSales.rejoin.heading = Have you made eligible sales since {0}?
 hasMadeSales.caption = These are sales of goods from Northern Ireland or an EU country to consumers in other EU countries.
 hasMadeSales.caption.excludeSales = <p>Do not include sales made on online marketplaces.</p>
 hasMadeSales.caption.youCanStillRegister = <p>You can still register, even if you have not made eligible sales.</p>

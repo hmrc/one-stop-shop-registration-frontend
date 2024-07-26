@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import formats.Format.dateFormatter
 import forms.HasMadeSalesFormProvider
 import models.NormalMode
 import models.SalesChannels.Mixed
@@ -32,6 +33,7 @@ import views.html.HasMadeSalesView
 
 import scala.concurrent.Future
 import org.scalatest.PrivateMethodTester
+import services.{CoreRegistrationValidationService, DateService}
 
 class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with PrivateMethodTester {
 
@@ -39,6 +41,10 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
   private val form = formProvider()
 
   private lazy val hasMadeSalesRoute = routes.HasMadeSalesController.onPageLoad(NormalMode).url
+
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+  private val dateService       = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
+  private val dateFormatted     = dateService.earliestSaleAllowed().format(dateFormatter)
 
   "HasMadeSales Controller" - {
 
@@ -54,7 +60,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
         val view = application.injector.instanceOf[HasMadeSalesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, false, dateFormatted)(request, messages(application)).toString
       }
     }
 
@@ -71,7 +77,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
         val view = application.injector.instanceOf[HasMadeSalesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, false, dateFormatted)(request, messages(application)).toString
       }
     }
 
@@ -116,7 +122,7 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, false)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, false, dateFormatted)(request, messages(application)).toString
       }
     }
 
@@ -173,7 +179,8 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
         contentAsString(result) mustEqual view(
           form,
           NormalMode,
-          controller invokePrivate showHintTextMethod(userAnswers)
+          controller invokePrivate showHintTextMethod(userAnswers),
+          dateFormatted
         )(request, messages(application)).toString
       }
     }
@@ -197,7 +204,8 @@ class HasMadeSalesControllerSpec extends SpecBase with MockitoSugar with Private
         contentAsString(result) mustEqual view(
           form,
           NormalMode,
-          controller invokePrivate showHintTextMethod(basicUserAnswersWithVatInfo)
+          controller invokePrivate showHintTextMethod(basicUserAnswersWithVatInfo),
+          dateFormatted
         )(request, messages(application)).toString
       }
     }

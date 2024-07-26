@@ -24,7 +24,7 @@
     button: ButtonGroup
 )
 
-@(form: Form[_], mode: Mode, hintTextFlag: Boolean)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, hintTextFlag: Boolean, dateFormatted: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("hasMadeSales.title"))) {
 
@@ -38,7 +38,7 @@
             @govukRadios(
                 RadiosViewModel.yesNo(
                     field = form("value"),
-                    legend = LegendViewModel(messages("hasMadeSales.rejoin.heading")).asPageHeading(),
+                    legend = LegendViewModel(messages("hasMadeSales.rejoin.heading", dateFormatted)).asPageHeading(),
                 ).withHint(HintViewModel(HtmlContent(Html(messages("hasMadeSales.caption.youCanStillRegister")))))
             )
         } else {
