@@ -97,51 +97,55 @@ class RejoinRegistrationController @Inject()(
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData(Some(RejoinMode)).async {
     implicit request =>
 
-      val date = LocalDate.now(clock)
-      val maybeRegistration = request.registration match {
-        case Some(reg) => Future.successful(reg)
-        case None => registrationConnector.getRegistration().map(_.getOrElse(throw new IllegalStateException("Registration data is missing in the request")))
-      }
+      getFirstValidationErrorRedirect(RejoinMode).map { redirect =>
+        Future.successful(redirect)
+      }.getOrElse {
+        val date = LocalDate.now(clock)
+        val maybeRegistration = request.registration match {
+          case Some(reg) => Future.successful(reg)
+          case None => registrationConnector.getRegistration().map(_.getOrElse(throw new IllegalStateException("Registration data is missing in the request")))
+        }
 
-      maybeRegistration.flatMap { registration =>
-        val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, registration.excludedTrader)
+        maybeRegistration.flatMap { registration =>
+          val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, registration.excludedTrader)
 
-        if (canRejoin) {
-          registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
-            case Valid(registration) =>
-              registrationConnector.amendRegistration(registration).flatMap {
-                case Right(_) =>
-                  auditService.audit(
-                    RegistrationAuditModel.build(
-                      RegistrationAuditType.AmendRegistration,
-                      registration,
-                      SubmissionResult.Success,
-                      request
-                    ))
-                  Redirect(routes.RejoinCompleteController.onPageLoad()).toFuture
+          if (canRejoin) {
+            registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
+              case Valid(registration) =>
+                registrationConnector.amendRegistration(registration).flatMap {
+                  case Right(_) =>
+                    auditService.audit(
+                      RegistrationAuditModel.build(
+                        RegistrationAuditType.AmendRegistration,
+                        registration,
+                        SubmissionResult.Success,
+                        request
+                      ))
+                    Redirect(routes.RejoinCompleteController.onPageLoad()).toFuture
 
-                case Left(e) =>
-                  logger.error(s"Unexpected result on submit: ${e.toString}")
-                  auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
-                  Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
-              }
-
-            case Invalid(errors) =>
-              getFirstValidationErrorRedirect(RejoinMode).map(
-                errorRedirect => if (incompletePrompt) {
-                  errorRedirect.toFuture
-                } else {
-                  Redirect(controllers.rejoin.routes.RejoinRegistrationController.onPageLoad()).toFuture
+                  case Left(e) =>
+                    logger.error(s"Unexpected result on submit: ${e.toString}")
+                    auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
+                    Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
                 }
-              ).getOrElse {
-                val errorList = errors.toChain.toList
-                val errorMessages = errorList.map(_.errorMessage).mkString("\n")
-                logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-                Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
-              }
+
+              case Invalid(errors) =>
+                getFirstValidationErrorRedirect(RejoinMode).map(
+                  errorRedirect => if (incompletePrompt) {
+                    errorRedirect.toFuture
+                  } else {
+                    Redirect(controllers.rejoin.routes.RejoinRegistrationController.onPageLoad()).toFuture
+                  }
+                ).getOrElse {
+                  val errorList = errors.toChain.toList
+                  val errorMessages = errorList.map(_.errorMessage).mkString("\n")
+                  logger.error(s"Unable to create a registration request from user answers: $errorMessages")
+                  Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
+                }
+            }
+          } else {
+            Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
           }
-        } else {
-          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
         }
       }
   }

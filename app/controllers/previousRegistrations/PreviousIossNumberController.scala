@@ -21,17 +21,14 @@ import controllers.GetCountry
 import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
-import models.core.Match
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode, PreviousScheme, RejoinMode}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.RejoinRedirectService.logger
-import services.{CoreRegistrationValidationService, RejoinRedirectService}
+import services.CoreRegistrationValidationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
@@ -64,7 +61,8 @@ class PreviousIossNumberController @Inject()(
             case Some(value) => form.fill(value)
           }
 
-          Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
+          Future.successful(Ok(view(
+            preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
         }
       }
   }

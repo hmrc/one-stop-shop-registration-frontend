@@ -18,24 +18,23 @@ package controllers
 
 import controllers.actions._
 import forms.HasMadeSalesFormProvider
-import models.{Mode, RejoinMode, UserAnswers}
 import models.SalesChannels.Mixed
-import pages.{BusinessBasedInNiPage, DateOfFirstSalePage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
+import models.{Mode, UserAnswers}
+import pages.{BusinessBasedInNiPage, HasFixedEstablishmentInNiPage, HasMadeSalesPage, SalesChannelsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FutureSyntax.FutureOps
 import views.html.HasMadeSalesView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class HasMadeSalesController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: HasMadeSalesFormProvider,
-                                         view: HasMadeSalesView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        override val messagesApi: MessagesApi,
+                                        cc: AuthenticatedControllerComponents,
+                                        formProvider: HasMadeSalesFormProvider,
+                                        view: HasMadeSalesView
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -45,7 +44,7 @@ class HasMadeSalesController @Inject()(
 
       val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
         case Some(answer) => form.fill(answer)
-        case None         => form
+        case None => form
       }
 
       Ok(view(preparedForm, mode, showHintText(request.userAnswers)))
@@ -58,25 +57,16 @@ class HasMadeSalesController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, showHintText(request.userAnswers)))),
 
-        value =>
-          if (mode == RejoinMode) {
-            val updatedAnswersFuture = for {
-              updateAnswers <- Future.fromTry(request.userAnswers.remove(DateOfFirstSalePage))
-              updatedAnswers <- Future.fromTry(updateAnswers.set(HasMadeSalesPage, value))
-              _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield updatedAnswers
+        value => {
+          val updatedAnswersFuture = for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
+            _ <- cc.sessionRepository.set(updatedAnswers)
+          } yield updatedAnswers
 
-            updatedAnswersFuture.flatMap { updatedAnswers =>
-              Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers)).toFuture
-            }
-          } else {
-            val updatedAnswersFuture = for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(HasMadeSalesPage, value))
-              _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield updatedAnswers
-
-            updatedAnswersFuture.map(updatedAnswers => Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers)))
+          updatedAnswersFuture.map { updatedAnswers =>
+            Redirect(HasMadeSalesPage.navigate(mode, updatedAnswers))
           }
+        }
       )
   }
 

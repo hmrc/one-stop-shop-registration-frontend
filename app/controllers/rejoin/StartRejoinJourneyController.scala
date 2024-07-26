@@ -22,7 +22,7 @@ import logging.Logging
 import models.RejoinMode
 import models.domain.Registration
 import models.requests.AuthenticatedOptionalDataRequest
-import pages.HasMadeSalesPage
+import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.AuthenticatedUserAnswersRepository
@@ -58,11 +58,17 @@ class StartRejoinJourneyController @Inject()(
             case Some(redirect) => redirect.toFuture
             case None => registrationConnector.getVatCustomerInfo().flatMap {
               case Right(vatInfo) =>
-                for {
-                  userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                  updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                  _ <- authenticatedUserAnswersRepository.set(updatedAnswers)
-                } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+                vatInfo.deregistrationDecisionDate match {
+                  case Some(_) =>
+                    Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+                  case None =>
+                    for {
+                      userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                      updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                      updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
+                      _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
+                    } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+                }
 
               case Left(error) =>
                 val exception = new Exception(error.body)
