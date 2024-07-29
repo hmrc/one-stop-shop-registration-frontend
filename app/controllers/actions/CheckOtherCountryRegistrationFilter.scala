@@ -42,9 +42,10 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(mode: Option[Mode],
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    implicit val req: AuthenticatedDataRequest[A] = request
 
     if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode) || !mode.contains(RejoinMode)) {
-      service.searchUkVrn(request.vrn)(hc, request.toAuthenticatedOptionalDataRequest).map {
+      service.searchUkVrn(request.vrn).map {
 
         case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
           Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))

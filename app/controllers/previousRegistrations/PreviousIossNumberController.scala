@@ -89,7 +89,7 @@ class PreviousIossNumberController @Inject()(
                     previousScheme = previousScheme,
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
-                  )(hc, request.toAuthenticatedOptionalDataRequest).flatMap {
+                  ).flatMap {
                     case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
                       if (mode == RejoinMode) {
                         Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(

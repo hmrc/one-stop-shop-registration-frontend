@@ -127,7 +127,7 @@ class PreviousOssNumberController @Inject()(
         previousScheme = previousScheme,
         intermediaryNumber = None,
         countryCode = country.code
-      )(hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch =>
+      ).flatMap { maybeMatch =>
         if (mode == RejoinMode) {
           RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult)
         } else {

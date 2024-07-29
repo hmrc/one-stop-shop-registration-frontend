@@ -86,8 +86,7 @@ class EuVatNumberController @Inject()(
               if (appConfig.otherCountryRegistrationValidationEnabled) {
                 val isOtherMS = !request.userAnswers.get(SellsGoodsToEUConsumersPage(index)).getOrElse(false)
 
-                coreRegistrationValidationService.searchEuVrn(value, country.code, isOtherMS)(
-                  hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch =>
+                coreRegistrationValidationService.searchEuVrn(value, country.code, isOtherMS).flatMap { maybeMatch =>
                   if (mode == RejoinMode) {
                     RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(successResult)
                   } else {

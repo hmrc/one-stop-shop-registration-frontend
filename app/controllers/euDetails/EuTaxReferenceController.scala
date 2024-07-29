@@ -20,7 +20,6 @@ import config.FrontendAppConfig
 import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuTaxReferenceFormProvider
-import models.core.Match
 import models.{Index, Mode, RejoinMode}
 import pages.euDetails.EuTaxReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -67,7 +66,6 @@ class EuTaxReferenceController @Inject()(
 
           val form = formProvider(country)
 
-
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, mode, index, country))),
@@ -79,8 +77,7 @@ class EuTaxReferenceController @Inject()(
               } yield Redirect(EuTaxReferencePage(index).navigate(mode, updatedAnswers))
 
               if (appConfig.otherCountryRegistrationValidationEnabled) {
-                coreRegistrationValidationService.searchEuTaxId(value, country.code)(
-                  hc, request.toAuthenticatedOptionalDataRequest).flatMap { maybeMatch =>
+                coreRegistrationValidationService.searchEuTaxId(value, country.code).flatMap { maybeMatch =>
                   if (mode == RejoinMode) {
                     RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(successResult)
                   } else {
