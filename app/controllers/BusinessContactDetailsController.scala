@@ -70,13 +70,6 @@ class BusinessContactDetailsController @Inject()(
 
         value => {
 
-          val emailAddress = value.emailAddress
-          val isMatchingEmailAddress = request.registration match {
-            case Some(registration) if mode == AmendMode || mode == RejoinMode =>
-              registration.contactDetails.emailAddress.contains(emailAddress)
-            case _ =>
-              false
-          }
 
           val continueUrl = if (mode == CheckMode) {
             routes.CheckYourAnswersController.onPageLoad().url
@@ -88,9 +81,7 @@ class BusinessContactDetailsController @Inject()(
             routes.BankDetailsController.onPageLoad(NormalMode).url
           }
 
-          if ((mode == AmendMode || mode == RejoinMode) && config.emailVerificationEnabled && !isMatchingEmailAddress) {
-            verifyEmailAndRedirect(mode, messages, continueUrl, value)
-          } else if ((mode != AmendMode || mode != RejoinMode) && config.emailVerificationEnabled) {
+          if (config.emailVerificationEnabled) {
             verifyEmailAndRedirect(mode, messages, continueUrl, value)
           } else {
             for {

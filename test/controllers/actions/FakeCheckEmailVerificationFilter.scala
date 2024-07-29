@@ -16,6 +16,7 @@
 
 package controllers.actions
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import org.scalatestplus.mockito.MockitoSugar.mock
 import services.{EmailVerificationService, SaveForLaterService}
 

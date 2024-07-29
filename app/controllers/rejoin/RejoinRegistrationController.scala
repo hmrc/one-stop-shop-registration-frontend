@@ -58,7 +58,7 @@ class RejoinRegistrationController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetData(Some(RejoinMode)).async {
+  def onPageLoad: Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(RejoinMode)).async {
     implicit request =>
 
       val date = LocalDate.now(clock)
@@ -94,7 +94,7 @@ class RejoinRegistrationController @Inject()(
 
   }
 
-  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData(Some(RejoinMode)).async {
+  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(RejoinMode)).async {
     implicit request =>
 
       getFirstValidationErrorRedirect(RejoinMode).map { redirect =>

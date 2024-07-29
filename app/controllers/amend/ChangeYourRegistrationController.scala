@@ -61,7 +61,7 @@ class ChangeYourRegistrationController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(AmendMode)).async {
     implicit request =>
 
       val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
@@ -84,7 +84,7 @@ class ChangeYourRegistrationController @Inject()(
       }
   }
 
-  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
+  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(AmendMode)).async {
     implicit request =>
 
       getFirstValidationErrorRedirect(AmendMode) match {
