@@ -305,7 +305,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           doNothing().when(auditService).audit(any())(any(), any())
 
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-          val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+          val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .overrides(
@@ -351,7 +351,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           doNothing().when(auditService).audit(any())(any(), any())
 
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-          val userAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
+          val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .configure("features.amend.email-enabled" -> "false")
@@ -629,7 +629,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -656,7 +656,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),

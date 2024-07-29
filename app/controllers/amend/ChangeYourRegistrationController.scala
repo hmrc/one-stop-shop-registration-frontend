@@ -86,38 +86,47 @@ class ChangeYourRegistrationController @Inject()(
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData(Some(AmendMode)).async {
     implicit request =>
-      registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
-        case Valid(registration) =>
-          val registrationWithOriginalSubmissionReceived = registration.copy(submissionReceived = request.registration.flatMap(_.submissionReceived))
-          registrationConnector.amendRegistration(registrationWithOriginalSubmissionReceived).flatMap {
-            case Right(_) =>
-              auditService.audit(
-                RegistrationAuditModel.build(
-                  RegistrationAuditType.AmendRegistration,
-                  registrationWithOriginalSubmissionReceived,
-                  SubmissionResult.Success,
-                  request
-                ))
-              sendEmailConfirmation(request, registrationWithOriginalSubmissionReceived)
 
-            case Left(e) =>
-              logger.error(s"Unexpected result on submit: ${e.toString}")
-              auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
-              Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
-          }
+      getFirstValidationErrorRedirect(AmendMode) match {
+        case Some(errorRedirect) => if (incompletePrompt) {
+          errorRedirect.toFuture
+        } else {
+          Redirect(routes.ChangeYourRegistrationController.onPageLoad()).toFuture
+        }
+        case None =>
+          registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
+            case Valid(registration) =>
+              val registrationWithOriginalSubmissionReceived = registration.copy(submissionReceived = request.registration.flatMap(_.submissionReceived))
+              registrationConnector.amendRegistration(registrationWithOriginalSubmissionReceived).flatMap {
+                case Right(_) =>
+                  auditService.audit(
+                    RegistrationAuditModel.build(
+                      RegistrationAuditType.AmendRegistration,
+                      registrationWithOriginalSubmissionReceived,
+                      SubmissionResult.Success,
+                      request
+                    ))
+                  sendEmailConfirmation(request, registrationWithOriginalSubmissionReceived)
 
-        case Invalid(errors) =>
-          getFirstValidationErrorRedirect(AmendMode).map(
-            errorRedirect => if (incompletePrompt) {
-              errorRedirect.toFuture
-            } else {
-              Redirect(amendRoutes.ChangeYourRegistrationController.onPageLoad()).toFuture
-            }
-          ).getOrElse {
-            val errorList = errors.toChain.toList
-            val errorMessages = errorList.map(_.errorMessage).mkString("\n")
-            logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-            Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
+                case Left(e) =>
+                  logger.error(s"Unexpected result on submit: ${e.toString}")
+                  auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
+                  Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
+              }
+
+            case Invalid(errors) =>
+              getFirstValidationErrorRedirect(AmendMode).map(
+                errorRedirect => if (incompletePrompt) {
+                  errorRedirect.toFuture
+                } else {
+                  Redirect(amendRoutes.ChangeYourRegistrationController.onPageLoad()).toFuture
+                }
+              ).getOrElse {
+                val errorList = errors.toChain.toList
+                val errorMessages = errorList.map(_.errorMessage).mkString("\n")
+                logger.error(s"Unable to create a registration request from user answers: $errorMessages")
+                Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
+              }
           }
       }
   }
