@@ -24,7 +24,7 @@ import pages.{DeleteWebsitePage, WebsitePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.CheckJourneyRecovery.determineMissingAnswersJourney
 import utils.FutureSyntax.FutureOps
 import views.html.DeleteWebsiteView
 
@@ -77,5 +77,5 @@ class DeleteWebsiteController @Inject()(
     request.userAnswers.get(WebsitePage(index)).map {
       name =>
         block(name)
-    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
+    }.getOrElse(Redirect(determineMissingAnswersJourney(Some(mode))).toFuture)
 }

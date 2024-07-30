@@ -166,7 +166,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no EU VAT details exist" in {
+    "must redirect to CheckYourAnswers for a GET if no EU VAT details exist" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
@@ -176,7 +176,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -212,7 +212,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must redirect to Amend Journey Recovery for a GET if no EU VAT details exist" in {
+      "must redirect to resolve missing answers for a GET if no EU VAT details exist" in {
 
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
@@ -226,7 +226,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
 
