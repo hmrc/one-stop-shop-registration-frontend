@@ -31,12 +31,13 @@ import utils.FutureSyntax._
 import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 import controllers.routes
 
+import java.time.{Clock, LocalDate}
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
                                                  migrationService: DataMigrationService,
-                                                 registrationConnector: RegistrationConnector
-                                                )
+                                                 registrationConnector: RegistrationConnector,
+                                                 clock: Clock)
                                                 (implicit val executionContext: ExecutionContext)
   extends ActionRefiner[AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest] {
 
@@ -47,10 +48,9 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
 
     request.queryString.get("k").flatMap(_.headOption) match {
       case Some(sessionId) =>
-        val k = migrationService
+        migrationService
           .migrate(sessionId, request.userId)
           .map(_ => Left(Redirect(request.path)))
-k
       case None =>
         authenticatedUserAnswersRepository
           .get(request.userId)
@@ -58,25 +58,47 @@ k
             case None =>
               copyCurrentSessionData(request).map(Right(_))
             case Some(answers) =>
-              if (answers.vatInfo.isDefined) {
-                getUpdatedVatInfo(answers).flatMap {
-                  case Right(updatedUserAnswers) =>
-                    AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, Some(updatedUserAnswers))
-                      .toFuture
-                      .map(Right[Result, AuthenticatedOptionalDataRequest[A]])
-                  case Left(value) =>
-                    value.toFuture.map(Left[Result, AuthenticatedOptionalDataRequest[A]])
-                }
-              } else {
-                AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, Some(answers))
-                  .toFuture
-                  .map(Right[Result, AuthenticatedOptionalDataRequest[A]])
-              }
+              updateVatOrContinue(answers, request)
+              //if (vatInfo.deregistrationDecisionDate.exists(!_.isAfter(LocalDate.now(clock)))) {
+              //                  Redirect(controllers.routes.InvalidVrnDateController.onPageLoad()).toFuture
+              //                }
+
+
           }
+    }
+    }
+
+  private def updateVatOrContinue[A](answers: UserAnswers,
+                                     request: AuthenticatedIdentifierRequest[A])
+                                    (implicit hc: HeaderCarrier): Future[Either[Result, AuthenticatedOptionalDataRequest[A]]] = {
+    if (answers.vatInfo.isDefined) {
+
+      val vatInfo = answers.vatInfo.get
+      
+      if (vatInfo.deregistrationDecisionDate.exists(!_.isAfter(LocalDate.now(clock)))) {
+        Future.successful(
+          Left[Result, AuthenticatedOptionalDataRequest[A]](
+            Redirect(controllers.routes.InvalidVrnDateController.onPageLoad())
+          )
+        )
+      } else {
+        getUpdatedVatInfo(answers).flatMap {
+          case Right(updatedUserAnswers) =>
+            AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, Some(updatedUserAnswers))
+              .toFuture
+              .map(Right[Result, AuthenticatedOptionalDataRequest[A]])
+          case Left(value) =>
+            value.toFuture.map(Left[Result, AuthenticatedOptionalDataRequest[A]])
+        }
+      }
+    } else {
+      AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, Some(answers))
+        .toFuture
+        .map(Right[Result, AuthenticatedOptionalDataRequest[A]])
     }
   }
 
-  private def getUpdatedVatInfo(answers: UserAnswers)(implicit hc: HeaderCarrier): Future[Either[Result, UserAnswers]] = {
+private def getUpdatedVatInfo(answers: UserAnswers)(implicit executionContext: ExecutionContext, hc: HeaderCarrier): Future[Either[Result, UserAnswers]] = {
     registrationConnector.getVatCustomerInfo().flatMap {
       case Right(vatInfo) =>
         Future.successful(
