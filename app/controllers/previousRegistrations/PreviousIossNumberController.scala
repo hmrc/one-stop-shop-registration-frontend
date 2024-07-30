@@ -24,7 +24,7 @@ import logging.Logging
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
 import models.requests.AuthenticatedDataRequest
-import models.{Country, Index, Mode, PreviousScheme}
+import models.{Country, Index, Mode, PreviousScheme, RejoinMode}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -61,7 +61,8 @@ class PreviousIossNumberController @Inject()(
             case Some(value) => form.fill(value)
           }
 
-          Future.successful(Ok(view(preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
+          Future.successful(Ok(view(
+            preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
         }
       }
   }
@@ -77,9 +78,11 @@ class PreviousIossNumberController @Inject()(
 
             form.bindFromRequest().fold(
               formWithErrors =>
-                Future.successful(BadRequest(view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
+                Future.successful(BadRequest(
+                  view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
+              value => {
+                lazy val defaultResult: Future[Result] = saveAndRedirect(countryIndex, schemeIndex, value, mode)
 
-              value =>
                 if (appConfig.otherCountryRegistrationValidationEnabled) {
                   coreRegistrationValidationService.searchScheme(
                     searchNumber = value.previousSchemeNumber,
@@ -87,14 +90,26 @@ class PreviousIossNumberController @Inject()(
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
                   ).flatMap {
-                    case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
-                      Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
-                    case _ =>
-                      saveAndRedirect(countryIndex, schemeIndex, value, mode)
+                    case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                      if (mode == RejoinMode) {
+                        Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+                          activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
+                            case Some(date) => date.toString
+                            case _ =>
+                              val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
+                              logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
+                              throw e
+                          })).toFuture
+                      } else {
+                        Future.successful(Redirect(
+                          controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
+                      }
+                    case _ => defaultResult
                   }
                 } else {
-                  saveAndRedirect(countryIndex, schemeIndex, value, mode)
+                  defaultResult
                 }
+              }
             )
           }
         }

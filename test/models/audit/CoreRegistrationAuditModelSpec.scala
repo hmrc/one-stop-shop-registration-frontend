@@ -18,7 +18,7 @@ package models.audit
 
 import base.SpecBase
 import models.core._
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.Json
@@ -36,7 +36,7 @@ class CoreRegistrationAuditModelSpec extends SpecBase with Matchers {
 
       val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
 
-      implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+      implicit val dataRequest: AuthenticatedOptionalDataRequest[AnyContent] = AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(emptyUserAnswers))
 
       val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 

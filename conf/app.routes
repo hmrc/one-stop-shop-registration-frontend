@@ -1,5 +1,4 @@
 # microservice specific routes
-
 ->          /hmrc-frontend                                                          hmrcfrontend.Routes
 
 GET         /                                                                       controllers.IndexController.onPageLoad()
@@ -656,3 +655,7 @@ GET         /error-submitting-rejoin                                            
 GET         /successful-rejoin                                                      controllers.rejoin.RejoinCompleteController.onPageLoad()
 
 GET         /rejoin-journey-recovery                                                controllers.rejoin.RejoinJourneyRecoveryController.onPageLoad()
+
+GET         /rejoin-already-registered-other-country                                controllers.rejoin.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(countryCode: String)
+
+GET         /cannot-rejoin-quarantined-country                                      controllers.rejoin.CannotRejoinQuarantinedCountryController.onPageLoad(countryCode: String, exclusionDate: String)

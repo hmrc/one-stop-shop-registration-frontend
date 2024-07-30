@@ -16,18 +16,24 @@
 
 package models.requests
 
-import play.api.mvc.{Request, WrappedRequest}
 import models.UserAnswers
 import models.domain.Registration
+import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
+
+sealed trait AuthenticatedVrnRequest[+A] extends Request[A] {
+  def request: Request[A]
+  def credentials: Credentials
+  def vrn: Vrn
+}
 
 case class AuthenticatedOptionalDataRequest[A](
                                                 request: Request[A],
                                                 credentials: Credentials,
                                                 vrn: Vrn,
                                                 userAnswers: Option[UserAnswers]
-                                              ) extends WrappedRequest[A](request) {
+                                              ) extends WrappedRequest[A](request) with AuthenticatedVrnRequest[A] {
 
   val userId: String = credentials.providerId
 }
@@ -39,12 +45,12 @@ case class UnauthenticatedOptionalDataRequest[A](
                                                 ) extends WrappedRequest[A](request)
 
 case class AuthenticatedDataRequest[A](
-                            request: Request[A],
-                            credentials: Credentials,
-                            vrn: Vrn,
-                            registration: Option[Registration],
-                            userAnswers: UserAnswers
-                          ) extends WrappedRequest[A](request) {
+                                        request: Request[A],
+                                        credentials: Credentials,
+                                        vrn: Vrn,
+                                        registration: Option[Registration],
+                                        userAnswers: UserAnswers
+                                      ) extends WrappedRequest[A](request) with AuthenticatedVrnRequest[A] {
 
   val userId: String = credentials.providerId
 }

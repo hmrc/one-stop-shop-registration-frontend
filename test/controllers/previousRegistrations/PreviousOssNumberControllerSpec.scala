@@ -17,8 +17,9 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme}
+import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme, RejoinMode}
 import models.core.{Match, MatchType}
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.PreviousSchemeHintText
@@ -30,9 +31,11 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.CoreRegistrationValidationService
+import services.{CoreRegistrationValidationService, RejoinRegistrationService}
+import testutils.RegistrationData.registration
 import views.html.previousRegistrations.PreviousOssNumberView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
@@ -161,7 +164,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         "DE",
         None,
         None,
-        None,
+        exclusionEffectiveDate = Some(LocalDate.now()),
         None,
         None
       )
@@ -175,7 +178,6 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Some(genericMatch))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -199,6 +201,41 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "Redirect to Rejoin Already Registered Other Country when active OSS found and mode=RejoinMode" in {
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+        val mockRegistrationConnector = mock[RegistrationConnector]
+        val mockRejoinRegistrationService = mock[RejoinRegistrationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Some(genericMatch))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(RejoinMode, index, index).url)
+              .withFormUrlEncodedBody(("value", "SI12345678"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(
+            genericMatch.memberState).url
+        }
+      }
+
       "Redirect to scheme quarantined when quarantined OSS found" in {
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -207,8 +244,6 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
-        when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -231,6 +266,42 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "Redirect to Cannot Rejoin Quarantined Country when quarantined OSS found and mode=RejoinMode" in {
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+        val mockRegistrationConnector = mock[RegistrationConnector]
+        val mockRejoinRegistrationService = mock[RejoinRegistrationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
+          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(RejoinMode, index, index).url)
+              .withFormUrlEncodedBody(("value", "SI12345678"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+            genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString).url
+        }
+      }
+
       "not call core validation when OSS Non Union" in {
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
@@ -239,8 +310,6 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
-        when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))

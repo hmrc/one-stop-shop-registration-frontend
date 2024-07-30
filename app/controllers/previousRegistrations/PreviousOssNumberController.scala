@@ -23,13 +23,14 @@ import forms.previousRegistrations.PreviousOssNumberFormProvider
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.PreviousSchemeHintText
 import models.requests.AuthenticatedDataRequest
-import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme, WithName}
+import models.{Country, CountryWithValidationDetails, Index, Mode, PreviousScheme, RejoinMode, WithName}
 import pages.previousRegistrations.{PreviousOssNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.previousRegistration.AllPreviousSchemesForCountryWithOptionalVatNumberQuery
-import services.CoreRegistrationValidationService
+import services.{CoreRegistrationValidationService, RejoinRedirectService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousOssNumberView
 
 import javax.inject.Inject
@@ -118,24 +119,31 @@ class PreviousOssNumberController @Inject()(
                                                value: String,
                                                previousScheme: WithName with PreviousScheme
                                              )(implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
-    if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
+    lazy val defaultResult: Future[Result] = saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
 
+    if (appConfig.otherCountryRegistrationValidationEnabled && previousScheme == PreviousScheme.OSSU) {
       coreRegistrationValidationService.searchScheme(
         searchNumber = value,
         previousScheme = previousScheme,
         intermediaryNumber = None,
         countryCode = country.code
-      ).flatMap {
-        case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
-          Future.successful(
-            Redirect(controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))
-        case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
-          Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
-        case _ =>
-          saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+      ).flatMap { maybeMatch =>
+        if (mode == RejoinMode) {
+          RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult)
+        } else {
+          maybeMatch match {
+            case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+              Future.successful(Redirect(
+                controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))
+            case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+              Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
+            case _ =>
+              defaultResult
+          }
+        }
       }
     } else {
-      saveAndRedirect(countryIndex, schemeIndex, value, previousScheme, mode)
+      defaultResult
     }
   }
 

@@ -34,7 +34,7 @@ class RejoinRegistrationService @Inject() {
   }
 
   private def isQuarantinedAndAfterTwoYears(currentDate: LocalDate, etmpExclusion: ExcludedTrader): Boolean = {
-    if(etmpExclusion.quarantined) {
+    if (etmpExclusion.quarantined) {
       val minimumDate = currentDate.minusYears(2)
       etmpExclusion.effectiveDate.isBefore(minimumDate)
     } else {
@@ -43,12 +43,10 @@ class RejoinRegistrationService @Inject() {
   }
 
   private def notQuarantinedAndAfterEffectiveDate(currentDate: LocalDate, etmpExclusion: ExcludedTrader): Boolean = {
-    if(!etmpExclusion.quarantined) {
+    if (!etmpExclusion.quarantined) {
       etmpExclusion.effectiveDate <= currentDate
     } else {
       false
     }
   }
-
-
 }

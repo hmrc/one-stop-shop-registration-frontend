@@ -18,8 +18,8 @@ package services
 
 import base.SpecBase
 import connectors.ValidateCoreRegistrationConnector
-import models.core.{CoreRegistrationValidationResult, Match, MatchType}
 import models.PreviousScheme
+import models.core.{CoreRegistrationValidationResult, Match, MatchType}
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
 import org.mockito.ArgumentMatchers.any
@@ -277,91 +277,6 @@ class CoreRegistrationValidationServiceSpec extends SpecBase with MockitoSugar w
       val response = intercept[Exception](coreRegistrationValidationService.searchScheme(iossNumber, previousScheme, None, countryCode).futureValue)
 
       response.getMessage must include("Error while validating core registration")
-    }
-  }
-
-  "coreRegistrationValidationService.isActiveTrader" - {
-
-    "call isActiveTrader with matchType = FixedEstablishmentActiveNETP and must return true" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val response = coreRegistrationValidationService.isActiveTrader(genericMatch)
-
-      response mustEqual true
-    }
-
-    "call isActiveTrader with matchType = TraderIdActiveNETP and must return true" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
-      val response = coreRegistrationValidationService.isActiveTrader(newMatch)
-
-      response mustEqual true
-    }
-
-    "call isActiveTrader with matchType = OtherMSNETPActiveNETP and must return true" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
-      val response = coreRegistrationValidationService.isActiveTrader(newMatch)
-
-      response mustEqual true
-    }
-
-    "call isActiveTrader with matchType = FixedEstablishmentQuarantinedNETP and must return false" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
-      val response = coreRegistrationValidationService.isActiveTrader(newMatch)
-
-      response mustEqual false
-    }
-  }
-
-  "coreRegistrationValidationService.isExcludedTrader" - {
-
-    "call isExcludedTrader with matchType = FixedEstablishmentQuarantinedNETP and must return true" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
-      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
-
-      response mustEqual true
-    }
-
-    "call isExcludedTrader with matchType = TraderIdQuarantinedNETP and must return true" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
-      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
-
-      response mustEqual true
-    }
-
-    "call isExcludedTrader with matchType = OtherMSNETPQuarantinedNETP and must return true" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
-      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
-
-      response mustEqual true
-    }
-
-    "call isExcludedTrader with matchType = FixedEstablishmentActiveNETP and must return false" in {
-
-      val coreRegistrationValidationService = new CoreRegistrationValidationService(connector, auditService)
-
-      val newMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentActiveNETP)
-      val response = coreRegistrationValidationService.isQuarantinedTrader(newMatch)
-
-      response mustEqual false
     }
   }
 }

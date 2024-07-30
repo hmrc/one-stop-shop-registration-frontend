@@ -47,7 +47,7 @@ class OtherCountryExcludedAndQuarantinedController @Inject()(
       connector.getSavedExternalEntry().map {
         case Right(response) =>
           Ok(view(Country.getCountryName(countryCode), exclusionDateFormatted, response.url))
-        case Left(e) =>
+        case Left(_) =>
           Ok(view(Country.getCountryName(countryCode), exclusionDateFormatted))
       }
   }

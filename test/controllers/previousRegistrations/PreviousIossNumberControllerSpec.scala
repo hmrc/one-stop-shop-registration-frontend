@@ -17,11 +17,12 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
 import controllers.previousRegistrations.{routes => prevRoutes}
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
-import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, RejoinMode}
 import models.core.{Match, MatchType}
 import models.domain.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
@@ -32,9 +33,11 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.AuthenticatedUserAnswersRepository
-import services.CoreRegistrationValidationService
+import services.{CoreRegistrationValidationService, RejoinRegistrationService}
+import testutils.RegistrationData.registration
 import views.html.previousRegistrations.PreviousIossNumberView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
@@ -134,7 +137,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         "DE",
         None,
         None,
-        None,
+        exclusionEffectiveDate = Some(LocalDate.now()),
         None,
         None
       )
@@ -146,7 +149,6 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Some(genericMatch))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -179,8 +181,6 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
           Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
-        when(mockCoreRegistrationValidationService.isActiveTrader(any())) thenReturn false
-        when(mockCoreRegistrationValidationService.isQuarantinedTrader(any())) thenReturn true
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -200,6 +200,42 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual prevRoutes.SchemeQuarantinedController.onPageLoad(NormalMode, index, index).url
+        }
+      }
+
+      "Redirect to Cannot Rejoin Quarantined Country when the previous registration matches to a quarantined trader and mode=RejoinMode" in {
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+        val mockRegistrationConnector = mock[RegistrationConnector]
+        val mockRejoinRegistrationService = mock[RejoinRegistrationService]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
+          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(RejoinMode, index, index).url)
+              .withFormUrlEncodedBody(("previousSchemeNumber", "IM0401234567"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+            genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString).url
         }
       }
     }

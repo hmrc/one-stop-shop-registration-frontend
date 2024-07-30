@@ -20,12 +20,13 @@ import config.FrontendAppConfig
 import controllers.GetCountry
 import controllers.actions._
 import forms.euDetails.EuVatNumberFormProvider
-import models.{CountryWithValidationDetails, Index, Mode}
+import models.{CountryWithValidationDetails, Index, Mode, RejoinMode}
 import pages.euDetails.{EuVatNumberPage, SellsGoodsToEUConsumersPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.CoreRegistrationValidationService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{CoreRegistrationValidationService, RejoinRedirectService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.euDetails.EuVatNumberView
 
 import javax.inject.Inject
@@ -76,30 +77,34 @@ class EuVatNumberController @Inject()(
                   Future.successful(BadRequest(view(formWithErrors, mode, index, countryWithValidationDetails)))
               },
 
-            value =>
+            value => {
+              lazy val successResult: Future[Result] = for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
 
               if (appConfig.otherCountryRegistrationValidationEnabled) {
                 val isOtherMS = !request.userAnswers.get(SellsGoodsToEUConsumersPage(index)).getOrElse(false)
 
-                coreRegistrationValidationService.searchEuVrn(value, country.code, isOtherMS).flatMap {
+                coreRegistrationValidationService.searchEuVrn(value, country.code, isOtherMS).flatMap { maybeMatch =>
+                  if (mode == RejoinMode) {
+                    RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(successResult)
+                  } else {
+                    maybeMatch match {
+                      case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+                        Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
 
-                  case Some(activeMatch) if coreRegistrationValidationService.isActiveTrader(activeMatch) =>
-                    Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
+                      case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                        Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
-                  case Some(activeMatch) if coreRegistrationValidationService.isQuarantinedTrader(activeMatch) =>
-                    Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
-
-                  case _ => for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
-                    _ <- cc.sessionRepository.set(updatedAnswers)
-                  } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
+                      case _ => successResult
+                    }
+                  }
                 }
               } else {
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(EuVatNumberPage(index), value))
-                  _ <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(EuVatNumberPage(index).navigate(mode, updatedAnswers))
+                successResult
               }
+            }
           )
       }
   }

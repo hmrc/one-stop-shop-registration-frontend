@@ -925,3 +925,16 @@ rejoinComplete.feedback.30seconds = (takes 30 seconds)
 rejoinJourneyRecovery.title = Sorry, there is a problem with the service
 rejoinJourneyRecovery.heading = Sorry, there is a problem with the service
 rejoinJourneyRecovery.guidance = For your security, we deleted your answers.
+
+rejoinAlreadyRegisteredOtherCountry.title = This account is already registered on a One Stop Shop union scheme in {0}
+rejoinAlreadyRegisteredOtherCountry.heading = This account is already registered on a One Stop Shop union scheme in {0}
+rejoinAlreadyRegisteredOtherCountry.p1 = You can only register on one OSS scheme at a time.
+rejoinAlreadyRegisteredOtherCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+rejoinAlreadyRegisteredOtherCountry.yourAccount = Return to your account
+
+cannotRejoinQuarantinedCountry.title = You cannot rejoin this service
+cannotRejoinQuarantinedCountry.heading = You cannot rejoin this service
+cannotRejoinQuarantinedCountry.p1 = {0} has blocked your account from One Stop Shop services until {1}.
+cannotRejoinQuarantinedCountry.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
+cannotRejoinQuarantinedCountry.yourAccount = Return to your account
+
