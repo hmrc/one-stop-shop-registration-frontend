@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{EuDetailsQuery, EuOptionalDetailsQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.CheckJourneyRecovery.determineMissingAnswersJourney
 import utils.FutureSyntax.FutureOps
 import views.html.euDetails.DeleteEuDetailsView
 
@@ -85,5 +85,5 @@ class DeleteEuDetailsController @Inject()(
     request.userAnswers.get(EuOptionalDetailsQuery(index)).map {
       details =>
         block(details)
-    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
+    }.getOrElse(Redirect(determineMissingAnswersJourney(Some(mode))).toFuture)
 }

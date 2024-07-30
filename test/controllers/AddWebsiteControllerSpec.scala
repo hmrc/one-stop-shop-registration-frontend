@@ -100,7 +100,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery and the correct view for a GET when cannot derive number of websites" in {
+    "must redirect to CheckYourAnswers and the correct view for a GET when cannot derive number of websites" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
@@ -110,7 +110,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -215,7 +215,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
     "in AmendMode" - {
 
-      "must redirect to Amend Journey Recovery and the correct view for a GET when cannot derive number of websites" in {
+      "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of websites" in {
 
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
@@ -229,7 +229,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
 

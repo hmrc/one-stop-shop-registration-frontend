@@ -98,7 +98,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to journey recovery and the correct view for a GET when cannot derive number of trading names" in {
+    "must redirect to CheckYourAnswersController and the correct view for a GET when cannot derive number of trading names" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
@@ -108,7 +108,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -214,7 +214,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
     "in AmendMode" - {
 
-      "must redirect to Amend Journey Recovery and the correct view for a GET when cannot derive number of trading names" in {
+      "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of trading names" in {
 
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
@@ -228,7 +228,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
 
