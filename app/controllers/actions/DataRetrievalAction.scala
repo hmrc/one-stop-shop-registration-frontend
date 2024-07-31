@@ -55,18 +55,11 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
         authenticatedUserAnswersRepository
           .get(request.userId)
           .flatMap {
-            case None =>
-              copyCurrentSessionData(request).map(Right(_))
-            case Some(answers) =>
-              updateVatOrContinue(answers, request)
-              //if (vatInfo.deregistrationDecisionDate.exists(!_.isAfter(LocalDate.now(clock)))) {
-              //                  Redirect(controllers.routes.InvalidVrnDateController.onPageLoad()).toFuture
-              //                }
-
-
+            case None => copyCurrentSessionData(request).map(Right(_))
+            case Some(answers) => updateVatOrContinue(answers, request)
           }
     }
-    }
+  }
 
   private def updateVatOrContinue[A](answers: UserAnswers,
                                      request: AuthenticatedIdentifierRequest[A])
@@ -74,7 +67,7 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
     if (answers.vatInfo.isDefined) {
 
       val vatInfo = answers.vatInfo.get
-      
+
       if (vatInfo.deregistrationDecisionDate.exists(!_.isAfter(LocalDate.now(clock)))) {
         Future.successful(
           Left[Result, AuthenticatedOptionalDataRequest[A]](
@@ -98,7 +91,7 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
     }
   }
 
-private def getUpdatedVatInfo(answers: UserAnswers)(implicit executionContext: ExecutionContext, hc: HeaderCarrier): Future[Either[Result, UserAnswers]] = {
+  private def getUpdatedVatInfo(answers: UserAnswers)(implicit executionContext: ExecutionContext, hc: HeaderCarrier): Future[Either[Result, UserAnswers]] = {
     registrationConnector.getVatCustomerInfo().flatMap {
       case Right(vatInfo) =>
         Future.successful(
@@ -126,7 +119,7 @@ private def getUpdatedVatInfo(answers: UserAnswers)(implicit executionContext: E
 }
 
 class UnauthenticatedDataRetrievalAction @Inject()(val sessionRepository: UnauthenticatedUserAnswersRepository)
-                                                (implicit val executionContext: ExecutionContext)
+                                                  (implicit val executionContext: ExecutionContext)
   extends ActionTransformer[SessionRequest, UnauthenticatedOptionalDataRequest] {
 
   override protected def transform[A](request: SessionRequest[A]): Future[UnauthenticatedOptionalDataRequest[A]] = {
