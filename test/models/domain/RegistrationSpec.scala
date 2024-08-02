@@ -165,6 +165,7 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |  "isOnlineMarketplace" : false,
                    |  "niPresence" : "principalPlaceOfBusinessInNi",
                    |  "dateOfFirstSale" : "2022-04-21",
+                   |  "rejoin": false,
                    |  "adminUse": {
                    |    "changeDate" : "${LocalDateTime.now()}"
                    |  }
