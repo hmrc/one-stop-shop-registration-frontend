@@ -42,6 +42,7 @@ final case class Registration(
                                adminUse: AdminUse = AdminUse(None),
                                exclusionDetails: Option[ExclusionDetails] = None,
                                excludedTrader: Option[ExcludedTrader] = None,
+                               rejoin: Boolean = false
                              )
 
 object Registration {
@@ -65,6 +66,7 @@ object Registration {
             adminUse: AdminUse = AdminUse(None),
             exclusionDetails: Option[ExclusionDetails] = None,
             excludedTrader: Option[ExcludedTrader] = None,
+            rejoin: Boolean = false
            ): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
@@ -82,7 +84,8 @@ object Registration {
     submissionReceived,
     adminUse,
     exclusionDetails,
-    excludedTrader
+    excludedTrader,
+    rejoin = rejoin
   )
 
 }
