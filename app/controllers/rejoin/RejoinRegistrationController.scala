@@ -112,7 +112,7 @@ class RejoinRegistrationController @Inject()(
           if (canRejoin) {
             registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
               case Valid(registration) =>
-                val rejoinRegistration = registration.copy(rejoin = true)
+                val rejoinRegistration = registration.copy(rejoin = Some(true))
               registrationConnector.amendRegistration(rejoinRegistration).flatMap {
                   case Right(_) =>
                     auditService.audit(
