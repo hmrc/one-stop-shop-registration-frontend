@@ -16,7 +16,8 @@
 
 package controllers.actions
 
-import controllers.actions.FakeAuthenticatedDataRetrievalAction.{mockMigrationService, mockSessionRepository}
+import connectors.RegistrationConnector
+import controllers.actions.FakeAuthenticatedDataRetrievalAction.{mockMigrationService, mockSessionRepository, registrationConnector, stubClock}
 import models.UserAnswers
 import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -26,10 +27,11 @@ import services.DataMigrationService
 import uk.gov.hmrc.domain.Vrn
 import utils.FutureSyntax._
 
+import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeAuthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vrn)
-  extends AuthenticatedDataRetrievalAction(mockSessionRepository, mockMigrationService)(ExecutionContext.Implicits.global) {
+  extends AuthenticatedDataRetrievalAction(mockSessionRepository, mockMigrationService, registrationConnector, stubClock)(ExecutionContext.Implicits.global) {
 
   override protected def refine[A](request: AuthenticatedIdentifierRequest[A]): Future[Either[Result, AuthenticatedOptionalDataRequest[A]]] =
     Right(
@@ -45,4 +47,9 @@ class FakeAuthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers], vr
 object FakeAuthenticatedDataRetrievalAction {
   val mockSessionRepository: AuthenticatedUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
   val mockMigrationService: DataMigrationService = mock[DataMigrationService]
+  val registrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
+  val instant: Instant = Instant.now
+  val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+
 }

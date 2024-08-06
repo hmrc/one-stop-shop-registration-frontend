@@ -17,12 +17,14 @@
 package controllers.actions
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import models.UserAnswers
 import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest, SessionRequest, UnauthenticatedOptionalDataRequest}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.EitherValues
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.http.Status.SEE_OTHER
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -33,15 +35,20 @@ import services.DataMigrationService
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderNames
 
+import java.time.{Clock, Instant, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValues {
 
+  private val instant = Instant.now
+  private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+  private val registrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
   class AuthenticatedHarness (
                                sessionRepository: AuthenticatedUserAnswersRepository,
                                migrationService: DataMigrationService
-                             ) extends AuthenticatedDataRetrievalAction(sessionRepository, migrationService) {
+                             ) extends AuthenticatedDataRetrievalAction(sessionRepository, migrationService, registrationConnector, stubClock) {
     def callRefine[A](request: AuthenticatedIdentifierRequest[A]): Future[Either[Result, AuthenticatedOptionalDataRequest[A]]] = refine(request)
   }
 
@@ -140,6 +147,56 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           result.value.credentials mustEqual testCredentials
           result.value.vrn mustEqual vrn
           result.value.userAnswers.value mustEqual answers
+        }
+
+        "must re-fetch vatinfo if userAnswers object has vat info in db and add it to the request" in {
+
+          val twoWeeksInSeconds = 600000
+          val decisionDateClock: Clock = Clock.fixed(Instant.now.plusSeconds(twoWeeksInSeconds), ZoneId.systemDefault)
+          val vatCustomerInformation = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(decisionDateClock)))
+
+          val answers =
+            UserAnswers(userAnswersId, Json.obj("foo" -> "bar"), vatInfo = Some(vatCustomerInformation))
+
+          val sessionRepository = mock[AuthenticatedUserAnswersRepository]
+          val migrationService  = mock[DataMigrationService]
+
+          when(sessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+          when(registrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInformation))
+
+          val action = new AuthenticatedHarness(sessionRepository, migrationService)
+          val request = FakeRequest(GET, "/test/url")
+
+          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty))).futureValue
+          verify(migrationService, never()).migrate(any(), any())
+          result.value.credentials mustEqual testCredentials
+          result.value.vrn mustEqual vrn
+          result.value.userAnswers.value mustEqual answers
+        }
+
+        "must return failure with invalid VRN error when deregistrationDecisionDate is in the past" in {
+
+          val twoWeeksInSeconds = 600000
+          val decisionDateClock: Clock = Clock.fixed(Instant.now.minusSeconds(twoWeeksInSeconds), ZoneId.systemDefault)
+          val vatCustomerInformation = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(decisionDateClock)))
+
+          val answers =
+            UserAnswers(userAnswersId, Json.obj("foo" -> "bar"), vatInfo = Some(vatCustomerInformation))
+
+          val sessionRepository = mock[AuthenticatedUserAnswersRepository]
+          val migrationService  = mock[DataMigrationService]
+
+          when(sessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+          when(registrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInformation))
+
+          val action = new AuthenticatedHarness(sessionRepository, migrationService)
+          val request = FakeRequest(GET, "/test/url")
+
+          val Left(error: Result) = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty))).futureValue
+          verify(migrationService, never()).migrate(any(), any())
+
+          error.header.status mustBe SEE_OTHER
+          error.header.headers("Location").contains("/invalid-vrn-date") mustBe true
         }
       }
     }
