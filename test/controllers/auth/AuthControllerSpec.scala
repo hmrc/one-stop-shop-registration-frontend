@@ -89,6 +89,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
           val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
           val application = appBuilder(Some(answers)).build()
           when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
           running(application) {
             val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
             val result = route(application, request).value
@@ -355,6 +356,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       val application = appBuilder(None).build()
       when(mockSavedAnswersConnector.get()(any())) thenReturn
         Future.successful(Right(None))
+      when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
 
       running(application) {
         val request = FakeRequest(GET, routes.AuthController.continueOnSignIn().url)
