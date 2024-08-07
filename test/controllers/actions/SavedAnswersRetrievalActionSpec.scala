@@ -80,17 +80,24 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
         val registrationConnector = mock[RegistrationConnector]
         val instant = Instant.now
         val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
-        val answers = UserAnswers(userAnswersId, lastUpdated = Instant.now(stubClock)).set(SavedProgressPage, "/url").success.value
+        val answers = UserAnswers(
+          userAnswersId,
+          vatInfo = Some(vatCustomerInfo),
+          lastUpdated = Instant.now(stubClock)
+        ).set(SavedProgressPage, "/url").success.value
 
         when(saveForLaterConnector.get()(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, answers.data, instant))))
+        when(registrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
         when(sessionRepository.set(any())) thenReturn Future.successful(true)
         val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector, stubClock)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
-        val result = action.callRefine(AuthenticatedOptionalDataRequest(request,
+        val result = action.callRefine(AuthenticatedOptionalDataRequest(
+          request,
           testCredentials,
           vrn,
-          Some(UserAnswers(userAnswersId)))).futureValue
+          Some(UserAnswers(userAnswersId))
+        )).futureValue
 
         verify(saveForLaterConnector, times(1)).get()(any())
         result.value.userAnswers mustBe Some(answers)
@@ -106,6 +113,7 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
 
         when(saveForLaterConnector.get()(any())) thenReturn Future.successful(Right(None))
         when(sessionRepository.set(any())) thenReturn Future.successful(true)
+        when(registrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
         val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector, stubClock)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
