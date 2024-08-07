@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import connectors.SaveForLaterConnector
+import connectors.{RegistrationConnector, SaveForLaterConnector}
 import models.UserAnswers
 import models.requests.AuthenticatedOptionalDataRequest
 import pages.SavedProgressPage
@@ -28,30 +28,35 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SavedAnswersRetrievalAction (repository: AuthenticatedUserAnswersRepository, saveForLaterConnector: SaveForLaterConnector)
-                          (implicit val executionContext: ExecutionContext)
+class SavedAnswersRetrievalAction(
+                                   repository: AuthenticatedUserAnswersRepository,
+                                   saveForLaterConnector: SaveForLaterConnector,
+                                   registrationConnector: RegistrationConnector
+                                 )
+                                 (implicit val executionContext: ExecutionContext)
   extends ActionTransformer[AuthenticatedOptionalDataRequest, AuthenticatedOptionalDataRequest] {
 
   override protected def transform[A](request: AuthenticatedOptionalDataRequest[A]): Future[AuthenticatedOptionalDataRequest[A]] = {
-    val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.request.session)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.request.session)
     val userAnswers =
-      if(request.userAnswers.flatMap(_.get(SavedProgressPage)).isEmpty) {
-      for {
-      savedForLater <- saveForLaterConnector.get()(hc)
-    } yield {
-        val answers = {
-          savedForLater match {
-            case Right(Some(answers)) => {
-              val newAnswers = UserAnswers(request.userId, answers.data, answers.vatInfo, answers.lastUpdated)
-              repository.set(newAnswers)
-              Some(newAnswers)
+      if (request.userAnswers.flatMap(_.get(SavedProgressPage)).isEmpty) {
+        for {
+          savedForLater <- saveForLaterConnector.get()
+          maybeVatInfo <- registrationConnector.getVatCustomerInfo()
+        } yield {
+          val answers = {
+            (savedForLater, maybeVatInfo) match {
+              case (Right(Some(answers)), Right(vatInfo)) => {
+                val newAnswers = UserAnswers(request.userId, answers.data, Some(vatInfo), answers.lastUpdated)
+                repository.set(newAnswers)
+                Some(newAnswers)
+              }
+              case _ => request.userAnswers
             }
-            case _ => request.userAnswers
           }
+          answers
         }
-        answers
-      }
-    } else {
+      } else {
         Future.successful(request.userAnswers)
       }
 
@@ -61,9 +66,13 @@ class SavedAnswersRetrievalAction (repository: AuthenticatedUserAnswersRepositor
   }
 }
 
-class SavedAnswersRetrievalActionProvider @Inject()(repository: AuthenticatedUserAnswersRepository, saveForLaterConnector: SaveForLaterConnector)
-                                           (implicit ec: ExecutionContext) {
+class SavedAnswersRetrievalActionProvider @Inject()(
+                                                     repository: AuthenticatedUserAnswersRepository,
+                                                     saveForLaterConnector: SaveForLaterConnector,
+                                                     registrationConnector: RegistrationConnector
+                                                   )
+                                                   (implicit ec: ExecutionContext) {
 
   def apply(): SavedAnswersRetrievalAction =
-    new SavedAnswersRetrievalAction(repository, saveForLaterConnector)
+    new SavedAnswersRetrievalAction(repository, saveForLaterConnector, registrationConnector)
 }

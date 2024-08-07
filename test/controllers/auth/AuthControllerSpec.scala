@@ -42,7 +42,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
   private val continueUrl = "http://localhost/foo"
 
-  private val mockConnector  = mock[RegistrationConnector]
+  private val mockConnector = mock[RegistrationConnector]
   private val mockRepository = mock[AuthenticatedUserAnswersRepository]
   private val mockSavedAnswersConnector = mock[SaveForLaterConnector]
 
@@ -69,7 +69,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
           .set(SavedProgressPage, "/url").success.value
         val application = appBuilder(Some(answers)).build()
         when(mockSavedAnswersConnector.get()(any())) thenReturn
-          Future.successful(Right(Some(SavedUserAnswers(vrn,answers.data, None, Instant.now))))
+          Future.successful(Right(Some(SavedUserAnswers(vrn, answers.data, Instant.now))))
 
         running(application) {
           val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
@@ -89,13 +89,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
           val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
           val application = appBuilder(Some(answers)).build()
           when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
           running(application) {
             val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
-            verify(mockConnector, never()).getVatCustomerInfo()(any())
             verify(mockRepository, never()).set(any())
           }
         }
@@ -191,28 +191,28 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
           val failureResponse = responses.UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
 
 
-            "must return an internal server error" in {
+          "must return an internal server error" in {
 
-              val application =
-                appBuilder(None)
-                  .build()
+            val application =
+              appBuilder(None)
+                .build()
 
-              when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
-              when(mockRepository.set(any())) thenReturn Future.successful(true)
-              when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+            when(mockRepository.set(any())) thenReturn Future.successful(true)
+            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
-              running(application) {
+            running(application) {
 
-                val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
-                val result = route(application, request).value
+              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+              val result = route(application, request).value
 
-                val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Error).success.value
+              val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Error).success.value
 
-                status(result) mustEqual SEE_OTHER
-                redirectLocation(result).value mustEqual controllers.routes.VatApiDownController.onPageLoad().url
-                verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
-              }
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.VatApiDownController.onPageLoad().url
+              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
             }
+          }
 
         }
       }
@@ -305,28 +305,28 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
         val failureResponse = responses.UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
 
-          "must return an internal server error" in {
+        "must return an internal server error" in {
 
-            val application =
-              appBuilder(None)
-                .build()
+          val application =
+            appBuilder(None)
+              .build()
 
-            when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
-            when(mockRepository.set(any())) thenReturn Future.successful(true)
-            when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
+          when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Left(failureResponse))
+          when(mockRepository.set(any())) thenReturn Future.successful(true)
+          when(mockSavedAnswersConnector.get()(any())) thenReturn Future.successful(Right(None))
 
-            running(application) {
+          running(application) {
 
-              val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
-              val result = route(application, request).value
+            val request = FakeRequest(GET, routes.AuthController.onSignIn().url)
+            val result = route(application, request).value
 
-              val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Error).success.value
+            val expectedAnswers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Error).success.value
 
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.routes.VatApiDownController.onPageLoad().url
-              verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
-            }
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.VatApiDownController.onPageLoad().url
+            verify(mockRepository, times(1)).set(eqTo(expectedAnswers))
           }
+        }
 
       }
     }
@@ -334,27 +334,28 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
   "continueOnSignIn" - {
 
-      "must redirect to the ContinueRegistration page if saved url was retrieved from saved answers" in {
+    "must redirect to the ContinueRegistration page if saved url was retrieved from saved answers" in {
 
-        val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
-          .set(SavedProgressPage, "/url").success.value
-        val application = appBuilder(Some(answers)).build()
-        when(mockSavedAnswersConnector.get()(any())) thenReturn
-          Future.successful(Right(Some(SavedUserAnswers(vrn,answers.data, None, Instant.now))))
+      val answers = emptyUserAnswers.set(VatApiCallResultQuery, VatApiCallResult.Success).success.value
+        .set(SavedProgressPage, "/url").success.value
+      val application = appBuilder(Some(answers)).build()
+      when(mockSavedAnswersConnector.get()(any())) thenReturn
+        Future.successful(Right(Some(SavedUserAnswers(vrn, answers.data, Instant.now))))
 
-        running(application) {
-          val request = FakeRequest(GET, routes.AuthController.continueOnSignIn().url)
-          val result = route(application, request).value
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.continueOnSignIn().url)
+        val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.ContinueRegistrationController.onPageLoad().url
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.ContinueRegistrationController.onPageLoad().url
       }
+    }
 
     "must redirect to NoRegistrationInProgress when there is no saved answers" in {
       val application = appBuilder(None).build()
       when(mockSavedAnswersConnector.get()(any())) thenReturn
         Future.successful(Right(None))
+      when(mockConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
 
       running(application) {
         val request = FakeRequest(GET, routes.AuthController.continueOnSignIn().url)
@@ -375,11 +376,11 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       running(application) {
 
         val appConfig = application.injector.instanceOf[FrontendAppConfig]
-        val request   = FakeRequest(GET, routes.AuthController.signOut().url)
+        val request = FakeRequest(GET, routes.AuthController.signOut().url)
 
         val result = route(application, request).value
 
-        val encodedContinueUrl  = URLEncoder.encode(appConfig.exitSurveyUrl, "UTF-8")
+        val encodedContinueUrl = URLEncoder.encode(appConfig.exitSurveyUrl, "UTF-8")
         val expectedRedirectUrl = s"${appConfig.signOutUrl}?continue=$encodedContinueUrl"
 
         status(result) mustEqual SEE_OTHER
@@ -397,11 +398,11 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       running(application) {
 
         val appConfig = application.injector.instanceOf[FrontendAppConfig]
-        val request   = FakeRequest(GET, routes.AuthController.signOutNoSurvey().url)
+        val request = FakeRequest(GET, routes.AuthController.signOutNoSurvey().url)
 
         val result = route(application, request).value
 
-        val encodedContinueUrl  = URLEncoder.encode(routes.SignedOutController.onPageLoad().url, "UTF-8")
+        val encodedContinueUrl = URLEncoder.encode(routes.SignedOutController.onPageLoad().url, "UTF-8")
         val expectedRedirectUrl = s"${appConfig.signOutUrl}?continue=$encodedContinueUrl"
 
         status(result) mustEqual SEE_OTHER

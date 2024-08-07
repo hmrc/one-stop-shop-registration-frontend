@@ -82,7 +82,6 @@ object SaveForLaterHttpParser extends Logging {
 case class SavedUserAnswers(
                              vrn: Vrn,
                              data: JsObject,
-                             vatInfo: Option[VatCustomerInfo],
                              lastUpdated: Instant
                            )
 

@@ -17,17 +17,22 @@
 package controllers.actions
 
 
-import connectors.SaveForLaterConnector
-import controllers.actions.FakeSavedAnswersRetrievalAction.{repository, saveForLaterConnector}
+import connectors.{RegistrationConnector, SaveForLaterConnector}
+import controllers.actions.FakeSavedAnswersRetrievalAction._
 import models.UserAnswers
 import models.requests.AuthenticatedOptionalDataRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
 import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.domain.Vrn
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeSavedAnswersRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vrn)
-  extends SavedAnswersRetrievalAction(repository, saveForLaterConnector)(ExecutionContext.Implicits.global) {
+  extends SavedAnswersRetrievalAction(
+    repository,
+    saveForLaterConnector,
+    registrationConnector
+  )(ExecutionContext.Implicits.global) {
 
   override protected def transform[A](request: AuthenticatedOptionalDataRequest[A]): Future[AuthenticatedOptionalDataRequest[A]] =
     Future.successful(
@@ -42,4 +47,5 @@ class FakeSavedAnswersRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vr
 object FakeSavedAnswersRetrievalAction {
   val repository: AuthenticatedUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
   val saveForLaterConnector: SaveForLaterConnector = mock[SaveForLaterConnector]
+  val registrationConnector: RegistrationConnector = mock[RegistrationConnector]
 }
