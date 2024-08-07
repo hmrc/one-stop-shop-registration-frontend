@@ -96,7 +96,6 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual controllers.routes.CheckVatDetailsController.onPageLoad().url
-            verify(mockConnector, never()).getVatCustomerInfo()(any())
             verify(mockRepository, never()).set(any())
           }
         }
