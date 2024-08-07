@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import connectors.{SaveForLaterConnector, SavedUserAnswers}
+import connectors.{SavedUserAnswers, SaveForLaterConnector}
 import controllers.routes
 import models.NormalMode
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
@@ -53,11 +53,10 @@ class SaveForLaterServiceSpec extends SpecBase with BeforeAndAfterEach {
   private val errorLocation = routes.JourneyRecoveryController.onPageLoad()
 
   private val instantDate = Instant.now()
-  private val saveForLaterRequest: SaveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"), None)
+  private val saveForLaterRequest: SaveForLaterRequest = SaveForLaterRequest(vrn, Json.toJson("test"))
   private val savedUserAnswers: SavedUserAnswers = SavedUserAnswers(
     saveForLaterRequest.vrn,
     JsObject(Seq("saveForLaterRequest" -> Json.toJson(saveForLaterRequest.data))),
-    Some(vatCustomerInfo),
     instantDate
   )
   override def beforeEach(): Unit = {
