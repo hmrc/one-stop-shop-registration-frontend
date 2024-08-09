@@ -39,7 +39,7 @@ object BankDetailsSummary  {
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(mode).url)
-              .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
+              .withVisuallyHiddenText(messages("bankDetails.change.accountName.hidden"))
           )
         )
     }
@@ -57,7 +57,7 @@ object BankDetailsSummary  {
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(mode).url)
-              .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
+              .withVisuallyHiddenText(messages("bankDetails.change.bic.hidden"))
           )
         )
     }
@@ -73,7 +73,7 @@ object BankDetailsSummary  {
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.BankDetailsController.onPageLoad(mode).url)
-              .withVisuallyHiddenText(messages("bankDetails.change.hidden"))
+              .withVisuallyHiddenText(messages("bankDetails.change.iban.hidden"))
           )
         )
     }

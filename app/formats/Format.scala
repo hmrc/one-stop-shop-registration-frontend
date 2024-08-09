@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter
 
 object Format {
 
-  val dateFormatter: DateTimeFormatter     = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
   val dateHintFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d M yyyy")
-  val dateOfRegistrationFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+  val dateOfRegistrationFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 }

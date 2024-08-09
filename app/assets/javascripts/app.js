@@ -109,13 +109,15 @@ if (typeof accessibleAutocomplete != 'undefined' && document.querySelector('.aut
 
 function showTheSpinner() {
 
+  const processingWheel = document.getElementById("processing-wheel");
+
   //make the spinning wheel visible
-  document.getElementById("processing-wheel").hidden = false;
+    processingWheel.removeAttribute("aria-hidden");
+    processingWheel.hidden = false;
 
   //make the button hidden
   document.getElementById("continue").style.visibility = 'hidden';
   document.getElementById("saveProgress").style.visibility = 'hidden';
-
 
   return false;
 }
