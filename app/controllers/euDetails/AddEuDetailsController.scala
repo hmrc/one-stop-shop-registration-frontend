@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.DeriveNumberOfEuRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.CheckJourneyRecovery.{determineJourneyRecovery, determineMissingAnswersJourney}
 import utils.CompletionChecks
 import utils.EuDetailsCompletionChecks.{getAllIncompleteEuDetails, incompleteCheckEuDetailsRedirect}
 import utils.FutureSyntax.FutureOps
@@ -104,5 +104,5 @@ class AddEuDetailsController @Inject()(
     request.userAnswers.get(DeriveNumberOfEuRegistrations).map {
       number =>
         block(number)
-    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
+    }.getOrElse(Redirect(determineMissingAnswersJourney(Some(mode))).toFuture)
 }
