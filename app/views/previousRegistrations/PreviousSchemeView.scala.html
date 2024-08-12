@@ -14,12 +14,14 @@
  * limitations under the License.
  *@
 
+@import components.ButtonGroup
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 
@@ -41,8 +43,10 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue")).withAttribute(("id", "continue"))
+        @button(
+          messages("site.continue"),
+          controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(mode, countryIndex, schemeIndex).url,
+          mode
         )
     }
 }
