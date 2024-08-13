@@ -80,7 +80,7 @@ trait SpecBase
       organisationName = Some("Company name"),
       singleMarketIndicator = Some(true),
       individualName = None,
-      deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate))
+      deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).plusYears(10))
     )
 
   val verifyEmail: VerifyEmail = VerifyEmail(
