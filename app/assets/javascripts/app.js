@@ -33,17 +33,14 @@ function upTo(el, tagName) {
 }
 
 
-if (typeof accessibleAutocomplete != 'undefined' && document.querySelector('.autocomplete') != null) {
+if (typeof HMRCAccessibleAutocomplete != 'undefined' && document.querySelector('[date-module="hmrc-accessible-autocomplete"]') != null) {
   // load autocomplete
-  var selectEl = document.querySelector('.autocomplete');
+  var selectEl = document.querySelector('[date-module="hmrc-accessible-autocomplete"]');
   if (selectEl && selectEl.style.display !== "none") {
-    accessibleAutocomplete.enhanceSelectElement({
-      autoselect: true,
+    HMRCAccessibleAutocomplete.enhanceSelectElement({
       id: selectEl.id, // Important that id is the same
       defaultValue: "",
-      minLength: 2,
-      selectElement: selectEl,
-      showAllValues: true
+      selectElement: selectEl
     });
   }
 
@@ -51,7 +48,7 @@ if (typeof accessibleAutocomplete != 'undefined' && document.querySelector('.aut
   // Polyfill autocomplete once loaded
   // =====================================================
   var checkForLoad = setInterval(checkForAutocompleteLoad, 500);
-  var originalSelect = document.querySelector('select.autocomplete');
+  var originalSelect = document.querySelector('[date-module="hmrc-accessible-autocomplete"]');
   var parentForm = upTo(originalSelect, 'form');
 
   function polyfillAutocomplete(){

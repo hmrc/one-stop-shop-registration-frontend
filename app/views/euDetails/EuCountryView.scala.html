@@ -14,38 +14,42 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth
 @import components.ButtonGroup
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    govukSelect: GovukSelect,
-    button: ButtonGroup
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukSelect: GovukSelect,
+        button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, index: Index)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("euCountry.title"))) {
 
-    @formHelper(action = controllers.euDetails.routes.EuCountryController.onSubmit(mode, index)) {
+  @formHelper(action = controllers.euDetails.routes.EuCountryController.onSubmit(mode, index)) {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
-
-        @govukSelect(
-            SelectViewModel(
-                field = form("value"),
-                items = Country.euCountrySelectItems,
-                label = LabelViewModel(messages("euCountry.heading")).asPageHeading()
-            )
-            .withCssClass(InputWidth.Fixed20.toString)
-            .withCssClass("autocomplete")
-        )
-
-        @button("site.continue",  controllers.euDetails.routes.DeleteEuDetailsController.onPageLoad(mode, index).url, mode)
+    @if(form.errors.nonEmpty) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
+
+    @govukSelect(
+      SelectViewModel(
+        field = form("value"),
+        items = Country.euCountrySelectItems,
+        label = LabelViewModel(messages("euCountry.heading")).asPageHeading()
+      ).asAccessibleAutocomplete(Some(
+        AccessibleAutocomplete(
+          showAllValues = true,
+          defaultValue = Some("")
+        )
+      ))
+    )
+
+    @button("site.continue", controllers.euDetails.routes.DeleteEuDetailsController.onPageLoad(mode, index).url, mode)
+  }
 }
