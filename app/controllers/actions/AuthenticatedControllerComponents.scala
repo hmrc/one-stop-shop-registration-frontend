@@ -45,6 +45,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def checkRejoinOtherCountryRegistration: CheckRejoinOtherCountryRegistrationFilter
   def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
   def checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider
+  def checkVatExpiredFilter: CheckVatExpiredFilter
   def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
     actionBuilder andThen
       identify andThen
@@ -52,6 +53,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkRegistration(mode) andThen
       getData andThen
       requireData(mode) andThen
+      checkVatExpiredFilter(mode) andThen
       checkNiProtocolExpired(mode) andThen
       checkNiProtocol(mode) andThen
       checkOtherCountryRegistration(mode)
@@ -94,5 +96,6 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter,
                                                                checkRejoinOtherCountryRegistration: CheckRejoinOtherCountryRegistrationFilter,
                                                                checkEmailVerificationStatus: CheckEmailVerificationFilterProvider,
-                                                               checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider
+                                                               checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider,
+                                                               checkVatExpiredFilter: CheckVatExpiredFilter,
                                                              ) extends AuthenticatedControllerComponents

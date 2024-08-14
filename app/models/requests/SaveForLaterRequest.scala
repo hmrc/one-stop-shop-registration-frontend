@@ -24,13 +24,12 @@ import uk.gov.hmrc.domain.Vrn
 
 case class SaveForLaterRequest(
                                 vrn: Vrn,
-                                data: JsValue,
-                                vatInfo: Option[VatCustomerInfo]
+                                data: JsValue
                               )
 
 object SaveForLaterRequest {
 
   implicit val format: OFormat[SaveForLaterRequest] = Json.format[SaveForLaterRequest]
 
-  def apply(answers: UserAnswers, vrn: Vrn): SaveForLaterRequest = SaveForLaterRequest(vrn, answers.data, answers.vatInfo)
+  def apply(answers: UserAnswers, vrn: Vrn): SaveForLaterRequest = SaveForLaterRequest(vrn, answers.data)
 }

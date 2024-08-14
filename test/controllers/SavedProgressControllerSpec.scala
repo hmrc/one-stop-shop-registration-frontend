@@ -58,7 +58,6 @@ class SavedProgressControllerSpec extends SpecBase {
       val savedAnswers = SavedUserAnswers(
         vrn,
         JsObject(Seq("test" -> Json.toJson("test"))),
-        None,
         instantDate
       )
 
@@ -105,7 +104,6 @@ class SavedProgressControllerSpec extends SpecBase {
       val savedAnswers = SavedUserAnswers(
         vrn,
         JsObject(Seq("test" -> Json.toJson("test"))),
-        None,
         instantDate
       )
 
