@@ -19,83 +19,90 @@
 @import views.html.helper.CSPNonce
 
 @this(
-    appConfig: FrontendAppConfig,
-    govukLayout: GovukLayout,
-    govukBackLink: GovukBackLink,
-    hmrcHead: HmrcHead,
-    hmrcStandardHeader: HmrcStandardHeader,
-    hmrcStandardFooter: HmrcStandardFooter,
-    hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
-    hmrcLanguageSelect: HmrcLanguageSelect,
-    hmrcTimeoutDialog: HmrcTimeoutDialog,
-    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-    hmrcScripts: HmrcScripts,
-    betaBanner: StandardBetaBanner
+        appConfig: FrontendAppConfig,
+        govukLayout: GovukLayout,
+        govukBackLink: GovukBackLink,
+        hmrcHead: HmrcHead,
+        hmrcStandardHeader: HmrcStandardHeader,
+        hmrcStandardFooter: HmrcStandardFooter,
+        hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
+        hmrcLanguageSelect: HmrcLanguageSelect,
+        hmrcTimeoutDialog: HmrcTimeoutDialog,
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+        hmrcScripts: HmrcScripts,
+        betaBanner: StandardBetaBanner,
+        autocompleteCss: HmrcAccessibleAutocompleteCss,
+        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript,
+        hmrcStandardPage: HmrcStandardPage
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
 
-    @hmrcHead(
-        headBlock = if(timeout) { Some(
-            hmrcTimeoutDialog(TimeoutDialog(
-                timeout             = Some(appConfig.timeout),
-                countdown           = Some(appConfig.countdown),
-                keepAliveUrl        = Some(routes.KeepAliveController.keepAliveAuthenticated().url),
-                keepAliveButtonText = Some(messages("timeout.keepAlive")),
-                signOutUrl          = Some(controllers.auth.routes.AuthController.signOut().url),
-                signOutButtonText   = Some(messages("timeout.signOut")),
-                title               = Some(messages("timeout.title")),
-                message             = Some(messages("timeout.message"))
-            )))
-        } else None
-    )
+@hmrcHead(
+  headBlock = if(timeout) {
+    Some(
+      hmrcTimeoutDialog(TimeoutDialog(
+        timeout = Some(appConfig.timeout),
+        countdown = Some(appConfig.countdown),
+        keepAliveUrl = Some(routes.KeepAliveController.keepAliveAuthenticated().url),
+        keepAliveButtonText = Some(messages("timeout.keepAlive")),
+        signOutUrl = Some(controllers.auth.routes.AuthController.signOut().url),
+        signOutButtonText = Some(messages("timeout.signOut")),
+        title = Some(messages("timeout.title")),
+        message = Some(messages("timeout.message"))
+      )))
+  } else None
+)
 
-    <link href="@routes.Assets.versioned("stylesheets/accessible-autocomplete.min.css").url" media="screen" rel="stylesheet" type="text/css" />
-    <link href="@routes.Assets.versioned("stylesheets/one-stop-shop.css").url" media="screen" rel="stylesheet" type="text/css" />
+  @autocompleteCss()
+  <link href="@routes.Assets.versioned("stylesheets/accessible-autocomplete.min.css").url" media="screen" rel="stylesheet" type="text/css" />
+  <link href="@routes.Assets.versioned("stylesheets/one-stop-shop.css").url" media="screen" rel="stylesheet" type="text/css" />
 }
 
 @additionalScripts = {
-    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete.js")'></script>
-    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
+
+  @autocompleteJavascript()
+  <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete.js")'></script>
+  <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
 }
 
 @beforeContent = {
 
-    @if(appConfig.languageTranslationEnabled) {
-        @hmrcLanguageSelect(LanguageSelect(
-            if (messages.lang.code == "cy") Cy else En,
-            (En, routes.LanguageSwitchController.switchToLanguage("en").url),
-            (Cy, routes.LanguageSwitchController.switchToLanguage("cy").url)
-        ))
-    }
+@if(appConfig.languageTranslationEnabled) {
+  @hmrcLanguageSelect(LanguageSelect(
+    if(messages.lang.code == "cy") Cy else En,
+    (En, routes.LanguageSwitchController.switchToLanguage("en").url),
+    (Cy, routes.LanguageSwitchController.switchToLanguage("cy").url)
+  ))
+}
 
-    @if(showBackLink) {
-        @govukBackLink(BackLinkViewModel(href = "#"))
-    }
+@if(showBackLink) {
+  @govukBackLink(BackLinkViewModel(href = "#"))
+}
 }
 
 @content = {
-    @contentBlock
+@contentBlock
 
-    <div class="govuk-!-margin-top-8">
-        @hmrcReportTechnicalIssueHelper()
-    </div>
+  <div class="govuk-!-margin-top-8">
+  @hmrcReportTechnicalIssueHelper()
+  </div>
 }
 
 @govukLayout(
-    pageTitle   = Some(pageTitle),
-    headBlock   = Some(head),
-    headerBlock = Some(hmrcStandardHeader(
-        serviceUrl  = Some(routes.IndexController.onPageLoad().url),
-        signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
-        phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
-        userResearchBanner = Some(UserResearchBanner(url = appConfig.userResearchUrl))
-)),
-    beforeContentBlock = Some(beforeContent),
-    footerBlock        = Some(hmrcStandardFooter()),
-    scriptsBlock       = Some(hmrcScripts(
-        scriptsBlock = Some(additionalScripts)
-    ))
+  pageTitle = Some(pageTitle),
+  headBlock = Some(head),
+  headerBlock = Some(hmrcStandardHeader(
+    serviceUrl = Some(routes.IndexController.onPageLoad().url),
+    signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
+    phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
+    userResearchBanner = Some(UserResearchBanner(url = appConfig.userResearchUrl))
+  )),
+  beforeContentBlock = Some(beforeContent),
+  footerBlock = Some(hmrcStandardFooter()),
+  scriptsBlock = Some(hmrcScripts(
+    scriptsBlock = Some(additionalScripts)
+  ))
 )(content)
