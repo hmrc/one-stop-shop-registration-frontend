@@ -18,8 +18,7 @@ package controllers
 
 import controllers.actions._
 import formats.Format.dateFormatter
-import models.{Mode, RejoinMode}
-import pages.previousRegistrations.PreviouslyRegisteredPage
+import models.Mode
 import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -71,33 +70,14 @@ class CommencementDateController @Inject()(
               }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))))
 
             case Some(false) =>
-              request.userAnswers.get(PreviouslyRegisteredPage) match {
-                case Some(false) =>
-                  Ok(view(
-                    mode,
-                    calculatedCommencementDate.format(dateFormatter),
-                    finalDayOfDateAmendment.format(dateFormatter),
-                    isDateInCurrentQuarter = true,
-                    None,
-                    None,
-                    None
-                  ))
-                case Some(true) =>
-                  if(mode == RejoinMode) {
-                    Ok(view(
-                      mode,
-                      calculatedCommencementDate.format(dateFormatter),
-                      finalDayOfDateAmendment.format(dateFormatter),
-                      isDateInCurrentQuarter = true,
-                      None,
-                      None,
-                      None
-                    ))
-                  } else {
-                    Redirect(routes.RegisterLaterController.onPageLoad())
-                  }
-                case _ => Redirect(determineJourneyRecovery(Some(mode)))
-              }
+              Ok(view(mode,
+                calculatedCommencementDate.format(dateFormatter),
+                finalDayOfDateAmendment.format(dateFormatter),
+                isDateInCurrentQuarter = true,
+                None,
+                None,
+                None
+              ))
 
             case _ => Redirect(determineJourneyRecovery(Some(mode)))
           }

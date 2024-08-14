@@ -203,7 +203,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
         val answers = answer1.set(PreviouslyRegisteredPage, false).success.value
         val startDateNow = LocalDate.now(stubClockAtArbitraryDate)
-        val dateOfLastAmendment = LocalDate.now() // TODO
+        val dateOfLastAmendment = LocalDate.now(stubClockAtArbitraryDate).minusDays(1)
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(startDateNow)
         when(dateService.startOfNextQuarter()) thenReturn startDateNow
@@ -234,10 +234,13 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
       }
 
       "must return OK and the correct view when user answers no to hasMadeSales and yes to previously registered" in {
+        val startDateFormatted = arbitraryStartDate.format(dateFormatter)
         val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
         val answers = answer1.set(PreviouslyRegisteredPage, true).success.value
+        val dateOfLastAmendment = LocalDate.now(stubClockAtArbitraryDate).minusDays(1)
 
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
+        when(dateService.calculateFinalAmendmentDate(any())(any())) thenReturn dateOfLastAmendment
         when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
 
         val application =
@@ -249,29 +252,18 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
         running(application) {
           val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
           val result = route(application, request).value
+          val view = application.injector.instanceOf[CommencementDateView]
 
-          status(result) mustEqual SEE_OTHER
-        }
-      }
-
-      "must redirect to Journey Recovery when user answers no to hasMadeSales and previously registered is empty" in {
-        val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
-
-        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-        when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
-
-        val application =
-          applicationBuilder(userAnswers = Some(answer1))
-            .overrides(bind[DateService].toInstance(dateService))
-            .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
-            .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(NormalMode).url)
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            NormalMode,
+            startDateFormatted,
+            dateOfLastAmendment.format(dateFormatter),
+            true,
+            None,
+            None,
+            None
+          )(request, messages(application)).toString
         }
       }
 
@@ -310,32 +302,6 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
           when(dateService.startOfCurrentQuarter) thenReturn now
           when(dateService.lastDayOfCalendarQuarter) thenReturn now
           when(dateService.startOfNextQuarter()) thenReturn now
-          when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(true)
-
-          val application =
-            applicationBuilder(userAnswers = Some(answer1))
-              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-              .overrides(bind[DateService].toInstance(dateService))
-              .overrides(bind[CoreRegistrationValidationService].toInstance(coreRegistrationValidationService))
-              .overrides(bind[RegistrationService].toInstance(registrationService))
-              .build()
-
-          running(application) {
-            val request = FakeRequest(GET, routes.CommencementDateController.onPageLoad(AmendMode).url)
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustBe amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-          }
-        }
-
-        "must redirect to Amend Journey Recovery when user answers no to hasMadeSales and previously registered is empty" in {
-
-          val answer1 = basicUserAnswersWithVatInfo.set(HasMadeSalesPage, false).success.value
-
-          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryStartDate)
-          when(dateService.startOfNextQuarter()) thenReturn arbitraryStartDate
           when(registrationService.isEligibleSalesAmendable(any())(any(), any(), any())) thenReturn Future.successful(true)
 
           val application =
