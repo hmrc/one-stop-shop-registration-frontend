@@ -71,33 +71,14 @@ class CommencementDateController @Inject()(
               }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))))
 
             case Some(false) =>
-              request.userAnswers.get(PreviouslyRegisteredPage) match {
-                case Some(false) =>
-                  Ok(view(
-                    mode,
-                    calculatedCommencementDate.format(dateFormatter),
-                    finalDayOfDateAmendment.format(dateFormatter),
-                    isDateInCurrentQuarter = true,
-                    None,
-                    None,
-                    None
-                  ))
-                case Some(true) =>
-                  if(mode == RejoinMode) {
-                    Ok(view(
-                      mode,
-                      calculatedCommencementDate.format(dateFormatter),
-                      finalDayOfDateAmendment.format(dateFormatter),
-                      isDateInCurrentQuarter = true,
-                      None,
-                      None,
-                      None
-                    ))
-                  } else {
-                    Redirect(routes.RegisterLaterController.onPageLoad())
-                  }
-                case _ => Redirect(determineJourneyRecovery(Some(mode)))
-              }
+              Ok(view(mode,
+                calculatedCommencementDate.format(dateFormatter),
+                finalDayOfDateAmendment.format(dateFormatter),
+                isDateInCurrentQuarter = true,
+                None,
+                None,
+                None
+              ))
 
             case _ => Redirect(determineJourneyRecovery(Some(mode)))
           }

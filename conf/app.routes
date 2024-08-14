@@ -389,8 +389,6 @@ POST        /amend-start-date                                                   
 GET         /rejoin-start-date                                                      controllers.CommencementDateController.onPageLoad(mode: Mode = RejoinMode)
 POST        /rejoin-start-date                                                      controllers.CommencementDateController.onSubmit(mode: Mode = RejoinMode)
 
-GET         /register-later                                                         controllers.RegisterLaterController.onPageLoad()
-
 GET         /already-eu-registered                                                  controllers.RegisteredForOssInEuController.onPageLoad()
 POST        /already-eu-registered                                                  controllers.RegisteredForOssInEuController.onSubmit()
 
