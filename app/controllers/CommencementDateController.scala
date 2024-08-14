@@ -18,8 +18,7 @@ package controllers
 
 import controllers.actions._
 import formats.Format.dateFormatter
-import models.{Mode, RejoinMode}
-import pages.previousRegistrations.PreviouslyRegisteredPage
+import models.Mode
 import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

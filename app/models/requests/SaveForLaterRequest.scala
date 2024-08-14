@@ -17,8 +17,7 @@
 package models.requests
 
 import models.UserAnswers
-import models.domain.VatCustomerInfo
-import play.api.libs.json.{JsValue, Json, OFormat}
+import play.api.libs.json.{Json, JsValue, OFormat}
 import uk.gov.hmrc.domain.Vrn
 
 
