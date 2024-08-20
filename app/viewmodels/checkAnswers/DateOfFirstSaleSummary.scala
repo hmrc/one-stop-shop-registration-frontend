@@ -43,4 +43,16 @@ object DateOfFirstSaleSummary  {
           )
         )
     }
+
+  def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(DateOfFirstSalePage).map {
+      answer =>
+
+        val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+
+        SummaryListRowViewModel(
+          key     = KeyViewModel("dateOfFirstSale.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
+          value   = ValueViewModel(answer.format(dateFormatter))
+        )
+    }
 }

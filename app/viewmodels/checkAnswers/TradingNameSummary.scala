@@ -61,4 +61,37 @@ object TradingNameSummary {
           )
         )
     }
+
+  def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllTradingNames).map {
+      addedTradingNames =>
+        val value = addedTradingNames.map {
+          name =>
+            HtmlFormat.escape(name)
+        }.mkString("<br/>")
+
+        SummaryListRowViewModel(
+          key = KeyViewModel("tradingNames.checkYourAnswersLabel.added").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+    }
+
+  def removedAnswersRow(removedTradingNames: Seq[String])(implicit messages: Messages): Option[SummaryListRow] =
+
+    if (removedTradingNames.nonEmpty) {
+      val value = removedTradingNames.map {
+        name =>
+          HtmlFormat.escape(name)
+      }.mkString("<br/>")
+
+      Some(
+        SummaryListRowViewModel(
+          key = KeyViewModel("tradingNames.checkYourAnswersLabel.removed").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+      )
+    } else {
+      None
+    }
+
 }

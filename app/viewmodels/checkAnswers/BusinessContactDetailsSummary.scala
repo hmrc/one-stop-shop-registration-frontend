@@ -76,4 +76,40 @@ object BusinessContactDetailsSummary  {
           )
         )
     }
+
+  def amendedContactNameRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BusinessContactDetailsPage).map {
+      answer =>
+
+        val value = HtmlFormat.escape(answer.fullName).toString
+
+        SummaryListRowViewModel(
+          key     = KeyViewModel("businessContactDetails.fullName").withCssClass("govuk-!-width-one-half"),
+          value   = ValueViewModel(HtmlContent(value))
+        )
+    }
+
+  def amendedTelephoneNumberRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BusinessContactDetailsPage).map {
+      answer =>
+
+        val value = HtmlFormat.escape(answer.telephoneNumber).toString
+
+        SummaryListRowViewModel(
+          key     = KeyViewModel("businessContactDetails.telephoneNumber").withCssClass("govuk-!-width-one-half"),
+          value   = ValueViewModel(HtmlContent(value))
+        )
+    }
+
+  def amendedEmailAddressRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(BusinessContactDetailsPage).map {
+      answer =>
+
+        val value = HtmlFormat.escape(answer.emailAddress).toString
+
+        SummaryListRowViewModel(
+          key     = KeyViewModel("businessContactDetails.emailAddress").withCssClass("govuk-!-width-one-half"),
+          value   = ValueViewModel(HtmlContent(value))
+        )
+    }
 }

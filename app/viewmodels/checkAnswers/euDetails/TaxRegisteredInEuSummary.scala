@@ -41,4 +41,16 @@ object TaxRegisteredInEuSummary {
           )
         )
     }
+
+  def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(TaxRegisteredInEuPage).map {
+      answer =>
+
+        val value = if (answer) "site.yes" else "site.no"
+
+        SummaryListRowViewModel(
+          key = KeyViewModel("taxRegisteredInEu.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(value)
+        )
+    }
 }

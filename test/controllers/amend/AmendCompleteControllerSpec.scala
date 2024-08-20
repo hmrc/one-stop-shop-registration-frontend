@@ -22,18 +22,25 @@ import connectors.RegistrationConnector
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.Quarter.{Q1, Q4}
+import models.domain.Registration
 import models.external.ExternalEntryUrl
+import models.requests.AuthenticatedDataRequest
 import models.{Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.Json
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
-import services.{CoreRegistrationValidationService, DateService, PeriodService}
+import services.{CoreRegistrationValidationService, DateService, PeriodService, RegistrationService}
+import testutils.RegistrationData
+import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.govuk.all.SummaryListViewModel
 import views.html.amend.AmendCompleteView
 
 import java.time.{Clock, LocalDate, ZoneId}
@@ -46,6 +53,12 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockDateService = mock[DateService]
+
+  private val mockRegistration = RegistrationData.registration
+  private val mockRegistrationService = mock[RegistrationService]
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
   private  val userAnswers = UserAnswers(
     userAnswersId,
@@ -86,12 +99,20 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            userAnswersWithEmail,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
@@ -100,6 +121,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
+            summaryList
           )(request, messages(application)).toString
         }
       }
@@ -125,12 +147,19 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            userAnswersWithoutEmail,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(
@@ -139,6 +168,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
+            summaryList
           )(request, messages(application)).toString
         }
       }
@@ -163,11 +193,18 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            answers,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
 
           val view = application.injector.instanceOf[AmendCompleteView]
           status(result) mustEqual OK
@@ -177,6 +214,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
+            summaryList
           )(request, messages(application)).toString
         }
       }
@@ -189,6 +227,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
+          .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application =
@@ -206,12 +245,19 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            answers,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
 
           status(result) mustEqual OK
 
@@ -221,6 +267,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
+            summaryList
           )(request, messages(application)).toString
         }
       }
@@ -234,9 +281,11 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
+          .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, true).success.value
 
         val application =
@@ -245,6 +294,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
             .overrides(bind[DateService].toInstance(mockDateService))
+            .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
             .build()
 
         running(application) {
@@ -252,6 +302,12 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
           val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            answers,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
 
           status(result) mustEqual OK
 
@@ -261,6 +317,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
+            summaryList
           )(request, messages(application)).toString
         }
       }

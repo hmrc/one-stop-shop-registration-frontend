@@ -18,7 +18,7 @@ package base
 
 import controllers.actions._
 import generators.Generators
-import models.domain.VatCustomerInfo
+import models.domain.{Registration, VatCustomerInfo}
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.requests.AuthenticatedDataRequest
 import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, Period, Quarter, UserAnswers}
@@ -36,6 +36,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
+import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 import services.{DateService, RegistrationService}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
@@ -214,6 +215,75 @@ trait SpecBase
         bankDetailsIbanSummaryRow
       ).flatten
     }
+  }
+
+  def getAmendedCYASummaryList(answers: UserAnswers, dateService: DateService, registrationService: RegistrationService, registration: Option[Registration])
+                       (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
+    new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
+
+      val hasTradingNameSummaryRow = new HasTradingNameSummary().amendedAnswersRow(answers)
+      val tradingNameSummaryRow = TradingNameSummary.amendedAnswersRow(answers)
+      val removedTradingNameRows = TradingNameSummary.removedAnswersRow(getRemovedTradingNames(answers, registration))
+      val hasMadeSalesSummaryRow = HasMadeSalesSummary.amendedAnswersRow(answers)
+      val dateOfFirstSaleSummary = DateOfFirstSaleSummary.amendedAnswersRow(request.userAnswers)
+      val commencementDateSummaryRow = Some(commencementDateSummary)
+      val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.amendedAnswersRow(answers)
+      val euDetailsSummaryRow = EuDetailsSummary.amendedAnswersRow(answers)
+      val removedEuDetailsRow = EuDetailsSummary.removedAnswersRow(getRemovedEuDetails(answers, registration))
+      val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.amendedAnswerRow(answers)
+      val hasWebsiteSummaryRow = HasWebsiteSummary.amendedAnswersRow(answers)
+      val websiteSummaryRow = WebsiteSummary.amendedAnswersRow(answers)
+      val removedWebsiteRow = WebsiteSummary.removedWebsiteRow(getRemovedWebsites(answers, registration))
+      val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.amendedContactNameRow(answers)
+      val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.amendedTelephoneNumberRow(answers)
+      val businessContactDetailsEmailSummaryRow= BusinessContactDetailsSummary.amendedEmailAddressRow(answers)
+      val bankDetailsAccountNameSummaryRow = BankDetailsSummary.amendedAccountNameRow(answers)
+      val bankDetailsBicSummaryRow = BankDetailsSummary.amendedBICRow(answers)
+      val bankDetailsIbanSummaryRow = BankDetailsSummary.amendedIBANRow(answers)
+
+      Seq(
+        hasTradingNameSummaryRow,
+        tradingNameSummaryRow,
+        removedTradingNameRows,
+        hasMadeSalesSummaryRow,
+        dateOfFirstSaleSummary,
+        commencementDateSummaryRow,
+        taxRegisteredInEuSummaryRow,
+        euDetailsSummaryRow,
+        removedEuDetailsRow,
+        isOnlineMarketplaceSummaryRow,
+        hasWebsiteSummaryRow,
+        websiteSummaryRow,
+        removedWebsiteRow,
+        businessContactDetailsContactNameSummaryRow,
+        businessContactDetailsTelephoneSummaryRow,
+        businessContactDetailsEmailSummaryRow,
+        bankDetailsAccountNameSummaryRow,
+        bankDetailsBicSummaryRow,
+        bankDetailsIbanSummaryRow
+      ).flatten
+    }
+  }
+
+  private def getRemovedTradingNames(answers: UserAnswers, registration: Option[Registration]): Seq[String] = {
+    val amendedAnswers = answers.get(AllTradingNames).getOrElse(List.empty)
+    val originalAnswers = registration.map(_.tradingNames).getOrElse(List.empty)
+
+    originalAnswers.diff(amendedAnswers)
+  }
+
+  private def getRemovedEuDetails(answers: UserAnswers, registration: Option[Registration]): Seq[Country] = {
+    val amendedAnswers = answers.get(AllEuOptionalDetailsQuery).map(_.map(_.euCountry)).getOrElse(List.empty)
+    val originalAnswers = registration.map(_.euRegistrations.map(_.country)).getOrElse(List.empty)
+
+    originalAnswers.diff(amendedAnswers)
+  }
+
+  private def getRemovedWebsites(answers: UserAnswers, registration: Option[Registration]): Seq[String] = {
+    val amendedAnswers = answers.get(AllWebsites).getOrElse(List.empty)
+    val originalAnswers = registration.map(_.websites).getOrElse(List.empty)
+
+    originalAnswers.diff(amendedAnswers)
   }
 
 }

@@ -159,12 +159,17 @@ businessContactDetails.change.emailAddress.hidden = your email address
 businessContactDetails.button.sendCode = Send code and continue
 
 euVatDetails.checkYourAnswersLabel = EU tax details added
+euVatDetails.checkYourAnswersLabel.removed = EU tax details removed
 euVatDetails.change.hidden = EU tax registration details added
 
 websites.checkYourAnswersLabel = Trading websites
+websites.checkYourAnswersLabel.added = Trading websites added
+websites.checkYourAnswersLabel.removed = Trading websites removed
 websites.change.hidden = Trading websites
 
 tradingNames.checkYourAnswersLabel = Other trading names
+tradingNames.checkYourAnswersLabel.added = Trading names added
+tradingNames.checkYourAnswersLabel.removed = Trading names removed
 tradingNames.change.hidden = Other trading names
 
 notInControlOfMovingGoods.title = You cannot register

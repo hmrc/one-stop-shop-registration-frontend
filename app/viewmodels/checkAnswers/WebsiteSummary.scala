@@ -17,7 +17,9 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
+import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode, UserAnswers}
+import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllWebsites
@@ -61,4 +63,38 @@ object WebsiteSummary {
           )
         )
     }
+
+  def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllWebsites).map {
+      websites =>
+
+        val value = websites.map {
+          name =>
+            HtmlFormat.escape(name)
+        }.mkString("<br/>")
+
+        SummaryListRowViewModel(
+          key = KeyViewModel("websites.checkYourAnswersLabel.added").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+    }
+
+  def removedWebsiteRow(removedWebsites: Seq[String])(implicit messages: Messages): Option[SummaryListRow] = {
+
+    if (removedWebsites.nonEmpty) {
+      val value = removedWebsites.map {
+        name =>
+          HtmlFormat.escape(name)
+      }.mkString("<br/>")
+
+      Some(
+        SummaryListRowViewModel(
+          key = KeyViewModel("websites.checkYourAnswersLabel.removed").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+      )
+    } else {
+      None
+    }
+  }
 }

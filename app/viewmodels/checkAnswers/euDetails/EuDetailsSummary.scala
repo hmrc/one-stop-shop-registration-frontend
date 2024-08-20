@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.euDetails
 
 import controllers.euDetails.routes
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, Mode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Country, Index, Mode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuOptionalDetailsQuery
@@ -106,5 +106,36 @@ object EuDetailsSummary {
       )
   }
 
+  def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(AllEuOptionalDetailsQuery).map {
+      euVatDetails =>
 
+        val value = euVatDetails.map {
+          details =>
+            HtmlFormat.escape(details.euCountry.name)
+        }.mkString("<br/>")
+
+        SummaryListRowViewModel(
+          key = KeyViewModel("euVatDetails.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+    }
+
+  def removedAnswersRow(removedEuDetails: Seq[Country])(implicit messages: Messages): Option[SummaryListRow] =
+
+    if (removedEuDetails.nonEmpty) {
+        val value = removedEuDetails.map {
+          details =>
+            HtmlFormat.escape(details.name)
+        }.mkString("<br/>")
+
+      Some(
+        SummaryListRowViewModel(
+          key = KeyViewModel("euVatDetails.checkYourAnswersLabel.removed").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+      )
+    } else {
+      None
+    }
 }
