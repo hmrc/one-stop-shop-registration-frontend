@@ -22,7 +22,6 @@ import connectors.RegistrationConnector
 import controllers.amend.{routes => amendRoutes}
 import controllers.routes
 import models.Quarter.{Q1, Q4}
-import models.domain.Registration
 import models.external.ExternalEntryUrl
 import models.requests.AuthenticatedDataRequest
 import models.{Period, UserAnswers}
