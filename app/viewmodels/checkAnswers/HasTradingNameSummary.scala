@@ -26,7 +26,7 @@ import viewmodels.implicits._
 
 import javax.inject.Inject
 
-class HasTradingNameSummary @Inject()() {
+class HasTradingNameSummary @Inject() {
 
   def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HasTradingNamePage).map {

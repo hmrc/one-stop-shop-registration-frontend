@@ -288,8 +288,8 @@ class AmendCompleteController @Inject()(
                                       userAnswers: UserAnswers
                                     )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
-    val originalIsOMPAnswer = originalRegistration.map(_.isOnlineMarketplace).getOrElse(List.empty)
-    val amendedIsOMPAnswer = userAnswers.get(IsOnlineMarketplacePage).getOrElse(List.empty)
+    val originalIsOMPAnswer = originalRegistration.map(_.isOnlineMarketplace)
+    val amendedIsOMPAnswer = userAnswers.get(IsOnlineMarketplacePage)
 
     if (originalIsOMPAnswer != amendedIsOMPAnswer) {
       Seq(

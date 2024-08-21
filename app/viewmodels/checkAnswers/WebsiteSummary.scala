@@ -17,9 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.requests.AuthenticatedDataRequest
 import models.{Index, Mode, UserAnswers}
-import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllWebsites
