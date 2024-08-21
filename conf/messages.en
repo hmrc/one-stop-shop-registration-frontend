@@ -830,6 +830,7 @@ changeYourRegistration.info.p1 = Confirm these changes to save them to your acco
 amendComplete.title = Registration details changed
 amendComplete.heading = Registration details changed
 amendComplete.info = You changed the following details:
+amendComplete.notAmended = You haven''t changed any details:
 amendComplete.link.BTA = Manage your One Stop Shop returns in your account.
 amendComplete.link.yourAccount = Manage your One Stop Shop returns in your account.
 amendComplete.contact.text = We will contact you if we need to check any information.
