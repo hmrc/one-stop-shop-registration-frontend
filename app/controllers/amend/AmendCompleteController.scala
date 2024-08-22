@@ -169,13 +169,10 @@ class AmendCompleteController @Inject()(
     val amendedDateOfFirstSale = userAnswers.get(DateOfFirstSalePage).getOrElse(List.empty)
     val hasChangedToNo = amendedDateOfFirstSale.toString.isEmpty && originalDateOfFirstSale.toString.nonEmpty
     val hasChangedToYes = amendedDateOfFirstSale.toString.nonEmpty && originalDateOfFirstSale.toString.nonEmpty || originalDateOfFirstSale.toString.isEmpty
-    val notAmended = originalDateOfFirstSale.toString.nonEmpty && amendedDateOfFirstSale.toString.nonEmpty ||
-      originalDateOfFirstSale.toString.isEmpty && amendedDateOfFirstSale.toString.isEmpty
+    val hasChangedDateOfFirstSale = originalDateOfFirstSale != amendedDateOfFirstSale
     val changedAnswer = hasChangedToNo || hasChangedToYes
 
-    if (notAmended) {
-      Seq.empty
-    } else if (changedAnswer) {
+    if (changedAnswer && hasChangedDateOfFirstSale) {
       Seq(
         HasMadeSalesSummary.amendedAnswersRow(request.userAnswers),
       )
