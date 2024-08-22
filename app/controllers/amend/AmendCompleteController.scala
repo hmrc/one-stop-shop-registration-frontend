@@ -31,7 +31,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, Summ
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers._
-import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.amend.AmendCompleteView
 
@@ -93,6 +93,7 @@ class AmendCompleteController @Inject()(
         getTradingNameRows(originalRegistration, userAnswers) ++
         getHasSalesRows(originalRegistration, userAnswers) ++
         getSalesRows(cds, originalRegistration, userAnswers) ++
+        getHasPreviouslyRegistered(originalRegistration, userAnswers)++
         getPreviouslyRegisteredRows(originalRegistration, userAnswers) ++
         getHasRegisteredInEuRows(originalRegistration, userAnswers) ++
         getRegisteredInEuRows(originalRegistration, userAnswers) ++
@@ -113,7 +114,7 @@ class AmendCompleteController @Inject()(
     val originalTradingNames = originalRegistration.map(_.tradingNames).getOrElse(List.empty)
     val amendedTradingNames = userAnswers.get(AllTradingNames).getOrElse(List.empty)
     val hasChangedToNo = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
-    val hasChangedToYes = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty
+    val hasChangedToYes = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
     val notAmended = amendedTradingNames == originalTradingNames
 
     if (hasChangedToNo || hasChangedToYes && !notAmended) {
@@ -165,7 +166,7 @@ class AmendCompleteController @Inject()(
     val originalDateOfFirstSale = originalRegistration.flatMap(_.dateOfFirstSale).getOrElse(List.empty)
     val amendedDateOfFirstSale = userAnswers.get(DateOfFirstSalePage).getOrElse(List.empty)
     val hasChangedToNo = amendedDateOfFirstSale.toString.isEmpty && originalDateOfFirstSale.toString.nonEmpty
-    val hasChangedToYes = amendedDateOfFirstSale.toString.nonEmpty && originalDateOfFirstSale.toString.nonEmpty
+    val hasChangedToYes = amendedDateOfFirstSale.toString.nonEmpty && originalDateOfFirstSale.toString.nonEmpty || originalDateOfFirstSale.toString.isEmpty
     val hasChangedDateOfFirstSale = originalDateOfFirstSale != amendedDateOfFirstSale
     val changedAnswer = hasChangedToNo || hasChangedToYes
 
@@ -197,6 +198,27 @@ class AmendCompleteController @Inject()(
       Seq.empty
     }
 
+  }
+
+  private def getHasPreviouslyRegistered(
+                                          originalRegistration: Option[Registration],
+                                          userAnswers: UserAnswers
+                                        )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val originalPreviouslyRegisteredDetails = originalRegistration.map(_.previousRegistrations.map(_.country)).getOrElse(List.empty)
+    val amendedPreviouslyRegisteredDetails = userAnswers.get(AllPreviousRegistrationsQuery).map(_.map(_.previousEuCountry)).getOrElse(List.empty)
+    val hasChangedToNo = amendedPreviouslyRegisteredDetails.isEmpty && originalPreviouslyRegisteredDetails.nonEmpty
+    val hasChangedToYes = amendedPreviouslyRegisteredDetails.isEmpty && originalPreviouslyRegisteredDetails.nonEmpty || originalPreviouslyRegisteredDetails.isEmpty
+
+    val changedAnswer = hasChangedToNo || hasChangedToYes
+
+    if (changedAnswer) {
+      Seq(
+        PreviouslyRegisteredSummary.amendedAnswersRow(request.userAnswers),
+      )
+    } else {
+      Seq.empty
+    }
   }
 
   private def getPreviouslyRegisteredRows(
@@ -236,7 +258,7 @@ class AmendCompleteController @Inject()(
     val originalEuDetails = originalRegistration.map(_.euRegistrations.map(_.country)).getOrElse(List.empty)
     val amendedEuDetails = userAnswers.get(AllEuOptionalDetailsQuery).map(_.map(_.euCountry)).getOrElse(List.empty)
     val hasChangedToNo = amendedEuDetails.isEmpty && originalEuDetails.nonEmpty
-    val hasChangedToYes = amendedEuDetails.nonEmpty && originalEuDetails.nonEmpty
+    val hasChangedToYes = amendedEuDetails.nonEmpty && originalEuDetails.nonEmpty || originalEuDetails.isEmpty
     val notAmended = originalEuDetails == amendedEuDetails
 
     if (hasChangedToNo || hasChangedToYes && !notAmended) {
@@ -308,7 +330,7 @@ class AmendCompleteController @Inject()(
     val originalWebsiteAnswers = originalRegistration.map(_.websites).getOrElse(List.empty)
     val amendedWebsitesAnswers = userAnswers.get(AllWebsites).getOrElse(List.empty)
     val hasChangedToNo = amendedWebsitesAnswers.isEmpty && originalWebsiteAnswers.nonEmpty
-    val hasChangedToYes = amendedWebsitesAnswers.nonEmpty && originalWebsiteAnswers.nonEmpty
+    val hasChangedToYes = amendedWebsitesAnswers.nonEmpty && originalWebsiteAnswers.nonEmpty || originalWebsiteAnswers.isEmpty
     val notAmended = amendedWebsitesAnswers == originalWebsiteAnswers
 
      if (hasChangedToNo || hasChangedToYes && !notAmended) {

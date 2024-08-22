@@ -57,7 +57,7 @@ object PreviouslyRegisteredSummary {
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key = "previouslyRegistered.checkYourAnswersLabel",
+          key = KeyViewModel("previouslyRegistered.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
           value = ValueViewModel(value)
         )
     }
