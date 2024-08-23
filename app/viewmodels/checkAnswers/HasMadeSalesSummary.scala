@@ -41,4 +41,16 @@ object HasMadeSalesSummary  {
           )
         )
     }
+
+  def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+    answers.get(HasMadeSalesPage).map {
+      hasMadeSales =>
+
+        val value = if (hasMadeSales) "site.yes" else "site.no"
+
+        SummaryListRowViewModel(
+          key     = KeyViewModel(messages("hasMadeSales.checkYourAnswersLabel")).withCssClass("govuk-!-width-one-half"),
+          value   = ValueViewModel(value)
+        )
+    }
 }
