@@ -17,30 +17,26 @@
 package controllers.rejoin
 
 import cats.data.Validated.{Invalid, Valid}
+import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import logging.Logging
 import models.RejoinMode
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
-import models.domain.{PreviousRegistration, PreviousRegistrationNew, Registration}
+import models.domain.Registration
 import models.exclusions.ExclusionReason.Reversal
-import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.AuthenticatedDataRequest
 import pages.DateOfFirstSalePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.previousRegistration.AllPreviousRegistrationsQuery
 import services.{AuditService, RegistrationValidationService, RejoinRegistrationService}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers._
-import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
-import viewmodels.govuk.all.{FluentSummaryListRow, SummaryListViewModel}
-import views.html.rejoin.{HybridReversalView, RejoinRegistrationView}
+import viewmodels.govuk.all.SummaryListViewModel
+import views.html.rejoin.HybridReversalView
 
 import java.time.{Clock, LocalDate}
 import javax.inject.Inject
@@ -54,6 +50,7 @@ class HybridReversalController @Inject()(
                                           registrationService: RegistrationValidationService,
                                           rejoinRegistrationService: RejoinRegistrationService,
                                           view: HybridReversalView,
+                                          appConfig: FrontendAppConfig,
                                           clock: Clock
                                         )
                                         (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
@@ -71,8 +68,8 @@ class HybridReversalController @Inject()(
         case Some(true) if canRejoin =>
           val list = detailList()
           val isValid = validate()
-          Ok(view(list, isValid, RejoinMode)).toFuture
-        case _ => Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+          Ok(view(list, isValid, RejoinMode, appConfig.ossYourAccountUrl)).toFuture
+        case _ => Redirect(controllers.rejoin.routes.CannotReverseController.onPageLoad().url).toFuture
       }
 
   }
@@ -108,7 +105,7 @@ class HybridReversalController @Inject()(
               }
           }
         } else {
-          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+          Redirect(controllers.rejoin.routes.CannotReverseController.onPageLoad().url).toFuture
         }
       }
   }

@@ -20,6 +20,7 @@ site.confirm = Confirm
 site.tryAgain = Try again
 site.to = to
 site.processing = We are processing your registration.
+site.cancel = Cancel
 
 date.day = Day
 date.month = Month
@@ -885,7 +886,6 @@ deleteAllFixedEstablishment.moreThanOneFixedEstablishment = You can re-register 
 cancelAmendRegistration.title = Do you want to delete your changes?
 cancelAmendRegistration.heading = Do you want to delete your changes?
 cancelAmendRegistration.warning = This will delete any changes that you have not saved.
-cancelAmendRegistration.link = Cancel
 cancelAmendRegistration.button.continue = Continue
 cancelAmendRegistration.button.btr = Back
 cancelAmendRegistration.error.required = Select yes if you want to remove your amended changes from this scheme

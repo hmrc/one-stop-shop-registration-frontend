@@ -14,18 +14,18 @@
  * limitations under the License.
  *@
 
-@import views.html.components.ButtonGroupProcessing
+@import views.html.components.CancelHybridReversalRegButton
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukErrorSummary: GovukErrorSummary,
-        button: ButtonGroupProcessing,
+        button: CancelHybridReversalRegButton,
         govukWarningText: GovukWarningText
 )
 
-@(list: SummaryList, isValid: Boolean, mode: Mode)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, isValid: Boolean, mode: Mode, yourAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
 
@@ -42,14 +42,22 @@
 
     @if(isValid) {
         @formHelper(action = controllers.rejoin.routes.RejoinRegistrationController.onSubmit(incompletePrompt = false)) {
-            @button("site.confirm", controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url, mode)
+            @button(
+              "site.confirm",
+              mode,
+              yourAccountUrl
+            )
         }
     } else {
         <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
         <p class="govuk-body">@messages("error.missing_answers_prompt.general")</p>
 
         @formHelper(action = controllers.rejoin.routes.RejoinRegistrationController.onSubmit(incompletePrompt = true)) {
-            @button("error.resolve_missing_answers", controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url, mode)
+            @button(
+              "error.resolve_missing_answers",
+              mode,
+              yourAccountUrl
+            )
         }
     }
 

@@ -644,6 +644,7 @@ GET         /amend-there-is-a-problem                                           
 GET         /start-rejoin-journey                                                      controllers.rejoin.StartRejoinJourneyController.onPageLoad()
 
 GET         /cannot-rejoin                                                             controllers.rejoin.CannotRejoinController.onPageLoad()
+GET         /cannot-reverse                                                            controllers.rejoin.CannotReverseController.onPageLoad()
 
 GET         /rejoin-registration                                                       controllers.rejoin.RejoinRegistrationController.onPageLoad()
 POST        /rejoin-registration                                                       controllers.rejoin.RejoinRegistrationController.onSubmit(incompletePrompt: Boolean)

@@ -15,13 +15,13 @@
  *@
 
 @this(govukButton: GovukButton)
-@(continueMessage: String, continueUrl: String = "", mode: Mode)(implicit messages: Messages)
+@(continueMessage: String, mode: Mode, cancelUrl: String)(implicit messages: Messages)
 <div class="govuk-button-group">
     @govukButton(
-    ButtonViewModel(messages(continueMessage)).withAttribute(("id", "continue")).withAttribute("onclick", "showTheSpinner()")
+      ButtonViewModel(messages(continueMessage)).withAttribute(("id", "continue")).withAttribute("onclick", "showTheSpinner()")
     )
 
-    <a id="cancel" role="link" href="@routes.CancelAmendRegistrationController.onPageLoad()" class="govuk-link" data-module="govuk-link">
+    <a id="cancel" role="link" href="@cancelUrl" class="govuk-link" data-module="govuk-link">
         @messages("site.cancel")
     </a>
 </div>
