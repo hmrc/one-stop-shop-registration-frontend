@@ -17,6 +17,7 @@
 package services
 
 import models.exclusions.{ExcludedTrader, ExclusionReason}
+import models.UserAnswers
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -31,6 +32,15 @@ class RejoinRegistrationService @Inject() {
       case Some(etmpExclusion) if notQuarantinedAndAfterEffectiveDate(currentDate, etmpExclusion) => true
       case _ => false
     }
+  }
+
+  def canReverse(dateOfFirstSale: LocalDate, exclusion: Option[ExcludedTrader]): Boolean = {
+    exclusion.map(_.effectiveDate) match {
+      case Some(effectiveDate) if dateOfFirstSale.isBefore(effectiveDate) =>
+        true
+      case _ => false
+    }
+
   }
 
   private def isQuarantinedAndAfterTwoYears(currentDate: LocalDate, etmpExclusion: ExcludedTrader): Boolean = {
