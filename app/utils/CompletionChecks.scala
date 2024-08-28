@@ -115,6 +115,10 @@ trait CompletionChecks {
       isDeregisteredPopulated()
   }
 
+  def validateHybridReversal()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+      isAlreadyMadeSalesValid()
+  }
+
   def getFirstValidationErrorRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
     (incompleteTradingNameRedirect(mode) ++
       incompleteEligibleSalesRedirect(mode) ++

@@ -660,3 +660,4 @@ GET         /rejoin-already-registered-other-country                            
 GET         /cannot-rejoin-quarantined-country                                         controllers.rejoin.CannotRejoinQuarantinedCountryController.onPageLoad(countryCode: String, exclusionDate: String)
 
 GET         /hybrid-reversal                                                           controllers.rejoin.HybridReversalController.onPageLoad()
+POST        /hybrid-reversal                                                           controllers.rejoin.HybridReversalController.onSubmit()

@@ -60,53 +60,45 @@ class HybridReversalController @Inject()(
   def onPageLoad: Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(RejoinMode)).async {
     implicit request =>
       val date = LocalDate.now(clock)
-      val registration = request.registration.getOrElse(throw new IllegalStateException("Registration data is missing in the request"))
+      val registration = request.registration.getOrElse {
+        val exception = new IllegalStateException("Registration data is missing in the request")
+        logger.error(exception.getMessage, exception)
+        throw exception
+      }
       val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, registration.excludedTrader)
 
       request.userAnswers.get(DateOfFirstSalePage)
         .map(value => rejoinRegistrationService.canReverse(value, request.registration.flatMap(_.excludedTrader))) match {
         case Some(true) if canRejoin =>
           val list = detailList()
-          val isValid = validate()
-          Ok(view(list, isValid, RejoinMode, appConfig.ossYourAccountUrl)).toFuture
-        case _ => Redirect(controllers.rejoin.routes.CannotReverseController.onPageLoad().url).toFuture
+          Ok(view(list, RejoinMode, appConfig.ossYourAccountUrl)).toFuture
+        case _ =>
+          Redirect(controllers.rejoin.routes.CannotReverseController.onPageLoad().url).toFuture
       }
 
   }
 
-  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(RejoinMode)).async {
+  def onSubmit(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(RejoinMode)).async {
     implicit request =>
 
-      getFirstValidationErrorRedirect(RejoinMode).map { redirect =>
-        Future.successful(redirect)
-      }.getOrElse {
-        val date = LocalDate.now(clock)
-        val registration = request.registration.getOrElse(throw new IllegalStateException("Registration data is missing in the request"))
+      val date = LocalDate.now(clock)
+      val registration = request.registration.getOrElse(throw new IllegalStateException("Registration data is missing in the request"))
 
-        val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, registration.excludedTrader)
+      val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, registration.excludedTrader)
 
-        if (canRejoin) {
-          registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
-            case Valid(registration) =>
-              amendAuditAndRedirect(registration)
+      if (canRejoin) {
+        registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
+          case Valid(registration) =>
+            amendAuditAndRedirect(registration)
 
-            case Invalid(errors) =>
-              getFirstValidationErrorRedirect(RejoinMode).map(
-                errorRedirect => if (incompletePrompt) {
-                  errorRedirect.toFuture
-                } else {
-                  Redirect(controllers.rejoin.routes.RejoinRegistrationController.onPageLoad()).toFuture
-                }
-              ).getOrElse {
-                val errorList = errors.toChain.toList
-                val errorMessages = errorList.map(_.errorMessage).mkString("\n")
-                logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-                Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
-              }
-          }
-        } else {
-          Redirect(controllers.rejoin.routes.CannotReverseController.onPageLoad().url).toFuture
+          case Invalid(errors) =>
+            val errorList = errors.toChain.toList
+            val errorMessages = errorList.map(_.errorMessage).mkString("\n")
+            logger.error(s"Unable to create a registration request from user answers: $errorMessages")
+            Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
         }
+      } else {
+        Redirect(controllers.rejoin.routes.CannotReverseController.onPageLoad().url).toFuture
       }
   }
 
