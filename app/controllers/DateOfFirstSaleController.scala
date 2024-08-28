@@ -24,8 +24,8 @@ import models.{AmendMode, Mode}
 import pages.DateOfFirstSalePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{DateService, RegistrationService}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import services.{DateService, RegistrationService, RejoinRegistrationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateOfFirstSaleUtil
 import utils.FutureSyntax.FutureOps
@@ -42,6 +42,7 @@ class DateOfFirstSaleController @Inject()(
                                            view: DateOfFirstSaleView,
                                            val dateService: DateService,
                                            registrationService: RegistrationService,
+                                           rejoinRegistrationService: RejoinRegistrationService,
                                            val clock: Clock
                                          )(implicit ec: ExecutionContext) extends FrontendBaseController
   with I18nSupport with DateOfFirstSaleUtil {
@@ -93,8 +94,25 @@ class DateOfFirstSaleController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(DateOfFirstSalePage, value))
               _ <- cc.sessionRepository.set(updatedAnswers)
-            } yield Redirect(DateOfFirstSalePage.navigate(mode, updatedAnswers))
+            } yield {
+              Redirect {
+                checkReverseEligible(value).getOrElse(
+                  DateOfFirstSalePage.navigate(mode, updatedAnswers)
+                )
+              }
+            }
         )
       }
   }
+
+  private def checkReverseEligible(dateOfFirstSale: LocalDate)(implicit request: AuthenticatedDataRequest[_]): Option[Call] = {
+    val canReverse = rejoinRegistrationService.canReverse(dateOfFirstSale, request.registration.flatMap(_.excludedTrader))
+
+    if (canReverse) {
+      Some(controllers.rejoin.routes.HybridReversalController.onPageLoad())
+    } else {
+      None
+    }
+  }
+
 }
