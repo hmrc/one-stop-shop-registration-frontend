@@ -509,6 +509,7 @@ class AmendCompleteController @Inject()(
     euTaxRegistration match {
       case EuVatRegistration(country,vatNumber) =>
         euDetails.euCountry == country &&
+        euDetails.sellsGoodsToEUConsumers.contains(false) &&
         euDetails.vatRegistered.contains(true) &&
         euDetails.euVatNumber.map(_.stripPrefix(euDetails.euCountry.code)).contains(vatNumber)
 
