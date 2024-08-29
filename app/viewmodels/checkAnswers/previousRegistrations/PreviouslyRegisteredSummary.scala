@@ -17,10 +17,12 @@
 package viewmodels.checkAnswers.previousRegistrations
 
 import controllers.previousRegistrations.routes
-import models.{AmendMode, Mode, RejoinMode, UserAnswers}
+import models.{AmendMode, Country, Mode, RejoinMode, UserAnswers}
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import queries.previousRegistration.AllPreviousRegistrationsQuery
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
@@ -60,5 +62,23 @@ object PreviouslyRegisteredSummary {
           key = KeyViewModel("previouslyRegistered.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
           value = ValueViewModel(value)
         )
+    }
+
+  def changedAnswersRow(changedAnswers: Seq[Country])(implicit messages: Messages): Option[SummaryListRow] =
+
+    if (changedAnswers.nonEmpty) {
+      val value = changedAnswers.map {
+        details =>
+          HtmlFormat.escape(details.name)
+      }.mkString("<br/>")
+
+      Some(
+        SummaryListRowViewModel(
+          key = KeyViewModel("previousRegistrations.checkYourAnswersLabel.changed").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value)),
+        )
+      )
+    } else {
+      None
     }
 }

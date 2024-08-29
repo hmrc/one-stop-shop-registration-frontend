@@ -138,4 +138,22 @@ object EuDetailsSummary {
     } else {
       None
     }
+
+  def changedAnswersRow(changedEuDetails: Seq[Country])(implicit messages: Messages): Option[SummaryListRow] =
+
+    if (changedEuDetails.nonEmpty) {
+      val value = changedEuDetails.map {
+        details =>
+          HtmlFormat.escape(details.name)
+      }.mkString("<br/>")
+
+      Some(
+        SummaryListRowViewModel(
+          key = KeyViewModel("euVatDetails.checkYourAnswersLabel.changed").withCssClass("govuk-!-width-one-half"),
+          value = ValueViewModel(HtmlContent(value))
+        )
+      )
+    } else {
+      None
+    }
 }
