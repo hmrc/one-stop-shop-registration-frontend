@@ -20,7 +20,8 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import models.UserAnswers
-import models.domain.Registration
+import models.domain._
+import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
 import pages.{BankDetailsPage, BusinessContactDetailsPage, DateOfFirstSalePage, IsOnlineMarketplacePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -95,8 +96,10 @@ class AmendCompleteController @Inject()(
         getSalesRows(cds, originalRegistration, userAnswers) ++
         getHasPreviouslyRegistered(originalRegistration, userAnswers)++
         getPreviouslyRegisteredRows(originalRegistration, userAnswers) ++
+        getCountriesWithNewSchemes(originalRegistration, userAnswers) ++
         getHasRegisteredInEuRows(originalRegistration, userAnswers) ++
         getRegisteredInEuRows(originalRegistration, userAnswers) ++
+        getChangedEuDetailsRows(originalRegistration, userAnswers) ++
         getIsOnlineMarketPlace(originalRegistration, userAnswers) ++
         getHasWebsiteRows(originalRegistration, userAnswers) ++
         getWebsiteRows(originalRegistration, userAnswers) ++
@@ -256,6 +259,42 @@ class AmendCompleteController @Inject()(
     }
   }
 
+  private def getCountriesWithNewSchemes(
+                                          originalRegistration: Option[Registration],
+                                          userAnswers: UserAnswers
+                                        )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val amendedDetails = userAnswers.get(AllPreviousRegistrationsQuery).getOrElse(List.empty)
+    val registrationDetails = originalRegistration.map(_.previousRegistrations).getOrElse(List.empty)
+
+    val changedSchemeDetails = amendedDetails.flatMap { amendedCountry =>
+      val matchingEuCountry = registrationDetails.collect {
+        case reg: PreviousRegistrationNew if reg.country == amendedCountry.previousEuCountry => reg
+      }
+
+      val existingSchemeDetails = matchingEuCountry.flatMap { registration =>
+        registration.previousSchemesDetails.map(_.previousSchemeNumbers)
+      }
+
+      val newSchemes = amendedCountry.previousSchemesDetails.map(_.previousSchemeNumbers)
+
+      val hasSchemeNumbersChanged = existingSchemeDetails.nonEmpty && newSchemes != existingSchemeDetails
+
+      if (hasSchemeNumbersChanged) {
+        Some(amendedCountry.previousEuCountry)
+      } else {
+        None
+      }
+    }
+
+    if (changedSchemeDetails.nonEmpty) {
+      Seq(PreviouslyRegisteredSummary.changedAnswersRow(changedSchemeDetails))
+    } else {
+      Seq.empty
+    }
+
+  }
+
   private def getHasRegisteredInEuRows(
                                         originalRegistration: Option[Registration],
                                         userAnswers: UserAnswers
@@ -311,6 +350,30 @@ class AmendCompleteController @Inject()(
     val removedEuDetailsRow = Some(EuDetailsSummary.removedAnswersRow(removedEuDetails))
 
     Seq(addedEuDetailsRow, removedEuDetailsRow).flatten
+  }
+
+  private def getChangedEuDetailsRows(
+                                       originalRegistration: Option[Registration],
+                                       userAnswers: UserAnswers
+                                     )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val amendedEuDetails = userAnswers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty)
+    val originalEuDetails = originalRegistration.map(_.euRegistrations).getOrElse(List.empty)
+
+    val changedEuDetails = amendedEuDetails.flatMap { amendedEuDetail =>
+      originalEuDetails.find(_.country == amendedEuDetail.euCountry) match {
+        case Some(registrationDetail) if hasDetailsChanged(amendedEuDetail, registrationDetail) =>
+          Some(amendedEuDetail.euCountry)
+        case _ =>
+          None
+      }
+    }
+
+    if (changedEuDetails.nonEmpty) {
+      Seq(EuDetailsSummary.changedAnswersRow(changedEuDetails))
+    } else {
+      Seq.empty
+    }
   }
 
   private def getIsOnlineMarketPlace(
@@ -439,5 +502,39 @@ class AmendCompleteController @Inject()(
         None
       }
     )
+  }
+
+  private def detailsMatched(euDetails: EuOptionalDetails, euTaxRegistration: EuTaxRegistration): Boolean = {
+
+    euTaxRegistration match {
+      case EuVatRegistration(country,vatNumber) =>
+        euDetails.euCountry == country &&
+        euDetails.sellsGoodsToEUConsumers.contains(false) &&
+        euDetails.vatRegistered.contains(true) &&
+        euDetails.euVatNumber.map(_.stripPrefix(euDetails.euCountry.code)).contains(vatNumber)
+
+      case RegistrationWithFixedEstablishment(country, taxIdentifier, fixedEstablishment) =>
+        euDetails.euCountry == country &&
+          (euDetails.euTaxReference.isEmpty || euDetails.euVatNumber == taxIdentifier.value) &&
+          euDetails.euVatNumber.map(_.stripPrefix(euDetails.euCountry.code)) == taxIdentifier.value &&
+          euDetails.fixedEstablishmentTradingName.contains(fixedEstablishment.tradingName) &&
+          euDetails.fixedEstablishmentAddress.contains(fixedEstablishment.address)
+
+      case RegistrationWithoutFixedEstablishmentWithTradeDetails(country, taxIdentifier, tradeDetails) =>
+        euDetails.euCountry == country &&
+        euDetails.euTaxReference == taxIdentifier.value &&
+        euDetails.euSendGoodsTradingName.contains(tradeDetails.tradingName) &&
+        euDetails.euSendGoodsAddress.contains(tradeDetails.address)
+
+      case RegistrationWithoutTaxId(country) =>
+        euDetails.euCountry == country &&
+        euDetails.vatRegistered.contains(false) &&
+        euDetails.euVatNumber.isEmpty &&
+        euDetails.euTaxReference.isEmpty
+    }
+  }
+
+  private def hasDetailsChanged(euDetails: EuOptionalDetails, euTaxRegistration: EuTaxRegistration): Boolean = {
+    !detailsMatched(euDetails, euTaxRegistration)
   }
 }

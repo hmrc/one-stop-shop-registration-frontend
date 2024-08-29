@@ -161,6 +161,7 @@ businessContactDetails.button.sendCode = Send code and continue
 
 euVatDetails.checkYourAnswersLabel = EU tax details added
 euVatDetails.checkYourAnswersLabel.removed = EU tax details removed
+euVatDetails.checkYourAnswersLabel.changed = EU tax details changed
 euVatDetails.change.hidden = EU tax registration details added
 
 websites.checkYourAnswersLabel = Trading websites
@@ -472,6 +473,7 @@ deletePreviousRegistration.heading = Are you sure you need to remove the deregis
 deletePreviousRegistration.error.required = Select yes if you are sure you need to remove the deregistration
 
 previousRegistrations.checkYourAnswersLabel = Countries registered in
+previousRegistrations.checkYourAnswersLabel.changed = Countries registered in changed
 previousRegistrations.change.hidden = Countries registered in
 previousRegistrations.add.hidden = Countries registered in
 
