@@ -106,6 +106,30 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
       }
     }
 
+    "must navigate in Rejoin mode" - {
+
+      "to DateOfFirstSalePage and answer is Some(true)" in {
+        val userAnswers = basicUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, true).success.value
+
+        HasMadeSalesPage.navigate(RejoinMode, userAnswers)
+          .mustEqual(routes.DateOfFirstSaleController.onPageLoad(RejoinMode))
+      }
+
+      "to PreviouslyRegisteredController and answer is Some(true)" in {
+        val userAnswers = basicUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, false).success.value
+
+        HasMadeSalesPage.navigate(RejoinMode, userAnswers)
+          .mustEqual(controllers.routes.CommencementDateController.onPageLoad(RejoinMode))
+      }
+
+      "to AmendJourneyRecoveryController and answer is empty" in {
+        HasMadeSalesPage.navigate(RejoinMode, basicUserAnswersWithVatInfo)
+          .mustEqual(controllers.rejoin.routes.RejoinJourneyRecoveryController.onPageLoad())
+      }
+    }
+
 
     "cleanup" - {
 
