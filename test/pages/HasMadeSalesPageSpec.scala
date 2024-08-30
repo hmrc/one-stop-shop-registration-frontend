@@ -19,7 +19,7 @@ package pages
 import base.SpecBase
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -97,7 +97,7 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           .set(HasMadeSalesPage, false).success.value
 
         HasMadeSalesPage.navigate(AmendMode, userAnswers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(AmendMode))
+          .mustEqual(controllers.routes.CommencementDateController.onPageLoad(AmendMode))
       }
 
       "to AmendJourneyRecoveryController and answer is empty" in {
