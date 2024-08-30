@@ -19,7 +19,7 @@ package pages
 import base.SpecBase
 import controllers.routes
 import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -97,12 +97,36 @@ class HasMadeSalesPageSpec extends SpecBase with PageBehaviours {
           .set(HasMadeSalesPage, false).success.value
 
         HasMadeSalesPage.navigate(AmendMode, userAnswers)
-          .mustEqual(controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(AmendMode))
+          .mustEqual(controllers.routes.CommencementDateController.onPageLoad(AmendMode))
       }
 
       "to AmendJourneyRecoveryController and answer is empty" in {
         HasMadeSalesPage.navigate(AmendMode, basicUserAnswersWithVatInfo)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to DateOfFirstSalePage and answer is Some(true)" in {
+        val userAnswers = basicUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, true).success.value
+
+        HasMadeSalesPage.navigate(RejoinMode, userAnswers)
+          .mustEqual(routes.DateOfFirstSaleController.onPageLoad(RejoinMode))
+      }
+
+      "to PreviouslyRegisteredController and answer is Some(true)" in {
+        val userAnswers = basicUserAnswersWithVatInfo
+          .set(HasMadeSalesPage, false).success.value
+
+        HasMadeSalesPage.navigate(RejoinMode, userAnswers)
+          .mustEqual(controllers.routes.CommencementDateController.onPageLoad(RejoinMode))
+      }
+
+      "to AmendJourneyRecoveryController and answer is empty" in {
+        HasMadeSalesPage.navigate(RejoinMode, basicUserAnswersWithVatInfo)
+          .mustEqual(controllers.rejoin.routes.RejoinJourneyRecoveryController.onPageLoad())
       }
     }
 
