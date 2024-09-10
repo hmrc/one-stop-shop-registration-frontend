@@ -21,9 +21,9 @@ import connectors.EmailVerificationConnector
 import connectors.EmailVerificationHttpParser.{ReturnEmailVerificationResponse, ReturnVerificationStatus}
 import controllers.routes
 import logging.Logging
+import models.Mode
 import models.emailVerification.PasscodeAttemptsStatus.NotVerified
 import models.emailVerification.{EmailVerificationRequest, PasscodeAttemptsStatus, VerifyEmail}
-import models.Mode
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}

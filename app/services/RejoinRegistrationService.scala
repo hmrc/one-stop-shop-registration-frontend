@@ -17,7 +17,6 @@
 package services
 
 import models.exclusions.{ExcludedTrader, ExclusionReason}
-import models.UserAnswers
 
 import java.time.LocalDate
 import javax.inject.Inject
