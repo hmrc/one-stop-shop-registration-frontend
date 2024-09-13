@@ -41,7 +41,6 @@
                 label = LabelViewModel(messages("tradingName.heading")).asPageHeading()
             )
             .withWidth(Full)
-            .withHint(HintViewModel("tradingName.hint"))
         )
 
         @button("site.continue",  routes.TradingNameController.onPageLoad(mode, index).url, mode)

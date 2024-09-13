@@ -33,7 +33,5 @@ object Constants {
 
   val schemeStartDate: LocalDate = LocalDate.of(2021, 7, 1)
 
-  val tradingNameReservedWords = Set("limited", "ltd", "llp", "plc")
-
   val emailVerificationMaxEmails: Int = 10
 }
