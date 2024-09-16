@@ -44,7 +44,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val signOutUrl: String       = configuration.get[String]("urls.signOut")
   val mfaUpliftUrl: String     = configuration.get[String]("urls.mfaUplift")
   val ivUpliftUrl: String      = configuration.get[String]("urls.ivUplift")
-  val emailVerificationUrl: String      = configuration.get[String]("urls.emailVerificationUrl")
+  val emailVerificationUrl: String = configuration.get[String]("urls.emailVerificationUrl")
   val ossCompleteReturnUrl: String = configuration.get[String]("urls.ossCompleteReturnGuidanceUrl")
   val ossYourAccountUrl: String = configuration.get[String]("urls.yourAccountUrl")
 

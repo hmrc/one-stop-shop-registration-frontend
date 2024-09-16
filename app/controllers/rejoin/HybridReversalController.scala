@@ -40,7 +40,7 @@ import views.html.rejoin.HybridReversalView
 
 import java.time.{Clock, LocalDate}
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class HybridReversalController @Inject()(
                                           override val messagesApi: MessagesApi,

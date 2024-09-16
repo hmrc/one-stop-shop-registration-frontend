@@ -29,6 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{EmailVerificationService, SaveForLaterService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.BusinessContactDetailsView
 
 import javax.inject.Inject
@@ -66,19 +67,19 @@ class BusinessContactDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled))),
+          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled)).toFuture,
 
         value => {
 
 
           val continueUrl = if (mode == CheckMode) {
-            routes.CheckYourAnswersController.onPageLoad().url
+            s"${config.loginContinueUrl}${routes.CheckYourAnswersController.onPageLoad().url}"
           } else if (mode == AmendMode) {
-            controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
-          } else if (mode == RejoinMode){
-            controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url
+            s"${config.loginContinueUrl}${controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url}"
+          } else if (mode == RejoinMode) {
+            s"${config.loginContinueUrl}${controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url}"
           } else {
-            routes.BankDetailsController.onPageLoad(NormalMode).url
+            s"${config.loginContinueUrl}${routes.BankDetailsController.onPageLoad(NormalMode).url}"
           }
 
           if (config.emailVerificationEnabled) {
@@ -134,7 +135,7 @@ class BusinessContactDetailsController @Inject()(
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessContactDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(s"${config.emailVerificationUrl}${validResponse.redirectUri}")
-            case _ => Future.successful(Redirect(routes.BusinessContactDetailsController.onPageLoad(mode).url))
+            case _ => Redirect(routes.BusinessContactDetailsController.onPageLoad(mode).url).toFuture
           }
     }
   }
