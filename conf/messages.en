@@ -154,7 +154,7 @@ businessContactDetails.error.telephoneNumber.length = Telephone number must be 2
 businessContactDetails.error.telephoneNumber.invalid = Enter a telephone number in the correct format, like 01642 123 456, 07777777777 or +33 1 23 45 67 88
 businessContactDetails.error.emailAddress.length = Email address must be 50 characters or less
 businessContactDetails.error.emailAddress.invalid = Enter an email address in the correct format, like yourname@example.com
-businessContactDetails.change.fullName.hidden = your contact name or department
+businessContactDetails.change.fullName.hidden = contact name or business department
 businessContactDetails.change.telephoneNumber.hidden = your telephone number
 businessContactDetails.change.emailAddress.hidden = your email address
 businessContactDetails.button.sendCode = Send code and continue
@@ -517,7 +517,7 @@ bankDetails.error.iban.invalid = Enter a real IBAN
 bankDetails.error.iban.checksum = Enter a real IBAN
 bankDetails.error.accountName.invalid = Name on the account must only include letters, numbers, hyphens, spaces and apostrophes
 bankDetails.error.bic.invalid = Enter a real BIC
-bankDetails.change.accountName.hidden = the name on this bank account
+bankDetails.change.accountName.hidden = name on the account
 bankDetails.change.bic.hidden = your BIC or SWIFT code
 bankDetails.change.iban.hidden = your IBAN
 
@@ -599,7 +599,7 @@ dateOfFirstSale.error.required = The date must include a {0}
 dateOfFirstSale.error.invalid = Enter a real date
 dateOfFirstSale.error.minMaxToday = Date of first eligible sale must be between {0} and today
 dateOfFirstSale.error.minMax = Date of first eligible sale must be between {0} and {1}
-dateOfFirstSale.change.hidden = date your sales start to be included in this scheme
+dateOfFirstSale.change.hidden = date of first sale
 
 hasMadeSales.title = Have you already made eligible sales?
 hasMadeSales.heading = Have you already made eligible sales?
