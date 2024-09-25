@@ -29,13 +29,13 @@ trait PreviousRegistrationsValidations {
     answers.get(PreviouslyRegisteredPage) match {
       case Some(true) =>
         answers.get(AllPreviousRegistrationsRawQuery) match {
-          case None =>
-            DataMissingError(AllPreviousRegistrationsRawQuery).invalidNec
-          case Some(details) =>
+          case Some(details) if details.value.nonEmpty =>
             details.value.zipWithIndex.map {
               case (_, index) =>
                 processPreviousRegistration(answers, Index(index))
             }.toList.sequence
+          case _ =>
+            DataMissingError(AllPreviousRegistrationsRawQuery).invalidNec
         }
 
       case Some(false) =>
@@ -84,13 +84,13 @@ trait PreviousRegistrationsValidations {
 
   private def getPreviousSchemes(answers: UserAnswers, countryIndex: Index): ValidationResult[List[PreviousSchemeDetails]] = {
     answers.get(AllPreviousSchemesRawQuery(countryIndex)) match {
-      case None =>
-        DataMissingError(AllPreviousSchemesRawQuery(countryIndex)).invalidNec
-      case Some(previousSchemes) =>
+      case Some(previousSchemes) if previousSchemes.value.nonEmpty =>
         previousSchemes.value.zipWithIndex.map {
           case (_, index) =>
             processPreviousSchemes(answers, countryIndex, Index(index))
         }.toList.sequence
+      case _ =>
+        DataMissingError(AllPreviousSchemesRawQuery(countryIndex)).invalidNec
     }
   }
 
