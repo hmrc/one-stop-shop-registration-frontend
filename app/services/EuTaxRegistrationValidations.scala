@@ -31,13 +31,13 @@ trait EuTaxRegistrationValidations {
     answers.get(TaxRegisteredInEuPage) match {
       case Some(true) =>
         answers.get(AllEuDetailsRawQuery) match {
-          case None =>
-            DataMissingError(AllEuDetailsRawQuery).invalidNec
-          case Some(euDetails) =>
+          case Some(euDetails) if euDetails.value.nonEmpty =>
             euDetails.value.zipWithIndex.map {
               case (_, index) =>
                 processEuDetail(answers, Index(index))
             }.toList.sequence
+          case _ =>
+            DataMissingError(AllEuDetailsRawQuery).invalidNec
         }
 
       case Some(false) =>

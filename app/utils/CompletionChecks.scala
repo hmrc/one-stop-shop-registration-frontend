@@ -105,6 +105,18 @@ trait CompletionChecks {
     }
   }
 
+  private def isOnlineMarketplacePopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(IsOnlineMarketplacePage).isDefined
+  }
+
+  private def isContactDetailsPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(BusinessContactDetailsPage).isDefined
+  }
+
+  private def isBankDetailsPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(BankDetailsPage).isDefined
+  }
+
   def validate()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     getAllIncompleteDeregisteredDetails().isEmpty &&
       getAllIncompleteEuDetails().isEmpty &&
@@ -112,11 +124,14 @@ trait CompletionChecks {
       isAlreadyMadeSalesValid() &&
       hasWebsiteValid() &&
       isEuDetailsPopulated() &&
-      isDeregisteredPopulated()
+      isDeregisteredPopulated() &&
+      isOnlineMarketplacePopulated() &&
+      isContactDetailsPopulated() &&
+      isBankDetailsPopulated()
   }
 
   def validateHybridReversal()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
-      isAlreadyMadeSalesValid()
+    isAlreadyMadeSalesValid()
   }
 
   def getFirstValidationErrorRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
@@ -126,7 +141,10 @@ trait CompletionChecks {
       incompleteEuDetailsRedirect(mode) ++
       emptyDeregisteredRedirect(mode) ++
       incompletePreviousRegistrationRedirect(mode) ++
-      incompleteWebsiteUrlsRedirect(mode)
+      emptyHasOnlineMarketplace(mode) ++
+      incompleteWebsiteUrlsRedirect(mode) ++
+      emptyContactDetails(mode) ++
+      emptyBankDetails(mode)
       ).headOption
   }
 
@@ -204,6 +222,27 @@ trait CompletionChecks {
   } else {
     None
   }
+
+  private def emptyHasOnlineMarketplace(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] =
+    if (!isOnlineMarketplacePopulated()) {
+      Some(Redirect(controllers.routes.IsOnlineMarketplaceController.onPageLoad(mode)))
+    } else {
+      None
+    }
+
+  private def emptyContactDetails(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] =
+    if (!isContactDetailsPopulated()) {
+      Some(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(mode)))
+    } else {
+      None
+    }
+
+  private def emptyBankDetails(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] =
+    if (!isBankDetailsPopulated()) {
+      Some(Redirect(controllers.routes.BankDetailsController.onPageLoad(mode)))
+    } else {
+      None
+    }
 
 }
 

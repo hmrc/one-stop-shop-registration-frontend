@@ -18,13 +18,13 @@ package utils
 
 import base.SpecBase
 import models.euDetails.EuOptionalDetails
-import models.{Country, PreviousScheme}
+import models.{BankDetails, BusinessContactDetails, Country, Iban, PreviousScheme}
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages.{DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
+import pages.{BankDetailsPage, BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.running
@@ -40,9 +40,12 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
     .set(AllTradingNames, List("Trading Name")).success.value
     .set(HasMadeSalesPage, true).success.value
     .set(DateOfFirstSalePage, arbitraryDate).success.value
+    .set(IsOnlineMarketplacePage, false).success.value
     .set(HasWebsitePage, true).success.value
     .set(AllWebsites, List("website.com")).success.value
     .set(PreviouslyRegisteredPage, false).success.value
+    .set(BusinessContactDetailsPage, BusinessContactDetails("fullname", "123456789", "unittest@email.com")).success.value
+    .set(BankDetailsPage, BankDetails("unit test account name", None, Iban("GB33BUKB20201555555555").value)).success.value
 
   "CompletionChecks" - {
 
@@ -140,6 +143,48 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
         running(application) {
           implicit val request: AuthenticatedDataRequest[AnyContent] = mock[AuthenticatedDataRequest[AnyContent]]
           when(request.userAnswers).thenReturn(basicUserAnswersWithVatInfo)
+
+          TestCompletionChecks.validate() mustBe false
+        }
+      }
+
+      "should return false if contact details are missing" in {
+
+        val answersWithoutContactDetails = completeAnswers.remove(BusinessContactDetailsPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(answersWithoutContactDetails)).build()
+
+        running(application) {
+          implicit val request: AuthenticatedDataRequest[AnyContent] = mock[AuthenticatedDataRequest[AnyContent]]
+          when(request.userAnswers).thenReturn(answersWithoutContactDetails)
+
+          TestCompletionChecks.validate() mustBe false
+        }
+      }
+
+      "should return false if bank details are missing" in {
+
+        val answersWithoutBankDetails = completeAnswers.remove(BankDetailsPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(answersWithoutBankDetails)).build()
+
+        running(application) {
+          implicit val request: AuthenticatedDataRequest[AnyContent] = mock[AuthenticatedDataRequest[AnyContent]]
+          when(request.userAnswers).thenReturn(answersWithoutBankDetails)
+
+          TestCompletionChecks.validate() mustBe false
+        }
+      }
+
+      "should return false if online marketplace question is missing" in {
+
+        val answersWithoutIsOnlineMarketplace = completeAnswers.remove(IsOnlineMarketplacePage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(answersWithoutIsOnlineMarketplace)).build()
+
+        running(application) {
+          implicit val request: AuthenticatedDataRequest[AnyContent] = mock[AuthenticatedDataRequest[AnyContent]]
+          when(request.userAnswers).thenReturn(answersWithoutIsOnlineMarketplace)
 
           TestCompletionChecks.validate() mustBe false
         }

@@ -21,7 +21,7 @@ import generators.Generators
 import models.domain.{Registration, VatCustomerInfo}
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.requests.AuthenticatedDataRequest
-import models.{BusinessContactDetails, Country, DesAddress, Index, Mode, Period, Quarter, UserAnswers}
+import models.{BankDetails, BusinessContactDetails, Country, DesAddress, Iban, Index, Mode, Period, Quarter, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -44,7 +44,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.checkAnswers._
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
+import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
 import viewmodels.govuk.summarylist._
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
@@ -111,6 +111,8 @@ trait SpecBase
     .set(PreviouslyRegisteredPage, false).success.value
     .set(IsOnlineMarketplacePage, false).success.value
     .set(HasWebsitePage, false).success.value
+    .set(BusinessContactDetailsPage, BusinessContactDetails("fullname", "123456789", "unittest@email.com")).success.value
+    .set(BankDetailsPage, BankDetails("unit test account name", None, Iban("GB33BUKB20201555555555").value)).success.value
   val invalidUserAnswers: UserAnswers = completeUserAnswers
     .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
