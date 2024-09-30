@@ -104,6 +104,12 @@ if (typeof HMRCAccessibleAutocomplete != 'undefined' && document.querySelector('
   }
 }
 
+const submitButton = document.querySelector('#submit');
+
+if(submitButton) {
+    submitButton.addEventListener("click", showTheSpinner)
+}
+
 function showTheSpinner() {
 
   const processingWheel = document.getElementById("processing-wheel");
