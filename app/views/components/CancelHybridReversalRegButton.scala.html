@@ -16,7 +16,7 @@
 
 @this(govukButton: GovukButton)
 @(continueMessage: String, mode: Mode, cancelUrl: String)(implicit messages: Messages)
-<div class="govuk-button-group">
+<div class="govuk-button-group" id="processing-button-group">
     @govukButton(
       ButtonViewModel(messages(continueMessage)).withAttribute(("id", "submit")).withAttribute("onclick", "showTheSpinner()")
     )
