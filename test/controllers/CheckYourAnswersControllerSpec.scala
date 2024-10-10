@@ -26,7 +26,6 @@ import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -70,15 +69,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
   private val commencementDate = LocalDate.of(2022, 1, 1)
 
   override def beforeEach(): Unit = {
-    Mockito.reset(
-      registrationConnector,
-      registrationValidationService,
-      registrationService,
-      auditService,
-      emailService,
-      dateService,
-      saveForLaterService
-    )
+    reset(registrationConnector)
+    reset(registrationValidationService)
+    reset(registrationService)
+    reset(auditService)
+    reset(emailService)
+    reset(dateService)
+    reset(saveForLaterService)
   }
 
   "Check Your Answers Controller" - {
