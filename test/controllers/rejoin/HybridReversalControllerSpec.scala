@@ -17,11 +17,10 @@
 package controllers.rejoin
 
 import base.SpecBase
-import cats.data.NonEmptyChain
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import models.{BusinessContactDetails, DataMissingError, Index, PreviousScheme, PreviousSchemeType, RejoinMode}
+import models.{BusinessContactDetails, RejoinMode}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
@@ -31,19 +30,14 @@ import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
-import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.EuDetailsQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services._
 import testutils.RegistrationData
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.checkAnswers.{DateOfFirstSaleSummary, HasMadeSalesSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.rejoin.HybridReversalView
@@ -52,10 +46,6 @@ import java.time.LocalDate
 import scala.concurrent.Future
 
 class HybridReversalControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
-
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
   private val registration = RegistrationData.registration
 
@@ -77,7 +67,6 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
 
       "must redirect to Cannot rejoin if can rejoin is false" in {
 
-        val commencementDate = LocalDate.of(2022, 1, 1)
         when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
         when(rejoinRegistrationService.canReverse(any(), any())) thenReturn false

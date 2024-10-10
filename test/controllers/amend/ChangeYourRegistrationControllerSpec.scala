@@ -27,7 +27,6 @@ import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -70,13 +69,11 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
   private val commencementDate = LocalDate.of(2022, 1, 1)
 
   override def beforeEach(): Unit = {
-    Mockito.reset(
-      registrationConnector,
-      registrationValidationService,
-      auditService,
-      emailService,
-      dateService
-    )
+    reset(registrationConnector)
+    reset(registrationValidationService)
+    reset(auditService)
+    reset(emailService)
+    reset(dateService)
   }
 
   "Change Your Registration Controller" - {
