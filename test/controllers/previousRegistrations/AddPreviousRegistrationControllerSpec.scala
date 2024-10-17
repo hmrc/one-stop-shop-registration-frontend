@@ -17,14 +17,14 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import controllers.routes
-import controllers.previousRegistrations.{routes => prevRoutes}
-import controllers.amend.{routes => amendRoutes}
 import connectors.RegistrationConnector
+import controllers.amend.{routes => amendRoutes}
+import controllers.previousRegistrations.{routes => prevRoutes}
+import controllers.routes
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.domain.PreviousSchemeNumbers
-import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
+import models.domain.PreviousSchemeNumbers
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalFields, SchemeDetailsWithOptionalVatNumber}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -104,8 +104,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
             list,
             canAddCountries = true,
             Seq(
-              PreviousRegistrationDetailsWithOptionalVatNumber(
-                Country.euCountries.head,
+              PreviousRegistrationDetailsWithOptionalFields(
+                Some(Country.euCountries.head),
                 Some(List(SchemeDetailsWithOptionalVatNumber(Some(PreviousScheme.OSSU), None)))
               )
             )
@@ -163,20 +163,6 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addPreviousRegistrationRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if user answers are empty" in {
-
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
       running(application) {
         val request = FakeRequest(GET, addPreviousRegistrationRoute)
@@ -326,24 +312,6 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
         val application = applicationBuilder(userAnswers = None)
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, addPreviousRegistrationAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Amend Journey Recovery for a GET if user answers are empty" in {
-
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 

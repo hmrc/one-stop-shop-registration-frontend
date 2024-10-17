@@ -521,8 +521,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
-
-            val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+            val answers = completeUserAnswers.remove(HasMadeSalesPage).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
@@ -535,6 +534,27 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+          "to Date of First Sale when date of first sale is not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+            val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(RejoinMode).url
 
             }
           }
@@ -601,7 +621,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(RejoinMode).url
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(RejoinMode).url
 
             }
           }

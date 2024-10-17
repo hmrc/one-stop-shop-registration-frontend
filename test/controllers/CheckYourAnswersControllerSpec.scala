@@ -488,7 +488,26 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
           }
 
-          "to Has Made Sales when eligible sales are not populated correctly" in {
+          "to Has Made Sales when has made sales are not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            val answers = completeUserAnswers.remove(HasMadeSalesPage).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService)).build()
+
+            running(application) {
+              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.HasMadeSalesController.onPageLoad(CheckMode).url
+
+            }
+
+          }
+
+          "to Date of First Sale when date of first sale is not populated correctly" in {
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
@@ -501,7 +520,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.routes.HasMadeSalesController.onPageLoad(CheckMode).url
+              redirectLocation(result).value mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(CheckMode).url
 
             }
 
@@ -558,7 +577,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(CheckMode).url
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(CheckMode).url
 
             }
 

@@ -19,14 +19,14 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
 import logging.Logging
-import models.domain.Registration
-import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
-import models.requests.AuthenticatedDataRequest
 import models.{AmendMode, Country, Mode, RejoinMode}
-import pages.previousRegistrations.AddPreviousRegistrationPage
+import models.domain.Registration
+import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalFields
+import models.requests.AuthenticatedDataRequest
+import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviouslyRegisteredPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
+import queries.previousRegistration.{AllPreviousRegistrationsQuery, DeriveNumberOfPreviousRegistrations}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CheckJourneyRecovery.determineJourneyRecovery
@@ -51,7 +51,7 @@ class AddPreviousRegistrationController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
-      getNumberOfPreviousRegistrations(mode) {
+      getNumberOfPreviousRegistrations() {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
@@ -63,9 +63,9 @@ class AddPreviousRegistrationController @Inject()(
             PreviousRegistrationSummary.addToListRows(request.userAnswers, Seq.empty, mode)
           }
 
-          withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
+          withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalFields](
             data = getAllIncompleteDeregisteredDetails _,
-            onFailure = (incomplete: Seq[PreviousRegistrationDetailsWithOptionalVatNumber]) => {
+            onFailure = (incomplete: Seq[PreviousRegistrationDetailsWithOptionalFields]) => {
               Future.successful(Ok(view(form, mode, previousRegistrations, canAddCountries, incomplete)))
             }) {
             Future.successful(Ok(view(form, mode, previousRegistrations, canAddCountries)))
@@ -75,9 +75,9 @@ class AddPreviousRegistrationController @Inject()(
 
   def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
-      withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalVatNumber](
+      withCompleteDataAsync[PreviousRegistrationDetailsWithOptionalFields](
         data = getAllIncompleteDeregisteredDetails _,
-        onFailure = (_: Seq[PreviousRegistrationDetailsWithOptionalVatNumber]) => {
+        onFailure = (_: Seq[PreviousRegistrationDetailsWithOptionalFields]) => {
           if (incompletePromptShown) {
             incompletePreviousRegistrationRedirect(mode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture
@@ -86,7 +86,7 @@ class AddPreviousRegistrationController @Inject()(
             Future.successful(Redirect(routes.AddPreviousRegistrationController.onPageLoad(mode)))
           }
         }) {
-        getNumberOfPreviousRegistrations(mode) {
+        getNumberOfPreviousRegistrations() {
           number =>
 
             val canAddCountries = number < Country.euCountries.size
@@ -105,17 +105,24 @@ class AddPreviousRegistrationController @Inject()(
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(AddPreviousRegistrationPage, value))
-                  _ <- cc.sessionRepository.set(updatedAnswers)
-                } yield Redirect(AddPreviousRegistrationPage.navigate(mode, updatedAnswers))
+                  updatedAnswers2 <- if(number == 0 && !value) {
+                    Future.fromTry(
+                      updatedAnswers.set(PreviouslyRegisteredPage, false)
+                    )
+                  } else {
+                    Future.successful(updatedAnswers)
+                  }
+                  _ <- cc.sessionRepository.set(updatedAnswers2)
+                } yield Redirect(AddPreviousRegistrationPage.navigate(mode, updatedAnswers2))
             )
         }
       }
   }
 
-  private def getNumberOfPreviousRegistrations(mode: Mode)(block: Int => Future[Result])
+  private def getNumberOfPreviousRegistrations()(block: Int => Future[Result])
                                               (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfPreviousRegistrations).map {
       number =>
         block(number)
-    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
+    }.getOrElse(block(0))
 }
