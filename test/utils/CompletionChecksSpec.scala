@@ -67,7 +67,7 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
 
           val result = TestCompletionChecks.getAllIncompleteDeregisteredDetails()
           result must have length 1
-          result.head.previousEuCountry mustEqual Country("DE", "Germany")
+          result.head.previousEuCountry mustEqual Some(Country("DE", "Germany"))
         }
 
       }
@@ -92,7 +92,7 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
           implicit val request: AuthenticatedDataRequest[AnyContent] = mock[AuthenticatedDataRequest[AnyContent]]
           when(request.userAnswers).thenReturn(userAnswers)
 
-          val result = TestCompletionChecks.firstIndexedIncompleteDeregisteredCountry(Seq(Country("DE", "Germany")))
+          val result = TestCompletionChecks.firstIndexedIncompleteDeregisteredCountry(Seq(0))
           result mustBe defined
           result.get._1.previousEuCountry mustEqual Country("DE", "Germany")
 
