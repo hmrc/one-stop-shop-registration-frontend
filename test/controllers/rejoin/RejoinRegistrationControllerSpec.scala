@@ -604,7 +604,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           }
 
 
-          "to Previously Registered when previous registrations are not populated correctly" in {
+          "to add Previous Reg when previous registrations are not populated correctly" in {
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
