@@ -207,7 +207,12 @@ trait CompletionChecks {
 
       case None =>
         request.userAnswers.get(PreviouslyRegisteredPage) match {
-          case Some(true) => Some(Redirect(controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(mode, Index(0))))
+          case Some(true) =>
+            if(getAllIncompleteDeregisteredDetails().isEmpty) {
+              Some(Redirect(controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(mode, Index(0))))
+            } else {
+              None
+            }
           case _ => None
         }
     }
