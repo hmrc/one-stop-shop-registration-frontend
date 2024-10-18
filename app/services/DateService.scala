@@ -171,7 +171,7 @@ class DateService @Inject()(
   private def getCommencementDate(userAnswers: UserAnswers, request: AuthenticatedDataRequest[_]) = {
     userAnswers.get(HasMadeSalesPage) match {
       case Some(true) =>
-        Some(getDateOfFirstSale(userAnswers))
+        getDateOfFirstSale(userAnswers)
       case Some(false) =>
         val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
 
@@ -184,15 +184,8 @@ class DateService @Inject()(
     }
   }
 
-  private def getDateOfFirstSale(userAnswers: UserAnswers): LocalDate = {
-    userAnswers.get(DateOfFirstSalePage) match {
-      case Some(date) =>
-        startDateBasedOnFirstSale(date)
-      case _ =>
-        val exception = new IllegalStateException("Must provide a Date of First Sale")
-        logger.error(exception.getMessage, exception)
-        throw exception
-    }
+  private def getDateOfFirstSale(userAnswers: UserAnswers): Option[LocalDate] = {
+    userAnswers.get(DateOfFirstSalePage).map(startDateBasedOnFirstSale)
   }
 
   def calculateFinalAmendmentDate(commencementDate: LocalDate)(implicit request: AuthenticatedDataRequest[_]): LocalDate = {
@@ -202,7 +195,7 @@ class DateService @Inject()(
       case Some(submissionReceived) if !submissionReceivedIsInSamePeriodWithCommencementDate(submissionReceived, commencementDate) =>
         getVatReturnEndDate(submissionReceived).plusDays(daysIntoReturnForAmendment)
       case _ =>
-        if(commencementDate.isAfter(LocalDate.now(clock))) {
+        if (commencementDate.isAfter(LocalDate.now(clock))) {
           getVatReturnEndDate(LocalDate.now(clock)).plusDays(daysIntoReturnForAmendment)
         } else {
           getVatReturnEndDate(commencementDate).plusDays(daysIntoReturnForAmendment)
