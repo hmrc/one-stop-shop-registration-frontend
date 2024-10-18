@@ -207,7 +207,7 @@ trait CompletionChecks {
 
       case None =>
         request.userAnswers.get(PreviouslyRegisteredPage) match {
-          case Some(true) => Some(Redirect(controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(mode)))
+          case Some(true) => Some(Redirect(controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(mode, Index(0))))
           case _ => None
         }
     }

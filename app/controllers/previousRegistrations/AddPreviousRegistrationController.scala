@@ -51,7 +51,7 @@ class AddPreviousRegistrationController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
-      getNumberOfPreviousRegistrations() {
+      getNumberOfPreviousRegistrations(mode) {
         number =>
 
           val canAddCountries = number < Country.euCountries.size
@@ -86,7 +86,7 @@ class AddPreviousRegistrationController @Inject()(
             Future.successful(Redirect(routes.AddPreviousRegistrationController.onPageLoad(mode)))
           }
         }) {
-        getNumberOfPreviousRegistrations() {
+        getNumberOfPreviousRegistrations(mode) {
           number =>
 
             val canAddCountries = number < Country.euCountries.size
@@ -119,10 +119,10 @@ class AddPreviousRegistrationController @Inject()(
       }
   }
 
-  private def getNumberOfPreviousRegistrations()(block: Int => Future[Result])
+  private def getNumberOfPreviousRegistrations(mode: Mode)(block: Int => Future[Result])
                                               (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfPreviousRegistrations).map {
       number =>
         block(number)
-    }.getOrElse(block(0))
+    }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
 }

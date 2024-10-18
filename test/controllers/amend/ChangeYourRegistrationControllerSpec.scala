@@ -611,7 +611,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.AddPreviousRegistrationController.onPageLoad(AmendMode).url
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0)).url
 
             }
 
