@@ -85,7 +85,7 @@ class AmendCompleteController @Inject()(
       case _ => None
     }
 
-  private def detailList(cds: SummaryListRow, originalRegistration: Option[Registration], userAnswers: UserAnswers)
+  private def detailList(cds: Option[SummaryListRow], originalRegistration: Option[Registration], userAnswers: UserAnswers)
                         (implicit request: AuthenticatedDataRequest[AnyContent]) = {
 
     SummaryListViewModel(
@@ -185,7 +185,7 @@ class AmendCompleteController @Inject()(
   }
 
   private def getSalesRows(
-                            cds: SummaryListRow,
+                            cds: Option[SummaryListRow],
                             originalRegistration: Option[Registration],
                             userAnswers: UserAnswers
                           )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
@@ -197,7 +197,7 @@ class AmendCompleteController @Inject()(
     if (hasChangedDateOfFirstSale) {
       Seq(
         DateOfFirstSaleSummary.amendedAnswersRow(request.userAnswers),
-        Some(cds)
+        cds
       )
     } else {
       Seq.empty

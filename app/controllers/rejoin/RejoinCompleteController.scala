@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
+import logging.Logging
 import models.UserAnswers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,14 +32,14 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class RejoinCompleteController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       cc: AuthenticatedControllerComponents,
-                                       view: RejoinCompleteView,
-                                       frontendAppConfig: FrontendAppConfig,
-                                       registrationConnector: RegistrationConnector,
-                                       dateService: DateService,
-                                       periodService: PeriodService
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                          override val messagesApi: MessagesApi,
+                                          cc: AuthenticatedControllerComponents,
+                                          view: RejoinCompleteView,
+                                          frontendAppConfig: FrontendAppConfig,
+                                          registrationConnector: RegistrationConnector,
+                                          dateService: DateService,
+                                          periodService: PeriodService
+                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -46,13 +47,18 @@ class RejoinCompleteController @Inject()(
     implicit request =>
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()
-        calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        maybeCalculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        calculatedCommencementDate = maybeCalculatedCommencementDate.getOrElse {
+          val exception = new IllegalStateException("A calculated commencement date is expected, otherwise it wasn't submitted")
+          logger.error(exception.getMessage, exception)
+          throw exception
+        }
       } yield {
-          val organisationName = getOrganisationName(request.userAnswers)
-          val savedUrl = externalEntryUrl.fold(_ => None, _.url)
-          val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
-          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-          val firstDayOfNextPeriod = nextPeriod.firstDay
+        val organisationName = getOrganisationName(request.userAnswers)
+        val savedUrl = externalEntryUrl.fold(_ => None, _.url)
+        val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
+        val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
+        val firstDayOfNextPeriod = nextPeriod.firstDay
         Ok(
           view(
             request.vrn.vrn,

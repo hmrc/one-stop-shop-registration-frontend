@@ -48,7 +48,7 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 
       "must return a view model when DateOfFirstSale has been answered" in {
 
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
 
         val answers = emptyUserAnswers
           .set(DateOfFirstSalePage, arbitraryDate).success.value
@@ -62,11 +62,11 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
           val msgs        = messages(app)
 
           val row = viewmodel.row(answers)(msgs, ec, hc, dataRequest).futureValue
-          row mustEqual SummaryListRowViewModel(
-            key     = KeyViewModel(Text(msgs("commencementDate.checkYourAnswersLabel"))),
-            value   = ValueViewModel(Text(answers.get(DateOfFirstSalePage).get.format(dateFormatter))),
+          row mustBe Some(SummaryListRowViewModel(
+            key = KeyViewModel(Text(msgs("commencementDate.checkYourAnswersLabel"))),
+            value = ValueViewModel(Text(answers.get(DateOfFirstSalePage).get.format(dateFormatter))),
             actions = Seq.empty
-          )
+          ))
         }
       }
     }

@@ -141,7 +141,7 @@ class DateService @Inject()(
   }
 
   def calculateCommencementDate(userAnswers: UserAnswers)
-                               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[LocalDate] = {
+                               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[LocalDate]] = {
 
     for {
       allMatches <- searchPreviousRegistrationSchemes(userAnswers)
@@ -152,7 +152,7 @@ class DateService @Inject()(
           matchedTransferringMsid.exclusionEffectiveDate match {
             case Some(exclusionEffectiveDate) =>
               if (isWithinLastDayOfRegistrationWhenTransferring(exclusionEffectiveDate)) {
-                exclusionEffectiveDate
+                Some(exclusionEffectiveDate)
               } else {
                 getCommencementDate(userAnswers, request)
               }
@@ -171,18 +171,16 @@ class DateService @Inject()(
   private def getCommencementDate(userAnswers: UserAnswers, request: AuthenticatedDataRequest[_]) = {
     userAnswers.get(HasMadeSalesPage) match {
       case Some(true) =>
-        getDateOfFirstSale(userAnswers)
+        Some(getDateOfFirstSale(userAnswers))
       case Some(false) =>
         val maybeRegistrationDate = request.registration.flatMap(_.submissionReceived.map(_.atZone(clock.getZone).toLocalDate))
 
         maybeRegistrationDate match {
-          case Some(registrationDate) => startOfNextQuarter(registrationDate)
-          case _ => startOfNextQuarter()
+          case Some(registrationDate) => Some(startOfNextQuarter(registrationDate))
+          case _ => Some(startOfNextQuarter())
         }
       case _ =>
-        val exception = new IllegalStateException("Must answer Has Made Sales")
-        logger.error(exception.getMessage, exception)
-        throw exception
+        None
     }
   }
 

@@ -163,7 +163,7 @@ class ChangeYourRegistrationController @Inject()(
     }
   }
 
-  private def detailList(existingPreviousRegistrations: Seq[PreviousRegistration], cds: SummaryListRow)
+  private def detailList(existingPreviousRegistrations: Seq[PreviousRegistration], cds: Option[SummaryListRow])
                         (implicit request: AuthenticatedDataRequest[AnyContent]) = {
 
     SummaryListViewModel(
@@ -191,11 +191,11 @@ class ChangeYourRegistrationController @Inject()(
       tradingNameSummaryRow)
   }
 
-  private def getSalesRows(cds: SummaryListRow)(implicit request: AuthenticatedDataRequest[_]) = {
+  private def getSalesRows(cds: Option[SummaryListRow])(implicit request: AuthenticatedDataRequest[_]) = {
     Seq(
       HasMadeSalesSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
       DateOfFirstSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      Some(cds)
+      cds
     )
   }
 
