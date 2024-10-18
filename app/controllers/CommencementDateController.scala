@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import formats.Format.dateFormatter
+import logging.Logging
 import models.Mode
 import pages.{CommencementDatePage, DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -36,14 +37,19 @@ class CommencementDateController @Inject()(
                                             view: CommencementDateView,
                                             dateService: DateService,
                                             registrationService: RegistrationService
-                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       for {
-        calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        maybeCalculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        calculatedCommencementDate = maybeCalculatedCommencementDate.getOrElse {
+          val exception = new IllegalStateException("A calculated commencement date is expected")
+          logger.error(exception.getMessage, exception)
+          throw exception
+        }
         isEligibleSalesAmendable <- registrationService.isEligibleSalesAmendable(mode)
         finalDayOfDateAmendment = dateService.calculateFinalAmendmentDate(calculatedCommencementDate)
       } yield {

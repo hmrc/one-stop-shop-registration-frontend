@@ -158,7 +158,7 @@ trait SpecBase
       val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode)
       val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode)
       val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode)
-      val commencementDateSummaryRow = Some(commencementDateSummary)
+      val commencementDateSummaryRow = commencementDateSummary
       val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(answers, mode)
       val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, Seq.empty, mode)
       val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(answers, mode)
@@ -228,7 +228,7 @@ trait SpecBase
       val removedTradingNameRows = TradingNameSummary.removedAnswersRow(getRemovedTradingNames(answers, registration))
       val hasMadeSalesSummaryRow = HasMadeSalesSummary.amendedAnswersRow(answers)
       val dateOfFirstSaleSummary = DateOfFirstSaleSummary.amendedAnswersRow(request.userAnswers)
-      val commencementDateSummaryRow = Some(commencementDateSummary)
+      val commencementDateSummaryRow = commencementDateSummary
       val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.amendedAnswersRow(answers)
       val euDetailsSummaryRow = EuDetailsSummary.amendedAnswersRow(answers)
       val removedEuDetailsRow = EuDetailsSummary.removedAnswersRow(getRemovedEuDetails(answers, registration))

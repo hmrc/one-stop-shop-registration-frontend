@@ -151,7 +151,7 @@ class RejoinRegistrationController @Inject()(
       }
   }
 
-  private def detailList(cds: SummaryListRow)(implicit request: AuthenticatedDataRequest[AnyContent]) = {
+  private def detailList(cds: Option[SummaryListRow])(implicit request: AuthenticatedDataRequest[AnyContent]) = {
 
     SummaryListViewModel(
       rows =
@@ -180,11 +180,11 @@ class RejoinRegistrationController @Inject()(
       tradingNameSummaryRow)
   }
 
-  private def getSalesRows(cds: SummaryListRow)(implicit request: AuthenticatedDataRequest[_]) = {
+  private def getSalesRows(cds: Option[SummaryListRow])(implicit request: AuthenticatedDataRequest[_]) = {
     Seq(
       HasMadeSalesSummary.row(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
       DateOfFirstSaleSummary.row(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      Some(cds)
+      cds
     )
   }
 

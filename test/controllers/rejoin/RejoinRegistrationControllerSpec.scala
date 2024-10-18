@@ -81,7 +81,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
       "must redirect to Cannot rejoin if can rejoin is false" in {
 
         val commencementDate = LocalDate.of(2022, 1, 1)
-        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
         when(dateService.startOfNextQuarter()) thenReturn commencementDate
         when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
@@ -107,7 +107,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
       "must return OK and the correct view for a GET" in {
 
         val commencementDate = LocalDate.of(2022, 1, 1)
-        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
         when(dateService.startOfNextQuarter()) thenReturn commencementDate
         when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -138,7 +138,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
       "must return OK and view with invalid prompt when" - {
         "trading name is missing" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -167,7 +167,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
         "websites are missing" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -196,7 +196,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
         "eligible sales is not populated correctly" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -225,7 +225,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
         "tax registered in eu is not populated correctly" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -254,7 +254,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
         "previous registrations is not populated correctly" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -283,7 +283,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
         "tax registered in eu has a country with missing data" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -314,7 +314,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
         "previous registrations has a country with missing data" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -521,8 +521,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
-
-            val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+            val answers = completeUserAnswers.remove(HasMadeSalesPage).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
@@ -535,6 +534,27 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url
+
+            }
+          }
+
+          "to Date of First Sale when date of first sale is not populated correctly" in {
+            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
+              Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
+            when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+            val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
+
+            val application = applicationBuilder(userAnswers = Some(answers))
+              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
+              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+              .build()
+
+            running(application) {
+              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
+              val result = route(application, request).value
+
+              status(result) mustEqual SEE_OTHER
+              redirectLocation(result).value mustEqual controllers.routes.DateOfFirstSaleController.onPageLoad(RejoinMode).url
 
             }
           }
@@ -584,7 +604,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           }
 
 
-          "to Previously Registered when previous registrations are not populated correctly" in {
+          "to add Previous Reg when previous registrations are not populated correctly" in {
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
@@ -601,7 +621,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(RejoinMode).url
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(RejoinMode, Index(0)).url
 
             }
           }

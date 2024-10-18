@@ -18,14 +18,14 @@ package utils
 
 import models._
 import models.euDetails._
-import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalVatNumber
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalFields, PreviousRegistrationDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import pages._
 import pages.previousRegistrations._
-import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
-import queries.previousRegistration._
+import play.api.mvc.Results.Redirect
 import queries._
+import queries.previousRegistration._
 import utils.EuDetailsCompletionChecks._
 
 import scala.concurrent.Future
@@ -54,20 +54,24 @@ trait CompletionChecks {
     }
   }
 
-  def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = {
+  def getAllIncompleteDeregisteredDetails()(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousRegistrationDetailsWithOptionalFields] = {
     request.userAnswers
-      .get(AllPreviousRegistrationsWithOptionalVatNumberQuery).map(
+      .get(AllPreviousRegistrationsWithOptionalFieldsQuery).map(
         _.filter(scheme =>
-          scheme.previousSchemesDetails.isEmpty || scheme.previousSchemesDetails.getOrElse(List.empty).exists(_.previousSchemeNumbers.isEmpty))
+          scheme.previousEuCountry.isEmpty ||
+            scheme.previousSchemesDetails.isEmpty ||
+            scheme.previousSchemesDetails.getOrElse(List.empty).exists(_.previousSchemeNumbers.isEmpty))
       ).getOrElse(List.empty)
   }
 
-  def firstIndexedIncompleteDeregisteredCountry(incompleteCountries: Seq[Country])
+  def firstIndexedIncompleteDeregisteredCountry(incompleteIndexes: Seq[Int])
                                                (implicit request: AuthenticatedDataRequest[AnyContent]):
   Option[(PreviousRegistrationDetailsWithOptionalVatNumber, Int)] = {
     request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery)
       .getOrElse(List.empty).zipWithIndex
-      .find(indexedDetails => incompleteCountries.contains(indexedDetails._1.previousEuCountry))
+      .find {
+        case (_, index) => incompleteIndexes.contains(index)
+      }
   }
 
   def firstIndexedIncompleteEuDetails(incompleteCountries: Seq[Country])
@@ -85,9 +89,20 @@ trait CompletionChecks {
   }
 
   private def isAlreadyMadeSalesValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(HasMadeSalesPage).isDefined
+  }
+
+  private def isDateOfFirstSaleValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(HasMadeSalesPage).exists {
       case true => request.userAnswers.get(DateOfFirstSalePage).isDefined
+      case _ => true
+    }
+  }
+
+  private def isPreviouslyRegisteredValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(HasMadeSalesPage).exists {
       case false => request.userAnswers.get(PreviouslyRegisteredPage).isDefined
+      case _ => true
     }
   }
 
@@ -99,8 +114,18 @@ trait CompletionChecks {
   }
 
   private def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
+    request.userAnswers.get(PreviouslyRegisteredPage).isDefined
+  }
+
+  private def arePreviousRegistrationsValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
-      case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
+      case true => val maybePreviousRegistrations = request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery)
+        maybePreviousRegistrations match {
+          case Some(previousRegistrations) if previousRegistrations.nonEmpty =>
+            true
+          case _ =>
+            false
+        }
       case false => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).isEmpty
     }
   }
@@ -122,9 +147,12 @@ trait CompletionChecks {
       getAllIncompleteEuDetails().isEmpty &&
       isTradingNamesValid() &&
       isAlreadyMadeSalesValid() &&
+      isDateOfFirstSaleValid() &&
+      isPreviouslyRegisteredValid() &&
       hasWebsiteValid() &&
       isEuDetailsPopulated() &&
       isDeregisteredPopulated() &&
+      arePreviousRegistrationsValid() &&
       isOnlineMarketplacePopulated() &&
       isContactDetailsPopulated() &&
       isBankDetailsPopulated()
@@ -137,6 +165,7 @@ trait CompletionChecks {
   def getFirstValidationErrorRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
     (incompleteTradingNameRedirect(mode) ++
       incompleteEligibleSalesRedirect(mode) ++
+      incompleteDateOfFirstSaleRedirect(mode) ++
       emptyEuDetailsRedirect(mode) ++
       incompleteEuDetailsRedirect(mode) ++
       emptyDeregisteredRedirect(mode) ++
@@ -150,7 +179,7 @@ trait CompletionChecks {
 
   def incompletePreviousRegistrationRedirect(mode: Mode)
                                             (implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] =
-    firstIndexedIncompleteDeregisteredCountry(getAllIncompleteDeregisteredDetails().map(_.previousEuCountry)) match {
+    firstIndexedIncompleteDeregisteredCountry(getAllIncompleteDeregisteredDetails().zipWithIndex.map(_._2)) match {
       case Some(incompleteCountry) if incompleteCountry._1.previousSchemesDetails.isDefined =>
         incompleteCountry._1.previousSchemesDetails.getOrElse(List.empty).zipWithIndex.find(_._1.previousSchemeNumbers.isEmpty) match {
           case Some(schemeDetails) =>
@@ -176,7 +205,16 @@ trait CompletionChecks {
         Some(Redirect(controllers.previousRegistrations.routes.PreviousSchemeController.onPageLoad(
           mode, Index(incompleteCountry._2), Index(0))))
 
-      case None => None
+      case None =>
+        request.userAnswers.get(PreviouslyRegisteredPage) match {
+          case Some(true) =>
+            if(request.userAnswers.get(AllPreviousRegistrationsWithOptionalFieldsQuery).isEmpty) {
+              Some(Redirect(controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(mode, Index(0))))
+            } else {
+              None
+            }
+          case _ => None
+        }
     }
 
   def incompleteCountryEuDetailsRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = {
@@ -207,6 +245,12 @@ trait CompletionChecks {
 
   private def incompleteEligibleSalesRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isAlreadyMadeSalesValid()) {
     Some(Redirect(controllers.routes.HasMadeSalesController.onPageLoad(mode)))
+  } else {
+    None
+  }
+
+  private def incompleteDateOfFirstSaleRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isDateOfFirstSaleValid()) {
+    Some(Redirect(controllers.routes.DateOfFirstSaleController.onPageLoad(mode)))
   } else {
     None
   }

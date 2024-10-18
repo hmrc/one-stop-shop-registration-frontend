@@ -81,7 +81,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
     "GET" - {
       "must return OK and the correct view when answers are complete" in {
         val commencementDate = LocalDate.of(2022, 1, 1)
-        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
         when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
         when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -107,7 +107,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
       "must return OK and view with invalid prompt when" - {
         "trading name is missing" in {
 
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -133,7 +133,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
 
         "websites are missing" in {
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -158,7 +158,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
 
         "eligible sales is not populated correctly" in {
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -183,7 +183,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
 
         "tax registered in eu is not populated correctly" in {
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -208,7 +208,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
 
         "previous registrations is not populated correctly" in {
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -233,7 +233,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
 
         "tax registered in eu has a country with missing data" in {
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -260,7 +260,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
 
         "previous registrations has a country with missing data" in {
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(commencementDate)
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(commencementDate))
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
@@ -608,7 +608,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               val result = route(application, request).value
 
               status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(AmendMode).url
+              redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0)).url
 
             }
 

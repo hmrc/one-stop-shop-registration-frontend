@@ -30,6 +30,18 @@ object PreviousRegistrationDetailsWithOptionalVatNumber {
   implicit val format: OFormat[PreviousRegistrationDetailsWithOptionalVatNumber] = Json.format[PreviousRegistrationDetailsWithOptionalVatNumber]
 }
 
+case class PreviousRegistrationDetailsWithOptionalFields(
+                                                             previousEuCountry: Option[Country],
+                                                             previousSchemesDetails: Option[List[SchemeDetailsWithOptionalVatNumber]]
+                                                           )
+
+
+object PreviousRegistrationDetailsWithOptionalFields {
+
+  implicit val format: OFormat[PreviousRegistrationDetailsWithOptionalFields] = Json.format[PreviousRegistrationDetailsWithOptionalFields]
+}
+
+
 case class SchemeDetailsWithOptionalVatNumber(
                                                previousScheme: Option[PreviousScheme],
                                                previousSchemeNumbers: Option[SchemeNumbersWithOptionalVatNumber]

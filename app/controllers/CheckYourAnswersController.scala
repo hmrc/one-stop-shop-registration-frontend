@@ -78,7 +78,7 @@ class CheckYourAnswersController @Inject()(
           val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode)
           val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(request.userAnswers, CheckMode)
           val dateOfFirstSaleSummaryRow = DateOfFirstSaleSummary.row(request.userAnswers, CheckMode)
-          val commencementDateSummaryRow = Some(cds)
+          val commencementDateSummaryRow = cds
           val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode)
           val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode)
           val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode)

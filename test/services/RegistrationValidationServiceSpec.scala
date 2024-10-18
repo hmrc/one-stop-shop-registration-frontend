@@ -135,7 +135,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
     "must return a Registration when user answers are provided and we have full VAT information on the user and is not part of vat group" in {
 
-      when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+      when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
       when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
       val regDate = LocalDate.of(2000, 1, 1)
@@ -659,7 +659,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "when Registration Type is missing" - {
 
-                  when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                  when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
                   when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersPartOfVatGroup.remove(RegistrationTypePage(Index(0))).success.value
@@ -695,7 +695,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
               "when Sells Goods To EU Consumer Method is missing" - {
 
-                when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
                 when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                 val userAnswers = answersPartOfVatGroup.remove(SellsGoodsToEUConsumerMethodPage(Index(0))).success.value
@@ -787,7 +787,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "when Registration Type is missing" - {
 
-                  when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                  when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
                   when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersNotPartOfVatGroup.remove(RegistrationTypePage(Index(0))).success.value
@@ -855,7 +855,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
                 "when Registration Type is missing" - {
 
-                  when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                  when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
                   when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                   val userAnswers = answersNotPartOfVatGroup.remove(RegistrationTypePage(Index(4))).success.value
@@ -891,7 +891,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
               "when Sells Goods To EU Consumer Method is missing" - {
 
-                when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(arbitraryDate)
+                when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryDate))
                 when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
                 val userAnswers = answersNotPartOfVatGroup.remove(SellsGoodsToEUConsumerMethodPage(Index(0))).success.value
