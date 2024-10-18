@@ -21,8 +21,7 @@ import config.FrontendAppConfig
 import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import models.{UserAnswers, VatApiCallResult, responses}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
-import org.mockito.Mockito.{never, times, verify, verifyNoInteractions, when}
+import org.mockito.Mockito.{never, reset, times, verify, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.SavedProgressPage
@@ -55,7 +54,9 @@ class AuthControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterE
       )
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector, mockRepository, mockSavedAnswersConnector)
+    reset(mockConnector)
+    reset(mockRepository)
+    reset(mockSavedAnswersConnector)
   }
 
 
