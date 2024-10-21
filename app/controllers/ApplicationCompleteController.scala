@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions._
 import formats.Format.dateFormatter
+import logging.Logging
 import models.UserAnswers
 import pages.BusinessContactDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -45,7 +46,7 @@ class ApplicationCompleteController @Inject()(
                                                coreRegistrationValidationService: CoreRegistrationValidationService,
                                                registrationConnector: RegistrationConnector,
                                                clock: Clock
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -54,55 +55,60 @@ class ApplicationCompleteController @Inject()(
 
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()
-        calculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
+        maybeCalculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
       } yield {
-          {for {
-            organisationName <- getOrganisationName(request.userAnswers)
-            contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)
-            showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
-          } yield {
-            val savedUrl = externalEntryUrl.fold(_ => None, _.url)
-            val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
-            val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
-            val firstDayOfNextPeriod = nextPeriod.firstDay
-            if(frontendAppConfig.enrolmentsEnabled) {
-              Ok(
-                viewEnrolments(
-                  HtmlFormat.escape(contactDetails.emailAddress).toString,
-                  request.vrn,
-                  showEmailConfirmation,
-                  frontendAppConfig.feedbackUrl,
-                  calculatedCommencementDate.format(dateFormatter),
-                  savedUrl,
-                  organisationName,
-                  periodOfFirstReturn.displayShortText,
-                  firstDayOfNextPeriod.format(dateFormatter)
-                )
+        val calculatedCommencementDate = maybeCalculatedCommencementDate.getOrElse {
+          val exception = new IllegalStateException("A calculated commencement date is expected, otherwise it wasn't submitted")
+          logger.error(exception.getMessage, exception)
+          throw exception
+        }
+        (for {
+          organisationName <- getOrganisationName(request.userAnswers)
+          contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)
+          showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
+        } yield {
+          val savedUrl = externalEntryUrl.fold(_ => None, _.url)
+          val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
+          val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
+          val firstDayOfNextPeriod = nextPeriod.firstDay
+          if (frontendAppConfig.enrolmentsEnabled) {
+            Ok(
+              viewEnrolments(
+                HtmlFormat.escape(contactDetails.emailAddress).toString,
+                request.vrn,
+                showEmailConfirmation,
+                frontendAppConfig.feedbackUrl,
+                calculatedCommencementDate.format(dateFormatter),
+                savedUrl,
+                organisationName,
+                periodOfFirstReturn.displayShortText,
+                firstDayOfNextPeriod.format(dateFormatter)
               )
-            } else {
-              Ok(
-                view(
-                  HtmlFormat.escape(contactDetails.emailAddress).toString,
-                  request.vrn,
-                  showEmailConfirmation,
-                  frontendAppConfig.feedbackUrl,
-                  calculatedCommencementDate.format(dateFormatter),
-                  savedUrl,
-                  organisationName,
-                  periodOfFirstReturn.displayShortText,
-                  firstDayOfNextPeriod.format(dateFormatter)
-                )
+            )
+          } else {
+            Ok(
+              view(
+                HtmlFormat.escape(contactDetails.emailAddress).toString,
+                request.vrn,
+                showEmailConfirmation,
+                frontendAppConfig.feedbackUrl,
+                calculatedCommencementDate.format(dateFormatter),
+                savedUrl,
+                organisationName,
+                periodOfFirstReturn.displayShortText,
+                firstDayOfNextPeriod.format(dateFormatter)
               )
-            }
-          }}.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+            )
+          }
+        }).getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
   }
 
   private def getOrganisationName(answers: UserAnswers): Option[String] =
     answers.vatInfo match {
-      case Some(vatInfo) if(vatInfo.organisationName.isDefined) => vatInfo.organisationName
-      case Some(vatInfo) if(vatInfo.individualName.isDefined) => vatInfo.individualName
-      case _             => None
+      case Some(vatInfo) if (vatInfo.organisationName.isDefined) => vatInfo.organisationName
+      case Some(vatInfo) if (vatInfo.individualName.isDefined) => vatInfo.individualName
+      case _ => None
     }
 }

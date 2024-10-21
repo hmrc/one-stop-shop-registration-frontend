@@ -480,7 +480,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe exclusionEffectiveDate
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(exclusionEffectiveDate)
 
     }
 
@@ -514,7 +514,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe exclusionEffectiveDate
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(exclusionEffectiveDate)
 
     }
 
@@ -541,7 +541,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe commencementDate
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(commencementDate)
 
     }
 
@@ -556,7 +556,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe commencementDate
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(commencementDate)
 
     }
 
@@ -569,10 +569,10 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      dateService.calculateCommencementDate(userAnswers).futureValue mustBe commencementDate
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe Some(commencementDate)
     }
 
-    "must return an Exception when no answers" in {
+    "must return None when no answers" in {
 
       val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
 
@@ -580,14 +580,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
       val dateService = new DateService(stubClock, coreRegistrationValidationService)
 
-      Try {
-        dateService.calculateCommencementDate(userAnswers).futureValue
-      } match {
-        case Success(_) => fail("failed, got success")
-        case Failure(exception) =>
-          exception mustBe a[Exception]
-          exception.getCause.getMessage mustBe "Must answer Has Made Sales"
-      }
+      dateService.calculateCommencementDate(userAnswers).futureValue mustBe None
     }
 
   }

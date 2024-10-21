@@ -29,15 +29,7 @@ import scala.util.Try
 object CheckExistingRegistrations extends Logging {
 
   def checkExistingRegistration()(implicit request: AuthenticatedDataRequest[AnyContent]): Registration = {
-    val registration: Registration = checkRegistration(request)
-
-    registration.previousRegistrations.map {
-      case previousRegistrationNew: PreviousRegistrationNew =>
-        previousRegistrationNew.country
-      case previousRegistrationLegacy: PreviousRegistrationLegacy =>
-        previousRegistrationLegacy.country
-    }
-    registration
+    checkRegistration(request)
   }
 
   def getExistingRegistrationSchemes(country: Country)(implicit request: AuthenticatedDataRequest[AnyContent]): Seq[PreviousScheme] = {

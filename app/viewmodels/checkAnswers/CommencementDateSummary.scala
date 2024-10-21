@@ -33,14 +33,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class CommencementDateSummary @Inject()(dateService: DateService, registrationService: RegistrationService) extends Logging {
 
   def row(answers: UserAnswers)
-         (implicit messages: Messages, ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[SummaryListRow] = {
+         (implicit messages: Messages, ec: ExecutionContext, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[SummaryListRow]] = {
 
     for {
-      calculatedCommencementDate <- if (registrationService.eligibleSalesDifference(request.registration, answers)) {
+      maybeCalculatedCommencementDate <- if (registrationService.eligibleSalesDifference(request.registration, answers)) {
         dateService.calculateCommencementDate(answers)
       } else {
         request.registration match {
-          case Some(registration) => Future.successful(registration.commencementDate)
+          case Some(registration) => Future.successful(Some(registration.commencementDate))
           case _ => val exception = new IllegalStateException("Registration was expected but not found")
             logger.error(exception.getMessage, exception)
             throw exception
@@ -48,11 +48,13 @@ class CommencementDateSummary @Inject()(dateService: DateService, registrationSe
       }
     } yield {
 
-      SummaryListRowViewModel(
-        key = "commencementDate.checkYourAnswersLabel",
-        value = ValueViewModel(calculatedCommencementDate.format(dateFormatter)),
-        actions = Seq.empty
-      )
+      maybeCalculatedCommencementDate.map { calculatedCommencementDate =>
+        SummaryListRowViewModel(
+          key = "commencementDate.checkYourAnswersLabel",
+          value = ValueViewModel(calculatedCommencementDate.format(dateFormatter)),
+          actions = Seq.empty
+        )
+      }
     }
   }
 }

@@ -93,7 +93,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockAtArbitraryDate))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
@@ -141,7 +141,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockAtArbitraryDate))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
@@ -188,7 +188,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockAtArbitraryDate))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
@@ -239,7 +239,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.now(stubClockForToday))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockForToday)))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
@@ -275,7 +275,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(LocalDate.of(2021, 10, 1))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.of(2021, 10, 1)))
 
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 

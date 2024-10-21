@@ -145,8 +145,9 @@ class RegistrationValidationService @Inject()(
 
 
     if (registrationService.eligibleSalesDifference(request.registration, answers)) {
-      dateService.calculateCommencementDate(answers).map { calculatedCommencementDate =>
-        calculatedCommencementDate.validNec
+      dateService.calculateCommencementDate(answers).map {
+        case Some(calculatedCommencementDate) => calculatedCommencementDate.validNec
+        case _ => DataMissingError(DateOfFirstSalePage).invalidNec
       }
     } else {
       request.registration match {

@@ -29,7 +29,7 @@
         govukWarningText: GovukWarningText
 )
 
-@(form: Form[_], mode: Mode, list: Seq[ListItemWrapper], canAddCountries: Boolean, incompleteCountries: Seq[PreviousRegistrationDetailsWithOptionalVatNumber] = List.empty)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, list: Seq[ListItemWrapper], canAddCountries: Boolean, incompleteCountries: Seq[PreviousRegistrationDetailsWithOptionalFields] = List.empty)(implicit request: Request[_], messages: Messages)
 @defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
 
     @layout(pageTitle = title(form, messages("addPreviousRegistration.title" + messageSuffix, list.size))) {
@@ -70,7 +70,7 @@
                 }
             } else {
                 <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
-                <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.map(_.previousEuCountry.name).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.previousEuCountry.name} else {incompleteCountries.head.previousEuCountry.name})</p>
+                <p class="govuk-body">@messages("error.missing_answers_prompt", if(incompleteCountries.size > 1) {incompleteCountries.flatMap(_.previousEuCountry.map(_.name)).reverse.tail.mkString(", ") + " and " + incompleteCountries.last.previousEuCountry.map(_.name)} else {incompleteCountries.head.previousEuCountry.map(_.name)})</p>
 
                 @formHelper(action = controllers.previousRegistrations.routes.AddPreviousRegistrationController.onSubmit(mode, incompletePromptShown = true)) {
 
