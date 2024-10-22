@@ -35,7 +35,7 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.EmailConfirmationQuery
+import queries.{EmailConfirmationQuery, OriginalRegistrationQuery}
 import services.{CoreRegistrationValidationService, DateService, PeriodService, RegistrationService}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -83,6 +83,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, true).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -99,7 +100,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
         when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -131,6 +131,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, false).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -146,7 +147,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -178,6 +178,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, true).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers))
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -192,7 +193,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -228,6 +228,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, true).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -244,7 +245,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -280,12 +280,12 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
 
         when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(mockRegistration))
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
           .set(HasMadeSalesPage, false).success.value
           .set(EmailConfirmationQuery, true).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))

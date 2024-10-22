@@ -18,6 +18,7 @@ package controllers.amend
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
+import controllers.GetOriginalRegistration
 import controllers.actions._
 import models.UserAnswers
 import models.domain._
@@ -30,13 +31,12 @@ import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.amend.AmendCompleteView
 
-import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -47,33 +47,33 @@ class AmendCompleteController @Inject()(
                                          view: AmendCompleteView,
                                          frontendAppConfig: FrontendAppConfig,
                                          registrationConnector: RegistrationConnector,
-                                         commencementDateSummary: CommencementDateSummary,
-                                         clock: Clock
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                         commencementDateSummary: CommencementDateSummary
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetOriginalRegistration {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData(None)).async {
     implicit request => {
+      getOriginalRegistration() { originalRegistration =>
 
-      for {
-        externalEntryUrl <- registrationConnector.getSavedExternalEntry()
-        originalRegistration <- registrationConnector.getRegistration()(hc)
-        cds <- commencementDateSummary.row(request.userAnswers)
-      } yield {
-        val organisationName = getOrganisationName(request.userAnswers)
-        val savedUrl = externalEntryUrl.fold(_ => None, _.url)
-        val list: SummaryList = detailList(cds, originalRegistration, request.userAnswers)
-        Ok(
-          view(
-            request.vrn,
-            frontendAppConfig.feedbackUrl,
-            savedUrl,
-            frontendAppConfig.ossYourAccountUrl,
-            organisationName.toString,
-            list
+        for {
+          externalEntryUrl <- registrationConnector.getSavedExternalEntry()
+          cds <- commencementDateSummary.row(request.userAnswers)
+        } yield {
+          val organisationName = getOrganisationName(request.userAnswers)
+          val savedUrl = externalEntryUrl.fold(_ => None, _.url)
+          val list: SummaryList = detailList(cds, originalRegistration, request.userAnswers)
+          Ok(
+            view(
+              request.vrn,
+              frontendAppConfig.feedbackUrl,
+              savedUrl,
+              frontendAppConfig.ossYourAccountUrl,
+              organisationName.toString,
+              list
+            )
           )
-        )
+        }
       }
     }
   }
@@ -91,21 +91,21 @@ class AmendCompleteController @Inject()(
     SummaryListViewModel(
       rows = (
         getHasTradingNameRows(originalRegistration, userAnswers) ++
-        getTradingNameRows(originalRegistration, userAnswers) ++
-        getHasSalesRows(originalRegistration, userAnswers) ++
-        getSalesRows(cds, originalRegistration, userAnswers) ++
-        getHasPreviouslyRegistered(originalRegistration, userAnswers)++
-        getPreviouslyRegisteredRows(originalRegistration, userAnswers) ++
-        getCountriesWithNewSchemes(originalRegistration, userAnswers) ++
-        getHasRegisteredInEuRows(originalRegistration, userAnswers) ++
-        getRegisteredInEuRows(originalRegistration, userAnswers) ++
-        getChangedEuDetailsRows(originalRegistration, userAnswers) ++
-        getIsOnlineMarketPlace(originalRegistration, userAnswers) ++
-        getHasWebsiteRows(originalRegistration, userAnswers) ++
-        getWebsiteRows(originalRegistration, userAnswers) ++
-        getBusinessContactDetailsRows(originalRegistration, userAnswers) ++
-        getBankDetailsRows(originalRegistration, userAnswers)
-      ).flatten
+          getTradingNameRows(originalRegistration, userAnswers) ++
+          getHasSalesRows(originalRegistration, userAnswers) ++
+          getSalesRows(cds, originalRegistration, userAnswers) ++
+          getHasPreviouslyRegistered(originalRegistration, userAnswers) ++
+          getPreviouslyRegisteredRows(originalRegistration, userAnswers) ++
+          getCountriesWithNewSchemes(originalRegistration, userAnswers) ++
+          getHasRegisteredInEuRows(originalRegistration, userAnswers) ++
+          getRegisteredInEuRows(originalRegistration, userAnswers) ++
+          getChangedEuDetailsRows(originalRegistration, userAnswers) ++
+          getIsOnlineMarketPlace(originalRegistration, userAnswers) ++
+          getHasWebsiteRows(originalRegistration, userAnswers) ++
+          getWebsiteRows(originalRegistration, userAnswers) ++
+          getBusinessContactDetailsRows(originalRegistration, userAnswers) ++
+          getBankDetailsRows(originalRegistration, userAnswers)
+        ).flatten
     )
   }
 
@@ -404,9 +404,9 @@ class AmendCompleteController @Inject()(
     val hasChangedToYes = amendedWebsitesAnswers.nonEmpty && originalWebsiteAnswers.nonEmpty || originalWebsiteAnswers.isEmpty
     val notAmended = amendedWebsitesAnswers.nonEmpty && originalWebsiteAnswers.nonEmpty || amendedWebsitesAnswers.isEmpty && originalWebsiteAnswers.isEmpty
 
-     if (notAmended) {
-       Seq.empty
-     } else if (hasChangedToNo || hasChangedToYes) {
+    if (notAmended) {
+      Seq.empty
+    } else if (hasChangedToNo || hasChangedToYes) {
       Seq(
         HasWebsiteSummary.amendedAnswersRow(request.userAnswers)
       )
@@ -418,8 +418,8 @@ class AmendCompleteController @Inject()(
 
   private def getWebsiteRows(
                               originalRegistration: Option[Registration],
-                                 userAnswers: UserAnswers
-                               )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+                              userAnswers: UserAnswers
+                            )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
     val originalWebsiteAnswers = originalRegistration.map(_.websites).getOrElse(List.empty)
     val amendedWebsitesAnswers = userAnswers.get(AllWebsites).getOrElse(List.empty)
@@ -507,11 +507,11 @@ class AmendCompleteController @Inject()(
   private def detailsMatched(euDetails: EuOptionalDetails, euTaxRegistration: EuTaxRegistration): Boolean = {
 
     euTaxRegistration match {
-      case EuVatRegistration(country,vatNumber) =>
+      case EuVatRegistration(country, vatNumber) =>
         euDetails.euCountry == country &&
-        euDetails.sellsGoodsToEUConsumers.contains(false) &&
-        euDetails.vatRegistered.contains(true) &&
-        euDetails.euVatNumber.map(_.stripPrefix(euDetails.euCountry.code)).contains(vatNumber)
+          euDetails.sellsGoodsToEUConsumers.contains(false) &&
+          euDetails.vatRegistered.contains(true) &&
+          euDetails.euVatNumber.map(_.stripPrefix(euDetails.euCountry.code)).contains(vatNumber)
 
       case RegistrationWithFixedEstablishment(country, taxIdentifier, fixedEstablishment) =>
         euDetails.euCountry == country &&
@@ -522,15 +522,15 @@ class AmendCompleteController @Inject()(
 
       case RegistrationWithoutFixedEstablishmentWithTradeDetails(country, taxIdentifier, tradeDetails) =>
         euDetails.euCountry == country &&
-        euDetails.euTaxReference == taxIdentifier.value &&
-        euDetails.euSendGoodsTradingName.contains(tradeDetails.tradingName) &&
-        euDetails.euSendGoodsAddress.contains(tradeDetails.address)
+          euDetails.euTaxReference == taxIdentifier.value &&
+          euDetails.euSendGoodsTradingName.contains(tradeDetails.tradingName) &&
+          euDetails.euSendGoodsAddress.contains(tradeDetails.address)
 
       case RegistrationWithoutTaxId(country) =>
         euDetails.euCountry == country &&
-        euDetails.vatRegistered.contains(false) &&
-        euDetails.euVatNumber.isEmpty &&
-        euDetails.euTaxReference.isEmpty
+          euDetails.vatRegistered.contains(false) &&
+          euDetails.euVatNumber.isEmpty &&
+          euDetails.euTaxReference.isEmpty
     }
   }
 

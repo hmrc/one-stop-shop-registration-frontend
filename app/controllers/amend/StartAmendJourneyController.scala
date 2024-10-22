@@ -22,13 +22,14 @@ import logging.Logging
 import models.AmendMode
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.OriginalRegistrationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class StartAmendJourneyController @Inject()(
                                              override val messagesApi: MessagesApi,
@@ -52,7 +53,9 @@ class StartAmendJourneyController @Inject()(
               case Right(vatInfo) =>
                 for {
                   userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                  originalRegistration <- Future.fromTry(userAnswers.set(OriginalRegistrationQuery, registration))
                   _ <- authenticatedUserAnswersRepository.set(userAnswers)
+                  _ <- authenticatedUserAnswersRepository.set(originalRegistration)
                 } yield Redirect(routes.ChangeYourRegistrationController.onPageLoad().url)
 
               case Left(error) => val exception = new Exception(s"Failed to retrieve VAT information when starting amend $error")
