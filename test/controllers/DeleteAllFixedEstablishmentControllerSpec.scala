@@ -20,8 +20,8 @@ import base.SpecBase
 import cats.data.Validated.Valid
 import connectors.RegistrationConnector
 import controllers.amend.{routes => amendRoutes}
-import models.{Country, Index}
 import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
+import models.{Country, Index}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when

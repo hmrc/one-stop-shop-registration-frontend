@@ -21,11 +21,11 @@ import connectors.RegistrationConnector
 import controllers.actions._
 import controllers.amend.{routes => amendRoutes}
 import logging.Logging
-import models.{AmendMode, Country, Index, UserAnswers}
 import models.euDetails.{EuConsumerSalesMethod, EuDetails}
+import models.{AmendMode, Country, Index, UserAnswers}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{AllEuDetailsQuery, EuDetailsQuery}
+import queries.{AllEuDetailsQuery, EuDetailsQuery, OriginalRegistrationQuery}
 import repositories.AuthenticatedUserAnswersRepository
 import services.{RegistrationService, RegistrationValidationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -59,7 +59,9 @@ class DeleteAllFixedEstablishmentController @Inject()(
               case Right(vatInfo) =>
                 for {
                   userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                  originalRegistration <- Future.fromTry(userAnswers.set(OriginalRegistrationQuery, registration))
                   _ <- authenticatedUserAnswersRepository.set(userAnswers)
+                  _ <- authenticatedUserAnswersRepository.set(originalRegistration)
                 } yield {
                   val euDetails = getEuDetailsForFixedEstablishment(userAnswers)
                   Ok(view(euDetails))
