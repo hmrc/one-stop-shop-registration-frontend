@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package formats
+package models.iossExclusions
 
-import java.time.format.DateTimeFormatter
+import play.api.libs.json.{Json, OFormat}
 
-object Format {
+case class EtmpDisplayRegistration(
+                                    exclusions: Seq[EtmpExclusion]
+                                  )
 
-  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-  val dateHintFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d M yyyy")
-  val dateOfRegistrationFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+object EtmpDisplayRegistration {
 
-  val eisDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
+  implicit val format: OFormat[EtmpDisplayRegistration] = Json.format[EtmpDisplayRegistration]
 }

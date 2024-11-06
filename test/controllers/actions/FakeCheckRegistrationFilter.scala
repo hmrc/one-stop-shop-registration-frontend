@@ -18,21 +18,15 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import models.requests.AuthenticatedIdentifierRequest
 import models.Mode
-import play.api.mvc.Result
+import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.mvc.Result
 import services.DataMigrationService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
-/*
-mode: Option[Mode],
-                                  connector: RegistrationConnector,
-                                  config: FrontendAppConfig,
-                                  migrationService: DataMigrationService
- */
 class FakeCheckRegistrationFilter() extends CheckRegistrationFilterImpl(
   mock[Option[Mode]],
   mock[RegistrationConnector],

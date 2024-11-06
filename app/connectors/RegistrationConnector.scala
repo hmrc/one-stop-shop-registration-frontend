@@ -19,7 +19,7 @@ package connectors
 import config.Service
 import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponse, AmendRegistrationResultResponseReads}
 import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, ExternalEntryUrlResponseReads}
-import connectors.RegistrationHttpParser.{RegistrationResponseReads, RegistrationResultResponse}
+import connectors.RegistrationHttpParser.{IossEtmpDisplayRegistrationReads, IossEtmpDisplayRegistrationResultResponse, RegistrationResponseReads, RegistrationResultResponse}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
 import play.api.Configuration
@@ -53,4 +53,10 @@ class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpC
 
   def enrolUser()(implicit hc: HeaderCarrier): Future[HttpResponse] =
     httpClientV2.post(url"$baseUrl/confirm-enrolment").execute[HttpResponse]
+
+  def getIossRegistration()(implicit hc: HeaderCarrier): Future[IossEtmpDisplayRegistrationResultResponse] = {
+    val baseUrl: Service = config.get[Service]("microservice.services.ioss-registration")
+
+    httpClientV2.get(url"$baseUrl/registration").execute[IossEtmpDisplayRegistrationResultResponse]
+  }
 }

@@ -28,18 +28,17 @@ import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviousSchemeTypePage}
+import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.Month._
-import java.time.{Clock, Instant, LocalDate, Year, ZoneId}
+import java.time._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Generators with PrivateMethodTester {
 

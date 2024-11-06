@@ -20,13 +20,13 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.routes
 import logging.Logging
-import models.requests.AuthenticatedIdentifierRequest
 import models.Mode
+import models.requests.AuthenticatedIdentifierRequest
 import play.api.http.Status.NO_CONTENT
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
-import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.auth.core.{EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckRegistrationFilterImpl(mode: Option[Mode],
                                   connector: RegistrationConnector,
-                                  config: FrontendAppConfig,
+                                  frontendAppConfig: FrontendAppConfig,
                                   migrationService: DataMigrationService)
                                  (implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedIdentifierRequest] with Logging {
@@ -71,11 +71,11 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
   }
 
   private def hasRegistrationEnrolment(enrolments: Enrolments): Boolean = {
-    config.enrolmentsEnabled && enrolments.enrolments.exists(_.key == config.ossEnrolment)
+    frontendAppConfig.enrolmentsEnabled && enrolments.enrolments.exists(_.key == frontendAppConfig.ossEnrolment)
   }
 
   private def enrolRegisteredUser(vrn: Vrn)
-                                           (implicit hc: HeaderCarrier): Future[Option[Result]] = {
+                                 (implicit hc: HeaderCarrier): Future[Option[Result]] = {
 
     connector.enrolUser().map { response =>
       response.status match {
@@ -88,14 +88,19 @@ class CheckRegistrationFilterImpl(mode: Option[Mode],
       }
     }
   }
+
+  private def getIossEnrolments(request: AuthenticatedIdentifierRequest[_]): Option[EnrolmentIdentifier] = {
+    request.enrolments.enrolments.filter(_.key == frontendAppConfig.iossEnrolment).toSeq
+      .flatMap(_.identifiers.filter(_.key == "IOSSNumber")).headOption
+  }
 }
 
 class CheckRegistrationFilterProvider @Inject()(
                                                  connector: RegistrationConnector,
-                                                 config: FrontendAppConfig,
+                                                 frontendAppConfig: FrontendAppConfig,
                                                  migrationService: DataMigrationService
                                                )(implicit ec: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckRegistrationFilterImpl = {
-    new CheckRegistrationFilterImpl(mode, connector, config, migrationService)
+    new CheckRegistrationFilterImpl(mode, connector, frontendAppConfig, migrationService)
   }
 }

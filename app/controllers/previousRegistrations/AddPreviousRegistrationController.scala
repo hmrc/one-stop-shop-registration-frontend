@@ -19,14 +19,14 @@ package controllers.previousRegistrations
 import controllers.actions._
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
 import logging.Logging
-import models.{AmendMode, Country, Mode, RejoinMode}
 import models.domain.Registration
 import models.previousRegistrations.PreviousRegistrationDetailsWithOptionalFields
 import models.requests.AuthenticatedDataRequest
+import models.{AmendMode, Country, Mode, RejoinMode}
 import pages.previousRegistrations.{AddPreviousRegistrationPage, PreviouslyRegisteredPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.previousRegistration.{AllPreviousRegistrationsQuery, DeriveNumberOfPreviousRegistrations}
+import queries.previousRegistration.DeriveNumberOfPreviousRegistrations
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CheckJourneyRecovery.determineJourneyRecovery

@@ -19,6 +19,7 @@ package connectors
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock._
 import models.external.ExternalEntryUrl
+import models.iossExclusions.EtmpDisplayRegistration
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
@@ -36,6 +37,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
   private def application: Application =
     applicationBuilder()
       .configure("microservice.services.one-stop-shop-registration.port" -> server.port)
+      .configure("microservice.services.ioss-registration.port" -> server.port)
       .build()
 
   "submitRegistration" - {
@@ -294,6 +296,71 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         result.status mustEqual NO_CONTENT
       }
 
+    }
+  }
+
+  ".getIossRegistration" - {
+
+    val iossUrl: String = "/ioss-registration/registration"
+
+    "must return OK with a valid EtmpDisplayRegistration when IOSS backend returns OK with a valid response body" in {
+
+      val etmpDisplayRegistration: EtmpDisplayRegistration = arbitraryEtmpDisplayRegistration.arbitrary.sample.value
+
+      running(application) {
+
+        val connector: RegistrationConnector = application.injector.instanceOf[RegistrationConnector]
+
+        val responseJson =
+          s"""{
+             | "exclusions" : ${Json.toJson(etmpDisplayRegistration.exclusions)}
+             |}""".stripMargin
+
+        server.stubFor(get(urlEqualTo(iossUrl))
+          .willReturn(ok().withBody(responseJson))
+        )
+
+        val result = connector.getIossRegistration().futureValue
+
+        result mustBe Right(etmpDisplayRegistration)
+      }
+    }
+
+    "must return InvalidJson when IOSS backend returns invalid JSON" in {
+
+      running(application) {
+
+        val connector: RegistrationConnector = application.injector.instanceOf[RegistrationConnector]
+
+
+        val responseJson = Json.obj("test" -> "test").toString()
+
+        server.stubFor(get(urlEqualTo(iossUrl))
+          .willReturn(ok().withBody(responseJson))
+        )
+
+        val result = connector.getIossRegistration().futureValue
+
+        result mustBe Left(InvalidJson)
+      }
+    }
+
+    "must return Left(UnexpectedStatus) when the backend returns another error code" in {
+
+      val status = Gen.oneOf(BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED, BAD_GATEWAY, SERVICE_UNAVAILABLE).sample.value
+
+      running(application) {
+
+        val connector: RegistrationConnector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(iossUrl))
+          .willReturn(aResponse().withStatus(status))
+        )
+
+        val result = connector.getIossRegistration().futureValue
+
+        result mustBe Left(UnexpectedResponseStatus(status, s"Unexpected IOSS registration response, status $status returned"))
+      }
     }
   }
 }
