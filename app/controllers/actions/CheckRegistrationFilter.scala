@@ -26,6 +26,7 @@ import play.api.http.Status.NO_CONTENT
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
+import services.ioss.IossExclusionService
 import uk.gov.hmrc.auth.core.{EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,11 +36,13 @@ import utils.FutureSyntax.FutureOps
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckRegistrationFilterImpl(mode: Option[Mode],
-                                  connector: RegistrationConnector,
-                                  frontendAppConfig: FrontendAppConfig,
-                                  migrationService: DataMigrationService)
-                                 (implicit val executionContext: ExecutionContext)
+class CheckRegistrationFilterImpl(
+                                   mode: Option[Mode],
+                                   connector: RegistrationConnector,
+                                   frontendAppConfig: FrontendAppConfig,
+                                   migrationService: DataMigrationService,
+                                   iossExclusionService: IossExclusionService
+                                 )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedIdentifierRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {

@@ -33,8 +33,7 @@ class IossExclusionService @Inject()(
   def isQuarantinedCode4()(implicit hc: HeaderCarrier): Future[Boolean] = {
     getIossEtmpExclusion().map {
       case Some(iossEtmpExclusion) =>
-        // TODO -> Why do check for quarantine again here? Check on IOSS change also
-        !isQuarantinedAndAfterTwoYears(iossEtmpExclusion) &&
+        !isAfterTwoYears(iossEtmpExclusion) &&
           iossEtmpExclusion.quarantine &&
           iossEtmpExclusion.exclusionReason.equals(EtmpExclusionReason.FailsToComply)
       case _ => false
@@ -52,14 +51,9 @@ class IossExclusionService @Inject()(
     }
   }
 
-  private def isQuarantinedAndAfterTwoYears(etmpExclusion: EtmpExclusion): Boolean = {
+  private def isAfterTwoYears(etmpExclusion: EtmpExclusion): Boolean = {
     val currentDate: LocalDate = LocalDate.now(clock)
-
-    if (etmpExclusion.quarantine) {
-      val minimumDate: LocalDate = currentDate.minusYears(2)
-      etmpExclusion.effectiveDate.isBefore(minimumDate)
-    } else {
-      false
-    }
+    val minimumDate: LocalDate = currentDate.minusYears(2)
+    etmpExclusion.effectiveDate.isBefore(minimumDate)
   }
 }

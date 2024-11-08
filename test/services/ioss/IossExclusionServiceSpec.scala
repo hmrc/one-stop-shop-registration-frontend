@@ -174,6 +174,21 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
         result mustBe iossEtmpDisplayRegistration.exclusions.headOption
       }
 
+      "must return None when IOSS backend returns an Etmp Display Registration with Exclusions as an empty Sequence" in {
+
+        val updatedIossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(
+          exclusions = Seq.empty
+        )
+
+        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+
+        val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
+
+        val result = service.getIossEtmpExclusion().futureValue
+
+        result mustBe None
+      }
+
       "must throw an Exception when a IOSS ETMP Display Registration can't be retrieved" in {
 
         when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Left(RegistrationNotFound).toFuture
@@ -191,51 +206,34 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
       }
     }
 
-    ".isQuarantinedAndAfterTwoYears" - {
+    ".isAfterTwoYears" - {
 
-      "must return false when IOSS ETMP Exclusion is not quarantined" in {
-
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(quarantine = false)
-
-        val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
-
-        val isQuarantinedAndAfterTwoYearsMethod = PrivateMethod[Boolean](Symbol("isQuarantinedAndAfterTwoYears"))
-
-        val result = service invokePrivate isQuarantinedAndAfterTwoYearsMethod(updatedIossEtmpExclusion)
-
-        result mustBe false
-      }
-
-      "must return true when OSS Excluded Trader is quarantined and the effective date is after 2 years" in {
+      "must return true when the effective date is after 2 years" in {
 
         val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = EtmpExclusionReason.FailsToComply,
-          effectiveDate = currentDate.minusYears(2).minusDays(1),
-          quarantine = true
+          effectiveDate = currentDate.minusYears(2).minusDays(1)
         )
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val isQuarantinedAndAfterTwoYearsMethod = PrivateMethod[Boolean](Symbol("isQuarantinedAndAfterTwoYears"))
+        val isAfterTwoYearsMethod = PrivateMethod[Boolean](Symbol("isAfterTwoYears"))
 
-        val result = service invokePrivate isQuarantinedAndAfterTwoYearsMethod(updatedIossEtmpExclusion)
+        val result = service invokePrivate isAfterTwoYearsMethod(updatedIossEtmpExclusion)
 
         result mustBe true
       }
 
-      "must return false when OSS Excluded Trader is quarantined and the effective date is before 2 years" in {
+      "must return false when the effective date is before 2 years" in {
 
         val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = EtmpExclusionReason.FailsToComply,
-          effectiveDate = currentDate.minusYears(2),
-          quarantine = true
+          effectiveDate = currentDate.minusYears(2)
         )
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val isQuarantinedAndAfterTwoYearsMethod = PrivateMethod[Boolean](Symbol("isQuarantinedAndAfterTwoYears"))
+        val isAfterTwoYearsMethod = PrivateMethod[Boolean](Symbol("isAfterTwoYears"))
 
-        val result = service invokePrivate isQuarantinedAndAfterTwoYearsMethod(updatedIossEtmpExclusion)
+        val result = service invokePrivate isAfterTwoYearsMethod(updatedIossEtmpExclusion)
 
         result mustBe false
       }
