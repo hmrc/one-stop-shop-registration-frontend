@@ -34,7 +34,7 @@ class CheckVatDetailsController @Inject()(
                                            cc: AuthenticatedControllerComponents,
                                            formProvider: CheckVatDetailsFormProvider,
                                            view: CheckVatDetailsView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -71,13 +71,12 @@ class CheckVatDetailsController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckVatDetailsPage, value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
+                _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CheckVatDetailsPage.navigate(NormalMode, updatedAnswers))
           )
 
         case None =>
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
-
   }
 }

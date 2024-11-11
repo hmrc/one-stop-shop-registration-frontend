@@ -41,7 +41,7 @@ object RegistrationHttpParser extends Logging {
 
     override def read(method: String, url: String, response: HttpResponse): IossEtmpDisplayRegistrationResultResponse =
       response.status match {
-        case OK => response.json.validate[EtmpDisplayRegistration] match {
+        case OK => (response.json \ "registration").validate[EtmpDisplayRegistration] match {
           case JsSuccess(etmpDisplayRegistration, _) => Right(etmpDisplayRegistration)
           case JsError(errors) =>
             logger.error(s"Failed trying to parse IOSS Etmp Display Registration response JSON with body ${response.body}" +

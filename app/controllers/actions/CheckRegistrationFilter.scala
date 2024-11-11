@@ -18,6 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
+import controllers.ioss.{routes => iossExclusionsRoutes}
 import controllers.routes
 import logging.Logging
 import models.Mode
@@ -28,7 +29,6 @@ import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
 import services.ioss.IossExclusionService
 import uk.gov.hmrc.auth.core.{EnrolmentIdentifier, Enrolments}
-import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.FutureSyntax.FutureOps
@@ -55,9 +55,15 @@ class CheckRegistrationFilterImpl(
 
       if (mode.exists(_.isInAmendOrRejoin)) {
         mayBeRegistration match {
-          case Some(_) if hasRegistrationEnrolment(request.enrolments) => None.toFuture
+          case Some(_) if hasRegistrationEnrolment(request.enrolments) =>
+            if (mode.exists(_.isInAmend)) {
+              None.toFuture
+            } else {
+              checkIossExclusionAndRedirect(request)
+            }
 
-          case Some(_) => enrolRegisteredUser(request.vrn)
+          case Some(_) =>
+            enrolRegisteredUser(request)
 
           case _ => Some(Redirect(routes.NotRegisteredController.onPageLoad())).toFuture
         }
@@ -68,27 +74,47 @@ class CheckRegistrationFilterImpl(
         )
         Some(Redirect(routes.AlreadyRegisteredController.onPageLoad())).toFuture
       } else {
-        None.toFuture
+        checkIossExclusionAndRedirect(request)
       }
     }).flatten
+  }
+
+  private def checkIossExclusionAndRedirect(request: AuthenticatedIdentifierRequest[_])(implicit hc: HeaderCarrier): Future[Option[Result]] = {
+    hasExcludedIossEnrolment(request).map {
+      case true =>
+        Some(Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad()))
+      case _ =>
+        None
+    }
   }
 
   private def hasRegistrationEnrolment(enrolments: Enrolments): Boolean = {
     frontendAppConfig.enrolmentsEnabled && enrolments.enrolments.exists(_.key == frontendAppConfig.ossEnrolment)
   }
 
-  private def enrolRegisteredUser(vrn: Vrn)
+  private def enrolRegisteredUser(request: AuthenticatedIdentifierRequest[_])
                                  (implicit hc: HeaderCarrier): Future[Option[Result]] = {
 
-    connector.enrolUser().map { response =>
+    connector.enrolUser().flatMap { response =>
       response.status match {
         case NO_CONTENT =>
-          logger.info(s"Successfully retrospectively enrolled user ${vrn.vrn}")
-          None
+          logger.info(s"Successfully retrospectively enrolled user ${request.vrn.vrn}")
+          checkIossExclusionAndRedirect(request)
         case status =>
           logger.error(s"Failure enrolling an existing user, got status $status from registration service")
           throw new IllegalStateException("Existing user didn't have enrolment and was unable to enrol user")
       }
+    }
+  }
+
+  private def hasExcludedIossEnrolment(request: AuthenticatedIdentifierRequest[_])(implicit hc: HeaderCarrier): Future[Boolean] = {
+    getIossEnrolments(request) match {
+      case Some(_) =>
+        iossExclusionService.isQuarantinedCode4().map { result =>
+          result
+        }
+      case _ =>
+        false.toFuture
     }
   }
 
@@ -101,9 +127,10 @@ class CheckRegistrationFilterImpl(
 class CheckRegistrationFilterProvider @Inject()(
                                                  connector: RegistrationConnector,
                                                  frontendAppConfig: FrontendAppConfig,
-                                                 migrationService: DataMigrationService
+                                                 migrationService: DataMigrationService,
+                                                 iossExclusionService: IossExclusionService
                                                )(implicit ec: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckRegistrationFilterImpl = {
-    new CheckRegistrationFilterImpl(mode, connector, frontendAppConfig, migrationService)
+    new CheckRegistrationFilterImpl(mode, connector, frontendAppConfig, migrationService, iossExclusionService)
   }
 }

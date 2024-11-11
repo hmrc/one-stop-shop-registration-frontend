@@ -313,7 +313,9 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
         val responseJson =
           s"""{
-             | "exclusions" : ${Json.toJson(etmpDisplayRegistration.exclusions)}
+             | "registration" : {
+             |    "exclusions" : ${Json.toJson(etmpDisplayRegistration.exclusions)}
+             | }
              |}""".stripMargin
 
         server.stubFor(get(urlEqualTo(iossUrl))
@@ -334,6 +336,25 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
 
         val responseJson = Json.obj("test" -> "test").toString()
+
+        server.stubFor(get(urlEqualTo(iossUrl))
+          .willReturn(ok().withBody(responseJson))
+        )
+
+        val result = connector.getIossRegistration().futureValue
+
+        result mustBe Left(InvalidJson)
+      }
+    }
+
+    "must return InvalidJson when IOSS backend returns a registration invalid JSON " in {
+
+      running(application) {
+
+        val connector: RegistrationConnector = application.injector.instanceOf[RegistrationConnector]
+
+
+        val responseJson = Json.obj("registration" -> "test").toString()
 
         server.stubFor(get(urlEqualTo(iossUrl))
           .willReturn(ok().withBody(responseJson))

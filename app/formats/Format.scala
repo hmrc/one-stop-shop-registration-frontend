@@ -24,6 +24,7 @@ object Format {
   val dateHintFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d M yyyy")
   val dateOfRegistrationFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  val eisDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+  val quarantinedIOSSRegistrationFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+
 
 }
