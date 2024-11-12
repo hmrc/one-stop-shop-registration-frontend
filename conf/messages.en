@@ -659,7 +659,7 @@ error.missing_answers_prompt = You need to complete the missing information for 
 error.missing_answers_prompt.general = You need to complete the missing information before you continue.
 error.resolve_missing_answers = Resolve missing answers
 
-site.back.BTA = Return to Business Tax Account
+site.back.BTA = Return to your business tax account
 
 euSendGoods.title = Does your business send goods from {0}?
 euSendGoods.heading = Does your business send goods from {0}?
@@ -770,7 +770,7 @@ otherCountryExcludedAndQuarantined.title = You cannot register for the One Stop 
 otherCountryExcludedAndQuarantined.heading = You cannot register for the One Stop Shop scheme
 otherCountryExcludedAndQuarantined.blocked.message = {0} has excluded your account from One Stop Shop services until <br> {1}.
 otherCountryExcludedAndQuarantined.contact = If you believe this is an error, contact <a class="govuk-link" href="mailto:vatoss.contact@hmrc.gov.uk">vatoss.contact@hmrc.gov.uk</a>
-otherCountryExcludedAndQuarantined.returnBTA = <a class="govuk-link" href="/business-account">Return to Business Tax Account</a>
+otherCountryExcludedAndQuarantined.returnBTA = <a class="govuk-link" href="/business-account">Return to your business tax account</a>
 
 vatRegistrationDetails.checkYourAnswers.heading = VAT registration details
 vatRegistrationDetails.checkYourAnswers.organisationName = Business name
