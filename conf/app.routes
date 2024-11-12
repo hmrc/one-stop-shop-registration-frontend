@@ -661,3 +661,5 @@ GET         /cannot-rejoin-quarantined-country                                  
 
 GET         /hybrid-reversal                                                           controllers.rejoin.HybridReversalController.onPageLoad()
 POST        /hybrid-reversal                                                           controllers.rejoin.HybridReversalController.onSubmit()
+
+GET         /cannot-register-quarantined-ioss-trader                                   controllers.ioss.CannotRegisterQuarantinedIossTraderController.onPageLoad()

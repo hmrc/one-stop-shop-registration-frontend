@@ -17,13 +17,16 @@
 package connectors
 
 import logging.Logging
-import models.responses.{ConflictFound, ErrorResponse, UnexpectedResponseStatus}
+import models.iossExclusions.EtmpDisplayRegistration
+import models.responses.{ConflictFound, ErrorResponse, InvalidJson, UnexpectedResponseStatus}
 import play.api.http.Status.{CONFLICT, CREATED, OK}
+import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object RegistrationHttpParser extends Logging {
 
   type RegistrationResultResponse = Either[ErrorResponse, Unit]
+  type IossEtmpDisplayRegistrationResultResponse = Either[ErrorResponse, EtmpDisplayRegistration]
 
   implicit object RegistrationResponseReads extends HttpReads[RegistrationResultResponse] {
     override def read(method: String, url: String, response: HttpResponse): RegistrationResultResponse =
@@ -34,6 +37,23 @@ object RegistrationHttpParser extends Logging {
       }
   }
 
+  implicit object IossEtmpDisplayRegistrationReads extends HttpReads[IossEtmpDisplayRegistrationResultResponse] {
+
+    override def read(method: String, url: String, response: HttpResponse): IossEtmpDisplayRegistrationResultResponse =
+      response.status match {
+        case OK => (response.json \ "registration").validate[EtmpDisplayRegistration] match {
+          case JsSuccess(etmpDisplayRegistration, _) => Right(etmpDisplayRegistration)
+          case JsError(errors) =>
+            logger.error(s"Failed trying to parse IOSS Etmp Display Registration response JSON with body ${response.body}" +
+              s" and status ${response.status} with errors: $errors")
+            Left(InvalidJson)
+        }
+
+        case status =>
+          logger.error(s"Unknown error occurred on IOSS Etmp Display Registration $status with body ${response.body}")
+          Left(UnexpectedResponseStatus(response.status, s"Unexpected IOSS registration response, status $status returned"))
+      }
+  }
 }
 
 object AmendRegistrationHttpParser extends Logging {
@@ -47,5 +67,4 @@ object AmendRegistrationHttpParser extends Logging {
         case status => Left(UnexpectedResponseStatus(response.status, s"Unexpected amend response, status $status returned"))
       }
   }
-
 }

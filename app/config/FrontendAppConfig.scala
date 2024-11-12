@@ -79,6 +79,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
   val enrolmentsEnabled: Boolean = configuration.get[Boolean]("features.enrolments-enabled")
   val ossEnrolment: String       = configuration.get[String]("oss-enrolment")
+  val iossEnrolment: String      = configuration.get[String]("ioss-enrolment")
   val amendmentEmailEnabled: Boolean = configuration.get[Boolean]("features.amend.email-enabled")
 
   val saveForLaterTtl: Int = configuration.get[Int]("mongodb.saveForLaterTTLInDays")

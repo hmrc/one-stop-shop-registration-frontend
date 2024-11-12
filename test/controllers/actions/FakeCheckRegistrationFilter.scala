@@ -18,26 +18,22 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import models.requests.AuthenticatedIdentifierRequest
 import models.Mode
-import play.api.mvc.Result
+import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.mvc.Result
 import services.DataMigrationService
+import services.ioss.IossExclusionService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
-/*
-mode: Option[Mode],
-                                  connector: RegistrationConnector,
-                                  config: FrontendAppConfig,
-                                  migrationService: DataMigrationService
- */
 class FakeCheckRegistrationFilter() extends CheckRegistrationFilterImpl(
   mock[Option[Mode]],
   mock[RegistrationConnector],
   mock[FrontendAppConfig],
-  mock[DataMigrationService]
+  mock[DataMigrationService],
+  mock[IossExclusionService]
 )(ExecutionContext.Implicits.global) {
 
   override protected def filter[A](request: AuthenticatedIdentifierRequest[A]): Future[Option[Result]] = {
@@ -50,7 +46,9 @@ class FakeCheckRegistrationFilterProvider()
   extends CheckRegistrationFilterProvider(
     mock[RegistrationConnector],
     mock[FrontendAppConfig],
-    mock[DataMigrationService])(ExecutionContext.Implicits.global) {
+    mock[DataMigrationService],
+    mock[IossExclusionService]
+  )(ExecutionContext.Implicits.global) {
 
   override def apply(mode: Option[Mode]): CheckRegistrationFilterImpl = new FakeCheckRegistrationFilter()
 

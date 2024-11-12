@@ -19,17 +19,18 @@ package generators
 import connectors.SavedUserAnswers
 import models._
 import models.domain.ModelHelpers.normaliseSpaces
+import models.domain.returns.VatOnSalesChoice.Standard
+import models.domain.returns._
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, PreviousSchemeNumbers, TradeDetails}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
-import models.domain.returns.{PaymentReference, ReturnReference, SalesDetails, SalesFromEuCountry, SalesToCountry, VatOnSales, VatRate, VatRateType, VatReturn}
-import models.domain.returns.VatOnSalesChoice.Standard
+import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
 
-import java.time.Instant
+import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.math.BigDecimal.RoundingMode
 
 trait ModelGenerators {
@@ -73,7 +74,7 @@ trait ModelGenerators {
     Arbitrary {
       for {
         firstChars <- Gen.listOfN(6, Gen.alphaUpperChar).map(_.mkString)
-        char7      <- Gen.oneOf(Gen.alphaUpperChar, Gen.choose(2, 9).map(_.toString.head))
+        char7 <- Gen.oneOf(Gen.alphaUpperChar, Gen.choose(2, 9).map(_.toString.head))
         char8 <- Gen.oneOf(
           Gen.choose(asciiCodeForA, asciiCodeForN).map(_.toChar),
           Gen.choose(asciiCodeForP, asciiCodeForZ).map(_.toChar),
@@ -109,12 +110,12 @@ trait ModelGenerators {
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
-        line1         <- commonFieldString(35)
-        line2         <- Gen.option(commonFieldString(35))
-        townOrCity    <- commonFieldString(35)
+        line1 <- commonFieldString(35)
+        line2 <- Gen.option(commonFieldString(35))
+        townOrCity <- commonFieldString(35)
         stateOrRegion <- Gen.option(commonFieldString(35))
-        postCode      <- Gen.option(arbitrary[String])
-        country       <- Gen.oneOf(Country.internationalCountries)
+        postCode <- Gen.option(arbitrary[String])
+        country <- Gen.oneOf(Country.internationalCountries)
       } yield InternationalAddress(normaliseSpaces(line1), normaliseSpaces(line2), normaliseSpaces(townOrCity), normaliseSpaces(stateOrRegion), normaliseSpaces(postCode), country)
     }
 
@@ -127,7 +128,7 @@ trait ModelGenerators {
     Arbitrary {
       for {
         identifierType <- arbitrary[EuTaxIdentifierType]
-        value          <- Gen.option(arbitrary[Int].toString)
+        value <- Gen.option(arbitrary[Int].toString)
       } yield EuTaxIdentifier(identifierType, value)
     }
 
@@ -140,8 +141,8 @@ trait ModelGenerators {
     Arbitrary {
       for {
         accountName <- arbitrary[String]
-        bic         <- Gen.option(arbitrary[Bic])
-        iban        <- arbitrary[Iban]
+        bic <- Gen.option(arbitrary[Bic])
+        iban <- arbitrary[Iban]
       } yield BankDetails(accountName, bic, iban)
     }
 
@@ -149,7 +150,7 @@ trait ModelGenerators {
     Arbitrary {
       for {
         tradingName <- arbitrary[String]
-        address     <- arbitrary[InternationalAddress]
+        address <- arbitrary[InternationalAddress]
       } yield TradeDetails(tradingName, address)
     }
 
@@ -170,17 +171,17 @@ trait ModelGenerators {
   implicit lazy val arbitraryUkAddress: Arbitrary[UkAddress] =
     Arbitrary {
       for {
-        line1      <- commonFieldString(35)
-        line2      <- Gen.option(commonFieldString(35))
+        line1 <- commonFieldString(35)
+        line2 <- Gen.option(commonFieldString(35))
         townOrCity <- commonFieldString(35)
-        county     <- Gen.option(commonFieldString(35))
-        postCode   <- ukPostcode()
+        county <- Gen.option(commonFieldString(35))
+        postCode <- ukPostcode()
       } yield UkAddress(normaliseSpaces(line1), normaliseSpaces(line2), normaliseSpaces(townOrCity), normaliseSpaces(county), normaliseSpaces(postCode))
     }
 
   implicit def arbitraryVrn: Arbitrary[Vrn] = Arbitrary {
     for {
-      chars  <- Gen.listOfN(9, Gen.numChar)
+      chars <- Gen.listOfN(9, Gen.numChar)
     } yield {
       Vrn(chars.mkString(""))
     }
@@ -188,10 +189,10 @@ trait ModelGenerators {
 
   def ukPostcode(): Gen[String] = (
     for {
-      numberOfFirstLetters <- choose(1,2)
+      numberOfFirstLetters <- choose(1, 2)
       firstLetters <- listOfN(numberOfFirstLetters, Gen.alphaChar)
       firstNumber <- Gen.numChar
-      numberOfMiddle <- choose(0,1)
+      numberOfMiddle <- choose(0, 1)
       middle <- listOfN(numberOfMiddle, Gen.alphaNumChar)
       lastNumber <- Gen.numChar
       lastLetters <- listOfN(2, Gen.alphaChar)
@@ -201,7 +202,7 @@ trait ModelGenerators {
 
   private def commonFieldString(maxLength: Int): Gen[String] = (for {
     length <- choose(1, maxLength)
-    chars  <- listOfN(length, commonFieldSafeInputs)
+    chars <- listOfN(length, commonFieldSafeInputs)
   } yield chars.mkString).retryUntil(_.trim.nonEmpty)
 
   private def commonFieldSafeInputs: Gen[Char] = Gen.oneOf(
@@ -222,9 +223,9 @@ trait ModelGenerators {
   implicit val arbitrarySavedUserAnswers: Arbitrary[SavedUserAnswers] =
     Arbitrary {
       for {
-        vrn         <- arbitrary[Vrn]
-        data        = JsObject(Seq("test" -> Json.toJson("test")))
-        now         = Instant.now
+        vrn <- arbitrary[Vrn]
+        data = JsObject(Seq("test" -> Json.toJson("test")))
+        now = Instant.now
       } yield SavedUserAnswers(vrn, data, now)
     }
 
@@ -289,4 +290,39 @@ trait ModelGenerators {
         now = Instant.now
       } yield VatReturn(vrn, period, ReturnReference(vrn, period), PaymentReference(vrn, period), None, None, salesFromNi, salesFromEu, now, now)
     }
+
+  implicit val arbitraryEtmpExclusion: Arbitrary[EtmpExclusion] =
+    Arbitrary {
+      for {
+        exclusionReason <- Gen.oneOf(EtmpExclusionReason.values)
+        effectiveDate <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+        decisionDate <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+        quarantine <- arbitrary[Boolean]
+      } yield EtmpExclusion(
+        exclusionReason = exclusionReason,
+        effectiveDate = effectiveDate,
+        decisionDate = decisionDate,
+        quarantine = quarantine
+      )
+    }
+
+  implicit val arbitraryEtmpDisplayRegistration: Arbitrary[EtmpDisplayRegistration] =
+    Arbitrary {
+      for {
+        exclusions <- Gen.listOfN(1, arbitraryEtmpExclusion.arbitrary)
+      } yield EtmpDisplayRegistration(
+        exclusions = exclusions
+      )
+    }
+
+  def datesBetween(min: LocalDate, max: LocalDate): Gen[LocalDate] = {
+
+    def toMillis(date: LocalDate): Long =
+      date.atStartOfDay.atZone(ZoneOffset.UTC).toInstant.toEpochMilli
+
+    Gen.choose(toMillis(min), toMillis(max)).map {
+      millis =>
+        Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
+    }
+  }
 }
