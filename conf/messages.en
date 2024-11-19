@@ -120,8 +120,8 @@ vatRegistered.change.hidden = if VAT registered
 
 addEuDetails.title.singular = You added tax details for one EU country
 addEuDetails.heading.singular = You added tax details for one EU country
-addEuDetails.title = You added details for {0} EU countries
-addEuDetails.heading = You added details for {0} EU countries
+addEuDetails.title = You added tax details for {0} EU countries
+addEuDetails.heading = You added tax details for {0} EU countries
 addEuDetails.maximumReached = You have added details for every EU country
 addEuDetails.error.required = Select yes if you need to add VAT details for another EU country
 addEuDetails.change.hidden = tax details for {0}
