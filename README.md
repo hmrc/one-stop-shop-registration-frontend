@@ -31,16 +31,7 @@ sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes
 ```
 
 ### Running correct version of mongo
-Mongo 6 with a replica set is required to run the service. If you are running a lower version, you'll need to stop your 
-current mongo instance (docker ps to get the name of your mongo docker then docker stop <name> to stop)
-
-```  
-docker run --restart unless-stopped --name mongodb -p 27017:27017 -d percona/percona-server-mongodb:6.0-multi --replSet rs0
-```
-Configure replica set:
-```
-docker exec -it mongodb mongosh --eval "rs.initiate();"
-```
+Mongo 6 with a replica set is required to run the service. Please refer to the MDTP Handbook for instructions on how to run this
 
 
 ### Using the application
