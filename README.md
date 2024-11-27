@@ -19,7 +19,7 @@ Once a trader has been registered, there are a few other functions that are avai
 Amend - this allows the trader to amend details they used on their original registration to keep
 their information up to date.
 
-Rejoin - if a trader has left the One Stop Shop service, if they would like to rejoin, they can access this
+Rejoin - Once a trader has left the One Stop Shop service, if they would like to rejoin, they can access this
 option and all of their previous registration data will be offered to reuse and edit on the rejoin.
 
 Summary of APIs
@@ -35,6 +35,7 @@ ETMP:
 Core:
 - EU VAT registrations are verified with Core to check for any exclusions
 
+Note: locally (and on staging) these connections are stubbed via one-stop-shop-registration-stub.
 
 Requirements
 ------------
@@ -69,12 +70,12 @@ Access the Authority Wizard to log in:
 http://localhost:9949/auth-login-stub/gg-sign-in
 
 Enter the following details on this page and submit:
-Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register
-Affinity Group: Organisation
-Enrolments:
-Enrolment Key: HMRC-MTD-VAT
-Identifier Name: VRN
-Identifier Value: 100000001
+- Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register
+- Affinity Group: Organisation
+- Enrolments:
+- Enrolment Key: HMRC-MTD-VAT
+- Identifier Name: VRN
+- Identifier Value: 100000001
 
 ### Registration journey
 
@@ -83,13 +84,13 @@ the "Identifier Value" above. Other scenarios can be found in one-stop-shop-regi
 
 To enter the registration journey, you will need to complete the initial filter questions as follows:
 1. Is your business already registered for the One Stop Shop Union scheme in an EU country? 
-No
+- No
 2. Will your business sell goods from Northern Ireland to consumers in the EU?
-Yes
+- Yes
 3. Is your principal place of business in Northern Ireland?
-Yes
+- Yes
 
-Continue through the journey completing each question through to the final check-your-answers page and submit the 
+Continue through the journey, completing each question through to the final check-your-answers page and submit the 
 registration. 
 
 Note: you can refer to the Registration.feature within one-stop-shop-registration-journey-tests if any examples of data 
@@ -101,15 +102,15 @@ Access the Authority Wizard to log in:
 http://localhost:9949/auth-login-stub/gg-sign-in
 
 Enter the following details on this page and submit:
-Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/start-amend-journey
-Affinity Group: Organisation
-Enrolments (there are two rows this time):
-Enrolment Key: HMRC-MTD-VAT
-Identifier Name: VRN
-Identifier Value: 100000002
-Enrolment Key: HMRC-OSS-ORG
-Identifier Name: VRN
-Identifier Value: 100000002
+- Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/start-amend-journey
+- Affinity Group: Organisation
+- Enrolments (there are two rows this time):
+- Enrolment Key: HMRC-MTD-VAT
+- Identifier Name: VRN
+- Identifier Value: 100000002
+- Enrolment Key: HMRC-OSS-ORG
+- Identifier Name: VRN
+- Identifier Value: 100000002
 
 It is recommended to use VRN 100000002 for a regular amend journey, however alternatives can be found in the 
 one-stop-shop-registration-stub.
@@ -120,15 +121,15 @@ Access the Authority Wizard to log in:
 http://localhost:9949/auth-login-stub/gg-sign-in
 
 Enter the following details on this page and submit:
-Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/start-rejoin-journey
-Affinity Group: Organisation
-Enrolments (there are two rows this time):
-Enrolment Key: HMRC-MTD-VAT
-Identifier Name: VRN
-Identifier Value: 600000050
-Enrolment Key: HMRC-OSS-ORG
-Identifier Name: VRN
-Identifier Value: 600000050
+- Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/start-rejoin-journey
+- Affinity Group: Organisation
+- Enrolments (there are two rows this time):
+- Enrolment Key: HMRC-MTD-VAT
+- Identifier Name: VRN
+- Identifier Value: 600000050
+- Enrolment Key: HMRC-OSS-ORG
+- Identifier Name: VRN
+- Identifier Value: 600000050
 
 It is recommended to use VRN 600000050 for a regular rejoin journey, however alternatives can be found in the
 one-stop-shop-registration-stub.
