@@ -7,23 +7,54 @@ Backend: https://github.com/hmrc/one-stop-shop-registration
 
 Stub: https://github.com/hmrc/one-stop-shop-registration-stub
 
+One Stop Shop Registration Service
+------------
+
+The main function of this service is to allow traders to register to pay VAT on distance sales of goods from 
+Northern Ireland to the EU. This will then provide them with an OSS enrolment that will allow access to other 
+OSS services - Returns (one-stop-shop-returns-frontend) and Exclusions (one-stop-shop-exclusions-frontend).
+
+Once a trader has been registered, there are a few other functions that are available in the service:
+
+Amend - this allows the trader to amend details they used on their original registration to keep
+their information up to date.
+
+Rejoin - Once a trader has left the One Stop Shop service, if they would like to rejoin, they can access this
+option and all of their previous registration data will be offered to reuse and edit on the rejoin.
+
+Summary of APIs
+------------
+
+This service utilises various APIs from other platforms in order to obtain and store information required for the 
+registration process.
+
+ETMP:
+- HMRC VAT registration details are retrieved
+- Submitted registration details are passed to ETMP for storing and later querying against
+
+Core:
+- EU VAT registrations are verified with Core to check for any exclusions
+
+Note: locally (and on staging) these connections are stubbed via one-stop-shop-registration-stub.
+
 Requirements
 ------------
 
 This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), so needs at least a [JRE] to run.
 
-## Run the application
+## Run the application locally via Service Manager
 
-To update from Nexus and start all services from the RELEASE version instead of snapshot
 ```
-sm --start ONE_STOP_SHOP_ALL -r
+sm2 --start ONE_STOP_SHOP_ALL -r
 ```
 
-### To run the application locally execute the following:
+### To run the application locally from the repository, execute the following:
 
-The service needs to run in testOnly mode in order to access the testOnly get-passcodes endpoint which will generate a passcode for email verification.
+The service needs to run in testOnly mode in order to access the testOnly get-passcodes endpoint for BTA and email
+verification.
+
 ```
-sm --stop ONE_STOP_SHOP_REGISTRATION_FRONTEND
+sm2 --stop ONE_STOP_SHOP_REGISTRATION_FRONTEND
 ```
 and 
 ```
@@ -31,77 +62,91 @@ sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes
 ```
 
 ### Running correct version of mongo
-We have introduced a transaction to the call to be able to ensure that both the vatreturn and correction get submitted to mongo.
-Your local mongo is unlikely to be running a latest enough version and probably not in a replica set.
-To do this, you'll need to stop your current mongo instance (docker ps to get the name of your mongo docker then docker stop <name> to stop)
-Run at least 4.0 with a replica set:
-```  
-docker run --restart unless-stopped -d -p 27017-27019:27017-27019 --name mongo4 mongo:4.0 --replSet rs0
-```
-Connect to said replica set:
-```
-docker exec -it mongo4 mongo
-```
-When that console is there:
-```
-rs.initiate()
-```
-You then should be running 4.0 with a replica set. You may have to re-run the rs.initiate() after you've restarted
+Mongo 6 with a replica set is required to run the service. Please refer to the MDTP Handbook for instructions on how to run this
 
 
-### Using the application
-To log in using the Authority Wizard provide "continue url", "affinity group" and "enrolments" as follows:
-  
-![image](https://user-images.githubusercontent.com/48218839/145985763-ffb28570-7679-46a9-96fa-e93996f03c23.png)
+Using the application
+------------
 
-![image](https://user-images.githubusercontent.com/48218839/145842926-c318cb10-70c3-4186-a839-b1928c8e2625.png)
-  
-The VRN can be any 9-digit number.
+Access the Authority Wizard to log in:
+http://localhost:9949/auth-login-stub/gg-sign-in
 
-To successfully register go through the journey providing the answers as follows:
-  1.
-  ![image](https://user-images.githubusercontent.com/48218839/145986022-f387e3d0-0a41-47d7-9d39-f3b290b8e3ea.png)
-  
-  2.
-  ![image](https://user-images.githubusercontent.com/48218839/145986122-d6f513ba-be1a-4a8c-9e9a-671580719bcd.png)
-  
-  3.
-  ![image](https://user-images.githubusercontent.com/48218839/145986164-4cd4a00a-ec91-4167-be36-e35b9232e672.png)
+Enter the following details on this page and submit:
+- Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register
+- Affinity Group: Organisation
+- Enrolments:
+- Enrolment Key: HMRC-MTD-VAT
+- Identifier Name: VRN
+- Identifier Value: 100000001
 
-  4.
-  ![image](https://user-images.githubusercontent.com/48218839/145986669-58fecb10-16b3-4822-9c8c-6efd3bff325a.png)
+### Registration journey
 
-  5.
-  ![image](https://user-images.githubusercontent.com/48218839/145986756-de78aad1-a215-42a0-a71b-aff8ee771103.png)
+It is recommended to use VRN 100000001 for a straightforward registration journey, hence why this one is used as
+the "Identifier Value" above. Other scenarios can be found in one-stop-shop-registration-stub.
 
-  6.
-  ![image](https://user-images.githubusercontent.com/48218839/145986873-fbae18cd-ce3d-46fa-aa10-c9d51aa0cabc.png)
+To enter the registration journey, you will need to complete the initial filter questions as follows:
+1. Is your business already registered for the One Stop Shop Union scheme in an EU country? 
+- No
+2. Will your business sell goods from Northern Ireland to consumers in the EU?
+- Yes
+3. Is your principal place of business in Northern Ireland?
+- Yes
 
-  7.
-  After clicking continue on the Contact details page, you will see the email verification page.
-  ![image](https://user-images.githubusercontent.com/36073378/203574815-a6fdba3a-59aa-41a7-827f-58b5382af95c.png)
+Continue through the journey, completing each question through to the final check-your-answers page and submit the 
+registration. 
 
-Open a new tab and paste this url:
-  8. 
-  ```
-  /pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-passcodes
-  ```
+Email verification: 
+Use the test-only endpoint (http://localhost:10190/pay-vat-on-goods-sold-to-eu/register-for-import-one-stop-shop/test-only/get-passcodes)
+in a separate tab to generate a passcode that can be entered into the email verification page, following adding 
+an email to the /business-contact-details page
 
-  This will generate a passcode to enter into the email verification page.
-  ![image](https://user-images.githubusercontent.com/36073378/203574977-a8298624-bc88-4090-8e8f-4b9d2be0abf4.png)
 
-Once you have pasted/entered the passcode into the input box on the email verification page and clicked continue and the email verification is successful,
-you will need to change the port in the url back to 10200 in order to redirect to the bank details page.
-  9.
-  ![image](https://user-images.githubusercontent.com/36073378/203573868-4809d4c5-8728-4b2f-bcce-3d8ad8f0e2c3.png)
+Note: you can refer to the Registration.feature within one-stop-shop-registration-journey-tests if any examples of data 
+to input are required.
 
-  10.
-  ![image](https://user-images.githubusercontent.com/36073378/203574605-b3a54885-bf3f-45e0-b58c-9c2d7b0cfa4d.png)
+### Amend registration journey
+
+Access the Authority Wizard to log in:
+http://localhost:9949/auth-login-stub/gg-sign-in
+
+Enter the following details on this page and submit:
+- Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/start-amend-journey
+- Affinity Group: Organisation
+- Enrolments (there are two rows this time):
+- Enrolment Key: HMRC-MTD-VAT
+- Identifier Name: VRN
+- Identifier Value: 100000002
+- Enrolment Key: HMRC-OSS-ORG
+- Identifier Name: VRN
+- Identifier Value: 100000002
+
+It is recommended to use VRN 100000002 for a regular amend journey, however alternatives can be found in the 
+one-stop-shop-registration-stub.
+
+### Rejoin registration journey
+
+Access the Authority Wizard to log in:
+http://localhost:9949/auth-login-stub/gg-sign-in
+
+Enter the following details on this page and submit:
+- Redirect URL: http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/start-rejoin-journey
+- Affinity Group: Organisation
+- Enrolments (there are two rows this time):
+- Enrolment Key: HMRC-MTD-VAT
+- Identifier Name: VRN
+- Identifier Value: 600000050
+- Enrolment Key: HMRC-OSS-ORG
+- Identifier Name: VRN
+- Identifier Value: 600000050
+
+It is recommended to use VRN 600000050 for a regular rejoin journey, however alternatives can be found in the
+one-stop-shop-registration-stub.
+
 
 Unit and Integration Tests
 ------------
 
-To run the unit and integration tests, you will need to open an sbt session on the browser.
+To run the unit and integration tests, you will need to open an sbt session on the terminal.
 
 ### Unit Tests
 
