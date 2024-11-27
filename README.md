@@ -50,7 +50,9 @@ sm --start ONE_STOP_SHOP_ALL -r
 
 ### To run the application locally from the repository, execute the following:
 
-The service needs to run in testOnly mode in order to access the testOnly get-passcodes endpoint for BTA.
+The service needs to run in testOnly mode in order to access the testOnly get-passcodes endpoint for BTA and email
+verification.
+
 ```
 sm --stop ONE_STOP_SHOP_REGISTRATION_FRONTEND
 ```
