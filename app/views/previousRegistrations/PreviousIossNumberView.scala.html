@@ -15,13 +15,14 @@
  *@
 
 @import viewmodels.InputWidth._
+@import components.ButtonGroup
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    button: ButtonGroup
 )
 
 @(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, country: Country, hasIntermediary: Boolean, iossHintText: String, intermediaryHintText: String)(implicit request: Request[_], messages: Messages)
@@ -75,8 +76,10 @@
             )
         }
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue")).withAttribute(("id", "continue"))
+        @button(
+            messages("site.continue"),
+            controllers.previousRegistrations.routes.PreviousIossNumberController.onSubmit(mode, countryIndex, schemeIndex).url,
+            mode
         )
     }
 }
