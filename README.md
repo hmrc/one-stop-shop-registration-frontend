@@ -95,6 +95,12 @@ To enter the registration journey, you will need to complete the initial filter 
 Continue through the journey, completing each question through to the final check-your-answers page and submit the 
 registration. 
 
+Email verification: 
+Use the test-only endpoint (http://localhost:10190/pay-vat-on-goods-sold-to-eu/register-for-import-one-stop-shop/test-only/get-passcodes)
+in a separate tab to generate a passcode that can be entered into the email verification page, following adding 
+an email to the /business-contact-details page
+
+
 Note: you can refer to the Registration.feature within one-stop-shop-registration-journey-tests if any examples of data 
 to input are required.
 
