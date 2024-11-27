@@ -45,7 +45,7 @@ This service is written in [Scala](http://www.scala-lang.org/) and [Play](http:/
 ## Run the application locally via Service Manager
 
 ```
-sm --start ONE_STOP_SHOP_ALL -r
+sm2 --start ONE_STOP_SHOP_ALL -r
 ```
 
 ### To run the application locally from the repository, execute the following:
@@ -54,7 +54,7 @@ The service needs to run in testOnly mode in order to access the testOnly get-pa
 verification.
 
 ```
-sm --stop ONE_STOP_SHOP_REGISTRATION_FRONTEND
+sm2 --stop ONE_STOP_SHOP_REGISTRATION_FRONTEND
 ```
 and 
 ```
