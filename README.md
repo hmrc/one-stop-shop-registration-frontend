@@ -96,7 +96,7 @@ Continue through the journey, completing each question through to the final chec
 registration. 
 
 Email verification: 
-Use the test-only endpoint (http://localhost:10190/pay-vat-on-goods-sold-to-eu/register-for-import-one-stop-shop/test-only/get-passcodes)
+Use the test-only endpoint (http://localhost:10200/pay-vat-on-goods-sold-to-eu/northern-ireland-register/test-only/get-passcodes)
 in a separate tab to generate a passcode that can be entered into the email verification page, following adding 
 an email to the /business-contact-details page
 
