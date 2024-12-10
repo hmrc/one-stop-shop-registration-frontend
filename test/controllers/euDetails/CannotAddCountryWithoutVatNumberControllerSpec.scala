@@ -20,8 +20,7 @@ import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.euDetails.{routes => euDetailsRoutes}
 import models.{AmendLoopMode, AmendMode, CheckLoopMode, Country, Index, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, SellsGoodsToEUConsumersPage, TaxRegisteredInEuPage, VatRegisteredPage}

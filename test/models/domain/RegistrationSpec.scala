@@ -172,6 +172,8 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |}""".stripMargin
 
       val registration = Json.parse(json).as[Registration]
+      println(json)
+      println(registration)
 
       registration.registeredCompanyName mustEqual expectedRegisteredCompanyName
       registration.tradingNames mustEqual expectedTradingNames

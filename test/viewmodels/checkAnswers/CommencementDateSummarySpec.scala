@@ -20,7 +20,7 @@ import base.SpecBase
 import formats.Format.dateFormatter
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DateOfFirstSalePage
 import play.api.inject.bind

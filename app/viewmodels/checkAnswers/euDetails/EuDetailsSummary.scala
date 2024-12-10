@@ -129,12 +129,12 @@ object EuDetailsSummary {
             HtmlFormat.escape(details.name)
         }.mkString("<br/>")
 
-      Some(
-        SummaryListRowViewModel(
-          key = KeyViewModel("euVatDetails.checkYourAnswersLabel.removed").withCssClass("govuk-!-width-one-half"),
-          value = ValueViewModel(HtmlContent(value))
+        Some(
+          SummaryListRowViewModel(
+            key = KeyViewModel("euVatDetails.checkYourAnswersLabel.removed").withCssClass("govuk-!-width-one-half"),
+            value = ValueViewModel(HtmlContent(value))
+          )
         )
-      )
     } else {
       None
     }

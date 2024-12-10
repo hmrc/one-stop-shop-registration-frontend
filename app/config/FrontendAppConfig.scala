@@ -76,7 +76,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
-  val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  val cacheTtl: Long = configuration.get[Long]("mongodb.timeToLiveInSeconds")
   val enrolmentsEnabled: Boolean = configuration.get[Boolean]("features.enrolments-enabled")
   val ossEnrolment: String       = configuration.get[String]("oss-enrolment")
   val iossEnrolment: String      = configuration.get[String]("ioss-enrolment")

@@ -140,9 +140,9 @@ class CheckYourAnswersController @Inject()(
             ).flatten
           )
 
-        val isValid = validate()
-        Ok(view(vatRegistrationDetailsList, list, isValid, CheckMode))
-      }
+          val isValid = validate()
+          Ok(view(vatRegistrationDetailsList, list, isValid, CheckMode))
+        }
   }
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData().async {
