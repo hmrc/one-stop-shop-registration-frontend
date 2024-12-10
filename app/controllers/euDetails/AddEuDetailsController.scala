@@ -31,7 +31,7 @@ import utils.CompletionChecks
 import utils.EuDetailsCompletionChecks.{getAllIncompleteEuDetails, incompleteCheckEuDetailsRedirect}
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
-import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
+import views.html.euDetails.PartOfVatGroupAddEuDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,7 +40,6 @@ class AddEuDetailsController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         cc: AuthenticatedControllerComponents,
                                         formProvider: AddEuDetailsFormProvider,
-                                        view: AddEuDetailsView,
                                         viewPartOfVatGroup: PartOfVatGroupAddEuDetailsView
 )(implicit ec: ExecutionContext) extends FrontendBaseController with CompletionChecks with I18nSupport {
 

@@ -40,6 +40,6 @@ class PreviousIossRegistrationNumberFormProvider @Inject() extends Mappings with
           "previousIntermediaryNumber" -> optional(text("previousIossNumber.error.intermediaryNumber.required")
             .verifying(validateIntermediaryIdentificationNumber(country.code, "previousIntermediaryNumber.error.invalid")))
         }
-      )(PreviousSchemeNumbers.apply)(PreviousSchemeNumbers.unapply)
+      )(PreviousSchemeNumbers.apply)(previousSchemeNumbers => Some(Tuple.fromProductTyped(previousSchemeNumbers)))
     )
 }

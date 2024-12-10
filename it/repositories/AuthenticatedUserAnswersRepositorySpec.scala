@@ -31,12 +31,12 @@ class AuthenticatedUserAnswersRepositorySpec
   private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), None, Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
-  when(mockAppConfig.cacheTtl) thenReturn 1
+  when(mockAppConfig.cacheTtl) thenReturn 1L
 
-  protected override val repository = new AuthenticatedUserAnswersRepository(
+  protected override val repository: AuthenticatedUserAnswersRepository = new AuthenticatedUserAnswersRepository(
     mongoComponent = mongoComponent,
-    appConfig      = mockAppConfig,
-    clock          = stubClock
+    appConfig = mockAppConfig,
+    clock = stubClock
   )
 
   ".set" - {

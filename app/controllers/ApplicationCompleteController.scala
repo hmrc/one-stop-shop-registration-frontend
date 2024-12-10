@@ -27,11 +27,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
 import queries.EmailConfirmationQuery
-import services.{CoreRegistrationValidationService, DateService, PeriodService}
+import services.{DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
-
-import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -43,9 +41,7 @@ class ApplicationCompleteController @Inject()(
                                                frontendAppConfig: FrontendAppConfig,
                                                dateService: DateService,
                                                periodService: PeriodService,
-                                               coreRegistrationValidationService: CoreRegistrationValidationService,
-                                               registrationConnector: RegistrationConnector,
-                                               clock: Clock
+                                               registrationConnector: RegistrationConnector
                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc

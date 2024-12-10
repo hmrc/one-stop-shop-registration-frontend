@@ -23,7 +23,7 @@ import models.domain.PreviousSchemeNumbers
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.when
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -389,7 +389,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           } yield LocalDate.of(year, month, day)
 
           forAll(dates) {
-            date: LocalDate =>
+            (date: LocalDate) =>
               val stubClock = getStubClock(date)
               val service   = new DateService(stubClock, coreRegistrationValidationService)
 

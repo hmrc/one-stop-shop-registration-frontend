@@ -24,8 +24,7 @@ import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionRe
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
 import models.{BusinessContactDetails, DataMissingError, Index, PreviousScheme, PreviousSchemeType, RejoinMode}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
