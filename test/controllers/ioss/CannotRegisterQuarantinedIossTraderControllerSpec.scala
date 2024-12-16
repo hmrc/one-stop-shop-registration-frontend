@@ -20,7 +20,7 @@ import base.SpecBase
 import formats.Format.quarantinedIOSSRegistrationFormatter
 import models.iossExclusions.{EtmpExclusion, EtmpExclusionReason}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.test.FakeRequest

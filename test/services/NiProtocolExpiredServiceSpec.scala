@@ -19,7 +19,10 @@ package services
 import base.SpecBase
 import config.FrontendAppConfig
 import models.{CheckMode, RejoinLoopMode, RejoinMode}
-import org.mockito.MockitoSugar.{mock, when}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
+
+
 
 class NiProtocolExpiredServiceSpec extends SpecBase {
 

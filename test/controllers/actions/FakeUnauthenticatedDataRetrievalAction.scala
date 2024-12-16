@@ -21,11 +21,10 @@ import models.UserAnswers
 import models.requests.{SessionRequest, UnauthenticatedOptionalDataRequest}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import repositories.UnauthenticatedUserAnswersRepository
-import uk.gov.hmrc.domain.Vrn
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeUnauthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vrn)
+class FakeUnauthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers])
   extends UnauthenticatedDataRetrievalAction(mockSessionRepository)(ExecutionContext.Implicits.global) {
 
   override protected def transform[A](request: SessionRequest[A]): Future[UnauthenticatedOptionalDataRequest[A]] =

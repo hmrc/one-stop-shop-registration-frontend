@@ -22,8 +22,7 @@ import connectors.RegistrationConnector
 import formats.Format.dateFormatter
 import models.{AmendMode, CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.reset
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations.PreviouslyRegisteredPage
@@ -44,7 +43,7 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
   private val registrationService: RegistrationService = mock[RegistrationService]
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
- private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   override def beforeEach(): Unit = {
     reset(dateService)

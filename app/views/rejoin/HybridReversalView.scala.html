@@ -20,9 +20,7 @@
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
-        govukErrorSummary: GovukErrorSummary,
-        button: CancelHybridReversalRegButton,
-        govukWarningText: GovukWarningText
+        button: CancelHybridReversalRegButton
 )
 
 @(list: SummaryList, mode: Mode, yourAccountUrl: String)(implicit request: Request[_], messages: Messages)

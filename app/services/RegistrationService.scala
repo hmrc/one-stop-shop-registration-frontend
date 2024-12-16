@@ -300,8 +300,7 @@ class RegistrationService @Inject()(
     previousSchemeDetails.previousScheme match {
       case scheme if scheme == PreviousScheme.OSSU || scheme == PreviousScheme.OSSNU =>
         PreviousSchemeType.OSS
-      case scheme if scheme == PreviousScheme.IOSSWI || scheme == PreviousScheme.IOSSWOI =>
-        PreviousSchemeType.IOSS
+      case _ => PreviousSchemeType.IOSS
     }
   }
 

@@ -469,7 +469,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
           }
 
-        "to Previous Eu Vat Number when one of the previously registered countries is incomplete" in {
+          "to Previous Eu Vat Number when one of the previously registered countries is incomplete" in {
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Future.successful(Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))))
             when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))

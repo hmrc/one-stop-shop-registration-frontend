@@ -20,8 +20,7 @@ import base.SpecBase
 import controllers.amend.{routes => amendRoutes}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{AmendMode, Country, Index, InternationalAddress, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.euDetails._

@@ -23,6 +23,7 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import play.api.libs.ws.writeableOf_JsValue
 
 import java.net.URL
 import javax.inject.Inject
