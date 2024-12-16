@@ -31,7 +31,6 @@ import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BusinessContactDetailsPage
-import play.api.http.Status.{BAD_GATEWAY, BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED}
 import play.api.inject.bind
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest

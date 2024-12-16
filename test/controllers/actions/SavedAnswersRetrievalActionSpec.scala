@@ -39,8 +39,7 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
   class Harness(
                  repository: AuthenticatedUserAnswersRepository,
                  saveForLaterConnector: SaveForLaterConnector,
-                 registrationConnector: RegistrationConnector,
-                 clock: Clock
+                 registrationConnector: RegistrationConnector
                ) extends SavedAnswersRetrievalAction(repository, saveForLaterConnector, registrationConnector) {
     def callRefine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedOptionalDataRequest[A]]] = refine(request)
   }
@@ -52,14 +51,12 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
 
       "must use the answers saved in session" in {
 
-        val instant = Instant.now
-        val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
         val sessionRepository = mock[AuthenticatedUserAnswersRepository]
         val saveForLaterConnector = mock[SaveForLaterConnector]
         val registrationConnector = mock[RegistrationConnector]
 
         val answers = UserAnswers(userAnswersId).set(SavedProgressPage, "/url").success.value
-        val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector, stubClock)
+        val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
         val result = action.callRefine(AuthenticatedOptionalDataRequest(request,
@@ -89,7 +86,7 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
         when(saveForLaterConnector.get()(any())) thenReturn Future.successful(Right(Some(SavedUserAnswers(vrn, answers.data, instant))))
         when(registrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
         when(sessionRepository.set(any())) thenReturn Future.successful(true)
-        val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector, stubClock)
+        val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
         val result = action.callRefine(AuthenticatedOptionalDataRequest(
@@ -107,14 +104,12 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
         val sessionRepository = mock[AuthenticatedUserAnswersRepository]
         val saveForLaterConnector = mock[SaveForLaterConnector]
         val registrationConnector = mock[RegistrationConnector]
-        val instant = Instant.now
-        val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
         val emptyAnswers = UserAnswers(userAnswersId)
 
         when(saveForLaterConnector.get()(any())) thenReturn Future.successful(Right(None))
         when(sessionRepository.set(any())) thenReturn Future.successful(true)
         when(registrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-        val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector, stubClock)
+        val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
         val result = action.callRefine(AuthenticatedOptionalDataRequest(request,

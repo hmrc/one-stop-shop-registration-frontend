@@ -150,6 +150,7 @@ trait EuTaxRegistrationValidations {
             DataMissingError(EuVatNumberPage(index)).invalidNec
         }
       case (None, _) => DataMissingError(EuVatNumberPage(index)).invalidNec
+      case (Some(_), None) => DataMissingError(EuCountryPage(index)).invalidNec
     }
   }
 
