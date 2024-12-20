@@ -26,7 +26,7 @@ import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
 import models.responses.NotFound
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar

@@ -24,7 +24,7 @@ import models.domain._
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._

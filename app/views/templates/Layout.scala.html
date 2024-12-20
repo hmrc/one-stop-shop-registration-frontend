@@ -25,15 +25,13 @@
         hmrcHead: HmrcHead,
         hmrcStandardHeader: HmrcStandardHeader,
         hmrcStandardFooter: HmrcStandardFooter,
-        hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
         hmrcLanguageSelect: HmrcLanguageSelect,
         hmrcTimeoutDialog: HmrcTimeoutDialog,
         hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         hmrcScripts: HmrcScripts,
         betaBanner: StandardBetaBanner,
         autocompleteCss: HmrcAccessibleAutocompleteCss,
-        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript,
-        hmrcStandardPage: HmrcStandardPage
+        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)

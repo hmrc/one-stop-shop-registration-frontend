@@ -21,8 +21,7 @@ import controllers.previousRegistrations.{routes => prevRoutes}
 import controllers.amend.{routes => amendRoutes}
 import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.previousRegistrations._

@@ -41,7 +41,7 @@ class IossExclusionService @Inject()(
   }
 
   def getIossEtmpExclusion()(implicit hc: HeaderCarrier): Future[Option[EtmpExclusion]] = {
-    registrationConnector.getIossRegistration.map {
+    registrationConnector.getIossRegistration().map {
       case Right(iossEtmpDisplayRegistration) =>
         iossEtmpDisplayRegistration.exclusions.headOption
       case Left(error) =>

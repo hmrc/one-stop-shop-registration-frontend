@@ -31,6 +31,5 @@ case object SalesChannelsPage extends QuestionPage[SalesChannels] {
     case SalesChannels.OnlineMarketplaces => routes.NotLiableForVatController.onPageLoad()
     case SalesChannels.Mixed => routes.LiableForVatOnDirectSalesController.onPageLoad()
     case SalesChannels.NotOnlineMarketplaces => routes.LiableForVatOnAllSalesController.onPageLoad()
-    case _ => routes.JourneyRecoveryController.onPageLoad()
   }
 }

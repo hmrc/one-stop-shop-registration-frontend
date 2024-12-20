@@ -24,13 +24,13 @@ sealed trait Address
 object Address {
   def reads: Reads[Address] =
     UkAddress.reads.widen[Address] orElse
-      InternationalAddress.format.widen[Address] orElse
-      DesAddress.format.widen[Address]
+      InternationalAddress.reads.widen[Address] orElse
+      DesAddress.reads.widen[Address]
 
   def writes: Writes[Address] = Writes {
     case u: UkAddress            => Json.toJson(u)(UkAddress.writes)
-    case d: DesAddress           => Json.toJson(d)(DesAddress.format)
-    case i: InternationalAddress => Json.toJson(i)(InternationalAddress.format)
+    case d: DesAddress           => Json.toJson(d)(DesAddress.writes)
+    case i: InternationalAddress => Json.toJson(i)(InternationalAddress.writes)
   }
 
   implicit def format: Format[Address] = Format(reads, writes)
@@ -104,9 +104,37 @@ case class DesAddress( line1: String,
 
 object DesAddress {
 
-  implicit val format: OFormat[DesAddress] = Json.format[DesAddress]
+    implicit val reads: Reads[DesAddress] = {
 
-  def apply( line1: String,
+        import play.api.libs.functional.syntax._
+        (
+            (__ \ "line1").read[String].map(normaliseSpaces) and
+                (__ \ "line2").readNullable[String].map(normaliseSpaces) and
+                (__ \ "line3").readNullable[String].map(normaliseSpaces) and
+                (__ \ "line4").readNullable[String].map(normaliseSpaces) and
+                (__ \ "line5").readNullable[String].map(normaliseSpaces) and
+                (__ \ "postCode").readNullable[String].map(normaliseSpaces) and
+                (__ \ "countryCode").read[String]
+            )(DesAddress(_, _, _, _, _, _, _))
+    }
+
+    implicit val writes: OWrites[DesAddress] = new OWrites[DesAddress] {
+
+        override def writes(o: DesAddress): JsObject = {
+            val line2Obj = o.line2.map(x => Json.obj("line2" -> x)).getOrElse(Json.obj())
+            val line3Obj = o.line3.map(x => Json.obj("line3" -> x)).getOrElse(Json.obj())
+            val line4Obj = o.line4.map(x => Json.obj("line4" -> x)).getOrElse(Json.obj())
+            val line5Obj = o.line5.map(x => Json.obj("line5" -> x)).getOrElse(Json.obj())
+            val postCodeObj = o.postCode.map(x => Json.obj("postCode" -> x)).getOrElse(Json.obj())
+
+            Json.obj(
+                "line1" -> o.line1,
+                "countryCode" -> o.countryCode
+            ) ++ line2Obj ++ line3Obj ++ line4Obj ++ line5Obj ++ postCodeObj
+        }
+    }
+
+    def apply( line1: String,
              line2: Option[String],
              line3: Option[String],
              line4: Option[String],
@@ -119,7 +147,6 @@ object DesAddress {
                                                                 normaliseSpaces(line5),
                                                                 normaliseSpaces(postCode),
                                                                 countryCode)
-
 }
 
 
@@ -133,9 +160,36 @@ case class InternationalAddress ( line1: String,
 
 object InternationalAddress {
 
-  implicit val format: OFormat[InternationalAddress] = Json.format[InternationalAddress]
+    implicit val reads: Reads[InternationalAddress] = {
 
-  def apply(line1: String,
+        import play.api.libs.functional.syntax._
+
+        (
+            (__ \ "line1").read[String].map(normaliseSpaces) and
+                (__ \ "line2").readNullable[String].map(normaliseSpaces) and
+                (__ \ "townOrCity").read[String].map(normaliseSpaces) and
+                (__ \ "stateOrRegion").readNullable[String].map(normaliseSpaces) and
+                (__ \ "postCode").readNullable[String].map(normaliseSpaces) and
+                (__ \ "country").read[Country]
+            )(InternationalAddress(_, _, _, _, _, _))
+    }
+
+    implicit val writes: OWrites[InternationalAddress] = new OWrites[InternationalAddress] {
+
+        override def writes(o: InternationalAddress): JsObject = {
+            val line2Obj = o.line2.map(x => Json.obj("line2" -> x)).getOrElse(Json.obj())
+            val stateOrRegionObj = o.stateOrRegion.map(x => Json.obj("stateOrRegion" -> x)).getOrElse(Json.obj())
+            val postCodeObj = o.postCode.map(x => Json.obj("postCode" -> x)).getOrElse(Json.obj())
+
+            Json.obj(
+                "line1" -> o.line1,
+                "townOrCity" -> o.townOrCity,
+                "country" -> o.country
+            ) ++ line2Obj ++ stateOrRegionObj ++ postCodeObj
+        }
+    }
+
+    def apply(line1: String,
             line2: Option[String],
             townOrCity: String,
             stateOrRegion: Option[String],

@@ -96,7 +96,6 @@ class RejoinRegistrationController @Inject()(
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(RejoinMode)).async {
     implicit request =>
-
       getFirstValidationErrorRedirect(RejoinMode).map { redirect =>
         Future.successful(redirect)
       }.getOrElse {
@@ -105,15 +104,13 @@ class RejoinRegistrationController @Inject()(
           case Some(reg) => Future.successful(reg)
           case None => registrationConnector.getRegistration().map(_.getOrElse(throw new IllegalStateException("Registration data is missing in the request")))
         }
-
         maybeRegistration.flatMap { registration =>
           val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, registration.excludedTrader)
-
           if (canRejoin) {
             registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
               case Valid(registration) =>
                 val rejoinRegistration = registration.copy(rejoin = Some(true))
-              registrationConnector.amendRegistration(rejoinRegistration).flatMap {
+                registrationConnector.amendRegistration(rejoinRegistration).flatMap {
                   case Right(_) =>
                     auditService.audit(
                       RegistrationAuditModel.build(

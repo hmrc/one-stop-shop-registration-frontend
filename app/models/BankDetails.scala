@@ -16,14 +16,22 @@
 
 package models
 
-import models.domain.ModelHelpers._
-import play.api.libs.json._
+import models.domain.ModelHelpers.*
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.*
 
 
 case class BankDetails (accountName: String, bic: Option[Bic], iban: Iban)
 
 object BankDetails {
-  implicit val format: OFormat[BankDetails] = Json.format[BankDetails]
+
+  implicit val reads: Reads[BankDetails] = (
+      (__ \ "accountName").read[String].map(normaliseSpaces) and
+          (__ \ "bic").readNullable[Bic] and
+          (__ \ "iban").read[Iban]
+      )(BankDetails.apply _)
+
+  implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
 
   def apply(accountName: String, bic: Option[Bic], iban: Iban): BankDetails =
     new BankDetails(normaliseSpaces(accountName), bic, iban)

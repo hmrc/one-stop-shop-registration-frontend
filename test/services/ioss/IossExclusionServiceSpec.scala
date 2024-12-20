@@ -22,7 +22,7 @@ import models.iossExclusions.EtmpExclusionReason.FailsToComply
 import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}
 import models.responses.RegistrationNotFound
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
+import org.mockito.Mockito.when
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatestplus.mockito.MockitoSugar.mock
