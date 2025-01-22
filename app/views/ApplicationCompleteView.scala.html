@@ -36,6 +36,7 @@
     <div class="grid-row column-two-thirds" id="application_complete_id">
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
+            <p class="govuk-panel__body">@Html(messages("applicationComplete.heading.reference", vrn.vrn))</p>
         </div>
 
         <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
@@ -46,13 +47,17 @@
           </div>
         }
 
-        <div class="govuk-body">@Html(messages("applicationComplete.reference", vrn.vrn))</div>
+        <div class="govuk-body">@messages("applicationComplete.useService.text.ul")</div>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("applicationComplete.useService.text.bullet1")</li>
+            <li>@messages("applicationComplete.useService.text.bullet2")</li>
+        </ul>
 
-        <div class="govuk-body">@messages("applicationComplete.useService.text")</div>
+        <h2 class="govuk-heading-s">@messages("applicationComplete.completing")</h2>
 
-        <div class="govuk-body">@messages("applicationComplete.payVat.text")</div>
+        <div class="govuk-body">@messages("applicationComplete.returns.text1", periodOfFirstReturn, firstDayOfNextPeriod, commencementDate)</div>
 
-        <div class="govuk-body">@messages("applicationComplete.returns.text", periodOfFirstReturn, firstDayOfNextPeriod, commencementDate)</div>
+        <p class="govuk-body">@Html(messages("applicationComplete.fillOut"))</p>
 
         <h2 class="govuk-heading-m">@messages("applicationComplete.next")</h2>
 
@@ -62,8 +67,6 @@
         ))
 
         <p class="govuk-body">@messages("applicationComplete.contact.text")</p>
-
-        <p class="govuk-body">@Html(messages("applicationComplete.readInformation"))</p>
 
         <p class="govuk-body">
             <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
