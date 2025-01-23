@@ -29,7 +29,7 @@ import play.twirl.api.HtmlFormat
 import queries.EmailConfirmationQuery
 import services.{DateService, PeriodService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
+import views.html.ApplicationCompleteView
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -37,7 +37,6 @@ class ApplicationCompleteController @Inject()(
                                                override val messagesApi: MessagesApi,
                                                cc: AuthenticatedControllerComponents,
                                                view: ApplicationCompleteView,
-                                               viewEnrolments: ApplicationCompleteWithEnrolmentView,
                                                frontendAppConfig: FrontendAppConfig,
                                                dateService: DateService,
                                                periodService: PeriodService,
@@ -67,21 +66,6 @@ class ApplicationCompleteController @Inject()(
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
-          if (frontendAppConfig.enrolmentsEnabled) {
-            Ok(
-              viewEnrolments(
-                HtmlFormat.escape(contactDetails.emailAddress).toString,
-                request.vrn,
-                showEmailConfirmation,
-                frontendAppConfig.feedbackUrl,
-                calculatedCommencementDate.format(dateFormatter),
-                savedUrl,
-                organisationName,
-                periodOfFirstReturn.displayShortText,
-                firstDayOfNextPeriod.format(dateFormatter)
-              )
-            )
-          } else {
             Ok(
               view(
                 HtmlFormat.escape(contactDetails.emailAddress).toString,
@@ -95,7 +79,6 @@ class ApplicationCompleteController @Inject()(
                 firstDayOfNextPeriod.format(dateFormatter)
               )
             )
-          }
         }).getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }

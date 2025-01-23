@@ -188,13 +188,11 @@ applicationComplete.next = What happens next
 applicationComplete.link.BTA = Manage your One Stop Shop returns in your account.
 applicationComplete.feedback.link.text = What did you think of this service?
 applicationComplete.feedback.30seconds = (takes 30 seconds)
-applicationComplete.useService.text = You can now use this service to fill out quarterly returns for goods sold to consumers in the EU.
-applicationComplete.useService.text.ul = You can now use this service to:
+applicationComplete.useService.text = You can now use this service to:
 applicationComplete.useService.text.bullet1 = fill out quarterly OSS VAT returns
 applicationComplete.useService.text.bullet2 = pay any One Stop Shop VAT that you owe.
 applicationComplete.payVat.text = You can also pay any One Stop Shop VAT that you owe.
-applicationComplete.returns.text = You can begin your {0} return on {1}. Include any sales from {2}.
-applicationComplete.returns.text1 = You can submit your {0} return on {1}. Include any sales from {2}.
+applicationComplete.returns.text = You can submit your {0} return on {1}. Include any sales from {2}.
 applicationComplete.registration.text = We''ve received your registration for <span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
 applicationComplete.contact.text = We will contact you if we need to check any information.
 applicationComplete.readInformation = Read more information about <a class="govuk-link" href="https://www.gov.uk/guidance/completing-a-one-stop-shop-vat-return">how to complete an OSS return.</a>

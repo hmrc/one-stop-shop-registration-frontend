@@ -37,7 +37,7 @@ import play.api.test.Helpers._
 import queries.EmailConfirmationQuery
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.{ApplicationCompleteView, ApplicationCompleteWithEnrolmentView}
+import views.html.ApplicationCompleteView
 
 import java.time.{Clock, LocalDate, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
@@ -81,7 +81,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
-          .configure("features.enrolments-enabled" -> "false")
           .configure("features.registration.email-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -152,7 +151,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
           val config = application.injector.instanceOf[FrontendAppConfig]
           val result = route(application, request).value
-          val view = application.injector.instanceOf[ApplicationCompleteWithEnrolmentView]
+          val view = application.injector.instanceOf[ApplicationCompleteView]
           val commencementDate = LocalDate.now(stubClockAtArbitraryDate)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(commencementDate)
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
