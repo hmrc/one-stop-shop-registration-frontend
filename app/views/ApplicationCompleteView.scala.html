@@ -36,7 +36,7 @@
     <div class="grid-row column-two-thirds" id="application_complete_id">
         <div class="govuk-panel govuk-panel--confirmation">
             <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
-            <p class="govuk-panel__body">@Html(messages("applicationComplete.heading.reference", vrn.vrn))</p>
+            <div class="govuk-panel__body">@Html(messages("applicationComplete.heading.reference", vrn.vrn))</div>
         </div>
 
         <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
