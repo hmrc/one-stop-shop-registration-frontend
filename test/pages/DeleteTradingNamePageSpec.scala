@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 
 class DeleteTradingNamePageSpec extends SpecBase {
 
@@ -72,6 +72,23 @@ class DeleteTradingNamePageSpec extends SpecBase {
 
         DeleteTradingNamePage(Index(0)).navigate(AmendMode, emptyUserAnswers)
           .mustEqual(routes.HasTradingNameController.onPageLoad(AmendMode))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Add Trading Name when there are still trading names present" in {
+
+        val answers = emptyUserAnswers.set(TradingNamePage(Index(0)), "foo").success.value
+
+        DeleteTradingNamePage(Index(0)).navigate(RejoinMode, answers)
+          .mustEqual(routes.AddTradingNameController.onPageLoad(RejoinMode))
+      }
+
+      "to Has Trading Name when there are no trading names present" in {
+
+        DeleteTradingNamePage(Index(0)).navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(routes.HasTradingNameController.onPageLoad(RejoinMode))
       }
     }
   }

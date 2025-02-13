@@ -17,11 +17,12 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import controllers.previousRegistrations.{routes => prevRegRoutes}
-import controllers.amend.{routes => amendRoutes}
+import controllers.previousRegistrations.routes as prevRegRoutes
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
 import models.domain.PreviousSchemeNumbers
-import models.{AmendMode, CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
@@ -168,5 +169,49 @@ class AddPreviousRegistrationPageSpec extends SpecBase with PageBehaviours {
       }
     }
 
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "to Previous EU Country with index equal to the number of countries already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+              .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("FR123", None)).success.value
+              .set(PreviousEuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+              .set(PreviousOssNumberPage(Index(1), Index(0)), PreviousSchemeNumbers("ES123", None)).success.value
+              .set(AddPreviousRegistrationPage, true).success.value
+
+          AddPreviousRegistrationPage.navigate(RejoinMode, answers)
+            .mustEqual(prevRegRoutes.PreviousEuCountryController.onPageLoad(RejoinMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Commencement Date" in {
+
+          val answers = emptyUserAnswers
+            .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+            .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("FR123", None)).success.value
+            .set(PreviousEuCountryPage(Index(1)), Country("ES", "Spain")).success.value
+            .set(PreviousOssNumberPage(Index(1), Index(0)), PreviousSchemeNumbers("ES123", None)).success.value
+            .set(AddPreviousRegistrationPage, false).success.value
+
+          AddPreviousRegistrationPage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Rejoin Journey recovery" in {
+
+          AddPreviousRegistrationPage.navigate(RejoinMode, emptyUserAnswers)
+            .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
   }
 }

@@ -17,9 +17,10 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
+import controllers.euDetails.routes as euRoutes
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, RejoinLoopMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
@@ -233,6 +234,108 @@ class VatRegisteredPageSpec extends SpecBase with PageBehaviours {
 
             VatRegisteredPage(index).navigate(AmendLoopMode, answers)
               .mustEqual(euRoutes.EuVatNumberController.onPageLoad(AmendLoopMode, index))
+          }
+        }
+
+        "and EU VAT number has been answered" - {
+
+          "to wherever EU VAT number would navigate to" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), true).success.value
+                .set(EuVatNumberPage(index), "foo").success.value
+
+            VatRegisteredPage(index).navigate(AmendLoopMode, answers)
+              .mustEqual(EuVatNumberPage(index).navigate(AmendLoopMode, answers))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Cannot Add Country Without Vat Number for the same index" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+
+          VatRegisteredPage(index).navigate(AmendLoopMode, answers)
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(AmendLoopMode, index))
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Amend Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(AmendLoopMode, emptyUserAnswers)
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "and EU VAT number has not been answered" - {
+
+          "to EU VAT number" in {
+
+            val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+
+            VatRegisteredPage(index).navigate(RejoinMode, answers)
+              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(RejoinMode, index))
+          }
+        }
+
+        "and EU VAT number has been answered" - {
+
+          "to wherever EU VAT number would navigate to" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(VatRegisteredPage(index), true).success.value
+                .set(EuVatNumberPage(index), "foo").success.value
+
+            VatRegisteredPage(index).navigate(RejoinMode, answers)
+              .mustEqual(EuVatNumberPage(index).navigate(RejoinMode, answers))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Cannot Add Country Without Vat Number for the same index" in {
+
+          val answers = emptyUserAnswers.set(VatRegisteredPage(index), false).success.value
+
+          VatRegisteredPage(index).navigate(RejoinMode, answers)
+            .mustEqual(euRoutes.CannotAddCountryWithoutVatNumberController.onPageLoad(RejoinMode, index))
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Rejoin Journey recovery" in {
+
+          VatRegisteredPage(index).navigate(RejoinMode, emptyUserAnswers)
+            .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Rejoin Loop mode" - {
+
+      "when the answer is yes" - {
+
+        "and EU VAT number has not been answered" - {
+
+          "to EU VAT number" in {
+
+            val answers = emptyUserAnswers.set(VatRegisteredPage(index), true).success.value
+
+            VatRegisteredPage(index).navigate(RejoinLoopMode, answers)
+              .mustEqual(euRoutes.EuVatNumberController.onPageLoad(RejoinLoopMode, index))
           }
         }
 

@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 
 class DeleteWebsitePageSpec extends SpecBase {
 
@@ -72,6 +72,23 @@ class DeleteWebsitePageSpec extends SpecBase {
 
         DeleteWebsitePage(Index(0)).navigate(AmendMode, emptyUserAnswers)
           .mustEqual(routes.HasWebsiteController.onPageLoad(AmendMode))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Add Website when there are still websites present" in {
+
+        val answers = emptyUserAnswers.set(WebsitePage(Index(0)), "foo").success.value
+
+        DeleteWebsitePage(Index(0)).navigate(RejoinMode, answers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(RejoinMode))
+      }
+
+      "to Has Website when there are no websites present" in {
+
+        DeleteWebsitePage(Index(0)).navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(routes.HasWebsiteController.onPageLoad(RejoinMode))
       }
     }
 

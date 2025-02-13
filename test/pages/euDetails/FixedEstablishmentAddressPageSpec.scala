@@ -17,8 +17,8 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import controllers.euDetails.routes as euRoutes
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode, RejoinLoopMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 import pages.euDetails
 
@@ -76,6 +76,24 @@ class FixedEstablishmentAddressPageSpec extends SpecBase with PageBehaviours {
 
         FixedEstablishmentAddressPage(index).navigate(AmendLoopMode, emptyUserAnswers)
           .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Check Eu Details Answers in Rejoin mode" in {
+
+        FixedEstablishmentAddressPage(index).navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, index))
+      }
+    }
+
+    "must navigate in Rejoin Loop mode" - {
+
+      "to Check Eu Details Answers in Rejoin mode" in {
+
+        FixedEstablishmentAddressPage(index).navigate(RejoinLoopMode, emptyUserAnswers)
+          .mustEqual(euRoutes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, index))
       }
     }
   }

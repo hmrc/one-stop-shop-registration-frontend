@@ -62,5 +62,27 @@ class AlreadyRegisteredOtherCountryControllerSpec extends SpecBase with MockitoS
         contentAsString(result) mustEqual view(countryName)(request, messages(application)).toString
       }
     }
+
+    "must return OK and the correct view when connector returns Left(error)" in {
+
+      when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Left("Some error"))
+
+      val countryCode: String = "FR"
+      val countryName: String = "France"
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AlreadyRegisteredOtherCountryController.onPageLoad(countryCode).url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[AlreadyRegisteredOtherCountryView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(countryName, None)(request, messages(application)).toString
+      }
+    }
   }
 }

@@ -22,7 +22,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsError, JsNull, JsSuccess, Json}
 
 class EuTaxRegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators {
 
@@ -58,6 +58,328 @@ class EuTaxRegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
         val json = Json.toJson(euRegistration)
         json.validate[EuTaxRegistration] mustEqual JsSuccess(euRegistration)
+    }
+  }
+
+  ".EuVatRegistration" - {
+
+    "must serialise and deserialise to / from EuVatRegistration" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "vatNumber" -> "123456789"
+      )
+
+      val expectedResult = EuVatRegistration(
+        country = Country("DE", "Germany"),
+        vatNumber = "123456789"
+      )
+
+      Json.toJson(expectedResult) mustBe json
+      json.validate[EuVatRegistration] mustBe JsSuccess(expectedResult)
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[EuVatRegistration] mustBe a[JsError]
+    }
+
+    "must handle invalid data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "vatNumber" -> 12345
+      )
+
+      json.validate[EuVatRegistration] mustBe a[JsError]
+    }
+
+    "must handle null data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "vatNumber" -> JsNull
+      )
+
+      json.validate[EuVatRegistration] mustBe a[JsError]
+    }
+  }
+
+  ".RegistrationWithFixedEstablishment" - {
+
+    "must serialise and deserialise to / from RegistrationWithFixedEstablishment" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "taxIdentifier" -> Json.obj(
+          "identifierType" -> "vat",
+          "value" -> "123456789"
+        ),
+        "fixedEstablishment" -> Json.obj(
+          "tradingName" -> "Irish trading name",
+          "address" -> Json.obj(
+            "line1" -> "Line 1",
+            "townOrCity" -> "Town",
+            "country" -> Json.obj(
+              "code" -> "IE",
+              "name" -> "Ireland"
+            )
+          )
+        )
+      )
+
+      val expectedResult = RegistrationWithFixedEstablishment(
+        country = Country("DE", "Germany"),
+        taxIdentifier = EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
+        fixedEstablishment = TradeDetails(
+          "Irish trading name",
+          InternationalAddress(
+            line1 = "Line 1",
+            line2 = None,
+            townOrCity = "Town",
+            stateOrRegion = None,
+            None,
+            Country("IE", "Ireland")
+          )
+        )
+      )
+
+      Json.toJson(expectedResult) mustBe json
+      json.validate[RegistrationWithFixedEstablishment] mustBe JsSuccess(expectedResult)
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[RegistrationWithFixedEstablishment] mustBe a[JsError]
+    }
+
+    "must handle invalid data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> 12345,
+          "name" -> "Germany"
+        ),
+        "taxIdentifier" -> Json.obj(
+          "identifierType" -> "vat",
+          "value" -> "123456789"
+        ),
+        "fixedEstablishment" -> Json.obj(
+          "tradingName" -> "Irish trading name",
+          "address" -> Json.obj(
+            "line1" -> "Line 1",
+            "townOrCity" -> "Town",
+            "country" -> Json.obj(
+              "code" -> "IE",
+              "name" -> "Ireland"
+            )
+          )
+        )
+      )
+
+      json.validate[RegistrationWithFixedEstablishment] mustBe a[JsError]
+    }
+
+    "must handle null data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "taxIdentifier" -> Json.obj(
+          "identifierType" -> "vat",
+          "value" -> "123456789"
+        ),
+        "fixedEstablishment" -> Json.obj(
+          "tradingName" -> "Irish trading name",
+          "address" -> Json.obj(
+            "line1" -> "Line 1",
+            "townOrCity" -> "Town",
+            "country" -> Json.obj(
+              "code" -> "IE",
+              "name" -> JsNull
+            )
+          )
+        )
+      )
+
+      json.validate[RegistrationWithFixedEstablishment] mustBe a[JsError]
+    }
+  }
+
+  ".RegistrationWithoutFixedEstablishmentWithTradeDetails" - {
+
+    "must serialise and deserialise to / from RegistrationWithoutFixedEstablishmentWithTradeDetails" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "taxIdentifier" -> Json.obj(
+          "identifierType" -> "vat",
+          "value" -> "123456789"
+        ),
+        "tradeDetails" -> Json.obj(
+          "tradingName" -> "Irish trading name",
+          "address" -> Json.obj(
+            "line1" -> "Line 1",
+            "townOrCity" -> "Town",
+            "country" -> Json.obj(
+              "code" -> "IE",
+              "name" -> "Ireland"
+            )
+          )
+        )
+      )
+
+      val expectedResult = RegistrationWithoutFixedEstablishmentWithTradeDetails(
+        country = Country("DE", "Germany"),
+        taxIdentifier = EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("123456789")),
+        tradeDetails = TradeDetails(
+          "Irish trading name",
+          InternationalAddress(
+            line1 = "Line 1",
+            line2 = None,
+            townOrCity = "Town",
+            stateOrRegion = None,
+            None,
+            Country("IE", "Ireland")
+          )
+        )
+      )
+
+      Json.toJson(expectedResult) mustBe json
+      json.validate[RegistrationWithoutFixedEstablishmentWithTradeDetails] mustBe JsSuccess(expectedResult)
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[RegistrationWithoutFixedEstablishmentWithTradeDetails] mustBe a[JsError]
+    }
+
+    "must handle invalid data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> 12345,
+          "name" -> "Germany"
+        ),
+        "taxIdentifier" -> Json.obj(
+          "identifierType" -> "vat",
+          "value" -> "123456789"
+        ),
+        "tradeDetails" -> Json.obj(
+          "tradingName" -> "Irish trading name",
+          "address" -> Json.obj(
+            "line1" -> "Line 1",
+            "townOrCity" -> "Town",
+            "country" -> Json.obj(
+              "code" -> "IE",
+              "name" -> "Ireland"
+            )
+          )
+        )
+      )
+
+      json.validate[RegistrationWithoutFixedEstablishmentWithTradeDetails] mustBe a[JsError]
+    }
+
+    "must handle null data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        ),
+        "taxIdentifier" -> Json.obj(
+          "identifierType" -> "vat",
+          "value" -> "123456789"
+        ),
+        "tradeDetails" -> Json.obj(
+          "tradingName" -> "Irish trading name",
+          "address" -> Json.obj(
+            "line1" -> "Line 1",
+            "townOrCity" -> "Town",
+            "country" -> Json.obj(
+              "code" -> "IE",
+              "name" -> JsNull
+            )
+          )
+        )
+      )
+
+      json.validate[RegistrationWithoutFixedEstablishmentWithTradeDetails] mustBe a[JsError]
+    }
+  }
+
+  ".RegistrationWithoutTaxId" - {
+
+    "must serialise and deserialise to / from RegistrationWithoutTaxId" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> "Germany"
+        )
+      )
+
+      val expectedResult = RegistrationWithoutTaxId(
+        country = Country("DE", "Germany")
+      )
+
+      Json.toJson(expectedResult) mustBe json
+      json.validate[RegistrationWithoutTaxId] mustBe JsSuccess(expectedResult)
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[RegistrationWithoutTaxId] mustBe a[JsError]
+    }
+
+    "must handle invalid data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> 12345,
+          "name" -> "Germany"
+        )
+      )
+
+      json.validate[RegistrationWithoutTaxId] mustBe a[JsError]
+    }
+
+    "must handle null data during deserialization" in {
+
+      val json = Json.obj(
+        "country" -> Json.obj(
+          "code" -> "DE",
+          "name" -> JsNull
+        )
+      )
+
+      json.validate[RegistrationWithoutTaxId] mustBe a[JsError]
     }
   }
 }

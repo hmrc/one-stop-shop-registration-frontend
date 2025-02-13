@@ -17,11 +17,12 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import controllers.previousRegistrations.{routes => prevRegRoutes}
-import controllers.amend.{routes => amendRoutes}
+import controllers.previousRegistrations.routes as prevRegRoutes
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
 import models.domain.PreviousSchemeNumbers
-import models.{AmendMode, CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class CheckPreviousSchemeAnswersPageSpec extends SpecBase with PageBehaviours {
@@ -126,6 +127,38 @@ class CheckPreviousSchemeAnswersPageSpec extends SpecBase with PageBehaviours {
 
         CheckPreviousSchemeAnswersPage(Index(0)).navigate(AmendMode, answers)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Previous Scheme Page when user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(CheckPreviousSchemeAnswersPage(Index(0)), true).success.value
+          .set(PreviousEuCountryPage(Index(0)), Country("FR", "France")).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("FR123", None)).success.value
+
+        CheckPreviousSchemeAnswersPage(Index(0)).navigate(RejoinMode, answers)
+          .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(RejoinMode, Index(0), Index(1)))
+      }
+
+      "to Add Previous Registration Page when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(CheckPreviousSchemeAnswersPage(Index(0)), false).success.value
+
+        CheckPreviousSchemeAnswersPage(Index(0)).navigate(RejoinMode, answers)
+          .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(RejoinMode))
+      }
+
+      "to Rejoin Journey Recovery Page when user does not answer" in {
+
+        val answers = emptyUserAnswers
+
+        CheckPreviousSchemeAnswersPage(Index(0)).navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
       }
 
     }

@@ -17,10 +17,11 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import controllers.amend.{routes => amendRoutes}
+import controllers.euDetails.routes as euRoutes
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, RejoinLoopMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
@@ -91,6 +92,34 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
 
     }
 
+    "must navigate in Check Loop Mode" - {
+
+      "to Sells Goods To EU Consumer Method when answer is Yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckLoopMode, answers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckLoopMode, countryIndex))
+      }
+
+      "to Sales Declaration Not Required when answer is No" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckLoopMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(NormalMode, countryIndex))
+      }
+
+      "to Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(CheckLoopMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+
+    }
+
     "must navigate in Amend Mode" - {
 
       "to Sells Goods To EU Consumer Method when answer is Yes" in {
@@ -115,6 +144,90 @@ class SellsGoodsToEUConsumersPageSpec extends SpecBase with PageBehaviours {
 
         SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendMode, answers)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+
+    }
+
+    "must navigate in Amend Loop Mode" - {
+
+      "to Sells Goods To EU Consumer Method when answer is Yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(AmendLoopMode, countryIndex))
+      }
+
+      "to Sales Declaration Not Required when answer is No" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(AmendMode, countryIndex))
+      }
+
+      "to Amend Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(AmendLoopMode, answers)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+
+    }
+
+    "must navigate in Rejoin Mode" - {
+
+      "to Sells Goods To EU Consumer Method when answer is Yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinMode, answers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(RejoinMode, countryIndex))
+      }
+
+      "to Sales Declaration Not Required when answer is No" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(RejoinMode, countryIndex))
+      }
+
+      "to Rejoin Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
+      }
+
+    }
+
+    "must navigate in Rejoin Loop Mode" - {
+
+      "to Sells Goods To EU Consumer Method when answer is Yes" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinLoopMode, answers)
+          .mustEqual(euRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(RejoinLoopMode, countryIndex))
+      }
+
+      "to Sales Declaration Not Required when answer is No" in {
+
+        val answers = emptyUserAnswers.set(SellsGoodsToEUConsumersPage(countryIndex), false).success.value
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinLoopMode, answers)
+          .mustEqual(euRoutes.SalesDeclarationNotRequiredController.onPageLoad(RejoinMode, countryIndex))
+      }
+
+      "to Rejoin Journey Recovery when there are no answers" in {
+
+        val answers = emptyUserAnswers
+
+        SellsGoodsToEUConsumersPage(countryIndex).navigate(RejoinLoopMode, answers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
       }
 
     }

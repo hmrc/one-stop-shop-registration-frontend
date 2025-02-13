@@ -19,7 +19,7 @@ package pages.previousRegistrations
 import base.SpecBase
 import controllers.previousRegistrations.routes
 import models.domain.PreviousSchemeNumbers
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
@@ -58,6 +58,15 @@ class PreviousIossNumberPageSpec extends SpecBase with PageBehaviours {
 
         PreviousIossNumberPage(index, index).navigate(AmendMode, emptyUserAnswers)
           .mustEqual(routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Check Previous Scheme Answers Page" in {
+
+        PreviousIossNumberPage(index, index).navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(routes.CheckPreviousSchemeAnswersController.onPageLoad(RejoinMode, index))
       }
     }
 

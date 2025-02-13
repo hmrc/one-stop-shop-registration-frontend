@@ -20,7 +20,7 @@ import base.SpecBase
 import models.emailVerification.{EmailStatus, VerificationStatus}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsError, JsNull, JsSuccess, Json}
 
 
 class VerificationStatusSpec extends AnyFreeSpec with Matchers with SpecBase {
@@ -53,6 +53,92 @@ class VerificationStatusSpec extends AnyFreeSpec with Matchers with SpecBase {
         expectedJson.validate[VerificationStatus] mustEqual JsSuccess(verificationStatus)
       }
 
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[VerificationStatus] mustBe a[JsError]
+    }
+
+    "must handle invalid data during deserialization" in {
+
+      val json = Json.obj(
+        "emails" -> Json.arr(
+          Json.obj(
+            "emailAddress" -> 12345,
+            "verified" -> true,
+            "locked" -> false
+          )),
+      )
+
+      json.validate[VerificationStatus] mustBe a[JsError]
+    }
+
+    "must handle null data during deserialization" in {
+      val json = Json.obj(
+        "emails" -> Json.arr(
+          Json.obj(
+            "emailAddress" -> "email@example.com",
+            "verified" -> JsNull,
+            "locked" -> false
+          )),
+      )
+
+      json.validate[VerificationStatus] mustBe a[JsError]
+    }
+  }
+
+  "EmailStatus" - {
+
+    "must serialise and deserialise to and from a EmailStatus" in {
+
+        val emailStatus: EmailStatus =
+          EmailStatus(
+              "email@example.com",
+              true,
+              false
+            )
+
+        val expectedJson = Json.obj(
+          "emailAddress" -> "email@example.com",
+          "verified" -> true,
+          "locked" -> false
+        )
+
+        Json.toJson(emailStatus) mustEqual expectedJson
+        expectedJson.validate[EmailStatus] mustEqual JsSuccess(emailStatus)
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[EmailStatus] mustBe a[JsError]
+
+    }
+
+    "must handle invalid data during deserialization" in {
+
+      val json = Json.obj(
+        "emailAddress" -> 12345,
+        "verified" -> true,
+        "locked" -> false
+      )
+
+      json.validate[EmailStatus] mustBe a[JsError]
+    }
+
+    "must handle null data during deserialization" in {
+
+      val json = Json.obj(
+        "emailAddress" -> JsNull,
+        "verified" -> true,
+        "locked" -> false
+      )
+
+      json.validate[EmailStatus] mustBe a[JsError]
     }
   }
 

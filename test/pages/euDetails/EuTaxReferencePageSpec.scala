@@ -17,10 +17,11 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import controllers.amend.{routes => amendRoutes}
+import controllers.euDetails.routes as euRoutes
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import models.euDetails.EuConsumerSalesMethod
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, RejoinLoopMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
@@ -202,8 +203,8 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
             .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
-          EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
-            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
+          EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckLoopMode, countryIndex))
         }
 
         "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
@@ -212,8 +213,8 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
             .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
 
-          EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
-            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers))
+          EuTaxReferencePage(countryIndex).navigate(CheckLoopMode, answers)
+            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(CheckLoopMode, answers))
         }
 
       }
@@ -319,8 +320,8 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
           val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
             .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
 
-          EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
-            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex))
+          EuTaxReferencePage(countryIndex).navigate(AmendLoopMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(AmendLoopMode, countryIndex))
         }
 
         "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
@@ -329,8 +330,8 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
             .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
             .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
 
-          EuTaxReferencePage(countryIndex).navigate(CheckMode, answers)
-            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(CheckMode, answers))
+          EuTaxReferencePage(countryIndex).navigate(AmendLoopMode, answers)
+            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(AmendLoopMode, answers))
         }
 
       }
@@ -343,5 +344,121 @@ class EuTaxReferencePageSpec extends SpecBase with PageBehaviours {
       }
     }
 
+    "must navigate in Rejoin mode" - {
+
+      "when user is not part of VAT group" - {
+
+        "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinMode, answers)
+            .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(RejoinMode, countryIndex))
+        }
+
+        "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(RejoinMode, countryIndex))
+        }
+
+      }
+
+      "when user is part of VAT group" - {
+
+        "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(RejoinMode, countryIndex))
+        }
+      }
+
+      "to Rejoin Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(RejoinMode, answers)
+          .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin Loop mode" - {
+
+      "when user is not part of VAT group" - {
+
+        "to Fixed Establishment Trading Name when Sells Goods To EU Consumer Method is Fixed Establishment and it has not been answered" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+            .mustEqual(euRoutes.FixedEstablishmentTradingNameController.onPageLoad(RejoinLoopMode, countryIndex))
+        }
+
+        "to wherever Fixed Establishment Trading Name navigates when Sells Goods To EU Consumer Method is Fixed Establishment and it has been answered" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
+            .set(FixedEstablishmentTradingNamePage(countryIndex), "foo").success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+            .mustEqual(FixedEstablishmentTradingNamePage(countryIndex).navigate(RejoinLoopMode, answers))
+        }
+
+        "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
+
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(RejoinLoopMode, countryIndex))
+        }
+
+        "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
+          val answers = emptyUserAnswers
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(RejoinLoopMode, answers))
+        }
+      }
+
+      "when user is part of VAT group" - {
+
+        "to Eu Send Goods Trading Name when Sells Goods To EU Consumer Method is DispatchWarehouse and it has not been answered" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+            .mustEqual(euRoutes.EuSendGoodsTradingNameController.onPageLoad(RejoinLoopMode, countryIndex))
+        }
+
+        "to wherever Eu Send Goods Trading Name navigates when Sells Goods To EU Consumer Method is DispatchWarehouse and it has been answered" in {
+
+          val answers = emptyUserAnswers.copy(vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
+            .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.DispatchWarehouse).success.value
+            .set(EuSendGoodsTradingNamePage(countryIndex), "foo").success.value
+
+          EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+            .mustEqual(EuSendGoodsTradingNamePage(countryIndex).navigate(RejoinLoopMode, answers))
+        }
+
+      }
+
+      "to Rejoin Journey Recovery when there are no answers" in {
+        val answers = emptyUserAnswers
+
+        EuTaxReferencePage(countryIndex).navigate(RejoinLoopMode, answers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
+      }
+    }
   }
 }

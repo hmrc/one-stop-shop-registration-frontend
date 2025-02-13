@@ -54,5 +54,14 @@ class RejoinRedirectServiceSpec extends SpecBase
             genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString))
       }
    }
+
+    "throw an IllegalStateException when the matchType is quarantined but exclusionEffectiveDate is missing" in {
+      Seq(MatchType.FixedEstablishmentQuarantinedNETP, MatchType.TraderIdQuarantinedNETP, MatchType.OtherMSNETPQuarantinedNETP).foreach { matchType =>
+        val exception = intercept[IllegalStateException] {
+          RejoinRedirectService.redirectOnMatch(Some(genericMatch.copy(matchType = matchType, exclusionEffectiveDate = None)))
+        }
+        exception.getMessage must include(s"MatchType $matchType didn't include an expected exclusion effective date")
+      }
+    }
   }
 }

@@ -17,9 +17,10 @@
 package pages
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import models.{AmendMode, CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
@@ -56,6 +57,15 @@ class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
 
         IsOnlineMarketplacePage.navigate(AmendMode, emptyUserAnswers)
           .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Rejoin Registration" in {
+
+        IsOnlineMarketplacePage.navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
       }
     }
   }

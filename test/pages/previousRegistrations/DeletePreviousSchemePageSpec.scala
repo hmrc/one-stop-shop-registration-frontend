@@ -17,9 +17,9 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.previousRegistrations.routes as prevRegRoutes
 import models.domain.PreviousSchemeNumbers
-import models.{AmendMode, CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 import queries.previousRegistration.PreviousSchemeForCountryQuery
 
@@ -182,6 +182,58 @@ class DeletePreviousSchemePageSpec extends SpecBase with PageBehaviours {
 
           DeletePreviousSchemePage(index).navigate(AmendMode, answers)
             .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(AmendMode))
+        }
+      }
+
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when there is a single country with multiple previous schemes remaining" - {
+
+        "redirect to Check Previous Scheme Answers Page" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(index), Country("FR", "France")).success.value
+              .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("FR123", None)).success.value
+              .set(PreviousOssNumberPage(index, index1), PreviousSchemeNumbers("FR234", None)).success.value
+
+          val updatedAnswers = Future.fromTry(answers.remove(PreviousSchemeForCountryQuery(index, index1)))
+
+          DeletePreviousSchemePage(index).navigate(RejoinMode, updatedAnswers.futureValue)
+            .mustEqual(prevRegRoutes.CheckPreviousSchemeAnswersController.onPageLoad(RejoinMode, index))
+        }
+      }
+
+      "when there are multiple countries with multiple previous schemes remaining" - {
+
+        "redirect to Add Previous Registration Page" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(PreviousEuCountryPage(index), Country("FR", "France")).success.value
+              .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("FR123", None)).success.value
+              .set(PreviousOssNumberPage(index, index1), PreviousSchemeNumbers("FR234", None)).success.value
+              .set(PreviousEuCountryPage(index1), Country("DE", "Germany")).success.value
+              .set(PreviousOssNumberPage(index1, index), PreviousSchemeNumbers("DE123", None)).success.value
+
+          val updatedAnswers = Future.fromTry(answers.remove(PreviousSchemeForCountryQuery(index1, index)))
+
+          DeletePreviousSchemePage(index1).navigate(RejoinMode, updatedAnswers.futureValue)
+            .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(RejoinMode))
+        }
+      }
+
+      "when there is no previous scheme remaining" - {
+
+        "redirect to Previously Registered Page" in {
+
+          val answers =
+            emptyUserAnswers
+
+          DeletePreviousSchemePage(index).navigate(RejoinMode, answers)
+            .mustEqual(prevRegRoutes.PreviouslyRegisteredController.onPageLoad(RejoinMode))
         }
       }
 

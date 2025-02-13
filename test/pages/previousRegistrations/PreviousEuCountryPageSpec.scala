@@ -17,9 +17,9 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.previousRegistrations.routes as prevRegRoutes
 import models.domain.PreviousSchemeNumbers
-import models.{AmendMode, CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
@@ -72,6 +72,22 @@ class PreviousEuCountryPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
         PreviousEuCountryPage(index).navigate(AmendMode, answers)
           .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(AmendMode, index, index))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Previous EU VAT number for the same index where the VAT number hasn't already been answered" in {
+
+        PreviousEuCountryPage(index).navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(RejoinMode, index, index))
+      }
+
+      "to Add Previous Registration when the VAT number for this index has been answered" in {
+
+        val answers = emptyUserAnswers.set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("123", None)).success.value
+        PreviousEuCountryPage(index).navigate(RejoinMode, answers)
+          .mustEqual(prevRegRoutes.PreviousSchemeController.onPageLoad(RejoinMode, index, index))
       }
     }
 

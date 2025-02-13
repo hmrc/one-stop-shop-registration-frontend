@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, InternationalAddress, NormalMode, RejoinLoopMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
@@ -64,6 +64,20 @@ class EuSendGoodsAddressPageSpec extends SpecBase with PageBehaviours {
       "to Check Eu Details Answers" in {
         EuSendGoodsAddressPage(index).navigate(AmendLoopMode, emptyUserAnswers) mustBe
           controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(AmendMode, index)
+      }
+    }
+
+    "must navigate in Rejoin Mode" - {
+      "to Check Eu Details Answers" in {
+        EuSendGoodsAddressPage(index).navigate(RejoinMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, index)
+      }
+    }
+
+    "must navigate in Rejoin Loop Mode" - {
+      "to Check Eu Details Answers" in {
+        EuSendGoodsAddressPage(index).navigate(RejoinLoopMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.CheckEuDetailsAnswersController.onPageLoad(RejoinMode, index)
       }
     }
   }

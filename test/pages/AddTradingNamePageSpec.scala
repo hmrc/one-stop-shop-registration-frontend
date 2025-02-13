@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
@@ -145,6 +146,40 @@ class AddTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
       }
     }
 
+    "must navigate in Rejoin mode" - {
 
+      "when the answer is yes" - {
+
+        "to Trading Name with index equal to the number of names already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo").success.value
+              .set(TradingNamePage(Index(1)), "bar").success.value
+              .set(AddTradingNamePage, true).success.value
+
+          AddTradingNamePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(RejoinMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Rejoin Registration" in {
+
+          val answers = emptyUserAnswers.set(AddTradingNamePage, false).success.value
+
+          AddTradingNamePage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is none" - {
+        "to Amend Journey recovery" in {
+          AddTradingNamePage.navigate(RejoinMode, emptyUserAnswers)
+            .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
   }
 }

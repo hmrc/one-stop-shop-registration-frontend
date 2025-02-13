@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class WebsitePageSpec extends SpecBase with PageBehaviours {
@@ -57,6 +57,15 @@ class WebsitePageSpec extends SpecBase with PageBehaviours {
 
         WebsitePage(index).navigate(AmendMode, emptyUserAnswers)
           .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Add Website" in {
+
+        WebsitePage(index).navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(RejoinMode))
       }
     }
 

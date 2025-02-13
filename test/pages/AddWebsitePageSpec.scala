@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class AddWebsitePageSpec extends SpecBase with PageBehaviours {
@@ -125,6 +126,40 @@ class AddWebsitePageSpec extends SpecBase with PageBehaviours {
       "to Amend Journey recovery when the answer is none" in {
         AddWebsitePage.navigate(AmendMode, emptyUserAnswers)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "to Website with index equal to the number of websites already answered" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(WebsitePage(Index(0)), "foo").success.value
+              .set(WebsitePage(Index(1)), "bar").success.value
+              .set(AddWebsitePage, true).success.value
+
+          AddWebsitePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.WebsiteController.onPageLoad(RejoinMode, Index(2)))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Rejoin Registration" in {
+
+          val answers = emptyUserAnswers.set(AddWebsitePage, false).success.value
+
+          AddWebsitePage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "to Rejoin Journey recovery when the answer is none" in {
+        AddWebsitePage.navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
       }
     }
 

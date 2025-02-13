@@ -20,7 +20,7 @@ import base.SpecBase
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsError, JsString, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsNull, JsString, JsSuccess, Json}
 
 class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
 
@@ -46,6 +46,37 @@ class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       Json.toJson(expectedResult) mustBe json
       json.validate[EtmpExclusion] mustBe JsSuccess(expectedResult)
+    }
+
+    "must handle missing fields" in {
+
+      val json = Json.obj()
+
+      json.validate[EtmpExclusion] mustBe a[JsError]
+    }
+
+    "must handle invalid fields" in {
+
+      val json = Json.obj(
+        "exclusionReason" -> 12345,
+        "effectiveDate" -> arbEtmpExclusion.effectiveDate,
+        "decisionDate" -> arbEtmpExclusion.decisionDate,
+        "quarantine" -> arbEtmpExclusion.quarantine
+      )
+
+      json.validate[EtmpExclusion] mustBe a[JsError]
+    }
+
+    "must handle null fields" in {
+
+      val json = Json.obj(
+        "exclusionReason" -> arbEtmpExclusion.exclusionReason,
+        "effectiveDate" -> JsNull,
+        "decisionDate" -> arbEtmpExclusion.decisionDate,
+        "quarantine" -> arbEtmpExclusion.quarantine
+      )
+
+      json.validate[EtmpExclusion] mustBe a[JsError]
     }
   }
 

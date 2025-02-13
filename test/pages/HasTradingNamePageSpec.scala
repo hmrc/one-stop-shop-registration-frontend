@@ -17,9 +17,10 @@
 package pages
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.behaviours.PageBehaviours
@@ -177,6 +178,63 @@ class HasTradingNamePageSpec extends SpecBase with PageBehaviours with MockitoSu
 
           HasTradingNamePage.navigate(AmendMode, emptyUserAnswers)
             .mustBe(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "to Trading name (index 0) when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasTradingNamePage, true).success.value
+
+          HasTradingNamePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(RejoinMode, Index(0)))
+        }
+
+        "to Add Trading name when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasTradingNamePage, true).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasTradingNamePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.AddTradingNameController.onPageLoad(RejoinMode))
+        }
+
+      }
+
+      "when the answer is no" - {
+
+        "to Delete All Trading Names Page when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasTradingNamePage, false).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasTradingNamePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad(RejoinMode))
+        }
+
+        "to Rejoin Registration Page when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasTradingNamePage, false).success.value
+
+          HasTradingNamePage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasTradingNamePage.navigate(RejoinMode, emptyUserAnswers)
+            .mustBe(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
         }
       }
     }

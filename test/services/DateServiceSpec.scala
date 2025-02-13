@@ -667,4 +667,43 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
 
   }
+
+  ".startOfCurrentQuarter" - {
+
+    "must be 1st January for any date in January, February, or March" in {
+      forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) { date =>
+        val stubClock = getStubClock(date)
+        val service = new DateService(stubClock, coreRegistrationValidationService)
+
+        service.startOfCurrentQuarter mustEqual LocalDate.of(2022, 1, 1)
+      }
+    }
+
+    "must be 1st April for any date in April, May, or June" in {
+      forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) { date =>
+        val stubClock = getStubClock(date)
+        val service = new DateService(stubClock, coreRegistrationValidationService)
+
+        service.startOfCurrentQuarter mustEqual LocalDate.of(2022, 4, 1)
+      }
+    }
+
+    "must be 1st July for any date in July, August, or September" in {
+      forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) { date =>
+        val stubClock = getStubClock(date)
+        val service = new DateService(stubClock, coreRegistrationValidationService)
+
+        service.startOfCurrentQuarter mustEqual LocalDate.of(2022, 7, 1)
+      }
+    }
+
+    "must be 1st October for any date in October, November, or December" in {
+      forAll(datesBetween(LocalDate.of(2022, 10, 1), LocalDate.of(2022, 12, 31))) { date =>
+        val stubClock = getStubClock(date)
+        val service = new DateService(stubClock, coreRegistrationValidationService)
+
+        service.startOfCurrentQuarter mustEqual LocalDate.of(2022, 10, 1)
+      }
+    }
+  }
 }

@@ -17,9 +17,9 @@
 package pages
 
 import base.SpecBase
-import controllers.previousRegistrations.{routes => prevRegRoutes}
+import controllers.previousRegistrations.routes as prevRegRoutes
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode}
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
 
@@ -55,6 +55,24 @@ class DateOfFirstSalePageSpec extends SpecBase with PageBehaviours {
 
       DateOfFirstSalePage.navigate(CheckMode, emptyUserAnswers)
         .mustEqual(routes.CommencementDateController.onPageLoad(CheckMode))
+    }
+  }
+
+  "must navigate in Amend Mode" - {
+
+    "to Amend Your Answers" in {
+
+      DateOfFirstSalePage.navigate(AmendMode, emptyUserAnswers)
+        .mustEqual(routes.CommencementDateController.onPageLoad(AmendMode))
+    }
+  }
+
+  "must navigate in Rejoin Mode" - {
+
+    "to Rejoin Your Answers" in {
+
+      DateOfFirstSalePage.navigate(RejoinMode, emptyUserAnswers)
+        .mustEqual(routes.CommencementDateController.onPageLoad(RejoinMode))
     }
   }
 }

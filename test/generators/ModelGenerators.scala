@@ -17,12 +17,13 @@
 package generators
 
 import connectors.SavedUserAnswers
-import models._
+import models.*
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.returns.VatOnSalesChoice.Standard
-import models.domain.returns._
+import models.domain.returns.*
 import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, PreviousSchemeNumbers, TradeDetails}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
+import models.exclusions.{ExcludedTrader, ExclusionReason}
 import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
@@ -325,4 +326,24 @@ trait ModelGenerators {
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  implicit lazy val arbitraryExclusionReason: Arbitrary[ExclusionReason] =
+    Arbitrary {
+      Gen.oneOf(ExclusionReason.values)
+    }
+
+  implicit lazy val arbitraryExcludedTrader: Arbitrary[ExcludedTrader] =
+    Arbitrary {
+      for {
+        vrn <- arbitraryVrn.arbitrary
+        exclusionReason <- arbitraryExclusionReason.arbitrary
+        effectiveDate <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+      } yield ExcludedTrader(
+        vrn = vrn,
+        exclusionReason = exclusionReason,
+        effectiveDate = effectiveDate,
+        quarantined = false
+      )
+    }
+
 }
