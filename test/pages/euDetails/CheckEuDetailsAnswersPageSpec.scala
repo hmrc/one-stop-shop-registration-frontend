@@ -17,8 +17,8 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, NormalMode}
+import controllers.euDetails.routes as euRoutes
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, NormalMode, RejoinLoopMode, RejoinMode}
 
 class CheckEuDetailsAnswersPageSpec extends SpecBase {
 
@@ -61,6 +61,22 @@ class CheckEuDetailsAnswersPageSpec extends SpecBase {
       "to Add EU Details in Amend mode (because the user has now finished checking this country)" in {
         CheckEuDetailsAnswersPage.navigate(AmendLoopMode, emptyUserAnswers)
           .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(AmendMode))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Add EU Details in Rejoin mode" - {
+        CheckEuDetailsAnswersPage.navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(RejoinMode))
+      }
+    }
+
+    "must navigate in Rejoin Loop mode" - {
+
+      "to Add EU Details in Rejoin mode (because the user has now finished checking this country)" in {
+        CheckEuDetailsAnswersPage.navigate(RejoinLoopMode, emptyUserAnswers)
+          .mustEqual(euRoutes.AddEuDetailsController.onPageLoad(RejoinMode))
       }
     }
   }

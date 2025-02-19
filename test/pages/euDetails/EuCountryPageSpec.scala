@@ -17,8 +17,8 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import models.{AmendMode, CheckMode, Country, Index, NormalMode, UserAnswers}
+import controllers.euDetails.routes as euRoutes
+import models.{AmendMode, CheckLoopMode, CheckMode, Country, Index, NormalMode, RejoinMode, UserAnswers}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.behaviours.PageBehaviours
@@ -102,5 +102,60 @@ class EuCountryPageSpec extends SpecBase with PageBehaviours with ScalaCheckProp
       }
     }
 
+    "must navigate in CheckLoop mode" - {
+
+      "when Sells Goods to EU Consumers has not been answered" - {
+
+        "to Sells Goods to EU Consumers for the same index" in {
+
+          EuCountryPage(countryIndex).navigate(CheckLoopMode, emptyUserAnswers)
+            .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckLoopMode, countryIndex))
+        }
+      }
+
+      "when Sells Goods to EU Consumers has been answered" - {
+
+        "to wherever Sells Goods to EU Consumers would navigate to in Check mode" in {
+
+          forAll(arbitrary[UserAnswers]) {
+            baseAnswers =>
+
+              val answers = baseAnswers
+                .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
+
+              EuCountryPage(countryIndex).navigate(CheckLoopMode, answers)
+                .mustEqual(SellsGoodsToEUConsumersPage(Index(0)).navigate(CheckLoopMode, answers))
+          }
+        }
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when Sells Goods to EU Consumers has not been answered" - {
+
+        "to Sells Goods to EU Consumers for the same index" in {
+
+          EuCountryPage(countryIndex).navigate(RejoinMode, emptyUserAnswers)
+            .mustEqual(euRoutes.SellsGoodsToEUConsumersController.onPageLoad(RejoinMode, countryIndex))
+        }
+      }
+
+      "when Sells Goods to EU Consumers has been answered" - {
+
+        "to wherever Sells Goods to EU Consumers would navigate to in Check mode" in {
+
+          forAll(arbitrary[UserAnswers]) {
+            baseAnswers =>
+
+              val answers = baseAnswers
+                .set(SellsGoodsToEUConsumersPage(Index(0)), true).success.value
+
+              EuCountryPage(countryIndex).navigate(RejoinMode, answers)
+                .mustEqual(SellsGoodsToEUConsumersPage(Index(0)).navigate(RejoinMode, answers))
+          }
+        }
+      }
+    }
   }
 }

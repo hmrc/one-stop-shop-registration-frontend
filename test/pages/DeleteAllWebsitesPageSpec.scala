@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, CheckMode, Index, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
@@ -95,6 +96,39 @@ class DeleteAllWebsitesPageSpec extends SpecBase with PageBehaviours {
 
         DeleteAllWebsitesPage.navigate(AmendMode, answers)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in RejoinMode" - {
+
+      "to Change Your Registration Page when user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
+          .set(DeleteAllWebsitesPage, true).success.value
+
+        DeleteAllWebsitesPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+      }
+
+      "to Change Your Registration Page when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(WebsitePage(Index(0)), "website1").success.value
+          .set(WebsitePage(Index(1)), "website2").success.value
+          .set(DeleteAllWebsitesPage, false).success.value
+
+        DeleteAllWebsitesPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+      }
+
+      "to Rejoin Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+
+        DeleteAllWebsitesPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
       }
     }
 

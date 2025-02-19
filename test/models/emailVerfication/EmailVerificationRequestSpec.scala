@@ -20,7 +20,7 @@ import base.SpecBase
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsError, JsNull, JsSuccess, Json}
 
 
 class EmailVerificationRequestSpec extends AnyFreeSpec with Matchers with SpecBase {
@@ -90,6 +90,99 @@ class EmailVerificationRequestSpec extends AnyFreeSpec with Matchers with SpecBa
         expectedJson.validate[EmailVerificationRequest] mustEqual JsSuccess(emailVerificationRequest)
       }
 
+      "with fields missing" in {
+
+        val expectedJson = Json.obj()
+
+        expectedJson.validate[EmailVerificationRequest] mustBe a[JsError]
+      }
+
+      "with invalid fields" in {
+
+        val expectedJson = Json.obj(
+          "credId" -> 12345,
+          "continueUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/bank-details",
+          "origin" -> "OSS",
+          "deskproServiceName" -> "one-stop-shop-registration-frontend",
+          "accessibilityStatementUrl" -> "/register-and-pay-vat-on-goods-sold-to-eu-from-northern-ireland",
+          "pageTitle" -> "Register to pay VAT on distance sales of goods from Northern Ireland to the EU",
+          "backUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details",
+          "email" -> Json.obj(
+            "address" -> "email@example.com",
+            "enterUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
+          ),
+          "lang" -> "en"
+        )
+
+        expectedJson.validate[EmailVerificationRequest] mustBe a[JsError]
+      }
+
+      "with null fields" in {
+
+        val expectedJson = Json.obj(
+          "credId" -> JsNull,
+          "continueUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/bank-details",
+          "origin" -> "OSS",
+          "deskproServiceName" -> "one-stop-shop-registration-frontend",
+          "accessibilityStatementUrl" -> "/register-and-pay-vat-on-goods-sold-to-eu-from-northern-ireland",
+          "pageTitle" -> "Register to pay VAT on distance sales of goods from Northern Ireland to the EU",
+          "backUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details",
+          "email" -> Json.obj(
+            "address" -> "email@example.com",
+            "enterUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
+          ),
+          "lang" -> "en"
+        )
+
+        expectedJson.validate[EmailVerificationRequest] mustBe a[JsError]
+      }
+
+    }
+  }
+
+  ".VerifyEmail" - {
+
+    "must serialise and deserialise to / from VerifyEmail" in {
+
+      val json = Json.obj(
+        "address" -> "email@example.com",
+        "enterUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
+      )
+
+      val expectedResult = VerifyEmail(
+        address = "email@example.com",
+        enterUrl = "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
+      )
+
+      Json.toJson(expectedResult) mustBe json
+      json.validate[VerifyEmail] mustBe JsSuccess(expectedResult)
+    }
+
+    "must handle missing fields during deserialization" in {
+
+      val json = Json.obj()
+
+      json.validate[VerifyEmail] mustBe a[JsError]
+    }
+
+    "must handle invalid fields during deserialization" in {
+
+      val json = Json.obj(
+        "address" -> 12345,
+        "enterUrl" -> "/pay-vat-on-goods-sold-to-eu/northern-ireland-register/business-contact-details"
+      )
+
+      json.validate[VerifyEmail] mustBe a[JsError]
+    }
+
+    "must handle null fields during deserialization" in {
+
+      val json = Json.obj(
+        "address" -> "email@example.com",
+        "enterUrl" -> JsNull
+      )
+
+      json.validate[VerifyEmail] mustBe a[JsError]
     }
   }
 

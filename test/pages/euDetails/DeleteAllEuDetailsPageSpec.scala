@@ -18,8 +18,9 @@ package pages.euDetails
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Country, Index}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, CheckMode, Country, Index, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class DeleteAllEuDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -102,6 +103,43 @@ class DeleteAllEuDetailsPageSpec extends SpecBase with PageBehaviours {
         val answers = emptyUserAnswers
 
         DeleteAllEuDetailsPage.navigate(AmendMode, answers)
+          .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in RejoinMode" - {
+
+      "to Change Your Registration Page when user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(EuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+          .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
+          .set(VatRegisteredPage(Index(0)), true).success.value
+          .set(EuVatNumberPage(Index(0)), "DE123456789").success.value
+          .set(DeleteAllEuDetailsPage, true).success.value
+
+        DeleteAllEuDetailsPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+      }
+
+      "to Change Your Registration when user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(EuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+          .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
+          .set(VatRegisteredPage(Index(0)), true).success.value
+          .set(EuVatNumberPage(Index(0)), "DE123456789").success.value
+          .set(DeleteAllEuDetailsPage, false).success.value
+
+        DeleteAllEuDetailsPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+      }
+
+      "to Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+
+        DeleteAllEuDetailsPage.navigate(RejoinMode, answers)
           .mustEqual(routes.JourneyRecoveryController.onPageLoad())
       }
     }

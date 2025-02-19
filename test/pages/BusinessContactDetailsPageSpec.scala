@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, BusinessContactDetails, CheckMode, NormalMode}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, BusinessContactDetails, CheckMode, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
@@ -56,6 +57,15 @@ class BusinessContactDetailsPageSpec extends SpecBase with PageBehaviours {
 
         BusinessContactDetailsPage.navigate(AmendMode, emptyUserAnswers)
           .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Rejoin Registration" in {
+
+        BusinessContactDetailsPage.navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
       }
     }
   }

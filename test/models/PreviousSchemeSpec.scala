@@ -16,13 +16,18 @@
 
 package models
 
+import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatest.OptionValues
-import play.api.libs.json.{JsError, Json, JsString}
+import play.api.i18n.Messages
+import play.api.libs.json.{JsError, JsString, Json}
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
 class PreviousSchemeSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
@@ -58,6 +63,36 @@ class PreviousSchemeSpec extends AnyFreeSpec with Matchers with ScalaCheckProper
         previousSchemePage =>
 
           Json.toJson(previousSchemePage) mustEqual JsString(previousSchemePage.toString)
+      }
+    }
+
+    "values must contain all PreviousScheme instances" in {
+      PreviousScheme.values must contain allElementsOf Seq(
+        PreviousScheme.OSSU,
+        PreviousScheme.OSSNU,
+        PreviousScheme.IOSSWOI,
+        PreviousScheme.IOSSWI
+      )
+    }
+
+    "iossValues must contain only IOSS-related PreviousScheme instances" in {
+      PreviousScheme.iossValues must contain allElementsOf Seq(
+        PreviousScheme.IOSSWOI,
+        PreviousScheme.IOSSWI
+      )
+    }
+
+    "options must generate the correct RadioItems" in {
+      implicit val messages: Messages = mock[Messages]
+      when(messages.apply(any[String], any())).thenReturn("mocked_message")
+
+      val options = PreviousScheme.options
+
+      options.zipWithIndex.foreach {
+        case (radioItem, index) =>
+          radioItem.content mustEqual Text("mocked_message")
+          radioItem.value mustBe Some(PreviousScheme.values(index).toString)
+          radioItem.id mustBe Some(s"value_$index")
       }
     }
   }

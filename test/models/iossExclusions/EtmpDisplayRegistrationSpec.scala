@@ -17,7 +17,7 @@
 package models.iossExclusions
 
 import base.SpecBase
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsError, JsSuccess, Json}
 
 class EtmpDisplayRegistrationSpec extends SpecBase {
 
@@ -37,6 +37,13 @@ class EtmpDisplayRegistrationSpec extends SpecBase {
 
       Json.toJson(expectedResult) mustBe json
       json.validate[EtmpDisplayRegistration] mustBe JsSuccess(expectedResult)
+    }
+
+    "handle empty data object" in {
+
+      val json = Json.obj()
+
+      json.validate[EtmpDisplayRegistration] mustBe a[JsError]
     }
   }
 }

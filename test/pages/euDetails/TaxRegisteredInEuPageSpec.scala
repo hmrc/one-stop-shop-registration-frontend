@@ -17,10 +17,11 @@
 package pages.euDetails
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
-import controllers.euDetails.{routes => euRoutes}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import controllers.euDetails.routes as euRoutes
 import controllers.routes
-import models.{AmendMode, CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
@@ -173,6 +174,19 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
       "when the answer is no" - {
 
+        "to Delete All EU details if there are eu details in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(EuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+            .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
+            .set(VatRegisteredPage(Index(0)), true).success.value
+            .set(EuVatNumberPage(Index(0)), "DE123456789").success.value
+            .set(TaxRegisteredInEuPage, false).success.value
+
+          TaxRegisteredInEuPage.navigate(AmendMode, answers)
+            .mustEqual(euRoutes.DeleteAllEuDetailsController.onPageLoad(AmendMode))
+        }
+
         "to Change Your Registration" in {
 
           val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
@@ -188,6 +202,72 @@ class TaxRegisteredInEuPageSpec extends SpecBase with PageBehaviours {
 
           TaxRegisteredInEuPage.navigate(AmendMode, emptyUserAnswers)
             .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "and country details have already been given" - {
+
+          "to Check Your Answers" in {
+
+            val answers =
+              emptyUserAnswers
+                .set(TaxRegisteredInEuPage, true).success.value
+                .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
+                .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
+                .set(VatRegisteredPage(Index(0)), false).success.value
+
+            TaxRegisteredInEuPage.navigate(RejoinMode, answers)
+              .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+          }
+        }
+
+        "and no country details have already been given" - {
+
+          "to EU Country (index 0)" in {
+
+            val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, true).success.value
+
+            TaxRegisteredInEuPage.navigate(RejoinMode, answers)
+              .mustEqual(euRoutes.EuCountryController.onPageLoad(RejoinMode, Index(0)))
+          }
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Delete All EU details if there are eu details in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(EuCountryPage(Index(0)), Country("DE", "Germany")).success.value
+            .set(SellsGoodsToEUConsumersPage(Index(0)), false).success.value
+            .set(VatRegisteredPage(Index(0)), true).success.value
+            .set(EuVatNumberPage(Index(0)), "DE123456789").success.value
+            .set(TaxRegisteredInEuPage, false).success.value
+
+          TaxRegisteredInEuPage.navigate(RejoinMode, answers)
+            .mustEqual(euRoutes.DeleteAllEuDetailsController.onPageLoad(RejoinMode))
+        }
+
+        "to Change Your Registration" in {
+
+          val answers = emptyUserAnswers.set(TaxRegisteredInEuPage, false).success.value
+
+          TaxRegisteredInEuPage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is empty" - {
+
+        "to Rejoin Journey Recovery" in {
+
+          TaxRegisteredInEuPage.navigate(RejoinMode, emptyUserAnswers)
+            .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
         }
       }
     }

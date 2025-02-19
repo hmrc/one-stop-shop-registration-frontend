@@ -17,7 +17,7 @@
 package pages.euDetails
 
 import base.SpecBase
-import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode}
+import models.{AmendLoopMode, AmendMode, CheckLoopMode, CheckMode, Index, NormalMode, RejoinLoopMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
@@ -82,6 +82,26 @@ class EuSendGoodsTradingNamePageSpec extends SpecBase with PageBehaviours {
         val address = arbitraryInternationalAddress.arbitrary.sample.value
         EuSendGoodsTradingNamePage(index).navigate(AmendLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
           EuSendGoodsAddressPage(index).navigate(AmendLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
+      }
+    }
+
+    "must navigate in Rejoin Mode" - {
+      "to Eu Send Goods Address" in {
+        EuSendGoodsTradingNamePage(index).navigate(RejoinMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(RejoinMode, index)
+      }
+    }
+
+    "must navigate in Rejoin Loop Mode" - {
+      "to Eu Send Goods Address if it hasn't been answered" in {
+        EuSendGoodsTradingNamePage(index).navigate(RejoinLoopMode, emptyUserAnswers) mustBe
+          controllers.euDetails.routes.EuSendGoodsAddressController.onPageLoad(RejoinLoopMode, index)
+      }
+
+      "to wherever Eu Send Goods Address navigates if it has been answered" in {
+        val address = arbitraryInternationalAddress.arbitrary.sample.value
+        EuSendGoodsTradingNamePage(index).navigate(RejoinLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value) mustBe
+          EuSendGoodsAddressPage(index).navigate(RejoinLoopMode, emptyUserAnswers.set(EuSendGoodsAddressPage(index), address).success.value)
       }
     }
 

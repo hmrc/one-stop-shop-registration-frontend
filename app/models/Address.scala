@@ -46,16 +46,6 @@ case class UkAddress(
 
   val country: Country = Country("GB", "United Kingdom")
 
-  def apply( line1: String,
-             line2: Option[String],
-             townOrCity: String,
-             county: Option[String],
-             postCode: String): UkAddress = new UkAddress(normaliseSpaces(line1),
-                                                          normaliseSpaces(line2),
-                                                          normaliseSpaces(townOrCity),
-                                                          normaliseSpaces(county),
-                                                          normaliseSpaces(postCode))
-
 }
 
 object UkAddress {
@@ -91,6 +81,16 @@ object UkAddress {
       ) ++ line2Obj ++ countyObj
     }
   }
+
+  def apply(line1: String,
+            line2: Option[String],
+            townOrCity: String,
+            county: Option[String],
+            postCode: String): UkAddress = new UkAddress(normaliseSpaces(line1),
+                                                          normaliseSpaces(line2),
+                                                          normaliseSpaces(townOrCity),
+                                                          normaliseSpaces(county),
+                                                          normaliseSpaces(postCode))
 }
 
 case class DesAddress( line1: String,

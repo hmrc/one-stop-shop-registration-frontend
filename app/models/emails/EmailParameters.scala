@@ -16,12 +16,18 @@
 
 package models.emails
 
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{JsResult, JsValue, Json, Reads, Writes}
 
 sealed trait EmailParameters
 
 object EmailParameters {
-  implicit val reads: Reads[EmailParameters] = Json.reads[EmailParameters]
+  implicit val reads: Reads[EmailParameters] = new Reads[EmailParameters] {
+    override def reads(json: JsValue): JsResult[EmailParameters] = {
+      json.validate[RegistrationConfirmation].orElse(
+        json.validate[AmendRegistrationConfirmation]
+      )
+    }
+  }
   implicit val writes: Writes[EmailParameters] = Writes[EmailParameters] {
   case registration: RegistrationConfirmation =>
       Json.toJson(registration)(RegistrationConfirmation.writes)

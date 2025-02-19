@@ -17,17 +17,21 @@
 package models
 
 import generators.Generators
-import models.Quarter._
+import models.Quarter.*
+import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatest.EitherValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.i18n.Messages
 import play.api.mvc.{PathBindable, QueryStringBindable}
 
 import java.time.LocalDate
-import java.time.Month._
+import java.time.Month.*
+import java.time.format.DateTimeFormatter
 
 class PeriodSpec
   extends AnyFreeSpec
@@ -38,6 +42,7 @@ class PeriodSpec
 
   private val pathBindable = implicitly[PathBindable[Period]]
   private val queryBindable = implicitly[QueryStringBindable[Period]]
+  private val year = 2024
 
   "Period" - {
     "pathBindable" - {
@@ -157,5 +162,39 @@ class PeriodSpec
     }
   }
 
+
+  "displayText" - {
+
+    "return formatted date range correctly" in {
+
+      implicit val messages: Messages = mock[Messages]
+      when(messages("site.to")).thenReturn("to")
+
+
+      val quarter = Q1
+      val firstDay = LocalDate.of(year, quarter.startMonth, 1)
+      val lastDay = firstDay.plusMonths(3).minusDays(1)
+
+      val firstDayFormatter = DateTimeFormatter.ofPattern("d MMMM")
+      val lastDayFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+
+      val expectedText = s"${firstDay.format(firstDayFormatter)} to ${lastDay.format(lastDayFormatter)}"
+
+      val period = Period(year, quarter)
+      period.displayText mustBe expectedText
+    }
+  }
+
+  "getPreviousPeriod" - {
+
+    val previousYear = 2023
+
+    "return the correct previous quarter" in {
+      Period(year, Q4).getPreviousPeriod mustBe Period(year, Q3)
+      Period(year, Q3).getPreviousPeriod mustBe Period(year, Q2)
+      Period(year, Q2).getPreviousPeriod mustBe Period(year, Q1)
+      Period(year, Q1).getPreviousPeriod mustBe Period(previousYear, Q4)
+    }
+  }
 
 }

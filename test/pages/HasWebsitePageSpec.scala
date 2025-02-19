@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class HasWebsitePageSpec extends SpecBase with PageBehaviours {
@@ -157,6 +158,59 @@ class HasWebsitePageSpec extends SpecBase with PageBehaviours {
 
         HasWebsitePage.navigate(AmendMode, emptyUserAnswers)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "to Website (index 0) when there are no websites in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasWebsitePage, true).success.value
+
+          HasWebsitePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.WebsiteController.onPageLoad(RejoinMode, Index(0)))
+        }
+
+        "to Add Website when there are websites in the user's answers" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(WebsitePage(Index(0)), "foo").success.value
+              .set(HasWebsitePage, true).success.value
+
+          HasWebsitePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.AddWebsiteController.onPageLoad(RejoinMode))
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Delete All Websites when there are websites in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasWebsitePage, false).success.value
+            .set(WebsitePage(Index(0)), "foo").success.value
+            .set(WebsitePage(Index(1)), "bar").success.value
+
+          HasWebsitePage.navigate(RejoinMode, answers)
+            .mustEqual(routes.DeleteAllWebsitesController.onPageLoad(RejoinMode))
+        }
+
+        "to Change Your Registration when there are no websites in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasWebsitePage, false).success.value
+
+          HasWebsitePage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "to Amend Journey recovery when the answer is empty" in {
+
+        HasWebsitePage.navigate(RejoinMode, emptyUserAnswers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
       }
     }
   }

@@ -20,7 +20,7 @@ import base.SpecBase
 import models.emailVerification.EmailVerificationResponse
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsError, JsNull, JsSuccess, Json}
 
 
 class EmailVerificationResponseSpec extends AnyFreeSpec with Matchers with SpecBase {
@@ -42,6 +42,31 @@ class EmailVerificationResponseSpec extends AnyFreeSpec with Matchers with SpecB
 
         Json.toJson(emailVerificationResponse) mustEqual expectedJson
         expectedJson.validate[EmailVerificationResponse] mustEqual JsSuccess(emailVerificationResponse)
+      }
+
+      "with fields missing" in {
+
+        val expectedJson = Json.obj()
+
+        expectedJson.validate[EmailVerificationResponse] mustBe a[JsError]
+      }
+
+      "with invalid fields" in {
+
+        val expectedJson = Json.obj(
+          "redirectUri" -> 12345
+        )
+
+        expectedJson.validate[EmailVerificationResponse] mustBe a[JsError]
+      }
+
+      "with null fields" in {
+
+        val expectedJson = Json.obj(
+          "redirectUri" -> JsNull
+        )
+
+        expectedJson.validate[EmailVerificationResponse] mustBe a[JsError]
       }
 
     }

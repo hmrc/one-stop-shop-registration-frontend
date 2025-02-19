@@ -17,7 +17,7 @@
 package pages.previousRegistrations
 
 import base.SpecBase
-import models.{AmendMode, CheckMode, Index, NormalMode, PreviousSchemeType}
+import models.{AmendMode, CheckMode, Index, NormalMode, PreviousSchemeType, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
@@ -86,6 +86,25 @@ class PreviousSchemeTypePageSpec extends SpecBase with PageBehaviours {
 
         PreviousSchemeTypePage(index, index).navigate(AmendMode, answers)
           .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(AmendMode, index, index))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to OSS scheme number when OSS is selected" in {
+
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.OSS).success.value
+
+        PreviousSchemeTypePage(index, index).navigate(RejoinMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousOssNumberController.onPageLoad(RejoinMode, index, index))
+      }
+
+      "to IOSS scheme when IOSS is selected" in {
+
+        val answers = emptyUserAnswers.set(PreviousSchemeTypePage(index, index), PreviousSchemeType.IOSS).success.value
+
+        PreviousSchemeTypePage(index, index).navigate(RejoinMode, answers)
+          .mustEqual(controllers.previousRegistrations.routes.PreviousIossSchemeController.onPageLoad(RejoinMode, index, index))
       }
     }
 

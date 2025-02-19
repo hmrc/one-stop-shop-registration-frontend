@@ -18,7 +18,7 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import models.{AmendMode, CheckMode, Index, NormalMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 
@@ -58,6 +58,15 @@ class TradingNamePageSpec extends SpecBase with PageBehaviours {
 
         TradingNamePage(index).navigate(AmendMode, emptyUserAnswers)
           .mustBe(routes.AddTradingNameController.onPageLoad(AmendMode))
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "to Add Trading Name" in {
+
+        TradingNamePage(index).navigate(RejoinMode, emptyUserAnswers)
+          .mustBe(routes.AddTradingNameController.onPageLoad(RejoinMode))
       }
     }
 

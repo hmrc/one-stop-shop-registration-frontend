@@ -18,8 +18,9 @@ package pages
 
 import base.SpecBase
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, CheckMode, Index}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import models.{AmendMode, CheckMode, Index, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
@@ -95,6 +96,39 @@ class DeleteAllTradingNamesPageSpec extends SpecBase with PageBehaviours {
 
         DeleteAllTradingNamesPage.navigate(AmendMode, answers)
           .mustEqual(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+      }
+    }
+
+    "must navigate in Rejoin" - {
+
+      "to Change Your Registration Page when the user answers Yes" in {
+
+        val answers = emptyUserAnswers
+          .set(TradingNamePage(Index(0)), "foo trading name").success.value
+          .set(TradingNamePage(Index(1)), "bar trading name").success.value
+          .set(DeleteAllTradingNamesPage, true).success.value
+
+        DeleteAllTradingNamesPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+      }
+
+      "to Change Your Registration Page when the user answers No" in {
+
+        val answers = emptyUserAnswers
+          .set(TradingNamePage(Index(0)), "foo trading Name").success.value
+          .set(TradingNamePage(Index(1)), "bar trading Name").success.value
+          .set(DeleteAllTradingNamesPage, false).success.value
+
+        DeleteAllTradingNamesPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+      }
+
+      "to Rejoin Journey Recovery Page when the user submits no answer" in {
+
+        val answers = emptyUserAnswers
+
+        DeleteAllTradingNamesPage.navigate(RejoinMode, answers)
+          .mustEqual(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
       }
     }
   }

@@ -17,10 +17,11 @@
 package pages
 
 import base.SpecBase
-import controllers.euDetails.{routes => euRoutes}
-import controllers.amend.{routes => amendRoutes}
+import controllers.euDetails.routes as euRoutes
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import models.{AmendMode, CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, NormalMode, RejoinMode}
 
 class CommencementDatePageSpec extends SpecBase {
 
@@ -44,5 +45,10 @@ class CommencementDatePageSpec extends SpecBase {
         .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
     }
 
+    "must navigate in Rejoin mode to Rejoin Registration" in {
+
+      CommencementDatePage.navigate(RejoinMode, emptyUserAnswers)
+        .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+    }
   }
 }
