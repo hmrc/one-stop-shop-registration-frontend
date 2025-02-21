@@ -67,7 +67,7 @@ class StartRejoinJourneyController @Inject()(
                       updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
                       updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
                       _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
-                    } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+                    } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url) // TODO check what to do for bounced email
                 }
 
               case Left(error) =>

@@ -17,16 +17,14 @@
 package controllers.actions
 
 import connectors.RegistrationConnector
+import controllers.amend.routes as amendRoutes
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, Mode}
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
+import models.{AmendMode, Mode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.CheckJourneyRecovery.determineJourneyRecovery
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,8 +50,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
         }
       case Some(data) =>
         if (mode.exists(_.isInAmendOrRejoin)) {
-          val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.session)
-          registrationConnector.getRegistration()(hc) flatMap {
+          request.registration match {
             case Some(registration) =>
               Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, Some(registration), data)).toFuture
             case None =>

@@ -66,12 +66,11 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
         "must redirect to Journey Recovery when there no userAnswers present" in {
 
-          val application =
-            applicationBuilder().build()
+          val application = applicationBuilder().build()
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None)
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None)
             val connector = application.injector.instanceOf[RegistrationConnector]
             val action = new Harness(NormalMode, connector)
 
@@ -83,12 +82,11 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
         "must redirect to Journey Recovery On Missing Answers when there are empty userAnswers present" in {
 
-          val application =
-            applicationBuilder().build()
+          val application = applicationBuilder().build()
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(emptyUserAnswers))
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers))
             val connector = application.injector.instanceOf[RegistrationConnector]
             val action = new Harness(NormalMode, connector)
 
@@ -100,8 +98,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
         "must return Right(AuthenticatedDataRequest) with no Registration when there is data present" in {
 
-          val application =
-            applicationBuilder().build()
+          val application = applicationBuilder().build()
 
           running(application) {
 
@@ -109,7 +106,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
             val connector = application.injector.instanceOf[RegistrationConnector]
             val action = new Harness(NormalMode, connector)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(basicUserAnswersWithVatInfo))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))).futureValue
 
             result mustBe Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo))
           }
@@ -122,10 +119,9 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
           when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
 
-          val application =
-            applicationBuilder()
-              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-              .build()
+          val application = applicationBuilder()
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .build()
 
           running(application) {
 
@@ -133,7 +129,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
             val connector = application.injector.instanceOf[RegistrationConnector]
             val action = new Harness(AmendMode, connector)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(basicUserAnswersWithVatInfo))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))).futureValue
 
             result mustBe Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(RegistrationData.registration), basicUserAnswersWithVatInfo))
             verify(connector, times(1)).getRegistration()(any())
@@ -144,14 +140,13 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
           when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(None)
 
-          val application =
-            applicationBuilder()
-              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-              .build()
+          val application = applicationBuilder()
+            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+            .build()
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
             val connector = application.injector.instanceOf[RegistrationConnector]
             val action = new Harness(AmendMode, connector)
 
@@ -164,12 +159,11 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
         "must redirect to Amend Journey Recovery when there are empty userAnswers present" in {
 
-          val application =
-            applicationBuilder().build()
+          val application = applicationBuilder().build()
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(emptyUserAnswers))
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers))
             val connector = application.injector.instanceOf[RegistrationConnector]
             val action = new Harness(AmendMode, connector)
 
@@ -189,8 +183,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
       "must redirect to Registered For Oss In Eu Controller when there no userAnswers present" in {
 
-        val application =
-          applicationBuilder().build()
+        val application = applicationBuilder().build()
 
         running(application) {
 
@@ -205,8 +198,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
       "must return Right(UnauthenticatedDataRequest) when there are userAnswers present" in {
 
-        val application =
-          applicationBuilder().build()
+        val application = applicationBuilder().build()
 
         running(application) {
 

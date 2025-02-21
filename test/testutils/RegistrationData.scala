@@ -100,7 +100,8 @@ object RegistrationData extends Generators with EitherValues {
       bankDetails = BankDetails("Account name", Some(bic), iban),
       isOnlineMarketplace = false,
       niPresence = Some(PrincipalPlaceOfBusinessInNi),
-      dateOfFirstSale = Some(LocalDate.now())
+      dateOfFirstSale = Some(LocalDate.now()),
+      unusableStatus = None
     )
 
 

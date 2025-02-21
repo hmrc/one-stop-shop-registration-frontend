@@ -17,23 +17,24 @@
 package controllers.actions
 
 import config.FrontendAppConfig
-import controllers.auth.{routes => authRoutes}
+import connectors.RegistrationConnector
+import controllers.auth.routes as authRoutes
 import controllers.routes
 import logging.Logging
 import models.requests.{AuthenticatedIdentifierRequest, SessionRequest}
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.mvc.*
+import play.api.mvc.Results.*
 import services.UrlBuilderService
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
-import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,14 +42,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthenticatedIdentifierAction @Inject()(
                                                override val authConnector: AuthConnector,
                                                config: FrontendAppConfig,
-                                               urlBuilder: UrlBuilderService
+                                               urlBuilder: UrlBuilderService,
+                                               registrationConnector: RegistrationConnector
                                              )
                                              (implicit val executionContext: ExecutionContext)
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
     with AuthorisedFunctions
     with Logging {
 
-  private lazy val redirectPolicy = (OnlyRelative | AbsoluteWithHostnameFromAllowlist(config.allowedRedirectUrls: _*))
+  private lazy val redirectPolicy = OnlyRelative | AbsoluteWithHostnameFromAllowlist(config.allowedRedirectUrls: _*)
 
   private type IdentifierActionResult[A] = Future[Either[Result, AuthenticatedIdentifierRequest[A]]]
 
@@ -69,15 +71,16 @@ class AuthenticatedIdentifierAction @Inject()(
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ =>
         findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) => Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments)).toFuture
-          case _      => throw InsufficientEnrolments()
+          case Some(vrn) =>
+            makeAuthRequest(request, credentials, enrolments, vrn)
+          case _ => throw InsufficientEnrolments()
         }
 
       case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence =>
         findVrnFromEnrolments(enrolments) match {
           case Some(vrn) =>
             if (confidence >= ConfidenceLevel.L200) {
-              Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments)).toFuture
+              makeAuthRequest(request, credentials, enrolments, vrn)
             } else {
               throw InsufficientConfidenceLevel()
             }
@@ -128,6 +131,13 @@ class AuthenticatedIdentifierAction @Inject()(
     }
   }
 
+  private def makeAuthRequest[A](request: Request[A], credentials: Credentials, enrolments: Enrolments, vrn: Vrn)
+                                (implicit hc: HeaderCarrier): IdentifierActionResult[A] = {
+    for {
+      maybeRegistration <- registrationConnector.getRegistration()
+    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration))
+  }
+
   private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] =
     enrolments.enrolments.find(_.key == "HMRC-MTD-VAT")
       .flatMap {
@@ -143,7 +153,7 @@ class AuthenticatedIdentifierAction @Inject()(
     Left(Redirect(
       config.mfaUpliftUrl,
       Map(
-        "origin"      -> Seq(config.origin),
+        "origin" -> Seq(config.origin),
         "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url)
       )
     )).toFuture
@@ -152,10 +162,10 @@ class AuthenticatedIdentifierAction @Inject()(
     Left(Redirect(
       config.ivUpliftUrl,
       Map(
-        "origin"          -> Seq(config.origin),
+        "origin" -> Seq(config.origin),
         "confidenceLevel" -> Seq(ConfidenceLevel.L200.toString),
-        "completionURL"   -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url),
-        "failureURL"      -> Seq(urlBuilder.ivFailureUrl(request))
+        "completionURL" -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url),
+        "failureURL" -> Seq(urlBuilder.ivFailureUrl(request))
       )
     )).toFuture
 }

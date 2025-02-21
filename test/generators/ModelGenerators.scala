@@ -17,11 +17,11 @@
 package generators
 
 import connectors.SavedUserAnswers
-import models._
+import models.*
+import models.domain.*
 import models.domain.ModelHelpers.normaliseSpaces
+import models.domain.returns.*
 import models.domain.returns.VatOnSalesChoice.Standard
-import models.domain.returns._
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, PreviousSchemeNumbers, TradeDetails}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}
 import org.scalacheck.Arbitrary.arbitrary

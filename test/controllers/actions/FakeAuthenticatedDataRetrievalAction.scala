@@ -24,7 +24,7 @@ import play.api.mvc.Result
 import repositories.AuthenticatedUserAnswersRepository
 import services.DataMigrationService
 import uk.gov.hmrc.domain.Vrn
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +37,7 @@ class FakeAuthenticatedDataRetrievalAction(dataToReturn: Option[UserAnswers], vr
         request.request,
         request.credentials,
         vrn,
+        None,
         dataToReturn
       )
     ).toFuture
