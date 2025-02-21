@@ -36,7 +36,7 @@ class CoreRegistrationAuditModelSpec extends SpecBase with Matchers {
 
       val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
 
-      implicit val dataRequest: AuthenticatedOptionalDataRequest[AnyContent] = AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(emptyUserAnswers))
+      implicit val dataRequest: AuthenticatedOptionalDataRequest[AnyContent] = AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(emptyUserAnswers))
 
       val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 

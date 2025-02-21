@@ -66,12 +66,13 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
     "when other country registration validation is enabled" - {
 
       "must redirect to RejoinAlreadyRegisteredOtherCountry page when matchType=OtherMSNETPActiveNETP" in {
+        
         val app = applicationBuilder(None)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -84,12 +85,13 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
       }
 
       "must redirect to RejoinAlreadyRegisteredOtherCountry page when matchType=FixedEstablishmentActiveNETP" in {
+        
         val app = applicationBuilder(None)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -102,12 +104,13 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
       }
 
       "must redirect to CannotRejoinQuarantinedCountryController page when matchType=OtherMSNETPQuarantinedNETP" in {
+        
         val app = applicationBuilder(None)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -121,12 +124,13 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
       }
 
       "must redirect to CannotRejoinQuarantinedCountryController page when matchType=FixedEstablishmentQuarantinedNETP" in {
+        
         val app = applicationBuilder(None)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -140,12 +144,13 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
       }
 
       "must redirect to CannotRejoinQuarantinedCountryController page when exclusion status code is 4" in {
+        
         val app = applicationBuilder(None)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -159,12 +164,13 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
       }
 
       "must return None when matchType=TransferringMSID" in {
+        
         val app = applicationBuilder(None)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -178,13 +184,15 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
     }
 
     "when other country registration validation is disabled" - {
+      
       "must return None" in {
+        
         val app = applicationBuilder(None)
           .configure("other-country-reg-validation-enabled" -> "false")
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, Some(basicUserAnswersWithVatInfo))
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 

@@ -19,6 +19,7 @@ package controllers.actions
 import base.SpecBase
 import com.google.inject.Inject
 import config.FrontendAppConfig
+import connectors.RegistrationConnector
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -26,16 +27,18 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{Action, AnyContent, DefaultActionBuilder, Results}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.UrlBuilderService
-import testutils.TestAuthRetrievals._
+import testutils.RegistrationData
+import testutils.TestAuthRetrievals.*
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
-import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 import uk.gov.hmrc.play.bootstrap.binders.OnlyRelative
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
+import utils.FutureSyntax.FutureOps
 
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,10 +54,14 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
     def onPageLoad(): Action[AnyContent] = (defaultAction andThen authAction) { _ => Results.Ok }
   }
 
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  private val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+
+  private val registration: Registration = RegistrationData.registration
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockAuthConnector)
+    Mockito.reset(mockRegistrationConnector)
   }
 
   "Auth Action" - {
@@ -71,14 +78,16 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(testCredentials) ~ vatEnrolment ~ Some(Organisation) ~ ConfidenceLevel.L50))
 
-            val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder)
+            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
+
+            val action = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, urlBuilder, mockRegistrationConnector)
             val controller = new Harness(action, actionBuilder)
             val result = controller.onPageLoad()(fakeRequest)
 
@@ -97,7 +106,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -123,7 +132,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -149,7 +158,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -177,7 +186,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -204,7 +213,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -231,7 +240,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
             when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
               .thenReturn(Future.successful(None ~ Enrolments(Set.empty) ~ Some(Individual) ~ ConfidenceLevel.L50))
@@ -260,7 +269,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new MissingBearerToken), appConfig, urlBuilder)
@@ -284,12 +293,12 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new BearerTokenExpired), appConfig, urlBuilder)
             val controller = new Harness(authAction, actionBuilder)
-            val request    = FakeRequest(GET, "/foo")
+            val request = FakeRequest(GET, "/foo")
             val result = controller.onPageLoad()(request)
 
             status(result) mustBe SEE_OTHER
@@ -309,7 +318,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAuthProvider), appConfig, urlBuilder)
@@ -333,7 +342,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAffinityGroup), appConfig, urlBuilder)
@@ -357,7 +366,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new IncorrectCredentialStrength), appConfig, urlBuilder)
@@ -374,7 +383,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
       "the connector returns other AuthorisationException" - {
 
-        val exceptions = List( new InternalError(), new FailedRelationship(),  IncorrectNino)
+        val exceptions = List(new InternalError(), new FailedRelationship(), IncorrectNino)
         exceptions.foreach { e =>
           s"$e must redirect the user to an Unauthorised page" in {
 
@@ -413,7 +422,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -438,7 +447,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -463,7 +472,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -488,7 +497,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -514,7 +523,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -540,7 +549,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
             .build()
 
           running(application) {
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
@@ -566,7 +575,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
             when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
               .thenReturn(Future.successful(None ~ Enrolments(Set.empty) ~ Some(Individual) ~ ConfidenceLevel.L50))
@@ -594,7 +603,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new MissingBearerToken), appConfig, urlBuilder)
@@ -617,12 +626,12 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new BearerTokenExpired), appConfig, urlBuilder)
             val controller = new Harness(authAction, actionBuilder)
-            val request    = FakeRequest(GET, "/foo")
+            val request = FakeRequest(GET, "/foo")
             val result = controller.onPageLoad()(request)
 
             status(result) mustBe SEE_OTHER
@@ -641,7 +650,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAuthProvider), appConfig, urlBuilder)
@@ -664,7 +673,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAffinityGroup), appConfig, urlBuilder)
@@ -687,7 +696,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
           running(application) {
             val urlBuilder = application.injector.instanceOf[UrlBuilderService]
-            val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+            val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
             val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new IncorrectCredentialStrength), appConfig, urlBuilder)
@@ -704,7 +713,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
       "the connector returns other AuthorisationException" - {
 
-        val exceptions = List( new InternalError(), new FailedRelationship(),  IncorrectNino)
+        val exceptions = List(new InternalError(), new FailedRelationship(), IncorrectNino)
         exceptions.foreach { e =>
           s"$e must redirect the user to an Unauthorised page" in {
 
@@ -717,7 +726,7 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
               val appConfig = application.injector.instanceOf[FrontendAppConfig]
               val actionBuilder = application.injector.instanceOf[DefaultActionBuilder]
 
-              val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(e), appConfig, urlBuilder)
+              val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(e), appConfig, urlBuilder, mockRegistrationConnector)
               val controller = new Harness(authAction, actionBuilder)
               val request = FakeRequest().withHeaders(HeaderNames.xSessionId -> "123")
               val result = controller.onPageLoad()(request)

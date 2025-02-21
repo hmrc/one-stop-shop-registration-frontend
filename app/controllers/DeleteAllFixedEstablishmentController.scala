@@ -18,8 +18,8 @@ package controllers
 
 import cats.data.Validated.Valid
 import connectors.RegistrationConnector
-import controllers.actions._
-import controllers.amend.{routes => amendRoutes}
+import controllers.actions.*
+import controllers.amend.routes as amendRoutes
 import logging.Logging
 import models.euDetails.{EuConsumerSalesMethod, EuDetails}
 import models.{AmendMode, Country, Index, UserAnswers}

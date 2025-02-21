@@ -30,6 +30,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
+// TODO = Add unusableStatus???
 class RegistrationValidationService @Inject()(
                                                dateService: DateService,
                                                registrationService: RegistrationService
