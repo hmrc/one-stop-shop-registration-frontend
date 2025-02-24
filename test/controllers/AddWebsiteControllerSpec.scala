@@ -17,18 +17,19 @@
 package controllers
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
+import controllers.amend.routes as amendRoutes
 import connectors.RegistrationConnector
 import forms.AddWebsiteFormProvider
+import models.domain.Registration
 import models.{AmendMode, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddWebsitePage, WebsitePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
 import viewmodels.checkAnswers.WebsiteSummary
@@ -47,6 +48,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
   private val baseAnswers = basicUserAnswersWithVatInfo.set(WebsitePage(Index(0)), "foo").success.value
 
   private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+  
+  private val registration: Registration = RegistrationData.registration
 
 
   "AddWebsite Controller" - {
@@ -64,8 +67,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
 
@@ -95,8 +98,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
         implicit val msgs: Messages = messages(application)
         val list                    = WebsiteSummary.addToListRows(answers, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
       }
     }
 
@@ -109,8 +112,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -129,7 +132,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) `mustBe` OK
         contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
@@ -155,8 +158,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseAnswers.set(AddWebsitePage, true).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddWebsitePage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` AddWebsitePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -178,8 +181,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
 
@@ -192,8 +195,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -208,8 +211,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -217,10 +220,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of websites" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -228,8 +228,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
 
@@ -242,8 +242,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -258,11 +258,10 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
-
     }
   }
 }

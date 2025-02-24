@@ -19,7 +19,7 @@ package controllers.rejoin
 import cats.data.Validated.{Invalid, Valid}
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import controllers.actions._
+import controllers.actions.*
 import logging.Logging
 import models.RejoinMode
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
@@ -34,7 +34,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import utils.FutureSyntax.FutureOps
-import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.*
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.rejoin.HybridReversalView
 
