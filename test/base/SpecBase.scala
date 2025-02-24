@@ -120,13 +120,18 @@ trait SpecBase
 
   val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None, clock: Option[Clock] = None, mode: Option[Mode] = None): GuiceApplicationBuilder = {
+  protected def applicationBuilder(
+                                    userAnswers: Option[UserAnswers] = None,
+                                    clock: Option[Clock] = None,
+                                    mode: Option[Mode] = None,
+                                    registration: Option[Registration] = None
+                                  ): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[AuthenticatedIdentifierAction].to[FakeAuthenticatedIdentifierAction],
+        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration)),
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers)),
@@ -134,7 +139,7 @@ trait SpecBase
         bind[CheckNiProtocolFilterImpl].toInstance(new FakeCheckNiProtocolFilterImpl()),
         bind[CheckEmailVerificationFilterProvider].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
-        bind[AuthenticatedDataRequiredActionImpl].toInstance(new FakeAuthenticatedDataRequiredAction(userAnswers, mode = mode)),
+        bind[AuthenticatedDataRequiredAction].toInstance(new FakeAuthenticatedDataRequiredActionProvider(userAnswers, registration)),
         bind[Clock].toInstance(clockToBind)
       )
   }

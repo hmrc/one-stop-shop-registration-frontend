@@ -18,6 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
+import models.domain.Registration
 import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.*
@@ -28,7 +29,7 @@ import uk.gov.hmrc.domain.Vrn
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAuthenticatedIdentifierAction extends AuthenticatedIdentifierAction(
+class FakeAuthenticatedIdentifierAction(registration: Option[Registration]) extends AuthenticatedIdentifierAction(
   mock[AuthConnector],
   mock[FrontendAppConfig],
   mock[UrlBuilderService],
@@ -41,6 +42,6 @@ class FakeAuthenticatedIdentifierAction extends AuthenticatedIdentifierAction(
       Credentials("12345-credId", "GGW"),
       Vrn("123456789"),
       Enrolments(Set.empty),
-      None
+      registration
     )))
 }
