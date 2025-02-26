@@ -18,9 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.amend.routes as amendRoutes
-import connectors.RegistrationConnector
 import forms.AddWebsiteFormProvider
-import models.domain.Registration
 import models.{AmendMode, Index, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -31,7 +29,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
 import viewmodels.checkAnswers.WebsiteSummary
 import views.html.AddWebsiteView
 
@@ -47,11 +44,6 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
   private val baseAnswers = basicUserAnswersWithVatInfo.set(WebsitePage(Index(0)), "foo").success.value
 
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-  
-  private val registration: Registration = RegistrationData.registration
-
-
   "AddWebsite Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -61,9 +53,9 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
+        val list = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -94,9 +86,9 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(answers, NormalMode)
+        val list = WebsiteSummary.addToListRows(answers, NormalMode)
 
         status(result) `mustBe` OK
         contentAsString(result) `mustBe` view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
@@ -126,9 +118,9 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
+        val list = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
@@ -175,44 +167,14 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
+        val list = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
         status(result) `mustBe` BAD_REQUEST
         contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addWebsiteRoute)
-
-        val result = route(application, request).value
-
-        status(result) `mustBe` SEE_OTHER
-        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, addWebsiteRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) `mustBe` SEE_OTHER
-        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -230,36 +192,6 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) `mustBe` SEE_OTHER
           redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, addWebsiteAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) `mustBe` SEE_OTHER
-          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, addWebsiteAmendRoute)
-              .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) `mustBe` SEE_OTHER
-          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
     }

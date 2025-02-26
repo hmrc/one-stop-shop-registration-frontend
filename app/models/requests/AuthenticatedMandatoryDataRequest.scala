@@ -28,7 +28,7 @@ case class AuthenticatedMandatoryDataRequest[A](
                                                  vrn: Vrn,
                                                  registration: Registration,
                                                  userAnswers: UserAnswers
-                                               ) extends WrappedRequest[A](request) {
+                                               ) extends WrappedRequest[A](request) with AuthenticatedVrnRequest[A] {
 
   val userId: String = credentials.providerId
 }

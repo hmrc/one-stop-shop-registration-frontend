@@ -18,10 +18,10 @@ package controllers.previousRegistrations
 
 import base.SpecBase
 import forms.previousRegistrations.DeletePreviousSchemeFormProvider
-import models.domain.{PreviousSchemeNumbers, PreviousSchemeDetails}
+import models.domain.{PreviousSchemeDetails, PreviousSchemeNumbers}
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.{Country, Index, NormalMode, PreviousScheme}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,14 +29,13 @@ import pages.previousRegistrations.{DeletePreviousSchemePage, PreviousEuCountryP
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.previousRegistration.PreviousSchemeForCountryQuery
 import repositories.AuthenticatedUserAnswersRepository
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.{DeletePreviousSchemeSummary, PreviousSchemeNumberSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.previousRegistrations.DeletePreviousSchemeView
-
-import scala.concurrent.Future
 
 class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency {
 
@@ -51,8 +50,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(index), previousRegistration.previousEuCountry).success.value
-        .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
-        .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
+      .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
+      .set(PreviousOssNumberPage(index, index), previousSchemeNumbers).success.value
 
   private lazy val deletePreviousSchemeRoute = controllers.previousRegistrations.routes.DeletePreviousSchemeController.onPageLoad(NormalMode, index, index).url
 
@@ -77,8 +76,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
 
         val view = application.injector.instanceOf[DeletePreviousSchemeView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
       }
     }
 
@@ -103,8 +102,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form.fill(true), NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
       }
     }
 
@@ -112,7 +111,7 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -127,8 +126,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
         val result = route(application, request).value
         val expectedAnswers = baseUserAnswers.remove(PreviousSchemeForCountryQuery(index, index)).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeletePreviousSchemePage(index).navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeletePreviousSchemePage(index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -149,8 +148,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeletePreviousSchemePage(index).navigate(NormalMode, baseUserAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeletePreviousSchemePage(index).navigate(NormalMode, baseUserAnswers).url
         verifyNoInteractions(mockSessionRepository)
       }
     }
@@ -178,38 +177,8 @@ class DeletePreviousSchemeControllerSpec extends SpecBase with MockitoSugar with
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deletePreviousSchemeRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, deletePreviousSchemeRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, index, index, country, list, isLastPreviousScheme = true)(request, messages(application)).toString
       }
     }
   }

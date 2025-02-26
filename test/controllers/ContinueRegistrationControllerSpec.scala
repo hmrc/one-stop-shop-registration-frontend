@@ -26,11 +26,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.SavedProgressPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
+import utils.FutureSyntax.FutureOps
 import views.html.ContinueRegistrationView
-
-import scala.concurrent.Future
 
 class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
@@ -52,8 +51,8 @@ class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[ContinueRegistrationView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form)(request, messages(application)).toString
       }
     }
 
@@ -77,8 +76,8 @@ class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "testUrl"
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` "testUrl"
         verifyNoInteractions(saveForLaterConnector)
         verifyNoInteractions(userAnswersRepository)
       }
@@ -89,8 +88,8 @@ class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
       val userAnswersRepository = mock[AuthenticatedUserAnswersRepository]
       val saveForLaterConnector = mock[SaveForLaterConnector]
 
-      when(userAnswersRepository.clear(any())) thenReturn(Future.successful(true))
-      when(saveForLaterConnector.delete()(any())) thenReturn(Future.successful(Right(true)))
+      when(userAnswersRepository.clear(any())) thenReturn true.toFuture
+      when(saveForLaterConnector.delete()(any())) thenReturn Right(true).toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers.set(SavedProgressPage, "testUrl").success.value))
@@ -107,8 +106,8 @@ class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.auth.routes.AuthController.onSignIn().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` controllers.auth.routes.AuthController.onSignIn().url
         verify(saveForLaterConnector, times(1)).delete()(any())
         verify(userAnswersRepository, times(1)).clear(any())
       }
@@ -129,38 +128,8 @@ class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, continueRegistrationRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, continueRegistrationRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm)(request, messages(application)).toString
       }
     }
   }

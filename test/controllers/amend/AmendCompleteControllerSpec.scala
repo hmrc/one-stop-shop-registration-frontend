@@ -19,8 +19,7 @@ package controllers.amend
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import controllers.amend.{routes => amendRoutes}
-import controllers.routes
+import controllers.amend.routes as amendRoutes
 import models.Quarter.{Q1, Q4}
 import models.external.ExternalEntryUrl
 import models.requests.AuthenticatedDataRequest
@@ -34,17 +33,16 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.{EmailConfirmationQuery, OriginalRegistrationQuery}
 import services.{CoreRegistrationValidationService, DateService, PeriodService, RegistrationService}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.amend.AmendCompleteView
 
 import java.time.{Clock, LocalDate, ZoneId}
-import scala.concurrent.Future
-
 
 class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
@@ -59,7 +57,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
   private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
   private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
-  private  val userAnswers = UserAnswers(
+  private val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       BusinessContactDetailsPage.toString -> Json.obj(
@@ -94,11 +92,11 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
         when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         running(application) {
@@ -113,8 +111,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             mockRegistrationService,
             Some(mockRegistration)).futureValue)
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             vrn,
             config.feedbackUrl(request),
             None,
@@ -142,11 +140,11 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -160,8 +158,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             mockRegistrationService,
             Some(mockRegistration)).futureValue)
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             vrn,
             config.feedbackUrl(request),
             None,
@@ -189,10 +187,10 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -206,8 +204,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             Some(mockRegistration)).futureValue)
 
           val view = application.injector.instanceOf[AmendCompleteView]
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             vrn,
             config.feedbackUrl(request),
             None,
@@ -240,11 +238,11 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockForToday)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockForToday)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
@@ -258,9 +256,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             mockRegistrationService,
             Some(mockRegistration)).futureValue)
 
-          status(result) mustEqual OK
+          status(result) `mustBe` OK
 
-          contentAsString(result) mustEqual view(
+          contentAsString(result) `mustBe` view(
             vrn,
             config.feedbackUrl(request),
             None,
@@ -275,11 +273,11 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.of(2021, 10, 1)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.of(2021, 10, 1)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
@@ -308,9 +306,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             mockRegistrationService,
             Some(mockRegistration)).futureValue)
 
-          status(result) mustEqual OK
+          status(result) `mustBe` OK
 
-          contentAsString(result) mustEqual view(
+          contentAsString(result) `mustBe` view(
             vrn,
             config.feedbackUrl(request),
             None,
@@ -318,20 +316,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList
           )(request, messages(application)).toString
-        }
-      }
-
-      "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
-
-        val application = applicationBuilder(userAnswers = None)
-          .overrides(bind[PeriodService].toInstance(periodService))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
-          val result = route(application, request).value
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }

@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckRegistrationFilterImpl(
                                    mode: Option[Mode],
-                                   connector: RegistrationConnector,
+                                   registrationConnector: RegistrationConnector,
                                    frontendAppConfig: FrontendAppConfig,
                                    migrationService: DataMigrationService,
                                    iossExclusionService: IossExclusionService
@@ -90,7 +90,7 @@ class CheckRegistrationFilterImpl(
   private def enrolRegisteredUser(request: AuthenticatedIdentifierRequest[_])
                                  (implicit hc: HeaderCarrier): Future[Option[Result]] = {
 
-    connector.enrolUser().flatMap { response =>
+    registrationConnector.enrolUser().flatMap { response =>
       response.status match {
         case NO_CONTENT =>
           logger.info(s"Successfully retrospectively enrolled user ${request.vrn.vrn}")

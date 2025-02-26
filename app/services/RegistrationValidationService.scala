@@ -16,13 +16,13 @@
 
 package services
 
-import cats.implicits._
+import cats.implicits.*
 import logging.Logging
-import models._
-import models.domain._
+import models.*
+import models.domain.*
 import models.requests.AuthenticatedDataRequest
-import pages._
-import queries._
+import pages.*
+import queries.*
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,7 +30,6 @@ import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-// TODO = Add unusableStatus???
 class RegistrationValidationService @Inject()(
                                                dateService: DateService,
                                                registrationService: RegistrationService

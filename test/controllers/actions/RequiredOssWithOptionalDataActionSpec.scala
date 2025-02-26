@@ -19,7 +19,7 @@ package controllers.actions
 import base.SpecBase
 import controllers.routes
 import models.domain.Registration
-import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest, AuthenticatedOptionalDataRequest, AuthenticatedOssOptionalDataRequest}
+import models.requests.{AuthenticatedOptionalDataRequest, AuthenticatedOssOptionalDataRequest}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest

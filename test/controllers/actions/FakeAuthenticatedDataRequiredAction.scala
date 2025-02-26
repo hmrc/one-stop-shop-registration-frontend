@@ -16,11 +16,9 @@
 
 package controllers.actions
 
-import connectors.RegistrationConnector
 import models.domain.Registration
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
 import models.{Mode, UserAnswers}
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.Result
 import utils.FutureSyntax.*
 
@@ -28,7 +26,7 @@ import java.time.{LocalDate, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeAuthenticatedDataRequiredAction(dataToReturn: Option[UserAnswers], mode: Option[Mode], registration: Option[Registration])
-  extends AuthenticatedDataRequiredActionImpl(mode, mock[RegistrationConnector])(ExecutionContext.Implicits.global) {
+  extends AuthenticatedDataRequiredActionImpl(mode)(ExecutionContext.Implicits.global) {
 
   private val emptyUserAnswers: UserAnswers = UserAnswers("12345-credId", lastUpdated = LocalDate.now.atStartOfDay(ZoneId.systemDefault).toInstant)
 
@@ -44,6 +42,6 @@ class FakeAuthenticatedDataRequiredAction(dataToReturn: Option[UserAnswers], mod
 
 
 class FakeAuthenticatedDataRequiredActionProvider(dataToReturn: Option[UserAnswers], registration: Option[Registration])
-  extends AuthenticatedDataRequiredAction(mock[RegistrationConnector])(ExecutionContext.Implicits.global) {
+  extends AuthenticatedDataRequiredAction()(ExecutionContext.Implicits.global) {
   override def apply(mode: Option[Mode]): FakeAuthenticatedDataRequiredAction = new FakeAuthenticatedDataRequiredAction(dataToReturn, mode, registration)
 }

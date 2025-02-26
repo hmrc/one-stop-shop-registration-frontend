@@ -17,22 +17,19 @@
 package controllers
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
+import controllers.amend.routes as amendRoutes
 import forms.DeleteWebsiteFormProvider
 import models.{AmendMode, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{DeleteWebsitePage, WebsitePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import views.html.DeleteWebsiteView
-
-import scala.concurrent.Future
 
 class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
@@ -47,8 +44,6 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(WebsitePage(index), website).success.value
 
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-
   "DeleteEuVatDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -62,8 +57,8 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[DeleteWebsiteView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, website)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, index, website)(request, messages(application)).toString
       }
     }
 
@@ -71,7 +66,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -88,8 +83,8 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseUserAnswers.remove(WebsitePage(index)).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteWebsitePage(index).navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeleteWebsitePage(index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -98,7 +93,7 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -114,8 +109,8 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteWebsitePage(index).navigate(NormalMode, baseUserAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeleteWebsitePage(index).navigate(NormalMode, baseUserAnswers).url
         verify(mockSessionRepository, never()).set(eqTo(baseUserAnswers))
       }
     }
@@ -135,24 +130,11 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, website)(request, messages(application)).toString
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, index, website)(request, messages(application)).toString
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteWebsiteRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
 
     "must redirect to CheckYourAnswers for a GET if the trading name is not found" in {
 
@@ -163,49 +145,16 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteWebsiteRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
     "in AmendMode" - {
 
-      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, deleteWebsiteAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
       "must redirect to resolve missing Answers for a GET if the trading name is not found" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -213,27 +162,11 @@ class DeleteWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
-
-      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, deleteWebsiteAmendRoute)
-              .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
     }
   }
 }
+

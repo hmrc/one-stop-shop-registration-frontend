@@ -17,17 +17,12 @@
 package controllers.actions
 
 import base.SpecBase
+import controllers.amend.routes as amendRoutes
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
+import models.domain.Registration
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import models.{AmendMode, Mode, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
@@ -37,12 +32,11 @@ import testutils.RegistrationData
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+  private val registration: Registration = RegistrationData.registration
 
-  class Harness(mode: Mode, registrationConnector: RegistrationConnector)
-    extends AuthenticatedDataRequiredActionImpl(Some(mode), registrationConnector) {
+  class Harness(mode: Mode) extends AuthenticatedDataRequiredActionImpl(Some(mode)) {
 
     def callRefine(request: AuthenticatedOptionalDataRequest[_]): Future[Either[Result, AuthenticatedDataRequest[_]]] = refine(request)
   }
@@ -52,11 +46,6 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
     def callRefine(request: UnauthenticatedOptionalDataRequest[_]): Future[Either[Result, UnauthenticatedDataRequest[_]]] = refine(request)
 
   }
-
-  override def beforeEach(): Unit = {
-    Mockito.reset(mockRegistrationConnector)
-  }
-
 
   "AuthenticatedDataRequiredActionImpl" - {
 
@@ -71,12 +60,11 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
           running(application) {
 
             val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None)
-            val connector = application.injector.instanceOf[RegistrationConnector]
-            val action = new Harness(NormalMode, connector)
+            val action = new Harness(NormalMode)
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
+            result `mustBe` Left(Redirect(routes.JourneyRecoveryController.onPageLoad().url))
           }
         }
 
@@ -87,12 +75,11 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
           running(application) {
 
             val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers))
-            val connector = application.injector.instanceOf[RegistrationConnector]
-            val action = new Harness(NormalMode, connector)
+            val action = new Harness(NormalMode)
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers().url))
+            result `mustBe` Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers().url))
           }
         }
 
@@ -103,12 +90,11 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
           running(application) {
 
             val request = FakeRequest(GET, "test/url")
-            val connector = application.injector.instanceOf[RegistrationConnector]
-            val action = new Harness(NormalMode, connector)
+            val action = new Harness(NormalMode)
 
             val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))).futureValue
 
-            result mustBe Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo))
           }
         }
       }
@@ -117,43 +103,31 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
         "must return Right(AuthenticatedDataRequest) with a Registration when there is data present" in {
 
-          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
-          val application = applicationBuilder()
-            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-            .build()
+          val application = applicationBuilder().build()
 
           running(application) {
 
             val request = FakeRequest(GET, "test/url")
-            val connector = application.injector.instanceOf[RegistrationConnector]
-            val action = new Harness(AmendMode, connector)
+            val action = new Harness(AmendMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo))).futureValue
 
-            result mustBe Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(RegistrationData.registration), basicUserAnswersWithVatInfo))
-            verify(connector, times(1)).getRegistration()(any())
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo))
           }
         }
 
         "must redirect to Amend Journey Recovery when there is data present but no registration has been retrieved" in {
 
-          when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(None)
-
-          val application = applicationBuilder()
-            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-            .build()
+          val application = applicationBuilder().build()
 
           running(application) {
 
             val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
-            val connector = application.injector.instanceOf[RegistrationConnector]
-            val action = new Harness(AmendMode, connector)
+            val action = new Harness(AmendMode)
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
-            verify(connector, times(1)).getRegistration()(any())
+            result `mustBe` Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
           }
         }
 
@@ -164,15 +138,13 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
           running(application) {
 
             val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers))
-            val connector = application.injector.instanceOf[RegistrationConnector]
-            val action = new Harness(AmendMode, connector)
+            val action = new Harness(AmendMode)
 
             val result = action.callRefine(request).futureValue
 
-            result mustBe Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
+            result `mustBe` Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad().url))
           }
         }
-
       }
     }
   }
@@ -192,7 +164,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
           val result = action.callRefine(UnauthenticatedOptionalDataRequest(request, testCredentials.providerId, None)).futureValue
 
-          result mustBe Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad().url))
+          result `mustBe` Left(Redirect(routes.RegisteredForOssInEuController.onPageLoad().url))
         }
       }
 
@@ -207,10 +179,10 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar wit
 
           val result = action.callRefine(UnauthenticatedOptionalDataRequest(request, testCredentials.providerId, Some(basicUserAnswersWithVatInfo))).futureValue
 
-          result mustBe Right(UnauthenticatedDataRequest(request, testCredentials.providerId, basicUserAnswersWithVatInfo))
+          result `mustBe` Right(UnauthenticatedDataRequest(request, testCredentials.providerId, basicUserAnswersWithVatInfo))
         }
       }
     }
   }
-
 }
+

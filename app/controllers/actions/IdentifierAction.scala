@@ -44,8 +44,7 @@ class AuthenticatedIdentifierAction @Inject()(
                                                config: FrontendAppConfig,
                                                urlBuilder: UrlBuilderService,
                                                registrationConnector: RegistrationConnector
-                                             )
-                                             (implicit val executionContext: ExecutionContext)
+                                             )(implicit val executionContext: ExecutionContext)
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
     with AuthorisedFunctions
     with Logging {

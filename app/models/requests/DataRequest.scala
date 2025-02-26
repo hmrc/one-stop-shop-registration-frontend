@@ -22,7 +22,7 @@ import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
-sealed trait AuthenticatedVrnRequest[+A] extends Request[A] {
+trait AuthenticatedVrnRequest[+A] extends Request[A] {
   def request: Request[A]
 
   def credentials: Credentials
