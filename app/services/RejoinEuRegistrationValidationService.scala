@@ -16,8 +16,8 @@
 
 package services
 
-import models.domain._
-import models.requests.AuthenticatedOptionalDataRequest
+import models.domain.*
+import models.requests.AuthenticatedMandatoryDataRequest
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,7 +28,7 @@ class RejoinEuRegistrationValidationService @Inject()(coreRegistrationValidation
 
   def validateEuRegistrations(euRegistrations: Seq[EuTaxRegistration])
                              (implicit hc: HeaderCarrier,
-                              request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                              request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     euRegistrations match {
       case head +: tail => validateSingleEuTaxRegistration(head).flatMap {
         case None => validateEuRegistrations(tail)
@@ -40,7 +40,7 @@ class RejoinEuRegistrationValidationService @Inject()(coreRegistrationValidation
 
   private def validateSingleEuTaxRegistration(euTaxRegistration: EuTaxRegistration)
                                              (implicit hc: HeaderCarrier,
-                                              request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                                              request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     val countryCode: String = euTaxRegistration.country.code
     val failure = Future.failed(new RuntimeException(s"$euTaxRegistration has neither a vrn or taxIdentificationNumber"))
 

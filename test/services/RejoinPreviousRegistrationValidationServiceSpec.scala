@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import models.core.{Match, MatchType}
 import models.domain.*
-import models.requests.AuthenticatedOptionalDataRequest
+import models.requests.AuthenticatedMandatoryDataRequest
 import models.{Country, PreviousScheme}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
@@ -27,6 +27,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
+import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 
@@ -34,13 +35,22 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
-  
+
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   private val rejoinPreviousRegistrationValidationService = new RejoinPreviousRegistrationValidationService(coreRegistrationValidationService)
 
+  private val registration: Registration = RegistrationData.registration
+
   private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private implicit val request: AuthenticatedOptionalDataRequest[_] = AuthenticatedOptionalDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, None)
+
+  private implicit val request: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(
+    FakeRequest("GET", "/"),
+    testCredentials,
+    vrn,
+    registration,
+    emptyUserAnswers
+  )
 
   private val genericMatch = Match(
     MatchType.FixedEstablishmentActiveNETP,
@@ -54,7 +64,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
     None
   )
 
-  val previousRegistrationNew: PreviousRegistrationNew =
+  private val previousRegistrationNew: PreviousRegistrationNew =
     PreviousRegistrationNew(Country("AT", "Austria"), Seq(PreviousSchemeDetails(PreviousScheme.OSSU, PreviousSchemeNumbers("123", None))))
 
   override def beforeEach(): Unit = {
@@ -64,7 +74,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
   ".validatePreviousRegistrations" - {
 
     "must redirect to CannotRejoinQuarantinedCountryController when the previous registration matches to a quarantined trader" in {
-      
+
       val quarantinedTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
 
       when(coreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())).thenReturn(Some(quarantinedTraderMatch).toFuture)
@@ -75,7 +85,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
     }
 
     "must redirect to RejoinAlreadyRegisteredOtherCountryController when the previous registration matches to an active trader" - {
-      
+
       val activeTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
 
       when(coreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())).thenReturn(Some(activeTraderMatch).toFuture)
@@ -85,7 +95,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
     }
 
     "must not redirect when the previous registration is neither a quarantined trader nor an active trader" - {
-      
+
       when(coreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())).thenReturn(None.toFuture)
 
       val result = rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(Seq(previousRegistrationNew)).futureValue
@@ -93,7 +103,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
     }
 
     "must not redirect when there is no previous registrations" - {
-      
+
       val result = rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(Seq.empty).futureValue
       result mustBe None
     }

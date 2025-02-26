@@ -172,29 +172,27 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |}""".stripMargin
 
       val registration = Json.parse(json).as[Registration]
-      println(json)
-      println(registration)
-
-      registration.registeredCompanyName mustEqual expectedRegisteredCompanyName
-      registration.tradingNames mustEqual expectedTradingNames
-      registration.contactDetails.fullName mustEqual expectedBusinessContactName
-      registration.bankDetails.accountName mustEqual expectedBankDetailsAccountName
+      
+      registration.registeredCompanyName `mustBe` expectedRegisteredCompanyName
+      registration.tradingNames `mustBe` expectedTradingNames
+      registration.contactDetails.fullName `mustBe` expectedBusinessContactName
+      registration.bankDetails.accountName `mustBe` expectedBankDetailsAccountName
 
       val euTaxRegistrations = registration.euRegistrations
         .filter(_.isInstanceOf[RegistrationWithFixedEstablishment])
         .asInstanceOf[Seq[RegistrationWithFixedEstablishment]]
 
       val germanyRegistration = euTaxRegistrations.find(_.country.code == "DE").get
-      germanyRegistration.fixedEstablishment.address.line1 mustEqual expectedFixedEstablishmentAddressLine1
-      germanyRegistration.fixedEstablishment.address.townOrCity mustEqual expectedFixedEstablishmentAddressTownCity
+      germanyRegistration.fixedEstablishment.address.line1 `mustBe` expectedFixedEstablishmentAddressLine1
+      germanyRegistration.fixedEstablishment.address.townOrCity `mustBe` expectedFixedEstablishmentAddressTownCity
 
       val spanishRegistration = euTaxRegistrations.find(_.country.code == "ES").get
-      spanishRegistration.fixedEstablishment.address.line1 mustEqual expectedFixedEstablishmentAddressLine1
-      spanishRegistration.fixedEstablishment.address.townOrCity mustEqual expectedFixedEstablishmentAddressTownCity
+      spanishRegistration.fixedEstablishment.address.line1 `mustBe` expectedFixedEstablishmentAddressLine1
+      spanishRegistration.fixedEstablishment.address.townOrCity `mustBe` expectedFixedEstablishmentAddressTownCity
 
-      registration.vatDetails.address.asInstanceOf[UkAddress].line1 mustEqual expectedVatDetailsAddressLine1
-      registration.vatDetails.address.asInstanceOf[UkAddress].line2 mustEqual Some(expectedVatDetailsAddressLine2)
-      registration.vatDetails.address.asInstanceOf[UkAddress].townOrCity mustEqual expectedVatDetailsAddressTownCity
+      registration.vatDetails.address.asInstanceOf[UkAddress].line1 `mustBe` expectedVatDetailsAddressLine1
+      registration.vatDetails.address.asInstanceOf[UkAddress].line2 `mustBe` Some(expectedVatDetailsAddressLine2)
+      registration.vatDetails.address.asInstanceOf[UkAddress].townOrCity `mustBe` expectedVatDetailsAddressTownCity
     }
   }
 }

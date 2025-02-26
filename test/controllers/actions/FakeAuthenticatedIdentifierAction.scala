@@ -36,7 +36,7 @@ class FakeAuthenticatedIdentifierAction(registration: Option[Registration]) exte
   mock[RegistrationConnector]
 )(ExecutionContext.Implicits.global) {
 
-  override def refine[A](request: Request[A]): Future[Either[Result, AuthenticatedIdentifierRequest[A]]] =
+  override def refine[A](request: Request[A]): Future[Either[Result, AuthenticatedIdentifierRequest[A]]] = {
     Future.successful(Right(AuthenticatedIdentifierRequest(
       request,
       Credentials("12345-credId", "GGW"),
@@ -44,4 +44,5 @@ class FakeAuthenticatedIdentifierAction(registration: Option[Registration]) exte
       Enrolments(Set.empty),
       registration
     )))
+  }
 }

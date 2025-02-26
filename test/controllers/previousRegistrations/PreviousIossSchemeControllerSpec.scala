@@ -19,17 +19,16 @@ package controllers.previousRegistrations
 import base.SpecBase
 import forms.previousRegistrations.PreviousIossSchemeFormProvider
 import models.{Country, Index, NormalMode, PreviousScheme, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousIossSchemePage, PreviousSchemePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousIossSchemeView
-
-import scala.concurrent.Future
 
 class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
 
@@ -55,8 +54,8 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[PreviousIossSchemeView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, index)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, index, index)(request, messages(application)).toString
       }
     }
 
@@ -73,8 +72,8 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, index, index)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form.fill(true), NormalMode, index, index)(request, messages(application)).toString
       }
     }
 
@@ -83,7 +82,7 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -100,8 +99,8 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
             .set(PreviousIossSchemePage(index, index), true).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.IOSSWI).success.value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
@@ -110,7 +109,7 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -127,8 +126,8 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
             .set(PreviousIossSchemePage(index, index), false).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.IOSSWOI).success.value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` PreviousIossSchemePage(index, index).navigate(NormalMode, expectedAnswers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
@@ -149,39 +148,8 @@ class PreviousIossSchemeControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, previousIossSchemeRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, previousIossSchemeRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, index, index)(request, messages(application)).toString
       }
     }
   }

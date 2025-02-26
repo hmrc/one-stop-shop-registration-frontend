@@ -19,7 +19,7 @@ package services
 import logging.Logging
 import models.Country
 import models.domain.{PreviousRegistration, PreviousRegistrationLegacy, PreviousRegistrationNew, PreviousSchemeDetails}
-import models.requests.AuthenticatedOptionalDataRequest
+import models.requests.AuthenticatedMandatoryDataRequest
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -30,7 +30,7 @@ class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationVali
                                                            (implicit ec: ExecutionContext) extends Logging {
 
   def validatePreviousRegistrations(previousRegistrations: Seq[PreviousRegistration])
-                                   (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                                   (implicit hc: HeaderCarrier, request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     previousRegistrations match {
       case head +: tail => validateSinglePreviousRegistration(head).flatMap {
         case None => validatePreviousRegistrations(tail)
@@ -41,7 +41,7 @@ class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationVali
   }
 
   private def validateSinglePreviousRegistration(previousRegistration: PreviousRegistration)
-                                                (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                                                (implicit hc: HeaderCarrier, request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     previousRegistration match {
       case previousRegistrationNew: PreviousRegistrationNew =>
         validateSchemeDetails(previousRegistrationNew.previousSchemesDetails, previousRegistrationNew.country)
@@ -50,7 +50,7 @@ class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationVali
   }
 
   private def validateSchemeDetails(previousSchemeDetails: Seq[PreviousSchemeDetails], country: Country)
-                                   (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                                   (implicit hc: HeaderCarrier, request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     previousSchemeDetails match {
       case head +: tail => validateSinglePreviousSchemeDetails(head, country).flatMap {
         case None => validateSchemeDetails(tail, country)
@@ -61,7 +61,7 @@ class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationVali
   }
 
   private def validateSinglePreviousSchemeDetails(previousSchemeDetails: PreviousSchemeDetails, country: Country)
-                                                 (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                                                 (implicit hc: HeaderCarrier, request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     coreRegistrationValidationService.searchScheme(
       searchNumber = previousSchemeDetails.previousSchemeNumbers.previousSchemeNumber,
       previousScheme = previousSchemeDetails.previousScheme,

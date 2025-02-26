@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import models.core.{Match, MatchType}
 import models.domain.*
-import models.requests.AuthenticatedOptionalDataRequest
+import models.requests.AuthenticatedMandatoryDataRequest
 import models.{Country, InternationalAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
@@ -27,6 +27,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
+import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 
@@ -35,12 +36,20 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+  private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-  val rejoinEuRegistrationValidationService = new RejoinEuRegistrationValidationService(coreRegistrationValidationService)
+  private val rejoinEuRegistrationValidationService = new RejoinEuRegistrationValidationService(coreRegistrationValidationService)
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val request: AuthenticatedOptionalDataRequest[_] = AuthenticatedOptionalDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, None)
+  private val registration: Registration = RegistrationData.registration
+
+  implicit private val hc: HeaderCarrier = HeaderCarrier()
+  implicit private val request: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(
+    FakeRequest("GET", "/"),
+    testCredentials,
+    vrn,
+    registration,
+    emptyUserAnswers
+  )
 
   private val genericMatch = Match(
     MatchType.FixedEstablishmentActiveNETP,

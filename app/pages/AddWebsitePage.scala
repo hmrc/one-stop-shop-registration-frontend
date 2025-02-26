@@ -16,9 +16,9 @@
 
 package pages
 
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import controllers.rejoin.{routes => rejoinRoutes}
 import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call

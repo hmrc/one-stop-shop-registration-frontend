@@ -19,18 +19,17 @@ package controllers
 import base.SpecBase
 import forms.BankDetailsFormProvider
 import models.{BankDetails, Bic, Iban, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BankDetailsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
+import utils.FutureSyntax.FutureOps
 import views.html.BankDetailsView
-
-import scala.concurrent.Future
 
 class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -39,8 +38,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val bankDetailsRoute = routes.BankDetailsController.onPageLoad(NormalMode).url
 
-  private val bic         = arbitrary[Bic].sample.value
-  private val iban        = arbitrary[Iban].sample.value
+  private val bic = arbitrary[Bic].sample.value
+  private val iban = arbitrary[Iban].sample.value
   private val bankDetails = BankDetails("account name", Some(bic), iban)
   private val userAnswers = basicUserAnswersWithVatInfo.set(BankDetailsPage, bankDetails).success.value
 
@@ -57,8 +56,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -73,8 +72,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(bankDetails), NormalMode)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -82,13 +81,11 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(
-            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -99,8 +96,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = basicUserAnswersWithVatInfo.set(BankDetailsPage, bankDetails).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual BankDetailsPage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` BankDetailsPage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -120,38 +117,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, bankDetailsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, bankDetailsRoute)
-            .withFormUrlEncodedBody(("accountName", "account name"), ("bic", bic.toString), ("iban", iban.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
   }

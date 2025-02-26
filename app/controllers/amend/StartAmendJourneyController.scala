@@ -41,7 +41,7 @@ class StartAmendJourneyController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetOptionalDataWithOss(Some(AmendMode)).async {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataWithOss(Some(AmendMode)).async {
     implicit request =>
 
       registrationConnector.getVatCustomerInfo().flatMap {

@@ -28,15 +28,14 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import services._
+import services.*
 import testutils.RegistrationData
 import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
 
 import java.time.LocalDate
-
 
 class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
@@ -78,7 +77,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
     "must redirect to Has Already Made Sales when a registration has been successfully retrieved and it passes exclusion checks" in {
 
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(futureVatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -88,7 +86,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
@@ -101,13 +99,13 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url
       }
     }
 
     "must redirect to Not Registered Page when no registration found" in {
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
+
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
@@ -115,7 +113,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
@@ -128,7 +126,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
       }
     }
@@ -145,13 +143,13 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.NiProtocolExpiredController.onPageLoad().url
       }
     }
 
     "must redirect to Kick-out Page when Trader is Deregistered from VAT" in {
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
+
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(deregisteredVatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -161,7 +159,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
@@ -174,16 +172,16 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
       }
     }
 
     "must redirect to the page returned by previous registration validation" in {
+
       val redirectPage = controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
         genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString)
 
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -192,7 +190,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
       when(mockRejoinPreviousRegistrationValidationService.validatePreviousRegistrations(any())(any(), any())) thenReturn Some(Redirect(redirectPage)).toFuture
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
@@ -206,16 +204,16 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe redirectPage.url
       }
     }
 
     "must redirect to the page returned by EU Registration validation" in {
+
       val redirectPage = controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(
         genericMatch.memberState)
 
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
@@ -225,7 +223,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockRejoinPreviousRegistrationValidationService.validatePreviousRegistrations(any())(any(), any())) thenReturn None.toFuture
       when(mockRejoinEuRegistrationValidationService.validateEuRegistrations(any())(any(), any())) thenReturn Some(Redirect(redirectPage)).toFuture
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
@@ -240,7 +238,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe redirectPage.url
       }
     }
