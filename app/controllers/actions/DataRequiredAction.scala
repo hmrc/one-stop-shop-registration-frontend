@@ -16,44 +16,31 @@
 
 package controllers.actions
 
-import connectors.RegistrationConnector
+import controllers.amend.routes as amendRoutes
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import models.{AmendMode, Mode}
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
+import models.{AmendMode, Mode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.CheckJourneyRecovery.determineJourneyRecovery
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedDataRequiredActionImpl @Inject()(
-                                                     mode: Option[Mode],
-                                                     val registrationConnector: RegistrationConnector
+                                                     mode: Option[Mode]
                                                    )(implicit val executionContext: ExecutionContext)
   extends ActionRefiner[AuthenticatedOptionalDataRequest, AuthenticatedDataRequest] {
 
   override protected def refine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedDataRequest[A]]] = {
-
+    
     request.userAnswers match {
       case None =>
         Left(Redirect(determineJourneyRecovery(mode))).toFuture
-      case Some(data) if data.data.value.isEmpty =>
-        if (mode.exists(_.isInAmendOrRejoin)) {
-          Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
-        } else if (mode.exists(_.isInAmendOrRejoin)) {
-          Left(Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad())).toFuture
-        } else {
-          Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
-        }
       case Some(data) =>
         if (mode.exists(_.isInAmendOrRejoin)) {
-          val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.session)
-          registrationConnector.getRegistration()(hc) flatMap {
+          request.registration match {
             case Some(registration) =>
               Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, Some(registration), data)).toFuture
             case None =>
@@ -63,10 +50,8 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
                 Left(Redirect(controllers.rejoin.routes.RejoinJourneyRecoveryController.onPageLoad())).toFuture
               }
           }
-
         } else {
           Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, None, data)).toFuture
-
         }
     }
   }
@@ -87,11 +72,9 @@ class UnauthenticatedDataRequiredAction @Inject()(implicit val executionContext:
   }
 }
 
-class AuthenticatedDataRequiredAction @Inject()(
-                                                 registrationConnector: RegistrationConnector
-                                               )(implicit val executionContext: ExecutionContext) {
+class AuthenticatedDataRequiredAction @Inject()(implicit val executionContext: ExecutionContext) {
 
   def apply(mode: Option[Mode]): AuthenticatedDataRequiredActionImpl = {
-    new AuthenticatedDataRequiredActionImpl(mode, registrationConnector)
+    new AuthenticatedDataRequiredActionImpl(mode)
   }
 }

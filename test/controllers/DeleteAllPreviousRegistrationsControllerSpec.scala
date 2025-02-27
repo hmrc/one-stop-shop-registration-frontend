@@ -32,7 +32,8 @@ import queries.previousRegistration.AllPreviousRegistrationsQuery
 import repositories.AuthenticatedUserAnswersRepository
 import views.html.DeleteAllPreviousRegistrationsView
 
-import scala.concurrent.Future
+import utils.FutureSyntax.FutureOps
+
 
 class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -58,8 +59,8 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
 
         val view = application.injector.instanceOf[DeleteAllPreviousRegistrationsView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, CheckMode)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, CheckMode)(request, messages(application)).toString
       }
     }
 
@@ -67,7 +68,7 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -84,8 +85,8 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
           .set(DeleteAllPreviousRegistrationsPage, true).success.value
           .remove(AllPreviousRegistrationsQuery).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllPreviousRegistrationsPage.navigate(CheckMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeleteAllPreviousRegistrationsPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -94,7 +95,7 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -111,8 +112,8 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
           .set(DeleteAllPreviousRegistrationsPage, false).success.value
           .set(PreviouslyRegisteredPage, true).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteAllPreviousRegistrationsPage.navigate(CheckMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeleteAllPreviousRegistrationsPage.navigate(CheckMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -132,38 +133,8 @@ class DeleteAllPreviousRegistrationsControllerSpec extends SpecBase with Mockito
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, CheckMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteAllPreviousRegistrationsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteAllPreviousRegistrationsRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, CheckMode)(request, messages(application)).toString
       }
     }
   }

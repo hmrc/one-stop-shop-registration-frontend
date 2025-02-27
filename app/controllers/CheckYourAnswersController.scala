@@ -21,25 +21,25 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
-import models.{CheckMode, NormalMode}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.ConflictFound
+import models.{CheckMode, NormalMode}
 import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import queries.EmailConfirmationQuery
-import services._
+import services.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
-import utils.FutureSyntax._
-import viewmodels.checkAnswers._
+import utils.FutureSyntax.*
+import viewmodels.checkAnswers.*
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
-import viewmodels.govuk.summarylist._
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
+import viewmodels.govuk.summarylist.*
 import views.html.CheckYourAnswersView
 
 import javax.inject.Inject
@@ -72,77 +72,77 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-        commencementDateSummary.row(request.userAnswers).map { cds =>
+      commencementDateSummary.row(request.userAnswers).map { cds =>
 
-          val hasTradingNameSummaryRow = new HasTradingNameSummary().row(request.userAnswers, CheckMode)
-          val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode)
-          val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(request.userAnswers, CheckMode)
-          val dateOfFirstSaleSummaryRow = DateOfFirstSaleSummary.row(request.userAnswers, CheckMode)
-          val commencementDateSummaryRow = cds
-          val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode)
-          val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode)
-          val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode)
-          val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, CheckMode)
-          val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode)
-          val hasWebsiteSummaryRow = HasWebsiteSummary.row(request.userAnswers, CheckMode)
-          val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, CheckMode)
-          val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(request.userAnswers, CheckMode)
-          val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, CheckMode)
-          val businessContactDetailsEmailSummaryRow = BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers, CheckMode)
-          val bankDetailsAccountNameSummaryRow = BankDetailsSummary.rowAccountName(request.userAnswers, CheckMode)
-          val bankDetailsBicSummaryRow = BankDetailsSummary.rowBIC(request.userAnswers, CheckMode)
-          val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(request.userAnswers, CheckMode)
+        val hasTradingNameSummaryRow = new HasTradingNameSummary().row(request.userAnswers, CheckMode)
+        val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode)
+        val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(request.userAnswers, CheckMode)
+        val dateOfFirstSaleSummaryRow = DateOfFirstSaleSummary.row(request.userAnswers, CheckMode)
+        val commencementDateSummaryRow = cds
+        val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(request.userAnswers, CheckMode)
+        val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, Seq.empty, CheckMode)
+        val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode)
+        val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, CheckMode)
+        val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode)
+        val hasWebsiteSummaryRow = HasWebsiteSummary.row(request.userAnswers, CheckMode)
+        val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, CheckMode)
+        val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(request.userAnswers, CheckMode)
+        val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, CheckMode)
+        val businessContactDetailsEmailSummaryRow = BusinessContactDetailsSummary.rowEmailAddress(request.userAnswers, CheckMode)
+        val bankDetailsAccountNameSummaryRow = BankDetailsSummary.rowAccountName(request.userAnswers, CheckMode)
+        val bankDetailsBicSummaryRow = BankDetailsSummary.rowBIC(request.userAnswers, CheckMode)
+        val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(request.userAnswers, CheckMode)
 
-          val list = SummaryListViewModel(
-            rows = Seq(
-              hasTradingNameSummaryRow.map { sr =>
-                if (tradingNameSummaryRow.isDefined) {
-                  sr.withCssClass("govuk-summary-list__row--no-border")
-                } else {
-                  sr
-                }
-              },
-              tradingNameSummaryRow,
-              hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              commencementDateSummaryRow,
-              previouslyRegisteredSummaryRow.map { sr =>
-                if (previousRegistrationSummaryRow.isDefined) {
-                  sr.withCssClass("govuk-summary-list__row--no-border")
-                } else {
-                  sr
-                }
-              },
-              previousRegistrationSummaryRow,
-              taxRegisteredInEuSummaryRow.map { sr =>
-                if (euDetailsSummaryRow.isDefined) {
-                  sr.withCssClass("govuk-summary-list__row--no-border")
-                } else {
-                  sr
-                }
-              },
-              euDetailsSummaryRow,
-              isOnlineMarketplaceSummaryRow,
-              hasWebsiteSummaryRow.map { sr =>
-                if (websiteSummaryRow.isDefined) {
-                  sr.withCssClass("govuk-summary-list__row--no-border")
-                } else {
-                  sr
-                }
-              },
-              websiteSummaryRow,
-              businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              businessContactDetailsEmailSummaryRow,
-              bankDetailsAccountNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              bankDetailsBicSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
-              bankDetailsIbanSummaryRow
-            ).flatten
-          )
+        val list = SummaryListViewModel(
+          rows = Seq(
+            hasTradingNameSummaryRow.map { sr =>
+              if (tradingNameSummaryRow.isDefined) {
+                sr.withCssClass("govuk-summary-list__row--no-border")
+              } else {
+                sr
+              }
+            },
+            tradingNameSummaryRow,
+            hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+            dateOfFirstSaleSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+            commencementDateSummaryRow,
+            previouslyRegisteredSummaryRow.map { sr =>
+              if (previousRegistrationSummaryRow.isDefined) {
+                sr.withCssClass("govuk-summary-list__row--no-border")
+              } else {
+                sr
+              }
+            },
+            previousRegistrationSummaryRow,
+            taxRegisteredInEuSummaryRow.map { sr =>
+              if (euDetailsSummaryRow.isDefined) {
+                sr.withCssClass("govuk-summary-list__row--no-border")
+              } else {
+                sr
+              }
+            },
+            euDetailsSummaryRow,
+            isOnlineMarketplaceSummaryRow,
+            hasWebsiteSummaryRow.map { sr =>
+              if (websiteSummaryRow.isDefined) {
+                sr.withCssClass("govuk-summary-list__row--no-border")
+              } else {
+                sr
+              }
+            },
+            websiteSummaryRow,
+            businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+            businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+            businessContactDetailsEmailSummaryRow,
+            bankDetailsAccountNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+            bankDetailsBicSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+            bankDetailsIbanSummaryRow
+          ).flatten
+        )
 
-          val isValid = validate()
-          Ok(view(vatRegistrationDetailsList, list, isValid, CheckMode))
-        }
+        val isValid = validate()
+        Ok(view(vatRegistrationDetailsList, list, isValid, CheckMode))
+      }
   }
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetData().async {
@@ -216,5 +216,5 @@ class CheckYourAnswersController @Inject()(
       }
     }
   }
-
 }
+

@@ -18,7 +18,7 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import controllers.ioss.{routes => iossExclusionsRoutes}
+import controllers.ioss.routes as iossExclusionsRoutes
 import controllers.routes
 import logging.Logging
 import models.Mode
@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckRegistrationFilterImpl(
                                    mode: Option[Mode],
-                                   connector: RegistrationConnector,
+                                   registrationConnector: RegistrationConnector,
                                    frontendAppConfig: FrontendAppConfig,
                                    migrationService: DataMigrationService,
                                    iossExclusionService: IossExclusionService
@@ -49,34 +49,29 @@ class CheckRegistrationFilterImpl(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    (for {
-      mayBeRegistration <- connector.getRegistration()
-    } yield {
+    if (mode.exists(_.isInAmendOrRejoin)) {
+      request.registration match {
+        case Some(_) if hasRegistrationEnrolment(request.enrolments) =>
+          if (mode.exists(_.isInAmend)) {
+            None.toFuture
+          } else {
+            checkIossExclusionAndRedirect(request)
+          }
 
-      if (mode.exists(_.isInAmendOrRejoin)) {
-        mayBeRegistration match {
-          case Some(_) if hasRegistrationEnrolment(request.enrolments) =>
-            if (mode.exists(_.isInAmend)) {
-              None.toFuture
-            } else {
-              checkIossExclusionAndRedirect(request)
-            }
+        case Some(_) =>
+          enrolRegisteredUser(request)
 
-          case Some(_) =>
-            enrolRegisteredUser(request)
-
-          case _ => Some(Redirect(routes.NotRegisteredController.onPageLoad())).toFuture
-        }
-      } else if (mayBeRegistration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
-        request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
-          migrationService
-            .migrate(sessionId, request.userId)
-        )
-        Some(Redirect(routes.AlreadyRegisteredController.onPageLoad())).toFuture
-      } else {
-        checkIossExclusionAndRedirect(request)
+        case _ => Some(Redirect(routes.NotRegisteredController.onPageLoad())).toFuture
       }
-    }).flatten
+    } else if (request.registration.isDefined || hasRegistrationEnrolment(request.enrolments)) {
+      request.queryString.get("k").flatMap(_.headOption).map(sessionId =>
+        migrationService
+          .migrate(sessionId, request.userId)
+      )
+      Some(Redirect(routes.AlreadyRegisteredController.onPageLoad())).toFuture
+    } else {
+      checkIossExclusionAndRedirect(request)
+    }
   }
 
   private def checkIossExclusionAndRedirect(request: AuthenticatedIdentifierRequest[_])(implicit hc: HeaderCarrier): Future[Option[Result]] = {
@@ -95,7 +90,7 @@ class CheckRegistrationFilterImpl(
   private def enrolRegisteredUser(request: AuthenticatedIdentifierRequest[_])
                                  (implicit hc: HeaderCarrier): Future[Option[Result]] = {
 
-    connector.enrolUser().flatMap { response =>
+    registrationConnector.enrolUser().flatMap { response =>
       response.status match {
         case NO_CONTENT =>
           logger.info(s"Successfully retrospectively enrolled user ${request.vrn.vrn}")

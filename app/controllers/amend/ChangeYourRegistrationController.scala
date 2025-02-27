@@ -20,28 +20,28 @@ import cats.data.Validated.{Invalid, Valid}
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
-import controllers.amend.{routes => amendRoutes}
+import controllers.amend.routes as amendRoutes
 import logging.Logging
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.{PreviousRegistration, Registration}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{AmendMode, NormalMode}
 import pages.amend.ChangeYourRegistrationPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import queries.EmailConfirmationQuery
-import services._
+import services.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
-import viewmodels.checkAnswers._
-import viewmodels.govuk.summarylist._
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
+import viewmodels.checkAnswers.*
+import viewmodels.govuk.summarylist.*
 import views.html.amend.ChangeYourRegistrationView
 
 import javax.inject.Inject
@@ -61,10 +61,10 @@ class ChangeYourRegistrationController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(AmendMode)).async {
-    implicit request =>
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataWithOss(Some(AmendMode)).async {
+    implicit request: AuthenticatedMandatoryDataRequest[AnyContent] =>
 
-      val existingPreviousRegistrations = checkExistingRegistration().previousRegistrations
+      val existingPreviousRegistrations = checkExistingRegistration()(request.request).previousRegistrations
 
       val vatRegistrationDetailsList = SummaryListViewModel(
         rows = Seq(
@@ -75,28 +75,28 @@ class ChangeYourRegistrationController @Inject()(
         ).flatten
       )
 
-      commencementDateSummary.row(request.userAnswers).map { cds =>
+      commencementDateSummary.row(request.userAnswers)(request = request.request).map { cds =>
 
-        val list: SummaryList = detailList(existingPreviousRegistrations, cds)
+        val list: SummaryList = detailList(existingPreviousRegistrations, cds)(request.request)
 
-        val isValid = validate()
+        val isValid = validate()(request.request)
         Ok(view(vatRegistrationDetailsList, list, isValid, AmendMode))
       }
   }
 
-  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataAndCheckVerifyEmail(Some(AmendMode)).async {
-    implicit request =>
+  def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataWithOss(Some(AmendMode)).async {
+    implicit request: AuthenticatedMandatoryDataRequest[AnyContent] =>
 
-      getFirstValidationErrorRedirect(AmendMode) match {
+      getFirstValidationErrorRedirect(AmendMode)(request.request) match {
         case Some(errorRedirect) => if (incompletePrompt) {
           errorRedirect.toFuture
         } else {
           Redirect(routes.ChangeYourRegistrationController.onPageLoad()).toFuture
         }
         case None =>
-          registrationService.fromUserAnswers(request.userAnswers, request.vrn).flatMap {
+          registrationService.fromUserAnswers(request.userAnswers, request.vrn)(request = request.request).flatMap {
             case Valid(registration) =>
-              val registrationWithOriginalSubmissionReceived = registration.copy(submissionReceived = request.registration.flatMap(_.submissionReceived))
+              val registrationWithOriginalSubmissionReceived = registration.copy(submissionReceived = request.registration.submissionReceived)
               registrationConnector.amendRegistration(registrationWithOriginalSubmissionReceived).flatMap {
                 case Right(_) =>
                   auditService.audit(
@@ -104,18 +104,18 @@ class ChangeYourRegistrationController @Inject()(
                       RegistrationAuditType.AmendRegistration,
                       registrationWithOriginalSubmissionReceived,
                       SubmissionResult.Success,
-                      request
+                      request.request
                     ))
-                  sendEmailConfirmation(request, registrationWithOriginalSubmissionReceived)
+                  sendEmailConfirmation(request.request, registrationWithOriginalSubmissionReceived)
 
                 case Left(e) =>
                   logger.error(s"Unexpected result on submit: ${e.toString}")
-                  auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request))
+                  auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request.request))
                   Redirect(amendRoutes.ErrorSubmittingAmendmentController.onPageLoad()).toFuture
               }
 
             case Invalid(errors) =>
-              getFirstValidationErrorRedirect(AmendMode).map(
+              getFirstValidationErrorRedirect(AmendMode)(request.request).map(
                 errorRedirect => if (incompletePrompt) {
                   errorRedirect.toFuture
                 } else {

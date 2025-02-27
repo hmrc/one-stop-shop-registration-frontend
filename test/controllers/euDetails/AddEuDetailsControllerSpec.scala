@@ -17,27 +17,24 @@
 package controllers.euDetails
 
 import base.SpecBase
+import controllers.amend.routes as amendRoutes
+import controllers.euDetails.routes as euDetailsRoutes
 import controllers.routes
-import controllers.euDetails.{routes => euDetailsRoutes}
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
 import models.{AmendMode, CheckMode, Country, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails._
+import pages.euDetails.*
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.euDetails.EuDetailsSummary
 import views.html.euDetails.{AddEuDetailsView, PartOfVatGroupAddEuDetailsView}
-
-import scala.concurrent.Future
 
 class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -48,11 +45,9 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val addEuVatDetailsRoute = euDetailsRoutes.AddEuDetailsController.onPageLoad(NormalMode).url
   private lazy val addEuVatDetailsAmendRoute = euDetailsRoutes.AddEuDetailsController.onPageLoad(AmendMode).url
+
   private def addEuVatDetailsPostRoute(prompt: Boolean = false) = euDetailsRoutes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
-  private def addEuVatDetailsPostAmendRoute(prompt: Boolean = false) = euDetailsRoutes.AddEuDetailsController.onSubmit(AmendMode, prompt).url
-
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-
+  
   private val baseAnswers =
     basicUserAnswersWithVatInfo
       .set(TaxRegisteredInEuPage, true).success.value
@@ -83,12 +78,12 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        val view = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers, NormalMode)
+        val list = EuDetailsSummary.countryAndVatNumberList(baseAnswers, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -103,12 +98,12 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        val view = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "ATU12345678").success.value, NormalMode)
+        val list = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "ATU12345678").success.value, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -121,12 +116,12 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        val view = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(incompleteAnswers, NormalMode)
+        val list = EuDetailsSummary.countryAndVatNumberList(incompleteAnswers, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true,
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddCountries = true,
           Seq(EuOptionalDetails(country, Some(true), None, None, None, None, None, None, None, None, None))
         )(request, implicitly).toString
       }
@@ -141,13 +136,13 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addEuVatDetailsRoute)
 
-        val view                    = application.injector.instanceOf[AddEuDetailsView]
+        val view = application.injector.instanceOf[AddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
+        val list = EuDetailsSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) `mustBe` OK
         contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
@@ -156,7 +151,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -171,8 +166,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseAnswers.set(AddEuDetailsPage, true).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddEuDetailsPage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` AddEuDetailsPage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -188,14 +183,14 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        val view = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers, NormalMode)
+        val list = EuDetailsSummary.countryAndVatNumberList(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -212,28 +207,14 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view                    = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
+        val view = application.injector.instanceOf[PartOfVatGroupAddEuDetailsView]
         implicit val msgs: Messages = messages(application)
-        val list                    = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "ATU12345678").success.value, NormalMode)
+        val list = EuDetailsSummary.countryAndVatNumberList(baseAnswers.set(EuVatNumberPage(countryIndex), "ATU12345678").success.value, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addEuVatDetailsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -246,24 +227,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute())
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -278,8 +243,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.AddEuDetailsController.onPageLoad(NormalMode).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.AddEuDetailsController.onPageLoad(NormalMode).url
       }
     }
 
@@ -294,8 +259,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.SellsGoodsToEUConsumersController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -312,8 +277,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.SellsGoodsToEUConsumerMethodController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -331,8 +296,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.RegistrationTypeController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -351,8 +316,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -371,8 +336,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.EuTaxReferenceController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.EuTaxReferenceController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -392,8 +357,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.FixedEstablishmentTradingNameController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -414,8 +379,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.FixedEstablishmentAddressController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.FixedEstablishmentAddressController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -435,8 +400,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.EuSendGoodsTradingNameController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -457,8 +422,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.EuSendGoodsAddressController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.EuSendGoodsAddressController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -475,8 +440,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.VatRegisteredController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.VatRegisteredController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -494,8 +459,8 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual euDetailsRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` euDetailsRoutes.EuVatNumberController.onPageLoad(CheckMode, countryIndex).url
       }
     }
 
@@ -515,34 +480,17 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual euDetailsRoutes.CannotAddCountryController.onPageLoad(CheckMode, countryIndex).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` euDetailsRoutes.CannotAddCountryController.onPageLoad(CheckMode, countryIndex).url
         }
       }
     }
 
     "in AmendMode" - {
 
-      "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, addEuVatDetailsAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
       "must redirect to resolve missing answers for a GET if user answers are empty" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -550,28 +498,11 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
-
-      "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, addEuVatDetailsPostAmendRoute())
-              .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
     }
-
   }
 }
+

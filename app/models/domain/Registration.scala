@@ -16,12 +16,12 @@
 
 package models.domain
 
+import models.domain.ModelHelpers.*
+import models.exclusions.{ExcludedTrader, ExclusionDetails}
 import models.{BankDetails, BusinessContactDetails}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, Reads, Writes, __}
 import uk.gov.hmrc.domain.Vrn
-import ModelHelpers.*
-import models.exclusions.{ExcludedTrader, ExclusionDetails}
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
 
 import java.time.{Instant, LocalDate}
 
@@ -43,31 +43,33 @@ final case class Registration(
                                adminUse: AdminUse = AdminUse(None),
                                exclusionDetails: Option[ExclusionDetails] = None,
                                excludedTrader: Option[ExcludedTrader] = None,
-                               rejoin: Option[Boolean] = None
+                               rejoin: Option[Boolean] = None,
+                               unusableStatus: Option[Boolean] = None
                              )
 
 object Registration {
 
   implicit val reads: Reads[Registration] = (
-      (__ \ "vrn").read[Vrn] and
-          (__ \ "registeredCompanyName").read[String].map(normaliseSpaces) and
-          (__ \ "tradingNames").read[Seq[String]].map(_.map(normaliseSpaces)) and
-          (__ \ "vatDetails").read[VatDetails] and
-          (__ \ "euRegistrations").read[Seq[EuTaxRegistration]] and
-          (__ \ "contactDetails").read[BusinessContactDetails] and
-          (__ \ "websites").read[Seq[String]] and
-          (__ \ "commencementDate").read[LocalDate] and
-          (__ \ "previousRegistrations").read[Seq[PreviousRegistration]] and
-          (__ \ "bankDetails").read[BankDetails] and
-          (__ \ "isOnlineMarketplace").read[Boolean] and
-          (__ \ "niPresence").readNullable[NiPresence] and
-          (__ \ "dateOfFirstSale").readNullable[LocalDate] and
-          (__ \ "submissionReceived").readNullable[Instant] and
-          (__ \ "adminUse").read[AdminUse] and
-          (__ \ "exclusionDetails").readNullable[ExclusionDetails] and
-          (__ \ "excludedTrader").readNullable[ExcludedTrader] and
-          (__ \ "rejoin").readNullable[Boolean]
-      )(Registration.apply _)
+    (__ \ "vrn").read[Vrn] and
+      (__ \ "registeredCompanyName").read[String].map(normaliseSpaces) and
+      (__ \ "tradingNames").read[Seq[String]].map(_.map(normaliseSpaces)) and
+      (__ \ "vatDetails").read[VatDetails] and
+      (__ \ "euRegistrations").read[Seq[EuTaxRegistration]] and
+      (__ \ "contactDetails").read[BusinessContactDetails] and
+      (__ \ "websites").read[Seq[String]] and
+      (__ \ "commencementDate").read[LocalDate] and
+      (__ \ "previousRegistrations").read[Seq[PreviousRegistration]] and
+      (__ \ "bankDetails").read[BankDetails] and
+      (__ \ "isOnlineMarketplace").read[Boolean] and
+      (__ \ "niPresence").readNullable[NiPresence] and
+      (__ \ "dateOfFirstSale").readNullable[LocalDate] and
+      (__ \ "submissionReceived").readNullable[Instant] and
+      (__ \ "adminUse").read[AdminUse] and
+      (__ \ "exclusionDetails").readNullable[ExclusionDetails] and
+      (__ \ "excludedTrader").readNullable[ExcludedTrader] and
+      (__ \ "rejoin").readNullable[Boolean] and
+      (__ \ "unusableStatus").readNullable[Boolean]
+    )(Registration.apply _)
 
   implicit val writes: Writes[Registration] = Json.writes[Registration]
 
@@ -88,7 +90,8 @@ object Registration {
             adminUse: AdminUse = AdminUse(None),
             exclusionDetails: Option[ExclusionDetails] = None,
             excludedTrader: Option[ExcludedTrader] = None,
-            rejoin: Option[Boolean] = None
+            rejoin: Option[Boolean] = None,
+            unusableStatus: Option[Boolean] = None
            ): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
@@ -107,7 +110,8 @@ object Registration {
     adminUse,
     exclusionDetails,
     excludedTrader,
-    rejoin = rejoin
+    rejoin = rejoin,
+    unusableStatus
   )
 
 }

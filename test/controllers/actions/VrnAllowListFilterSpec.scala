@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.FeatureFlagService
 import uk.gov.hmrc.auth.core.Enrolments
 
@@ -48,14 +48,14 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
             applicationBuilder(None)
               .configure(
                 "restrict-access-using-vrn-allow-list" -> true,
-                "vrn-allow-list"                       -> Seq(vrn.value),
-                "vrn-blocked-redirect-url"             -> "foo"
+                "vrn-allow-list" -> Seq(vrn.value),
+                "vrn-blocked-redirect-url" -> "foo"
               )
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-            val features   = app.injector.instanceOf[FeatureFlagService]
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
             val result = controller.callFilter(request).futureValue
@@ -73,14 +73,14 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
             applicationBuilder(None)
               .configure(
                 "features.restrict-access-using-vrn-allow-list" -> true,
-                "features.vrn-allow-list"                       -> Seq.empty,
-                "features.vrn-blocked-redirect-url"             -> "foo"
+                "features.vrn-allow-list" -> Seq.empty,
+                "features.vrn-blocked-redirect-url" -> "foo"
               )
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-            val features   = app.injector.instanceOf[FeatureFlagService]
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
             val result = controller.callFilter(request).futureValue
@@ -107,7 +107,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
             val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 

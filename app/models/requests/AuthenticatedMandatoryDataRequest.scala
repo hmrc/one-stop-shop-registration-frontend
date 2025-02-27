@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,19 @@
 
 package models.requests
 
+import models.UserAnswers
 import models.domain.Registration
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.Enrolments
+import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
-case class AuthenticatedIdentifierRequest[A](
-                                              request: Request[A],
-                                              credentials: Credentials,
-                                              vrn: Vrn,
-                                              enrolments: Enrolments,
-                                              registration: Option[Registration]
-                                            ) extends WrappedRequest[A](request) {
+case class AuthenticatedMandatoryDataRequest[A](
+                                                 request: AuthenticatedDataRequest[A],
+                                                 credentials: Credentials,
+                                                 vrn: Vrn,
+                                                 registration: Registration,
+                                                 userAnswers: UserAnswers
+                                               ) extends WrappedRequest[A](request) with AuthenticatedVrnRequest[A] {
 
   val userId: String = credentials.providerId
 }
-
-case class SessionRequest[A](request: Request[A], userId: String) extends WrappedRequest[A](request)

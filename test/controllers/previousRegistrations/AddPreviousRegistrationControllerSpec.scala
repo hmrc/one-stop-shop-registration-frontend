@@ -17,28 +17,26 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
-import connectors.RegistrationConnector
-import controllers.amend.{routes => amendRoutes}
-import controllers.previousRegistrations.{routes => prevRoutes}
+import controllers.amend.routes as amendRoutes
+import controllers.previousRegistrations.routes as prevRoutes
 import controllers.routes
 import forms.previousRegistrations.AddPreviousRegistrationFormProvider
-import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalFields, SchemeDetailsWithOptionalVatNumber}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, PreviousSchemeType}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations._
+import pages.previousRegistrations.*
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.previousRegistrations.PreviousRegistrationSummary
 import views.html.previousRegistrations.AddPreviousRegistrationView
-
-import scala.concurrent.Future
 
 class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
@@ -47,7 +45,9 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val addPreviousRegistrationRoute = prevRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
   private lazy val addPreviousRegistrationAmendRoute = prevRoutes.AddPreviousRegistrationController.onPageLoad(AmendMode).url
+
   private def addPreviousRegistrationRoutePost(prompt: Boolean) = prevRoutes.AddPreviousRegistrationController.onSubmit(NormalMode, prompt).url
+
   private def addPreviousRegistrationRouteAmendPost(prompt: Boolean) = prevRoutes.AddPreviousRegistrationController.onSubmit(AmendMode, prompt).url
 
   private val baseAnswers =
@@ -60,8 +60,6 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
     basicUserAnswersWithVatInfo
       .set(PreviousEuCountryPage(Index(0)), Country.euCountries.head).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
-
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   "AddPreviousRegistration Controller" - {
 
@@ -76,10 +74,10 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
+        val list = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -94,10 +92,10 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(incompleteAnswers, Seq.empty, NormalMode)
+        val list = PreviousRegistrationSummary.addToListRows(incompleteAnswers, Seq.empty, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe`
           view(
             form,
             NormalMode,
@@ -117,7 +115,7 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -132,8 +130,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseAnswers.set(AddPreviousRegistrationPage, true).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddPreviousRegistrationPage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` AddPreviousRegistrationPage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -151,12 +149,12 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[AddPreviousRegistrationView]
         implicit val msgs: Messages = messages(application)
-        val list                    = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
+        val list = PreviousRegistrationSummary.addToListRows(baseAnswers, Seq.empty, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddCountries = true)(request, implicitly).toString
       }
     }
 
@@ -169,8 +167,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -185,8 +183,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -201,8 +199,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual prevRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` prevRoutes.AddPreviousRegistrationController.onPageLoad(NormalMode).url
       }
     }
 
@@ -219,8 +217,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual prevRoutes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` prevRoutes.PreviousOssNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -239,8 +237,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual prevRoutes.PreviousIossNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` prevRoutes.PreviousIossNumberController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -258,8 +256,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual prevRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` prevRoutes.PreviousIossSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -276,8 +274,8 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual prevRoutes.PreviousSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` prevRoutes.PreviousSchemeController.onPageLoad(NormalMode, Index(0), Index(0)).url
       }
     }
 
@@ -285,12 +283,9 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
       "must return OK and the correct view for a GET when there are existing previous registrations" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val existingPreviousRegistrations = RegistrationData.registration.previousRegistrations
 
-        val application = applicationBuilder(userAnswers = Some(baseAnswers))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        val application = applicationBuilder(userAnswers = Some(baseAnswers), registration = Some(RegistrationData.registration))
           .build()
 
         running(application) {
@@ -302,17 +297,14 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
           implicit val msgs: Messages = messages(application)
           val list = PreviousRegistrationSummary.addToListRows(baseAnswers, existingPreviousRegistrations, AmendMode)
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, AmendMode, list, canAddCountries = true)(request, implicitly).toString
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(form, AmendMode, list, canAddCountries = true)(request, implicitly).toString
         }
       }
 
       "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = None)
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -320,17 +312,14 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
       "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = None)
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -340,11 +329,10 @@ class AddPreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
-
     }
   }
 }

@@ -22,9 +22,11 @@ import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 
-sealed trait AuthenticatedVrnRequest[+A] extends Request[A] {
+trait AuthenticatedVrnRequest[+A] extends Request[A] {
   def request: Request[A]
+
   def credentials: Credentials
+
   def vrn: Vrn
 }
 
@@ -32,6 +34,7 @@ case class AuthenticatedOptionalDataRequest[A](
                                                 request: Request[A],
                                                 credentials: Credentials,
                                                 vrn: Vrn,
+                                                registration: Option[Registration],
                                                 userAnswers: Option[UserAnswers]
                                               ) extends WrappedRequest[A](request) with AuthenticatedVrnRequest[A] {
 

@@ -17,11 +17,11 @@
 package controllers.rejoin
 
 import connectors.RegistrationConnector
-import controllers.actions._
+import controllers.actions.*
 import logging.Logging
 import models.RejoinMode
 import models.domain.Registration
-import models.requests.AuthenticatedOptionalDataRequest
+import models.requests.AuthenticatedMandatoryDataRequest
 import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -50,44 +50,46 @@ class StartRejoinJourneyController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad: Action[AnyContent] = cc.authAndGetOptionalData(Some(RejoinMode)).async {
+  def onPageLoad: Action[AnyContent] = cc.authAndGetDataWithOss(Some(RejoinMode)).async {
     implicit request =>
-      registrationConnector.getRegistration().flatMap {
-        case Some(registration) if rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) =>
-          validateRegistration(registration).flatMap {
-            case Some(redirect) => redirect.toFuture
-            case None => registrationConnector.getVatCustomerInfo().flatMap {
-              case Right(vatInfo) =>
-                vatInfo.deregistrationDecisionDate match {
-                  case Some(_) =>
-                    Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
-                  case None =>
-                    for {
-                      userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                      updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                      updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
-                      _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
-                    } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
-                }
 
-              case Left(error) =>
-                val exception = new Exception(error.body)
-                logger.error(exception.getMessage, exception)
-                throw exception
-            }
+      val registration: Registration = request.registration
+
+      if (rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader)) {
+        validateRegistration(registration).flatMap {
+          case Some(redirect) => redirect.toFuture
+          case None => registrationConnector.getVatCustomerInfo().flatMap {
+            case Right(vatInfo) =>
+              vatInfo.deregistrationDecisionDate match {
+                case Some(_) =>
+                  Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+                case None =>
+                  for {
+                    userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                    updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                    updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
+                    _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
+                  } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+              }
+
+            case Left(error) =>
+              val exception = new Exception(error.body)
+              logger.error(exception.getMessage, exception)
+              throw exception
           }
-        case _ =>
-          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+        }
+      } else {
+        Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
       }
   }
 
 
   private def validateRegistration(registration: Registration)
-                                  (implicit hc: HeaderCarrier, request: AuthenticatedOptionalDataRequest[_]): Future[Option[Result]] = {
+                                  (implicit hc: HeaderCarrier, request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
     rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations).flatMap {
       case Some(redirect) => Some(redirect).toFuture
       case None => rejoinEuRegistrationValidationService.validateEuRegistrations(registration.euRegistrations)
     }
   }
-
 }
+

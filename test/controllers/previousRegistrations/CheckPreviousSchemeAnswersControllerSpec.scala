@@ -17,39 +17,35 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import controllers.amend.routes as amendRoutes
 import controllers.routes
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
 import forms.previousRegistrations.CheckPreviousSchemeAnswersFormProvider
 import models.domain.PreviousSchemeNumbers
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations._
+import pages.previousRegistrations.*
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
-import viewmodels.checkAnswers.previousRegistrations._
+import utils.FutureSyntax.FutureOps
+import viewmodels.checkAnswers.previousRegistrations.*
 import viewmodels.govuk.SummaryListFluency
 import views.html.previousRegistrations.CheckPreviousSchemeAnswersView
 
-import scala.concurrent.Future
-
 class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryListFluency with MockitoSugar with BeforeAndAfterEach {
-
 
   private val index = Index(0)
   private val country = Country.euCountries.head
   private val formProvider = new CheckPreviousSchemeAnswersFormProvider()
   private val form = formProvider(country)
   private val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-  private val mockRegistrationConnector = mock[RegistrationConnector]
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
@@ -80,17 +76,14 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
           ).flatten
         ))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
       }
     }
 
     "must return OK and the correct view for a GET when there are existing previous schemes in Amend mode" in {
 
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
-      val application = applicationBuilder(userAnswers = Some(baseUserAnswers), mode = Some(AmendMode))
-        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+      val application = applicationBuilder(userAnswers = Some(baseUserAnswers), mode = Some(AmendMode), registration = Some(RegistrationData.registration))
         .build()
 
       val previousSchemes = Seq(PreviousScheme.OSSNU)
@@ -107,8 +100,8 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
           ).flatten
         ))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, AmendMode, lists, index, country, canAddScheme = true)(request, messages(application)).toString
       }
     }
 
@@ -120,25 +113,22 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
         val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index).url)
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must redirect to Journey Recovery if user answers are empty in AmendMode" in {
 
-      when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo),  mode = Some(AmendMode))
-        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo), mode = Some(AmendMode))
         .build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(AmendMode, index).url)
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -148,7 +138,7 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -163,8 +153,8 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
           val result = route(application, request).value
           val expectedAnswers = baseUserAnswers.set(CheckPreviousSchemeAnswersPage(index), true).success.value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual CheckPreviousSchemeAnswersPage(index).navigate(NormalMode, expectedAnswers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` CheckPreviousSchemeAnswersPage(index).navigate(NormalMode, expectedAnswers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
@@ -192,8 +182,8 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
           val result = route(application, request).value
 
-          status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode, list, index, country, canAddScheme = true)(request, implicitly).toString
+          status(result) `mustBe` BAD_REQUEST
+          contentAsString(result) `mustBe` view(boundForm, NormalMode, list, index, country, canAddScheme = true)(request, implicitly).toString
         }
       }
 
@@ -207,18 +197,14 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
       "must redirect to Journey Recovery if user answers are empty in AmendMode" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -227,13 +213,10 @@ class CheckPreviousSchemeAnswersControllerSpec extends SpecBase with SummaryList
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
-
     }
   }
-
 }

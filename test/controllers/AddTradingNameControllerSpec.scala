@@ -17,24 +17,21 @@
 package controllers
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
+import controllers.amend.routes as amendRoutes
 import forms.AddTradingNameFormProvider
 import models.{AmendMode, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddTradingNamePage, TradingNamePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
-
-import scala.concurrent.Future
 
 class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
@@ -45,8 +42,6 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
   private lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(NormalMode).url
   private lazy val addTradingNameAmendRoute = routes.AddTradingNameController.onPageLoad(AmendMode).url
 
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-
   "AddTradingName Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -56,14 +51,14 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)
 
-        val view                    = application.injector.instanceOf[AddTradingNameView]
+        val view = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
-        val list                    = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
+        val list = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
       }
     }
 
@@ -87,13 +82,13 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)
 
-        val view                    = application.injector.instanceOf[AddTradingNameView]
+        val view = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe`
           view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false)(request, implicitly).toString
       }
     }
@@ -107,8 +102,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -121,13 +116,13 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addTradingNameRoute)
 
-        val view                    = application.injector.instanceOf[AddTradingNameView]
+        val view = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
-        val list                    = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
+        val list = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) `mustBe` OK
         contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
       }
     }
@@ -136,7 +131,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -154,8 +149,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val expectedAnswers = baseAnswers.set(AddTradingNamePage, true).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddTradingNamePage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` AddTradingNamePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -171,44 +166,14 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view                    = application.injector.instanceOf[AddTradingNameView]
+        val view = application.injector.instanceOf[AddTradingNameView]
         implicit val msgs: Messages = messages(application)
-        val list                    = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
+        val list = TradingNameSummary.addToListRows(baseAnswers, NormalMode)
 
 
         val result = route(application, request).value
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addTradingNameRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, addTradingNameRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
       }
     }
 
@@ -216,10 +181,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of trading names" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -227,41 +189,10 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
-
-      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, addTradingNameAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, addTradingNameAmendRoute)
-              .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
     }
   }
 }

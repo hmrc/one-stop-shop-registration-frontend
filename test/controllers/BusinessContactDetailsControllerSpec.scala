@@ -24,9 +24,9 @@ import models.emailVerification.EmailVerificationResponse
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,7 +34,7 @@ import pages.BusinessContactDetailsPage
 import play.api.inject.bind
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.{EmailVerificationService, SaveForLaterService}
 import testutils.RegistrationData
@@ -86,8 +86,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
           val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
         }
       }
 
@@ -104,8 +104,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
           val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode, enrolmentsEnabled = true)(request, messages(application)).toString
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true)(request, messages(application)).toString
         }
       }
 
@@ -122,8 +122,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
           val result = route(application, request).value
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
         }
       }
     }
@@ -159,8 +159,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val result = route(application, request).value
             val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` routes.BankDetailsController.onPageLoad(NormalMode).url
             verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
@@ -203,8 +203,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val result = route(application, request).value
             val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
             verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
@@ -261,8 +261,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
               eqTo(anEmailVerificationRequest.pageTitle),
               eqTo(anEmailVerificationRequest.continueUrl))(any())) thenReturn Right(emailVerificationResponse).toFuture
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual config.emailVerificationUrl + emailVerificationResponse.redirectUri
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` config.emailVerificationUrl + emailVerificationResponse.redirectUri
             verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(anEmailVerificationRequest.email.get.address), eqTo(anEmailVerificationRequest.credId))(any())
@@ -321,8 +321,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val result = route(application, request).value
             val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails.copy(emailAddress = newEmailAddress)).success.value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual config.emailVerificationUrl + amendEmailVerificationResponse.redirectUri
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` config.emailVerificationUrl + amendEmailVerificationResponse.redirectUri
             verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(newEmailAddress), eqTo(amendEmailVerificationRequest.credId))(any())
@@ -362,8 +362,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
             val result = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.EmailVerificationCodesExceededController.onPageLoad().url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` routes.EmailVerificationCodesExceededController.onPageLoad().url
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
             verifyNoMoreInteractions(mockEmailVerificationService)
@@ -401,8 +401,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
             val result = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` routes.EmailVerificationCodesAndEmailsExceededController.onPageLoad().url
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(emailVerificationRequest.email.get.address), eqTo(emailVerificationRequest.credId))(any())
             verifyNoMoreInteractions(mockEmailVerificationService)
@@ -457,8 +457,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
             val result = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
             verifyNoInteractions(mockSessionRepository)
             verify(mockEmailVerificationService, times(1))
               .isEmailVerified(eqTo(anEmailVerificationRequest.email.get.address), eqTo(anEmailVerificationRequest.credId))(any())
@@ -498,8 +498,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val result = route(application, request).value
             val expectedAnswers = basicUserAnswersWithVatInfo.set(BusinessContactDetailsPage, contactDetails).success.value
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.BankDetailsController.onPageLoad(NormalMode).url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` routes.BankDetailsController.onPageLoad(NormalMode).url
             verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             verifyNoInteractions(mockEmailVerificationService)
           }
@@ -523,40 +523,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
           val result = route(application, request).value
 
-          status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
-        }
-      }
-
-      "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, businessContactDetailsRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None)
-          .configure("features.enrolments-enabled" -> "false")
-          .build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, businessContactDetailsRoute)
-              .withFormUrlEncodedBody(("fullName", "value 1"), ("telephoneNumber", "0111 2223334"), ("emailAddress", "email@email.com"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` BAD_REQUEST
+          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
         }
       }
     }

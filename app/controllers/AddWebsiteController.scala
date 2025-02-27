@@ -75,9 +75,10 @@ class AddWebsiteController @Inject()(
   }
 
   private def getNumberOfWebsites(mode: Mode)(block: Int => Future[Result])
-                                 (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+                                 (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.get(DeriveNumberOfWebsites).map {
       number =>
         block(number)
     }.getOrElse(Redirect(determineMissingAnswersJourney(Some(mode))).toFuture)
+  }
 }

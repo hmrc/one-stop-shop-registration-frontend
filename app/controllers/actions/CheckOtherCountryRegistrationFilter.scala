@@ -31,7 +31,8 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckOtherCountryRegistrationFilterImpl @Inject()(mode: Option[Mode],
+class CheckOtherCountryRegistrationFilterImpl @Inject()(
+                                                         mode: Option[Mode],
                                                          service: CoreRegistrationValidationService,
                                                          appConfig: FrontendAppConfig
                                                        )(implicit val executionContext: ExecutionContext)
@@ -77,6 +78,6 @@ class CheckOtherCountryRegistrationFilter @Inject()(
                                                      appConfig: FrontendAppConfig
                                                    )(implicit val executionContext: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = {
-    new CheckOtherCountryRegistrationFilterImpl(mode, service,appConfig)
+    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig)
   }
 }

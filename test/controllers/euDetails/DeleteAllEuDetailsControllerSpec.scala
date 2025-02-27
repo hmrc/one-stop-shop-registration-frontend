@@ -17,35 +17,26 @@
 package controllers.euDetails
 
 import base.SpecBase
-import connectors.RegistrationConnector
-import controllers.euDetails.{routes => euRoutes}
+import controllers.euDetails.routes as euRoutes
 import forms.euDetails.DeleteAllEuDetailsFormProvider
-import models.domain.Registration
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.{AmendMode, CheckMode, Country, Index, InternationalAddress}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails._
+import pages.euDetails.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.EuDetailsTopLevelNode
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
-import utils.CheckJourneyRecovery.determineJourneyRecovery
+import utils.FutureSyntax.FutureOps
 import views.html.euDetails.DeleteAllEuDetailsView
-
-import scala.concurrent.Future
 
 class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-
   private val formProvider = new DeleteAllEuDetailsFormProvider()
   private val form = formProvider()
-
-  private val registration: Registration = RegistrationData.registration
 
   private val userAnswers = basicUserAnswersWithVatInfo
     .set(TaxRegisteredInEuPage, true).success.value
@@ -70,10 +61,7 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
           "must return OK and the correct view for a GET" in {
 
-            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
-
             val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
               .build()
 
             running(application) {
@@ -83,8 +71,8 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
               val view = application.injector.instanceOf[DeleteAllEuDetailsView]
 
-              status(result) mustEqual OK
-              contentAsString(result) mustEqual view(form, mode)(request, messages(application)).toString
+              status(result) `mustBe` OK
+              contentAsString(result) `mustBe` view(form, mode)(request, messages(application)).toString
             }
           }
 
@@ -92,13 +80,11 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
             val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+            when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
             val application =
               applicationBuilder(userAnswers = Some(userAnswers))
                 .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
                 .build()
 
             running(application) {
@@ -111,8 +97,8 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
                 .set(DeleteAllEuDetailsPage, true).success.value
                 .remove(EuDetailsTopLevelNode).success.value
 
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual DeleteAllEuDetailsPage.navigate(mode, expectedAnswers).url
+              status(result) `mustBe` SEE_OTHER
+              redirectLocation(result).value `mustBe` DeleteAllEuDetailsPage.navigate(mode, expectedAnswers).url
               verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             }
           }
@@ -121,13 +107,11 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
             val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-            when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+            when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
             val application =
               applicationBuilder(userAnswers = Some(userAnswers))
                 .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-                .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
                 .build()
 
             running(application) {
@@ -140,18 +124,15 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
                 .set(DeleteAllEuDetailsPage, false).success.value
                 .set(TaxRegisteredInEuPage, true).success.value
 
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual DeleteAllEuDetailsPage.navigate(mode, expectedAnswers).url
+              status(result) `mustBe` SEE_OTHER
+              redirectLocation(result).value `mustBe` DeleteAllEuDetailsPage.navigate(mode, expectedAnswers).url
               verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
             }
           }
 
           "must return a Bad Request and errors when invalid data is submitted" in {
 
-            when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
-
             val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-              .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
               .build()
 
             running(application) {
@@ -165,41 +146,10 @@ class DeleteAllEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
               val result = route(application, request).value
 
-              status(result) mustEqual BAD_REQUEST
-              contentAsString(result) mustEqual view(boundForm, mode)(request, messages(application)).toString
+              status(result) `mustBe` BAD_REQUEST
+              contentAsString(result) `mustBe` view(boundForm, mode)(request, messages(application)).toString
             }
           }
-
-          s"must redirect to Journey Recovery in $mode for a GET if no existing data is found" in {
-
-            val application = applicationBuilder(userAnswers = None).build()
-
-            running(application) {
-              val request = FakeRequest(GET, deleteAllEuDetailsRoute)
-
-              val result = route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual determineJourneyRecovery(Some(mode)).url
-            }
-          }
-
-          s"must redirect to Journey Recovery in $mode for a POST if no existing data is found" in {
-
-            val application = applicationBuilder(userAnswers = None).build()
-
-            running(application) {
-              val request =
-                FakeRequest(POST, deleteAllEuDetailsRoute)
-                  .withFormUrlEncodedBody(("value", "true"))
-
-              val result = route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-              redirectLocation(result).value mustEqual determineJourneyRecovery(Some(mode)).url
-            }
-          }
-
         }
     }
   }
