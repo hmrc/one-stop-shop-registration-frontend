@@ -16,11 +16,11 @@
 
 package controllers.actions
 
-import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest, AuthenticatedOptionalDataRequest, AuthenticatedOssOptionalDataRequest}
 import models.Mode
+import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest, AuthenticatedOptionalDataRequest}
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
-import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
+import play.api.mvc.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.FeatureFlagService
 
@@ -65,8 +65,6 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   def checkVatExpiredFilter: CheckVatExpiredFilter
 
   def requireOss: OssRequiredAction
-  
-  def requireOssWithOptionalData: RequiredOssWithOptionalDataAction
 
   def checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
 
@@ -97,14 +95,9 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   }
 
   def authAndGetDataWithOss(mode: Option[Mode] = None): ActionBuilder[AuthenticatedMandatoryDataRequest, AnyContent] = {
-    authAndGetData(mode) andThen
+    authAndGetDataAndCheckVerifyEmail(mode) andThen
       requireOss() andThen
       checkBouncedEmailFilter(mode)
-  }
-
-  def authAndGetOptionalDataWithOss(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOssOptionalDataRequest, AnyContent] = {
-    authAndGetOptionalData(mode) andThen
-      requireOssWithOptionalData()
   }
 }
 
@@ -134,6 +127,5 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider,
                                                                checkVatExpiredFilter: CheckVatExpiredFilter,
                                                                requireOss: OssRequiredAction,
-                                                               requireOssWithOptionalData: RequiredOssWithOptionalDataAction,
                                                                checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
                                                              ) extends AuthenticatedControllerComponents

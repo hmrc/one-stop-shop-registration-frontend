@@ -54,7 +54,7 @@ class CheckBouncedEmailFilterImpl(
   }
 
   private def checkVerificationStatusAndGetRedirect(
-                                                     mode: Option[Mode],
+                                                     maybeMode: Option[Mode],
                                                      userId: String,
                                                      emailAddress: String
                                                    )(implicit hc: HeaderCarrier): Future[Option[Result]] = {
@@ -74,9 +74,9 @@ class CheckBouncedEmailFilterImpl(
 
       case NotVerified =>
         logger.info("CheckBouncedEmailFilter - NotVerified")
-        mode match {
-          case Some(otherMode) if otherMode == AmendMode || otherMode == RejoinMode =>
-            Some(Redirect(routes.BusinessContactDetailsController.onPageLoad(otherMode).url)).toFuture
+        maybeMode match {
+          case Some(mode) if mode == AmendMode || mode == RejoinMode =>
+            Some(Redirect(routes.BusinessContactDetailsController.onPageLoad(mode).url)).toFuture
 
           case _ =>
             None.toFuture

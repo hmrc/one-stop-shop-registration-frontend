@@ -17,10 +17,10 @@
 package controllers.actions
 
 import logging.Logging
-import models.{AmendMode, Mode}
 import models.requests.AuthenticatedDataRequest
-import play.api.mvc.{ActionFilter, Result}
+import models.{AmendMode, Mode}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Result}
 import services.RegistrationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter

@@ -68,21 +68,6 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
           }
         }
 
-        "must redirect to Journey Recovery On Missing Answers when there are empty userAnswers present" in {
-
-          val application = applicationBuilder().build()
-
-          running(application) {
-
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers))
-            val action = new Harness(NormalMode)
-
-            val result = action.callRefine(request).futureValue
-
-            result `mustBe` Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers().url))
-          }
-        }
-
         "must return Right(AuthenticatedDataRequest) with no Registration when there is data present" in {
 
           val application = applicationBuilder().build()

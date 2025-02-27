@@ -20,7 +20,6 @@ import base.SpecBase
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import models.domain.Registration
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -31,7 +30,6 @@ import play.api.mvc.{Action, AnyContent, DefaultActionBuilder, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.UrlBuilderService
-import testutils.RegistrationData
 import testutils.TestAuthRetrievals.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
@@ -46,7 +44,6 @@ import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-// TODO -> getReg tests
 class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private type RetrievalsType = Option[Credentials] ~ Enrolments ~ Option[AffinityGroup] ~ ConfidenceLevel
@@ -59,8 +56,6 @@ class AuthActionSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach 
 
   private val mockAuthConnector: AuthConnector = mock[AuthConnector]
   private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-
-  private val registration: Registration = RegistrationData.registration
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockAuthConnector)

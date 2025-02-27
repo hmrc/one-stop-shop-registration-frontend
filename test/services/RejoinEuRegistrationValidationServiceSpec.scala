@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import models.core.{Match, MatchType}
 import models.domain.*
-import models.requests.AuthenticatedMandatoryDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{Country, InternationalAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
@@ -44,7 +44,7 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
 
   implicit private val hc: HeaderCarrier = HeaderCarrier()
   implicit private val request: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(
-    FakeRequest("GET", "/"),
+    AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers),
     testCredentials,
     vrn,
     registration,

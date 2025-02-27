@@ -23,7 +23,7 @@ import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.AuthenticatedDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -54,10 +54,9 @@ import java.time.LocalDate
 class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
-
   private val registration = RegistrationData.registration
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers)
+  private val dataRequest: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(request, testCredentials, vrn, registration, emptyUserAnswers)
 
   private val registrationValidationService = mock[RegistrationValidationService]
   private val registrationService = mock[RegistrationService]
@@ -84,7 +83,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
         val commencementDate = LocalDate.of(2022, 1, 1)
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-        when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
         when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
@@ -97,7 +96,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val view = application.injector.instanceOf[ChangeYourRegistrationView]
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
-          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, AmendMode).futureValue)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
           status(result) `mustBe` OK
           contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, AmendMode)(request, messages(application)).toString
@@ -123,7 +122,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
 
             status(result) `mustBe` OK
@@ -148,7 +147,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
@@ -172,7 +171,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
@@ -196,7 +195,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
@@ -220,7 +219,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
@@ -246,7 +245,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
@@ -272,7 +271,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
@@ -297,7 +296,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
           val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
-          val application = applicationBuilder(userAnswers = Some(userAnswers))
+          val application = applicationBuilder(userAnswers = Some(userAnswers), registration = Some(registration))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -343,7 +342,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
           val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
-          val application = applicationBuilder(userAnswers = Some(userAnswers))
+          val application = applicationBuilder(userAnswers = Some(userAnswers), registration = Some(registration))
             .configure("features.amend.email-enabled" -> "false")
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
@@ -378,7 +377,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
             Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
 
-          val application = applicationBuilder(userAnswers = Some(invalidUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(invalidUserAnswers), registration = Some(registration))
             .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
             .build()
 
@@ -402,7 +401,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               .set(TaxRegisteredInEuPage, true).success.value
               .set(EuCountryPage(Index(0)), country).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -422,7 +421,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               .set(EuCountryPage(Index(0)), country).success.value
               .remove(EuDetailsQuery(Index(0))).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .build()
 
             running(application) {
@@ -446,7 +445,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
               .set(PreviousSchemeTypePage(Index(0), Index(0)), PreviousSchemeType.OSS).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -466,7 +465,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
 
             val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -486,7 +485,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
             val answers = completeUserAnswers.remove(HasMadeSalesPage).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -506,7 +505,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
             val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -526,7 +525,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
             val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -546,7 +545,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
             val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -566,7 +565,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
             val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
 
-            val application = applicationBuilder(userAnswers = Some(answers))
+            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
               .build()
 
@@ -590,7 +589,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Left(errorResponse).toFuture
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -616,7 +615,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Left(errorResponse).toFuture
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),

@@ -34,18 +34,10 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
   extends ActionRefiner[AuthenticatedOptionalDataRequest, AuthenticatedDataRequest] {
 
   override protected def refine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedDataRequest[A]]] = {
-
+    
     request.userAnswers match {
       case None =>
         Left(Redirect(determineJourneyRecovery(mode))).toFuture
-      case Some(data) if data.data.value.isEmpty =>
-        if (mode.exists(_.isInAmendOrRejoin)) {
-          Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
-        } else if (mode.exists(_.isInAmendOrRejoin)) {
-          Left(Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad())).toFuture
-        } else {
-          Left(Redirect(routes.JourneyRecoveryController.onMissingAnswers())).toFuture
-        }
       case Some(data) =>
         if (mode.exists(_.isInAmendOrRejoin)) {
           request.registration match {
@@ -58,7 +50,6 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
                 Left(Redirect(controllers.rejoin.routes.RejoinJourneyRecoveryController.onPageLoad())).toFuture
               }
           }
-
         } else {
           Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, None, data)).toFuture
         }

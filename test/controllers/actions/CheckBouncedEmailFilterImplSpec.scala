@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import controllers.routes
 import models.domain.Registration
 import models.emailVerification.PasscodeAttemptsStatus
-import models.requests.AuthenticatedMandatoryDataRequest
+import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{AmendLoopMode, AmendMode, BusinessContactDetails, CheckLoopMode, CheckMode, Mode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -50,6 +50,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
     def callFilter[A](request: AuthenticatedMandatoryDataRequest[A]): Future[Option[Result]] = {
       filter(request)
     }
+  }
+
+  private def populateDataRequest(registration: Registration, userAnswers: UserAnswers): AuthenticatedDataRequest[_] = {
+    AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, Some(registration), userAnswers)
   }
 
   private val mockEmailVerificationService: EmailVerificationService = mock[EmailVerificationService]
@@ -88,7 +92,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
             .build()
 
           running(application) {
-            val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registration, updatedUserAnswers)
+            val request = AuthenticatedMandatoryDataRequest(
+              populateDataRequest(registration, updatedUserAnswers),
+              testCredentials, vrn, registration, updatedUserAnswers
+            )
 
             val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -111,7 +118,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
             .build()
 
           running(application) {
-            val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registration, updatedUserAnswers)
+            val request = AuthenticatedMandatoryDataRequest(
+              populateDataRequest(registration, updatedUserAnswers),
+              testCredentials, vrn, registration, updatedUserAnswers
+            )
 
             val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -134,7 +144,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
             .build()
 
           running(application) {
-            val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registration, updatedUserAnswers)
+            val request = AuthenticatedMandatoryDataRequest(
+              populateDataRequest(registration, updatedUserAnswers),
+              testCredentials, vrn, registration, updatedUserAnswers
+            )
 
             val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -159,7 +172,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
             .build()
 
           running(application) {
-            val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registration, emptyUserAnswers)
+            val request = AuthenticatedMandatoryDataRequest(
+              populateDataRequest(registration, emptyUserAnswers),
+              testCredentials, vrn, registration, emptyUserAnswers
+            )
 
             val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -179,7 +195,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
             .build()
 
           running(application) {
-            val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registrationWithUnusableStatusFalse, emptyUserAnswers)
+            val request = AuthenticatedMandatoryDataRequest(
+              populateDataRequest(registration, emptyUserAnswers),
+              testCredentials, vrn, registrationWithUnusableStatusFalse, emptyUserAnswers
+            )
 
             val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -203,7 +222,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
           .build()
 
         running(application) {
-          val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registration, updatedUserAnswers)
+          val request = AuthenticatedMandatoryDataRequest(
+            populateDataRequest(registration, updatedUserAnswers),
+            testCredentials, vrn, registration, updatedUserAnswers
+          )
 
           val config = application.injector.instanceOf[FrontendAppConfig]
 
@@ -228,7 +250,10 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
           .build()
 
         running(application) {
-          val request = AuthenticatedMandatoryDataRequest(FakeRequest(), testCredentials, vrn, registration, updatedUserAnswers)
+          val request = AuthenticatedMandatoryDataRequest(
+            populateDataRequest(registration, updatedUserAnswers),
+            testCredentials, vrn, registration, updatedUserAnswers
+          )
 
           val config = application.injector.instanceOf[FrontendAppConfig]
 
