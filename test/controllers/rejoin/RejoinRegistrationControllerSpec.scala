@@ -34,7 +34,6 @@ import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, P
 import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.EuDetailsQuery

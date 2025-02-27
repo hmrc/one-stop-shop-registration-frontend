@@ -37,7 +37,6 @@ import pages.previousRegistrations.*
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, *}
 import queries.{EmailConfirmationQuery, EuDetailsQuery}
