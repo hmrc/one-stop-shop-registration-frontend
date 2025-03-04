@@ -68,7 +68,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
 
-  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+  def authAndGetDataBase(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
@@ -77,17 +77,28 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       requireData(mode) andThen
       checkVatExpiredFilter(mode) andThen
       checkNiProtocolExpired(mode) andThen
-      checkNiProtocol(mode) andThen
-      checkOtherCountryRegistration(mode)
+      checkNiProtocol(mode)
+  }
 
-  def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
+  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+    authAndGetDataBase(mode) andThen
+      checkOtherCountryRegistration(mode)
+  }
+
+  def authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+    authAndGetDataBase(mode) andThen
+      checkRejoinOtherCountryRegistration(mode) andThen
+      checkEmailVerificationStatus(mode)
+  }
+
+  def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] = {
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
       getData andThen
-      checkNiProtocolExpiredOptional(mode) andThen
-      checkRejoinOtherCountryRegistration(mode)
+      checkNiProtocolExpiredOptional(mode)
+  }
 
   def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     authAndGetData(mode) andThen
@@ -95,7 +106,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
   }
 
   def authAndGetDataWithOss(mode: Option[Mode] = None): ActionBuilder[AuthenticatedMandatoryDataRequest, AnyContent] = {
-    authAndGetDataAndCheckVerifyEmail(mode) andThen
+    authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode) andThen
       requireOss() andThen
       checkBouncedEmailFilter(mode)
   }
