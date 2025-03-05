@@ -17,26 +17,23 @@
 package controllers.euDetails
 
 import base.SpecBase
+import controllers.amend.routes as amendRoutes
+import controllers.euDetails.routes as euDetailsRoutes
 import controllers.routes
-import controllers.euDetails.{routes => euDetailsRoutes}
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
 import forms.euDetails.DeleteEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
 import models.{AmendMode, Country, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails._
+import pages.euDetails.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.EuDetailsQuery
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import views.html.euDetails.DeleteEuDetailsView
-
-import scala.concurrent.Future
 
 class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -48,8 +45,6 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val deleteEuVatDetailsRoute = euDetailsRoutes.DeleteEuDetailsController.onPageLoad(NormalMode, countryIndex).url
   private lazy val deleteEuVatDetailsAmendRoute = euDetailsRoutes.DeleteEuDetailsController.onPageLoad(AmendMode, countryIndex).url
-
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   private val formProvider = new DeleteEuDetailsFormProvider()
   private val form = formProvider(euVatDetails.euCountry.name)
@@ -78,8 +73,8 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[DeleteEuDetailsView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, countryIndex, euVatDetails.euCountry.name)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, countryIndex, euVatDetails.euCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -87,7 +82,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -102,8 +97,8 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseUserAnswers.remove(EuDetailsQuery(Index(0))).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteEuDetailsPage(Index(0)).navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeleteEuDetailsPage(Index(0)).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -112,7 +107,7 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -126,8 +121,8 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeleteEuDetailsPage(Index(0)).navigate(NormalMode, baseUserAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeleteEuDetailsPage(Index(0)).navigate(NormalMode, baseUserAnswers).url
         verify(mockSessionRepository, never()).set(eqTo(baseUserAnswers))
       }
     }
@@ -147,22 +142,8 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, countryIndex, euVatDetails.euCountry.name)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, deleteEuVatDetailsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, countryIndex, euVatDetails.euCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -175,49 +156,16 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, deleteEuVatDetailsRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
     "in AmendMode" - {
 
-      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, deleteEuVatDetailsAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
       "must redirect to resolve missing answers for a GET if no EU VAT details exist" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -225,27 +173,10 @@ class DeleteEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
-
-      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, deleteEuVatDetailsAmendRoute)
-              .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
     }
   }
 }

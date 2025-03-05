@@ -16,15 +16,15 @@
 
 package controllers.actions
 
-import javax.inject.Inject
-import models.requests._
+import models.requests.*
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, ActionTransformer, Result}
 import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 import services.DataMigrationService
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersRepository: AuthenticatedUserAnswersRepository,
@@ -47,7 +47,7 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
             case None =>
               copyCurrentSessionData(request).map(Right(_))
             case Some(answers) =>
-              AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, Some(answers)).toFuture.map(Right(_))
+              AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(answers)).toFuture.map(Right(_))
           }
     }
   }
@@ -58,13 +58,13 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
       id =>
         migrationService
           .migrate(id.value, request.userId)
-          .map(ua => AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, Some(ua)))
-    }.getOrElse(AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, None).toFuture)
+          .map(ua => AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(ua)))
+    }.getOrElse(AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, None).toFuture)
   }
 }
 
 class UnauthenticatedDataRetrievalAction @Inject()(val sessionRepository: UnauthenticatedUserAnswersRepository)
-                                                (implicit val executionContext: ExecutionContext)
+                                                  (implicit val executionContext: ExecutionContext)
   extends ActionTransformer[SessionRequest, UnauthenticatedOptionalDataRequest] {
 
   override protected def transform[A](request: SessionRequest[A]): Future[UnauthenticatedOptionalDataRequest[A]] = {

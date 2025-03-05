@@ -16,17 +16,17 @@
 
 package utils
 
-import models._
-import models.euDetails._
+import models.*
+import models.euDetails.*
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalFields, PreviousRegistrationDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
-import pages._
-import pages.previousRegistrations._
-import play.api.mvc.{AnyContent, Result}
+import pages.*
+import pages.previousRegistrations.*
 import play.api.mvc.Results.Redirect
-import queries._
-import queries.previousRegistration._
-import utils.EuDetailsCompletionChecks._
+import play.api.mvc.{AnyContent, Result}
+import queries.*
+import queries.previousRegistration.*
+import utils.EuDetailsCompletionChecks.*
 
 import scala.concurrent.Future
 

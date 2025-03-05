@@ -19,8 +19,9 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import controllers.ioss.{routes => iossExclusionsRoutes}
+import controllers.ioss.routes as iossExclusionsRoutes
 import controllers.routes
+import models.domain.Registration
 import models.requests.AuthenticatedIdentifierRequest
 import models.{AmendLoopMode, AmendMode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -32,7 +33,7 @@ import play.api.inject.bind
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.DataMigrationService
 import services.ioss.IossExclusionService
 import testutils.RegistrationData
@@ -50,7 +51,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
     def callFilter(request: AuthenticatedIdentifierRequest[_]): Future[Option[Result]] = filter(request)
   }
 
-  private val mockConnector = mock[RegistrationConnector]
+  private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockDataMigrationService = mock[DataMigrationService]
   private val mockIossExclusionService = mock[IossExclusionService]
   private val registrationEnrolment = Enrolments(
@@ -68,6 +69,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
     )
   )
 
+  private val registration: Registration = RegistrationData.registration
   private val iossEnrolmentKey: String = "HMRC-IOSS-ORG"
   private val iossNumber: String = "IM9001234567"
   private val iossEnrolment = Enrolment(iossEnrolmentKey, Seq(EnrolmentIdentifier("IOSSNumber", iossNumber)), "test", None)
@@ -82,21 +84,19 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
     Enrolments(registrationEnrolment.enrolments ++ Set(iossEnrolment))
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector)
+    Mockito.reset(mockRegistrationConnector)
   }
 
   ".filter" - {
 
     "must return None when an existing registration or enrolment is not found" in {
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
-
-      val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
+      val app = applicationBuilder(None).build()
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-        val controller = new Harness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+        val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
 
@@ -106,28 +106,28 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
     "must redirect to Already Registered and migrate data when an existing registration is found" in {
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-      when(mockDataMigrationService.migrate(any(), any())) thenReturn Future.successful(UserAnswers(userAnswersId))
+      when(mockDataMigrationService.migrate(any(), any())) thenReturn UserAnswers(userAnswersId).toFuture
 
-      val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector)).build()
+      val app = applicationBuilder(None)
+        .overrides(
+          bind[DataMigrationService].toInstance(mockDataMigrationService)
+        ).build()
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty))
-        val controller = new Harness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty), Some(registration))
+        val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
         verify(mockDataMigrationService, times(1)).migrate(any(), any())
 
-        result.value mustEqual Redirect(routes.AlreadyRegisteredController.onPageLoad())
+        result.value `mustBe` Redirect(routes.AlreadyRegisteredController.onPageLoad())
       }
     }
 
     "must redirect to Already Registered when an enrolment is found" in {
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
-
-      val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockConnector))
+      val app = applicationBuilder(None).overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .configure(
           "features.enrolments-enabled" -> true,
           "oss-enrolment" -> "HMRC-OSS-ORG"
@@ -136,22 +136,20 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment)
-        val controller = new Harness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment, None)
+        val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
 
-        result.value mustEqual Redirect(routes.AlreadyRegisteredController.onPageLoad())
+        result.value `mustBe` Redirect(routes.AlreadyRegisteredController.onPageLoad())
       }
     }
 
     "must redirect to Cannot Register Quarantined Ioss Trader when trader is quarantined code 4 on IOSS service when in Normal mode" in {
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
       when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
 
       val app = applicationBuilder(None, mode = Some(NormalMode))
-        .overrides(bind[RegistrationConnector].toInstance(mockConnector))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
         .configure(
           "features.enrolments-enabled" -> true,
@@ -161,22 +159,20 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments)
-        val controller = new Harness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None)
+        val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
 
-        result.value mustEqual Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad())
+        result.value `mustBe` Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad())
       }
     }
 
     "must redirect to Cannot Register Quarantined Ioss Trader when trader is quarantined code 4 on IOSS service when in Rejoin mode" in {
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
       when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
 
       val app = applicationBuilder(None, mode = Some(RejoinMode))
-        .overrides(bind[RegistrationConnector].toInstance(mockConnector))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
         .configure(
           "features.enrolments-enabled" -> true,
@@ -186,22 +182,20 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments)
-        val controller = new Harness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None)
+        val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
 
-        result.value mustEqual Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad())
+        result.value `mustBe` Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad())
       }
     }
 
     "must redirect to Cannot Register Quarantined Ioss Trader when trader is quarantined code 4 on IOSS service when in Rejoin Loop mode" in {
 
-      when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
       when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
 
       val app = applicationBuilder(None, mode = Some(RejoinLoopMode))
-        .overrides(bind[RegistrationConnector].toInstance(mockConnector))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
         .configure(
           "features.enrolments-enabled" -> true,
@@ -211,12 +205,12 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments)
-        val controller = new Harness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None)
+        val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
 
-        result.value mustEqual Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad())
+        result.value `mustBe` Redirect(iossExclusionsRoutes.CannotRegisterQuarantinedIossTraderController.onPageLoad())
       }
     }
   }
@@ -232,18 +226,15 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
         s"must return None when an existing registration is found without enrolments" in {
 
-          when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-          when(mockConnector.enrolUser()(any())) thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
-
+          when(mockRegistrationConnector.enrolUser()(any())) thenReturn HttpResponse(NO_CONTENT, "").toFuture
 
           val app = applicationBuilder(None, mode = Some(mode))
-            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .build()
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-            val controller = new AmendHarness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), Some(registration))
+            val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
 
@@ -253,19 +244,14 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
         s"must return None when an existing registration is found with enrolments" in {
 
-          when(mockConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
           val app = applicationBuilder(None, mode = Some(mode))
-            .configure(
-              "features.enrolments-enabled" -> true
-            )
-            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
+            .configure("features.enrolments-enabled" -> true)
             .build()
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment)
-            val controller = new AmendHarness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment, Some(registration))
+            val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
 
@@ -275,30 +261,25 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
         s"must redirect to Not Registered Controller when a registration is not found" in {
 
-          when(mockConnector.getRegistration()(any())) thenReturn Future.successful(None)
-
           val app = applicationBuilder(None, mode = Some(mode))
-            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .build()
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty))
-            val controller = new AmendHarness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
 
-            result.value mustBe Redirect(routes.NotRegisteredController.onPageLoad())
+            result.value `mustBe` Redirect(routes.NotRegisteredController.onPageLoad())
           }
         }
 
         s"must return None when trader is quarantined code 4 on IOSS service" in {
 
-          when(mockConnector.getRegistration()(any())) thenReturn Some(RegistrationData.registration).toFuture
           when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
 
           val app = applicationBuilder(None, mode = Some(mode))
-            .overrides(bind[RegistrationConnector].toInstance(mockConnector))
             .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
             .configure(
               "features.enrolments-enabled" -> true,
@@ -308,8 +289,8 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, ossAndIossEnrolments)
-            val controller = new AmendHarness(mockConnector, config, mockDataMigrationService, mockIossExclusionService)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, ossAndIossEnrolments, Some(registration))
+            val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
 

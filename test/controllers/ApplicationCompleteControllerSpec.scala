@@ -22,8 +22,8 @@ import connectors.RegistrationConnector
 import formats.Format.dateFormatter
 import models.Quarter.{Q1, Q4}
 import models.external.ExternalEntryUrl
-import models.{Period, UserAnswers}
 import models.requests.AuthenticatedDataRequest
+import models.{Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,14 +33,15 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.EmailConfirmationQuery
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.FutureSyntax.FutureOps
 import views.html.ApplicationCompleteView
 
 import java.time.{Clock, LocalDate, ZoneId}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 
 class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
@@ -55,7 +56,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
   private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
   private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
 
-  private  val userAnswers = UserAnswers(
+  private val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       BusinessContactDetailsPage.toString -> Json.obj(
@@ -88,13 +89,13 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           .overrides(bind[DateService].toInstance(mockDateService))
           .build()
 
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(arbitraryStartDate))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(arbitraryStartDate).toFuture
         when(mockDateService.startOfNextQuarter()) thenReturn arbitraryStartDate
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -107,8 +108,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
             showEmailConfirmation = true,
@@ -140,11 +141,11 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -157,8 +158,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
             showEmailConfirmation = true,
@@ -189,11 +190,11 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -206,8 +207,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val firstDayOfNextPeriod = nextPeriod.firstDay
           val view = application.injector.instanceOf[ApplicationCompleteView]
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             "",
             vrn,
             showEmailConfirmation = false,
@@ -239,10 +240,10 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockAtArbitraryDate)))
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -255,8 +256,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val firstDayOfNextPeriod = nextPeriod.firstDay
 
           val view = application.injector.instanceOf[ApplicationCompleteView]
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
             showEmailConfirmation = true,
@@ -292,11 +293,11 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.now(stubClockForToday)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockForToday)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         running(application) {
           implicit val msgs: Messages = messages(application)
@@ -309,9 +310,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
 
-          status(result) mustEqual OK
+          status(result) `mustBe` OK
 
-          contentAsString(result) mustEqual view(
+          contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
             showEmailConfirmation = true,
@@ -329,11 +330,11 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
         when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Future.successful(Some(LocalDate.of(2021, 10, 1)))
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.of(2021, 10, 1)).toFuture
 
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
 
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Future.successful(Right(ExternalEntryUrl(None)))
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
@@ -360,9 +361,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           val nextPeriod = periodService.getNextPeriod(periodOfFirstReturn)
           val firstDayOfNextPeriod = nextPeriod.firstDay
 
-          status(result) mustEqual OK
+          status(result) `mustBe` OK
 
-          contentAsString(result) mustEqual view(
+          contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
             showEmailConfirmation = true,
@@ -373,21 +374,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter)
           )(request, messages(application)).toString
-        }
-      }
-
-      "must redirect to Journey Recovery and the correct view for a GET with no user answers" in {
-
-        val application = applicationBuilder(userAnswers = None)
-          .configure("features.enrolments-enabled" -> "false")
-          .overrides(bind[PeriodService].toInstance(periodService))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.ApplicationCompleteController.onPageLoad().url)
-          val result = route(application, request).value
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }

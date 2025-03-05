@@ -19,7 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import logging.Logging
 import models.core.MatchType
-import models.requests.AuthenticatedOptionalDataRequest
+import models.requests.AuthenticatedDataRequest
 import models.{Mode, RejoinLoopMode, RejoinMode}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
@@ -34,11 +34,11 @@ class CheckRejoinOtherCountryRegistrationFilterImpl(mode: Option[Mode],
                                                     coreRegistrationValidationService: CoreRegistrationValidationService,
                                                     appConfig: FrontendAppConfig)
                                                    (implicit val executionContext: ExecutionContext)
-  extends ActionFilter[AuthenticatedOptionalDataRequest] with Logging {
+  extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   private val exclusionStatusCode = 4
 
-  override protected def filter[A](request: AuthenticatedOptionalDataRequest[A]): Future[Option[Result]] = {
+  override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.otherCountryRegistrationValidationEnabled && Seq(RejoinMode, RejoinLoopMode).exists(mode.contains)) {
@@ -47,8 +47,8 @@ class CheckRejoinOtherCountryRegistrationFilterImpl(mode: Option[Mode],
           Some(Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
 
         case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(exclusionStatusCode) ||
-            activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
-            activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
+          activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
+          activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
           Some(Redirect(
             controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
               case Some(date) => date.toString

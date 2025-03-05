@@ -20,11 +20,11 @@ import base.SpecBase
 import cats.data.Validated.Valid
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
-import models.{BusinessContactDetails, RejoinMode}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.requests.AuthenticatedDataRequest
 import models.responses.UnexpectedResponseStatus
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.{BusinessContactDetails, RejoinMode}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
@@ -33,9 +33,9 @@ import pages.{BusinessContactDetailsPage, DateOfFirstSalePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import services._
+import services.*
 import testutils.RegistrationData
 import viewmodels.checkAnswers.{DateOfFirstSaleSummary, HasMadeSalesSummary}
 import viewmodels.govuk.SummaryListFluency
@@ -66,13 +66,11 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
 
       "must redirect to Cannot rejoin if can rejoin is false" in {
 
-        when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
         when(rejoinRegistrationService.canReverse(any(), any())) thenReturn false
 
 
-        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-          .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
           .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
           .build()
 
@@ -81,21 +79,19 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotReverseController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.rejoin.routes.CannotReverseController.onPageLoad().url
         }
       }
 
       "must return OK and the correct view for a GET" in {
 
-        when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
         when(rejoinRegistrationService.canReverse(any(), any())) thenReturn true
 
         val answers = completeUserAnswers.set(DateOfFirstSalePage, LocalDate.now()).success.value
 
-        val application = applicationBuilder(userAnswers = Some(answers))
-          .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+        val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
           .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
           .build()
 
@@ -112,8 +108,8 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
             DateOfFirstSaleSummary.row(answers, RejoinMode)
           ).flatten)
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(list, RejoinMode, config.ossYourAccountUrl)(request, messages(application)).toString
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(list, RejoinMode, config.ossYourAccountUrl)(request, messages(application)).toString
         }
       }
 
@@ -127,7 +123,6 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
-        when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Right(()))
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
         when(rejoinRegistrationService.canReverse(any(), any())) thenReturn true
@@ -136,7 +131,7 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
         val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
         val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswers), registration = Some(registration))
           .overrides(
             bind[RegistrationValidationService].toInstance(registrationValidationService),
             bind[RegistrationConnector].toInstance(registrationConnector),
@@ -152,8 +147,8 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
           val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, dataRequest)
 
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinCompleteController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.rejoin.routes.RejoinCompleteController.onPageLoad().url
           verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
         }
       }
@@ -165,13 +160,12 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
           val errorResponse = UnexpectedResponseStatus(INTERNAL_SERVER_ERROR, "foo")
 
           when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Future.successful(Valid(registration))
-          when(registrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Future.successful(Left(errorResponse))
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(rejoinRegistrationService.canReverse(any(), any())) thenReturn true
           doNothing().when(auditService).audit(any())(any(), any())
 
-          val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
@@ -186,13 +180,12 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, dataRequest)
 
 
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual controllers.rejoin.routes.ErrorSubmittingRejoinController.onPageLoad().url
+            status(result) `mustBe` SEE_OTHER
+            redirectLocation(result).value `mustBe` controllers.rejoin.routes.ErrorSubmittingRejoinController.onPageLoad().url
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
           }
         }
       }
-
     }
   }
 }

@@ -17,20 +17,18 @@
 package controllers
 
 import base.SpecBase
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
+import controllers.amend.routes as amendRoutes
 import forms.AddWebsiteFormProvider
 import models.{AmendMode, Index, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AddWebsitePage, WebsitePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
-import testutils.RegistrationData
 import viewmodels.checkAnswers.WebsiteSummary
 import views.html.AddWebsiteView
 
@@ -46,9 +44,6 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
   private val baseAnswers = basicUserAnswersWithVatInfo.set(WebsitePage(Index(0)), "foo").success.value
 
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
-
-
   "AddWebsite Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -58,14 +53,14 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
+        val list = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
 
@@ -91,12 +86,12 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(answers, NormalMode)
+        val list = WebsiteSummary.addToListRows(answers, NormalMode)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddWebsites = false)(request, implicitly).toString
       }
     }
 
@@ -109,8 +104,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -123,13 +118,13 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, addWebsiteRoute)
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
+        val list = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) `mustBe` OK
         contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
@@ -155,8 +150,8 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseAnswers.set(AddWebsitePage, true).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddWebsitePage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` AddWebsitePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -172,44 +167,14 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view                    = application.injector.instanceOf[AddWebsiteView]
+        val view = application.injector.instanceOf[AddWebsiteView]
         implicit val msgs: Messages = messages(application)
-        val list                    = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
+        val list = WebsiteSummary.addToListRows(baseAnswers, NormalMode)
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, addWebsiteRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, addWebsiteRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddWebsites = true)(request, implicitly).toString
       }
     }
 
@@ -217,10 +182,7 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
       "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of websites" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -228,41 +190,10 @@ class AddWebsiteControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
-
-      "must redirect to Amend Journey Recovery for a GET if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request = FakeRequest(GET, addWebsiteAmendRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Amend Journey Recovery for a POST if no existing data is found" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, addWebsiteAmendRoute)
-              .withFormUrlEncodedBody(("value", "true"))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
-        }
-      }
-
     }
   }
 }

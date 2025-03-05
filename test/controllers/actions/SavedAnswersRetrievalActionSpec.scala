@@ -17,11 +17,11 @@
 package controllers.actions
 
 import base.SpecBase
-import connectors.{RegistrationConnector, SavedUserAnswers, SaveForLaterConnector}
+import connectors.{RegistrationConnector, SaveForLaterConnector, SavedUserAnswers}
 import models.UserAnswers
 import models.requests.AuthenticatedOptionalDataRequest
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.EitherValues
 import org.scalatestplus.mockito.MockitoSugar
 import pages.SavedProgressPage
@@ -59,14 +59,17 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
         val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
-        val result = action.callRefine(AuthenticatedOptionalDataRequest(request,
+        val result = action.callRefine(AuthenticatedOptionalDataRequest(
+          request,
           testCredentials,
           vrn,
-          Some(answers))).futureValue
+          None,
+          Some(answers)
+        )).futureValue
 
         verifyNoInteractions(saveForLaterConnector)
         verifyNoInteractions(sessionRepository)
-        result.value.userAnswers mustBe (Some(answers))
+        result.value.userAnswers mustBe Some(answers)
       }
     }
 
@@ -93,6 +96,7 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           request,
           testCredentials,
           vrn,
+          None,
           Some(UserAnswers(userAnswersId))
         )).futureValue
 
@@ -112,9 +116,11 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
         val action = new Harness(sessionRepository, saveForLaterConnector, registrationConnector)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
-        val result = action.callRefine(AuthenticatedOptionalDataRequest(request,
+        val result = action.callRefine(AuthenticatedOptionalDataRequest(
+          request,
           testCredentials,
           vrn,
+          None,
           Some(emptyAnswers))).futureValue
 
         verify(saveForLaterConnector, times(1)).get()(any())

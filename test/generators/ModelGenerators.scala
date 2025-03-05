@@ -18,10 +18,10 @@ package generators
 
 import connectors.SavedUserAnswers
 import models.*
+import models.domain.*
 import models.domain.ModelHelpers.normaliseSpaces
-import models.domain.returns.VatOnSalesChoice.Standard
 import models.domain.returns.*
-import models.domain.{EuTaxIdentifier, EuTaxIdentifierType, PreviousSchemeNumbers, TradeDetails}
+import models.domain.returns.VatOnSalesChoice.Standard
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.exclusions.{ExcludedTrader, ExclusionReason}
 import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}

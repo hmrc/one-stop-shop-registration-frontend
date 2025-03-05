@@ -17,27 +17,25 @@
 package controllers.previousRegistrations
 
 import base.SpecBase
+import controllers.amend.routes as amendRoutes
+import controllers.previousRegistrations.routes as prevRoutes
 import controllers.routes
-import controllers.previousRegistrations.{routes => prevRoutes}
-import controllers.amend.{routes => amendRoutes}
-import connectors.RegistrationConnector
 import forms.previousRegistrations.DeletePreviousRegistrationFormProvider
 import models.domain.{PreviousSchemeDetails, PreviousSchemeNumbers}
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.previousRegistrations._
+import pages.previousRegistrations.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import queries.previousRegistration.PreviousRegistrationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.DeletePreviousRegistrationView
-
-import scala.concurrent.Future
 
 class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
@@ -53,8 +51,6 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
   private lazy val deletePreviousRegistrationRoute = prevRoutes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url
   private lazy val deletePreviousRegistrationAmendRoute = prevRoutes.DeletePreviousRegistrationController.onPageLoad(AmendMode, index).url
-
-  private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
@@ -75,8 +71,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         val view = application.injector.instanceOf[DeletePreviousRegistrationView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, previousRegistration.previousEuCountry.name)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, index, previousRegistration.previousEuCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -84,7 +80,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -101,8 +97,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
           baseUserAnswers
             .remove(PreviousRegistrationQuery(index)).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index).navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeletePreviousRegistrationPage(index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -111,7 +107,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(baseUserAnswers))
@@ -125,8 +121,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index).navigate(NormalMode, baseUserAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DeletePreviousRegistrationPage(index).navigate(NormalMode, baseUserAnswers).url
         verify(mockSessionRepository, never()).set(any())
       }
     }
@@ -146,8 +142,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, previousRegistration.previousEuCountry.name)(request, messages(application)).toString
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, index, previousRegistration.previousEuCountry.name)(request, messages(application)).toString
       }
     }
 
@@ -160,8 +156,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -174,8 +170,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -190,8 +186,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -199,11 +195,9 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
       "must not delete an existing previous registration and redirect to Cannot Remove Existing Previous Registrations when the user answers Yes" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
         val application =
           applicationBuilder(userAnswers =
@@ -214,9 +208,11 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
               .set(PreviousEuCountryPage(index1), Country("FR", "France")).success.value
               .set(PreviousSchemePage(index1, index), PreviousScheme.OSSNU).success.value
               .set(PreviousOssNumberPage(index1, index), previousSchemeNumbers).success.value
-            ), mode = Some(AmendMode))
+            ),
+            mode = Some(AmendMode),
+            registration = Some(RegistrationData.registration)
+          )
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .build()
 
         running(application) {
@@ -226,8 +222,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual prevRoutes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` prevRoutes.CannotRemoveExistingPreviousRegistrationsController.onPageLoad().url
           verify(mockSessionRepository, never()).set(any())
         }
       }
@@ -244,17 +240,13 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
           .set(PreviousSchemePage(index1, index), PreviousScheme.OSSNU).success.value
           .set(PreviousOssNumberPage(index1, index), previousSchemeNumbers).success.value
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
         val application =
-          applicationBuilder(userAnswers =
-            Some(answers), mode = Some(AmendMode))
+          applicationBuilder(userAnswers = Some(answers), mode = Some(AmendMode), registration = Some(RegistrationData.registration))
             .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
-            .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .build()
 
         running(application) {
@@ -267,10 +259,9 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual DeletePreviousRegistrationPage(index1).navigate(AmendMode, answers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` DeletePreviousRegistrationPage(index1).navigate(AmendMode, answers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
-
         }
       }
 
@@ -283,17 +274,14 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
       "must redirect to Amend Journey Recovery for a GET if no EU VAT details exist" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(RegistrationData.registration))
-
         val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .build()
 
         running(application) {
@@ -301,8 +289,8 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -317,11 +305,10 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.AmendJourneyRecoveryController.onPageLoad().url
         }
       }
-
     }
   }
 }

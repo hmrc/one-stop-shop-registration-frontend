@@ -17,7 +17,7 @@
 package testutils
 
 import generators.Generators
-import models.domain._
+import models.domain.*
 import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, PreviousScheme}
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
@@ -36,23 +36,23 @@ object RegistrationData extends Generators with EitherValues {
       tradingNames = List("single", "double"),
       vatDetails = VatDetails(
         registrationDate = LocalDate.now,
-        address          = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-        partOfVatGroup   = false,
-        source           = VatDetailSource.Etmp
+        address = DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+        partOfVatGroup = false,
+        source = VatDetailSource.Etmp
       ),
       euRegistrations = Seq(
         RegistrationWithoutFixedEstablishmentWithTradeDetails(Country("FR", "France"),
           EuTaxIdentifier(EuTaxIdentifierType.Vat, Some("FRAA123456789")),
           TradeDetails(
             "French trading name",
-          InternationalAddress(
-            line1 = "Line 1",
-            line2 = None,
-            townOrCity = "Town",
-            stateOrRegion = None,
-            None,
-            Country("FR", "France")
-          ))
+            InternationalAddress(
+              line1 = "Line 1",
+              line2 = None,
+              townOrCity = "Town",
+              stateOrRegion = None,
+              None,
+              Country("FR", "France")
+            ))
         ),
         EuVatRegistration(
           Country("DE", "Germany"),
@@ -62,15 +62,15 @@ object RegistrationData extends Generators with EitherValues {
           Country("IE", "Ireland"),
           EuTaxIdentifier(EuTaxIdentifierType.Other, Some("IE1234567AB")),
           TradeDetails(
-          "Irish trading name",
-          InternationalAddress(
-            line1 = "Line 1",
-            line2 = None,
-            townOrCity = "Town",
-            stateOrRegion = None,
-            None,
-            Country("IE", "Ireland")
-          ))
+            "Irish trading name",
+            InternationalAddress(
+              line1 = "Line 1",
+              line2 = None,
+              townOrCity = "Town",
+              stateOrRegion = None,
+              None,
+              Country("IE", "Ireland")
+            ))
         ),
         RegistrationWithFixedEstablishment(
           Country("ES", "Spain"),
@@ -100,7 +100,8 @@ object RegistrationData extends Generators with EitherValues {
       bankDetails = BankDetails("Account name", Some(bic), iban),
       isOnlineMarketplace = false,
       niPresence = Some(PrincipalPlaceOfBusinessInNi),
-      dateOfFirstSale = Some(LocalDate.now())
+      dateOfFirstSale = Some(LocalDate.now()),
+      unusableStatus = None
     )
 
 

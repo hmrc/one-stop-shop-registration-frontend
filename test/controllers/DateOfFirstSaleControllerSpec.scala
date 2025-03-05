@@ -19,64 +19,63 @@ package controllers
 import base.SpecBase
 import formats.Format.{dateFormatter, dateHintFormatter}
 import forms.DateOfFirstSaleFormProvider
-import models.{NormalMode, UserAnswers}
 import models.requests.AuthenticatedDataRequest
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.{NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DateOfFirstSalePage
 import play.api.inject.bind
 import play.api.mvc.{AnyContent, AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.{CoreRegistrationValidationService, DateService}
+import utils.FutureSyntax.FutureOps
 import views.html.DateOfFirstSaleView
 
 import java.time.LocalDate
-import scala.concurrent.Future
 
-class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
 
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-  private val date: LocalDate   = LocalDate.now(stubClockAtArbitraryDate)
-  private val dateService       = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
-  private val dateFormatted     = dateService.earliestSaleAllowed().format(dateFormatter)
+  private val date: LocalDate = LocalDate.now(stubClockAtArbitraryDate)
+  private val dateService = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
+  private val dateFormatted = dateService.earliestSaleAllowed().format(dateFormatter)
   private val dateHintFormatted = dateService.earliestSaleAllowed().format(dateHintFormatter)
 
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(getRequest(), testCredentials, vrn, None, emptyUserAnswers)
+  private implicit lazy val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(getRequest, testCredentials, vrn, None, emptyUserAnswers)
 
   private val formProvider = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)
-  private val form = formProvider()
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
 
-  private def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
+  private def getRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, dateOfFirstSaleRoute)
 
   private def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, dateOfFirstSaleRoute)
       .withFormUrlEncodedBody(
-        "value.day"   -> date.getDayOfMonth.toString,
+        "value.day" -> date.getDayOfMonth.toString,
         "value.month" -> date.getMonthValue.toString,
-        "value.year"  -> date.getYear.toString
+        "value.year" -> date.getYear.toString
       )
 
   "DateOfFirstSale Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        .build()
 
       running(application) {
-        val result = route(application, getRequest()).value
+        val result = route(application, getRequest).value
 
         val view = application.injector.instanceOf[DateOfFirstSaleView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, dateFormatted, dateHintFormatted)(getRequest(), messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(formProvider(), NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
       }
     }
 
@@ -89,10 +88,10 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
       running(application) {
         val view = application.injector.instanceOf[DateOfFirstSaleView]
 
-        val result = route(application, getRequest()).value
+        val result = route(application, getRequest).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(date), NormalMode, dateFormatted, dateHintFormatted)(getRequest(), messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(formProvider().fill(date), NormalMode, dateFormatted, dateHintFormatted)(getRequest, messages(application)).toString
       }
     }
 
@@ -100,7 +99,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -114,8 +113,8 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
         val result = route(application, postRequest()).value
         val expectedAnswers = basicUserAnswersWithVatInfo.set(DateOfFirstSalePage, date).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DateOfFirstSalePage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` DateOfFirstSalePage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -129,38 +128,14 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar with Befo
           .withFormUrlEncodedBody(("value", "invalid value"))
 
       running(application) {
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = formProvider().bind(Map("value" -> "invalid value"))
 
         val view = application.injector.instanceOf[DateOfFirstSaleView]
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, dateFormatted, dateHintFormatted)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val result = route(application, getRequest()).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val result = route(application, postRequest()).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, dateFormatted, dateHintFormatted)(request, messages(application)).toString
       }
     }
   }

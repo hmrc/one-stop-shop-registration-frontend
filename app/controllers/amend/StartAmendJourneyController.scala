@@ -26,7 +26,6 @@ import queries.OriginalRegistrationQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.RegistrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FutureSyntax.FutureOps
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,30 +41,21 @@ class StartAmendJourneyController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetOptionalData(Some(AmendMode)).async {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetDataWithOss(Some(AmendMode)).async {
     implicit request =>
-      (for {
-        maybeRegistration <- registrationConnector.getRegistration()
-      } yield {
-        maybeRegistration match {
-          case Some(registration) =>
-            registrationConnector.getVatCustomerInfo().flatMap {
-              case Right(vatInfo) =>
-                for {
-                  userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                  originalRegistration <- Future.fromTry(userAnswers.set(OriginalRegistrationQuery, registration))
-                  _ <- authenticatedUserAnswersRepository.set(userAnswers)
-                  _ <- authenticatedUserAnswersRepository.set(originalRegistration)
-                } yield Redirect(routes.ChangeYourRegistrationController.onPageLoad().url)
 
-              case Left(error) => val exception = new Exception(s"Failed to retrieve VAT information when starting amend $error")
-                logger.error(exception.getMessage, exception)
-                throw exception
-            }
+      registrationConnector.getVatCustomerInfo().flatMap {
+        case Right(vatInfo) =>
+          for {
+            userAnswers <- registrationService.toUserAnswers(request.userId, request.registration, vatInfo)
+            originalRegistration <- Future.fromTry(userAnswers.set(OriginalRegistrationQuery, request.registration))
+            _ <- authenticatedUserAnswersRepository.set(userAnswers)
+            _ <- authenticatedUserAnswersRepository.set(originalRegistration)
+          } yield Redirect(routes.ChangeYourRegistrationController.onPageLoad().url)
 
-          case None =>
-            Redirect(controllers.routes.NotRegisteredController.onPageLoad().url).toFuture
-        }
-      }).flatten
+        case Left(error) => val exception = new Exception(s"Failed to retrieve VAT information when starting amend $error")
+          logger.error(exception.getMessage, exception)
+          throw exception
+      }
   }
 }

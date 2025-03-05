@@ -18,29 +18,29 @@ package controllers.amend
 
 import base.SpecBase
 import connectors.RegistrationConnector
-import controllers.amend.{routes => amendRoutes}
+import controllers.amend.routes as amendRoutes
+import models.domain.Registration
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{running, _}
+import play.api.test.Helpers.{running, *}
 import repositories.AuthenticatedUserAnswersRepository
-import services._
+import services.*
 import testutils.RegistrationData
+import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
 
-import scala.concurrent.Future
-
 class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
-
-  private val registration = RegistrationData.registration
 
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockRegistrationService = mock[RegistrationService]
   private val mockAuthenticatedUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
+
+  private val registration: Registration = RegistrationData.registration
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockRegistrationConnector)
@@ -54,12 +54,11 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
 
       "must set user answers from registration and redirect to change your registration" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
-        when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-        when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn Future.successful(completeUserAnswers)
-        when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn Future.successful(true)
+        when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+        when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
+        when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
@@ -69,16 +68,15 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
           val request = FakeRequest(GET, amendRoutes.StartAmendJourneyController.onPageLoad().url)
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
         }
       }
 
       "must redirect to Not Registered Page when no registration found" in {
 
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(None)
-        when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Future.successful(Right(vatCustomerInfo))
-        when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn Future.successful(true)
+        when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+        when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -89,12 +87,10 @@ class StartAmendJourneyControllerSpec extends SpecBase with MockitoSugar with Su
           val request = FakeRequest(GET, amendRoutes.StartAmendJourneyController.onPageLoad().url)
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.NotRegisteredController.onPageLoad().url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.routes.NotRegisteredController.onPageLoad().url
         }
       }
-
     }
-
   }
 }

@@ -16,33 +16,32 @@
 
 package controllers.actions
 
-import connectors.RegistrationConnector
-import models.{AmendMode, Mode, UserAnswers}
+import models.domain.Registration
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
-import org.scalatestplus.mockito.MockitoSugar.mock
+import models.{Mode, UserAnswers}
 import play.api.mvc.Result
-import testutils.RegistrationData
-import utils.FutureSyntax._
+import utils.FutureSyntax.*
 
 import java.time.{LocalDate, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAuthenticatedDataRequiredAction(dataToReturn: Option[UserAnswers], mode: Option[Mode])
-  extends AuthenticatedDataRequiredActionImpl(mode, mock[RegistrationConnector])(ExecutionContext.Implicits.global) {
+class FakeAuthenticatedDataRequiredAction(dataToReturn: Option[UserAnswers], mode: Option[Mode], registration: Option[Registration])
+  extends AuthenticatedDataRequiredActionImpl(mode)(ExecutionContext.Implicits.global) {
 
   private val emptyUserAnswers: UserAnswers = UserAnswers("12345-credId", lastUpdated = LocalDate.now.atStartOfDay(ZoneId.systemDefault).toInstant)
-
-  private val registration = RegistrationData.registration
 
   private val data = dataToReturn match {
     case Some(data) => data
     case _ => emptyUserAnswers
   }
-  override protected def refine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedDataRequest[A]]] = {
-    mode match {
-      case Some(AmendMode) => Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, Some(registration), data)).toFuture
-      case _ =>  Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, None, data)).toFuture
 
-    }
+  override protected def refine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedDataRequest[A]]] = {
+    Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, registration, data)).toFuture
   }
+}
+
+
+class FakeAuthenticatedDataRequiredActionProvider(dataToReturn: Option[UserAnswers], registration: Option[Registration])
+  extends AuthenticatedDataRequiredAction()(ExecutionContext.Implicits.global) {
+  override def apply(mode: Option[Mode]): FakeAuthenticatedDataRequiredAction = new FakeAuthenticatedDataRequiredAction(dataToReturn, mode, registration)
 }

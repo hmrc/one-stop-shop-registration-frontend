@@ -16,11 +16,11 @@
 
 package controllers.actions
 
-import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest}
 import models.Mode
+import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest, AuthenticatedOptionalDataRequest}
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
-import play.api.mvc.{ActionBuilder, AnyContent, DefaultActionBuilder, MessagesActionBuilder, MessagesControllerComponents, PlayBodyParsers}
+import play.api.mvc.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.FeatureFlagService
 
@@ -29,24 +29,46 @@ import javax.inject.Inject
 trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def actionBuilder: DefaultActionBuilder
+
   def sessionRepository: AuthenticatedUserAnswersRepository
+
   def identify: AuthenticatedIdentifierAction
+
   def getData: AuthenticatedDataRetrievalAction
+
   def requireData: AuthenticatedDataRequiredAction
+
   def checkRegistration: CheckRegistrationFilterProvider
+
   def checkVrnAllowList: VrnAllowListFilter
+
   def limitIndex: MaximumIndexFilterProvider
+
   def features: FeatureFlagService
+
   def checkNiProtocol: CheckNiProtocolFilter
+
   def checkNiProtocolExpired: CheckNiProtocolExpiredFilter
+
   def checkNiProtocolExpiredOptional: CheckNiProtocolExpiredOptionalFilter
+
   def retrieveSavedAnswers: SavedAnswersRetrievalActionProvider
+
   def checkOtherCountryRegistration: CheckOtherCountryRegistrationFilter
+
   def checkRejoinOtherCountryRegistration: CheckRejoinOtherCountryRegistrationFilter
+
   def checkEmailVerificationStatus: CheckEmailVerificationFilterProvider
+
   def checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider
+
   def checkVatExpiredFilter: CheckVatExpiredFilter
-  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+
+  def requireOss: OssRequiredAction
+
+  def checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
+
+  def authAndGetDataBase(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
@@ -55,22 +77,39 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       requireData(mode) andThen
       checkVatExpiredFilter(mode) andThen
       checkNiProtocolExpired(mode) andThen
-      checkNiProtocol(mode) andThen
-      checkOtherCountryRegistration(mode)
+      checkNiProtocol(mode)
+  }
 
-  def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] =
+  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+    authAndGetDataBase(mode) andThen
+      checkOtherCountryRegistration(mode)
+  }
+
+  def authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+    authAndGetDataBase(mode) andThen
+      checkRejoinOtherCountryRegistration(mode) andThen
+      checkEmailVerificationStatus(mode)
+  }
+
+  def authAndGetOptionalData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedOptionalDataRequest, AnyContent] = {
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
       getData andThen
-      checkNiProtocolExpiredOptional(mode) andThen
-      checkRejoinOtherCountryRegistration(mode)
+      checkNiProtocolExpiredOptional(mode)
+  }
 
-  def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] =
+  def authAndGetDataAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     authAndGetData(mode) andThen
       checkEmailVerificationStatus(mode)
+  }
 
+  def authAndGetDataWithOss(mode: Option[Mode] = None): ActionBuilder[AuthenticatedMandatoryDataRequest, AnyContent] = {
+    authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode) andThen
+      requireOss() andThen
+      checkBouncedEmailFilter(mode)
+  }
 }
 
 case class DefaultAuthenticatedControllerComponents @Inject()(
@@ -98,4 +137,6 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkEmailVerificationStatus: CheckEmailVerificationFilterProvider,
                                                                checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider,
                                                                checkVatExpiredFilter: CheckVatExpiredFilter,
+                                                               requireOss: OssRequiredAction,
+                                                               checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
                                                              ) extends AuthenticatedControllerComponents

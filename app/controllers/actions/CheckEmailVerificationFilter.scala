@@ -18,12 +18,12 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import logging.Logging
-import models.{AmendMode, BusinessContactDetails, Mode, NormalMode, RejoinMode}
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
+import models.{AmendMode, BusinessContactDetails, Mode, NormalMode, RejoinMode}
 import pages.BusinessContactDetailsPage
-import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Call, Result}
 import services.{EmailVerificationService, SaveForLaterService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpVerbs.GET
@@ -96,8 +96,8 @@ class CheckEmailVerificationFilterImpl(mode: Option[Mode],
         } else if (mode.contains(RejoinMode)) {
           Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(RejoinMode).url)))
         } else {
-        Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
-      }
+          Future.successful(Option(Redirect(controllers.routes.BusinessContactDetailsController.onPageLoad(NormalMode).url)))
+        }
     }
   }
 }

@@ -31,6 +31,5 @@ class Module extends AbstractModule {
 
     bind(classOf[AuthenticatedControllerComponents]).to(classOf[DefaultAuthenticatedControllerComponents]).asEagerSingleton()
     bind(classOf[UnauthenticatedControllerComponents]).to(classOf[DefaultUnauthenticatedControllerComponents]).asEagerSingleton()
-
   }
 }

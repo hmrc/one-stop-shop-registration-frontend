@@ -61,7 +61,7 @@ class SavedAnswersRetrievalAction(
       }
 
     userAnswers.map {
-      AuthenticatedOptionalDataRequest(request.request, request.credentials, request.vrn, _)
+      AuthenticatedOptionalDataRequest(request.request, request.credentials, request.vrn, request.registration, _)
     }
   }
 }
