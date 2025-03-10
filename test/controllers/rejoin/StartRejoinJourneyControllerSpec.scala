@@ -17,8 +17,9 @@
 package controllers.rejoin
 
 import base.SpecBase
-import connectors.RegistrationConnector
-import models.RejoinMode
+import config.Constants.correctionsPeriodsLimit
+import connectors.{RegistrationConnector, ReturnStatusConnector}
+import models.{CurrentReturns, RejoinMode, Return, SubmissionStatus}
 import models.core.{Match, MatchType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
@@ -35,7 +36,7 @@ import testutils.RegistrationData
 import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate}
 
 class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
@@ -62,6 +63,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
   private val mockRejoinPreviousRegistrationValidationService = mock[RejoinPreviousRegistrationValidationService]
   private val mockRejoinEuRegistrationValidationService = mock[RejoinEuRegistrationValidationService]
+  private val mockReturnStatusConnector = mock[ReturnStatusConnector]
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockRegistrationConnector)
@@ -240,6 +242,48 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
         status(result) `mustBe` SEE_OTHER
         redirectLocation(result).value mustBe redirectPage.url
+      }
+    }
+
+    "must redirect to Cannot Rejoin Registration Page when there are outstanding returns" in {
+
+      val dueReturn = Return(
+        firstDay = LocalDate.now(),
+        lastDay = LocalDate.now(),
+        dueDate = LocalDate.now().minusYears(correctionsPeriodsLimit - 1),
+        submissionStatus = SubmissionStatus.Due,
+        inProgress = true,
+        isOldest = true
+      )
+      
+      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+      when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
+      when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+      when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+        Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
+
+
+      when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
+
+      val application = applicationBuilder(
+        userAnswers = Some(completeUserAnswers),
+        clock = Some(Clock.systemUTC()),
+        registration = Some(registration)
+      )
+        .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+        .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
+        .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
+        .overrides(bind[RejoinEuRegistrationValidationService].toInstance(mockRejoinEuRegistrationValidationService))
+        .overrides(bind[ReturnStatusConnector].toInstance(mockReturnStatusConnector))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.StartRejoinJourneyController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
       }
     }
   }
