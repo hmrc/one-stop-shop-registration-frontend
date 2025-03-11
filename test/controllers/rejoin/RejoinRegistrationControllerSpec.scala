@@ -19,13 +19,15 @@ package controllers.rejoin
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
-import connectors.RegistrationConnector
+import config.Constants.correctionsPeriodsLimit
+import connectors.{RegistrationConnector, ReturnStatusConnector}
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
+import models.domain.RegistrationWithoutTaxId
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.responses.UnexpectedResponseStatus
-import models.{BusinessContactDetails, DataMissingError, Index, PreviousScheme, PreviousSchemeType, RejoinMode}
+import models.{BusinessContactDetails, Country, CurrentReturns, DataMissingError, Index, PreviousScheme, PreviousSchemeType, RejoinMode, Return, SubmissionStatus}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.mockito.Mockito.{doNothing, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -45,7 +47,7 @@ import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
 import views.html.rejoin.RejoinRegistrationView
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate}
 import scala.concurrent.Future
 
 class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
@@ -70,6 +72,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
     Mockito.reset(rejoinRegistrationService)
     Mockito.reset(auditService)
     Mockito.reset(dateService)
+
   }
 
   "RejoinRegistration Controller" - {
@@ -623,6 +626,54 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
               redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(RejoinMode, Index(0)).url
             }
           }
+        }
+      }
+    }
+    ".onPageLoad" -{
+      "must redirect to Cannot Rejoin Registration Page when there are outstanding returns" in {
+        val registrationConnector = mock[RegistrationConnector]
+        val rejoinRegistrationValidation = mock[RejoinEuRegistrationValidationService]
+        val returnStatusConnector = mock[ReturnStatusConnector]
+
+        val registrationWith = RegistrationWithoutTaxId(Country("ES","Spain"))
+
+        val dueReturn = Return(
+          firstDay = LocalDate.now(),
+          lastDay = LocalDate.now(),
+          dueDate = LocalDate.now().minusYears(correctionsPeriodsLimit - 1),
+          submissionStatus = SubmissionStatus.Due,
+          inProgress = true,
+          isOldest = true
+        )
+
+        when(registrationConnector.getRegistration()(any()))
+          .thenReturn(Future.successful(Right(vatCustomerInfo)))
+
+        when(rejoinRegistrationValidation.validateEuRegistrations(
+          ArgumentMatchers.eq(Seq(registrationWith))
+        )(any(), any()))
+          .thenReturn(Future.successful(Right(true)))
+
+        when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+          Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
+
+        val application = applicationBuilder(
+          userAnswers = Some(completeUserAnswers),
+          clock = Some(Clock.systemUTC()),
+          registration = Some(registration)
+        )
+          .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
+          .overrides(bind[RejoinEuRegistrationValidationService].toInstance(rejoinRegistrationValidation))
+          .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.RejoinRegistrationController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe controllers.rejoin.routes.CannotRejoinController.onPageLoad().url
         }
       }
     }

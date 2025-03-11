@@ -255,7 +255,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         inProgress = true,
         isOldest = true
       )
-      
+
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture
       when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
