@@ -17,7 +17,8 @@
 package controllers.rejoin
 
 import cats.data.Validated.{Invalid, Valid}
-import connectors.RegistrationConnector
+import connectors.{RegistrationConnector, ReturnStatusConnector}
+import controllers.CheckOutstandingReturns.existsOutstandingReturns
 import controllers.actions.*
 import logging.Logging
 import models.RejoinMode
@@ -25,6 +26,7 @@ import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionRe
 import models.domain.{PreviousRegistration, PreviousRegistrationNew}
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.AuthenticatedDataRequest
+import models.responses.ErrorResponse
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.AllPreviousRegistrationsQuery
@@ -47,6 +49,7 @@ class RejoinRegistrationController @Inject()(
                                               override val messagesApi: MessagesApi,
                                               cc: AuthenticatedControllerComponents,
                                               registrationConnector: RegistrationConnector,
+                                              returnStatusConnector: ReturnStatusConnector,
                                               auditService: AuditService,
                                               registrationService: RegistrationValidationService,
                                               rejoinRegistrationService: RejoinRegistrationService,
@@ -62,30 +65,33 @@ class RejoinRegistrationController @Inject()(
     implicit request =>
 
       val date = LocalDate.now(clock)
-
       val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, request.registration.excludedTrader)
 
-      if (canRejoin) {
-        val userAnswers = request.userAnswers
-        val vatRegistrationDetailsList = SummaryListViewModel(
-          rows = Seq(
-            VatRegistrationDetailsSummary.rowBusinessName(userAnswers),
-            VatRegistrationDetailsSummary.rowPartOfVatUkGroup(userAnswers),
-            VatRegistrationDetailsSummary.rowUkVatRegistrationDate(userAnswers),
-            VatRegistrationDetailsSummary.rowBusinessAddress(userAnswers)
-          ).flatten
-        )
 
-        commencementDateSummary.row(request.userAnswers)(request = request.request).map { cds =>
+      returnStatusConnector.getCurrentReturns(request.vrn).flatMap{ currentReturnsResponse =>
+        val currentReturns = getResponseValue(currentReturnsResponse)
 
-          val list = detailList(cds)(request.request)
-          val isValid = validate()(request.request)
-          Ok(view(vatRegistrationDetailsList, list, isValid, RejoinMode))
+        if (canRejoin && !existsOutstandingReturns(currentReturns, clock)) {
+          val userAnswers = request.userAnswers
+          val vatRegistrationDetailsList = SummaryListViewModel(
+            rows = Seq(
+              VatRegistrationDetailsSummary.rowBusinessName(userAnswers),
+              VatRegistrationDetailsSummary.rowPartOfVatUkGroup(userAnswers),
+              VatRegistrationDetailsSummary.rowUkVatRegistrationDate(userAnswers),
+              VatRegistrationDetailsSummary.rowBusinessAddress(userAnswers)
+            ).flatten
+          )
+
+          commencementDateSummary.row(request.userAnswers)(request = request.request).map { cds =>
+
+            val list = detailList(cds)(request.request)
+            val isValid = validate()(request.request)
+            Ok(view(vatRegistrationDetailsList, list, isValid, RejoinMode))
+          }
+        } else {
+          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
         }
-      } else {
-        Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
       }
-
   }
 
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataWithOss(Some(RejoinMode)).async {
@@ -95,45 +101,49 @@ class RejoinRegistrationController @Inject()(
         Future.successful(redirect)
       }.getOrElse {
         val date = LocalDate.now(clock)
-
         val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, request.registration.excludedTrader)
-        if (canRejoin) {
-          registrationService.fromUserAnswers(request.userAnswers, request.vrn)(request = request.request).flatMap {
-            case Valid(registration) =>
-              val rejoinRegistration = registration.copy(rejoin = Some(true))
-              registrationConnector.amendRegistration(rejoinRegistration).flatMap {
-                case Right(_) =>
-                  auditService.audit(
-                    RegistrationAuditModel.build(
-                      RegistrationAuditType.AmendRegistration,
-                      registration,
-                      SubmissionResult.Success,
-                      request.request
-                    ))
-                  Redirect(routes.RejoinCompleteController.onPageLoad()).toFuture
+        
+        returnStatusConnector.getCurrentReturns(request.vrn).flatMap{currentReturnsResponse =>
+          val currentReturns = getResponseValue(currentReturnsResponse)
 
-                case Left(e) =>
-                  logger.error(s"Unexpected result on submit: ${e.toString}")
-                  auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request.request))
-                  Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
-              }
+          if (canRejoin && !existsOutstandingReturns(currentReturns, clock)) {
+            registrationService.fromUserAnswers(request.userAnswers, request.vrn)(request = request.request).flatMap {
+              case Valid(registration) =>
+                val rejoinRegistration = registration.copy(rejoin = Some(true))
+                registrationConnector.amendRegistration(rejoinRegistration).flatMap {
+                  case Right(_) =>
+                    auditService.audit(
+                      RegistrationAuditModel.build(
+                        RegistrationAuditType.AmendRegistration,
+                        registration,
+                        SubmissionResult.Success,
+                        request.request
+                      ))
+                    Redirect(routes.RejoinCompleteController.onPageLoad()).toFuture
 
-            case Invalid(errors) =>
-              getFirstValidationErrorRedirect(RejoinMode)(request.request).map(
-                errorRedirect => if (incompletePrompt) {
-                  errorRedirect.toFuture
-                } else {
-                  Redirect(controllers.rejoin.routes.RejoinRegistrationController.onPageLoad()).toFuture
+                  case Left(e) =>
+                    logger.error(s"Unexpected result on submit: ${e.toString}")
+                    auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, request.request))
+                    Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
                 }
-              ).getOrElse {
-                val errorList = errors.toChain.toList
-                val errorMessages = errorList.map(_.errorMessage).mkString("\n")
-                logger.error(s"Unable to create a registration request from user answers: $errorMessages")
-                Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
-              }
+
+              case Invalid(errors) =>
+                getFirstValidationErrorRedirect(RejoinMode)(request.request).map(
+                  errorRedirect => if (incompletePrompt) {
+                    errorRedirect.toFuture
+                  } else {
+                    Redirect(controllers.rejoin.routes.RejoinRegistrationController.onPageLoad()).toFuture
+                  }
+                ).getOrElse {
+                  val errorList = errors.toChain.toList
+                  val errorMessages = errorList.map(_.errorMessage).mkString("\n")
+                  logger.error(s"Unable to create a registration request from user answers: $errorMessages")
+                  Redirect(routes.ErrorSubmittingRejoinController.onPageLoad()).toFuture
+                }
+            }
+          } else {
+            Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
           }
-        } else {
-          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
         }
       }
   }
@@ -244,5 +254,15 @@ class RejoinRegistrationController @Inject()(
       BankDetailsSummary.rowBIC(request.userAnswers, RejoinMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
       BankDetailsSummary.rowIBAN(request.userAnswers, RejoinMode)
     )
+  }
+
+  private def getResponseValue[A](response: Either[ErrorResponse, A]): A = {
+    response match {
+      case Right(value) => value
+      case Left(error) =>
+        val exception = new Exception(error.body)
+        logger.error(exception.getMessage, exception)
+        throw exception
+    }
   }
 }
