@@ -131,7 +131,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
         when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-          Right(CurrentReturns(returns = Seq(), finalReturnsCompleted = true)).toFuture
+          Right(CurrentReturns(returns = Seq(), finalReturnsCompleted = false)).toFuture
 
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
@@ -167,7 +167,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
 
@@ -200,7 +200,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
 
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
@@ -234,7 +234,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
           val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
 
@@ -267,7 +267,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
           val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
 
@@ -300,7 +300,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
           val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
 
@@ -333,7 +333,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
           val answers = completeUserAnswers
             .set(TaxRegisteredInEuPage, true).success.value
@@ -368,7 +368,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
           val answers = completeUserAnswers
             .set(PreviouslyRegisteredPage, true).success.value

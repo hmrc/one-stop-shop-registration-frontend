@@ -56,6 +56,15 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
     None
   )
 
+  val dueReturn: Return = Return(
+    firstDay = LocalDate.now(),
+    lastDay = LocalDate.now(),
+    dueDate = LocalDate.now().minusYears(correctionsPeriodsLimit - 1),
+    submissionStatus = SubmissionStatus.Due,
+    inProgress = true,
+    isOldest = true
+  )
+
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockRegistrationService = mock[RegistrationService]
   private val mockRejoinRegistrationService = mock[RejoinRegistrationService]
@@ -73,6 +82,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
     Mockito.reset(mockCoreRegistrationValidationService)
     Mockito.reset(mockRejoinPreviousRegistrationValidationService)
     Mockito.reset(mockRejoinEuRegistrationValidationService)
+    Mockito.reset(mockReturnStatusConnector)
   }
 
   "StartRejoinJourney Controller" - {
@@ -88,12 +98,17 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
 
+      when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+        Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
         .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+        .overrides(bind[ReturnStatusConnector].toInstance(mockReturnStatusConnector))
         .build()
 
       running(application) {
@@ -115,12 +130,18 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
 
+      when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+        Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
+
+
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
         .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+        .overrides(bind[ReturnStatusConnector].toInstance(mockReturnStatusConnector))
         .build()
 
       running(application) {
@@ -161,12 +182,18 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchEuTaxId(any(), any())(any(), any())) thenReturn None.toFuture
       when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
 
+      when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+        Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
+
+
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
         .overrides(bind[RejoinRegistrationService].toInstance(mockRejoinRegistrationService))
         .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+        .overrides(bind[ReturnStatusConnector].toInstance(mockReturnStatusConnector))
         .build()
 
       running(application) {
@@ -192,6 +219,11 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
       when(mockRejoinPreviousRegistrationValidationService.validatePreviousRegistrations(any())(any(), any())) thenReturn Some(Redirect(redirectPage)).toFuture
 
+      when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+        Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
+
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
@@ -199,6 +231,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockAuthenticatedUserAnswersRepository))
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
         .overrides(bind[RejoinPreviousRegistrationValidationService].toInstance(mockRejoinPreviousRegistrationValidationService))
+        .overrides(bind[ReturnStatusConnector].toInstance(mockReturnStatusConnector))
         .build()
 
       running(application) {
@@ -225,6 +258,11 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockRejoinPreviousRegistrationValidationService.validatePreviousRegistrations(any())(any(), any())) thenReturn None.toFuture
       when(mockRejoinEuRegistrationValidationService.validateEuRegistrations(any())(any(), any())) thenReturn Some(Redirect(redirectPage)).toFuture
 
+      when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+        Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
+
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
@@ -233,6 +271,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
         .overrides(bind[RejoinPreviousRegistrationValidationService].toInstance(mockRejoinPreviousRegistrationValidationService))
         .overrides(bind[RejoinEuRegistrationValidationService].toInstance(mockRejoinEuRegistrationValidationService))
+        .overrides(bind[ReturnStatusConnector].toInstance(mockReturnStatusConnector))
         .build()
 
       running(application) {
@@ -246,15 +285,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
     }
 
     "must redirect to Cannot Rejoin Registration Page when there are outstanding returns" in {
-
-      val dueReturn = Return(
-        firstDay = LocalDate.now(),
-        lastDay = LocalDate.now(),
-        dueDate = LocalDate.now().minusYears(correctionsPeriodsLimit - 1),
-        submissionStatus = SubmissionStatus.Due,
-        inProgress = true,
-        isOldest = true
-      )
 
       when(mockRegistrationConnector.getVatCustomerInfo()(any())) thenReturn Right(vatCustomerInfo).toFuture
       when(mockRegistrationService.toUserAnswers(any(), any(), any())) thenReturn completeUserAnswers.toFuture

@@ -16,12 +16,14 @@
 
 package controllers.rejoin
 
-import connectors.RegistrationConnector
+import connectors.{RegistrationConnector, ReturnStatusConnector}
+import controllers.CheckOutstandingReturns.existsOutstandingReturns
 import controllers.actions.*
 import logging.Logging
 import models.RejoinMode
 import models.domain.Registration
 import models.requests.AuthenticatedMandatoryDataRequest
+import models.responses.ErrorResponse
 import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -39,6 +41,7 @@ class StartRejoinJourneyController @Inject()(
                                               override val messagesApi: MessagesApi,
                                               cc: AuthenticatedControllerComponents,
                                               registrationConnector: RegistrationConnector,
+                                              returnStatusConnector: ReturnStatusConnector,
                                               registrationService: RegistrationService,
                                               rejoinRegistrationService: RejoinRegistrationService,
                                               rejoinPreviousRegistrationValidationService: RejoinPreviousRegistrationValidationService,
@@ -54,32 +57,35 @@ class StartRejoinJourneyController @Inject()(
     implicit request =>
 
       val registration: Registration = request.registration
+      
+      returnStatusConnector.getCurrentReturns(request.vrn).flatMap{currentReturnsResponse =>
+        val currentReturns = getResponseValue(currentReturnsResponse)
+        if (rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader) && !existsOutstandingReturns(currentReturns, clock)) {
+          validateRegistration(registration).flatMap {
+            case Some(redirect) => redirect.toFuture
+            case None => registrationConnector.getVatCustomerInfo().flatMap {
+              case Right(vatInfo) =>
+                vatInfo.deregistrationDecisionDate match {
+                  case Some(_) =>
+                    Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
+                  case None =>
+                    for {
+                      userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
+                      updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
+                      updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
+                      _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
+                    } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
+                }
 
-      if (rejoinRegistrationService.canRejoinRegistration(LocalDate.now(clock), registration.excludedTrader)) {
-        validateRegistration(registration).flatMap {
-          case Some(redirect) => redirect.toFuture
-          case None => registrationConnector.getVatCustomerInfo().flatMap {
-            case Right(vatInfo) =>
-              vatInfo.deregistrationDecisionDate match {
-                case Some(_) =>
-                  Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
-                case None =>
-                  for {
-                    userAnswers <- registrationService.toUserAnswers(request.userId, registration, vatInfo)
-                    updatedAnswers <- Future.fromTry(userAnswers.remove(HasMadeSalesPage))
-                    updateAnswers2 <- Future.fromTry(updatedAnswers.remove(DateOfFirstSalePage))
-                    _ <- authenticatedUserAnswersRepository.set(updateAnswers2)
-                  } yield Redirect(controllers.routes.HasMadeSalesController.onPageLoad(RejoinMode).url)
-              }
-
-            case Left(error) =>
-              val exception = new Exception(error.body)
-              logger.error(exception.getMessage, exception)
-              throw exception
+              case Left(error) =>
+                val exception = new Exception(error.body)
+                logger.error(exception.getMessage, exception)
+                throw exception
+            }
           }
+        } else {
+          Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
         }
-      } else {
-        Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url).toFuture
       }
   }
 
@@ -89,6 +95,16 @@ class StartRejoinJourneyController @Inject()(
     rejoinPreviousRegistrationValidationService.validatePreviousRegistrations(registration.previousRegistrations).flatMap {
       case Some(redirect) => Some(redirect).toFuture
       case None => rejoinEuRegistrationValidationService.validateEuRegistrations(registration.euRegistrations)
+    }
+  }
+
+  private def getResponseValue[A](response: Either[ErrorResponse, A]): A = {
+    response match {
+      case Right(value) => value
+      case Left(error) =>
+        val exception = new Exception(error.body)
+        logger.error(exception.getMessage, exception)
+        throw exception
     }
   }
 }

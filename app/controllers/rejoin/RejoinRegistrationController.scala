@@ -89,38 +89,6 @@ class RejoinRegistrationController @Inject()(
     }
   }
 
-//  def onPageLoad: Action[AnyContent] = cc.authAndGetDataWithOss(Some(RejoinMode)).async { implicit request =>
-//    val date = LocalDate.now(clock)
-//    val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, request.registration.excludedTrader)
-//    
-//    if (canRejoin) {
-//      returnStatusConnector.getCurrentReturns(request.vrn).flatMap { currentReturnsResponse =>
-//        val currentReturns = getResponseValue(currentReturnsResponse)
-//        if(!existsOutstandingReturns(currentReturns, clock)){
-//          val userAnswers = request.userAnswers
-//          val vatRegistrationDetailsList = SummaryListViewModel(
-//            rows = Seq(
-//              VatRegistrationDetailsSummary.rowBusinessName(userAnswers),
-//              VatRegistrationDetailsSummary.rowPartOfVatUkGroup(userAnswers),
-//              VatRegistrationDetailsSummary.rowUkVatRegistrationDate(userAnswers),
-//              VatRegistrationDetailsSummary.rowBusinessAddress(userAnswers)
-//            ).flatten
-//          )
-//
-//          commencementDateSummary.row(userAnswers)(request = request.request).map { cds =>
-//            val list = detailList(cds)(request.request)
-//            val isValid = validate()(request.request)
-//            Ok(view(vatRegistrationDetailsList, list, isValid, RejoinMode))
-//          }
-//        }else{
-//          Future.successful(Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url))
-//        }
-//      }
-//    } else {
-//      Future.successful(Redirect(controllers.rejoin.routes.CannotRejoinController.onPageLoad().url))
-//    }
-//  }
-
   def onSubmit(incompletePrompt: Boolean): Action[AnyContent] = cc.authAndGetDataWithOss(Some(RejoinMode)).async {
     implicit request =>
 
