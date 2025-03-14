@@ -34,4 +34,5 @@ object Constants {
   val schemeStartDate: LocalDate = LocalDate.of(2021, 7, 1)
 
   val emailVerificationMaxEmails: Int = 10
+  val correctionsPeriodsLimit: Int = 3
 }
