@@ -66,14 +66,26 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
   private val country = arbitraryCountry.arbitrary.sample.value
   private val commencementDate = LocalDate.of(2022, 1, 1)
 
+  private val returnStatusConnector = mock[ReturnStatusConnector]
+
   override def beforeEach(): Unit = {
     Mockito.reset(registrationConnector)
     Mockito.reset(registrationValidationService)
     Mockito.reset(rejoinRegistrationService)
     Mockito.reset(auditService)
     Mockito.reset(dateService)
+    Mockito.reset(returnStatusConnector)
 
   }
+
+  val dueReturn: Return = Return(
+    firstDay = LocalDate.now(),
+    lastDay = LocalDate.now(),
+    dueDate = LocalDate.now().minusYears(correctionsPeriodsLimit - 1),
+    submissionStatus = SubmissionStatus.Due,
+    inProgress = true,
+    isOldest = true
+  )
 
   "RejoinRegistration Controller" - {
 
@@ -88,11 +100,15 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn false
         when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+        when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+          Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
           .overrides(bind[DateService].toInstance(dateService))
           .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
           .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+          .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
           .build()
 
         running(application) {
@@ -114,11 +130,15 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
         when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+        when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+          Right(CurrentReturns(returns = Seq(), finalReturnsCompleted = true)).toFuture
+
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
           .overrides(bind[DateService].toInstance(dateService))
           .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
           .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+          .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
           .build()
 
         running(application) {
@@ -146,12 +166,16 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -175,12 +199,17 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
+
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -204,12 +233,16 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -233,12 +266,16 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -262,12 +299,16 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -291,6 +332,9 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val answers = completeUserAnswers
             .set(TaxRegisteredInEuPage, true).success.value
             .set(EuCountryPage(Index(0)), country).success.value
@@ -299,6 +343,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -322,6 +367,9 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val answers = completeUserAnswers
             .set(PreviouslyRegisteredPage, true).success.value
             .set(PreviousEuCountryPage(Index(0)), country).success.value
@@ -330,6 +378,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             .overrides(bind[DateService].toInstance(dateService))
             .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
             .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
+            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
             .build()
 
           running(application) {
@@ -360,6 +409,9 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
         doNothing().when(auditService).audit(any())(any(), any())
 
+        when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+          Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
         val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
         val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
 
@@ -369,7 +421,8 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             bind[RegistrationConnector].toInstance(registrationConnector),
             bind[RejoinRegistrationService].toInstance(rejoinRegistrationService),
             bind[AuditService].toInstance(auditService),
-            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
+            bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository),
+            bind[ReturnStatusConnector].toInstance(returnStatusConnector)
           ).build()
 
         running(application) {
@@ -397,12 +450,16 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
           doNothing().when(auditService).audit(any())(any(), any())
 
+          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
+            Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
+
           val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
               bind[RejoinRegistrationService].toInstance(rejoinRegistrationService),
-              bind[AuditService].toInstance(auditService)
+              bind[AuditService].toInstance(auditService),
+              bind[ReturnStatusConnector].toInstance(returnStatusConnector)
             ).build()
 
           running(application) {
@@ -633,18 +690,9 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
       "must redirect to Cannot Rejoin Registration Page when there are outstanding returns" in {
         val registrationConnector = mock[RegistrationConnector]
         val rejoinRegistrationValidation = mock[RejoinEuRegistrationValidationService]
-        val returnStatusConnector = mock[ReturnStatusConnector]
+
 
         val registrationWith = RegistrationWithoutTaxId(Country("ES","Spain"))
-
-        val dueReturn = Return(
-          firstDay = LocalDate.now(),
-          lastDay = LocalDate.now(),
-          dueDate = LocalDate.now().minusYears(correctionsPeriodsLimit - 1),
-          submissionStatus = SubmissionStatus.Due,
-          inProgress = true,
-          isOldest = true
-        )
 
         when(registrationConnector.getRegistration()(any()))
           .thenReturn(Future.successful(Right(vatCustomerInfo)))
