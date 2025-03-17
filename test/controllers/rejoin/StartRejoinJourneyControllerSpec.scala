@@ -185,8 +185,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
       when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
         Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = false)).toFuture
 
-
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
         .overrides(bind[RegistrationService].toInstance(mockRegistrationService))
@@ -221,8 +219,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
       when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
         Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
-
-
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -260,8 +256,6 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
 
       when(mockReturnStatusConnector.getCurrentReturns(any())(any())) thenReturn
         Right(CurrentReturns(returns = Seq(dueReturn), finalReturnsCompleted = true)).toFuture
-
-
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), registration = Some(registration))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
