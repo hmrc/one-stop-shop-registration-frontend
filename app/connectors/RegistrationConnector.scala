@@ -22,6 +22,7 @@ import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, External
 import connectors.RegistrationHttpParser.{IossEtmpDisplayRegistrationReads, IossEtmpDisplayRegistrationResultResponse, RegistrationResponseReads, RegistrationResultResponse}
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
+import models.enrolments.EACDEnrolments
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
@@ -35,7 +36,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpClientV2)
                                      (implicit ec: ExecutionContext) extends HttpErrorFunctions {
 
-  private val baseUrl = config.get[Service]("microservice.services.one-stop-shop-registration")
+  private val baseUrl: Service = config.get[Service]("microservice.services.one-stop-shop-registration")
+  private val iossBaseUrl: Service = config.get[Service]("microservice.services.ioss-registration")
 
   def submitRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[RegistrationResultResponse] =
     httpClientV2.post(url"$baseUrl/create").withBody(Json.toJson(registration)).execute[RegistrationResultResponse]
@@ -54,10 +56,10 @@ class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpC
 
   def enrolUser()(implicit hc: HeaderCarrier): Future[HttpResponse] =
     httpClientV2.post(url"$baseUrl/confirm-enrolment").execute[HttpResponse]
-
-  def getIossRegistration()(implicit hc: HeaderCarrier): Future[IossEtmpDisplayRegistrationResultResponse] = {
-    val baseUrl: Service = config.get[Service]("microservice.services.ioss-registration")
-
-    httpClientV2.get(url"$baseUrl/registration").execute[IossEtmpDisplayRegistrationResultResponse]
-  }
+  
+  def getIossRegistration(iossNumber: String)(implicit hc: HeaderCarrier): Future[IossEtmpDisplayRegistrationResultResponse] =
+    httpClientV2.get(url"$iossBaseUrl/registration/$iossNumber").execute[IossEtmpDisplayRegistrationResultResponse]
+  
+  def getAccounts()(implicit hc: HeaderCarrier): Future[EACDEnrolments] =
+    httpClientV2.get(url"$iossBaseUrl/accounts").execute[EACDEnrolments]
 }

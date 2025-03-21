@@ -18,9 +18,10 @@ package controllers.actions
 
 import base.SpecBase
 import models.UserAnswers
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest, SessionRequest, UnauthenticatedOptionalDataRequest}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.EitherValues
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
@@ -38,10 +39,10 @@ import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValues {
 
-  class AuthenticatedHarness (
-                               sessionRepository: AuthenticatedUserAnswersRepository,
-                               migrationService: DataMigrationService
-                             ) extends AuthenticatedDataRetrievalAction(sessionRepository, migrationService) {
+  class AuthenticatedHarness(
+                              sessionRepository: AuthenticatedUserAnswersRepository,
+                              migrationService: DataMigrationService
+                            ) extends AuthenticatedDataRetrievalAction(sessionRepository, migrationService) {
     def callRefine[A](request: AuthenticatedIdentifierRequest[A]): Future[Either[Result, AuthenticatedOptionalDataRequest[A]]] = refine(request)
   }
 
@@ -56,7 +57,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
       "must migrate the session then redirect the user to the same path without the key" in {
 
         val sessionRepository = mock[AuthenticatedUserAnswersRepository]
-        val migrationService  = mock[DataMigrationService]
+        val migrationService = mock[DataMigrationService]
 
         when(sessionRepository.get(userAnswersId)) thenReturn Future.successful(None)
         when(migrationService.migrate(any(), any())) thenReturn Future.successful(UserAnswers(userAnswersId))
@@ -64,7 +65,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
         val action = new AuthenticatedHarness(sessionRepository, migrationService)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
-        val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None)).futureValue
+        val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)).futureValue
 
         verify(migrationService, times(1)).migrate("session-id", userAnswersId)
         result mustBe Left(Redirect("/test/url"))
@@ -80,7 +81,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
           val sessionRepository = mock[AuthenticatedUserAnswersRepository]
-          val migrationService  = mock[DataMigrationService]
+          val migrationService = mock[DataMigrationService]
 
           when(sessionRepository.get(any())) thenReturn Future.successful(None)
           when(sessionRepository.set(any())) thenReturn Future.successful(true)
@@ -90,7 +91,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url").withHeaders(HeaderNames.xSessionId -> sessionId)
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None)).futureValue
+          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)).futureValue
 
           verify(migrationService, times(1)).migrate("session-id", userAnswersId)
           result.value.credentials mustEqual testCredentials
@@ -103,7 +104,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
           val sessionRepository = mock[AuthenticatedUserAnswersRepository]
-          val migrationService  = mock[DataMigrationService]
+          val migrationService = mock[DataMigrationService]
 
           when(sessionRepository.get(any())) thenReturn Future.successful(None)
           when(sessionRepository.set(any())) thenReturn Future.successful(true)
@@ -112,7 +113,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url")
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None)).futureValue
+          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)).futureValue
 
           verifyNoInteractions(migrationService)
           result.value.credentials mustEqual testCredentials
@@ -128,14 +129,35 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
           val sessionRepository = mock[AuthenticatedUserAnswersRepository]
-          val migrationService  = mock[DataMigrationService]
+          val migrationService = mock[DataMigrationService]
 
           when(sessionRepository.get(any())) thenReturn Future.successful(Some(answers))
 
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url")
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None)).futureValue
+          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)).futureValue
+          verify(migrationService, never()).migrate(any(), any())
+          result.value.credentials mustEqual testCredentials
+          result.value.vrn mustEqual vrn
+          result.value.userAnswers.value mustEqual answers
+        }
+
+        "must build a userAnswers object when IOSS Registration Data is present and add it to the request" in {
+
+          val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
+          val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
+
+          val sessionRepository = mock[AuthenticatedUserAnswersRepository]
+          val migrationService = mock[DataMigrationService]
+
+          when(sessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+
+          val action = new AuthenticatedHarness(sessionRepository, migrationService)
+          val request = FakeRequest(GET, "/test/url")
+
+          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))).futureValue
           verify(migrationService, never()).migrate(any(), any())
           result.value.credentials mustEqual testCredentials
           result.value.vrn mustEqual vrn

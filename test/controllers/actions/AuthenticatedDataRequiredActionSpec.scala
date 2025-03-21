@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.amend.routes as amendRoutes
 import controllers.routes
 import models.domain.Registration
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.{AuthenticatedDataRequest, AuthenticatedOptionalDataRequest, UnauthenticatedDataRequest, UnauthenticatedOptionalDataRequest}
 import models.{AmendMode, Mode, NormalMode}
 import org.scalatestplus.mockito.MockitoSugar
@@ -35,6 +36,7 @@ import scala.concurrent.Future
 class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
   private val registration: Registration = RegistrationData.registration
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
 
   class Harness(mode: Mode) extends AuthenticatedDataRequiredActionImpl(Some(mode)) {
 
@@ -59,7 +61,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None)
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None, None, 0, None)
             val action = new Harness(NormalMode)
 
             val result = action.callRefine(request).futureValue
@@ -77,9 +79,24 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
             val request = FakeRequest(GET, "test/url")
             val action = new Harness(NormalMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None)).futureValue
 
-            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None))
+          }
+        }
+
+        "must return Right(AuthenticatedDataRequest) with no Registration and an IOSS Registration when there is data present" in {
+
+          val application = applicationBuilder().build()
+
+          running(application) {
+
+            val request = FakeRequest(GET, "test/url")
+            val action = new Harness(NormalMode)
+
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))).futureValue
+
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration)))
           }
         }
       }
@@ -95,9 +112,24 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
             val request = FakeRequest(GET, "test/url")
             val action = new Harness(AmendMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo), None, 0, None)).futureValue
 
-            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo, None, 0, None))
+          }
+        }
+
+        "must return Right(AuthenticatedDataRequest) with a Registration and an IOSS Registration when there is data present" in {
+
+          val application = applicationBuilder().build()
+
+          running(application) {
+
+            val request = FakeRequest(GET, "test/url")
+            val action = new Harness(AmendMode)
+
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))).futureValue
+
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration)))
           }
         }
 
@@ -107,7 +139,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo))
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None)
             val action = new Harness(AmendMode)
 
             val result = action.callRefine(request).futureValue
@@ -122,7 +154,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers))
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers), None, 0, None)
             val action = new Harness(AmendMode)
 
             val result = action.callRefine(request).futureValue

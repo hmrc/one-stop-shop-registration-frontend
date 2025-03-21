@@ -18,13 +18,13 @@ package utils
 
 import base.SpecBase
 import models.euDetails.EuOptionalDetails
-import models.{BankDetails, BusinessContactDetails, Country, Iban, PreviousScheme}
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
+import models.{BankDetails, BusinessContactDetails, Country, Iban, PreviousScheme}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations.PreviouslyRegisteredPage
-import pages.{BankDetailsPage, BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage, IsOnlineMarketplacePage}
+import pages.*
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.running
@@ -113,7 +113,7 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
 
         running(application) {
           implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(
-            FakeRequest(), testCredentials, vrn, None, answers
+            FakeRequest(), testCredentials, vrn, None, answers, None, 0, None
           )
 
           val result = TestCompletionChecks.firstIndexedIncompleteEuDetails(Seq(Country("BE", "Belgium")))
@@ -190,8 +190,5 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
         }
       }
     }
-
-
   }
-
 }

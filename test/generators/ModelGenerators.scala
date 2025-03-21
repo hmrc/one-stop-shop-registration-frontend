@@ -22,16 +22,18 @@ import models.domain.*
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.returns.*
 import models.domain.returns.VatOnSalesChoice.Standard
+import models.enrolments.{EACDEnrolment, EACDEnrolments, EACDIdentifiers}
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.exclusions.{ExcludedTrader, ExclusionReason}
-import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}
+import models.iossRegistration.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.domain.Vrn
 
-import java.time.{Instant, LocalDate, ZoneOffset}
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
 import scala.math.BigDecimal.RoundingMode
 
 trait ModelGenerators {
@@ -292,29 +294,21 @@ trait ModelGenerators {
       } yield VatReturn(vrn, period, ReturnReference(vrn, period), PaymentReference(vrn, period), None, None, salesFromNi, salesFromEu, now, now)
     }
 
-  implicit val arbitraryEtmpExclusion: Arbitrary[EtmpExclusion] =
+  implicit val arbitraryIossEtmpExclusion: Arbitrary[IossEtmpExclusion] = {
     Arbitrary {
       for {
-        exclusionReason <- Gen.oneOf(EtmpExclusionReason.values)
+        exclusionReason <- Gen.oneOf(IossEtmpExclusionReason.values)
         effectiveDate <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
         decisionDate <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
         quarantine <- arbitrary[Boolean]
-      } yield EtmpExclusion(
+      } yield IossEtmpExclusion(
         exclusionReason = exclusionReason,
         effectiveDate = effectiveDate,
         decisionDate = decisionDate,
         quarantine = quarantine
       )
     }
-
-  implicit val arbitraryEtmpDisplayRegistration: Arbitrary[EtmpDisplayRegistration] =
-    Arbitrary {
-      for {
-        exclusions <- Gen.listOfN(1, arbitraryEtmpExclusion.arbitrary)
-      } yield EtmpDisplayRegistration(
-        exclusions = exclusions
-      )
-    }
+  }
 
   def datesBetween(min: LocalDate, max: LocalDate): Gen[LocalDate] = {
 
@@ -332,7 +326,7 @@ trait ModelGenerators {
       Gen.oneOf(ExclusionReason.values)
     }
 
-  implicit lazy val arbitraryExcludedTrader: Arbitrary[ExcludedTrader] =
+  implicit lazy val arbitraryExcludedTrader: Arbitrary[ExcludedTrader] = {
     Arbitrary {
       for {
         vrn <- arbitraryVrn.arbitrary
@@ -345,5 +339,90 @@ trait ModelGenerators {
         quarantined = false
       )
     }
+  }
 
+  implicit lazy val arbitraryIossEtmpTradingName: Arbitrary[IossEtmpTradingName] = {
+    Arbitrary {
+      for {
+        tradingName <- Gen.alphaStr
+      } yield IossEtmpTradingName(tradingName)
+    }
+  }
+
+  implicit lazy val arbitraryIossEtmpBankDetails: Arbitrary[IossEtmpBankDetails] = {
+    Arbitrary {
+      for {
+        accountName <- Gen.alphaStr
+        bic <- Gen.option(arbitrary[Bic])
+        iban <- arbitrary[Iban]
+      } yield IossEtmpBankDetails(accountName, bic, iban)
+    }
+  }
+
+  implicit lazy val arbitraryIossEtmpDisplaySchemeDetails: Arbitrary[IossEtmpDisplaySchemeDetails] = {
+    Arbitrary {
+      for {
+        contactName <- Gen.alphaStr
+        businessTelephoneNumber <- Gen.alphaStr
+        businessEmailId <- Gen.alphaStr
+      } yield IossEtmpDisplaySchemeDetails(
+        contactName = contactName,
+        businessTelephoneNumber = businessTelephoneNumber,
+        businessEmailId = businessEmailId
+      )
+    }
+  }
+
+  implicit lazy val arbitraryIossEtmpDisplayRegistration: Arbitrary[IossEtmpDisplayRegistration] = {
+    Arbitrary {
+      for {
+        tradingNames <- Gen.listOfN(3, arbitraryIossEtmpTradingName.arbitrary)
+        schemeDetails <- arbitraryIossEtmpDisplaySchemeDetails.arbitrary
+        bankDetails <- arbitraryIossEtmpBankDetails.arbitrary
+        exclusions <- arbitraryIossEtmpExclusion.arbitrary
+      } yield IossEtmpDisplayRegistration(
+        tradingNames = tradingNames,
+        schemeDetails = schemeDetails,
+        bankDetails = bankDetails,
+        exclusions = Seq(exclusions)
+      )
+    }
+  }
+
+  implicit lazy val arbitraryEACDIdentifiers: Arbitrary[EACDIdentifiers] = {
+    Arbitrary {
+      for {
+        key <- Gen.alphaStr
+        value <- Gen.alphaStr
+      } yield EACDIdentifiers(
+        key = key,
+        value = value
+      )
+    }
+  }
+
+  implicit lazy val arbitraryEACDEnrolment: Arbitrary[EACDEnrolment] = {
+    Arbitrary {
+      for {
+        service <- Gen.alphaStr
+        state <- Gen.alphaStr
+        identifiers <- Gen.listOfN(3, arbitraryEACDIdentifiers.arbitrary)
+      } yield EACDEnrolment(
+        service = service,
+        state = state,
+        activationDate = Some(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)),
+        identifiers = identifiers
+      )
+    }
+  }
+
+  implicit lazy val arbitraryEACDEnrolments: Arbitrary[EACDEnrolments] = {
+    Arbitrary {
+      for {
+        enrolments <- Gen.listOfN(3, arbitraryEACDEnrolment.arbitrary)
+      } yield EACDEnrolments(
+        enrolments = enrolments
+      )
+    }
+  }
 }

@@ -17,7 +17,7 @@
 package controllers
 
 import config.Constants
-import controllers.actions._
+import controllers.actions.*
 import forms.AddTradingNameFormProvider
 import models.Mode
 import models.requests.AuthenticatedDataRequest
@@ -35,11 +35,11 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddTradingNameController @Inject()(
-  override val messagesApi: MessagesApi,
-  cc: AuthenticatedControllerComponents,
-  formProvider: AddTradingNameFormProvider,
-  view: AddTradingNameView
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                          override val messagesApi: MessagesApi,
+                                          cc: AuthenticatedControllerComponents,
+                                          formProvider: AddTradingNameFormProvider,
+                                          view: AddTradingNameView
+                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc

@@ -23,26 +23,33 @@ import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.*
 import services.UrlBuilderService
+import services.ioss.{AccountService, IossRegistrationService}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.domain.Vrn
+import utils.FutureSyntax.FutureOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAuthenticatedIdentifierAction(registration: Option[Registration]) extends AuthenticatedIdentifierAction(
+class FakeAuthenticatedIdentifierAction(registration: Option[Registration], iossNumber: Option[String]) extends AuthenticatedIdentifierAction(
   mock[AuthConnector],
   mock[FrontendAppConfig],
   mock[UrlBuilderService],
+  mock[AccountService],
+  mock[IossRegistrationService],
   mock[RegistrationConnector]
 )(ExecutionContext.Implicits.global) {
 
   override def refine[A](request: Request[A]): Future[Either[Result, AuthenticatedIdentifierRequest[A]]] = {
-    Future.successful(Right(AuthenticatedIdentifierRequest(
+    Right(AuthenticatedIdentifierRequest(
       request,
       Credentials("12345-credId", "GGW"),
       Vrn("123456789"),
       Enrolments(Set.empty),
-      registration
-    )))
+      registration,
+      iossNumber,
+      1,
+      None
+    )).toFuture
   }
 }

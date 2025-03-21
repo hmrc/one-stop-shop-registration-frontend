@@ -17,13 +17,11 @@
 package models.core
 
 import base.SpecBase
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.{JsSuccess, Json}
 
 import java.time.LocalDate
 
-class MatchSpec extends AnyFreeSpec with Matchers with SpecBase {
+class MatchSpec extends SpecBase {
 
   "Match" - {
 
@@ -61,6 +59,7 @@ class MatchSpec extends AnyFreeSpec with Matchers with SpecBase {
       }
 
       "with all optional fields missing" in {
+
         val aMatch: Match =
           Match(
             MatchType.FixedEstablishmentQuarantinedNETP,
@@ -83,8 +82,6 @@ class MatchSpec extends AnyFreeSpec with Matchers with SpecBase {
         Json.toJson(aMatch) mustEqual expectedJson
         expectedJson.validate[Match] mustEqual JsSuccess(aMatch)
       }
-
     }
   }
-
 }

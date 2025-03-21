@@ -18,7 +18,7 @@ package controllers.actions
 
 
 import connectors.{RegistrationConnector, SaveForLaterConnector}
-import controllers.actions.FakeSavedAnswersRetrievalAction._
+import controllers.actions.FakeSavedAnswersRetrievalAction.*
 import models.UserAnswers
 import models.requests.AuthenticatedOptionalDataRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -41,7 +41,10 @@ class FakeSavedAnswersRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vr
         request.credentials,
         vrn,
         None,
-        dataToReturn
+        dataToReturn,
+        request.iossNumber,
+        request.numberOfIossRegistrations,
+        request.latestIossRegistration
       ))
 }
 

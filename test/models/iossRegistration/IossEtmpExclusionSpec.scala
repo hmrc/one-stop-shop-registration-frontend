@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package models.iossExclusions
+package models.iossRegistration
 
 import base.SpecBase
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsError, JsNull, JsString, JsSuccess, Json}
+import play.api.libs.json.*
 
-class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
+class IossEtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
 
-  private val arbEtmpExclusion: EtmpExclusion = arbitraryEtmpExclusion.arbitrary.sample.value
+  private val arbEtmpExclusion: IossEtmpExclusion = arbitraryIossEtmpExclusion.arbitrary.sample.value
 
-  "EtmpExclusion" - {
+  "IossEtmpExclusion" - {
 
-    "must serialise/deserialise from and to an EtmpExclusion" in {
+    "must serialise/deserialise from and to an IossEtmpExclusion" in {
 
       val json = Json.obj(
         "exclusionReason" -> arbEtmpExclusion.exclusionReason,
@@ -37,7 +37,7 @@ class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
         "quarantine" -> arbEtmpExclusion.quarantine
       )
 
-      val expectedResult = EtmpExclusion(
+      val expectedResult = IossEtmpExclusion(
         exclusionReason = arbEtmpExclusion.exclusionReason,
         effectiveDate = arbEtmpExclusion.effectiveDate,
         decisionDate = arbEtmpExclusion.decisionDate,
@@ -45,14 +45,14 @@ class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
       )
 
       Json.toJson(expectedResult) mustBe json
-      json.validate[EtmpExclusion] mustBe JsSuccess(expectedResult)
+      json.validate[IossEtmpExclusion] mustBe JsSuccess(expectedResult)
     }
 
     "must handle missing fields" in {
 
       val json = Json.obj()
 
-      json.validate[EtmpExclusion] mustBe a[JsError]
+      json.validate[IossEtmpExclusion] mustBe a[JsError]
     }
 
     "must handle invalid fields" in {
@@ -64,7 +64,7 @@ class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
         "quarantine" -> arbEtmpExclusion.quarantine
       )
 
-      json.validate[EtmpExclusion] mustBe a[JsError]
+      json.validate[IossEtmpExclusion] mustBe a[JsError]
     }
 
     "must handle null fields" in {
@@ -76,36 +76,36 @@ class EtmpExclusionSpec extends SpecBase with ScalaCheckPropertyChecks {
         "quarantine" -> arbEtmpExclusion.quarantine
       )
 
-      json.validate[EtmpExclusion] mustBe a[JsError]
+      json.validate[IossEtmpExclusion] mustBe a[JsError]
     }
   }
 
-  "EtmpExclusionReason" - {
+  "IossEtmpExclusionReason" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(EtmpExclusionReason.values)
+      val gen = Gen.oneOf(IossEtmpExclusionReason.values)
 
       forAll(gen) {
         etmpExclusionReason =>
-          JsString(etmpExclusionReason.toString).validate[EtmpExclusionReason].asOpt.value mustBe etmpExclusionReason
+          JsString(etmpExclusionReason.toString).validate[IossEtmpExclusionReason].asOpt.value mustBe etmpExclusionReason
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String].suchThat(!EtmpExclusionReason.values.map(_.toString).contains(_))
+      val gen = arbitrary[String].suchThat(!IossEtmpExclusionReason.values.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValues =>
 
-          JsString(invalidValues).validate[EtmpExclusionReason] mustBe JsError("error.invalid")
+          JsString(invalidValues).validate[IossEtmpExclusionReason] mustBe JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(EtmpExclusionReason.values)
+      val gen = Gen.oneOf(IossEtmpExclusionReason.values)
 
       forAll(gen) {
         etmpExclusionReason =>

@@ -54,7 +54,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
             val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
@@ -79,7 +79,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
             val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 
@@ -107,7 +107,7 @@ class VrnAllowListFilterSpec extends SpecBase with MockitoSugar with BeforeAndAf
               .build()
 
           running(app) {
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
             val features = app.injector.instanceOf[FeatureFlagService]
             val controller = new Harness(features)
 

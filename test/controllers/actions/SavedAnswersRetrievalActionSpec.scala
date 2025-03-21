@@ -64,7 +64,10 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           testCredentials,
           vrn,
           None,
-          Some(answers)
+          Some(answers),
+          None,
+          0,
+          None
         )).futureValue
 
         verifyNoInteractions(saveForLaterConnector)
@@ -74,7 +77,9 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
     }
 
     "when there is no answers in session with continueUrl set" - {
+
       "must retrieve saved answers when present" in {
+
         val sessionRepository = mock[AuthenticatedUserAnswersRepository]
         val saveForLaterConnector = mock[SaveForLaterConnector]
         val registrationConnector = mock[RegistrationConnector]
@@ -97,7 +102,10 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           testCredentials,
           vrn,
           None,
-          Some(UserAnswers(userAnswersId))
+          Some(UserAnswers(userAnswersId)),
+          None,
+          0,
+          None
         )).futureValue
 
         verify(saveForLaterConnector, times(1)).get()(any())
@@ -105,6 +113,7 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
       }
 
       "must use answers in request when no saved answers present" in {
+
         val sessionRepository = mock[AuthenticatedUserAnswersRepository]
         val saveForLaterConnector = mock[SaveForLaterConnector]
         val registrationConnector = mock[RegistrationConnector]
@@ -121,13 +130,15 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           testCredentials,
           vrn,
           None,
-          Some(emptyAnswers))).futureValue
+          Some(emptyAnswers),
+          None,
+          0,
+          None
+        )).futureValue
 
         verify(saveForLaterConnector, times(1)).get()(any())
         result.value.userAnswers mustBe Some(emptyAnswers)
       }
     }
-
   }
-
 }

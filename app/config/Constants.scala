@@ -35,4 +35,6 @@ object Constants {
 
   val emailVerificationMaxEmails: Int = 10
   val correctionsPeriodsLimit: Int = 3
+
+  val iossEnrolmentKey: String = "IOSSNumber"
 }

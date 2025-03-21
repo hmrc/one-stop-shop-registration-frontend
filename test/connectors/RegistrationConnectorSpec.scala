@@ -17,18 +17,19 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import models.enrolments.EACDEnrolments
 import models.external.ExternalEntryUrl
-import models.iossExclusions.EtmpDisplayRegistration
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
+class RegistrationConnectorSpec extends SpecBase with WireMockHelper {
 
   private val registration = RegistrationData.registration
 
@@ -301,11 +302,11 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
 
   ".getIossRegistration" - {
 
-    val iossUrl: String = "/ioss-registration/registration"
+    val iossUrl: String = s"/ioss-registration/registration/$iossNumber"
 
-    "must return OK with a valid EtmpDisplayRegistration when IOSS backend returns OK with a valid response body" in {
+    "must return OK with a valid IossEtmpDisplayRegistration when IOSS backend returns OK with a valid response body" in {
 
-      val etmpDisplayRegistration: EtmpDisplayRegistration = arbitraryEtmpDisplayRegistration.arbitrary.sample.value
+      val etmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
 
       running(application) {
 
@@ -314,6 +315,9 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
         val responseJson =
           s"""{
              | "registration" : {
+             |    "tradingNames" : ${Json.toJson(etmpDisplayRegistration.tradingNames)},
+             |    "schemeDetails" : ${Json.toJson(etmpDisplayRegistration.schemeDetails)},
+             |    "bankDetails" : ${Json.toJson(etmpDisplayRegistration.bankDetails)},
              |    "exclusions" : ${Json.toJson(etmpDisplayRegistration.exclusions)}
              | }
              |}""".stripMargin
@@ -322,7 +326,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
           .willReturn(ok().withBody(responseJson))
         )
 
-        val result = connector.getIossRegistration().futureValue
+        val result = connector.getIossRegistration(iossNumber).futureValue
 
         result mustBe Right(etmpDisplayRegistration)
       }
@@ -341,7 +345,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
           .willReturn(ok().withBody(responseJson))
         )
 
-        val result = connector.getIossRegistration().futureValue
+        val result = connector.getIossRegistration(iossNumber).futureValue
 
         result mustBe Left(InvalidJson)
       }
@@ -360,7 +364,7 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
           .willReturn(ok().withBody(responseJson))
         )
 
-        val result = connector.getIossRegistration().futureValue
+        val result = connector.getIossRegistration(iossNumber).futureValue
 
         result mustBe Left(InvalidJson)
       }
@@ -378,9 +382,34 @@ class RegistrationRequestConnectorSpec extends SpecBase with WireMockHelper {
           .willReturn(aResponse().withStatus(status))
         )
 
-        val result = connector.getIossRegistration().futureValue
+        val result = connector.getIossRegistration(iossNumber).futureValue
 
         result mustBe Left(UnexpectedResponseStatus(status, s"Unexpected IOSS registration response, status $status returned"))
+      }
+    }
+  }
+
+  ".getAccounts" - {
+
+    val iossAccountsUrl: String = "/ioss-registration/accounts"
+
+    "must return a valid EACDEnrolments payload when the server provides one" in {
+
+      val eACDEnrolments: EACDEnrolments = arbitraryEACDEnrolments.arbitrary.sample.value
+
+      running(application) {
+
+        val connector: RegistrationConnector = application.injector.instanceOf[RegistrationConnector]
+
+        val responseJson = Json.toJson(eACDEnrolments).toString
+
+        server.stubFor(get(urlEqualTo(iossAccountsUrl))
+          .willReturn(ok().withBody(responseJson))
+        )
+
+        val result = connector.getAccounts().futureValue
+
+        result mustBe eACDEnrolments
       }
     }
   }

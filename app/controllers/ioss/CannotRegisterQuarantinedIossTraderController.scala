@@ -16,7 +16,7 @@
 
 package controllers.ioss
 
-import controllers.actions._
+import controllers.actions.*
 import formats.Format.quarantinedIOSSRegistrationFormatter
 import logging.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -39,13 +39,21 @@ class CannotRegisterQuarantinedIossTraderController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
-      iossExclusionService.getIossEtmpExclusion().map {
-        case Some(iossEtmpExclusion) =>
-          val excludeEndDate: String = iossEtmpExclusion.effectiveDate.plusYears(2).plusDays(1).format(quarantinedIOSSRegistrationFormatter)
-          Ok(view(excludeEndDate))
+      request.iossNumber match {
+        case Some(iossNumber) =>
+          iossExclusionService.getIossEtmpExclusion(iossNumber).map {
+            case Some(iossEtmpExclusion) =>
+              val excludeEndDate: String = iossEtmpExclusion.effectiveDate.plusYears(2).plusDays(1).format(quarantinedIOSSRegistrationFormatter)
+              Ok(view(excludeEndDate))
+            case _ =>
+              val exception = new IllegalStateException("Expected an ETMP Exclusion")
+              logger.error(s"Service was unable to retrieve ETMP Exclusion: ${exception.getMessage}", exception)
+              throw exception
+          }
+
         case _ =>
-          val exception = new IllegalStateException("Expected an ETMP Exclusion")
-          logger.error(s"Service was unable to retrieve ETMP Exclusion: ${exception.getMessage}", exception)
+          val exception = new IllegalStateException("Expected an IOSS number")
+          logger.error(s"Request does not contain an IOSS number: ${exception.getMessage}", exception)
           throw exception
       }
   }

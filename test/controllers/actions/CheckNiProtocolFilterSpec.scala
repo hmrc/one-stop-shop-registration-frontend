@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -50,7 +50,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -68,11 +68,11 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           )
           .build()
 
-        val userAnswersWithSingleMarketIndicatorFalse = basicUserAnswersWithVatInfo copy(vatInfo =
-          Some(vatCustomerInfo copy(singleMarketIndicator = Some(false))))
+        val userAnswersWithSingleMarketIndicatorFalse = basicUserAnswersWithVatInfo copy (vatInfo =
+          Some(vatCustomerInfo copy (singleMarketIndicator = Some(false))))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -94,7 +94,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           Some(vatCustomerInfo copy (singleMarketIndicator = Some(false))))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorFalse, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -116,7 +116,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           Some(vatCustomerInfo copy (singleMarketIndicator = None)))
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorNone)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithSingleMarketIndicatorNone, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -137,7 +137,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
         val userAnswersWithVatCustomerInfoNone = basicUserAnswersWithVatInfo copy (vatInfo = None)
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithVatCustomerInfoNone)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, userAnswersWithVatCustomerInfoNone, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -158,7 +158,7 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           ).build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -168,6 +168,6 @@ class CheckNiProtocolFilterSpec extends SpecBase with MockitoSugar with BeforeAn
         }
       }
     }
-
   }
 }
+

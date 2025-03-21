@@ -44,7 +44,7 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
 
   implicit private val hc: HeaderCarrier = HeaderCarrier()
   implicit private val request: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(
-    AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers),
+    AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers, None, 0, None),
     testCredentials,
     vrn,
     registration,

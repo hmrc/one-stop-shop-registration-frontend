@@ -43,7 +43,6 @@ import views.html.ApplicationCompleteView
 import java.time.{Clock, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext
 
-
 class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
   private val periodService = mock[PeriodService]
@@ -53,8 +52,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
   private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val userAnswers = UserAnswers(
     userAnswersId,

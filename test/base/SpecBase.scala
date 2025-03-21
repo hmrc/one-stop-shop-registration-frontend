@@ -117,6 +117,7 @@ trait SpecBase
     .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
+  val iossNumber: String = "IM9001234567"
 
   val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
 
@@ -124,14 +125,15 @@ trait SpecBase
                                     userAnswers: Option[UserAnswers] = None,
                                     clock: Option[Clock] = None,
                                     mode: Option[Mode] = None,
-                                    registration: Option[Registration] = None
+                                    registration: Option[Registration] = None,
+                                    iossNumber: Option[String] = None
                                   ): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration)),
+        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber)),
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers)),

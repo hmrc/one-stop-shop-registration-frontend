@@ -31,9 +31,9 @@ class EtmpExclusionSpec extends SpecBase {
   private val decisionDate: LocalDate = LocalDate.of(2023, 1, 15)
   private val quarantine: Boolean = arbitrary[Boolean].sample.value
 
-  "EtmpExclusion" - {
+  "IossEtmpExclusion" - {
 
-    "must serialise/deserialise to and from EtmpExclusion" in {
+    "must serialise/deserialise to and from IossEtmpExclusion" in {
 
       val etmpExclusion: EtmpExclusion = EtmpExclusion(
         exclusionReason = exclusionReason,
@@ -54,6 +54,7 @@ class EtmpExclusionSpec extends SpecBase {
     }
 
     "must handle missing fields during deserialization" in {
+
       val expectedJson = Json.obj()
 
       expectedJson.validate[EtmpExclusion] mustBe a[JsError]

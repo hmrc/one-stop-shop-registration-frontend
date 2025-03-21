@@ -18,7 +18,7 @@ package services.ioss
 
 import connectors.RegistrationConnector
 import logging.Logging
-import models.iossExclusions.{EtmpExclusion, EtmpExclusionReason}
+import models.iossRegistration.{IossEtmpExclusion, IossEtmpExclusionReason}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.{Clock, LocalDate}
@@ -30,28 +30,30 @@ class IossExclusionService @Inject()(
                                       registrationConnector: RegistrationConnector
                                     )(implicit ec: ExecutionContext) extends Logging {
 
-  def isQuarantinedCode4()(implicit hc: HeaderCarrier): Future[Boolean] = {
-    getIossEtmpExclusion().map {
+  def isQuarantinedCode4(iossNumber: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+    getIossEtmpExclusion(iossNumber).map {
       case Some(iossEtmpExclusion) =>
         !isAfterTwoYears(iossEtmpExclusion) &&
           iossEtmpExclusion.quarantine &&
-          iossEtmpExclusion.exclusionReason.equals(EtmpExclusionReason.FailsToComply)
+          iossEtmpExclusion.exclusionReason.equals(IossEtmpExclusionReason.FailsToComply)
       case _ => false
     }
   }
 
-  def getIossEtmpExclusion()(implicit hc: HeaderCarrier): Future[Option[EtmpExclusion]] = {
-    registrationConnector.getIossRegistration().map {
+  def getIossEtmpExclusion(iossNumber: String)(implicit hc: HeaderCarrier): Future[Option[IossEtmpExclusion]] = {
+    registrationConnector.getIossRegistration(iossNumber).map {
       case Right(iossEtmpDisplayRegistration) =>
         iossEtmpDisplayRegistration.exclusions.headOption
       case Left(error) =>
         val exception = new Exception(s"An error occurred whilst retrieving the IOSS ETMP Display Registration with error: $error")
-        logger.error(s"Unable to retrieve IOSS EtmpExclusion with error: ${exception.getMessage}", exception)
+        logger.error(s"Unable to retrieve IOSS IossEtmpExclusion with error: ${
+          exception.getMessage
+        }", exception)
         throw exception
     }
   }
 
-  private def isAfterTwoYears(etmpExclusion: EtmpExclusion): Boolean = {
+  private def isAfterTwoYears(etmpExclusion: IossEtmpExclusion): Boolean = {
     val currentDate: LocalDate = LocalDate.now(clock)
     val minimumDate: LocalDate = currentDate.minusYears(2)
     etmpExclusion.effectiveDate.isBefore(minimumDate)

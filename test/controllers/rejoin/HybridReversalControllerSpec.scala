@@ -143,7 +143,7 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
         running(application) {
           val request = FakeRequest(POST, controllers.rejoin.routes.HybridReversalController.onSubmit().url)
           val result = route(application, request).value
-          val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers)
+          val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
           val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, dataRequest)
 
 
@@ -176,7 +176,7 @@ class HybridReversalControllerSpec extends SpecBase with MockitoSugar with Summa
           running(application) {
             val request = FakeRequest(POST, controllers.rejoin.routes.HybridReversalController.onSubmit().url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, dataRequest)
 
 

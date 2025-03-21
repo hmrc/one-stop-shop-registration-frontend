@@ -45,7 +45,7 @@ class OssRequiredActionSpec extends SpecBase {
 
       val action = new Harness
 
-      val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers)
+      val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
       val result = action.callRefine(request).futureValue
 
@@ -56,7 +56,7 @@ class OssRequiredActionSpec extends SpecBase {
 
       val action = new Harness
 
-      val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, Some(registration), emptyUserAnswers)
+      val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, Some(registration), emptyUserAnswers, None, 0, None)
 
       val result = action.callRefine(request).futureValue
 

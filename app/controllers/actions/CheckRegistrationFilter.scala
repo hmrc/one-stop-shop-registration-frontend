@@ -28,7 +28,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 import services.DataMigrationService
 import services.ioss.IossExclusionService
-import uk.gov.hmrc.auth.core.{EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import utils.FutureSyntax.FutureOps
@@ -103,19 +103,14 @@ class CheckRegistrationFilterImpl(
   }
 
   private def hasExcludedIossEnrolment(request: AuthenticatedIdentifierRequest[_])(implicit hc: HeaderCarrier): Future[Boolean] = {
-    getIossEnrolments(request) match {
-      case Some(_) =>
-        iossExclusionService.isQuarantinedCode4().map { result =>
+    request.iossNumber match {
+      case Some(iossNumber) =>
+        iossExclusionService.isQuarantinedCode4(iossNumber).map { result =>
           result
         }
       case _ =>
         false.toFuture
     }
-  }
-
-  private def getIossEnrolments(request: AuthenticatedIdentifierRequest[_]): Option[EnrolmentIdentifier] = {
-    request.enrolments.enrolments.filter(_.key == frontendAppConfig.iossEnrolment).toSeq
-      .flatMap(_.identifiers.filter(_.key == "IOSSNumber")).headOption
   }
 }
 

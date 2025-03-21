@@ -34,7 +34,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
   extends ActionRefiner[AuthenticatedOptionalDataRequest, AuthenticatedDataRequest] {
 
   override protected def refine[A](request: AuthenticatedOptionalDataRequest[A]): Future[Either[Result, AuthenticatedDataRequest[A]]] = {
-    
+
     request.userAnswers match {
       case None =>
         Left(Redirect(determineJourneyRecovery(mode))).toFuture
@@ -42,7 +42,16 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
         if (mode.exists(_.isInAmendOrRejoin)) {
           request.registration match {
             case Some(registration) =>
-              Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, Some(registration), data)).toFuture
+              Right(AuthenticatedDataRequest(
+                request.request,
+                request.credentials,
+                request.vrn,
+                Some(registration),
+                data,
+                request.iossNumber,
+                request.numberOfIossRegistrations,
+                request.latestIossRegistration
+              )).toFuture
             case None =>
               if (mode.contains(AmendMode)) {
                 Left(Redirect(amendRoutes.AmendJourneyRecoveryController.onPageLoad())).toFuture
@@ -51,7 +60,16 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
               }
           }
         } else {
-          Right(AuthenticatedDataRequest(request.request, request.credentials, request.vrn, None, data)).toFuture
+          Right(AuthenticatedDataRequest(
+            request.request,
+            request.credentials,
+            request.vrn,
+            None,
+            data,
+            request.iossNumber,
+            request.numberOfIossRegistrations,
+            request.latestIossRegistration
+          )).toFuture
         }
     }
   }

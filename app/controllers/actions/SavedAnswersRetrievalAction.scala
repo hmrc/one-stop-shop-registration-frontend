@@ -46,11 +46,10 @@ class SavedAnswersRetrievalAction(
         } yield {
           val answers = {
             (savedForLater, maybeVatInfo) match {
-              case (Right(Some(answers)), Right(vatInfo)) => {
+              case (Right(Some(answers)), Right(vatInfo)) =>
                 val newAnswers = UserAnswers(request.userId, answers.data, Some(vatInfo), answers.lastUpdated)
                 repository.set(newAnswers)
                 Some(newAnswers)
-              }
               case _ => request.userAnswers
             }
           }
@@ -60,8 +59,17 @@ class SavedAnswersRetrievalAction(
         Future.successful(request.userAnswers)
       }
 
-    userAnswers.map {
-      AuthenticatedOptionalDataRequest(request.request, request.credentials, request.vrn, request.registration, _)
+    userAnswers.map { (maybeUserAnswers: Option[UserAnswers]) =>
+      AuthenticatedOptionalDataRequest(
+        request.request,
+        request.credentials,
+        request.vrn,
+        request.registration,
+        maybeUserAnswers,
+        request.iossNumber,
+        request.numberOfIossRegistrations,
+        request.latestIossRegistration
+      )
     }
   }
 }

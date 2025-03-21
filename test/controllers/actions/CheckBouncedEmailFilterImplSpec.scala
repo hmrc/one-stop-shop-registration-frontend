@@ -53,7 +53,7 @@ class CheckBouncedEmailFilterImplSpec extends SpecBase with MockitoSugar with Be
   }
 
   private def populateDataRequest(registration: Registration, userAnswers: UserAnswers): AuthenticatedDataRequest[_] = {
-    AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, Some(registration), userAnswers)
+    AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, Some(registration), userAnswers, None, 0, None)
   }
 
   private val mockEmailVerificationService: EmailVerificationService = mock[EmailVerificationService]
