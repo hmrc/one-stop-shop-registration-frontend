@@ -35,13 +35,14 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
   private val mockIossExclusionService: IossExclusionService = mock[IossExclusionService]
 
-  private val iossEtmpExclusion: IossEtmpExclusion =
+  private val iossEtmpExclusion: IossEtmpExclusion = {
     IossEtmpExclusion(
       exclusionReason = IossEtmpExclusionReason.FailsToComply,
       effectiveDate = LocalDate.now(stubClockAtArbitraryDate),
       decisionDate = LocalDate.now(stubClockAtArbitraryDate),
       quarantine = true
     )
+  }
 
   "CannotRegisterQuarantinedIossTrader Controller" - {
 
@@ -49,7 +50,7 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
       when(mockIossExclusionService.getIossEtmpExclusion(any())(any())) thenReturn Some(iossEtmpExclusion).toFuture
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo), iossNumber = Some(iossNumber))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
         .build()
 
@@ -62,8 +63,8 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
         val formattedExcludeEndDate: String = iossEtmpExclusion.effectiveDate.plusYears(2).plusDays(1).format(quarantinedIOSSRegistrationFormatter)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(formattedExcludeEndDate)(request, messages(application)).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(formattedExcludeEndDate)(request, messages(application)).toString
       }
     }
 
@@ -73,8 +74,27 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
       when(mockIossExclusionService.getIossEtmpExclusion(any())(any())) thenReturn None.toFuture
 
-      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo), iossNumber = Some(iossNumber))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.CannotRegisterQuarantinedIossTraderController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        whenReady(result.failed) { exp =>
+          exp mustBe a[IllegalStateException]
+          exp.getMessage mustBe exceptionMessage
+        }
+      }
+    }
+
+    "must throw an IllegalStateException for a GET when the expected IOSS number is missing" in {
+
+      val exceptionMessage: String = "Expected an IOSS number"
+
+      val application = applicationBuilder(userAnswers = None)
         .build()
 
       running(application) {

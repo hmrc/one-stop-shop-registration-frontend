@@ -31,7 +31,7 @@ import utils.FutureSyntax.FutureOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAuthenticatedIdentifierAction(registration: Option[Registration]) extends AuthenticatedIdentifierAction(
+class FakeAuthenticatedIdentifierAction(registration: Option[Registration], iossNumber: Option[String]) extends AuthenticatedIdentifierAction(
   mock[AuthConnector],
   mock[FrontendAppConfig],
   mock[UrlBuilderService],
@@ -47,7 +47,7 @@ class FakeAuthenticatedIdentifierAction(registration: Option[Registration]) exte
       Vrn("123456789"),
       Enrolments(Set.empty),
       registration,
-      Some("IM9001234567"),
+      iossNumber,
       1,
       None
     )).toFuture
