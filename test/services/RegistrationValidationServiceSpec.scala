@@ -19,21 +19,21 @@ package services
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
-import models._
-import models.domain._
+import models.*
+import models.domain.*
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages._
-import pages.euDetails._
-import pages.previousRegistrations.{PreviousEuCountryPage, PreviouslyRegisteredPage, PreviousOssNumberPage, PreviousSchemePage}
+import pages.*
+import pages.euDetails.*
+import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
 import queries.previousRegistration.AllPreviousRegistrationsRawQuery
+import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -47,8 +47,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
   private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val mockDateService: DateService = mock[DateService]
   private val mockRegistrationService: RegistrationService = mock[RegistrationService]
@@ -105,16 +105,16 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
   private val answersNotPartOfVatGroup =
     answersPartOfVatGroup.copy(vatInfo =
-      Some(VatCustomerInfo(
-        DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
-        LocalDate.now,
-        partOfVatGroup = false,
-        organisationName = Some("foo"),
-        individualName = None,
-        singleMarketIndicator = Some(true),
-        Some(LocalDate.now)
-      ))
-    )
+        Some(VatCustomerInfo(
+          DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
+          LocalDate.now,
+          partOfVatGroup = false,
+          organisationName = Some("foo"),
+          individualName = None,
+          singleMarketIndicator = Some(true),
+          Some(LocalDate.now)
+        ))
+      )
       .set(EuCountryPage(Index(3)), Country("ES", "Spain")).success.value
       .set(SellsGoodsToEUConsumersPage(Index(3)), true).success.value
       .set(SellsGoodsToEUConsumerMethodPage(Index(3)), EuConsumerSalesMethod.FixedEstablishment).success.value

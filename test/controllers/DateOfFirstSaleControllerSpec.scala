@@ -45,7 +45,7 @@ class DateOfFirstSaleControllerSpec extends SpecBase with MockitoSugar {
   private val dateFormatted = dateService.earliestSaleAllowed().format(dateFormatter)
   private val dateHintFormatted = dateService.earliestSaleAllowed().format(dateHintFormatter)
 
-  private implicit lazy val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(getRequest, testCredentials, vrn, None, emptyUserAnswers)
+  private implicit lazy val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(getRequest, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val formProvider = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)
 

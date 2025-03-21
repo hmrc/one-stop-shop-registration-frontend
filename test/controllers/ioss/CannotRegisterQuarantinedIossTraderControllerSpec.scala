@@ -18,13 +18,13 @@ package controllers.ioss
 
 import base.SpecBase
 import formats.Format.quarantinedIOSSRegistrationFormatter
-import models.iossExclusions.{EtmpExclusion, EtmpExclusionReason}
+import models.iossRegistration.{IossEtmpExclusion, IossEtmpExclusionReason}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.ioss.IossExclusionService
 import utils.FutureSyntax.FutureOps
 import views.html.ioss.CannotRegisterQuarantinedIossTraderView
@@ -35,9 +35,9 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
   private val mockIossExclusionService: IossExclusionService = mock[IossExclusionService]
 
-  private val iossEtmpExclusion: EtmpExclusion =
-    EtmpExclusion(
-      exclusionReason = EtmpExclusionReason.FailsToComply,
+  private val iossEtmpExclusion: IossEtmpExclusion =
+    IossEtmpExclusion(
+      exclusionReason = IossEtmpExclusionReason.FailsToComply,
       effectiveDate = LocalDate.now(stubClockAtArbitraryDate),
       decisionDate = LocalDate.now(stubClockAtArbitraryDate),
       quarantine = true
@@ -47,7 +47,7 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      when(mockIossExclusionService.getIossEtmpExclusion()(any())) thenReturn Some(iossEtmpExclusion).toFuture
+      when(mockIossExclusionService.getIossEtmpExclusion(any())(any())) thenReturn Some(iossEtmpExclusion).toFuture
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
@@ -71,7 +71,7 @@ class CannotRegisterQuarantinedIossTraderControllerSpec extends SpecBase {
 
       val exceptionMessage: String = "Expected an ETMP Exclusion"
 
-      when(mockIossExclusionService.getIossEtmpExclusion()(any())) thenReturn None.toFuture
+      when(mockIossExclusionService.getIossEtmpExclusion(any())(any())) thenReturn None.toFuture
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))

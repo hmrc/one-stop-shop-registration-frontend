@@ -18,8 +18,8 @@ package services.ioss
 
 import base.SpecBase
 import connectors.RegistrationConnector
-import models.iossExclusions.EtmpExclusionReason.FailsToComply
-import models.iossExclusions.{EtmpDisplayRegistration, EtmpExclusion, EtmpExclusionReason}
+import models.iossRegistration.IossEtmpExclusionReason.FailsToComply
+import models.iossRegistration.{IossEtmpDisplayRegistration, IossEtmpExclusion, IossEtmpExclusionReason}
 import models.responses.RegistrationNotFound
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -40,7 +40,7 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
 
   private val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
-  private val iossEtmpDisplayRegistration: EtmpDisplayRegistration = arbitraryEtmpDisplayRegistration.arbitrary.sample.value
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
 
   "IossExclusionService" - {
 
@@ -48,114 +48,114 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
 
       "must return true when an IOSS excluded trader is both quarantined and the exclusion reason is code 4 and the effective date is within 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = EtmpExclusionReason.FailsToComply,
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+          exclusionReason = IossEtmpExclusionReason.FailsToComply,
           effectiveDate = currentDate.minusYears(2),
           quarantine = true
         )
 
-        val updatedIossEtmpDisplayRegistration: EtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
+        val updatedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.isQuarantinedCode4().futureValue
+        val result = service.isQuarantinedCode4(iossNumber).futureValue
 
         result mustBe true
       }
 
       "must return false when an IOSS excluded trader is both quarantined and the exclusion reason is code 4 but the effective date is outside 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = EtmpExclusionReason.FailsToComply,
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+          exclusionReason = IossEtmpExclusionReason.FailsToComply,
           effectiveDate = currentDate.minusYears(2).minusDays(1),
           quarantine = true
         )
 
-        val updatedIossEtmpDisplayRegistration: EtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
+        val updatedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.isQuarantinedCode4().futureValue
+        val result = service.isQuarantinedCode4(iossNumber).futureValue
 
         result mustBe false
       }
 
       "must return false when an IOSS excluded trader is not quarantined and the exclusion reason is code 4 but the effective date is outside 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = EtmpExclusionReason.FailsToComply,
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+          exclusionReason = IossEtmpExclusionReason.FailsToComply,
           effectiveDate = currentDate.minusYears(2).minusDays(1),
           quarantine = false
         )
 
-        val updatedIossEtmpDisplayRegistration: EtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
+        val updatedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.isQuarantinedCode4().futureValue
+        val result = service.isQuarantinedCode4(iossNumber).futureValue
 
         result mustBe false
       }
 
       "must return false when an IOSS excluded trader is not quarantined but the exclusion reason is not code 4 but the effective date is outside 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = Gen.oneOf(EtmpExclusionReason.values).retryUntil(x => x != FailsToComply).sample.value,
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+          exclusionReason = Gen.oneOf(IossEtmpExclusionReason.values).retryUntil(x => x != FailsToComply).sample.value,
           effectiveDate = currentDate.minusYears(2).minusDays(1),
           quarantine = false
         )
 
-        val updatedIossEtmpDisplayRegistration: EtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
+        val updatedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.isQuarantinedCode4().futureValue
+        val result = service.isQuarantinedCode4(iossNumber).futureValue
 
         result mustBe false
       }
 
       "must return false when an IOSS excluded trader is not quarantined but the exclusion reason is not code 4 but the effective date is inside 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = Gen.oneOf(EtmpExclusionReason.values).retryUntil(x => x != FailsToComply).sample.value,
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+          exclusionReason = Gen.oneOf(IossEtmpExclusionReason.values).retryUntil(x => x != FailsToComply).sample.value,
           effectiveDate = currentDate.minusYears(2),
           quarantine = false
         )
 
-        val updatedIossEtmpDisplayRegistration: EtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
+        val updatedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.isQuarantinedCode4().futureValue
+        val result = service.isQuarantinedCode4(iossNumber).futureValue
 
         result mustBe false
       }
 
       "must return false when an IOSS excluded trader is not quarantined but the exclusion reason is code 4 but the effective date is outside 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
-          exclusionReason = EtmpExclusionReason.FailsToComply,
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+          exclusionReason = IossEtmpExclusionReason.FailsToComply,
           effectiveDate = currentDate.minusYears(2).minusDays(1),
           quarantine = false
         )
 
-        val updatedIossEtmpDisplayRegistration: EtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
+        val updatedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration = iossEtmpDisplayRegistration.copy(exclusions = Seq(updatedIossEtmpExclusion))
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.isQuarantinedCode4().futureValue
+        val result = service.isQuarantinedCode4(iossNumber).futureValue
 
         result mustBe false
       }
@@ -165,11 +165,11 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
 
       "must return an IossEtmpExclusion when IOSS backend returns a successful valid payload" in {
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(iossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(iossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.getIossEtmpExclusion().futureValue
+        val result = service.getIossEtmpExclusion(iossNumber).futureValue
 
         result mustBe iossEtmpDisplayRegistration.exclusions.headOption
       }
@@ -180,24 +180,24 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
           exclusions = Seq.empty
         )
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Right(updatedIossEtmpDisplayRegistration).toFuture
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.getIossEtmpExclusion().futureValue
+        val result = service.getIossEtmpExclusion(iossNumber).futureValue
 
         result mustBe None
       }
 
       "must throw an Exception when a IOSS ETMP Display Registration can't be retrieved" in {
 
-        when(mockRegistrationConnector.getIossRegistration()(any())) thenReturn Left(RegistrationNotFound).toFuture
+        when(mockRegistrationConnector.getIossRegistration(any())(any())) thenReturn Left(RegistrationNotFound).toFuture
 
         val exceptionMessage: String = s"An error occurred whilst retrieving the IOSS ETMP Display Registration with error: $RegistrationNotFound"
 
         val service = new IossExclusionService(stubClockAtArbitraryDate, mockRegistrationConnector)
 
-        val result = service.getIossEtmpExclusion()
+        val result = service.getIossEtmpExclusion(iossNumber)
 
         whenReady(result.failed) { exp =>
           exp mustBe a[Exception]
@@ -210,7 +210,7 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
 
       "must return true when the effective date is after 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
           effectiveDate = currentDate.minusYears(2).minusDays(1)
         )
 
@@ -225,7 +225,7 @@ class IossExclusionServiceSpec extends SpecBase with PrivateMethodTester {
 
       "must return false when the effective date is before 2 years" in {
 
-        val updatedIossEtmpExclusion: EtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
+        val updatedIossEtmpExclusion: IossEtmpExclusion = iossEtmpDisplayRegistration.exclusions.head.copy(
           effectiveDate = currentDate.minusYears(2)
         )
 

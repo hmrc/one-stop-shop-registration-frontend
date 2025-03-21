@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import config.Constants.iossEnrolmentKey
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.auth.routes as authRoutes
@@ -25,6 +26,7 @@ import models.requests.{AuthenticatedIdentifierRequest, SessionRequest}
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import services.UrlBuilderService
+import services.ioss.{AccountService, IossRegistrationService}
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.auth.core.retrieve.*
@@ -43,6 +45,8 @@ class AuthenticatedIdentifierAction @Inject()(
                                                override val authConnector: AuthConnector,
                                                config: FrontendAppConfig,
                                                urlBuilder: UrlBuilderService,
+                                               accountService: AccountService,
+                                               iossRegistrationService: IossRegistrationService,
                                                registrationConnector: RegistrationConnector
                                              )(implicit val executionContext: ExecutionContext)
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
@@ -69,17 +73,18 @@ class AuthenticatedIdentifierAction @Inject()(
         Retrievals.confidenceLevel) {
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ =>
-        findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) =>
-            makeAuthRequest(request, credentials, enrolments, vrn)
+        (findVrnFromEnrolments(enrolments), findIosNumberFromEnrolments(enrolments)) match {
+          case (Some(vrn), futureMaybeIossNumber) =>
+            makeAuthRequest(request, credentials, enrolments, vrn, futureMaybeIossNumber)
+
           case _ => throw InsufficientEnrolments()
         }
 
       case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence =>
-        findVrnFromEnrolments(enrolments) match {
-          case Some(vrn) =>
+        (findVrnFromEnrolments(enrolments), findIosNumberFromEnrolments(enrolments)) match {
+          case (Some(vrn), futureMaybeIossNumber) =>
             if (confidence >= ConfidenceLevel.L200) {
-              makeAuthRequest(request, credentials, enrolments, vrn)
+              makeAuthRequest(request, credentials, enrolments, vrn, futureMaybeIossNumber)
             } else {
               throw InsufficientConfidenceLevel()
             }
@@ -130,14 +135,21 @@ class AuthenticatedIdentifierAction @Inject()(
     }
   }
 
-  private def makeAuthRequest[A](request: Request[A], credentials: Credentials, enrolments: Enrolments, vrn: Vrn)
-                                (implicit hc: HeaderCarrier): IdentifierActionResult[A] = {
+  private def makeAuthRequest[A](
+                                  request: Request[A],
+                                  credentials: Credentials,
+                                  enrolments: Enrolments,
+                                  vrn: Vrn,
+                                  futureMaybeIossNumber: Future[(Int, Option[String])]
+                                )(implicit hc: HeaderCarrier): IdentifierActionResult[A] = {
     for {
       maybeRegistration <- registrationConnector.getRegistration()
-    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration))
+      (numberOfIossRegistrations, maybeIossNumber) <- futureMaybeIossNumber
+      maybeLatestIossRegistration <- iossRegistrationService.getIossRegistration(maybeIossNumber)
+    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration, maybeIossNumber, numberOfIossRegistrations, maybeLatestIossRegistration))
   }
 
-  private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] =
+  private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] = {
     enrolments.enrolments.find(_.key == "HMRC-MTD-VAT")
       .flatMap {
         enrolment =>
@@ -147,8 +159,18 @@ class AuthenticatedIdentifierAction @Inject()(
         enrolment =>
           enrolment.identifiers.find(_.key == "VATRegNo").map(e => Vrn(e.value))
       }
+  }
 
-  private def upliftCredentialStrength[A](request: Request[A]): IdentifierActionResult[A] =
+  private def findIosNumberFromEnrolments(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[(Int, Option[String])] = {
+    enrolments.enrolments.filter(_.key == config.iossEnrolment).toSeq.flatMap(_.identifiers.filter(_.key == iossEnrolmentKey).map(_.value)) match {
+      case firstEnrolment :: Nil => (1, Some(firstEnrolment)).toFuture
+      case enrolments if enrolments.nonEmpty =>
+        accountService.getLatestAccount().map(iossNumber => (enrolments.size, iossNumber))
+      case _ => (0, None).toFuture
+    }
+  }
+
+  private def upliftCredentialStrength[A](request: Request[A]): IdentifierActionResult[A] = {
     Left(Redirect(
       config.mfaUpliftUrl,
       Map(
@@ -156,8 +178,9 @@ class AuthenticatedIdentifierAction @Inject()(
         "continueUrl" -> Seq(urlBuilder.loginContinueUrl(request).get(redirectPolicy).url)
       )
     )).toFuture
+  }
 
-  private def upliftConfidenceLevel[A](request: Request[A]): IdentifierActionResult[A] =
+  private def upliftConfidenceLevel[A](request: Request[A]): IdentifierActionResult[A] = {
     Left(Redirect(
       config.ivUpliftUrl,
       Map(
@@ -167,6 +190,7 @@ class AuthenticatedIdentifierAction @Inject()(
         "failureURL" -> Seq(urlBuilder.ivFailureUrl(request))
       )
     )).toFuture
+  }
 }
 
 class SessionIdentifierAction @Inject()()(implicit val executionContext: ExecutionContext)

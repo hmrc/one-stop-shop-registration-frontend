@@ -19,8 +19,8 @@ package services
 import base.SpecBase
 import connectors.returns.VatReturnConnector
 import controllers.routes
-import models._
-import models.domain._
+import models.*
+import models.domain.*
 import models.domain.returns.VatReturn
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.requests.AuthenticatedDataRequest
@@ -31,9 +31,9 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages._
-import pages.euDetails._
-import pages.previousRegistrations._
+import pages.*
+import pages.euDetails.*
+import pages.previousRegistrations.*
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
@@ -123,7 +123,7 @@ class RegistrationServiceSpec
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
   implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-    AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
+    AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -174,7 +174,7 @@ class RegistrationServiceSpec
               TradeDetails("Danish trading name", InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark")))
             ),
           )
-      )
+        )
 
       val result = service.toUserAnswers(userAnswersId, modifiedRegistrationData, vatCustomerInfo).futureValue
 
@@ -184,7 +184,9 @@ class RegistrationServiceSpec
   }
 
   ".eligibleSalesDifference" - {
+
     "return true if the user answers are different" in {
+
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val result = service.eligibleSalesDifference(Some(RegistrationData.registration), completeUserAnswers)
@@ -193,6 +195,7 @@ class RegistrationServiceSpec
     }
 
     "return true if there is no registration provided" in {
+
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val result = service.eligibleSalesDifference(None, completeUserAnswers)
@@ -201,6 +204,7 @@ class RegistrationServiceSpec
     }
 
     "return false if the user answers are not different" in {
+
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
 
       val userAnswers = completeUserAnswers.set(DateOfFirstSalePage, RegistrationData.registration.dateOfFirstSale.get).success.value
@@ -212,9 +216,11 @@ class RegistrationServiceSpec
   }
 
   ".isEligibleSalesAmendable" - {
+
     "return true when registrations is amendable" in {
+
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None)
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
       when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
@@ -226,8 +232,9 @@ class RegistrationServiceSpec
     }
 
     "return true when no registration provided" in {
+
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
       val mode = AmendMode
 
@@ -237,8 +244,9 @@ class RegistrationServiceSpec
     }
 
     "return false when today is passed the amendable date" in {
+
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None)
       val daysToAdd = 100
       val instant = Instant.now.plus(daysToAdd, ChronoUnit.DAYS)
       val adjustedStubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
@@ -255,8 +263,9 @@ class RegistrationServiceSpec
     }
 
     "return false when vat return has been submitted not amendable" in {
+
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None)
       val vatReturn = arbitrary[VatReturn].sample.value
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
@@ -267,8 +276,9 @@ class RegistrationServiceSpec
     }
 
     "return true when in Rejoin Mode" in {
+
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
       val mode = RejoinMode
 
@@ -277,7 +287,4 @@ class RegistrationServiceSpec
       result mustBe true
     }
   }
-
-
-
 }

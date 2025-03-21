@@ -22,7 +22,7 @@ import models.core.{Match, MatchType}
 import models.domain.PreviousSchemeNumbers
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
@@ -35,8 +35,8 @@ import play.api.test.FakeRequest
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.Month._
-import java.time._
+import java.time.*
+import java.time.Month.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -47,9 +47,9 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   ".startOfNextQuarter" - {
@@ -59,7 +59,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 12, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.startOfNextQuarter() mustEqual LocalDate.of(2022, 1, 1)
       }
@@ -70,7 +70,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.startOfNextQuarter() mustEqual LocalDate.of(2022, 4, 1)
       }
@@ -81,7 +81,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.startOfNextQuarter() mustEqual LocalDate.of(2022, 7, 1)
       }
@@ -92,7 +92,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.startOfNextQuarter() mustEqual LocalDate.of(2022, 10, 1)
       }
@@ -102,10 +102,11 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   ".lastDayOfNextCalendarQuarter" - {
 
     "must be 31st March of the next year for any date in October, November or December" in {
+
       forAll(datesBetween(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 12, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 3, 31)
       }
@@ -116,7 +117,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 6, 30)
       }
@@ -127,7 +128,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 9, 30)
       }
@@ -138,7 +139,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfNextCalendarQuarter mustEqual LocalDate.of(2022, 12, 31)
       }
@@ -152,7 +153,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2021, 10, 1), LocalDate.of(2021, 12, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2022, 4, 30)
       }
@@ -163,7 +164,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2022, 7, 31)
       }
@@ -174,7 +175,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 6, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2022, 10, 31)
       }
@@ -185,7 +186,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfMonthAfterNextCalendarQuarter mustEqual LocalDate.of(2023, 1, 31)
       }
@@ -199,7 +200,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfCalendarQuarter mustEqual LocalDate.of(2022, 9, 30)
       }
@@ -213,7 +214,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       forAll(datesBetween(LocalDate.of(2022, 7, 1), LocalDate.of(2022, 9, 30))) {
         date =>
           val stubClock = getStubClock(date)
-          val service   = new DateService(stubClock, coreRegistrationValidationService)
+          val service = new DateService(stubClock, coreRegistrationValidationService)
 
           service.lastDayOfMonthAfterCalendarQuarter mustEqual LocalDate.of(2022, 10, 31)
       }
@@ -228,8 +229,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
         val dates: Gen[(LocalDate, LocalDate)] = for {
           dayOfMonthOfFirstSale <- Gen.choose(1, 26)
-          firstSale             <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
-          dayOfToday            <- Gen.choose(dayOfMonthOfFirstSale, firstSale.lengthOfMonth())
+          firstSale <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          dayOfToday <- Gen.choose(dayOfMonthOfFirstSale, firstSale.lengthOfMonth())
         } yield (firstSale.withDayOfMonth(dayOfMonthOfFirstSale), firstSale.withDayOfMonth(dayOfToday))
 
         forAll(dates) {
@@ -245,7 +246,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       "when today is the 1st to the 10th of the month after the date of first sale" in {
 
         val dates: Gen[(LocalDate, LocalDate)] = for {
-          firstSale  <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          firstSale <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
           dayOfToday <- Gen.choose(1, 10)
         } yield (firstSale, firstSale.plusMonths(1).withDayOfMonth(dayOfToday))
 
@@ -265,7 +266,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       "when today is the 11th onwards of the month after the first sale" in {
 
         val dates: Gen[(LocalDate, LocalDate)] = for {
-          firstSale  <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          firstSale <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
           dayOfToday <- Gen.choose(11, firstSale.plusMonths(1).lengthOfMonth())
         } yield (firstSale, firstSale.plusMonths(1).withDayOfMonth(dayOfToday))
 
@@ -282,7 +283,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
       "when today is two or more months after the first sale" in {
 
         val dates: Gen[(LocalDate, LocalDate)] = for {
-          firstSale  <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
+          firstSale <- datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2022, 12, 31))
           extraMonths <- Gen.choose(2, 12)
         } yield (firstSale, firstSale.plusMonths(extraMonths))
 
@@ -301,8 +302,9 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   ".isDateOfFirstSaleDifferentToCommencementDate" - {
 
     "must return true if the Date Of First Sale is a different date to the Commencement Date" in {
+
       val dates: Gen[(LocalDate, LocalDate)] = for {
-        dateOfFirstSale  <- datesBetween(
+        dateOfFirstSale <- datesBetween(
           LocalDate.of(2021, 7, 1),
           LocalDate.now().minusDays(1)
         )
@@ -321,12 +323,14 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
 
     "must return false if the Date Of First Sale is the same date as the Commencement Date" in {
+
       val service = new DateService(getStubClock(LocalDate.now()), coreRegistrationValidationService)
 
       service.isDOFSDifferentToCommencementDate(Some(LocalDate.now()), LocalDate.now()) mustEqual false
     }
 
     "must return false if the Date Of First Sale is empty" in {
+
       val service = new DateService(getStubClock(LocalDate.now()), coreRegistrationValidationService)
 
       service.isDOFSDifferentToCommencementDate(None, LocalDate.now()) mustEqual false
@@ -336,7 +340,8 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   "getVatReturnEndDate" - {
 
     "must return the end of the quarter based on commencement date" in {
-      val commencementDate         = LocalDate.of(2021, 8, 11)
+
+      val commencementDate = LocalDate.of(2021, 8, 11)
       val expectedVatReturnEndDate = LocalDate.of(2021, 9, 30)
       val service = new DateService(getStubClock(LocalDate.now()), coreRegistrationValidationService)
 
@@ -350,6 +355,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   "getVatReturnDeadline" - {
 
     "must return the end of the month following the VAT Return end date" in {
+
       val vatReturnsEndDate = LocalDate.of(2021, 9, 30)
       val expectedVatReturnDeadline = LocalDate.of(2021, 10, 31)
       val service = new DateService(getStubClock(LocalDate.now()), coreRegistrationValidationService)
@@ -369,7 +375,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
         forAll(datesBetween(LocalDate.of(2021, 7, 1), LocalDate.of(2021, 9, 30))) {
           date =>
             val stubClock = getStubClock(date)
-            val service   = new DateService(stubClock, coreRegistrationValidationService)
+            val service = new DateService(stubClock, coreRegistrationValidationService)
 
             service.earliestSaleAllowed() mustEqual LocalDate.of(2021, 7, 1)
         }
@@ -383,15 +389,15 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
         "must be the 1st of the previous month" in {
 
           val dates = for {
-            day   <- Gen.choose(1, 10)
+            day <- Gen.choose(1, 10)
             month <- Gen.oneOf(JANUARY, APRIL, JULY, OCTOBER).map(_.getValue)
-            year  <- Gen.choose(2022, 2030)
+            year <- Gen.choose(2022, 2030)
           } yield LocalDate.of(year, month, day)
 
           forAll(dates) {
             (date: LocalDate) =>
               val stubClock = getStubClock(date)
-              val service   = new DateService(stubClock, coreRegistrationValidationService)
+              val service = new DateService(stubClock, coreRegistrationValidationService)
 
               service.earliestSaleAllowed() mustEqual date.minusMonths(1).withDayOfMonth(1)
           }
@@ -403,13 +409,13 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
         "must be the first day of the quarter" in {
 
           val datesIn31DayMonths = for {
-            day   <- Gen.choose(11, 31)
+            day <- Gen.choose(11, 31)
             month <- Gen.oneOf(JANUARY, JULY, OCTOBER).map(_.getValue)
-            year  <- Gen.choose(2022, 2030)
+            year <- Gen.choose(2022, 2030)
           } yield LocalDate.of(year, month, day)
 
           val datesInApril = for {
-            day  <- Gen.choose(11, 30)
+            day <- Gen.choose(11, 30)
             year <- Gen.choose(2022, 2030)
           } yield LocalDate.of(year, APRIL.getValue, day)
 
@@ -418,7 +424,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           forAll(dates) {
             date =>
               val stubClock = getStubClock(date)
-              val service   = new DateService(stubClock, coreRegistrationValidationService)
+              val service = new DateService(stubClock, coreRegistrationValidationService)
 
               service.earliestSaleAllowed() mustEqual date.withDayOfMonth(1)
           }
@@ -430,14 +436,14 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
         "must be the first day of the quarter" in {
 
           val dates = for {
-            year  <- Gen.choose(2022, 2030)
+            year <- Gen.choose(2022, 2030)
             month <- Gen.oneOf(FEBRUARY, MARCH, MAY, JUNE, AUGUST, SEPTEMBER, NOVEMBER, DECEMBER)
-            day   <- Gen.choose(1, month.length(Year.of(year).isLeap))
+            day <- Gen.choose(1, month.length(Year.of(year).isLeap))
             quarterStart = month match {
-              case FEBRUARY | MARCH     => JANUARY
-              case MAY      | JUNE      => APRIL
-              case AUGUST   | SEPTEMBER => JULY
-              case NOVEMBER | DECEMBER  => OCTOBER
+              case FEBRUARY | MARCH => JANUARY
+              case MAY | JUNE => APRIL
+              case AUGUST | SEPTEMBER => JULY
+              case NOVEMBER | DECEMBER => OCTOBER
               case _ => month
             }
           } yield (LocalDate.of(year, month, day), LocalDate.of(year, quarterStart, 1))
@@ -445,7 +451,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           forAll(dates) {
             case (today, startOfQuarter) =>
               val stubClock = getStubClock(today)
-              val service   = new DateService(stubClock, coreRegistrationValidationService)
+              val service = new DateService(stubClock, coreRegistrationValidationService)
 
               service.earliestSaleAllowed() mustEqual startOfQuarter
           }
@@ -560,6 +566,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
 
     "must return commencement date in next quarter when not declaring a sale now" in {
+
       val stubClock = getStubClock(LocalDate.of(2023, 4, 1))
       val commencementDate = LocalDate.of(2023, 7, 1)
 
@@ -587,6 +594,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   "calculateFinalAmendmentDate" - {
 
     "must return 10th of April given commencement date is 20th March" in {
+
       val stubClock = getStubClock(LocalDate.of(2023, 3, 21))
       val commencementDate = LocalDate.of(2023, 3, 20)
 
@@ -600,6 +608,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
 
     "must return 10th October given commencement date is 14th July" in {
+
       val stubClock = getStubClock(LocalDate.of(2023, 7, 14))
       val commencementDate = LocalDate.of(2023, 7, 14)
 
@@ -613,6 +622,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     }
 
     "must return 10th October given commencement date is 14th July if today is 11th November" in {
+
       val stubClock = getStubClock(LocalDate.of(2023, 11, 11))
       val commencementDate = LocalDate.of(2023, 7, 14)
 
@@ -651,7 +661,10 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
               submissionReceived = Some(Instant.parse("2023-07-01T12:00:00Z"))
             )
           ),
-          emptyUserAnswers
+          emptyUserAnswers,
+          None,
+          0,
+          None
         )
 
       val stubClock = getStubClock(LocalDate.of(2023, 7, 1))
@@ -671,6 +684,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
   ".startOfCurrentQuarter" - {
 
     "must be 1st January for any date in January, February, or March" in {
+
       forAll(datesBetween(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 3, 31))) { date =>
         val stubClock = getStubClock(date)
         val service = new DateService(stubClock, coreRegistrationValidationService)

@@ -54,7 +54,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
   private val registration = RegistrationData.registration
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers, None, 0, None)
   private val dataRequest: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(request, testCredentials, vrn, registration, emptyUserAnswers)
 
   private val registrationValidationService = mock[RegistrationValidationService]
@@ -157,7 +157,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
       }
 
       "must return OK and view with invalid prompt when" - {
-        
+
         "trading name is missing" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
@@ -428,7 +428,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         running(application) {
           val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(false).url)
           val result = route(application, request).value
-          val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers)
+          val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
           val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, dataRequest)
 
 
@@ -465,7 +465,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           running(application) {
             val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Failure, dataRequest)
 
 

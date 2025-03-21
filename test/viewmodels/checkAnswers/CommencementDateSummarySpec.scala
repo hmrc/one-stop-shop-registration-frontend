@@ -26,11 +26,11 @@ import pages.DateOfFirstSalePage
 import play.api.inject.bind
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.DateService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.govuk.summarylist._
+import viewmodels.govuk.summarylist.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,8 +38,8 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
   private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
   private val mockDateService = mock[DateService]
 
   ".row" - {
@@ -58,8 +58,8 @@ class CommencementDateSummarySpec extends SpecBase with MockitoSugar {
           .build()
 
         running(app) {
-          val viewmodel   = app.injector.instanceOf[CommencementDateSummary]
-          val msgs        = messages(app)
+          val viewmodel = app.injector.instanceOf[CommencementDateSummary]
+          val msgs = messages(app)
 
           val row = viewmodel.row(answers)(msgs, ec, hc, dataRequest).futureValue
           row mustBe Some(SummaryListRowViewModel(

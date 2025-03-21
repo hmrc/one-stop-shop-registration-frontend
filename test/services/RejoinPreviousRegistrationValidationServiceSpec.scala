@@ -45,7 +45,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private implicit val request: AuthenticatedMandatoryDataRequest[_] = AuthenticatedMandatoryDataRequest(
-    AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers),
+    AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, Some(registration), emptyUserAnswers, None, 0, None),
     testCredentials,
     vrn,
     registration,

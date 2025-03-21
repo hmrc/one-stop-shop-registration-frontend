@@ -47,7 +47,16 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
             case None =>
               copyCurrentSessionData(request).map(Right(_))
             case Some(answers) =>
-              AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(answers)).toFuture.map(Right(_))
+              AuthenticatedOptionalDataRequest(
+                request,
+                request.credentials,
+                request.vrn,
+                request.registration,
+                Some(answers),
+                request.iossNumber,
+                request.numberOfIossRegistrations,
+                request.latestIossRegistration
+              ).toFuture.map(Right(_))
           }
     }
   }
@@ -58,8 +67,8 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
       id =>
         migrationService
           .migrate(id.value, request.userId)
-          .map(ua => AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(ua)))
-    }.getOrElse(AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, None).toFuture)
+          .map(ua => AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(ua), request.iossNumber, request.numberOfIossRegistrations, request.latestIossRegistration))
+    }.getOrElse(AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, None, request.iossNumber, request.numberOfIossRegistrations, request.latestIossRegistration).toFuture)
   }
 }
 

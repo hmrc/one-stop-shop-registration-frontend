@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import connectors.{SavedUserAnswers, SaveForLaterConnector}
+import connectors.{SaveForLaterConnector, SavedUserAnswers}
 import controllers.routes
 import models.NormalMode
 import models.requests.{AuthenticatedDataRequest, SaveForLaterRequest}
@@ -42,8 +42,8 @@ class SaveForLaterServiceSpec extends SpecBase with BeforeAndAfterEach {
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
-  val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
-  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers)
+  val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val mockSaveForLaterConnector = mock[SaveForLaterConnector]
   private val mockUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]
@@ -59,6 +59,7 @@ class SaveForLaterServiceSpec extends SpecBase with BeforeAndAfterEach {
     JsObject(Seq("saveForLaterRequest" -> Json.toJson(saveForLaterRequest.data))),
     instantDate
   )
+
   override def beforeEach(): Unit = {
     Mockito.reset(mockSaveForLaterConnector)
     Mockito.reset(mockUserAnswersRepository)
@@ -105,5 +106,5 @@ class SaveForLaterServiceSpec extends SpecBase with BeforeAndAfterEach {
       verifyNoInteractions(mockUserAnswersRepository)
     }
   }
-
 }
+

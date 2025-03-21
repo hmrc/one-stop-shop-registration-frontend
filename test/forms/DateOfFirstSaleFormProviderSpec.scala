@@ -20,8 +20,8 @@ import base.SpecBase
 import controllers.routes
 import formats.Format.dateFormatter
 import forms.behaviours.DateBehaviours
-import models.requests.AuthenticatedDataRequest
 import models.NormalMode
+import models.requests.AuthenticatedDataRequest
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.FormError
 import play.api.mvc.AnyContent
@@ -38,7 +38,7 @@ class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with 
   private val dateService = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   val form = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)()
 

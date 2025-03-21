@@ -117,6 +117,7 @@ trait SpecBase
     .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
+  val iossNumber: String = "IM9001234567"
 
   val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
 

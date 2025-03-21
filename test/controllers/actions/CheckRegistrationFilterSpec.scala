@@ -22,6 +22,7 @@ import connectors.RegistrationConnector
 import controllers.ioss.routes as iossExclusionsRoutes
 import controllers.routes
 import models.domain.Registration
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedIdentifierRequest
 import models.{AmendLoopMode, AmendMode, NormalMode, RejoinLoopMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -54,6 +55,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockDataMigrationService = mock[DataMigrationService]
   private val mockIossExclusionService = mock[IossExclusionService]
+
   private val registrationEnrolment = Enrolments(
     Set(
       Enrolment(
@@ -80,11 +82,14 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
     )
   )
 
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
   private val ossAndIossEnrolments: Enrolments =
     Enrolments(registrationEnrolment.enrolments ++ Set(iossEnrolment))
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockRegistrationConnector)
+    Mockito.reset(mockIossExclusionService)
   }
 
   ".filter" - {
@@ -95,7 +100,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -115,7 +120,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty), Some(registration))
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty), Some(registration), None, 0, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -136,7 +141,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment, None, None, 0, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -147,7 +152,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
     "must redirect to Cannot Register Quarantined Ioss Trader when trader is quarantined code 4 on IOSS service when in Normal mode" in {
 
-      when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
+      when(mockIossExclusionService.isQuarantinedCode4(any())(any())) thenReturn true.toFuture
 
       val app = applicationBuilder(None, mode = Some(NormalMode))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
@@ -159,7 +164,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -170,7 +175,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
     "must redirect to Cannot Register Quarantined Ioss Trader when trader is quarantined code 4 on IOSS service when in Rejoin mode" in {
 
-      when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
+      when(mockIossExclusionService.isQuarantinedCode4(any())(any())) thenReturn true.toFuture
 
       val app = applicationBuilder(None, mode = Some(RejoinMode))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
@@ -182,7 +187,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -193,7 +198,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
     "must redirect to Cannot Register Quarantined Ioss Trader when trader is quarantined code 4 on IOSS service when in Rejoin Loop mode" in {
 
-      when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
+      when(mockIossExclusionService.isQuarantinedCode4(any())(any())) thenReturn true.toFuture
 
       val app = applicationBuilder(None, mode = Some(RejoinLoopMode))
         .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
@@ -205,7 +210,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -233,7 +238,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), Some(registration))
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), Some(registration), None, 0, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
@@ -250,7 +255,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment, Some(registration))
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment, Some(registration), None, 0, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
@@ -266,7 +271,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
@@ -277,7 +282,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
         s"must return None when trader is quarantined code 4 on IOSS service" in {
 
-          when(mockIossExclusionService.isQuarantinedCode4()(any())) thenReturn true.toFuture
+          when(mockIossExclusionService.isQuarantinedCode4(any())(any())) thenReturn true.toFuture
 
           val app = applicationBuilder(None, mode = Some(mode))
             .overrides(bind[IossExclusionService].toInstance(mockIossExclusionService))
@@ -289,7 +294,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, ossAndIossEnrolments, Some(registration))
+            val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, ossAndIossEnrolments, Some(registration), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue

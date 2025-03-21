@@ -21,15 +21,14 @@ import config.FrontendAppConfig
 import models.NormalMode
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.EitherValues
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BusinessContactDetailsPage
 import play.api.inject.bind
-import play.api.mvc.{Call, Result}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.running
 import services.{EmailVerificationService, SaveForLaterService}
@@ -37,8 +36,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with EitherValues {
 
@@ -70,7 +69,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
         running(app) {
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -92,7 +91,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
             Future.successful(Verified)
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -116,7 +115,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             Future.successful(NotVerified)
 
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -138,18 +137,17 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
         running(app) {
 
           when(mockEmailVerificationService.isEmailVerified(
-            eqTo(contactDetails.emailAddress), eqTo(userAnswersId)) (any())) thenReturn
+            eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
             Future.successful(LockedPasscodeForSingleEmail)
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
           val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
           (ExecutionContext.global, request, hc)
           when(saveForLaterService.saveAnswers(
             eqTo(redirectLocation),
-            eqTo(Call(GET, request.uri))) (any(), any(), any())
+            eqTo(Call(GET, request.uri)))(any(), any(), any())
           ) thenReturn Future(Redirect(redirectLocation.url))
-
 
 
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -175,7 +173,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             Future.successful(LockedTooManyLockedEmails)
 
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -196,7 +194,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
         running(app) {
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -207,5 +205,5 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
       }
     }
   }
-
 }
+

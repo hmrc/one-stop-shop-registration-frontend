@@ -101,7 +101,7 @@ class ExcludedTraderSpec extends SpecBase with ScalaCheckPropertyChecks {
 
   "fromEtmpExclusion" - {
 
-    "must create an ExcludedTrader from EtmpExclusion" in {
+    "must create an ExcludedTrader from IossEtmpExclusion" in {
 
       val decisionDate = LocalDate.of(2023, 1, 15)
 

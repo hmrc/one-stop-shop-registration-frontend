@@ -41,12 +41,12 @@ class MaximumIndexFilterSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       val invalidCombinations = for {
         index <- arbitrary[Int] suchThat (_ > Int.MinValue) suchThat (_ < Int.MaxValue) map (Index(_))
-        max   <- Gen.choose(Int.MinValue, index.position + 1)
+        max <- Gen.choose(Int.MinValue, index.position + 1)
       } yield (index, max)
 
       forAll(invalidCombinations) {
         case (index, max) =>
-          val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
           val harness = new Harness(index, max)
 
           val result = harness.callFilter(request).futureValue
@@ -59,12 +59,12 @@ class MaximumIndexFilterSpec extends SpecBase with ScalaCheckPropertyChecks {
 
       val validCombinations = for {
         index <- arbitrary[Int] suchThat (_ < Int.MaxValue - 1) map (Index(_))
-        max   <- Gen.choose(index.position + 1, Int.MaxValue)
+        max <- Gen.choose(index.position + 1, Int.MaxValue)
       } yield (index, max)
 
       forAll(validCombinations) {
         case (index, max) =>
-          val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers)
+          val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
           val harness = new Harness(index, max)
 
           val result = harness.callFilter(request).futureValue

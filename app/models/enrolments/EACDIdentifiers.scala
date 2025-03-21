@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package models.iossExclusions
+package models.enrolments
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EtmpDisplayRegistration(
-                                    exclusions: Seq[EtmpExclusion]
-                                  )
+case class EACDIdentifiers(key: String, value: String)
 
-object EtmpDisplayRegistration {
-
-  implicit val format: OFormat[EtmpDisplayRegistration] = Json.format[EtmpDisplayRegistration]
+object EACDIdentifiers {
+  
+  implicit val format: OFormat[EACDIdentifiers] = Json.format[EACDIdentifiers]
 }
