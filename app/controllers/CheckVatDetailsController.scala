@@ -16,18 +16,21 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.CheckVatDetailsFormProvider
-import models.NormalMode
-import pages.CheckVatDetailsPage
+import models.requests.AuthenticatedDataRequest
+import models.{NormalMode, UserAnswers}
+import pages.{CheckVatDetailsPage, HasTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AllTradingNames
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.CheckVatDetailsViewModel
 import views.html.CheckVatDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class CheckVatDetailsController @Inject()(
                                            override val messagesApi: MessagesApi,
@@ -70,7 +73,8 @@ class CheckVatDetailsController @Inject()(
 
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckVatDetailsPage, value))
+                answersWithIossTradingNamesCheck <- Future.fromTry(iossTradingNamesAnswersTry(request))
+                updatedAnswers <- Future.fromTry(answersWithIossTradingNamesCheck.set(CheckVatDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CheckVatDetailsPage.navigate(NormalMode, updatedAnswers))
           )
@@ -78,5 +82,18 @@ class CheckVatDetailsController @Inject()(
         case None =>
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
+  }
+
+  private def iossTradingNamesAnswersTry(request: AuthenticatedDataRequest[AnyContent]): Try[UserAnswers] = {
+    request.latestIossRegistration match {
+      case Some(iossRegistration) if iossRegistration.tradingNames.nonEmpty =>
+        for {
+          answers <- request.userAnswers.set(HasTradingNamePage, true)
+          updatedAnswers <- answers.set(AllTradingNames, iossRegistration.tradingNames.map(_.tradingName).toList)
+        } yield updatedAnswers
+
+      case _ =>
+        Try(request.userAnswers)
+    }
   }
 }

@@ -15,48 +15,95 @@
  *@
 
 @import components.ButtonGroup
+@import models.iossRegistration.IossEtmpDisplayRegistration
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.Long
 @import viewmodels.{LegendSize, ListItemWrapper}
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukRadios: GovukRadios,
         button: ButtonGroup,
-        addToList: components.addToList
+        addToList: components.addToList,
+        govukWarningText: GovukWarningText
 )
 
-@(form: Form[_], mode: Mode, list: Seq[ListItemWrapper], canAddTradingNames: Boolean)(implicit request: Request[_], messages: Messages)
-@defining(if(list.size == 1) ".singular" else "") { messageSuffix =>
+@(
+        form: Form[_],
+        mode: Mode,
+        list: Seq[ListItemWrapper],
+        canAddTradingNames: Boolean,
+        latestIossRegistration: Option[IossEtmpDisplayRegistration],
+        numberOfIossRegistrations: Int
+)(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = title(form, messages("addTradingName.title" + messageSuffix, list.size))) {
+@defining(list.size match {
+  case 1 => (".singular", 1)
+  case i => (".plural", i)
+}) { messageSuffix =>
 
-        @formHelper(action = routes.AddTradingNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+  @defining(if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
+    "addTradingName.iossRegistration.title"
+  } else {
+    "addTradingName.title"
+  }) { t =>
+    @layout(pageTitle = title(form, messages(t + messageSuffix._1, messageSuffix._2))) {
 
-            @if(form.errors.nonEmpty) {
-                @govukErrorSummary(ErrorSummaryViewModel(form))
-            }
+      @formHelper(action = routes.AddTradingNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
-            <h1 class="govuk-heading-xl">@messages("addTradingName.heading" + messageSuffix, list.size)</h1>
-
-            @addToList(list, itemSize = Long, "addTradingName.change.hidden", "addTradingName.remove.hidden")
-
-            @if(canAddTradingNames) {
-                @govukRadios(
-                    RadiosViewModel.yesNo(
-                        field = form("value"),
-                        legend = LegendViewModel(
-                            HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("addTradingName.addAnother") + "</h2>"))
-                        ).withSize(LegendSize.Medium)
-                    ).withHint(HintViewModel(messages("addTradingName.addAnother.hint")))
-                )
-            } else {
-                <p class="govuk-body">@messages("addTradingName.maximumReached")</p>
-                <input type="hidden" name="value" id="value" value="false"/>
-            }
-
-            @button("site.continue", routes.AddTradingNameController.onPageLoad(mode).url, mode)
-
+        @if(form.errors.nonEmpty) {
+          @govukErrorSummary(ErrorSummaryViewModel(form))
         }
+
+        @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
+          <h1 class="govuk-heading-l">@messages("addTradingName.iossRegistration.heading" + messageSuffix._1, messageSuffix._2)</h1>
+          @if(!(mode.isInAmend || mode.isInRejoin)) {
+            <p class="govuk-body">@messages("addTradingName.iossRegistration.p1")</p>
+          }
+        } else {
+          <h1 class="govuk-heading-l">@messages("addTradingName.heading" + messageSuffix._1, messageSuffix._2)</h1>
+        }
+        
+        @addToList(list, itemSize = Long, "addTradingName.change.hidden", "addTradingName.remove.hidden")
+
+        @if(canAddTradingNames) {
+          @govukRadios(
+            RadiosViewModel.yesNo(
+              field = form("value"),
+              legend = LegendViewModel(
+                HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("addTradingName.addAnother") + "</h2>"))
+              ).withSize(LegendSize.Medium)
+            ).withHint(HintViewModel(messages("addTradingName.addAnother.hint")))
+          )
+        } else {
+          <p class="govuk-body">@messages("addTradingName.maximumReached")</p>
+          <input type="hidden" name="value" id="value" value="false"/>
+        }
+
+        @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
+          @if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+            @govukWarningText(WarningText(
+              iconFallbackText = Option(messages("site.warning")),
+              content = Text(messages("addTradingName.iossRegistration.previous.warning"))
+            ))
+          } else {
+            @defining(numberOfIossRegistrations match {
+              case 1 =>
+                "addTradingName.iossRegistration.warning"
+              case i =>
+                "addTradingName.iossRegistration.multiple.warning"
+            }) { message =>
+              @govukWarningText(WarningText(
+                iconFallbackText = Option(messages("site.warning")),
+                content = Text(messages(message))
+              ))
+            }
+          }
+        }
+
+        @button("site.continue", routes.AddTradingNameController.onPageLoad(mode).url, mode)
+      }
     }
+  }
 }

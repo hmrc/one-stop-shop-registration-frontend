@@ -14,18 +14,26 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
 @import components.ButtonGroup
+@import models.iossRegistration.IossEtmpDisplayRegistration
+@import viewmodels.InputWidth.*
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukInput: GovukInput,
-        button: ButtonGroup
+        button: ButtonGroup,
+        govukWarningText: GovukWarningText
 )
 
-@(form: Form[_], mode: Mode, enrolmentsEnabled: Boolean)(implicit request: Request[_], messages: Messages)
+@(
+        form: Form[_],
+        mode: Mode,
+        enrolmentsEnabled: Boolean,
+        latestIossRegistration: Option[IossEtmpDisplayRegistration],
+        numberOfIossRegistrations: Int
+)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("businessContactDetails.title"))) {
 
@@ -36,6 +44,11 @@
     }
 
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
+
+    @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
+      <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.iossRegistration.p1")</p>
+    }
+
     @if(enrolmentsEnabled) {
       <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetailsWithBta.p1")</p>
       <p class="govuk-body govuk-!-margin-bottom-6">@messages("businessContactDetailsWithBta.p2")</p>
@@ -72,6 +85,27 @@
       .withWidth(Full)
       .asEmail()
     )
+
+    @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
+      @if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+        @govukWarningText(WarningText(
+          iconFallbackText = Option(messages("site.warning")),
+          content = Text(messages("businessContactDetails.iossRegistration.previous.warning"))
+        ))
+      } else {
+        @defining(numberOfIossRegistrations match {
+          case 1 =>
+            "businessContactDetails.iossRegistration.warning"
+          case i =>
+            "businessContactDetails.iossRegistration.multiple.warning"
+        }) { message =>
+          @govukWarningText(WarningText(
+            iconFallbackText = Option(messages("site.warning")),
+            content = Text(messages(message))
+          ))
+        }
+      }
+    }
 
     <p class="govuk-body">@messages("businessContactDetails.emailHint")</p>
 

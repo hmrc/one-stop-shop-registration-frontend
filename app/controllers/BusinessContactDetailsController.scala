@@ -57,7 +57,7 @@ class BusinessContactDetailsController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, config.enrolmentsEnabled))
+      Ok(view(preparedForm, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -67,7 +67,7 @@ class BusinessContactDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled)).toFuture,
+          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations)).toFuture,
 
         value => {
 
