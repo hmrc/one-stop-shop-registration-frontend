@@ -44,7 +44,9 @@
 
     <h1 class="govuk-heading-xl">@messages("bankDetails.heading")</h1>
 
-    <p class="govuk-body">@messages("bankDetails.iossRegistration.p1")</p>
+    @if(latestIossRegistration.map(_.bankDetails.accountName.nonEmpty) && !(mode.isInAmend || mode.isInRejoin)) {
+      <p class="govuk-body">@messages("bankDetails.iossRegistration.p1")</p>
+    }
 
     <p class="govuk-body hint">@messages("bankDetails.hint")</p>
 
@@ -76,23 +78,20 @@
     )
 
     @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
-      @if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+      @defining(numberOfIossRegistrations match {
+        case 1 =>
+          if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+            "bankDetails.iossRegistration.previous.warning"
+          } else {
+            "bankDetails.iossRegistration.warning"
+          }
+        case i =>
+          "bankDetails.iossRegistration.multiple.warning"
+      }) { message =>
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
-          content = Text(messages("bankDetails.iossRegistration.previous.warning"))
+          content = Text(messages(message))
         ))
-      } else {
-        @defining(numberOfIossRegistrations match {
-          case 1 =>
-            "bankDetails.iossRegistration.warning"
-          case i =>
-            "bankDetails.iossRegistration.multiple.warning"
-        }) { message =>
-          @govukWarningText(WarningText(
-            iconFallbackText = Option(messages("site.warning")),
-            content = Text(messages(message))
-          ))
-        }
       }
     }
 

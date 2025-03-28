@@ -64,7 +64,7 @@
         } else {
           <h1 class="govuk-heading-l">@messages("addTradingName.heading" + messageSuffix._1, messageSuffix._2)</h1>
         }
-        
+
         @addToList(list, itemSize = Long, "addTradingName.change.hidden", "addTradingName.remove.hidden")
 
         @if(canAddTradingNames) {
@@ -82,23 +82,20 @@
         }
 
         @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
-          @if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+          @defining(numberOfIossRegistrations match {
+            case 1 =>
+              if (latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+              "addTradingName.iossRegistration.previous.warning"
+            } else {
+              "addTradingName.iossRegistration.warning"
+            }
+            case i =>
+              "addTradingName.iossRegistration.multiple.warning"
+          }) { message =>
             @govukWarningText(WarningText(
               iconFallbackText = Option(messages("site.warning")),
-              content = Text(messages("addTradingName.iossRegistration.previous.warning"))
+              content = Text(messages(message))
             ))
-          } else {
-            @defining(numberOfIossRegistrations match {
-              case 1 =>
-                "addTradingName.iossRegistration.warning"
-              case i =>
-                "addTradingName.iossRegistration.multiple.warning"
-            }) { message =>
-              @govukWarningText(WarningText(
-                iconFallbackText = Option(messages("site.warning")),
-                content = Text(messages(message))
-              ))
-            }
           }
         }
 

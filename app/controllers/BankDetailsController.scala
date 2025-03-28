@@ -18,8 +18,10 @@ package controllers
 
 import controllers.actions.*
 import forms.BankDetailsFormProvider
-import models.Mode
+import models.{BankDetails, Mode}
+import models.requests.AuthenticatedDataRequest
 import pages.BankDetailsPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -42,7 +44,7 @@ class BankDetailsController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BankDetailsPage) match {
-        case None => form
+        case None => fillIossBankDetailsForm(request)
         case Some(value) => form.fill(value)
       }
 
@@ -62,5 +64,20 @@ class BankDetailsController @Inject()(
             _ <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(BankDetailsPage.navigate(mode, updatedAnswers))
       )
+  }
+
+  private def fillIossBankDetailsForm(request: AuthenticatedDataRequest[_]): Form[BankDetails] = {
+    request.latestIossRegistration match {
+      case Some(iossEtmpDisplayRegistration) =>
+        form.fill(
+          BankDetails(
+            accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+            bic = iossEtmpDisplayRegistration.bankDetails.bic,
+            iban = iossEtmpDisplayRegistration.bankDetails.iban
+          )
+        )
+
+      case _ => form
+    }
   }
 }

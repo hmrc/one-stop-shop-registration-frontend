@@ -47,17 +47,17 @@
     </p>
 
     @if(maybeIossRegistration.nonEmpty && hasUpdatedRegistration) {
-      @if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
-        <p class="govuk-body">@messages("rejoinComplete.iossRegistration.previous.updated")</p>
-      } else {
-        @defining(numberOfIossRegistrations match {
-          case 1 =>
+      @defining(numberOfIossRegistrations match {
+        case 1 =>
+          if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
+            "rejoinComplete.iossRegistration.previous.updated"
+          } else {
             "rejoinComplete.iossRegistration.updated"
-          case i =>
-            "rejoinComplete.iossRegistration.multiple.updated"
-        }) { message =>
-          <p class="govuk-body">@messages(message)</p>
-        }
+          }
+        case i =>
+          "rejoinComplete.iossRegistration.multiple.updated"
+      }) { message =>
+        <p class="govuk-body">@messages(message)</p>
       }
     }
 
