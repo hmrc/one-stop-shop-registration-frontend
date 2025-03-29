@@ -53,7 +53,7 @@ class RejoinCompleteController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData(Some(RejoinMode))).async {
     implicit request =>
-      
+
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()
         maybeCalculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
@@ -107,6 +107,7 @@ class RejoinCompleteController @Inject()(
               getBankDetailsRows(registration)
             ).flatten
         )
+
       case _ =>
         SummaryListViewModel(
           rows = Seq.empty
@@ -173,6 +174,7 @@ class RejoinCompleteController @Inject()(
 
     Seq(
       if (amendedDetails.exists(_.fullName != originalDetails.fullName)) {
+        
         BusinessContactDetailsSummary.amendedContactNameRow(request.userAnswers)
       } else {
         None

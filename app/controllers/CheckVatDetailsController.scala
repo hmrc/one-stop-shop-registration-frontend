@@ -18,13 +18,15 @@ package controllers
 
 import controllers.actions.*
 import forms.CheckVatDetailsFormProvider
+import models.CheckVatDetails.Yes
 import models.requests.AuthenticatedDataRequest
-import models.{NormalMode, UserAnswers}
+import models.{CheckVatDetails, NormalMode, UserAnswers}
 import pages.{CheckVatDetailsPage, HasTradingNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.AllTradingNames
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import viewmodels.CheckVatDetailsViewModel
 import views.html.CheckVatDetailsView
 
@@ -68,32 +70,36 @@ class CheckVatDetailsController @Inject()(
           form.bindFromRequest().fold(
             formWithErrors => {
               val viewModel = CheckVatDetailsViewModel(request.vrn, vatInfo)
-              Future.successful(BadRequest(view(formWithErrors, viewModel)))
+              BadRequest(view(formWithErrors, viewModel)).toFuture
             },
 
             value =>
               for {
-                answersWithIossTradingNamesCheck <- Future.fromTry(iossTradingNamesAnswersTry(request))
+                answersWithIossTradingNamesCheck <- Future.fromTry(iossTradingNamesAnswersTry(value, request))
                 updatedAnswers <- Future.fromTry(answersWithIossTradingNamesCheck.set(CheckVatDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CheckVatDetailsPage.navigate(NormalMode, updatedAnswers))
           )
 
         case None =>
-          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
       }
   }
 
-  private def iossTradingNamesAnswersTry(request: AuthenticatedDataRequest[AnyContent]): Try[UserAnswers] = {
-    request.latestIossRegistration match {
-      case Some(iossRegistration) if iossRegistration.tradingNames.nonEmpty =>
-        for {
-          answers <- request.userAnswers.set(HasTradingNamePage, true)
-          updatedAnswers <- answers.set(AllTradingNames, iossRegistration.tradingNames.map(_.tradingName).toList)
-        } yield updatedAnswers
+  private def iossTradingNamesAnswersTry(value: CheckVatDetails, request: AuthenticatedDataRequest[AnyContent]): Try[UserAnswers] = {
+    if (value == Yes) {
+      request.latestIossRegistration match {
+        case Some(iossRegistration) if iossRegistration.tradingNames.nonEmpty =>
+          for {
+            answers <- request.userAnswers.set(HasTradingNamePage, true)
+            updatedAnswers <- answers.set(AllTradingNames, iossRegistration.tradingNames.map(_.tradingName).toList)
+          } yield updatedAnswers
 
-      case _ =>
-        Try(request.userAnswers)
+        case _ =>
+          Try(request.userAnswers)
+      }
+    } else {
+      Try(request.userAnswers)
     }
   }
 }

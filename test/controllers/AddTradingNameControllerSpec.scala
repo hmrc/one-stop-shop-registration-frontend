@@ -19,7 +19,8 @@ package controllers
 import base.SpecBase
 import controllers.amend.routes as amendRoutes
 import forms.AddTradingNameFormProvider
-import models.{AmendMode, Index, NormalMode}
+import models.iossRegistration.IossEtmpDisplayRegistration
+import models.{AmendMode, Index, NormalMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.TradingNameSummary
@@ -41,6 +43,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(NormalMode).url
   private lazy val addTradingNameAmendRoute = routes.AddTradingNameController.onPageLoad(AmendMode).url
+
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
 
   "AddTradingName Controller" - {
 
@@ -58,7 +62,112 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an IOSS Registration is present with trading names" in {
+
+      val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+        iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+      val updatedAnswers: UserAnswers = baseAnswers
+        .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+      val application = applicationBuilder(
+        userAnswers = Some(updatedAnswers),
+        iossNumber = Some(iossNumber),
+        iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+        numberOfIossRegistrations = 1
+      )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameRoute)
+
+        val view = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list = TradingNameSummary.addToListRows(updatedAnswers, NormalMode)
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          form,
+          NormalMode,
+          list,
+          canAddTradingNames = true,
+          Some(nonExcludedIossEtmpDisplayRegistration),
+          1
+        )(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an excluded IOSS Registration is present with trading names" in {
+
+      val updatedAnswers: UserAnswers = baseAnswers
+        .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+      val application = applicationBuilder(
+        userAnswers = Some(updatedAnswers),
+        iossNumber = Some(iossNumber),
+        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+        numberOfIossRegistrations = 1
+      )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameRoute)
+
+        val view = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list = TradingNameSummary.addToListRows(updatedAnswers, NormalMode)
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          form,
+          NormalMode,
+          list,
+          canAddTradingNames = true,
+          Some(iossEtmpDisplayRegistration),
+          1
+        )(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when multiple IOSS Registrations are present with trading names" in {
+
+      val updatedAnswers: UserAnswers = baseAnswers
+        .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+      val application = applicationBuilder(
+        userAnswers = Some(updatedAnswers),
+        iossNumber = Some(iossNumber),
+        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+        numberOfIossRegistrations = 2
+      )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameRoute)
+
+        val view = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list = TradingNameSummary.addToListRows(updatedAnswers, NormalMode)
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          form,
+          NormalMode,
+          list,
+          canAddTradingNames = true,
+          Some(iossEtmpDisplayRegistration),
+          2
+        )(request, implicitly).toString
       }
     }
 
@@ -89,7 +198,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) `mustBe` OK
         contentAsString(result) `mustBe`
-          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false)(request, implicitly).toString
+          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false, None, 0)(request, implicitly).toString
       }
     }
 
@@ -123,7 +232,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
       }
     }
 
@@ -173,24 +282,134 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true)(request, implicitly).toString
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
       }
     }
 
-    "in AmendMode" - {
+    "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of trading names when in Amend mode" in {
 
-      "must redirect to resolve missing answers and the correct view for a GET when cannot derive number of trading names" in {
+      val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
+        .build()
 
-        val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
-          .build()
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameAmendRoute)
 
-        running(application) {
-          val request = FakeRequest(GET, addTradingNameAmendRoute)
+        val result = route(application, request).value
 
-          val result = route(application, request).value
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+      }
+    }
 
-          status(result) `mustBe` SEE_OTHER
-          redirectLocation(result).value `mustBe` amendRoutes.ChangeYourRegistrationController.onPageLoad().url
+    Seq(AmendMode, RejoinMode).foreach { mode =>
+
+      lazy val addTradingNameRoute = routes.AddTradingNameController.onPageLoad(mode).url
+
+      s"in $mode" - {
+
+        s"must return OK and the correct view for a GET when an IOSS Registration is present with trading names when in $mode" in {
+
+          val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+            iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+          val updatedAnswers: UserAnswers = baseAnswers
+            .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+          val application = applicationBuilder(
+            userAnswers = Some(updatedAnswers),
+            iossNumber = Some(iossNumber),
+            iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+            numberOfIossRegistrations = 1
+          )
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, addTradingNameRoute)
+
+            val view = application.injector.instanceOf[AddTradingNameView]
+            implicit val msgs: Messages = messages(application)
+            val list = TradingNameSummary.addToListRows(updatedAnswers, mode)
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              form,
+              mode,
+              list,
+              canAddTradingNames = true,
+              Some(nonExcludedIossEtmpDisplayRegistration),
+              1
+            )(request, implicitly).toString
+          }
+        }
+
+        s"must return OK and the correct view for a GET when an excluded IOSS Registration is present with trading names when in $mode" in {
+
+          val updatedAnswers: UserAnswers = baseAnswers
+            .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+          val application = applicationBuilder(
+            userAnswers = Some(updatedAnswers),
+            iossNumber = Some(iossNumber),
+            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+            numberOfIossRegistrations = 1
+          )
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, addTradingNameRoute)
+
+            val view = application.injector.instanceOf[AddTradingNameView]
+            implicit val msgs: Messages = messages(application)
+            val list = TradingNameSummary.addToListRows(updatedAnswers, mode)
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              form,
+              mode,
+              list,
+              canAddTradingNames = true,
+              Some(iossEtmpDisplayRegistration),
+              1
+            )(request, implicitly).toString
+          }
+        }
+
+        s"must return OK and the correct view for a GET when multiple IOSS Registrations are present with trading names whwn in $mode" in {
+
+          val updatedAnswers: UserAnswers = baseAnswers
+            .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+          val application = applicationBuilder(
+            userAnswers = Some(updatedAnswers),
+            iossNumber = Some(iossNumber),
+            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+            numberOfIossRegistrations = 2
+          )
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, addTradingNameRoute)
+
+            val view = application.injector.instanceOf[AddTradingNameView]
+            implicit val msgs: Messages = messages(application)
+            val list = TradingNameSummary.addToListRows(updatedAnswers, mode)
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              form,
+              mode,
+              list,
+              canAddTradingNames = true,
+              Some(iossEtmpDisplayRegistration),
+              2
+            )(request, implicitly).toString
+          }
         }
       }
     }

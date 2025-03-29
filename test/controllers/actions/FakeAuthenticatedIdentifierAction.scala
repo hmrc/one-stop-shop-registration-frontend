@@ -19,6 +19,7 @@ package controllers.actions
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import models.domain.Registration
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.*
@@ -31,7 +32,12 @@ import utils.FutureSyntax.FutureOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAuthenticatedIdentifierAction(registration: Option[Registration], iossNumber: Option[String]) extends AuthenticatedIdentifierAction(
+class FakeAuthenticatedIdentifierAction(
+                                         registration: Option[Registration],
+                                         iossNumber: Option[String],
+                                         numberOfIossRegistrations: Int,
+                                         iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration]
+                                       ) extends AuthenticatedIdentifierAction(
   mock[AuthConnector],
   mock[FrontendAppConfig],
   mock[UrlBuilderService],
@@ -48,8 +54,8 @@ class FakeAuthenticatedIdentifierAction(registration: Option[Registration], ioss
       Enrolments(Set.empty),
       registration,
       iossNumber,
-      1,
-      None
+      numberOfIossRegistrations,
+      iossEtmpDisplayRegistration
     )).toFuture
   }
 }

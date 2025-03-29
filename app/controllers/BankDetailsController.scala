@@ -18,8 +18,8 @@ package controllers
 
 import controllers.actions.*
 import forms.BankDetailsFormProvider
-import models.{BankDetails, Mode}
 import models.requests.AuthenticatedDataRequest
+import models.{BankDetails, Mode}
 import pages.BankDetailsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
