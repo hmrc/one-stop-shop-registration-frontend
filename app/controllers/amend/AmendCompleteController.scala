@@ -19,9 +19,9 @@ package controllers.amend
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.GetOriginalRegistration
-import controllers.actions._
+import controllers.actions.*
 import models.UserAnswers
-import models.domain._
+import models.domain.*
 import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
 import pages.{BankDetailsPage, BusinessContactDetailsPage, DateOfFirstSalePage, IsOnlineMarketplacePage}
@@ -31,7 +31,7 @@ import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.*
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
 import viewmodels.govuk.all.SummaryListViewModel
@@ -70,7 +70,9 @@ class AmendCompleteController @Inject()(
               savedUrl,
               frontendAppConfig.ossYourAccountUrl,
               organisationName.toString,
-              list
+              list,
+              request.latestIossRegistration,
+              request.numberOfIossRegistrations
             )
           )
         }
@@ -85,8 +87,11 @@ class AmendCompleteController @Inject()(
       case _ => None
     }
 
-  private def detailList(cds: Option[SummaryListRow], originalRegistration: Option[Registration], userAnswers: UserAnswers)
-                        (implicit request: AuthenticatedDataRequest[AnyContent]) = {
+  private def detailList(
+                          cds: Option[SummaryListRow],
+                          originalRegistration: Option[Registration],
+                          userAnswers: UserAnswers
+                        )(implicit request: AuthenticatedDataRequest[AnyContent]) = {
 
     SummaryListViewModel(
       rows = (
@@ -447,8 +452,9 @@ class AmendCompleteController @Inject()(
 
   }
 
-  private def getBusinessContactDetailsRows(originalRegistration: Option[Registration],
-                                            userAnswers: UserAnswers
+  private def getBusinessContactDetailsRows(
+                                             originalRegistration: Option[Registration],
+                                             userAnswers: UserAnswers
                                            )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
     val originalDetails = originalRegistration.map(_.contactDetails)

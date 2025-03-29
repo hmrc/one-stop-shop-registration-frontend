@@ -19,8 +19,10 @@ package pages
 import base.SpecBase
 import controllers.routes
 import models.CheckVatDetails.{DetailsIncorrect, WrongAccount, Yes}
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.{CheckVatDetails, NormalMode}
 import pages.behaviours.PageBehaviours
+import queries.AllTradingNames
 
 class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
@@ -40,11 +42,11 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
           "to wherever the Has Trading Name page would navigate to" in {
 
-              val answers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
+            val answers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
 
-              CheckVatDetailsPage.navigate(NormalMode, answers)
-                .mustEqual(controllers.routes.HasTradingNameController.onPageLoad(NormalMode))
-            }
+            CheckVatDetailsPage.navigate(NormalMode, answers)
+              .mustEqual(controllers.routes.HasTradingNameController.onPageLoad(NormalMode))
+          }
 
         }
 
@@ -56,6 +58,37 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
             CheckVatDetailsPage.navigate(NormalMode, answers)
               .mustEqual(routes.JourneyRecoveryController.onPageLoad())
+          }
+        }
+
+        "when we have current or previous IOSS accounts" - {
+
+          "and there are trading names present within the latest IOSS account" - {
+
+            "to Add Trading Name" in {
+
+              val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
+              val answers = basicUserAnswersWithVatInfo
+                .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+                .set(HasTradingNamePage, true).success.value
+                .set(CheckVatDetailsPage, Yes).success.value
+
+              CheckVatDetailsPage.navigate(NormalMode, answers)
+                .mustEqual(controllers.routes.AddTradingNameController.onPageLoad(NormalMode))
+            }
+          }
+
+          "and there are no trading names present within the latest IOSS account" - {
+
+            "to Has Trading Name" in {
+
+              val answers = basicUserAnswersWithVatInfo
+                .set(CheckVatDetailsPage, Yes).success.value
+
+              CheckVatDetailsPage.navigate(NormalMode, answers)
+                .mustEqual(controllers.routes.HasTradingNameController.onPageLoad(NormalMode))
+            }
           }
         }
       }

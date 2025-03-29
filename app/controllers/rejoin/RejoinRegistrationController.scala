@@ -62,6 +62,7 @@ class RejoinRegistrationController @Inject()(
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad: Action[AnyContent] = cc.authAndGetDataWithOss(Some(RejoinMode)).async { implicit request =>
+    
     val date = LocalDate.now(clock)
     val canRejoin = rejoinRegistrationService.canRejoinRegistration(date, request.registration.excludedTrader)
 

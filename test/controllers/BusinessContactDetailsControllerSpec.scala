@@ -22,8 +22,9 @@ import connectors.RegistrationConnector
 import forms.BusinessContactDetailsFormProvider
 import models.emailVerification.EmailVerificationResponse
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.UnexpectedResponseStatus
-import models.{AmendMode, NormalMode}
+import models.{AmendMode, BusinessContactDetails, NormalMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -31,6 +32,7 @@ import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BusinessContactDetailsPage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
@@ -63,6 +65,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
     redirectUri = controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url
   )
 
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
   override def beforeEach(): Unit = {
     Mockito.reset(mockEmailVerificationService)
     Mockito.reset(mockSaveForLaterService)
@@ -87,7 +91,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
         }
       }
 
@@ -105,7 +109,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true, None, 0)(request, messages(application)).toString
         }
       }
 
@@ -123,7 +127,243 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an IOSS Registration is present" in {
+
+        val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+          iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+          fullName = nonExcludedIossEtmpDisplayRegistration.schemeDetails.contactName,
+          telephoneNumber = nonExcludedIossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+          emailAddress = nonExcludedIossEtmpDisplayRegistration.schemeDetails.businessEmailId
+        )
+
+        val updatedForm: Form[BusinessContactDetails] = form.fill(iossBusinessDetails)
+
+        val application = applicationBuilder(
+          userAnswers = Some(basicUserAnswersWithVatInfo),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 1
+        )
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessContactDetailsRoute)
+
+          val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+          val result = route(application, request).value
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            updatedForm,
+            NormalMode,
+            enrolmentsEnabled = false,
+            Some(nonExcludedIossEtmpDisplayRegistration),
+            1
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an excluded IOSS Registration is present" in {
+
+        val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+          fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
+          telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+          emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+        )
+
+        val updatedForm = form.fill(iossBusinessDetails)
+
+        val application = applicationBuilder(
+          userAnswers = Some(basicUserAnswersWithVatInfo),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 1
+        )
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessContactDetailsRoute)
+
+          val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+          val result = route(application, request).value
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            updatedForm,
+            NormalMode,
+            enrolmentsEnabled = false,
+            Some(iossEtmpDisplayRegistration),
+            1
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when multiple IOSS Registrations are present" in {
+
+        val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+          fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
+          telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+          emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+        )
+
+        val updatedForm = form.fill(iossBusinessDetails)
+
+        val application = applicationBuilder(
+          userAnswers = Some(basicUserAnswersWithVatInfo),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 2
+        )
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessContactDetailsRoute)
+
+          val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+          val result = route(application, request).value
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            updatedForm,
+            NormalMode,
+            enrolmentsEnabled = false,
+            Some(iossEtmpDisplayRegistration),
+            2
+          )(request, messages(application)).toString
+        }
+      }
+
+      Seq(AmendMode, RejoinMode).foreach { mode =>
+
+        lazy val businessContactDetailsRoute = routes.BusinessContactDetailsController.onPageLoad(mode).url
+
+        s"in $mode" - {
+
+          s"must return OK and the correct view for a GET when an IOSS Registration is present when in $mode" in {
+
+            val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+              iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+            val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+              fullName = nonExcludedIossEtmpDisplayRegistration.schemeDetails.contactName,
+              telephoneNumber = nonExcludedIossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+              emailAddress = nonExcludedIossEtmpDisplayRegistration.schemeDetails.businessEmailId
+            )
+
+            val updatedForm: Form[BusinessContactDetails] = form.fill(iossBusinessDetails)
+
+            val application = applicationBuilder(
+              userAnswers = Some(basicUserAnswersWithVatInfo),
+              iossNumber = Some(iossNumber),
+              iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+              numberOfIossRegistrations = 1
+            )
+              .configure("features.enrolments-enabled" -> "false")
+              .build()
+
+            running(application) {
+              val request = FakeRequest(GET, businessContactDetailsRoute)
+
+              val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+              val result = route(application, request).value
+
+              status(result) `mustBe` OK
+              contentAsString(result) `mustBe` view(
+                updatedForm,
+                mode,
+                enrolmentsEnabled = false,
+                Some(nonExcludedIossEtmpDisplayRegistration),
+                1
+              )(request, messages(application)).toString
+            }
+          }
+
+          s"must return OK and the correct view for a GET when an excluded IOSS Registration is present when in $mode" in {
+
+            val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+              fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
+              telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+              emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+            )
+
+            val updatedForm = form.fill(iossBusinessDetails)
+
+            val application = applicationBuilder(
+              userAnswers = Some(basicUserAnswersWithVatInfo),
+              iossNumber = Some(iossNumber),
+              iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+              numberOfIossRegistrations = 1
+            )
+              .configure("features.enrolments-enabled" -> "false")
+              .build()
+
+            running(application) {
+              val request = FakeRequest(GET, businessContactDetailsRoute)
+
+              val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+              val result = route(application, request).value
+
+              status(result) `mustBe` OK
+              contentAsString(result) `mustBe` view(
+                updatedForm,
+                mode,
+                enrolmentsEnabled = false,
+                Some(iossEtmpDisplayRegistration),
+                1
+              )(request, messages(application)).toString
+            }
+          }
+
+          s"must return OK and the correct view for a GET when multiple IOSS Registrations are present when in $mode" in {
+
+            val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+              fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
+              telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+              emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+            )
+
+            val updatedForm = form.fill(iossBusinessDetails)
+
+            val application = applicationBuilder(
+              userAnswers = Some(basicUserAnswersWithVatInfo),
+              iossNumber = Some(iossNumber),
+              iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+              numberOfIossRegistrations = 2
+            )
+              .configure("features.enrolments-enabled" -> "false")
+              .build()
+
+            running(application) {
+              val request = FakeRequest(GET, businessContactDetailsRoute)
+
+              val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+              val result = route(application, request).value
+
+              status(result) `mustBe` OK
+              contentAsString(result) `mustBe` view(
+                updatedForm,
+                mode,
+                enrolmentsEnabled = false,
+                Some(iossEtmpDisplayRegistration),
+                2
+              )(request, messages(application)).toString
+            }
+          }
         }
       }
     }
@@ -524,7 +764,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` BAD_REQUEST
-          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
         }
       }
     }

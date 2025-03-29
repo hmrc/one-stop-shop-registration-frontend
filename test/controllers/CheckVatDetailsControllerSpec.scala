@@ -18,19 +18,20 @@ package controllers
 
 import base.SpecBase
 import forms.CheckVatDetailsFormProvider
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.{CheckVatDetails, NormalMode}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CheckVatDetailsPage, RegisteredForOssInEuPage}
+import pages.{CheckVatDetailsPage, HasTradingNamePage, RegisteredForOssInEuPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
+import utils.FutureSyntax.FutureOps
 import viewmodels.CheckVatDetailsViewModel
 import views.html.CheckVatDetailsView
-
-import scala.concurrent.Future
 
 class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -38,6 +39,8 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider()
 
   private lazy val checkVatDetailsRoute = routes.CheckVatDetailsController.onPageLoad().url
+
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
 
   "CheckVatDetails Controller" - {
 
@@ -54,8 +57,8 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         implicit val msgs = messages(application)
         val viewModel = CheckVatDetailsViewModel(vrn, vatCustomerInfo)
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, viewModel)(request, implicitly).toString
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, viewModel)(request, implicitly).toString
       }
     }
 
@@ -74,8 +77,8 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe`
           view(form.fill(CheckVatDetails.Yes), viewModel)(request, implicitly).toString
       }
     }
@@ -84,7 +87,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -101,8 +104,40 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual CheckVatDetailsPage.navigate(NormalMode, expectedAnswers).url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` CheckVatDetailsPage.navigate(NormalMode, expectedAnswers).url
+        verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted when an IOSS Registration is present" in {
+
+      val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn true.toFuture
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(basicUserAnswersWithVatInfo),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration)
+        )
+          .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, checkVatDetailsRoute)
+            .withFormUrlEncodedBody(("value", CheckVatDetails.Yes.toString))
+
+        val result = route(application, request).value
+        val expectedAnswers = basicUserAnswersWithVatInfo
+          .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
+          .set(HasTradingNamePage, true).success.value
+          .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` CheckVatDetailsPage.navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
       }
     }
@@ -124,8 +159,8 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, viewModel)(request, implicitly).toString
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, viewModel)(request, implicitly).toString
       }
     }
 
@@ -138,8 +173,8 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -152,8 +187,8 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -167,9 +202,9 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
 
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -183,9 +218,9 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result) `mustBe` SEE_OTHER
 
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value `mustBe` routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

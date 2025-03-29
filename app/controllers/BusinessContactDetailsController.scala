@@ -17,13 +17,14 @@
 package controllers
 
 import config.FrontendAppConfig
-import controllers.actions._
+import controllers.actions.*
 import forms.BusinessContactDetailsFormProvider
 import logging.Logging
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
 import models.requests.AuthenticatedDataRequest
 import models.{AmendMode, BusinessContactDetails, CheckMode, Mode, NormalMode, RejoinMode}
 import pages.BusinessContactDetailsPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{EmailVerificationService, SaveForLaterService}
@@ -53,11 +54,11 @@ class BusinessContactDetailsController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BusinessContactDetailsPage) match {
-        case None => form
+        case None => fillIossBusinessContactDetailsForm(request)
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, config.enrolmentsEnabled))
+      Ok(view(preparedForm, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -67,10 +68,9 @@ class BusinessContactDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled)).toFuture,
+          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations)).toFuture,
 
         value => {
-
 
           val continueUrl = if (mode == CheckMode) {
             s"${config.loginContinueUrl}${routes.CheckYourAnswersController.onPageLoad().url}"
@@ -140,4 +140,18 @@ class BusinessContactDetailsController @Inject()(
     }
   }
 
+  private def fillIossBusinessContactDetailsForm(request: AuthenticatedDataRequest[_]): Form[BusinessContactDetails] = {
+    request.latestIossRegistration match {
+      case Some(iossEtmpDisplayRegistration) =>
+        form.fill(
+          BusinessContactDetails(
+            fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
+            telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+            emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+          )
+        )
+
+      case _ => form
+    }
+  }
 }
