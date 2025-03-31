@@ -14,59 +14,87 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
 @import components.ButtonGroup
+@import models.iossRegistration.IossEtmpDisplayRegistration
+@import viewmodels.InputWidth.*
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    button: ButtonGroup
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        button: ButtonGroup,
+        govukWarningText: GovukWarningText
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(
+        form: Form[_],
+        mode: Mode,
+        latestIossRegistration: Option[IossEtmpDisplayRegistration],
+        numberOfIossRegistrations: Int
+)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("bankDetails.title"))) {
 
-    @formHelper(action = routes.BankDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+  @formHelper(action = routes.BankDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
-
-        <h1 class="govuk-heading-xl">@messages("bankDetails.heading")</h1>
-
-        <p class="govuk-body hint">@messages("bankDetails.hint")</p>
-
-        @govukInput(
-            InputViewModel(
-                field = form("accountName"),
-                label = LabelViewModel(messages("bankDetails.accountName")).withCssClass("govuk-label--m")
-            )
-            .withWidth(Full)
-            .withHint(HintViewModel(messages("bankDetails.accountName.hint")))
-        )
-
-        @govukInput(
-            InputViewModel(
-                field = form("bic"),
-                label = LabelViewModel(messages("bankDetails.bic")).withCssClass("govuk-label--m")
-            )
-            .withWidth(Fixed10)
-            .withHint(HintViewModel(messages("bankDetails.bic.hint")))
-        )
-
-
-        @govukInput(
-            InputViewModel(
-                field = form("iban"),
-                label = LabelViewModel(messages("bankDetails.iban")).withCssClass("govuk-label--m")
-            )
-            .withWidth(Fixed30)
-            .withHint(HintViewModel(messages("bankDetails.iban.hint")))
-        )
-
-        @button("site.continue", routes.BankDetailsController.onPageLoad(mode).url, mode)
+    @if(form.errors.nonEmpty) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
+
+    <h1 class="govuk-heading-xl">@messages("bankDetails.heading")</h1>
+
+    @if(latestIossRegistration.map(_.bankDetails.accountName.nonEmpty) && !(mode.isInAmend || mode.isInRejoin)) {
+      <p class="govuk-body">@messages("bankDetails.iossRegistration.p1")</p>
+    }
+
+    <p class="govuk-body hint">@messages("bankDetails.hint")</p>
+
+    @govukInput(
+      InputViewModel(
+        field = form("accountName"),
+        label = LabelViewModel(messages("bankDetails.accountName")).withCssClass("govuk-label--m")
+      )
+      .withWidth(Full)
+      .withHint(HintViewModel(messages("bankDetails.accountName.hint")))
+    )
+
+    @govukInput(
+      InputViewModel(
+        field = form("bic"),
+        label = LabelViewModel(messages("bankDetails.bic")).withCssClass("govuk-label--m")
+      )
+      .withWidth(Fixed10)
+      .withHint(HintViewModel(messages("bankDetails.bic.hint")))
+    )
+
+    @govukInput(
+      InputViewModel(
+        field = form("iban"),
+        label = LabelViewModel(messages("bankDetails.iban")).withCssClass("govuk-label--m")
+      )
+      .withWidth(Fixed30)
+      .withHint(HintViewModel(messages("bankDetails.iban.hint")))
+    )
+
+    @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
+      @defining(numberOfIossRegistrations match {
+        case 1 =>
+          if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
+            "bankDetails.iossRegistration.previous.warning"
+          } else {
+            "bankDetails.iossRegistration.warning"
+          }
+        case i =>
+          "bankDetails.iossRegistration.multiple.warning"
+      }) { message =>
+        @govukWarningText(WarningText(
+          iconFallbackText = Option(messages("site.warning")),
+          content = Text(messages(message))
+        ))
+      }
+    }
+
+    @button("site.continue", routes.BankDetailsController.onPageLoad(mode).url, mode)
+  }
 }

@@ -14,58 +14,76 @@
  * limitations under the License.
  *@
 
+@import models.iossRegistration.IossEtmpDisplayRegistration
 @import uk.gov.hmrc.domain.Vrn
 
 @this(
         layout: templates.Layout,
-        govukSummaryList: GovukSummaryList,
+        govukSummaryList: GovukSummaryList
 )
 
 @(
-    vrn: Vrn,
-    feedbackLink: String,
-    externalUrl: Option[String] = None,
-    yourAccountUrl: String,
-    organisationName: String,
-    list: SummaryList
+        vrn: Vrn,
+        feedbackLink: String,
+        externalUrl: Option[String] = None,
+        yourAccountUrl: String,
+        organisationName: String,
+        list: SummaryList,
+        maybeIossRegistration: Option[IossEtmpDisplayRegistration],
+        numberOfIossRegistrations: Int
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("amendComplete.title")), showBackLink = false) {
-    <div class="grid-row column-two-thirds" id="application_complete_id">
-        <div class="govuk-panel govuk-panel--confirmation">
-            <h1 class="govuk-panel__title">@messages("amendComplete.heading")</h1>
-        </div>
-
-        @if(list.rows.nonEmpty){
-            <div class="govuk-body">@messages("amendComplete.info")</div>
-        } else {
-            <div class="govuk-body">@messages("amendComplete.notAmended")</div>
-        }
-
-        @govukSummaryList(
-            SummaryListViewModel(
-                list.rows
-            ).withCssClass("govuk-body govuk-!-margin-bottom-7")
-        )
-
-        @externalUrl match {
-          case Some(url) => {
-            @Html(
-            s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("amendComplete.link.BTA") + "</a></p>"
-            )
-          }
-          case _ => {
-            @Html(
-              s"""<p class="govuk-body"><a href=$yourAccountUrl id="back-to-your-account" class="govuk-link">""" + messages("amendComplete.link.yourAccount") + "</a></p>"
-            )
-          }
-        }
-
-        <p class="govuk-body">@messages("amendComplete.contact.text")</p>
-
-        <p class="govuk-body">
-            <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
-            @messages("applicationComplete.feedback.30seconds")
-        </p>
+  <div class="grid-row column-two-thirds" id="application_complete_id">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">@messages("amendComplete.heading")</h1>
     </div>
+
+    @if(list.rows.nonEmpty) {
+      <div class="govuk-body">@messages("amendComplete.info")</div>
+    } else {
+      <div class="govuk-body">@messages("amendComplete.notAmended")</div>
+    }
+
+    @govukSummaryList(
+      SummaryListViewModel(
+        list.rows
+      ).withCssClass("govuk-body govuk-!-margin-bottom-7")
+    )
+
+    @if(maybeIossRegistration.nonEmpty && list.rows.nonEmpty) {
+      @defining(numberOfIossRegistrations match {
+        case 1 =>
+          if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
+            "amendComplete.iossRegistration.previous.updated"
+          } else {
+            "amendComplete.iossRegistration.updated"
+          }
+        case i =>
+          "amendComplete.iossRegistration.multiple.updated"
+      }) { message =>
+        <p class="govuk-body">@messages(message)</p>
+      }
+    }
+
+    @externalUrl match {
+      case Some(url) => {
+        @Html(
+          s"""<p class="govuk-body"><a href=$url id="back-to-your-account" class="govuk-link">""" + messages("amendComplete.link.BTA") + "</a></p>"
+        )
+      }
+      case _ => {
+        @Html(
+          s"""<p class="govuk-body"><a href=$yourAccountUrl id="back-to-your-account" class="govuk-link">""" + messages("amendComplete.link.yourAccount") + "</a></p>"
+        )
+      }
+    }
+
+    <p class="govuk-body">@messages("amendComplete.contact.text")</p>
+
+    <p class="govuk-body">
+      <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
+      @messages("applicationComplete.feedback.30seconds")
+    </p>
+  </div>
 }

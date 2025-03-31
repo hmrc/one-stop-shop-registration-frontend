@@ -16,17 +16,18 @@
 
 package base
 
-import controllers.actions._
+import controllers.actions.*
 import generators.Generators
 import models.domain.{Registration, VatCustomerInfo}
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
 import models.{BankDetails, BusinessContactDetails, Country, DesAddress, Iban, Index, Mode, Period, Quarter, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
-import pages._
+import pages.*
 import pages.euDetails.{EuCountryPage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.Application
@@ -42,10 +43,10 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.checkAnswers._
+import viewmodels.checkAnswers.*
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
-import viewmodels.checkAnswers.previousRegistrations.{PreviouslyRegisteredSummary, PreviousRegistrationSummary}
-import viewmodels.govuk.summarylist._
+import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
+import viewmodels.govuk.summarylist.*
 
 import java.time.{Clock, Instant, LocalDate, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -126,14 +127,16 @@ trait SpecBase
                                     clock: Option[Clock] = None,
                                     mode: Option[Mode] = None,
                                     registration: Option[Registration] = None,
-                                    iossNumber: Option[String] = None
+                                    iossNumber: Option[String] = None,
+                                    numberOfIossRegistrations: Int = 0,
+                                    iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration] = None
                                   ): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber)),
+        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, iossEtmpDisplayRegistration)),
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers)),
@@ -176,7 +179,7 @@ trait SpecBase
       val websiteSummaryRow = WebsiteSummary.checkAnswersRow(answers, mode)
       val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(answers, mode)
       val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(answers, mode)
-      val businessContactDetailsEmailSummaryRow= BusinessContactDetailsSummary.rowEmailAddress(answers, mode)
+      val businessContactDetailsEmailSummaryRow = BusinessContactDetailsSummary.rowEmailAddress(answers, mode)
       val bankDetailsAccountNameSummaryRow = BankDetailsSummary.rowAccountName(answers, mode)
       val bankDetailsBicSummaryRow = BankDetailsSummary.rowBIC(answers, mode)
       val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(answers, mode)
@@ -228,7 +231,7 @@ trait SpecBase
   }
 
   def getAmendedCYASummaryList(answers: UserAnswers, dateService: DateService, registrationService: RegistrationService, registration: Option[Registration])
-                       (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
+                              (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
     new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
       val hasTradingNameSummaryRow = new HasTradingNameSummary().amendedAnswersRow(answers)
@@ -246,7 +249,7 @@ trait SpecBase
       val removedWebsiteRow = WebsiteSummary.removedWebsiteRow(getRemovedWebsites(answers, registration))
       val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.amendedContactNameRow(answers)
       val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.amendedTelephoneNumberRow(answers)
-      val businessContactDetailsEmailSummaryRow= BusinessContactDetailsSummary.amendedEmailAddressRow(answers)
+      val businessContactDetailsEmailSummaryRow = BusinessContactDetailsSummary.amendedEmailAddressRow(answers)
       val bankDetailsAccountNameSummaryRow = BankDetailsSummary.amendedAccountNameRow(answers)
       val bankDetailsBicSummaryRow = BankDetailsSummary.amendedBICRow(answers)
       val bankDetailsIbanSummaryRow = BankDetailsSummary.amendedIBANRow(answers)

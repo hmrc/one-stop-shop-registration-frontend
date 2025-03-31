@@ -22,19 +22,20 @@ import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
 import models.Quarter.{Q1, Q4}
 import models.external.ExternalEntryUrl
+import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
-import models.{Period, UserAnswers}
+import models.{BankDetails, BusinessContactDetails, Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{BusinessContactDetailsPage, DateOfFirstSalePage, HasMadeSalesPage}
+import pages.*
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{EmailConfirmationQuery, OriginalRegistrationQuery}
+import queries.{AllTradingNames, EmailConfirmationQuery, OriginalRegistrationQuery}
 import services.{CoreRegistrationValidationService, DateService, PeriodService, RegistrationService}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -69,6 +70,20 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
       DateOfFirstSalePage.toString -> Json.toJson(arbitraryStartDate)
     ),
     vatInfo = Some(vatCustomerInfo)
+  )
+
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
+  private val iossBusinessContactDetails: BusinessContactDetails = BusinessContactDetails(
+    fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
+    telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+    emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+  )
+
+  private val iossBankDetails: BankDetails = BankDetails(
+    accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+    bic = iossEtmpDisplayRegistration.bankDetails.bic,
+    iban = iossEtmpDisplayRegistration.bankDetails.iban
   )
 
   "AmendComplete Controller" - {
@@ -118,7 +133,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
-            summaryList
+            summaryList,
+            None,
+            0
           )(request, messages(application)).toString
         }
       }
@@ -165,7 +182,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
-            summaryList
+            summaryList,
+            None,
+            0
           )(request, messages(application)).toString
         }
       }
@@ -211,7 +230,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
-            summaryList
+            summaryList,
+            None,
+            0
           )(request, messages(application)).toString
         }
       }
@@ -264,7 +285,9 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
-            summaryList
+            summaryList,
+            None,
+            0
           )(request, messages(application)).toString
         }
       }
@@ -314,7 +337,250 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             None,
             yourAccountUrl,
             "Company name",
-            summaryList
+            summaryList,
+            None,
+            0
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an IOSS Registration is present and no user answers have been updated" in {
+
+        val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+          iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val updatedAnswers = userAnswers
+          .remove(DateOfFirstSalePage).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(EmailConfirmationQuery, false).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
+          .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+          .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
+          .set(BankDetailsPage, iossBankDetails).success.value
+
+        val application = applicationBuilder(
+          userAnswers = Some(updatedAnswers),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 1
+        )
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
+          .build()
+
+        when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
+        when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+
+          val summaryList = SummaryListViewModel(
+            rows = getAmendedCYASummaryList(
+              updatedAnswers,
+              mockDateService,
+              mockRegistrationService,
+              Some(mockRegistration)
+            ).futureValue
+          )
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            vrn,
+            config.feedbackUrl(request),
+            None,
+            yourAccountUrl,
+            "Company name",
+            summaryList,
+            Some(nonExcludedIossEtmpDisplayRegistration),
+            1
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an IOSS Registration is present and some user answers have been updated" in {
+
+        val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+          iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val userAnswersWithoutEmail = userAnswers
+          .remove(DateOfFirstSalePage).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(EmailConfirmationQuery, false).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
+          .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+          .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
+          .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value
+
+        val application = applicationBuilder(
+          userAnswers = Some(userAnswersWithoutEmail),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 1
+        )
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
+          .build()
+
+        when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
+        when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            userAnswersWithoutEmail,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            vrn,
+            config.feedbackUrl(request),
+            None,
+            yourAccountUrl,
+            "Company name",
+            summaryList,
+            Some(nonExcludedIossEtmpDisplayRegistration),
+            1
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an excluded IOSS Registration is present and some user answers have been updated" in {
+
+        val userAnswersWithoutEmail = userAnswers
+          .remove(DateOfFirstSalePage).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(EmailConfirmationQuery, false).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
+          .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+          .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
+          .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value
+
+        val application = applicationBuilder(
+          userAnswers = Some(userAnswersWithoutEmail),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 1
+        )
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
+          .build()
+
+        when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
+        when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            userAnswersWithoutEmail,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            vrn,
+            config.feedbackUrl(request),
+            None,
+            yourAccountUrl,
+            "Company name",
+            summaryList,
+            Some(iossEtmpDisplayRegistration),
+            1
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when multiple IOSS Registrations are present and some user answers have been updated" in {
+
+        val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+          iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val userAnswersWithoutEmail = userAnswers
+          .remove(DateOfFirstSalePage).success.value
+          .set(HasMadeSalesPage, false).success.value
+          .set(EmailConfirmationQuery, false).success.value
+          .set(OriginalRegistrationQuery, mockRegistration).success.value
+          .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+          .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(fullName = "Test name")).success.value
+          .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value
+
+        val application = applicationBuilder(
+          userAnswers = Some(userAnswersWithoutEmail),
+          iossNumber = Some(iossNumber),
+          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+          numberOfIossRegistrations = 2
+        )
+          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .overrides(bind[PeriodService].toInstance(periodService))
+          .overrides(bind[DateService].toInstance(mockDateService))
+          .build()
+
+        when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
+        when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
+        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
+
+        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
+
+        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[AmendCompleteView]
+          implicit val msgs: Messages = messages(application)
+          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
+            userAnswersWithoutEmail,
+            mockDateService,
+            mockRegistrationService,
+            Some(mockRegistration)).futureValue)
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            vrn,
+            config.feedbackUrl(request),
+            None,
+            yourAccountUrl,
+            "Company name",
+            summaryList,
+            Some(nonExcludedIossEtmpDisplayRegistration),
+            2
           )(request, messages(application)).toString
         }
       }

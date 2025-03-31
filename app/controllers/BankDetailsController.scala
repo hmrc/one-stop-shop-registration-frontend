@@ -16,10 +16,12 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.BankDetailsFormProvider
-import models.Mode
+import models.requests.AuthenticatedDataRequest
+import models.{BankDetails, Mode}
 import pages.BankDetailsPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,10 +31,10 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      cc: AuthenticatedControllerComponents,
-                                      formProvider: BankDetailsFormProvider,
-                                      view: BankDetailsView
+                                       override val messagesApi: MessagesApi,
+                                       cc: AuthenticatedControllerComponents,
+                                       formProvider: BankDetailsFormProvider,
+                                       view: BankDetailsView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -42,11 +44,11 @@ class BankDetailsController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BankDetailsPage) match {
-        case None => form
+        case None => fillIossBankDetailsForm(request)
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, request.latestIossRegistration, request.numberOfIossRegistrations))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -54,13 +56,28 @@ class BankDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, request.latestIossRegistration, request.numberOfIossRegistrations))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BankDetailsPage, value))
-            _              <- cc.sessionRepository.set(updatedAnswers)
+            _ <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(BankDetailsPage.navigate(mode, updatedAnswers))
       )
+  }
+
+  private def fillIossBankDetailsForm(request: AuthenticatedDataRequest[_]): Form[BankDetails] = {
+    request.latestIossRegistration match {
+      case Some(iossEtmpDisplayRegistration) =>
+        form.fill(
+          BankDetails(
+            accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+            bic = iossEtmpDisplayRegistration.bankDetails.bic,
+            iban = iossEtmpDisplayRegistration.bankDetails.iban
+          )
+        )
+
+      case _ => form
+    }
   }
 }

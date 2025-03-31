@@ -18,12 +18,14 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
-import models.{BankDetails, Bic, Iban, NormalMode}
+import models.iossRegistration.IossEtmpDisplayRegistration
+import models.{AmendMode, BankDetails, Bic, Iban, NormalMode, RejoinMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.mockito.MockitoSugar
 import pages.BankDetailsPage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,6 +45,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
   private val bankDetails = BankDetails("account name", Some(bic), iban)
   private val userAnswers = basicUserAnswersWithVatInfo.set(BankDetailsPage, bankDetails).success.value
 
+  private val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
   "BankDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -57,7 +61,112 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form, NormalMode, None, 0)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an IOSS Registration is present" in {
+
+      val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+        iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+      val iossBankDetails: BankDetails = BankDetails(
+        accountName = nonExcludedIossEtmpDisplayRegistration.bankDetails.accountName,
+        bic = nonExcludedIossEtmpDisplayRegistration.bankDetails.bic,
+        iban = nonExcludedIossEtmpDisplayRegistration.bankDetails.iban
+      )
+
+      val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
+
+      val application = applicationBuilder(
+        userAnswers = Some(basicUserAnswersWithVatInfo),
+        iossNumber = Some(iossNumber),
+        iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+        numberOfIossRegistrations = 1
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, bankDetailsRoute)
+
+        val view = application.injector.instanceOf[BankDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          updatedForm,
+          NormalMode,
+          Some(nonExcludedIossEtmpDisplayRegistration),
+          1
+        )(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an excluded IOSS Registration is present" in {
+
+      val iossBankDetails: BankDetails = BankDetails(
+        accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+        bic = iossEtmpDisplayRegistration.bankDetails.bic,
+        iban = iossEtmpDisplayRegistration.bankDetails.iban
+      )
+
+      val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
+
+      val application = applicationBuilder(
+        userAnswers = Some(basicUserAnswersWithVatInfo),
+        iossNumber = Some(iossNumber),
+        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+        numberOfIossRegistrations = 1
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, bankDetailsRoute)
+
+        val view = application.injector.instanceOf[BankDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          updatedForm,
+          NormalMode,
+          Some(iossEtmpDisplayRegistration),
+          1
+        )(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when multiple IOSS Registrations are present" in {
+
+      val iossBankDetails: BankDetails = BankDetails(
+        accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+        bic = iossEtmpDisplayRegistration.bankDetails.bic,
+        iban = iossEtmpDisplayRegistration.bankDetails.iban
+      )
+
+      val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
+
+      val application = applicationBuilder(
+        userAnswers = Some(basicUserAnswersWithVatInfo),
+        iossNumber = Some(iossNumber),
+        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+        numberOfIossRegistrations = 2
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, bankDetailsRoute)
+
+        val view = application.injector.instanceOf[BankDetailsView]
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          updatedForm,
+          NormalMode,
+          Some(iossEtmpDisplayRegistration),
+          2
+        )(request, messages(application)).toString
       }
     }
 
@@ -73,7 +182,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode, None, 0)(request, messages(application)).toString
       }
     }
 
@@ -118,7 +227,120 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, None, 0)(request, messages(application)).toString
+      }
+    }
+
+    Seq(AmendMode, RejoinMode).foreach { mode =>
+
+      lazy val bankDetailsRoute = routes.BankDetailsController.onPageLoad(mode).url
+
+      s"in $mode" - {
+
+        s"must return OK and the correct view for a GET when an IOSS Registration is present when in $mode" in {
+
+          val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
+            iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+          val iossBankDetails: BankDetails = BankDetails(
+            accountName = nonExcludedIossEtmpDisplayRegistration.bankDetails.accountName,
+            bic = nonExcludedIossEtmpDisplayRegistration.bankDetails.bic,
+            iban = nonExcludedIossEtmpDisplayRegistration.bankDetails.iban
+          )
+
+          val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
+
+          val application = applicationBuilder(
+            userAnswers = Some(basicUserAnswersWithVatInfo),
+            iossNumber = Some(iossNumber),
+            iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
+            numberOfIossRegistrations = 1
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(GET, bankDetailsRoute)
+
+            val view = application.injector.instanceOf[BankDetailsView]
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              updatedForm,
+              mode,
+              Some(nonExcludedIossEtmpDisplayRegistration),
+              1
+            )(request, messages(application)).toString
+          }
+        }
+
+        s"must return OK and the correct view for a GET when an excluded IOSS Registration is present when in $mode" in {
+
+          val iossBankDetails: BankDetails = BankDetails(
+            accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+            bic = iossEtmpDisplayRegistration.bankDetails.bic,
+            iban = iossEtmpDisplayRegistration.bankDetails.iban
+          )
+
+          val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
+
+          val application = applicationBuilder(
+            userAnswers = Some(basicUserAnswersWithVatInfo),
+            iossNumber = Some(iossNumber),
+            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+            numberOfIossRegistrations = 1
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(GET, bankDetailsRoute)
+
+            val view = application.injector.instanceOf[BankDetailsView]
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              updatedForm,
+              mode,
+              Some(iossEtmpDisplayRegistration),
+              1
+            )(request, messages(application)).toString
+          }
+        }
+
+        s"must return OK and the correct view for a GET when multiple IOSS Registrations are present when in $mode" in {
+
+          val iossBankDetails: BankDetails = BankDetails(
+            accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
+            bic = iossEtmpDisplayRegistration.bankDetails.bic,
+            iban = iossEtmpDisplayRegistration.bankDetails.iban
+          )
+
+          val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
+
+          val application = applicationBuilder(
+            userAnswers = Some(basicUserAnswersWithVatInfo),
+            iossNumber = Some(iossNumber),
+            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
+            numberOfIossRegistrations = 2
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(GET, bankDetailsRoute)
+
+            val view = application.injector.instanceOf[BankDetailsView]
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              updatedForm,
+              mode,
+              Some(iossEtmpDisplayRegistration),
+              2
+            )(request, messages(application)).toString
+          }
+        }
       }
     }
   }
