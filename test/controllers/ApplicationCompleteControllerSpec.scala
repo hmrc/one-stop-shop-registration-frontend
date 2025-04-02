@@ -126,7 +126,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -179,7 +178,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -231,7 +229,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "",
             vrn,
-            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -283,7 +280,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -341,7 +337,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -395,7 +390,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = true,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -459,7 +453,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -523,7 +516,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -584,7 +576,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,
@@ -648,7 +639,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           contentAsString(result) `mustBe` view(
             "test@test.com",
             vrn,
-            showEmailConfirmation = false,
             config.feedbackUrl(request),
             commencementDate.format(dateFormatter),
             None,

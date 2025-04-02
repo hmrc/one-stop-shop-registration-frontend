@@ -203,7 +203,6 @@ applicationComplete.fillOut = <a class="govuk-link" href="https://www.gov.uk/gui
 
 applicationComplete.enrolment.heading = We''ve received your registration request
 applicationComplete.enrolment.title = We''ve received your registration request
-applicationComplete.enrolment.confirmation = We''ll send a confirmation to <span class="govuk-body govuk-!-font-weight-bold">{0}</span> when your registration is complete.
 
 applicationComplete.iossRegistration.updated = We''ve also updated your Import One Stop Shop registration.
 applicationComplete.iossRegistration.previous.updated = We''ve also updated your previous Import One Stop Shop registration.
@@ -435,8 +434,8 @@ previousEuCountry.heading = Which country did your business register in?
 previousEuCountry.error.required = Select an EU country
 previousEuCountry.error.duplicate = You selected this EU country already. Select a different one.
 
-previousOssNumber.title = Enter your registration number for {0}?
-previousOssNumber.heading = Enter your registration number for {0}?
+previousOssNumber.title = Enter your registration number for {0}
+previousOssNumber.heading = Enter your registration number for {0}
 previousOssNumber.hint.default = This will start with {0} or EU, for example {0}{1}{2}
 previousOssNumber.hint.union = This will start with {0}, for example {0}{1}{2}
 previousOssNumber.hint.nonunion = This will start with EU, for example EU123456789
@@ -619,8 +618,8 @@ registeredForOssInEu.title = Is your business already registered for the One Sto
 registeredForOssInEu.heading = Is your business already registered for the One Stop Shop Union scheme in an EU country?
 registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop Union scheme in an EU country
 
-dateOfFirstSale.title = When was your first eligible sale since {0}
-dateOfFirstSale.heading = When was your first eligible sale since {0}
+dateOfFirstSale.title = When was your first eligible sale since {0}?
+dateOfFirstSale.heading = When was your first eligible sale since {0}?
 dateOfFirstSale.hint = For example, {0}
 dateOfFirstSale.checkYourAnswersLabel = Date of first sale
 dateOfFirstSale.error.required.all = Enter the date of your first eligible sale
