@@ -43,6 +43,7 @@ class CommencementDateController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
+      val hasMadeSales = request.userAnswers.get(HasMadeSalesPage).contains(true)
       for {
         maybeCalculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
         calculatedCommencementDate = maybeCalculatedCommencementDate.getOrElse {
@@ -70,7 +71,8 @@ class CommencementDateController @Inject()(
                       isDateInCurrentQuarter,
                       Some(startOfCurrentQuarter.format(dateFormatter)),
                       Some(endOfCurrentQuarter.format(dateFormatter)),
-                      Some(startOfNextQuarter.format(dateFormatter))
+                      Some(startOfNextQuarter.format(dateFormatter)),
+                      hasMadeSales
                     )
                   )
               }.getOrElse(Redirect(determineJourneyRecovery(Some(mode))))
@@ -82,7 +84,8 @@ class CommencementDateController @Inject()(
                 isDateInCurrentQuarter = true,
                 None,
                 None,
-                None
+                None,
+                hasMadeSales
               ))
 
             case _ => Redirect(determineJourneyRecovery(Some(mode)))

@@ -195,11 +195,11 @@ applicationComplete.feedback.30seconds = (takes 30 seconds)
 applicationComplete.useService.text = You can now use this service to:
 applicationComplete.useService.text.bullet1 = fill out quarterly One Stop Shop VAT returns
 applicationComplete.useService.text.bullet2 = pay any One Stop Shop VAT that you owe
-applicationComplete.returns.text = You can submit your {0} return on {1}. Include any sales from {2}.
+applicationComplete.returns.text = You can submit your {0} return from {1}. Include any sales from {2} onwards.
 applicationComplete.registration.text = We''ve received your registration for <span class="govuk-body govuk-!-font-weight-bold">{0}</span>.
 applicationComplete.contact.text = We will contact you if we need to check any information.
 applicationComplete.readInformation = Read more information about <a class="govuk-link" href="https://www.gov.uk/guidance/completing-a-one-stop-shop-vat-return">how to complete an OSS return.</a>
-applicationComplete.fillOut = <a class="govuk-link" href="https://www.gov.uk/guidance/completing-a-one-stop-shop-vat-return">Find out how to fill an OSS return.</a>
+applicationComplete.fillOut = <a class="govuk-link" href="https://www.gov.uk/guidance/completing-a-one-stop-shop-vat-return">Find out how to fill in an OSS VAT return.</a>
 
 applicationComplete.enrolment.heading = We''ve received your registration request
 applicationComplete.enrolment.title = We''ve received your registration request
@@ -595,7 +595,8 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
 commencementDate.p1 = You must include all eligible sales from {0} in your first return.
-commencementDate.p2 = You can change your sales information up to {0}.
+commencementDate.p2 = If you make your first sale before {0} you must update your registration to tell us.
+commencementDate.p3 = You can change your sales information up to {0}.
 commencementDate.checkYourAnswersLabel = Include sales from this date
 
 commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
