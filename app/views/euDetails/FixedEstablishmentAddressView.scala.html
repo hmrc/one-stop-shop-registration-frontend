@@ -35,12 +35,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("fixedEstablishmentAddress.heading", country.name)</h1>
+        <h1 class="govuk-heading-l">@messages("fixedEstablishmentAddress.heading", country.name)</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("line1"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.line1")).withCssClass("govuk-label--m")
+                label = LabelViewModel(
+                    HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("fixedEstablishmentAddress.line1") + "</h2>"))
+                ).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
             .withAutocomplete("address-line1")
@@ -49,7 +51,9 @@
         @govukInput(
             InputViewModel(
                 field = form("line2"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.line2")).withCssClass("govuk-label--m")
+                label = LabelViewModel(
+                    HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("fixedEstablishmentAddress.line2") + "</h2>"))
+                ).withCssClass("govuk-label--m")
             )
             .withWidth(Full)
             .withAutocomplete("address-line2")
@@ -58,7 +62,9 @@
         @govukInput(
             InputViewModel(
                 field = form("townOrCity"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.townOrCity")).withCssClass("govuk-label--m")
+                label = LabelViewModel(
+                    HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("fixedEstablishmentAddress.townOrCity") + "</h2>"))
+                ).withCssClass("govuk-label--m")
             )
             .withWidth(TwoThirds)
             .withAutocomplete("address-level2")
@@ -67,7 +73,9 @@
         @govukInput(
             InputViewModel(
                 field = form("stateOrRegion"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.stateOrRegion")).withCssClass("govuk-label--m")
+                label = LabelViewModel(
+                    HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("fixedEstablishmentAddress.stateOrRegion") + "</h2>"))
+                ).withCssClass("govuk-label--m")
             )
             .withWidth(TwoThirds)
             .withAutocomplete("address-level1")
@@ -76,7 +84,9 @@
         @govukInput(
             InputViewModel(
                 field = form("postCode"),
-                label = LabelViewModel(messages("fixedEstablishmentAddress.postCode")).withCssClass("govuk-label--m")
+                label = LabelViewModel(
+                    HtmlContent(Html("""<h2 class="govuk-fieldset__heading">""" + messages("fixedEstablishmentAddress.postCode") + "</h2>"))
+                ).withCssClass("govuk-label--m")
             )
             .withWidth(Fixed10)
             .withAutocomplete("postal-code")

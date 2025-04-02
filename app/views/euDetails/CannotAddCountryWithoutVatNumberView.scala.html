@@ -26,7 +26,7 @@
 
         @formHelper(action = controllers.euDetails.routes.CannotAddCountryWithoutVatNumberController.onSubmit(mode, countryIndex), Symbol("autoComplete") -> "off") {
 
-            <h1 class="govuk-heading-xl">@messages("cannotAddCountryWithoutVatNumber.heading", country.name)</h1>
+            <h1 class="govuk-heading-l">@messages("cannotAddCountryWithoutVatNumber.heading", country.name)</h1>
 
             <p class="govuk-body">@messages("cannotAddCountryWithoutVatNumber.paragraph")</p>
 

@@ -35,7 +35,7 @@
             ))
         }
 
-        <h1 class="govuk-heading-xl">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
+        <h1 class="govuk-heading-l">@messages("checkEuVatDetailsAnswers.heading", country.name)</h1>
 
         @if(!incompleteDetails){
             @formHelper(action = controllers.euDetails.routes.CheckEuDetailsAnswersController.onSubmit(mode, index, false)) {

@@ -42,7 +42,7 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-xl">@messages("bankDetails.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("bankDetails.heading")</h1>
 
     @if(latestIossRegistration.map(_.bankDetails.accountName.nonEmpty) && !(mode.isInAmend || mode.isInRejoin)) {
       <p class="govuk-body">@messages("bankDetails.iossRegistration.p1")</p>

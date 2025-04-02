@@ -34,12 +34,12 @@
 
   @layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("commencementDate.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("commencementDate.heading")</h1>
 
     @if(isDateInCurrentQuarter) {
       <p class="govuk-body">@messages("commencementDate.p1", formattedCommencementDate)</p>
 
-      <p class="govuk-body">@messages("commencementDate.p2", formattedCommencementDate)</p>
+      <p class="govuk-body">@messages("commencementDate.p2", formattedLastAmendmentDate)</p>
     } else {
       <p class="govuk-body">@messages("commencementDate.youRegisteredAfterThe10th")</p>
 

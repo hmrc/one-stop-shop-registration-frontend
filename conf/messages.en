@@ -493,8 +493,8 @@ previousIntermediaryNumber.error.invalid = Enter a valid intermediary identifica
 
 previousSchemeNumber.checkYourAnswersLabel = Registration number
 
-deletePreviousRegistration.title = Are you sure you need to remove the deregistration for {0}?
-deletePreviousRegistration.heading = Are you sure you need to remove the deregistration for {0}?
+deletePreviousRegistration.title = Are you sure you want to remove the registration for {0}?
+deletePreviousRegistration.heading = Are you sure you want to remove the registration for {0}?
 deletePreviousRegistration.error.required = Select yes if you are sure you need to remove the deregistration
 
 previousRegistrations.checkYourAnswersLabel = Countries registered in
@@ -551,8 +551,8 @@ bankDetails.iossRegistration.warning = Any changes you make here will also updat
 bankDetails.iossRegistration.previous.warning = Any changes you make here will also update the bank details in your previous Import One Stop Shop registration.
 bankDetails.iossRegistration.multiple.warning = Any changes you make here will also update the bank details in all of your Import One Stop Shop registrations.
 
-euTaxReference.title = What is your business tax identification number in {0}?
-euTaxReference.heading = What is your business tax identification number in {0}?
+euTaxReference.title = What is your business tax identification number for {0}?
+euTaxReference.heading = What is your business tax identification number for {0}?
 euTaxReference.checkYourAnswersLabel = Tax identification number
 euTaxReference.error.required = Enter your business''s tax identification number in {0}
 euTaxReference.error.length = Tax identification number must be 20 characters or less
@@ -596,7 +596,7 @@ notSellingGoodsFromNi.p = This scheme is only for businesses that sell goods fro
 commencementDate.title = Your start date
 commencementDate.heading = Your start date
 commencementDate.p1 = You must include all eligible sales from {0} in your first return.
-commencementDate.p2 = If you make your first sale before {0} you must amend your registration to tell us.
+commencementDate.p2 = You can change your sales information up to {0}.
 commencementDate.checkYourAnswersLabel = Include sales from this date
 
 commencementDate.youRegisteredAfterThe10th = You registered after the 10th day of the next month following your first eligible sale.
@@ -619,8 +619,8 @@ registeredForOssInEu.title = Is your business already registered for the One Sto
 registeredForOssInEu.heading = Is your business already registered for the One Stop Shop Union scheme in an EU country?
 registeredForOssInEu.error.required = Select yes if your business is already registered for the One Stop Shop Union scheme in an EU country
 
-dateOfFirstSale.title = Date of your first eligible sale since {0}
-dateOfFirstSale.heading = Date of your first eligible sale since {0}
+dateOfFirstSale.title = When was your first eligible sale since {0}
+dateOfFirstSale.heading = When was your first eligible sale since {0}
 dateOfFirstSale.hint = For example, {0}
 dateOfFirstSale.checkYourAnswersLabel = Date of first sale
 dateOfFirstSale.error.required.all = Enter the date of your first eligible sale
@@ -851,6 +851,7 @@ registrationType.change.hidden = Your registration type
 
 salesDeclarationNotRequired.title = Do not tell us about sales of services on your returns
 salesDeclarationNotRequired.heading = Do not tell us about sales of services on your returns
+salesDeclarationNotRequired.p1 = You must still tell us about countries where your business is registered.
 
 changeYourRegistration.title = Change Your Registration
 changeYourRegistration.heading = Change Your Registration
