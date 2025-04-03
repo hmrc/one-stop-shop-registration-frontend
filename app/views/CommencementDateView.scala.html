@@ -29,17 +29,22 @@
         isDateInCurrentQuarter: Boolean,
         startOfCurrentQuarter: Option[String],
         endOfCurrentQuarter: Option[String],
-        startOfNextQuarter: Option[String]
+        startOfNextQuarter: Option[String],
+        hasMadeSales: Boolean
 )(implicit request: Request[_], messages: Messages)
 
   @layout(pageTitle = titleNoForm(messages("commencementDate.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("commencementDate.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("commencementDate.heading")</h1>
 
     @if(isDateInCurrentQuarter) {
       <p class="govuk-body">@messages("commencementDate.p1", formattedCommencementDate)</p>
 
-      <p class="govuk-body">@messages("commencementDate.p2", formattedCommencementDate)</p>
+      @if(hasMadeSales){
+        <p class="govuk-body">@messages("commencementDate.p3", formattedLastAmendmentDate)</p>
+      } else {
+        <p class="govuk-body">@messages("commencementDate.p2", formattedCommencementDate)</p>
+      }
     } else {
       <p class="govuk-body">@messages("commencementDate.youRegisteredAfterThe10th")</p>
 

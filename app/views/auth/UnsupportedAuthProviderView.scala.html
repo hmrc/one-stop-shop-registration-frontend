@@ -24,7 +24,7 @@
 
 @layout(pageTitle = titleNoForm(messages("unsupportedAuthProvider.title")), showBackLink = false) {
 
-    <h1 class="govuk-heading-xl">@messages("unsupportedAuthProvider.title")</h1>
+    <h1 class="govuk-heading-l">@messages("unsupportedAuthProvider.title")</h1>
 
     <p class="govuk-body">@messages("unsupportedAuthProvider.p1") <a href="@controllers.auth.routes.AuthController.redirectToLogin(continueUrl)">@messages("unsupportedAuthProvider.p1.link")</a>.</p>
     <p class="govuk-body">@messages("unsupportedAuthProvider.p2") <a href="@controllers.auth.routes.AuthController.redirectToRegister(continueUrl)">@messages("unsupportedAuthProvider.p2.link")</a>.</p>

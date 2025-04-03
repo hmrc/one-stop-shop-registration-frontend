@@ -92,7 +92,8 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
             true,
             Some(nowFormatted),
             Some(nowFormatted),
-            Some(nowFormatted)
+            Some(nowFormatted),
+            true
           )(request, messages(application)).toString
         }
       }
@@ -192,7 +193,8 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
             false,
             Some(nowFormatted),
             Some(nowFormatted),
-            Some(nowFormatted)
+            Some(nowFormatted),
+            true
           )(request, messages(application)).toString
         }
       }
@@ -227,7 +229,8 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
             true,
             None,
             None,
-            None
+            None,
+            false
           )(request, messages(application)).toString
         }
       }
@@ -261,7 +264,8 @@ class CommencementDateControllerSpec extends SpecBase with MockitoSugar with Bef
             true,
             None,
             None,
-            None
+            None,
+            false
           )(request, messages(application)).toString
         }
       }

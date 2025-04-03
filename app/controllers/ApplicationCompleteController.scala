@@ -28,7 +28,7 @@ import pages.{BankDetailsPage, BusinessContactDetailsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
-import queries.{AllTradingNames, EmailConfirmationQuery}
+import queries.AllTradingNames
 import services.{DateService, PeriodService}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -67,7 +67,6 @@ class ApplicationCompleteController @Inject()(
         (for {
           organisationName <- getOrganisationName(request.userAnswers)
           contactDetails <- request.userAnswers.get(BusinessContactDetailsPage)
-          showEmailConfirmation <- request.userAnswers.get(EmailConfirmationQuery)
         } yield {
           val savedUrl = externalEntryUrl.fold(_ => None, _.url)
           val periodOfFirstReturn = periodService.getFirstReturnPeriod(calculatedCommencementDate)
@@ -77,7 +76,6 @@ class ApplicationCompleteController @Inject()(
             view(
               HtmlFormat.escape(contactDetails.emailAddress).toString,
               request.vrn,
-              showEmailConfirmation,
               frontendAppConfig.feedbackUrl,
               calculatedCommencementDate.format(dateFormatter),
               savedUrl,
