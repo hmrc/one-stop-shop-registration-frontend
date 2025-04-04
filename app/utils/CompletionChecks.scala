@@ -114,7 +114,10 @@ trait CompletionChecks {
   }
 
   private def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
-    request.userAnswers.get(PreviouslyRegisteredPage).isDefined
+    request.userAnswers.get(PreviouslyRegisteredPage).exists {
+      case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
+      case false => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty).isEmpty
+    }
   }
 
   private def arePreviousRegistrationsValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {

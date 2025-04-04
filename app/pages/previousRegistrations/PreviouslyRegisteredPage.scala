@@ -41,7 +41,7 @@ case object PreviouslyRegisteredPage extends QuestionPage[Boolean] {
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     (answers.get(PreviouslyRegisteredPage), answers.get(DeriveNumberOfPreviousRegistrations)) match {
-      case (Some(true), Some(size)) if size > 0   => routes.CheckYourAnswersController.onPageLoad()
+      case (Some(true), Some(size)) if size > 0   => prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode)
       case (Some(true), _)                        => prevRegRoutes.PreviousEuCountryController.onPageLoad(CheckMode, Index(0))
       case (Some(false), Some(size)) if size > 0  => routes.DeleteAllPreviousRegistrationsController.onPageLoad()
       case (Some(false), _)                       => routes.CheckYourAnswersController.onPageLoad()
