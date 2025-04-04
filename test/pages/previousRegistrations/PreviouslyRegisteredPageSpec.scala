@@ -84,7 +84,7 @@ class PreviouslyRegisteredPageSpec extends SpecBase with PageBehaviours {
                 .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("123", None)).success.value
 
             PreviouslyRegisteredPage.navigate(CheckMode, answers)
-              .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+              .mustEqual(prevRegRoutes.AddPreviousRegistrationController.onPageLoad(CheckMode))
           }
         }
 
