@@ -573,7 +573,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               val result = route(application, request).value
 
               status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(AmendMode, Index(0)).url
+              redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(AmendMode).url
             }
           }
         }

@@ -680,7 +680,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
               val result = route(application, request).value
 
               status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.PreviousEuCountryController.onPageLoad(RejoinMode, Index(0)).url
+              redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.PreviouslyRegisteredController.onPageLoad(RejoinMode).url
             }
           }
         }
