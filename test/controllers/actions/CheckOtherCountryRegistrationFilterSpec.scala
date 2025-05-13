@@ -134,7 +134,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2022, 10, 10)))
+            val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -145,6 +145,34 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             result mustBe Some(Redirect(controllers.routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
               expectedMatch.memberState, expectedMatch.exclusionEffectiveDate.get.toString).url))
+          }
+        }
+
+        "must not redirect when the exclusionEffectiveDate is past quarantined cut off date" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val exclusionDate = LocalDate.now.minusYears(2).minusDays(1)
+
+            val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(exclusionDate))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe None
           }
         }
       }
@@ -164,7 +192,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2022, 10, 10)))
+            val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -175,6 +203,34 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             result mustBe Some(Redirect(controllers.routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
               expectedMatch.memberState, expectedMatch.exclusionEffectiveDate.get.toString).url))
+          }
+        }
+
+        "must not redirect when the exclusionEffectiveDate is past quarantined cut off date" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val exclusionDate = LocalDate.now.minusYears(2).minusDays(1)
+
+            val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(exclusionDate))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe None
           }
         }
       }
@@ -195,7 +251,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
           running(app) {
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
-              exclusionEffectiveDate = Some(LocalDate.of(2022, 10, 10)), exclusionStatusCode = Some(4))
+              exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)), exclusionStatusCode = Some(4))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -206,6 +262,34 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             result mustBe Some(Redirect(controllers.routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
               expectedMatch.memberState, expectedMatch.exclusionEffectiveDate.get.toString).url))
+          }
+        }
+
+        "must not redirect when the exclusionEffectiveDate is past quarantined cut off date" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val exclusionDate = LocalDate.now.minusYears(2).minusDays(1)
+
+            val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID, exclusionEffectiveDate = Some(exclusionDate))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe None
           }
         }
       }
