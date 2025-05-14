@@ -28,14 +28,15 @@ import services.CoreRegistrationValidationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import java.time.LocalDate
+import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckOtherCountryRegistrationFilterImpl @Inject()(
                                                          mode: Option[Mode],
                                                          service: CoreRegistrationValidationService,
-                                                         appConfig: FrontendAppConfig
+                                                         appConfig: FrontendAppConfig,
+                                                         clock: Clock
                                                        )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
@@ -67,7 +68,7 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
             activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
             activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
           val effectiveDate = getEffectiveDate(activeMatch)
-          val quarantineCutOffDate = LocalDate.now.minusYears(2)
+          val quarantineCutOffDate = LocalDate.now(clock).minusYears(2)
           if (effectiveDate.isAfter(quarantineCutOffDate)) {
             Some(Redirect(
               routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, effectiveDate.toString)
@@ -86,9 +87,10 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
 class CheckOtherCountryRegistrationFilter @Inject()(
                                                      service: CoreRegistrationValidationService,
-                                                     appConfig: FrontendAppConfig
+                                                     appConfig: FrontendAppConfig,
+                                                     clock: Clock
                                                    )(implicit val executionContext: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = {
-    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig)
+    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig, clock)
   }
 }

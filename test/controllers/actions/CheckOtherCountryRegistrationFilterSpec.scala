@@ -51,7 +51,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
   )
 
   class Harness(service: CoreRegistrationValidationService, appConfig: FrontendAppConfig) extends
-    CheckOtherCountryRegistrationFilterImpl(None, service, appConfig) {
+    CheckOtherCountryRegistrationFilterImpl(None, service, appConfig, stubClockAtArbitraryDate) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -161,7 +161,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val exclusionDate = LocalDate.now.minusYears(2).minusDays(1)
+            val exclusionDate = LocalDate.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(exclusionDate))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
@@ -219,7 +219,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val exclusionDate = LocalDate.now.minusYears(2).minusDays(1)
+            val exclusionDate = LocalDate.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(exclusionDate))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
@@ -278,7 +278,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val exclusionDate = LocalDate.now.minusYears(2).minusDays(1)
+            val exclusionDate = LocalDate.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
 
             val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID, exclusionEffectiveDate = Some(exclusionDate))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
