@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
 import models.{AmendMode, Mode, RejoinMode}
-import models.core.MatchType
+import models.core.{Match, MatchType}
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
@@ -28,13 +28,15 @@ import services.CoreRegistrationValidationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import java.time.{Clock, LocalDate}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckOtherCountryRegistrationFilterImpl @Inject()(
                                                          mode: Option[Mode],
                                                          service: CoreRegistrationValidationService,
-                                                         appConfig: FrontendAppConfig
+                                                         appConfig: FrontendAppConfig,
+                                                         clock: Clock
                                                        )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
@@ -44,6 +46,16 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     implicit val req: AuthenticatedDataRequest[A] = request
+
+    def getEffectiveDate(activeMatch: Match) = {
+      activeMatch.exclusionEffectiveDate match {
+        case Some(date) => date
+        case _ =>
+          val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
+          logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
+          throw e
+      }
+    }
 
     if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode) || !mode.contains(RejoinMode)) {
       service.searchUkVrn(request.vrn).map {
@@ -55,15 +67,15 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
           if activeMatch.exclusionStatusCode.contains(exclusionStatusCode) ||
             activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
             activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
-          Some(Redirect(
-            routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
-              case Some(date) => date.toString
-              case _ =>
-                val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
-                logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
-                throw e
-            })
-          ))
+          val effectiveDate = getEffectiveDate(activeMatch)
+          val quarantineCutOffDate = LocalDate.now(clock).minusYears(2)
+          if (effectiveDate.isAfter(quarantineCutOffDate)) {
+            Some(Redirect(
+              routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, effectiveDate.toString)
+            ))
+          } else {
+            None
+          }
 
         case _ => None
       }
@@ -75,9 +87,10 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
 class CheckOtherCountryRegistrationFilter @Inject()(
                                                      service: CoreRegistrationValidationService,
-                                                     appConfig: FrontendAppConfig
+                                                     appConfig: FrontendAppConfig,
+                                                     clock: Clock
                                                    )(implicit val executionContext: ExecutionContext) {
   def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = {
-    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig)
+    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig, clock)
   }
 }
