@@ -3,8 +3,8 @@ import sbt.*
 object AppDependencies {
   import play.core.PlayVersion
 
-  private val bootstrapVersion = "9.13.0"
-  private val hmrcMongoVersion = "2.6.0"
+  private val bootstrapVersion = "9.18.0"
+  private val hmrcMongoVersion = "2.7.0"
 
   val compile = Seq(
     play.sbt.PlayImport.ws,
@@ -20,9 +20,9 @@ object AppDependencies {
     "org.scalatest"           %% "scalatest"               % "3.2.19",
     "org.scalatestplus"       %% "scalacheck-1-15"         % "3.2.11.0",
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"  % bootstrapVersion,
-    "org.scalatestplus.play"  %% "scalatestplus-play"      % "7.0.1",
+    "org.scalatestplus.play"  %% "scalatestplus-play"      % "7.0.2",
     "org.pegdown"             %  "pegdown"                 % "1.6.0",
-    "org.jsoup"               %  "jsoup"                   % "1.18.3",
+    "org.jsoup"               %  "jsoup"                   % "1.21.1",
     "org.playframework"       %% "play-test"               % PlayVersion.current,
     "org.scalacheck"          %% "scalacheck"              % "1.18.1",
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30" % hmrcMongoVersion,
