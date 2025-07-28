@@ -22,7 +22,7 @@ import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
 import models.domain.PreviousSchemeNumbers
-import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
+import models.previousRegistrations.IossRegistrationNumberValidation
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode, PreviousScheme, RejoinMode}
 import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
@@ -54,7 +54,7 @@ class PreviousIossNumberController @Inject()(
 
         getHasIntermediary(mode, countryIndex, schemeIndex) { hasIntermediary =>
 
-          val form = formProvider(country, hasIntermediary)
+          val form = formProvider(country)
 
           val preparedForm = request.userAnswers.get(PreviousIossNumberPage(countryIndex, schemeIndex)) match {
             case None => form
@@ -62,7 +62,7 @@ class PreviousIossNumberController @Inject()(
           }
 
           Future.successful(Ok(view(
-            preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
+            preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country))))
         }
       }
   }
@@ -74,12 +74,12 @@ class PreviousIossNumberController @Inject()(
         getHasIntermediary(mode, countryIndex, schemeIndex) { hasIntermediary =>
           getPreviousScheme(mode, countryIndex, schemeIndex) { previousScheme =>
 
-            val form = formProvider(country, hasIntermediary)
+            val form = formProvider(country)
 
             form.bindFromRequest().fold(
               formWithErrors =>
                 Future.successful(BadRequest(
-                  view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
+                  view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country)))),
               value => {
                 lazy val defaultResult: Future[Result] = saveAndRedirect(countryIndex, schemeIndex, value, mode)
 
@@ -149,12 +149,6 @@ class PreviousIossNumberController @Inject()(
   private def getIossHintText(country: Country): String = {
     IossRegistrationNumberValidation.euCountriesWithIOSSValidationRules.filter(_.country == country).head match {
       case countryWithIossValidation => countryWithIossValidation.messageInput
-    }
-  }
-
-  private def getIntermediaryHintText(country: Country): String = {
-    IntermediaryIdentificationNumberValidation.euCountriesWithIntermediaryValidationRules.filter(_.country == country).head match {
-      case countryWithIntermediaryValidation => countryWithIntermediaryValidation.messageInput
     }
   }
 }
