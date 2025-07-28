@@ -21,7 +21,6 @@ object AppDependencies {
     "org.scalatestplus"       %% "scalacheck-1-15"         % "3.2.11.0",
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"  % bootstrapVersion,
     "org.scalatestplus.play"  %% "scalatestplus-play"      % "7.0.2",
-    "org.pegdown"             %  "pegdown"                 % "1.6.0",
     "org.jsoup"               %  "jsoup"                   % "1.21.1",
     "org.playframework"       %% "play-test"               % PlayVersion.current,
     "org.scalacheck"          %% "scalacheck"              % "1.18.1",
