@@ -31,38 +31,7 @@ class PreviousIossRegistrationNumberFormProviderSpec extends OptionFieldBehaviou
 
     val fieldName = "previousSchemeNumber"
 
-    val form = new PreviousIossRegistrationNumberFormProvider()(country, false)
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-  }
-
-  ".previousIntermediaryNumber as optional field" - {
-
-    val requiredKey = "previousIntermediaryNumber.error.invalid"
-
-    val fieldName = "previousIntermediaryNumber"
-
-    val form = new PreviousIossRegistrationNumberFormProvider()(country, false)
-
-    behave like optionsField(
-      form,
-      fieldName,
-      Seq("IN0401234567"),
-      invalidError = FormError(fieldName, requiredKey)
-    )
-  }
-
-  ".previousIntermediaryNumber as mandatory field" - {
-
-    val requiredKey = "previousIossNumber.error.intermediaryNumber.required"
-
-    val fieldName = "previousIntermediaryNumber"
-
-    val form = new PreviousIossRegistrationNumberFormProvider()(country, true)
+    val form = new PreviousIossRegistrationNumberFormProvider()(country)
 
     behave like mandatoryField(
       form,
