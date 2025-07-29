@@ -57,7 +57,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
   private def getRegistrationService =
     new RegistrationValidationService(mockDateService, mockRegistrationService)
-    
+
   private val nonCompliantDetails: NonCompliantDetails = NonCompliantDetails(nonCompliantReturns = Some(1), nonCompliantPayments = Some(1))
 
   private val answersPartOfVatGroup =
@@ -134,10 +134,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(EuTaxReferencePage(Index(4)), "DK12345678").success.value
       .set(FixedEstablishmentTradingNamePage(Index(4)), "Danish trading name").success.value
       .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
-
-  override def beforeEach(): Unit = {
-    Mockito.reset(mockRegistrationService)
-  }
 
   "fromUserAnswers" - {
 
@@ -312,7 +308,9 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           previousRegistrations = Seq.empty,
           euRegistrations = Seq(
             EuVatRegistration(Country("FR", "France"), "FRAA123456789")
-          )
+          ),
+          nonCompliantReturns = None,
+          nonCompliantPayments = None,
         )
       }
       result mustEqual Valid(expectedRegistration)
@@ -988,7 +986,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
             vatDetails = RegistrationData.registration.vatDetails,
             commencementDate = arbitraryDate
           )
-          
+
           val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
           result mustEqual Valid(expectedRegistration)

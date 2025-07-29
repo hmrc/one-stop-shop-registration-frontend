@@ -18,9 +18,10 @@ package services
 
 import cats.implicits.*
 import models.domain.*
+import models.previousRegistrations.NonCompliantDetails
 import models.{Country, DataMissingError, Index, PreviousScheme, UserAnswers, ValidationResult}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
-import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, AllPreviousSchemesRawQuery}
+import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, AllPreviousSchemesRawQuery, NonCompliantDetailsQuery}
 
 trait PreviousRegistrationsValidations {
 
@@ -97,9 +98,19 @@ trait PreviousRegistrationsValidations {
   private def processPreviousSchemes(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[PreviousSchemeDetails] = {
     (
       getPreviousScheme(answers, countryIndex, schemeIndex),
-      getPreviousSchemeNumber(answers, countryIndex, schemeIndex)
-    ).mapN((previousScheme, previousSchemeNumber) =>
-      PreviousSchemeDetails(previousScheme, previousSchemeNumber, None)
+      getPreviousSchemeNumber(answers, countryIndex, schemeIndex),
+      getNonCompliantDetails(answers, countryIndex, schemeIndex)
+    ).mapN((previousScheme, previousSchemeNumber, nonCompliantDetails) =>
+      PreviousSchemeDetails(previousScheme, previousSchemeNumber, nonCompliantDetails)
     )
+  }
+  
+  private def getNonCompliantDetails(answers: UserAnswers, countryIndex: Index, schemeIndex: Index): ValidationResult[Option[NonCompliantDetails]] = {
+    answers.get(NonCompliantDetailsQuery(countryIndex, schemeIndex)) match {
+      case Some(nonCompliantDetails) =>
+        Some(nonCompliantDetails).validNec
+      case None =>
+        None.validNec
+    }
   }
 }
