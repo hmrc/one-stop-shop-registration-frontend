@@ -65,8 +65,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
                   } else {
                     PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country, Seq.empty, mode)
                   },
-                  PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
-                  PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
+                  PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
                 ).flatten
               )
             }
@@ -99,8 +98,7 @@ class CheckPreviousSchemeAnswersController @Inject()(
                 } else {
                   PreviousSchemeSummary.row(request.userAnswers, index, Index(schemeIndex), country,  Seq.empty, mode)
                 },
-                PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex)),
-                PreviousIntermediaryNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
+                PreviousSchemeNumberSummary.row(request.userAnswers, index, Index(schemeIndex))
               ).flatten
             )
           }
