@@ -22,8 +22,10 @@ import cats.data.Validated.{Invalid, Valid}
 import models.*
 import models.domain.*
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
+import models.previousRegistrations.NonCompliantDetails
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,7 +34,7 @@ import pages.euDetails.*
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import queries.previousRegistration.AllPreviousRegistrationsRawQuery
+import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, NonCompliantDetailsQuery}
 import queries.{AllEuDetailsRawQuery, AllTradingNames, AllWebsites}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -55,6 +57,8 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
   private def getRegistrationService =
     new RegistrationValidationService(mockDateService, mockRegistrationService)
+    
+  private val nonCompliantDetails: NonCompliantDetails = NonCompliantDetails(nonCompliantReturns = Some(1), nonCompliantPayments = Some(1))
 
   private val answersPartOfVatGroup =
     UserAnswers("id",
@@ -100,6 +104,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
       .set(PreviousSchemePage(Index(0), Index(0)), PreviousScheme.OSSU).success.value
       .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers("DE123", None)).success.value
+      .set(NonCompliantDetailsQuery(Index(0), Index(0)), nonCompliantDetails).success.value
       .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
       .set(IsOnlineMarketplacePage, false).success.value
 
@@ -130,6 +135,9 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(FixedEstablishmentTradingNamePage(Index(4)), "Danish trading name").success.value
       .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
 
+  override def beforeEach(): Unit = {
+    Mockito.reset(mockRegistrationService)
+  }
 
   "fromUserAnswers" - {
 
@@ -980,7 +988,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
             vatDetails = RegistrationData.registration.vatDetails,
             commencementDate = arbitraryDate
           )
-
+          
           val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
           result mustEqual Valid(expectedRegistration)

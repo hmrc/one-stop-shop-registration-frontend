@@ -18,6 +18,7 @@ package testutils
 
 import generators.Generators
 import models.domain.*
+import models.previousRegistrations.NonCompliantDetails
 import models.{BankDetails, Bic, BusinessContactDetails, Country, DesAddress, Iban, InternationalAddress, PreviousScheme}
 import org.scalatest.EitherValues
 import uk.gov.hmrc.domain.Vrn
@@ -92,7 +93,13 @@ object RegistrationData extends Generators with EitherValues {
           previousSchemesDetails = Seq(
             PreviousSchemeDetails(
               previousScheme = PreviousScheme.OSSU,
-              previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
+              previousSchemeNumbers = PreviousSchemeNumbers("DE123", None),
+              nonCompliantDetails = Some(
+                NonCompliantDetails(
+                  nonCompliantReturns = Some(1),
+                  nonCompliantPayments = Some(1)
+                )
+              )
             )
           )
         )
@@ -101,7 +108,9 @@ object RegistrationData extends Generators with EitherValues {
       isOnlineMarketplace = false,
       niPresence = Some(PrincipalPlaceOfBusinessInNi),
       dateOfFirstSale = Some(LocalDate.now()),
-      unusableStatus = None
+      unusableStatus = None,
+      nonCompliantReturns = Some("1"),
+      nonCompliantPayments = Some("1")
     )
 
 

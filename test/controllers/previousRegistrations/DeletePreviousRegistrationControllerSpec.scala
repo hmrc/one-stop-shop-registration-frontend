@@ -46,7 +46,7 @@ class DeletePreviousRegistrationControllerSpec extends SpecBase with MockitoSuga
   private val index1 = Index(1)
   private val country = Country.euCountries.head
   private val previousSchemeNumbers = PreviousSchemeNumbers("VAT Number", None)
-  private val previousScheme = PreviousSchemeDetails(PreviousScheme.OSSU, previousSchemeNumbers)
+  private val previousScheme = PreviousSchemeDetails(PreviousScheme.OSSU, previousSchemeNumbers, nonCompliantDetails = None)
   private val previousRegistration = PreviousRegistrationDetails(country, List(previousScheme))
 
   private lazy val deletePreviousRegistrationRoute = prevRoutes.DeletePreviousRegistrationController.onPageLoad(NormalMode, index).url

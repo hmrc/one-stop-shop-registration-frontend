@@ -16,8 +16,8 @@
 
 package services
 
-import cats.implicits._
-import models.domain._
+import cats.implicits.*
+import models.domain.*
 import models.{Country, DataMissingError, Index, PreviousScheme, UserAnswers, ValidationResult}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage, PreviouslyRegisteredPage}
 import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, AllPreviousSchemesRawQuery}
@@ -53,7 +53,7 @@ trait PreviousRegistrationsValidations {
     (
       getPreviousCountry(answers, index),
       getPreviousSchemes(answers, index)
-      ).mapN((previousCountry, previousSchemes) =>
+    ).mapN((previousCountry, previousSchemes) =>
       PreviousRegistrationNew(previousCountry, previousSchemes)
     )
   }
@@ -98,9 +98,8 @@ trait PreviousRegistrationsValidations {
     (
       getPreviousScheme(answers, countryIndex, schemeIndex),
       getPreviousSchemeNumber(answers, countryIndex, schemeIndex)
-      ).mapN((previousScheme, previousSchemeNumber) =>
-      PreviousSchemeDetails(previousScheme, previousSchemeNumber)
+    ).mapN((previousScheme, previousSchemeNumber) =>
+      PreviousSchemeDetails(previousScheme, previousSchemeNumber, None)
     )
   }
-
 }

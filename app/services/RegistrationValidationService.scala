@@ -20,9 +20,11 @@ import cats.implicits.*
 import logging.Logging
 import models.*
 import models.domain.*
+import models.previousRegistrations.NonCompliantDetails
 import models.requests.AuthenticatedDataRequest
 import pages.*
 import queries.*
+import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.domain.Vrn
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -56,6 +58,7 @@ class RegistrationValidationService @Inject()(
         getBankDetails(answers),
         getOnlineMarketplace(answers),
         getNiPresence(answers),
+        getNonCompliantDetails(answers)
       ).mapN(
         (
           name,
@@ -68,7 +71,8 @@ class RegistrationValidationService @Inject()(
           previousRegistrations,
           bankDetails,
           isOnlineMarketplace,
-          niPresence
+          niPresence,
+          nonCompliantDetails
         ) =>
           Registration(
             vrn = vrn,
@@ -83,13 +87,15 @@ class RegistrationValidationService @Inject()(
             bankDetails = bankDetails,
             isOnlineMarketplace = isOnlineMarketplace,
             niPresence = niPresence,
-            dateOfFirstSale = answers.get(DateOfFirstSalePage)
+            dateOfFirstSale = answers.get(DateOfFirstSalePage),
+            nonCompliantReturns = nonCompliantDetails.flatMap(_.nonCompliantReturns.map(_.toString)),
+            nonCompliantPayments = nonCompliantDetails.flatMap(_.nonCompliantPayments.map(_.toString))
           )
       )
     }
   }
 
-  private def getCompanyName(answers: UserAnswers): ValidationResult[String] =
+  private def getCompanyName(answers: UserAnswers): ValidationResult[String] = {
     answers.vatInfo match {
       case Some(vatInfo) =>
         vatInfo.organisationName match {
@@ -102,6 +108,7 @@ class RegistrationValidationService @Inject()(
         }
       case _ => DataMissingError(CheckVatDetailsPage).invalidNec
     }
+  }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
     answers.get(HasTradingNamePage) match {
@@ -161,19 +168,21 @@ class RegistrationValidationService @Inject()(
 
   }
 
-  private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] =
+  private def getContactDetails(answers: UserAnswers): ValidationResult[BusinessContactDetails] = {
     answers.get(BusinessContactDetailsPage) match {
       case Some(details) => details.validNec
       case None => DataMissingError(BusinessContactDetailsPage).invalidNec
     }
+  }
 
-  private def getBankDetails(answers: UserAnswers): ValidationResult[BankDetails] =
+  private def getBankDetails(answers: UserAnswers): ValidationResult[BankDetails] = {
     answers.get(BankDetailsPage) match {
       case Some(bankDetails) => bankDetails.validNec
       case None => DataMissingError(BankDetailsPage).invalidNec
     }
+  }
 
-  private def getWebsites(answers: UserAnswers): ValidationResult[List[String]] =
+  private def getWebsites(answers: UserAnswers): ValidationResult[List[String]] = {
     answers.get(HasWebsitePage) match {
       case Some(true) =>
         answers.get(AllWebsites) match {
@@ -190,14 +199,16 @@ class RegistrationValidationService @Inject()(
       case None =>
         DataMissingError(HasWebsitePage).invalidNec
     }
+  }
 
-  private def getOnlineMarketplace(answers: UserAnswers): ValidationResult[Boolean] =
+  private def getOnlineMarketplace(answers: UserAnswers): ValidationResult[Boolean] = {
     answers.get(IsOnlineMarketplacePage) match {
       case Some(answer) => answer.validNec
       case None => DataMissingError(IsOnlineMarketplacePage).invalidNec
     }
+  }
 
-  private def getNiPresence(answers: UserAnswers): ValidationResult[Option[NiPresence]] =
+  private def getNiPresence(answers: UserAnswers): ValidationResult[Option[NiPresence]] = {
     answers.get(BusinessBasedInNiPage) match {
       case Some(true) =>
         Some(PrincipalPlaceOfBusinessInNi).validNec
@@ -220,5 +231,27 @@ class RegistrationValidationService @Inject()(
       case None =>
         None.validNec
     }
+  }
 
+  private def getNonCompliantDetails(answers: UserAnswers): ValidationResult[Option[NonCompliantDetails]] = {
+    answers.get(AllPreviousRegistrationsQuery) match {
+      case None =>
+        None.validNec
+
+      case Some(allPreviousRegistrations) =>
+        val maybeNonCompliantDetails = allPreviousRegistrations
+          .flatMap(_.previousSchemesDetails)
+          .flatMap(_.nonCompliantDetails)
+
+        maybeNonCompliantDetails match {
+          case Nil =>
+            None.validNec
+          case nonCompliantDetailsList =>
+            Some(nonCompliantDetailsList.maxBy { nonCompliantDetails =>
+              nonCompliantDetails.nonCompliantReturns.getOrElse(0) +
+                nonCompliantDetails.nonCompliantPayments.getOrElse(0)
+            }).validNec
+        }
+    }
+  }
 }

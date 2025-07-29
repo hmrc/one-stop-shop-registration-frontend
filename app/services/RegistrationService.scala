@@ -18,14 +18,14 @@ package services
 
 import connectors.returns.VatReturnConnector
 import logging.Logging
-import models._
-import models.domain.{PreviousSchemeNumbers, _}
-import models.euDetails._
+import models.*
+import models.domain.*
+import models.euDetails.*
 import models.previousRegistrations.PreviousRegistrationDetails
 import models.requests.AuthenticatedDataRequest
-import pages._
-import pages.euDetails._
-import pages.previousRegistrations._
+import pages.*
+import pages.euDetails.*
+import pages.previousRegistrations.*
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import queries.{AllEuOptionalDetailsQuery, AllTradingNames, AllWebsites}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -205,7 +205,9 @@ class RegistrationService @Inject()(
                   PreviousSchemeNumbers(
                     previousSchemesDetails.previousSchemeNumbers.previousSchemeNumber,
                     previousSchemesDetails.previousSchemeNumbers.previousIntermediaryNumber
-                  ))
+                  ),
+                None
+              )
           }.toList
         )
       case legacyPreviousRegistration: PreviousRegistrationLegacy =>
@@ -216,7 +218,8 @@ class RegistrationService @Inject()(
             previousSchemeNumbers = PreviousSchemeNumbers(
               previousSchemeNumber = legacyPreviousRegistration.vatNumber,
               previousIntermediaryNumber = None
-            )
+            ),
+            None
           ))
         )
     }
@@ -315,7 +318,7 @@ class RegistrationService @Inject()(
           Try(hasMadeSalesUA)
       }
       firstEligibleSaleUA <-
-          Try(dateOfFirstSaleUA)
+        Try(dateOfFirstSaleUA)
 
     } yield firstEligibleSaleUA
   }
@@ -355,7 +358,6 @@ class RegistrationService @Inject()(
         Future.successful(true)
     }
   }
-
 
 
   def getLastPossibleDateOfFirstSale(maybeRegistration: Option[Registration])(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[LocalDate]] = {
