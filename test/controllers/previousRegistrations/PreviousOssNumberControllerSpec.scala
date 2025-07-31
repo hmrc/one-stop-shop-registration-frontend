@@ -19,24 +19,24 @@ package controllers.previousRegistrations
 import base.SpecBase
 import connectors.RegistrationConnector
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme, RejoinMode}
 import models.core.{Match, MatchType}
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.PreviousSchemeHintText
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme, RejoinMode}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousOssNumberPage, PreviousSchemePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.{CoreRegistrationValidationService, RejoinRegistrationService}
 import testutils.RegistrationData.registration
+import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousOssNumberView
 
 import java.time.LocalDate
-import scala.concurrent.Future
 
 class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
@@ -64,8 +64,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[PreviousOssNumberView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, index, index, countryWithValidation,
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form, NormalMode, index, index, countryWithValidation,
           PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
@@ -83,8 +83,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, index, index,
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(form.fill("answer"), NormalMode, index, index,
           countryWithValidation, PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
@@ -96,9 +96,9 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -116,8 +116,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
             .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("EU123456789", None)).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.OSSNU).success.value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
@@ -127,9 +127,9 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(None)
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -147,16 +147,15 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
             .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("SI12345678", None)).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.OSSU).success.value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
           verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
         }
       }
-
-
     }
 
     "when other country validation is enabled" - {
+
       val genericMatch = Match(
         MatchType.TraderIdActiveNETP,
         "IM0987654321",
@@ -176,8 +175,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Some(genericMatch))
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Some(genericMatch).toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -195,8 +194,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(NormalMode, countryCode, index, index).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(NormalMode, countryCode, index, index).url
           verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())(any(), any())
         }
       }
@@ -207,9 +206,9 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockRegistrationConnector = mock[RegistrationConnector]
         val mockRejoinRegistrationService = mock[RejoinRegistrationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Some(genericMatch))
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Some(genericMatch).toFuture
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
         when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
 
         val application =
@@ -230,8 +229,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(
             genericMatch.memberState).url
         }
       }
@@ -241,9 +240,9 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+          Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)).toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -261,7 +260,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result) `mustBe` SEE_OTHER
           verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())(any(), any())
         }
       }
@@ -272,10 +271,10 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockRegistrationConnector = mock[RegistrationConnector]
         val mockRejoinRegistrationService = mock[RejoinRegistrationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
-        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
+          Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)).toFuture
+        when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
         when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
 
         val application =
@@ -296,9 +295,45 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
             genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString).url
+        }
+      }
+
+      "save and redirect to the next page when non-compliant details populated" in {
+
+        val genericMatchWithNonCompliantDetails = genericMatch.copy(
+          matchType = MatchType.TransferringMSID,
+          nonCompliantReturns = Some(1),
+          nonCompliantPayments = Some(1),
+        )
+
+        val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
+        val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
+
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Some(genericMatchWithNonCompliantDetails).toFuture
+
+        val application =
+          applicationBuilder(userAnswers = Some(baseAnswers))
+            .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
+            .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, previousOssNumberRoute)
+              .withFormUrlEncodedBody(("value", "SI12345678"))
+
+          val result = route(application, request).value
+
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` controllers.previousRegistrations.routes.CheckPreviousSchemeAnswersController.onPageLoad(NormalMode, index).url
+          verify(mockCoreRegistrationValidationService, times(1)).searchScheme(any(), any(), any(), any())(any(), any())
         }
       }
 
@@ -307,9 +342,9 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
         val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
         val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+          Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)).toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -330,8 +365,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
             .set(PreviousOssNumberPage(index, index), PreviousSchemeNumbers("EU123456789", None)).success.value
             .set(PreviousSchemePage(index, index), PreviousScheme.OSSNU).success.value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` PreviousOssNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
           verify(mockCoreRegistrationValidationService, times(0)).searchScheme(any(), any(), any(), any())(any(), any())
         }
 
@@ -353,8 +388,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, countryWithValidation,
+        status(result) `mustBe` BAD_REQUEST
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, index, index, countryWithValidation,
           PreviousSchemeHintText.Both)(request, messages(application)).toString
       }
     }
@@ -368,8 +403,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -382,8 +417,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -398,8 +433,8 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

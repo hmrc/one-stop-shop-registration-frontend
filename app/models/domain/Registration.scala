@@ -44,7 +44,9 @@ final case class Registration(
                                exclusionDetails: Option[ExclusionDetails] = None,
                                excludedTrader: Option[ExcludedTrader] = None,
                                rejoin: Option[Boolean] = None,
-                               unusableStatus: Option[Boolean] = None
+                               unusableStatus: Option[Boolean] = None,
+                               nonCompliantReturns: Option[String] = None,
+                               nonCompliantPayments: Option[String] = None
                              )
 
 object Registration {
@@ -68,7 +70,9 @@ object Registration {
       (__ \ "exclusionDetails").readNullable[ExclusionDetails] and
       (__ \ "excludedTrader").readNullable[ExcludedTrader] and
       (__ \ "rejoin").readNullable[Boolean] and
-      (__ \ "unusableStatus").readNullable[Boolean]
+      (__ \ "unusableStatus").readNullable[Boolean] and
+      (__ \ "nonCompliantReturns").readNullable[String] and
+      (__ \ "nonCompliantPayments").readNullable[String]
     )(Registration.apply _)
 
   implicit val writes: Writes[Registration] = Json.writes[Registration]
@@ -91,7 +95,9 @@ object Registration {
             exclusionDetails: Option[ExclusionDetails] = None,
             excludedTrader: Option[ExcludedTrader] = None,
             rejoin: Option[Boolean] = None,
-            unusableStatus: Option[Boolean] = None
+            unusableStatus: Option[Boolean] = None,
+            nonCompliantReturns: Option[String] = None,
+            nonCompliantPayments: Option[String] = None
            ): Registration = new Registration(
     vrn,
     normaliseSpaces(registeredCompanyName),
@@ -111,7 +117,9 @@ object Registration {
     exclusionDetails,
     excludedTrader,
     rejoin = rejoin,
-    unusableStatus
+    unusableStatus,
+    nonCompliantReturns,
+    nonCompliantPayments
   )
 
 }

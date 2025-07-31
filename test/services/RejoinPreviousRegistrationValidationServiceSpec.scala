@@ -65,7 +65,10 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
   )
 
   private val previousRegistrationNew: PreviousRegistrationNew =
-    PreviousRegistrationNew(Country("AT", "Austria"), Seq(PreviousSchemeDetails(PreviousScheme.OSSU, PreviousSchemeNumbers("123", None))))
+    PreviousRegistrationNew(
+      Country("AT", "Austria"),
+      Seq(PreviousSchemeDetails(PreviousScheme.OSSU, PreviousSchemeNumbers("123", None), nonCompliantDetails = None))
+    )
 
   override def beforeEach(): Unit = {
     reset(coreRegistrationValidationService)

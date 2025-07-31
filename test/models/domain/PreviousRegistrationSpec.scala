@@ -17,6 +17,7 @@
 package models.domain
 
 import base.SpecBase
+import models.previousRegistrations.NonCompliantDetails
 import models.{Country, PreviousScheme}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -40,6 +41,10 @@ class PreviousRegistrationSpec extends SpecBase with Matchers with ScalaCheckPro
             "previousScheme" -> "ossu",
             "previousSchemeNumbers" -> Json.obj(
               "previousSchemeNumber" -> "DE123"
+            ),
+            "nonCompliantDetails" -> Json.obj(
+              "nonCompliantReturns" -> 1,
+              "nonCompliantPayments" -> 1
             )
           )
         )
@@ -49,8 +54,13 @@ class PreviousRegistrationSpec extends SpecBase with Matchers with ScalaCheckPro
         country = Country("DE", "Germany"),
         previousSchemesDetails = Seq(PreviousSchemeDetails(
           previousScheme = PreviousScheme.OSSU,
-          previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
-        ))
+          previousSchemeNumbers = PreviousSchemeNumbers("DE123", None),
+          nonCompliantDetails = Some(NonCompliantDetails(
+            nonCompliantReturns = Some(1),
+            nonCompliantPayments = Some(1)
+          ))
+        )
+        )
       )
 
       Json.toJson(expectedResult) mustBe json
@@ -104,6 +114,10 @@ class PreviousRegistrationSpec extends SpecBase with Matchers with ScalaCheckPro
             "previousScheme" -> "ossu",
             "previousSchemeNumbers" -> Json.obj(
               "previousSchemeNumber" -> "DE123"
+            ),
+            "nonCompliantDetails" -> Json.obj(
+              "nonCompliantReturns" -> 1,
+              "nonCompliantPayments" -> 1
             )
           )
         )
@@ -113,7 +127,11 @@ class PreviousRegistrationSpec extends SpecBase with Matchers with ScalaCheckPro
         country = Country("DE", "Germany"),
         previousSchemesDetails = Seq(PreviousSchemeDetails(
           previousScheme = PreviousScheme.OSSU,
-          previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
+          previousSchemeNumbers = PreviousSchemeNumbers("DE123", None),
+          nonCompliantDetails = Some(NonCompliantDetails(
+            nonCompliantReturns = Some(1),
+            nonCompliantPayments = Some(1)
+          ))
         ))
       )
 
@@ -232,12 +250,20 @@ class PreviousRegistrationSpec extends SpecBase with Matchers with ScalaCheckPro
         "previousScheme" -> "ossu",
         "previousSchemeNumbers" -> Json.obj(
           "previousSchemeNumber" -> "DE123"
+        ),
+        "nonCompliantDetails" -> Json.obj(
+          "nonCompliantReturns" -> 1,
+          "nonCompliantPayments" -> 1
         )
       )
 
       val expectedResult = PreviousSchemeDetails(
         previousScheme = PreviousScheme.OSSU,
-        previousSchemeNumbers = PreviousSchemeNumbers("DE123", None)
+        previousSchemeNumbers = PreviousSchemeNumbers("DE123", None),
+        nonCompliantDetails = Some(NonCompliantDetails(
+          nonCompliantReturns = Some(1),
+          nonCompliantPayments = Some(1)
+        ))
       )
 
       Json.toJson(expectedResult) mustBe json

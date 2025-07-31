@@ -99,7 +99,7 @@ class AddEuDetailsController @Inject()(
   }
 
   private def getNumberOfEuCountries(mode: Mode)(block: Int => Future[Result])
-                                    (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
+                                     (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
     request.userAnswers.get(DeriveNumberOfEuRegistrations).map {
       number =>
         block(number)

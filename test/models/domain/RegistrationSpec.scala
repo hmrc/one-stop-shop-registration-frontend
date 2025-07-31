@@ -22,7 +22,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.time.LocalDateTime
 
@@ -154,6 +154,10 @@ class RegistrationSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
                    |      "previousScheme": "ossu",
                    |      "previousSchemeNumbers": {
                    |        "previousSchemeNumber": "DE123"
+                   |      },
+                   |      "nonCompliantDetails": {
+                   |        "nonCompliantReturns": 1,
+                   |        "nonCompliantPayments": 1
                    |      }
                    |    } ]
                    |  } ],
