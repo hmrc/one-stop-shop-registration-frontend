@@ -473,9 +473,7 @@ previousIossScheme.error.required = Select yes if this was with intermediary
 previousIossScheme.change.hidden = if this was with intermediary
 
 previousIossNumber.title = Enter your IOSS registration number for {0}
-previousIossNumber.titleWithIntermediary = Enter your IOSS registration number for {0}
 previousIossNumber.heading = Enter your IOSS registration number for {0}
-previousIossNumber.headingWithIntermediary = Enter your IOSS registration number for {0}
 previousIossNumber.iossNumber = IOSS number
 previousIossNumber.iossNumber.hint = {0}
 previousIossNumber.checkYourAnswersLabel = Registration number

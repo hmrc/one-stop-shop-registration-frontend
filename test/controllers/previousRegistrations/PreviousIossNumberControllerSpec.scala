@@ -74,7 +74,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, index, index, country,
-          hasIntermediary = false, ossHintText)(request, messages(application)).toString
+           ossHintText)(request, messages(application)).toString
       }
     }
 
@@ -94,7 +94,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(PreviousSchemeNumbers("answer", None)),
-          NormalMode, index, index, country, hasIntermediary = false, ossHintText)(request, messages(application)).toString
+          NormalMode, index, index, country, ossHintText)(request, messages(application)).toString
       }
     }
 
@@ -263,7 +263,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, country,
-          hasIntermediary = false, ossHintText)(request, messages(application)).toString
+          ossHintText)(request, messages(application)).toString
       }
     }
 

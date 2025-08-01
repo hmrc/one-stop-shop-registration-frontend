@@ -25,14 +25,10 @@
     button: ButtonGroup
 )
 
-@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, country: Country, hasIntermediary: Boolean, iossHintText: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, countryIndex: Index, schemeIndex: Index, country: Country, iossHintText: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle =
-    if(hasIntermediary) {
-        title(form, messages("previousIossNumber.titleWithIntermediary", country.name))
-    } else {
         title(form, messages("previousIossNumber.title", country.name))
-    }
 ) {
 
     @formHelper(action = controllers.previousRegistrations.routes.PreviousIossNumberController.onSubmit(mode, countryIndex, schemeIndex)) {
@@ -40,16 +36,9 @@
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
-
-        @if(hasIntermediary) {
-            <h1 class="govuk-heading-l">@messages("previousIossNumber.headingWithIntermediary", country.name)</h1>
-
-            <input type="hidden" name="previousScheme" id="previousScheme" value="@PreviousScheme.IOSSWI"/>
-        } else {
             <h1 class="govuk-heading-l">@messages("previousIossNumber.heading", country.name)</h1>
 
             <input type="hidden" name="previousScheme" id="previousScheme" value="@PreviousScheme.IOSSWOI"/>
-        }
 
         @govukInput(
             InputViewModel(
