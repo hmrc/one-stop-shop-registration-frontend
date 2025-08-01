@@ -55,9 +55,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
   private lazy val previousIossNumberRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(NormalMode, index, index).url
   private lazy val previousIossNumberAmendRoute = controllers.previousRegistrations.routes.PreviousIossNumberController.onPageLoad(AmendMode, index, index).url
 
-  private val hasIntermediary: Boolean = false
-
-  private val form = formProvider(country, hasIntermediary)
+  private val form = formProvider(country)
 
   private val ossHintText = "This will start with IM040 followed by 7 numbers"
 
@@ -76,7 +74,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, index, index, country,
-          hasIntermediary = false, ossHintText, "")(request, messages(application)).toString
+           ossHintText)(request, messages(application)).toString
       }
     }
 
@@ -96,7 +94,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(PreviousSchemeNumbers("answer", None)),
-          NormalMode, index, index, country, hasIntermediary = false, ossHintText, "")(request, messages(application)).toString
+          NormalMode, index, index, country, ossHintText)(request, messages(application)).toString
       }
     }
 
@@ -122,6 +120,8 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = baseAnswers.set(PreviousIossNumberPage(index, index), PreviousSchemeNumbers("IM0401234567", None)).success.value
 
+        println("XXXXX")
+        println(contentAsString(result))
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual PreviousIossNumberPage(index, index).navigate(NormalMode, expectedAnswers).url
         verify(mockSessionRepository, times(1)).set(eqTo(expectedAnswers))
@@ -263,7 +263,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, index, index, country,
-          hasIntermediary = false, ossHintText, "")(request, messages(application)).toString
+          ossHintText)(request, messages(application)).toString
       }
     }
 

@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.previousRegistration.{DeriveNumberOfPreviousSchemes, PreviousSchemeForCountryQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.getExistingRegistrationSchemes
-import viewmodels.checkAnswers.previousRegistrations.{DeletePreviousSchemeSummary, PreviousIntermediaryNumberSummary, PreviousSchemeNumberSummary}
+import viewmodels.checkAnswers.previousRegistrations.{DeletePreviousSchemeSummary, PreviousSchemeNumberSummary}
 import viewmodels.govuk.summarylist._
 import views.html.previousRegistrations.DeletePreviousSchemeView
 
@@ -55,8 +55,7 @@ class DeletePreviousSchemeController @Inject()(
             SummaryListViewModel(
               rows = Seq(
                 DeletePreviousSchemeSummary.row(request.userAnswers, countryIndex, schemeIndex),
-                PreviousSchemeNumberSummary.row(request.userAnswers, countryIndex, schemeIndex),
-                PreviousIntermediaryNumberSummary.row(request.userAnswers, countryIndex, schemeIndex)
+                PreviousSchemeNumberSummary.row(request.userAnswers, countryIndex, schemeIndex)
               ).flatten
             )
 
@@ -92,8 +91,7 @@ class DeletePreviousSchemeController @Inject()(
             SummaryListViewModel(
               rows = Seq(
                 DeletePreviousSchemeSummary.row(request.userAnswers, countryIndex, schemeIndex),
-                PreviousSchemeNumberSummary.row(request.userAnswers, countryIndex, schemeIndex),
-                PreviousIntermediaryNumberSummary.row(request.userAnswers, countryIndex, schemeIndex)
+                PreviousSchemeNumberSummary.row(request.userAnswers, countryIndex, schemeIndex)
               ).flatten
             )
 

@@ -22,10 +22,10 @@ import controllers.actions._
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
 import models.domain.PreviousSchemeNumbers
-import models.previousRegistrations.{IntermediaryIdentificationNumberValidation, IossRegistrationNumberValidation}
+import models.previousRegistrations.IossRegistrationNumberValidation
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, Mode, PreviousScheme, RejoinMode}
-import pages.previousRegistrations.{PreviousIossNumberPage, PreviousIossSchemePage, PreviousSchemePage}
+import pages.previousRegistrations.{PreviousIossNumberPage, PreviousSchemePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.CoreRegistrationValidationService
@@ -52,9 +52,7 @@ class PreviousIossNumberController @Inject()(
     implicit request =>
       getPreviousCountry(mode, countryIndex) { country =>
 
-        getHasIntermediary(mode, countryIndex, schemeIndex) { hasIntermediary =>
-
-          val form = formProvider(country, hasIntermediary)
+          val form = formProvider(country)
 
           val preparedForm = request.userAnswers.get(PreviousIossNumberPage(countryIndex, schemeIndex)) match {
             case None => form
@@ -62,24 +60,22 @@ class PreviousIossNumberController @Inject()(
           }
 
           Future.successful(Ok(view(
-            preparedForm, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country))))
+            preparedForm, mode, countryIndex, schemeIndex, country, getIossHintText(country))))
         }
-      }
   }
 
   def onSubmit(mode: Mode, countryIndex: Index, schemeIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       getPreviousCountry(mode, countryIndex) { country =>
 
-        getHasIntermediary(mode, countryIndex, schemeIndex) { hasIntermediary =>
           getPreviousScheme(mode, countryIndex, schemeIndex) { previousScheme =>
 
-            val form = formProvider(country, hasIntermediary)
+            val form = formProvider(country)
 
             form.bindFromRequest().fold(
               formWithErrors =>
                 Future.successful(BadRequest(
-                  view(formWithErrors, mode, countryIndex, schemeIndex, country, hasIntermediary, getIossHintText(country), getIntermediaryHintText(country)))),
+                  view(formWithErrors, mode, countryIndex, schemeIndex, country, getIossHintText(country)))),
               value => {
                 lazy val defaultResult: Future[Result] = saveAndRedirect(countryIndex, schemeIndex, value, mode)
 
@@ -112,7 +108,6 @@ class PreviousIossNumberController @Inject()(
               }
             )
           }
-        }
       }
   }
 
@@ -123,17 +118,6 @@ class PreviousIossNumberController @Inject()(
       _ <- cc.sessionRepository.set(updatedAnswers)
     } yield Redirect(PreviousIossNumberPage(countryIndex, schemeIndex).navigate(mode, updatedAnswers))
   }
-
-  private def getHasIntermediary(mode: Mode, countryIndex: Index, schemeIndex: Index)
-                                (block: Boolean => Future[Result])
-                                (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] =
-    request.userAnswers.get(PreviousIossSchemePage(countryIndex, schemeIndex)).map {
-      hasIntermediary =>
-        block(hasIntermediary)
-    }.getOrElse {
-      logger.error("Failed to get intermediary")
-      Redirect(determineJourneyRecovery(Some(mode))).toFuture
-    }
 
   private def getPreviousScheme(mode: Mode, countryIndex: Index, schemeIndex: Index)
                                (block: PreviousScheme => Future[Result])
@@ -149,12 +133,6 @@ class PreviousIossNumberController @Inject()(
   private def getIossHintText(country: Country): String = {
     IossRegistrationNumberValidation.euCountriesWithIOSSValidationRules.filter(_.country == country).head match {
       case countryWithIossValidation => countryWithIossValidation.messageInput
-    }
-  }
-
-  private def getIntermediaryHintText(country: Country): String = {
-    IntermediaryIdentificationNumberValidation.euCountriesWithIntermediaryValidationRules.filter(_.country == country).head match {
-      case countryWithIntermediaryValidation => countryWithIntermediaryValidation.messageInput
     }
   }
 }
