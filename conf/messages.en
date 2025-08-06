@@ -473,12 +473,18 @@ previousIossScheme.error.required = Select yes if this was with intermediary
 previousIossScheme.change.hidden = if this was with intermediary
 
 previousIossNumber.title = Enter your IOSS registration number for {0}
+previousIossNumber.titleWithIntermediary = Enter your IOSS registration numbers for {0}
 previousIossNumber.heading = Enter your IOSS registration number for {0}
+previousIossNumber.headingWithIntermediary = Enter your IOSS registration numbers for {0}
 previousIossNumber.iossNumber = IOSS number
 previousIossNumber.iossNumber.hint = {0}
+previousIossNumber.intermediaryNumber = Intermediary identification number
+previousIossNumber.intermediaryNumber.hint = {0}
+previousIossNumber.intermediaryNumber.checkYourAnswersLabel = Intermediary number
 previousIossNumber.checkYourAnswersLabel = Registration number
 previousIossNumber.error.previousScheme.required = Enter your scheme number
 previousIossNumber.error.schemeNumber.required = Enter your IOSS registration number
+previousIossNumber.error.intermediaryNumber.required = Enter your intermediary number
 previousIossNumber.error.length = PreviousIossNumber must be 100 characters or less
 previousIossNumber.change.hidden = PreviousIossNumber
 previousIossNumber.error.invalid = Enter a valid IOSS registration number
@@ -742,7 +748,7 @@ savedProgress.nextSteps = What happens next
 savedProgress.listStart = You can:
 savedProgress.continue.registration = continue to complete your registration
 savedProgress.sign.out = sign out and come back later
-savedProgress.sign.in = If you sign out, you must sign back into your <a href="{0}">Government Gateway</a> to continue.
+savedProgress.sign.in = If you sign out, you must sign back into your <a class="govuk-link" href="{0}">Government Gateway</a> to continue.
 
 continueRegistration.title = You have a registration in progress. Do you want to continue?
 continueRegistration.heading = You have a registration in progress. Do you want to continue?
