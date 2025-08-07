@@ -247,10 +247,14 @@ class RegistrationValidationService @Inject()(
           case Nil =>
             None.validNec
           case nonCompliantDetailsList =>
-            Some(nonCompliantDetailsList.maxBy { nonCompliantDetails =>
-              nonCompliantDetails.nonCompliantReturns.getOrElse(0) +
-                nonCompliantDetails.nonCompliantPayments.getOrElse(0)
-            }).validNec
+
+            val nonCompliantReturns = nonCompliantDetailsList.map(_.nonCompliantReturns).maxBy(_.getOrElse(0))
+            val nonCompliantPayments = nonCompliantDetailsList.map(_.nonCompliantPayments).maxBy(_.getOrElse(0))
+
+            Some(NonCompliantDetails(
+              nonCompliantReturns = nonCompliantReturns,
+              nonCompliantPayments = nonCompliantPayments
+            )).validNec
         }
     }
   }
