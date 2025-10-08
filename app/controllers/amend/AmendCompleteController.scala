@@ -54,6 +54,9 @@ class AmendCompleteController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData(None)).async {
     implicit request => {
+
+      val userResearchUrl = frontendAppConfig.userResearchUrl2
+      
       getOriginalRegistration() { originalRegistration =>
 
         for {
@@ -72,7 +75,8 @@ class AmendCompleteController @Inject()(
               organisationName.toString,
               list,
               request.latestIossRegistration,
-              request.numberOfIossRegistrations
+              request.numberOfIossRegistrations,
+              userResearchUrl
             )
           )
         }
