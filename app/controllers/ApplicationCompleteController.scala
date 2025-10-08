@@ -55,6 +55,8 @@ class ApplicationCompleteController @Inject()(
   def onPageLoad(): Action[AnyContent] = (cc.actionBuilder andThen cc.identify andThen cc.getData andThen cc.requireData(None)).async {
     implicit request => {
 
+      val userResearchUrl = frontendAppConfig.userResearchUrl1
+
       for {
         externalEntryUrl <- registrationConnector.getSavedExternalEntry()
         maybeCalculatedCommencementDate <- dateService.calculateCommencementDate(request.userAnswers)
@@ -84,7 +86,8 @@ class ApplicationCompleteController @Inject()(
               firstDayOfNextPeriod.format(dateFormatter),
               request.latestIossRegistration,
               detailList(request.latestIossRegistration, request.userAnswers).rows.nonEmpty,
-              request.numberOfIossRegistrations
+              request.numberOfIossRegistrations,
+              userResearchUrl
             )
           )
         }).getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))

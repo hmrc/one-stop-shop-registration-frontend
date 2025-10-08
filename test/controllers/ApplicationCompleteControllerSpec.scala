@@ -97,6 +97,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.registration.email-enabled" -> "true")
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -134,7 +135,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             None,
             hasUpdatedIossRegistration = false,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -148,6 +150,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "true")
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -186,7 +189,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             None,
             hasUpdatedIossRegistration = false,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -200,6 +204,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
           .configure("features.enrolments-enabled" -> "false")
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -237,7 +242,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             None,
             hasUpdatedIossRegistration = false,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -251,6 +257,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(userAnswers = Some(answers))
           .configure("features.enrolments-enabled" -> "false")
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> "true")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -288,7 +295,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             None,
             hasUpdatedIossRegistration = false,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -305,6 +313,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
+            .configure("urls.userResearch1" -> "https://test-url.com")
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
@@ -345,7 +354,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             None,
             hasUpdatedIossRegistration = false,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -366,6 +376,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
+            .configure("urls.userResearch1" -> "https://test-url.com")
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
@@ -398,7 +409,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             None,
             hasUpdatedIossRegistration = false,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -423,6 +435,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
           numberOfIossRegistrations = 1
         )
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -461,7 +474,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             Some(nonExcludedIossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = false,
-            1
+            1,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -486,6 +500,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
           numberOfIossRegistrations = 1
         )
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -524,7 +539,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             Some(nonExcludedIossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = true,
-            1
+            1,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -546,6 +562,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
           numberOfIossRegistrations = 1
         )
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -584,7 +601,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             Some(iossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = true,
-            1
+            1,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -609,6 +627,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
           numberOfIossRegistrations = 2
         )
+          .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -647,7 +666,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             firstDayOfNextPeriod.format(dateFormatter),
             Some(nonExcludedIossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = true,
-            2
+            2,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }

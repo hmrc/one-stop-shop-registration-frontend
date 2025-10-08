@@ -32,7 +32,8 @@
         firstDayOfNextPeriod: String,
         maybeIossRegistration: Option[IossEtmpDisplayRegistration],
         hasUpdatedIossRegistration: Boolean,
-        numberOfIossRegistrations: Int
+        numberOfIossRegistrations: Int,
+        userResearchUrl: String
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("applicationComplete.title")), showBackLink = false) {
@@ -80,9 +81,14 @@
 
     <p class="govuk-body">@messages("applicationComplete.contact.text")</p>
 
-    <p class="govuk-body">
-      <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
-      @messages("applicationComplete.feedback.30seconds")
-    </p>
+      <h2 class="govuk-heading-m">@messages("userResearch.heading")</h2>
+      <p class="govuk-body">
+          <a href="@userResearchUrl" class="govuk-link" target="_blank">@messages("userResearch.link.text")</a>
+      </p>
+      
+      <p class="govuk-body">
+          <a href="@feedbackLink" class="govuk-link">@messages("applicationComplete.feedback.link.text")</a>
+          @messages("applicationComplete.feedback.30seconds")
+      </p>
   </div>
 }
