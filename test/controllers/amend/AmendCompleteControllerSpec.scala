@@ -99,6 +99,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -135,7 +136,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             None,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -149,6 +151,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -184,7 +187,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             None,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -198,6 +202,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers))
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -232,7 +237,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             None,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -251,6 +257,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
+            .configure("urls.userResearch2" -> "https://test-url.com")
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
@@ -287,7 +294,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             None,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -310,6 +318,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
+            .configure("urls.userResearch2" -> "https://test-url.com")
             .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
             .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
             .overrides(bind[PeriodService].toInstance(periodService))
@@ -339,7 +348,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             None,
-            0
+            0,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -364,6 +374,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
           numberOfIossRegistrations = 1
         )
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -403,7 +414,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             Some(nonExcludedIossEtmpDisplayRegistration),
-            1
+            1,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -428,6 +440,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
           numberOfIossRegistrations = 1
         )
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -463,7 +476,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             Some(nonExcludedIossEtmpDisplayRegistration),
-            1
+            1,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -485,6 +499,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
           numberOfIossRegistrations = 1
         )
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -520,7 +535,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             Some(iossEtmpDisplayRegistration),
-            1
+            1,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
@@ -545,6 +561,7 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
           numberOfIossRegistrations = 2
         )
+          .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
           .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
           .overrides(bind[PeriodService].toInstance(periodService))
@@ -580,7 +597,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             summaryList,
             Some(nonExcludedIossEtmpDisplayRegistration),
-            2
+            2,
+            "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
