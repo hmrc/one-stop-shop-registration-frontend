@@ -23,11 +23,14 @@ import models.requests.AuthenticatedMandatoryDataRequest
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationValidationService: CoreRegistrationValidationService)
-                                                           (implicit ec: ExecutionContext) extends Logging {
+class RejoinPreviousRegistrationValidationService @Inject()(
+                                                             coreRegistrationValidationService: CoreRegistrationValidationService,
+                                                             clock: Clock
+                                                           )(implicit ec: ExecutionContext) extends Logging {
 
   def validatePreviousRegistrations(previousRegistrations: Seq[PreviousRegistration])
                                    (implicit hc: HeaderCarrier, request: AuthenticatedMandatoryDataRequest[_]): Future[Option[Result]] = {
@@ -67,6 +70,6 @@ class RejoinPreviousRegistrationValidationService @Inject()(coreRegistrationVali
       previousScheme = previousSchemeDetails.previousScheme,
       intermediaryNumber = previousSchemeDetails.previousSchemeNumbers.previousIntermediaryNumber,
       countryCode = country.code
-    ).map(RejoinRedirectService.redirectOnMatch)
+    ).map(m => RejoinRedirectService.redirectOnMatch(m, clock))
   }
 }

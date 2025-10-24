@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import generators.Generators
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.domain.PreviousSchemeNumbers
 import models.requests.AuthenticatedDataRequest
 import models.{Country, Index, PreviousScheme, PreviousSchemeType}
@@ -465,7 +465,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     "must return exclusion effective date as commencement date when trader has a previous registration and is transferring MSID" in {
 
       val exclusionEffectiveDate = LocalDate.of(2023, 3, 15)
-      val aMatch = Match(MatchType.TransferringMSID, "123456789-id", None, "EE", Some(7), None, Some(exclusionEffectiveDate), None, None)
+      val aMatch = Match(TraderId("123456789-id"), None, "EE", Some(7), None, Some(exclusionEffectiveDate), None, None)
 
       when(coreRegistrationValidationService.searchScheme(
         eqTo("123456789"),
@@ -492,7 +492,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     "must return exclusion effective date as commencement date when there are multiple previous registrations and one is transferring MSID" in {
 
       val exclusionEffectiveDate = LocalDate.of(2023, 3, 15)
-      val aMatch = Match(MatchType.TransferringMSID, "123456789-id", None, "EE", Some(7), None, Some(exclusionEffectiveDate), None, None)
+      val aMatch = Match(TraderId("123456789-id"), None, "EE", Some(7), None, Some(exclusionEffectiveDate), None, None)
 
       when(coreRegistrationValidationService.searchScheme(
         eqTo("123456789"),

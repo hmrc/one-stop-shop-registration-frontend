@@ -19,7 +19,7 @@ package controllers.previousRegistrations
 import base.SpecBase
 import connectors.RegistrationConnector
 import forms.previousRegistrations.PreviousOssNumberFormProvider
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.domain.PreviousSchemeNumbers
 import models.previousRegistrations.PreviousSchemeHintText
 import models.{Country, CountryWithValidationDetails, Index, NormalMode, PreviousScheme, RejoinMode}
@@ -157,8 +157,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
     "when other country validation is enabled" - {
 
       val genericMatch = Match(
-        MatchType.TraderIdActiveNETP,
-        "IM0987654321",
+        TraderId("IM0987654321"),
         None,
         "DE",
         None,
@@ -242,7 +241,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)).toFuture
+          Some(genericMatch.copy(exclusionStatusCode = Some(4))).toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -273,7 +272,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)).toFuture
+          Some(genericMatch.copy(exclusionStatusCode = Some(4))).toFuture
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
         when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
 
@@ -304,7 +303,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
       "save and redirect to the next page when non-compliant details populated" in {
 
         val genericMatchWithNonCompliantDetails = genericMatch.copy(
-          matchType = MatchType.TransferringMSID,
+          exclusionStatusCode = Some(6),
           nonCompliantReturns = Some(1),
           nonCompliantPayments = Some(1),
         )
@@ -344,7 +343,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)).toFuture
+          Some(genericMatch.copy(exclusionStatusCode = Some(4))).toFuture
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))

@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.domain.*
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{Country, PreviousScheme}
@@ -38,7 +38,8 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
 
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-  private val rejoinPreviousRegistrationValidationService = new RejoinPreviousRegistrationValidationService(coreRegistrationValidationService)
+  private val rejoinPreviousRegistrationValidationService =
+    new RejoinPreviousRegistrationValidationService(coreRegistrationValidationService, stubClockAtArbitraryDate)
 
   private val registration: Registration = RegistrationData.registration
 
@@ -53,8 +54,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
   )
 
   private val genericMatch = Match(
-    MatchType.FixedEstablishmentActiveNETP,
-    "33333333",
+    TraderId("33333333"),
     None,
     "DE",
     None,
@@ -78,7 +78,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
 
     "must redirect to CannotRejoinQuarantinedCountryController when the previous registration matches to a quarantined trader" in {
 
-      val quarantinedTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
+      val quarantinedTraderMatch: Match = genericMatch.copy(exclusionStatusCode = Some(4))
 
       when(coreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())).thenReturn(Some(quarantinedTraderMatch).toFuture)
 
@@ -89,7 +89,7 @@ class RejoinPreviousRegistrationValidationServiceSpec extends SpecBase with Mock
 
     "must redirect to RejoinAlreadyRegisteredOtherCountryController when the previous registration matches to an active trader" - {
 
-      val activeTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
+      val activeTraderMatch: Match = genericMatch
 
       when(coreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())).thenReturn(Some(activeTraderMatch).toFuture)
 

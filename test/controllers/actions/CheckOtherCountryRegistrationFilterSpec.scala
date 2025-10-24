@@ -18,7 +18,7 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -39,8 +39,7 @@ import scala.concurrent.Future
 class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val genericMatch = Match(
-    MatchType.FixedEstablishmentActiveNETP,
-    "333333333",
+    TraderId("333333333"),
     None,
     "DE",
     Some(2),
@@ -76,7 +75,8 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(genericMatch))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn
+              Future.successful(Option(genericMatch.copy(exclusionStatusCode = None)))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
             val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
@@ -104,7 +104,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = None)
 
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
@@ -134,7 +134,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(4), exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -163,7 +163,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val exclusionDate = LocalDate.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP, exclusionEffectiveDate = Some(exclusionDate))
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(4), exclusionEffectiveDate = Some(exclusionDate))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -192,7 +192,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(4), exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -221,7 +221,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val exclusionDate = LocalDate.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP, exclusionEffectiveDate = Some(exclusionDate))
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(4), exclusionEffectiveDate = Some(exclusionDate))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -250,8 +250,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
-              exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)), exclusionStatusCode = Some(4))
+            val expectedMatch = genericMatch.copy(exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)), exclusionStatusCode = Some(4))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -280,7 +279,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val exclusionDate = LocalDate.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID, exclusionEffectiveDate = Some(exclusionDate))
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(6), exclusionEffectiveDate = Some(exclusionDate))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -309,8 +308,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
           running(app) {
 
-            val expectedMatch = genericMatch.copy(matchType = MatchType.TransferringMSID,
-              exclusionEffectiveDate = None, exclusionStatusCode = Some(4))
+            val expectedMatch = genericMatch.copy(exclusionEffectiveDate = None, exclusionStatusCode = Some(4))
             when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
 
             val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
@@ -321,7 +319,7 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             whenReady(result) { exp =>
               exp mustBe a[IllegalStateException]
-              exp.getMessage must include(s"MatchType ${expectedMatch.matchType} didn't include an expected exclusion effective date")
+              exp.getMessage must include(s"Exclusion status code ${expectedMatch.exclusionStatusCode} didn't include an expected exclusion effective date")
             }
 
           }

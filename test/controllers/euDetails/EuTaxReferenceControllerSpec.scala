@@ -20,7 +20,7 @@ import base.SpecBase
 import connectors.RegistrationConnector
 import forms.euDetails.EuTaxReferenceFormProvider
 import models.{Country, Index, Mode, NormalMode, RejoinMode}
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
@@ -49,8 +49,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
   private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
 
   private val genericMatch = Match(
-    MatchType.FixedEstablishmentActiveNETP,
-    "333333333",
+    TraderId("333333333"),
     None,
     "DE",
     None,
@@ -254,7 +253,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
+          val expectedResponse = genericMatch
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -283,7 +282,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+          val expectedResponse = genericMatch
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -313,7 +312,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -342,7 +341,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -371,7 +370,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -400,7 +399,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.TransferringMSID)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -431,7 +430,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.TransferringMSID)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -529,7 +528,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
+          val expectedResponse = genericMatch
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -564,7 +563,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)
+          val expectedResponse = genericMatch
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -600,7 +599,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -635,7 +634,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -670,7 +669,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
