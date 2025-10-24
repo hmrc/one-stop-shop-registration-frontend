@@ -31,8 +31,7 @@ class MatchSpec extends SpecBase {
 
         val aMatch: Match =
           Match(
-            MatchType.FixedEstablishmentQuarantinedNETP,
-            "IM0987654321",
+            TraderId("IM0987654321"),
             Some("444444444"),
             "DE",
             Some(3),
@@ -43,7 +42,6 @@ class MatchSpec extends SpecBase {
           )
 
         val expectedJson = Json.obj(
-          "matchType" -> "006",
           "traderId" -> "IM0987654321",
           "intermediary" -> "444444444",
           "memberState" -> "DE",
@@ -62,8 +60,7 @@ class MatchSpec extends SpecBase {
 
         val aMatch: Match =
           Match(
-            MatchType.FixedEstablishmentQuarantinedNETP,
-            "IM0987654321",
+            TraderId("IM0987654321"),
             None,
             "DE",
             None,
@@ -74,7 +71,6 @@ class MatchSpec extends SpecBase {
           )
 
         val expectedJson = Json.obj(
-          "matchType" -> "006",
           "traderId" -> "IM0987654321",
           "memberState" -> "DE"
         )

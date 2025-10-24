@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results.Redirect
 
@@ -27,8 +27,7 @@ class RejoinRedirectServiceSpec extends SpecBase
   with MockitoSugar {
 
   private val genericMatch = Match(
-    MatchType.TransferringMSID,
-    "33333333",
+    TraderId("33333333"),
     None,
     "DE",
     None,
@@ -41,27 +40,31 @@ class RejoinRedirectServiceSpec extends SpecBase
   ".redirectOnMatch" - {
 
     "redirects to RejoinAlreadyRegisteredOtherCountryController when the match is an active trader" in {
-      Seq(MatchType.FixedEstablishmentActiveNETP, MatchType.TraderIdActiveNETP, MatchType.OtherMSNETPActiveNETP).map { matchType =>
-        RejoinRedirectService.redirectOnMatch(Some(genericMatch.copy(matchType = matchType))).value mustBe
-          Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState))
-      }
+      RejoinRedirectService.redirectOnMatch(
+        maybeMatch = Some(genericMatch),
+        clock = stubClockAtArbitraryDate
+      ).value mustBe
+        Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState))
     }
 
     "redirects to CannotRejoinQuarantinedCountryController when the match is a quarantined trader" in {
-      Seq(MatchType.FixedEstablishmentQuarantinedNETP, MatchType.TraderIdQuarantinedNETP, MatchType.OtherMSNETPQuarantinedNETP).map { matchType =>
-        RejoinRedirectService.redirectOnMatch(Some(genericMatch.copy(matchType = matchType))).value mustBe
-          Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
-            genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString))
-      }
-   }
+      RejoinRedirectService.redirectOnMatch(
+        maybeMatch = Some(genericMatch.copy(exclusionStatusCode = Some(4))),
+        clock = stubClockAtArbitraryDate
+      ).value mustBe
+        Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
+          genericMatch.memberState, genericMatch.exclusionEffectiveDate.mkString))
+    }
 
     "throw an IllegalStateException when the matchType is quarantined but exclusionEffectiveDate is missing" in {
-      Seq(MatchType.FixedEstablishmentQuarantinedNETP, MatchType.TraderIdQuarantinedNETP, MatchType.OtherMSNETPQuarantinedNETP).foreach { matchType =>
-        val exception = intercept[IllegalStateException] {
-          RejoinRedirectService.redirectOnMatch(Some(genericMatch.copy(matchType = matchType, exclusionEffectiveDate = None)))
-        }
-        exception.getMessage must include(s"MatchType $matchType didn't include an expected exclusion effective date")
+      val exclusionStatusCode = Some(4)
+      val exception = intercept[IllegalStateException] {
+        RejoinRedirectService.redirectOnMatch(
+          maybeMatch = Some(genericMatch.copy(exclusionStatusCode = exclusionStatusCode, exclusionEffectiveDate = None)),
+          clock = stubClockAtArbitraryDate
+        )
       }
+      exception.getMessage must include(s"Exclusion status code $exclusionStatusCode didn't include an expected exclusion effective date")
     }
   }
 }

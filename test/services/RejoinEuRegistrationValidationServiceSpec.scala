@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.domain.*
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{Country, InternationalAddress}
@@ -38,7 +38,7 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
 
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
-  private val rejoinEuRegistrationValidationService = new RejoinEuRegistrationValidationService(coreRegistrationValidationService)
+  private val rejoinEuRegistrationValidationService = new RejoinEuRegistrationValidationService(coreRegistrationValidationService, stubClockAtArbitraryDate)
 
   private val registration: Registration = RegistrationData.registration
 
@@ -52,8 +52,7 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
   )
 
   private val genericMatch = Match(
-    MatchType.FixedEstablishmentActiveNETP,
-    "33333333",
+    TraderId("33333333"),
     None,
     "DE",
     None,
@@ -104,7 +103,7 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
 
     "must redirect to CannotRejoinQuarantinedCountryController" - {
 
-      val quarantinedTraderMatch: Match = genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)
+      val quarantinedTraderMatch: Match = genericMatch.copy(exclusionStatusCode = Some(4))
 
       "when the EU VAT registration matches to a quarantined trader" in {
 
@@ -136,7 +135,7 @@ class RejoinEuRegistrationValidationServiceSpec extends SpecBase with MockitoSug
 
     "must redirect to RejoinAlreadyRegisteredOtherCountryController" - {
 
-      val activeTraderMatch = genericMatch.copy(matchType = MatchType.TraderIdActiveNETP)
+      val activeTraderMatch = genericMatch
 
       "when the EU VAT registration matches to an active trader" in {
 

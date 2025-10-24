@@ -18,7 +18,7 @@ package controllers.previousRegistrations
 
 import config.FrontendAppConfig
 import controllers.GetCountry
-import controllers.actions._
+import controllers.actions.*
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import logging.Logging
 import models.domain.PreviousSchemeNumbers
@@ -34,6 +34,7 @@ import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousIossNumberView
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,6 +44,7 @@ class PreviousIossNumberController @Inject()(
                                               coreRegistrationValidationService: CoreRegistrationValidationService,
                                               formProvider: PreviousIossRegistrationNumberFormProvider,
                                               appConfig: FrontendAppConfig,
+                                              clock: Clock,
                                               view: PreviousIossNumberView
                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with GetCountry {
 
@@ -86,16 +88,10 @@ class PreviousIossNumberController @Inject()(
                     intermediaryNumber = value.previousIntermediaryNumber,
                     countryCode = country.code
                   ).flatMap {
-                    case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                    case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
                       if (mode == RejoinMode) {
                         Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
-                          activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
-                            case Some(date) => date.toString
-                            case _ =>
-                              val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
-                              logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
-                              throw e
-                          })).toFuture
+                          activeMatch.memberState, activeMatch.getEffectiveDate)).toFuture
                       } else {
                         Future.successful(Redirect(
                           controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))

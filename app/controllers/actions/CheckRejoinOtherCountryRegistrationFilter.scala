@@ -18,7 +18,6 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import logging.Logging
-import models.core.MatchType
 import models.requests.AuthenticatedDataRequest
 import models.{Mode, RejoinLoopMode, RejoinMode}
 import play.api.mvc.Results.Redirect
@@ -27,36 +26,30 @@ import services.CoreRegistrationValidationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckRejoinOtherCountryRegistrationFilterImpl(mode: Option[Mode],
-                                                    coreRegistrationValidationService: CoreRegistrationValidationService,
-                                                    appConfig: FrontendAppConfig)
+class CheckRejoinOtherCountryRegistrationFilterImpl(
+                                                     mode: Option[Mode],
+                                                     coreRegistrationValidationService: CoreRegistrationValidationService,
+                                                     appConfig: FrontendAppConfig,
+                                                     clock: Clock
+                                                   )
                                                    (implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
-
-  private val exclusionStatusCode = 4
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (appConfig.otherCountryRegistrationValidationEnabled && Seq(RejoinMode, RejoinLoopMode).exists(mode.contains)) {
       coreRegistrationValidationService.searchUkVrn(request.vrn)(hc, request).map {
-        case Some(activeMatch) if activeMatch.matchType == MatchType.OtherMSNETPActiveNETP || activeMatch.matchType == MatchType.FixedEstablishmentActiveNETP =>
+        case Some(activeMatch) if activeMatch.isActiveTrader =>
           Some(Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
 
-        case Some(activeMatch) if activeMatch.exclusionStatusCode.contains(exclusionStatusCode) ||
-          activeMatch.matchType == MatchType.OtherMSNETPQuarantinedNETP ||
-          activeMatch.matchType == MatchType.FixedEstablishmentQuarantinedNETP =>
+        case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
           Some(Redirect(
-            controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
-              case Some(date) => date.toString
-              case _ =>
-                val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
-                logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
-                throw e
-            })
+            controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(activeMatch.memberState, activeMatch.getEffectiveDate)
           ))
 
         case _ => None
@@ -67,9 +60,13 @@ class CheckRejoinOtherCountryRegistrationFilterImpl(mode: Option[Mode],
   }
 }
 
-class CheckRejoinOtherCountryRegistrationFilter @Inject()(coreRegistrationValidationService: CoreRegistrationValidationService, appConfig: FrontendAppConfig)
-                                                         (implicit val executionContext: ExecutionContext) {
+class CheckRejoinOtherCountryRegistrationFilter @Inject()(
+                                                           coreRegistrationValidationService: CoreRegistrationValidationService,
+                                                           appConfig: FrontendAppConfig,
+                                                           clock: Clock
+                                                         )(implicit val executionContext: ExecutionContext) {
 
-  def apply(mode: Option[Mode]): CheckRejoinOtherCountryRegistrationFilterImpl = new CheckRejoinOtherCountryRegistrationFilterImpl(mode, coreRegistrationValidationService, appConfig)
+  def apply(mode: Option[Mode]): CheckRejoinOtherCountryRegistrationFilterImpl =
+    new CheckRejoinOtherCountryRegistrationFilterImpl(mode, coreRegistrationValidationService, appConfig, clock)
 }
 

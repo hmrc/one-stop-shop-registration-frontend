@@ -18,7 +18,7 @@ package controllers.euDetails
 
 import config.FrontendAppConfig
 import controllers.GetCountry
-import controllers.actions._
+import controllers.actions.*
 import forms.euDetails.EuVatNumberFormProvider
 import models.{CountryWithValidationDetails, Index, Mode, RejoinMode}
 import pages.euDetails.{EuVatNumberPage, SellsGoodsToEUConsumersPage}
@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
 import views.html.euDetails.EuVatNumberView
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,6 +39,7 @@ class EuVatNumberController @Inject()(
                                        formProvider: EuVatNumberFormProvider,
                                        coreRegistrationValidationService: CoreRegistrationValidationService,
                                        appConfig: FrontendAppConfig,
+                                       clock: Clock,
                                        view: EuVatNumberView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
@@ -88,13 +90,13 @@ class EuVatNumberController @Inject()(
 
                 coreRegistrationValidationService.searchEuVrn(value, country.code, isOtherMS).flatMap { maybeMatch =>
                   if (mode == RejoinMode) {
-                    RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(successResult)
+                    RejoinRedirectService.redirectOnMatch(maybeMatch, clock).map(_.toFuture).getOrElse(successResult)
                   } else {
                     maybeMatch match {
-                      case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+                      case Some(activeMatch) if activeMatch.isActiveTrader =>
                         Future.successful(Redirect(controllers.routes.FixedEstablishmentVRNAlreadyRegisteredController.onPageLoad(mode, index)))
 
-                      case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+                      case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
                         Future.successful(Redirect(controllers.routes.ExcludedVRNController.onPageLoad()))
 
                       case _ => successResult

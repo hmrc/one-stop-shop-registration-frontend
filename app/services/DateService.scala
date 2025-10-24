@@ -18,15 +18,16 @@ package services
 
 import config.Constants.schemeStartDate
 import logging.Logging
-import models.core.{Match, MatchType}
-import models.requests.AuthenticatedDataRequest
 import models.{PreviousScheme, UserAnswers}
+import models.core.Match
+import models.exclusions.ExclusionReason
+import models.requests.AuthenticatedDataRequest
 import pages.{DateOfFirstSalePage, HasMadeSalesPage}
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.Month._
 import java.time.{Clock, LocalDate}
+import java.time.Month.*
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -146,7 +147,7 @@ class DateService @Inject()(
     for {
       allMatches <- searchPreviousRegistrationSchemes(userAnswers)
     } yield {
-      val findTransferringMsid = allMatches.find(_.matchType == MatchType.TransferringMSID)
+      val findTransferringMsid = allMatches.find(_.exclusionStatusCode.contains(ExclusionReason.TransferringMSID.numberValue))
       findTransferringMsid match {
         case Some(matchedTransferringMsid) =>
           matchedTransferringMsid.exclusionEffectiveDate match {

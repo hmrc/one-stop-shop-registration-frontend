@@ -21,10 +21,14 @@ import models.requests.AuthenticatedMandatoryDataRequest
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RejoinEuRegistrationValidationService @Inject()(coreRegistrationValidationService: CoreRegistrationValidationService)(implicit ec: ExecutionContext) {
+class RejoinEuRegistrationValidationService @Inject()(
+                                                       coreRegistrationValidationService: CoreRegistrationValidationService,
+                                                       clock: Clock
+                                                     )(implicit ec: ExecutionContext) {
 
   def validateEuRegistrations(euRegistrations: Seq[EuTaxRegistration])
                              (implicit hc: HeaderCarrier,
@@ -46,15 +50,15 @@ class RejoinEuRegistrationValidationService @Inject()(coreRegistrationValidation
 
     euTaxRegistration match {
       case EuVatRegistration(_, vatNumber) =>
-        coreRegistrationValidationService.searchEuVrn(vatNumber, countryCode, isOtherMS = false).map(RejoinRedirectService.redirectOnMatch)
+        coreRegistrationValidationService.searchEuVrn(vatNumber, countryCode, isOtherMS = false).map(m => RejoinRedirectService.redirectOnMatch(m, clock))
       case RegistrationWithFixedEstablishment(_, taxIdentifier, _) =>
         taxIdentifier.value match {
-          case Some(taxId) => coreRegistrationValidationService.searchEuTaxId(taxId, countryCode).map(RejoinRedirectService.redirectOnMatch)
+          case Some(taxId) => coreRegistrationValidationService.searchEuTaxId(taxId, countryCode).map(m => RejoinRedirectService.redirectOnMatch(m, clock))
           case None => failure
         }
       case RegistrationWithoutFixedEstablishmentWithTradeDetails(_, taxIdentifier, _) =>
         taxIdentifier.value match {
-          case Some(taxId) => coreRegistrationValidationService.searchEuTaxId(taxId, countryCode).map(RejoinRedirectService.redirectOnMatch)
+          case Some(taxId) => coreRegistrationValidationService.searchEuTaxId(taxId, countryCode).map(m => RejoinRedirectService.redirectOnMatch(m, clock))
           case None => failure
         }
       case RegistrationWithoutTaxId(_) => failure

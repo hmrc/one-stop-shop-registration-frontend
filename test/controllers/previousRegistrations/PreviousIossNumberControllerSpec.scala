@@ -23,7 +23,7 @@ import controllers.amend.{routes => amendRoutes}
 import controllers.previousRegistrations.{routes => prevRoutes}
 import forms.previousRegistrations.PreviousIossRegistrationNumberFormProvider
 import models.{AmendMode, Country, Index, NormalMode, PreviousScheme, RejoinMode}
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.domain.PreviousSchemeNumbers
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -131,8 +131,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
     "when other country validation is enabled" - {
 
       val genericMatch = Match(
-        MatchType.FixedEstablishmentActiveNETP,
-        "IM0987654321",
+        TraderId("IM0987654321"),
         None,
         "DE",
         None,
@@ -180,7 +179,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+          Future.successful(Some(genericMatch.copy(exclusionStatusCode = Some(4))))
 
         val application =
           applicationBuilder(userAnswers = Some(baseAnswers))
@@ -211,7 +210,7 @@ class PreviousIossNumberControllerSpec extends SpecBase with MockitoSugar {
 
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
         when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn
-          Future.successful(Some(genericMatch.copy(matchType = MatchType.TraderIdQuarantinedNETP)))
+          Future.successful(Some(genericMatch.copy(exclusionStatusCode = Some(4))))
         when(mockRegistrationConnector.getRegistration()(any())) thenReturn Future.successful(Some(registration))
         when(mockRejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
 

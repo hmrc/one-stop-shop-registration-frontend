@@ -144,7 +144,7 @@ trait SpecBase
         bind[CheckNiProtocolFilterImpl].toInstance(new FakeCheckNiProtocolFilterImpl()),
         bind[CheckEmailVerificationFilterProvider].toInstance(new FakeCheckEmailVerificationFilter()),
         bind[CheckOtherCountryRegistrationFilter].toInstance(new FakeCheckOtherCountryRegistrationFilter()),
-        bind[CheckRejoinOtherCountryRegistrationFilter].toInstance(new FakeCheckRejoinOtherCountryRegistrationFilter()),
+        bind[CheckRejoinOtherCountryRegistrationFilter].toInstance(new FakeCheckRejoinOtherCountryRegistrationFilter(clockToBind)),
         bind[AuthenticatedDataRequiredAction].toInstance(new FakeAuthenticatedDataRequiredActionProvider(userAnswers, registration)),
         bind[Clock].toInstance(clockToBind)
       )
