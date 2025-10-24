@@ -157,7 +157,7 @@ class PreviousOssNumberControllerSpec extends SpecBase with MockitoSugar {
     "when other country validation is enabled" - {
 
       val genericMatch = Match(
-        TraderId("IM0987654321"),
+        TraderId("123456789"),
         None,
         "DE",
         None,

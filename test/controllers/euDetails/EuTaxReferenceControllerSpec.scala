@@ -21,15 +21,16 @@ import connectors.RegistrationConnector
 import forms.euDetails.EuTaxReferenceFormProvider
 import models.{Country, Index, Mode, NormalMode, RejoinMode}
 import models.core.{Match, TraderId}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.euDetails.EuConsumerSalesMethod
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails.{EuCountryPage, EuTaxReferencePage}
+import pages.euDetails.{EuCountryPage, EuTaxReferencePage, SellsGoodsToEUConsumerMethodPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.{CoreRegistrationValidationService, RejoinRegistrationService}
 import testutils.RegistrationData.registration
@@ -46,7 +47,9 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
   private val formProvider = new EuTaxReferenceFormProvider()
   private val form = formProvider(country)
 
-  private val baseUserAnswers = basicUserAnswersWithVatInfo.set(EuCountryPage(index), country).success.value
+  private val baseUserAnswers = basicUserAnswersWithVatInfo
+    .set(EuCountryPage(index), country).success.value
+    .set(SellsGoodsToEUConsumerMethodPage(index), EuConsumerSalesMethod.FixedEstablishment).success.value
 
   private val genericMatch = Match(
     TraderId("333333333"),
@@ -399,7 +402,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
+          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(1))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -409,14 +412,15 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
           val result = route(application, request).value
 
-          val expectedAnswers = baseUserAnswers.set(EuTaxReferencePage(index), taxReferenceNumber).success.value
+          val expectedAnswers = baseUserAnswers
+            .set(EuTaxReferencePage(index), taxReferenceNumber).success.value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual EuTaxReferencePage(index).navigate(NormalMode, expectedAnswers).url
         }
       }
 
-      "must redirect to the next page when there is no excluded trader" in {
+      "must redirect to the next page when there is no OSS excluded trader" in {
 
         val taxReferenceNumber: String = "333333333"
 
@@ -430,7 +434,7 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
         running(application) {
 
-          val expectedResponse = genericMatch.copy(exclusionStatusCode = Some(4))
+          val expectedResponse = genericMatch.copy(traderId = TraderId("IM1231234567"))
 
           when(mockCoreRegistrationValidationService.searchEuTaxId(eqTo(taxReferenceNumber), eqTo(country.code))(any(), any())) thenReturn
             Future.successful(Option(expectedResponse))
@@ -440,7 +444,9 @@ class EuTaxReferenceControllerSpec extends SpecBase with MockitoSugar with Befor
 
           val result = route(application, request).value
 
-          val expectedAnswers = baseUserAnswers.set(EuTaxReferencePage(index), taxReferenceNumber).success.value
+          val expectedAnswers = baseUserAnswers
+            .set(EuTaxReferencePage(index), taxReferenceNumber).success.value
+            .set(SellsGoodsToEUConsumerMethodPage(index), EuConsumerSalesMethod.FixedEstablishment).success.value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual EuTaxReferencePage(index).navigate(NormalMode, expectedAnswers).url

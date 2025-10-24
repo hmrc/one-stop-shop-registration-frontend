@@ -100,7 +100,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.toFuture)
+            Some(genericMatch).toFuture
 
           val result = controller.callFilter(request).futureValue.value
           result mustBe Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState))
