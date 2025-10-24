@@ -465,7 +465,16 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     "must return exclusion effective date as commencement date when trader has a previous registration and is transferring MSID" in {
 
       val exclusionEffectiveDate = LocalDate.of(2023, 3, 15)
-      val aMatch = Match(TraderId("123456789-id"), None, "EE", Some(7), None, Some(exclusionEffectiveDate), None, None)
+      val aMatch = Match(
+        traderId = TraderId("123456789-id"),
+        intermediary = None,
+        memberState = "EE",
+        exclusionStatusCode = Some(6),
+        exclusionDecisionDate = None,
+        exclusionEffectiveDate = Some(exclusionEffectiveDate),
+        nonCompliantReturns = None,
+        nonCompliantPayments = None
+      )
 
       when(coreRegistrationValidationService.searchScheme(
         eqTo("123456789"),
@@ -492,7 +501,7 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
     "must return exclusion effective date as commencement date when there are multiple previous registrations and one is transferring MSID" in {
 
       val exclusionEffectiveDate = LocalDate.of(2023, 3, 15)
-      val aMatch = Match(TraderId("123456789-id"), None, "EE", Some(7), None, Some(exclusionEffectiveDate), None, None)
+      val aMatch = Match(TraderId("123456789-id"), None, "EE", Some(6), None, Some(exclusionEffectiveDate), None, None)
 
       when(coreRegistrationValidationService.searchScheme(
         eqTo("123456789"),

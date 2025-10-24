@@ -147,7 +147,7 @@ class DateService @Inject()(
     for {
       allMatches <- searchPreviousRegistrationSchemes(userAnswers)
     } yield {
-      val findTransferringMsid = allMatches.find(_.exclusionStatusCode.contains(ExclusionReason.TransferringMSID))
+      val findTransferringMsid = allMatches.find(_.exclusionStatusCode.contains(ExclusionReason.TransferringMSID.numberValue))
       findTransferringMsid match {
         case Some(matchedTransferringMsid) =>
           matchedTransferringMsid.exclusionEffectiveDate match {
