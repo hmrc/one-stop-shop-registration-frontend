@@ -34,6 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
 import views.html.previousRegistrations.PreviousOssNumberView
 
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,6 +44,7 @@ class PreviousOssNumberController @Inject()(
                                              coreRegistrationValidationService: CoreRegistrationValidationService,
                                              formProvider: PreviousOssNumberFormProvider,
                                              appConfig: FrontendAppConfig,
+                                             clock: Clock,
                                              view: PreviousOssNumberView
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with GetCountry {
 
@@ -130,13 +132,13 @@ class PreviousOssNumberController @Inject()(
         countryCode = country.code
       ).flatMap { maybeMatch =>
         if (mode == RejoinMode) {
-          RejoinRedirectService.redirectOnMatch(maybeMatch).map(_.toFuture).getOrElse(defaultResult())
+          RejoinRedirectService.redirectOnMatch(maybeMatch, clock).map(_.toFuture).getOrElse(defaultResult())
         } else {
           maybeMatch match {
-            case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+            case Some(activeMatch) if activeMatch.isActiveTrader =>
               Future.successful(Redirect(
                 controllers.previousRegistrations.routes.SchemeStillActiveController.onPageLoad(mode, activeMatch.memberState, countryIndex, schemeIndex)))
-            case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+            case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
               Future.successful(Redirect(controllers.previousRegistrations.routes.SchemeQuarantinedController.onPageLoad(mode, countryIndex, schemeIndex)))
             case Some(activeMatch) =>
               defaultResult(Some(activeMatch))

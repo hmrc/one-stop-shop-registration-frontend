@@ -23,12 +23,14 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.Result
 import services.CoreRegistrationValidationService
 
+import java.time.Clock
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeCheckRejoinOtherCountryRegistrationFilterImpl() extends CheckRejoinOtherCountryRegistrationFilterImpl(
+class FakeCheckRejoinOtherCountryRegistrationFilterImpl(clock: Clock) extends CheckRejoinOtherCountryRegistrationFilterImpl(
   mock[Option[Mode]],
   mock[CoreRegistrationValidationService],
-  mock[FrontendAppConfig]
+  mock[FrontendAppConfig],
+  clock
 )(ExecutionContext.Implicits.global) {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
@@ -36,10 +38,11 @@ class FakeCheckRejoinOtherCountryRegistrationFilterImpl() extends CheckRejoinOth
   }
 }
 
-class FakeCheckRejoinOtherCountryRegistrationFilter()
+class FakeCheckRejoinOtherCountryRegistrationFilter(clock: Clock)
   extends CheckRejoinOtherCountryRegistrationFilter(
     mock[CoreRegistrationValidationService],
-    mock[FrontendAppConfig]
+    mock[FrontendAppConfig],
+    clock
   )(ExecutionContext.Implicits.global) {
-  override def apply(mode: Option[Mode]): CheckRejoinOtherCountryRegistrationFilterImpl = new FakeCheckRejoinOtherCountryRegistrationFilterImpl
+  override def apply(mode: Option[Mode]): CheckRejoinOtherCountryRegistrationFilterImpl = new FakeCheckRejoinOtherCountryRegistrationFilterImpl(clock)
 }

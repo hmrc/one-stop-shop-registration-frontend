@@ -20,7 +20,7 @@ import base.SpecBase
 import config.Constants.correctionsPeriodsLimit
 import connectors.{RegistrationConnector, ReturnStatusConnector}
 import models.{CurrentReturns, RejoinMode, Return, SubmissionStatus}
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -45,8 +45,7 @@ class StartRejoinJourneyControllerSpec extends SpecBase with MockitoSugar with S
   private val deregisteredVatCustomerInfo = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusDays(1)))
 
   private val genericMatch = Match(
-    MatchType.FixedEstablishmentActiveNETP,
-    "33333333",
+    TraderId("33333333"),
     None,
     "DE",
     None,

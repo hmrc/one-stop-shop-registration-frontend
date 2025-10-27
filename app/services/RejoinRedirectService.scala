@@ -21,20 +21,16 @@ import models.core.Match
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 
+import java.time.Clock
+
 object RejoinRedirectService extends Logging {
 
-  def redirectOnMatch(maybeMatch: Option[Match]): Option[Result] = maybeMatch match {
-    case Some(activeMatch) if activeMatch.matchType.isActiveTrader =>
+  def redirectOnMatch(maybeMatch: Option[Match], clock: Clock): Option[Result] = maybeMatch match {
+    case Some(activeMatch) if activeMatch.isActiveTrader =>
       Some(Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
-    case Some(activeMatch) if activeMatch.matchType.isQuarantinedTrader =>
+    case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
       Some(Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
-        activeMatch.memberState, activeMatch.exclusionEffectiveDate match {
-          case Some(date) => date.toString
-          case _ =>
-            val e = new IllegalStateException(s"MatchType ${activeMatch.matchType} didn't include an expected exclusion effective date")
-            logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
-            throw e
-        })))
+        activeMatch.memberState, activeMatch.getEffectiveDate)))
     case _ => None
   }
 

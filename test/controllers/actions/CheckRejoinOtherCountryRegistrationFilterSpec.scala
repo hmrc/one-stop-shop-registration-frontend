@@ -19,7 +19,7 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import models.RejoinMode
-import models.core.{Match, MatchType}
+import models.core.{Match, TraderId}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -42,7 +42,12 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
   private val mockCoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   class Harness(frontendAppConfig: FrontendAppConfig)
-    extends CheckRejoinOtherCountryRegistrationFilterImpl(Some(RejoinMode), mockCoreRegistrationValidationService, frontendAppConfig) {
+    extends CheckRejoinOtherCountryRegistrationFilterImpl(
+      mode = Some(RejoinMode),
+      coreRegistrationValidationService = mockCoreRegistrationValidationService,
+      appConfig = frontendAppConfig,
+      clock = stubClockAtArbitraryDate
+    ) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -50,8 +55,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
     new Harness(frontendAppConfig)
 
   private val genericMatch = Match(
-    MatchType.FixedEstablishmentActiveNETP,
-    "333333333",
+    TraderId("333333333"),
     None,
     "DE",
     None,
@@ -77,7 +81,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.copy(matchType = MatchType.OtherMSNETPActiveNETP)).toFuture
+            Some(genericMatch).toFuture
 
           val result = controller.callFilter(request).futureValue.value
           result mustBe Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState))
@@ -96,7 +100,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.copy(matchType = MatchType.FixedEstablishmentActiveNETP)).toFuture
+            Some(genericMatch).toFuture
 
           val result = controller.callFilter(request).futureValue.value
           result mustBe Redirect(controllers.rejoin.routes.RejoinAlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState))
@@ -115,7 +119,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.copy(matchType = MatchType.OtherMSNETPQuarantinedNETP)).toFuture
+            Some(genericMatch.copy(exclusionStatusCode = Some(4))).toFuture
 
           val result = controller.callFilter(request).futureValue.value
           result mustBe Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
@@ -135,7 +139,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.copy(matchType = MatchType.FixedEstablishmentQuarantinedNETP)).toFuture
+            Some(genericMatch.copy(exclusionStatusCode = Some(4))).toFuture
 
           val result = controller.callFilter(request).futureValue.value
           result mustBe Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
@@ -155,7 +159,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.copy(matchType = MatchType.TransferringMSID, exclusionStatusCode = Some(4))).toFuture
+            Some(genericMatch.copy(exclusionStatusCode = Some(4))).toFuture
 
           val result = controller.callFilter(request).futureValue.value
           result mustBe Redirect(controllers.rejoin.routes.CannotRejoinQuarantinedCountryController.onPageLoad(
@@ -175,7 +179,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           val controller: Harness = globalController(frontendAppConfig)
 
           when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn
-            Some(genericMatch.copy(matchType = MatchType.TransferringMSID)).toFuture
+            Some(genericMatch.copy(exclusionStatusCode = Some(6))).toFuture
 
           val result = controller.callFilter(request).futureValue
           result mustBe None
