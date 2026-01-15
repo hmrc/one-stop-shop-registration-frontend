@@ -458,7 +458,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             }
           }
 
-          "to Has Trading Name when trading names are not populated correctly" in {
+          "to Trading Name when trading names are not populated correctly" in {
 
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
@@ -473,7 +473,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
               val result = route(application, request).value
 
               status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.routes.HasTradingNameController.onPageLoad(AmendMode).url
+              redirectLocation(result).value `mustBe` controllers.routes.TradingNameController.onPageLoad(AmendMode, Index(0)).url
             }
           }
 
