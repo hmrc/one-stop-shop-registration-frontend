@@ -458,7 +458,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             }
           }
 
-          "to Has Trading Name when trading names are not populated correctly" in {
+          "to Trading Name when trading names are not populated correctly" in {
 
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
@@ -472,7 +472,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
               val result = route(application, request).value
 
               status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.routes.HasTradingNameController.onPageLoad(CheckMode).url
+              redirectLocation(result).value `mustBe` controllers.routes.TradingNameController.onPageLoad(CheckMode, Index(0)).url
             }
           }
 

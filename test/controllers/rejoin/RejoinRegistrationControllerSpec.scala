@@ -553,7 +553,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             }
           }
 
-          "to Has Trading Name when trading names are not populated correctly" in {
+          "to Trading Name when trading names are not populated correctly" in {
 
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
@@ -571,7 +571,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
               val result = route(application, request).value
 
               status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.routes.HasTradingNameController.onPageLoad(RejoinMode).url
+              redirectLocation(result).value `mustBe` controllers.routes.TradingNameController.onPageLoad(RejoinMode, Index(0)).url
             }
           }
 
