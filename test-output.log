@@ -1,0 +1,413 @@
+=== Run 1 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] compiling 1 Scala source to /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project/target/scala-2.12/sbt-1.0/classes ...
+[info] done compiling
+/Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:12: warning: value IntegrationTest in trait LibraryManagementSyntax is deprecated (since 1.9.0): Create a separate subproject for testing instead
+  .configs(IntegrationTest)
+           ^
+/Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:13: warning: value IntegrationTest in trait LibraryManagementSyntax is deprecated (since 1.9.0): Create a separate subproject for testing instead
+  .settings(inConfig(IntegrationTest)(itSettings): _*)
+                     ^
+/Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:69: warning: lazy value itSettings in object Defaults is deprecated (since 1.9.0): Create a separate subproject instead of using IntegrationTest and in addition avoid using itSettings
+lazy val itSettings = Defaults.itSettings ++ Seq(
+                               ^
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] compiling 363 Scala sources to /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/target/scala-3.3.4/test-classes ...
+[info] done compiling
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 1 second, 833 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 133 s (0:02:13.0), completed 10 Feb 2026, 16:29:51
+=== Run 2 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 1 second, 835 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 10 s, completed 10 Feb 2026, 16:30:12
+=== Run 3 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 1 second, 864 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 8 s, completed 10 Feb 2026, 16:30:30
+=== Run 4 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 2 seconds, 915 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 8 s, completed 10 Feb 2026, 16:30:48
+=== Run 5 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 2 seconds, 433 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 9 s, completed 10 Feb 2026, 16:31:07
+=== Run 6 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 2 seconds, 317 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 9 s, completed 10 Feb 2026, 16:31:26
+=== Run 7 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 1 second, 310 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 8 s, completed 10 Feb 2026, 16:31:45
+=== Run 8 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 674 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 3 s, completed 10 Feb 2026, 16:31:51
+=== Run 9 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 652 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 2 s, completed 10 Feb 2026, 16:31:56
+=== Run 10 ===
+[info] welcome to sbt 1.10.10 (Eclipse Adoptium Java 11.0.19)
+[info] loading settings for project one-stop-shop-registration-frontend-build from plugins.sbt, scaffold.sbt...
+[info] loading project definition from /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/project
+[info] SbtAutoBuildPlugin - adding projectSettings
+[info] loading settings for project root from build.sbt...
+[info] SbtAutoBuildPlugin - adding global settings
+[info] SbtAutoBuildPlugin - repository is marked public. Licence headers will be added to all source files
+[info]   __              __
+[info]   \ \     ____   / /____ _ __  __
+[info]    \ \   / __ \ / // __ `// / / /
+[info]    / /  / /_/ // // /_/ // /_/ /
+[info]   /_/  / .___//_/ \__,_/ \__, /
+[info]       /_/               /____/
+[info] 
+[info] Version 3.0.9 running Java 11.0.19
+[info] 
+[info] Play is run entirely by the community. Please consider contributing and/or donating:
+[info] https://www.playframework.com/sponsors
+[info] 
+[warn] there's a key that's not used by any other settings/tasks:
+[warn]  
+[warn] * root / update / evictionWarningOptions
+[warn]   +- /Users/dorothea.toeller/Documents/IOSS/one-stop-shop-registration-frontend/build.sbt:44
+[warn]  
+[warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+[warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+[info] Building 1 concat group(s)
+[info] Optimizing 1 JavaScript(s) with Uglify
+[info] IossEtmpBankDetailsSpec:
+[info] must deserialise/serialise to and from IossEtmpBankDetails
+[info] - when all optional values are present
+[info] - when all optional values are absent
+[info] - must handle empty data object
+[info] Run completed in 710 milliseconds.
+[info] Total number of tests run: 3
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 3 s, completed 10 Feb 2026, 16:32:02
