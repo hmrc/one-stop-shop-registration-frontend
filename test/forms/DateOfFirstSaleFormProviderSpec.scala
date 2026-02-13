@@ -46,7 +46,7 @@ class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with 
 
     val validData = datesBetween(
       min = dateService.earliestSaleAllowed(),
-      max = dateService.earliestSaleAllowed().plusDays(9)
+      max = LocalDate.now(stubClockAtArbitraryDate)
     )
 
     behave like dateField(form, "value", validData)
