@@ -66,6 +66,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
           val expectedContent =
             view(
+              config.ossYourAccountUrl,
               config.feedbackUrl(request)
             )(request, messages(application)).toString
 
@@ -99,6 +100,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
         val expectedContent =
           view(
+            config.ossYourAccountUrl,
             config.feedbackUrl(request),
           )(request, messages(application)).toString
 
@@ -128,6 +130,7 @@ class AlreadyRegisteredControllerSpec extends SpecBase with MockitoSugar with Be
 
         val expectedContent =
           view(
+            config.ossYourAccountUrl,
             config.feedbackUrl(request)
           )(request, messages(application)).toString
 

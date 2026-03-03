@@ -47,8 +47,11 @@ class AlreadyRegisteredController @Inject()(
         val savedUrl = savedExternalEntry.fold(_ => None, _.url)
         registrationData match {
           case Some(_) =>
+            val redirectUrl = savedUrl.getOrElse(config.ossYourAccountUrl)
+
             Ok(
               view(
+                redirectUrl,
                 config.feedbackUrl,
                 savedUrl
               )
