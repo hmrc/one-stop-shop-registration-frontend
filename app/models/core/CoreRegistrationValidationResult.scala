@@ -18,7 +18,6 @@ package models.core
 
 import logging.Logging
 import models.exclusions.ExclusionReason
-import org.slf4j.LoggerFactory
 import play.api.libs.json.{Format, JsError, Json, JsString, JsSuccess, OFormat, Reads, Writes}
 
 import java.time.{Clock, LocalDate}
