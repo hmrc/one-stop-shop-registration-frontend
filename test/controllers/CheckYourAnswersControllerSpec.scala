@@ -21,7 +21,6 @@ import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
-import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.AuthenticatedDataRequest
 import models.responses.{ConflictFound, UnexpectedResponseStatus}
 import models.{BusinessContactDetails, CheckMode, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
@@ -39,8 +38,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, *}
-import queries.{EmailConfirmationQuery, EuDetailsQuery}
-import repositories.AuthenticatedUserAnswersRepository
+import queries.EuDetailsQuery
 import services.*
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -62,7 +60,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
   private val registrationService = mock[RegistrationService]
   private val registrationConnector = mock[RegistrationConnector]
   private val saveForLaterService = mock[SaveForLaterService]
-  private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
   private val dateService = mock[DateService]
   private val country = arbitraryCountry.arbitrary.sample.value
@@ -73,7 +70,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
     reset(registrationValidationService)
     reset(registrationService)
     reset(auditService)
-    reset(emailService)
     reset(dateService)
     reset(saveForLaterService)
   }
@@ -287,11 +283,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-        "must audit the event and redirect to the next page and successfully send email confirmation when email is enabled" in {
+        "must audit the event and redirect to the next page" in {
 
-          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-
-          when(mockSessionRepository.set(any())) thenReturn true.toFuture
           when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Valid(registration).toFuture
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Right(()).toFuture
           doNothing().when(auditService).audit(any())(any(), any())
@@ -305,41 +298,25 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[EmailService].toInstance(emailService),
-              bind[AuditService].toInstance(auditService),
-              bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
+              bind[AuditService].toInstance(auditService)
             ).build()
 
           running(application) {
-            when(emailService.sendConfirmationEmail(
-              eqTo(registration.contactDetails.fullName),
-              eqTo(registration.registeredCompanyName),
-              eqTo(registration.commencementDate),
-              eqTo(registration.contactDetails.emailAddress),
-              eqTo(NormalMode)
-            )(any(), any())) thenReturn EMAIL_ACCEPTED.toFuture
 
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, dataRequest)
-            val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
 
             status(result) `mustBe` SEE_OTHER
-            redirectLocation(result).value `mustBe` CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
+            redirectLocation(result).value `mustBe` CheckYourAnswersPage.navigate(NormalMode, userAnswers).url
 
-            verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any(), any())(any(), any())
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-            verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
           }
         }
 
-        "must audit the event and redirect to the next page and not send email confirmation when enrolment is enabled" in {
+        "must audit the event and redirect to the next page when enrolment is enabled" in {
 
-          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-
-          when(mockSessionRepository.set(any())) thenReturn true.toFuture
           when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Valid(registration).toFuture
           when(registrationConnector.submitRegistration(any())(any())) thenReturn Right(()).toFuture
           doNothing().when(auditService).audit(any())(any(), any())
@@ -352,9 +329,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[EmailService].toInstance(emailService),
-              bind[AuditService].toInstance(auditService),
-              bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
+              bind[AuditService].toInstance(auditService)
             ).build()
 
           running(application) {
@@ -363,13 +338,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, dataRequest)
-            val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, false).success.value
 
             status(result) `mustBe` SEE_OTHER
-            redirectLocation(result).value `mustBe` CheckYourAnswersPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
+            redirectLocation(result).value `mustBe` CheckYourAnswersPage.navigate(NormalMode, userAnswers).url
 
-            verifyNoInteractions(emailService)
-            verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
           }
         }

@@ -17,22 +17,17 @@
 package controllers
 
 import cats.data.Validated.{Invalid, Valid}
-import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import logging.Logging
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
-import models.emails.EmailSendingResult.EMAIL_ACCEPTED
-import models.requests.AuthenticatedDataRequest
 import models.responses.ConflictFound
 import models.{CheckMode, NormalMode}
 import pages.CheckYourAnswersPage
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
-import queries.EmailConfirmationQuery
 import services.*
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CompletionChecks
 import utils.FutureSyntax.*
@@ -43,7 +38,7 @@ import viewmodels.govuk.summarylist.*
 import views.html.CheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -52,10 +47,8 @@ class CheckYourAnswersController @Inject()(
                                             registrationService: RegistrationValidationService,
                                             auditService: AuditService,
                                             view: CheckYourAnswersView,
-                                            emailService: EmailService,
                                             commencementDateSummary: CommencementDateSummary,
-                                            saveForLaterService: SaveForLaterService,
-                                            frontendAppConfig: FrontendAppConfig
+                                            saveForLaterService: SaveForLaterService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -152,7 +145,7 @@ class CheckYourAnswersController @Inject()(
           registrationConnector.submitRegistration(registration).flatMap {
             case Right(_) =>
               auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, request))
-              sendEmailConfirmation(request, registration)
+              Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers)).toFuture
             case Left(ConflictFound) =>
               auditService.audit(RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Duplicate, request))
               Redirect(routes.AlreadyRegisteredController.onPageLoad()).toFuture
@@ -183,38 +176,6 @@ class CheckYourAnswersController @Inject()(
             )
           }
       }
-  }
-
-  private def sendEmailConfirmation(
-                                     request: AuthenticatedDataRequest[AnyContent],
-                                     registration: Registration
-                                   )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
-    if (frontendAppConfig.registrationEmailEnabled) {
-      emailService.sendConfirmationEmail(
-        registration.contactDetails.fullName,
-        registration.registeredCompanyName,
-        registration.commencementDate,
-        registration.contactDetails.emailAddress,
-        NormalMode
-      ) flatMap {
-        emailConfirmationResult =>
-          val emailSent = EMAIL_ACCEPTED == emailConfirmationResult
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-            _ <- cc.sessionRepository.set(updatedAnswers)
-          } yield {
-            Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
-          }
-      }
-    } else {
-      val emailSent = false
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-        _ <- cc.sessionRepository.set(updatedAnswers)
-      } yield {
-        Redirect(CheckYourAnswersPage.navigate(NormalMode, request.userAnswers))
-      }
-    }
   }
 }
 

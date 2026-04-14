@@ -46,7 +46,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val mfaUpliftUrl: String     = configuration.get[String]("urls.mfaUplift")
   val ivUpliftUrl: String      = configuration.get[String]("urls.ivUplift")
   val emailVerificationUrl: String = configuration.get[String]("urls.emailVerificationUrl")
-  val ossCompleteReturnUrl: String = configuration.get[String]("urls.ossCompleteReturnGuidanceUrl")
   val ossYourAccountUrl: String = configuration.get[String]("urls.yourAccountUrl")
 
   val allowedRedirectUrls: Seq[String] = configuration.get[Seq[String]]("urls.allowedRedirects")
@@ -81,7 +80,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val enrolmentsEnabled: Boolean = configuration.get[Boolean]("features.enrolments-enabled")
   val ossEnrolment: String       = configuration.get[String]("oss-enrolment")
   val iossEnrolment: String      = configuration.get[String]("ioss-enrolment")
-  val amendmentEmailEnabled: Boolean = configuration.get[Boolean]("features.amend.email-enabled")
 
   val saveForLaterTtl: Int = configuration.get[Int]("mongodb.saveForLaterTTLInDays")
 
@@ -92,8 +90,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val coreValidationUrl: Service = configuration.get[Service]("microservice.services.core-validation")
 
   val emailVerificationEnabled: Boolean = configuration.get[Boolean]("features.email-verification-enabled")
-
-  val registrationEmailEnabled: Boolean = configuration.get[Boolean]("features.registration.email-enabled")
 
   lazy val userResearchUrl1: String = configuration.get[String]("urls.userResearch1")
 

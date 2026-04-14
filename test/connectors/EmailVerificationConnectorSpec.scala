@@ -22,7 +22,7 @@ import models.emailVerification.{EmailStatus, EmailVerificationResponse, Verific
 import models.responses.UnexpectedResponseStatus
 import org.scalacheck.Gen
 import play.api.Application
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.Json
 import play.api.test.Helpers.{OK, running}
 import testutils.WireMockHelper
