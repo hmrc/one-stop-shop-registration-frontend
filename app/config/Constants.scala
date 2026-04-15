@@ -28,9 +28,6 @@ object Constants {
   val maxOssSchemes: Int = 2
   val maxIossSchemes: Int = 1
 
-  val registrationConfirmationTemplateId = "oss_registration_confirmation"
-  val amendRegistrationConfirmationTemplateId = "oss_registration_amendment_confirmation"
-
   val schemeStartDate: LocalDate = LocalDate.of(2021, 7, 1)
 
   val emailVerificationMaxEmails: Int = 10
