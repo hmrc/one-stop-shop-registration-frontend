@@ -19,16 +19,16 @@ package controllers.actions
 import config.FrontendAppConfig
 import controllers.routes
 import logging.Logging
-import models.{AmendMode, Mode, RejoinMode}
 import models.core.Match
 import models.requests.AuthenticatedDataRequest
-import play.api.mvc.{ActionFilter, Result}
+import models.{AmendMode, Mode, RejoinMode}
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionFilter, Result}
 import services.CoreRegistrationValidationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import java.time.{Clock, LocalDate}
+import java.time.Clock
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,16 +44,6 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     implicit val req: AuthenticatedDataRequest[A] = request
-
-    def getEffectiveDate(activeMatch: Match) = {
-      activeMatch.exclusionEffectiveDate match {
-        case Some(date) => date
-        case _ =>
-          val e = new IllegalStateException(s"Exclusion status code ${activeMatch.exclusionStatusCode} didn't include an expected exclusion effective date")
-          logger.error(s"Must have an Exclusion Effective Date ${e.getMessage}", e)
-          throw e
-      }
-    }
 
     if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode) || !mode.contains(RejoinMode)) {
       service.searchUkVrn(request.vrn).map {

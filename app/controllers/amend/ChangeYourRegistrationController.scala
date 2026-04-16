@@ -17,20 +17,17 @@
 package controllers.amend
 
 import cats.data.Validated.{Invalid, Valid}
-import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import controllers.amend.routes as amendRoutes
 import logging.Logging
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.{PreviousRegistration, Registration}
-import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{AmendMode, NormalMode}
 import pages.amend.ChangeYourRegistrationPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
-import queries.EmailConfirmationQuery
 import services.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,14 +35,14 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.checkExistingRegistration
 import utils.CompletionChecks
 import utils.FutureSyntax.*
+import viewmodels.checkAnswers.*
 import viewmodels.checkAnswers.euDetails.{EuDetailsSummary, TaxRegisteredInEuSummary}
 import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummary, PreviouslyRegisteredSummary}
-import viewmodels.checkAnswers.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.ChangeYourRegistrationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ChangeYourRegistrationController @Inject()(
                                                   override val messagesApi: MessagesApi,
@@ -54,9 +51,7 @@ class ChangeYourRegistrationController @Inject()(
                                                   registrationService: RegistrationValidationService,
                                                   auditService: AuditService,
                                                   view: ChangeYourRegistrationView,
-                                                  emailService: EmailService,
-                                                  commencementDateSummary: CommencementDateSummary,
-                                                  frontendAppConfig: FrontendAppConfig
+                                                  commencementDateSummary: CommencementDateSummary
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
 
   protected val controllerComponents: MessagesControllerComponents = cc
@@ -106,7 +101,7 @@ class ChangeYourRegistrationController @Inject()(
                       SubmissionResult.Success,
                       request.request
                     ))
-                  sendEmailConfirmation(request.request, registrationWithOriginalSubmissionReceived)
+                  Redirect(ChangeYourRegistrationPage.navigate(NormalMode, request.userAnswers)).toFuture
 
                 case Left(e) =>
                   logger.error(s"Unexpected result on submit: ${e.toString}")
@@ -129,38 +124,6 @@ class ChangeYourRegistrationController @Inject()(
               }
           }
       }
-  }
-
-  private def sendEmailConfirmation(
-                                     request: AuthenticatedDataRequest[AnyContent],
-                                     registration: Registration
-                                   )(implicit hc: HeaderCarrier, messages: Messages): Future[Result] = {
-    if (frontendAppConfig.amendmentEmailEnabled) {
-      emailService.sendConfirmationEmail(
-        registration.contactDetails.fullName,
-        registration.registeredCompanyName,
-        registration.commencementDate,
-        registration.contactDetails.emailAddress,
-        AmendMode
-      ) flatMap {
-        emailConfirmationResult =>
-          val emailSent = EMAIL_ACCEPTED == emailConfirmationResult
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-            _ <- cc.sessionRepository.set(updatedAnswers)
-          } yield {
-            Redirect(ChangeYourRegistrationPage.navigate(NormalMode, request.userAnswers))
-          }
-      }
-    } else {
-      val emailSent = false
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailConfirmationQuery, emailSent))
-        _ <- cc.sessionRepository.set(updatedAnswers)
-      } yield {
-        Redirect(ChangeYourRegistrationPage.navigate(NormalMode, request.userAnswers))
-      }
-    }
   }
 
   private def detailList(existingPreviousRegistrations: Seq[PreviousRegistration], cds: Option[SummaryListRow])

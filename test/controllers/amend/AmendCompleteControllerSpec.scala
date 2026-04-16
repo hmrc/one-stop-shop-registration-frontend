@@ -35,7 +35,7 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{AllTradingNames, EmailConfirmationQuery, OriginalRegistrationQuery}
+import queries.{AllTradingNames, OriginalRegistrationQuery}
 import services.{CoreRegistrationValidationService, DateService, PeriodService, RegistrationService}
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -95,7 +95,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
@@ -142,63 +141,11 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must return OK and the correct view for a GET without email confirmation" in {
-
-        val userAnswersWithoutEmail = userAnswers.copy()
-          .remove(DateOfFirstSalePage).success.value
-          .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
-          .set(OriginalRegistrationQuery, mockRegistration).success.value
-
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
-          .configure("urls.userResearch2" -> "https://test-url.com")
-          .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
-          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
-          .overrides(bind[PeriodService].toInstance(periodService))
-          .overrides(bind[DateService].toInstance(mockDateService))
-          .build()
-
-        when(periodService.getFirstReturnPeriod(any())) thenReturn Period(2022, Q4)
-        when(periodService.getNextPeriod(any())) thenReturn Period(2023, Q1)
-        when(mockDateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(LocalDate.now(stubClockAtArbitraryDate)).toFuture
-
-        when(mockCoreRegistrationValidationService.searchUkVrn(any())(any(), any())) thenReturn None.toFuture
-
-        when(mockRegistrationConnector.getSavedExternalEntry()(any())) thenReturn Right(ExternalEntryUrl(None)).toFuture
-
-        running(application) {
-          val request = FakeRequest(GET, amendRoutes.AmendCompleteController.onPageLoad().url)
-          val config = application.injector.instanceOf[FrontendAppConfig]
-          val result = route(application, request).value
-          val view = application.injector.instanceOf[AmendCompleteView]
-          implicit val msgs: Messages = messages(application)
-          val summaryList = SummaryListViewModel(rows = getAmendedCYASummaryList(
-            userAnswersWithoutEmail,
-            mockDateService,
-            mockRegistrationService,
-            Some(mockRegistration)).futureValue)
-
-          status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(
-            vrn,
-            config.feedbackUrl(request),
-            None,
-            yourAccountUrl,
-            "Company name",
-            summaryList,
-            None,
-            0,
-            "https://test-url.com"
-          )(request, messages(application)).toString
-        }
-      }
-
       "must return OK and the correct view when there is no Date Of First Sale and Is Planned First Eligible Sale is true" in {
 
         val answers = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers))
@@ -252,7 +199,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application =
@@ -313,7 +259,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
 
         val application =
@@ -362,7 +307,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
@@ -428,7 +372,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithoutEmail = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
@@ -487,7 +430,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithoutEmail = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
           .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
@@ -549,7 +491,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithoutEmail = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(OriginalRegistrationQuery, mockRegistration).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(fullName = "Test name")).success.value

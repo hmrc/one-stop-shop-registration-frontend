@@ -22,7 +22,6 @@ import cats.data.Validated.{Invalid, Valid}
 import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
-import models.emails.EmailSendingResult.EMAIL_ACCEPTED
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
@@ -39,8 +38,7 @@ import play.api.inject.bind
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, *}
-import queries.{EmailConfirmationQuery, EuDetailsQuery}
-import repositories.AuthenticatedUserAnswersRepository
+import queries.EuDetailsQuery
 import services.*
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -60,7 +58,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
   private val registrationValidationService = mock[RegistrationValidationService]
   private val registrationService = mock[RegistrationService]
   private val registrationConnector = mock[RegistrationConnector]
-  private val emailService = mock[EmailService]
   private val auditService = mock[AuditService]
   private val dateService = mock[DateService]
   private val country = arbitraryCountry.arbitrary.sample.value
@@ -70,7 +67,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
     reset(registrationConnector)
     reset(registrationValidationService)
     reset(auditService)
-    reset(emailService)
     reset(dateService)
   }
 
@@ -122,8 +118,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
-
-
+            
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
           }
@@ -283,11 +278,8 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
       "when the user has answered all necessary data and submission of the registration succeeds" - {
 
-        "must audit the event and redirect to the next page and successfully send email confirmation when enrolment is not enabled" in {
-
-          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-
-          when(mockSessionRepository.set(any())) thenReturn true.toFuture
+        "must audit the event and redirect to the next page when enrolment is not enabled" in {
+          
           when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Valid(registration).toFuture
           when(registrationConnector.amendRegistration(any())(any())) thenReturn Right(()).toFuture
           doNothing().when(auditService).audit(any())(any(), any())
@@ -299,56 +291,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             .overrides(
               bind[RegistrationValidationService].toInstance(registrationValidationService),
               bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[EmailService].toInstance(emailService),
-              bind[AuditService].toInstance(auditService),
-              bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
-            ).build()
-
-          running(application) {
-            when(emailService.sendConfirmationEmail(
-              eqTo(registration.contactDetails.fullName),
-              eqTo(registration.registeredCompanyName),
-              eqTo(registration.commencementDate),
-              eqTo(registration.contactDetails.emailAddress),
-              eqTo(AmendMode)
-            )(any(), any())) thenReturn EMAIL_ACCEPTED.toFuture
-
-            val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(false).url)
-            val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
-            val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, dataRequest)
-            val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, true).success.value
-
-            status(result) `mustBe` SEE_OTHER
-            redirectLocation(result).value `mustBe` ChangeYourRegistrationPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
-
-            verify(emailService, times(1))
-              .sendConfirmationEmail(any(), any(), any(), any(), any())(any(), any())
-            verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
-            verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
-          }
-        }
-
-        "must audit the event and redirect to the next page and not send email confirmation when send email is disabled" in {
-
-          val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
-
-          when(mockSessionRepository.set(any())) thenReturn true.toFuture
-          when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn Valid(registration).toFuture
-          when(registrationConnector.amendRegistration(any())(any())) thenReturn Right(()).toFuture
-          doNothing().when(auditService).audit(any())(any(), any())
-
-          val contactDetails = BusinessContactDetails("name", "0111 2223334", "email@example.com")
-          val userAnswers = completeUserAnswers.set(BusinessContactDetailsPage, contactDetails).success.value
-
-          val application = applicationBuilder(userAnswers = Some(userAnswers), registration = Some(registration))
-            .configure("features.amend.email-enabled" -> "false")
-            .overrides(
-              bind[RegistrationValidationService].toInstance(registrationValidationService),
-              bind[RegistrationConnector].toInstance(registrationConnector),
-              bind[EmailService].toInstance(emailService),
-              bind[AuditService].toInstance(auditService),
-              bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository)
+              bind[AuditService].toInstance(auditService)
             ).build()
 
           running(application) {
@@ -357,13 +300,10 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val result = route(application, request).value
             val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.AmendRegistration, registration, SubmissionResult.Success, dataRequest)
-            val userAnswersWithEmailConfirmation = userAnswers.copy().set(EmailConfirmationQuery, false).success.value
 
             status(result) `mustBe` SEE_OTHER
-            redirectLocation(result).value `mustBe` ChangeYourRegistrationPage.navigate(NormalMode, userAnswersWithEmailConfirmation).url
-
-            verifyNoInteractions(emailService)
-            verify(mockSessionRepository, times(1)).set(eqTo(userAnswersWithEmailConfirmation))
+            redirectLocation(result).value `mustBe` ChangeYourRegistrationPage.navigate(NormalMode, userAnswers).url
+            
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
           }
         }

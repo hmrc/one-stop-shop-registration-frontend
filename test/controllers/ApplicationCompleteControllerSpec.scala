@@ -35,7 +35,7 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{AllTradingNames, EmailConfirmationQuery}
+import queries.AllTradingNames
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
@@ -93,7 +93,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.registration.email-enabled" -> "true")
@@ -146,7 +145,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithEmail))
           .configure("features.enrolments-enabled" -> "true")
@@ -200,7 +198,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val userAnswersWithoutEmail = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithoutEmail))
           .configure("features.enrolments-enabled" -> "false")
@@ -253,7 +250,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val answers = userAnswers.copy()
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers))
           .configure("features.enrolments-enabled" -> "false")
@@ -309,7 +305,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.now()).success.value
-          .set(EmailConfirmationQuery, true).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -372,7 +367,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val answers = userAnswers.copy()
           .set(DateOfFirstSalePage, LocalDate.of(2021, 7, 1)).success.value
-          .set(EmailConfirmationQuery, true).success.value
 
         val application =
           applicationBuilder(userAnswers = Some(answers))
@@ -423,7 +417,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(HasTradingNamePage, true).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
@@ -488,7 +481,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(HasTradingNamePage, true).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
@@ -550,7 +542,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(HasTradingNamePage, true).success.value
           .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(telephoneNumber = "123456789")).success.value
@@ -615,7 +606,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(EmailConfirmationQuery, false).success.value
           .set(HasTradingNamePage, true).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(fullName = "Test name")).success.value
