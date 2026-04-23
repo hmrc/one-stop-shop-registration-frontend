@@ -17,9 +17,10 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UserAnswers
+import crypto.UserAnswersEncryptor
+import models.{EncryptedUserAnswers, UserAnswers}
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model._
+import org.mongodb.scala.model.*
 import play.api.libs.json.Format
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -31,15 +32,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthenticatedUserAnswersRepository @Inject()(
-                                                mongoComponent: MongoComponent,
-                                                appConfig: FrontendAppConfig,
-                                                clock: Clock
-                                              )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[UserAnswers](
+                                                    mongoComponent: MongoComponent,
+                                                    appConfig: FrontendAppConfig,
+                                                    encryptor: UserAnswersEncryptor,
+                                                    clock: Clock
+                                                  )(implicit ec: ExecutionContext)
+  extends PlayMongoRepository[EncryptedUserAnswers](
     collectionName = "authenticated-user-answers",
     mongoComponent = mongoComponent,
-    domainFormat   = UserAnswers.format,
-    indexes        = Seq(
+    domainFormat = EncryptedUserAnswers.format,
+    indexes = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
         IndexOptions()
@@ -68,17 +70,21 @@ class AuthenticatedUserAnswersRepository @Inject()(
         collection
           .find(byId(id))
           .headOption()
+          .map(_.map(encryptedUserAnswers =>
+            encryptor.decryptUserAnswers(encryptedUserAnswers)
+          ))
     }
 
   def set(answers: UserAnswers): Future[Boolean] = {
 
     val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
+    val encryptedUserAnswers = encryptor.encryptUserAnswers(updatedAnswers)
 
     collection
       .replaceOne(
-        filter      = byId(updatedAnswers.id),
-        replacement = updatedAnswers,
-        options     = ReplaceOptions().upsert(true)
+        filter = byId(encryptedUserAnswers.id),
+        replacement = encryptedUserAnswers,
+        options = ReplaceOptions().upsert(true)
       )
       .toFuture()
       .map(_ => true)
