@@ -149,7 +149,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           val view = application.injector.instanceOf[RejoinRegistrationView]
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
-          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
           status(result) `mustBe` OK
           contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, RejoinMode)(request, messages(application)).toString
@@ -184,7 +184,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
@@ -218,7 +218,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
@@ -251,7 +251,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
@@ -284,7 +284,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
@@ -317,7 +317,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
@@ -352,7 +352,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
@@ -387,7 +387,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
             val view = application.injector.instanceOf[RejoinRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, RejoinMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString

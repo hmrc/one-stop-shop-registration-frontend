@@ -114,7 +114,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           DesAddress("Line 1", None, None, None, None, Some("AA11 1AA"), "GB"),
           LocalDate.now,
           partOfVatGroup = false,
-          organisationName = Some("foo"),
+          organisationName = Some("Company name"),
           individualName = None,
           singleMarketIndicator = Some(true),
           Some(LocalDate.now)

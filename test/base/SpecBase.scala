@@ -18,7 +18,7 @@ package base
 
 import controllers.actions.*
 import generators.Generators
-import models.domain.{Registration, VatCustomerInfo}
+import models.domain.{PreviousRegistration, Registration, VatCustomerInfo}
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
@@ -162,16 +162,22 @@ trait SpecBase
     ).flatten
   }
 
-  def getCYASummaryList(answers: UserAnswers, dateService: DateService, registrationService: RegistrationService, mode: Mode)
-                       (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
+  def getCYASummaryList(
+                         answers: UserAnswers,
+                         dateService: DateService,
+                         registrationService: RegistrationService,
+                         previousRegsitrations: Seq[PreviousRegistration] = Seq.empty,
+                         mode: Mode
+                       )(implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
     new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
       val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode)
       val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode)
       val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode)
       val commencementDateSummaryRow = commencementDateSummary
+      val dateOfFirstSaleSumaryRow = DateOfFirstSaleSummary.row(answers, mode)
       val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(answers, mode)
-      val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, Seq.empty, mode)
+      val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, previousRegsitrations, mode)
       val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(answers, mode)
       val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(answers, mode)
       val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(answers, mode)
@@ -194,6 +200,7 @@ trait SpecBase
         },
         tradingNameSummaryRow,
         hasMadeSalesSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
+        dateOfFirstSaleSumaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
         commencementDateSummaryRow,
         previouslyRegisteredSummaryRow.map { sr =>
           if (previousRegistrationSummaryRow.isDefined) {

@@ -24,7 +24,7 @@ import org.scalacheck.Gen
 import play.api.Application
 import play.api.http.Status.*
 import play.api.libs.json.Json
-import play.api.test.Helpers.{OK, running}
+import play.api.test.Helpers.running
 import testutils.WireMockHelper
 import uk.gov.hmrc.http.HeaderCarrier
 

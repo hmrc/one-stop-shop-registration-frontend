@@ -18,9 +18,8 @@ package crypto
 
 import config.FrontendAppConfig
 import models.{EncryptedUserAnswers, UserAnswers}
-import play.api.libs.json.{JsObject, Json, JsSuccess}
+import play.api.libs.json.{JsObject, Json}
 import services.crypto.EncryptionService
-import uk.gov.hmrc.domain.Vrn
 
 import javax.inject.Inject
 

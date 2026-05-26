@@ -19,12 +19,15 @@ package controllers.amend
 import base.SpecBase
 import cats.data.NonEmptyChain
 import cats.data.Validated.{Invalid, Valid}
+import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
+import controllers.routes
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
+import models.domain.Registration
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.responses.UnexpectedResponseStatus
-import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType}
+import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
@@ -41,6 +44,7 @@ import play.api.test.Helpers.{running, *}
 import queries.EuDetailsQuery
 import services.*
 import testutils.RegistrationData
+import testutils.RegistrationData.registrationToUserAnswers
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
@@ -66,6 +70,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
   override def beforeEach(): Unit = {
     reset(registrationConnector)
     reset(registrationValidationService)
+    reset(registrationService)
     reset(auditService)
     reset(dateService)
   }
@@ -74,7 +79,118 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
     "GET" - {
 
-      "must return OK and the correct view when answers are complete" in {
+      "must return OK and the correct view when answers are complete and have not been amended" in {
+
+        val commencementDate = LocalDate.of(2022, 1, 1)
+
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+        when(registrationService.toUserAnswers(any(), any(), any())) thenReturn registrationToUserAnswers.toFuture
+
+        val application = applicationBuilder(userAnswers = Some(registrationToUserAnswers), registration = Some(registration))
+          .overrides(
+            bind[DateService].toInstance(dateService),
+            bind[RegistrationService].toInstance(registrationService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[ChangeYourRegistrationView]
+          implicit val msgs: Messages = messages(application)
+          val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(registrationToUserAnswers))
+          val list = SummaryListViewModel(rows = getCYASummaryList(registrationToUserAnswers, dateService, registrationService, RegistrationData.registration.previousRegistrations, AmendMode)(request = dataRequest.request).futureValue)
+
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val yourAccountUrl: String = config.ossYourAccountUrl
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, yourAccountUrl, AmendMode)(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view when answers are complete and original answers have been changed" in {
+
+        val commencementDate = LocalDate.of(2022, 1, 1)
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+        when(registrationService.toUserAnswers(any(), any(), any())) thenReturn registrationToUserAnswers.toFuture
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers), registration = Some(registration))
+          .overrides(
+            bind[DateService].toInstance(dateService),
+            bind[RegistrationService].toInstance(registrationService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[ChangeYourRegistrationView]
+          implicit val msgs: Messages = messages(application)
+          val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, RegistrationData.registration.previousRegistrations, AmendMode)(request = dataRequest.request).futureValue)
+
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val yourAccountUrl: String = config.ossYourAccountUrl
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+        }
+      }
+
+      "must redirect to Business Contact Details page when unusable status is true" in {
+
+        val commencementDate = LocalDate.of(2022, 1, 1)
+        val registrationWithUnusableStatus: Registration = registration.copy(unusableStatus = Some(true))
+
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+        when(registrationService.toUserAnswers(any(), any(), any())) thenReturn registrationToUserAnswers.toFuture
+
+        val application = applicationBuilder(userAnswers = Some(registrationToUserAnswers), registration = Some(registrationWithUnusableStatus))
+          .overrides(
+            bind[DateService].toInstance(dateService),
+            bind[RegistrationService].toInstance(registrationService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` routes.BusinessContactDetailsController.onPageLoad(AmendMode).url
+          verifyNoInteractions(registrationService)
+        }
+      }
+
+      "must throw an exception when no VAT info is present" in {
+
+        val answersWithoutVatInfo: UserAnswers = emptyUserAnswers
+
+        val errorMessage: String = "Vat information was not found"
+
+        val application = applicationBuilder(userAnswers = Some(answersWithoutVatInfo), registration = Some(registration))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
+          val result = route(application, request).value
+
+          whenReady(result.failed) { exp =>
+            exp `mustBe` a[Exception]
+            exp.getMessage `mustBe` errorMessage
+          }
+          verifyNoInteractions(registrationService)
+        }
+      }
+
+      "must return OK and the correct view when answers are complete and " in {
 
         val commencementDate = LocalDate.of(2022, 1, 1)
         when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
@@ -91,10 +207,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val view = application.injector.instanceOf[ChangeYourRegistrationView]
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
-          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val yourAccountUrl: String = config.ossYourAccountUrl
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, AmendMode)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
         }
       }
 
@@ -117,10 +236,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
-            
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
+
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -141,10 +263,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -165,10 +290,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -189,10 +317,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -213,10 +344,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -239,10 +373,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -265,10 +402,13 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val view = application.injector.instanceOf[ChangeYourRegistrationView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, AmendMode)(request = dataRequest.request).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
       }
@@ -303,7 +443,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
             status(result) `mustBe` SEE_OTHER
             redirectLocation(result).value `mustBe` ChangeYourRegistrationPage.navigate(NormalMode, userAnswers).url
-            
+
             verify(auditService, times(1)).audit(eqTo(expectedAuditEvent))(any(), any())
           }
         }
