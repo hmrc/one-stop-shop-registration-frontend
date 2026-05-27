@@ -353,9 +353,9 @@ trait ModelGenerators {
     Arbitrary {
       for {
         accountName <- Gen.alphaStr
-        bic <- Gen.option(arbitrary[Bic])
+        bic <- arbitrary[Bic]
         iban <- arbitrary[Iban]
-      } yield IossEtmpBankDetails(accountName, bic, iban)
+      } yield IossEtmpBankDetails(accountName, Some(bic), iban)
     }
   }
 
