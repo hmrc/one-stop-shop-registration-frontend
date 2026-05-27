@@ -17,17 +17,19 @@
 package controllers.amend
 
 import cats.data.Validated.{Invalid, Valid}
+import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.actions.AuthenticatedControllerComponents
 import controllers.amend.routes as amendRoutes
 import logging.Logging
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
-import models.domain.{PreviousRegistration, Registration}
+import models.domain.{PreviousRegistration, Registration, VatCustomerInfo}
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{AmendMode, NormalMode}
 import pages.amend.ChangeYourRegistrationPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
+import queries.OriginalRegistrationQuery
 import services.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -42,14 +44,16 @@ import viewmodels.govuk.summarylist.*
 import views.html.amend.ChangeYourRegistrationView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ChangeYourRegistrationController @Inject()(
                                                   override val messagesApi: MessagesApi,
                                                   cc: AuthenticatedControllerComponents,
                                                   registrationConnector: RegistrationConnector,
-                                                  registrationService: RegistrationValidationService,
+                                                  registrationValidationService: RegistrationValidationService,
                                                   auditService: AuditService,
+                                                  registrationService: RegistrationService,
+                                                  frontendAppConfig: FrontendAppConfig,
                                                   view: ChangeYourRegistrationView,
                                                   commencementDateSummary: CommencementDateSummary
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
@@ -70,12 +74,32 @@ class ChangeYourRegistrationController @Inject()(
         ).flatten
       )
 
-      commencementDateSummary.row(request.userAnswers)(request = request.request).map { cds =>
+      commencementDateSummary.row(request.userAnswers)(request = request.request).flatMap { cds =>
 
         val list: SummaryList = detailList(existingPreviousRegistrations, cds)(request.request)
 
         val isValid = validate()(request.request)
-        Ok(view(vatRegistrationDetailsList, list, isValid, AmendMode))
+
+        request.userAnswers.vatInfo match {
+          case Some(vatCustomerInfo: VatCustomerInfo) =>
+            for {
+              originalUserAnswers <- registrationService.toUserAnswers(request.userId, request.registration, vatCustomerInfo)
+              userAnswersWithoutOriginalRegistration <- Future.fromTry(request.userAnswers.remove(OriginalRegistrationQuery))
+            } yield {
+
+              val noAmendments = originalUserAnswers.data == userAnswersWithoutOriginalRegistration.data
+
+              val unusableStatus: Boolean = request.registration.unusableStatus.contains(true)
+              val noAmendmentsWithUnusableStatusCheck: Boolean = noAmendments && !unusableStatus
+              
+              Ok(view(vatRegistrationDetailsList, list, isValid, noAmendmentsWithUnusableStatusCheck, frontendAppConfig.ossYourAccountUrl, AmendMode))
+            }
+          case None =>
+            val errorMessage: String = "Vat information was not found"
+            logger.error(errorMessage)
+            val exception: Exception = new Exception(errorMessage)
+            throw exception
+        }
       }
   }
 
@@ -89,7 +113,7 @@ class ChangeYourRegistrationController @Inject()(
           Redirect(routes.ChangeYourRegistrationController.onPageLoad()).toFuture
         }
         case None =>
-          registrationService.fromUserAnswers(request.userAnswers, request.vrn)(request = request.request).flatMap {
+          registrationValidationService.fromUserAnswers(request.userAnswers, request.vrn)(request = request.request).flatMap {
             case Valid(registration) =>
               val registrationWithOriginalSubmissionReceived = registration.copy(submissionReceived = request.registration.submissionReceived)
               registrationConnector.amendRegistration(registrationWithOriginalSubmissionReceived).flatMap {

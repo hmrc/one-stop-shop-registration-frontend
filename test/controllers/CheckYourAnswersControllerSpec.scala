@@ -95,7 +95,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           val view = application.injector.instanceOf[CheckYourAnswersView]
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(completeUserAnswers))
-          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, CheckMode).futureValue)
+          val list = SummaryListViewModel(rows = getCYASummaryList(completeUserAnswers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
           status(result) `mustBe` OK
           contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, CheckMode)(request, messages(application)).toString
@@ -121,7 +121,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
 
             status(result) `mustBe` OK
@@ -146,7 +146,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
@@ -170,7 +170,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
@@ -194,7 +194,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
@@ -218,7 +218,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
@@ -244,7 +244,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
@@ -270,7 +270,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val view = application.injector.instanceOf[CheckYourAnswersView]
             implicit val msgs: Messages = messages(application)
             val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, CheckMode).futureValue)
+            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
             contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString

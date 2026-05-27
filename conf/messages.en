@@ -850,6 +850,8 @@ salesDeclarationNotRequired.p1 = You must still tell us about countries where yo
 changeYourRegistration.title = Change Your Registration
 changeYourRegistration.heading = Change Your Registration
 changeYourRegistration.info.p1 = Confirm these changes to save them to your account.
+changeYourRegistration.noAmendments = You have not made any changes.
+changeYourRegistration.returnToYourAccount = <a class="govuk-link" id="returnToYourAccount" href="{0}">Return to your account</a>
 
 amendComplete.title = Registration details changed
 amendComplete.heading = Registration details changed

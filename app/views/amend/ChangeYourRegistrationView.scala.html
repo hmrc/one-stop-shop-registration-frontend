@@ -24,7 +24,14 @@
         govukWarningText: GovukWarningText
 )
 
-@(vatRegistrationDetailsList: SummaryList, list: SummaryList, isValid: Boolean, mode: Mode)(implicit request: Request[_], messages: Messages)
+@(
+    vatRegistrationDetailsList: SummaryList,
+    list: SummaryList,
+    isValid: Boolean,
+    noAmendmentsWithUnusableStatusCheck: Boolean,
+    ossYourAccountUrl: String,
+    mode: Mode
+)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(messages("changeYourRegistration.title"))) {
 
@@ -53,11 +60,15 @@
 
         @govukSummaryList(list)
 
-        <p class="govuk-body">@messages("changeYourRegistration.info.p1")</p>
-
         @if(isValid) {
-            @formHelper(action = controllers.amend.routes.ChangeYourRegistrationController.onSubmit(false)) {
-                @button("site.confirm", controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url, mode)
+            @if(noAmendmentsWithUnusableStatusCheck) {
+                <p class="govuk-body">@messages("changeYourRegistration.noAmendments")</p>
+                <p class="govuk-body">@Html(messages("changeYourRegistration.returnToYourAccount", ossYourAccountUrl))</p>
+            } else {
+                <p class="govuk-body">@messages("changeYourRegistration.info.p1")</p>
+                @formHelper(action = controllers.amend.routes.ChangeYourRegistrationController.onSubmit(false)) {
+                    @button("site.confirm", controllers.amend.routes.ChangeYourRegistrationController.onPageLoad().url, mode)
+                }
             }
         } else {
             <h2 class="govuk-heading-m push--top">@messages("error.missing_answers_header")</h2>
