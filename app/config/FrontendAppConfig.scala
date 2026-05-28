@@ -63,8 +63,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host") + configuration.get[String]("feedback-frontend.url")
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/${origin.toLowerCase}"
 
-  val userResearchUrl : String = configuration.get[String]("urls.userResearchUrl")
-
   val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
 
