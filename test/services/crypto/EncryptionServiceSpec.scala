@@ -20,6 +20,9 @@ import base.SpecBase
 import org.scalatest.matchers.should.Matchers.should
 import play.api.Configuration
 import play.api.test.Helpers.running
+import uk.gov.hmrc.crypto.{PlainText, SymmetricCryptoFactory}
+
+import scala.util.Success
 
 
 class EncryptionServiceSpec extends SpecBase {
@@ -56,6 +59,23 @@ class EncryptionServiceSpec extends SpecBase {
         val invalidEncryptedValue = service.encryptField(textToEncrypt) + "any"
         val result = intercept[SecurityException](service.decryptField(invalidEncryptedValue))
         result.getMessage mustBe "Unable to decrypt value"
+      }
+    }
+
+    "ensure legacy encrypted value can be decrypted" in {
+      val textToEncrypt: String = "Test String"
+      val application = applicationBuilder().build()
+      running(application) {
+        val configuration: Configuration = application.configuration
+        val service: EncryptionService = new EncryptionService(configuration)
+        val legacyCrypto =  SymmetricCryptoFactory.aesCryptoFromConfig(
+          baseConfigKey = "mongodb.encryption",
+          config = configuration.underlying
+        )
+        val encryptedValue = legacyCrypto.encrypt(PlainText(textToEncrypt)).value
+        val result = service.decryptField(encryptedValue)
+        result mustBe a[String]
+        result mustBe textToEncrypt
       }
     }
   }

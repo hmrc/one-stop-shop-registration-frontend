@@ -20,11 +20,17 @@ import play.api.Configuration
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText, SymmetricCryptoFactory}
 
 import javax.inject.{Inject, Singleton}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class EncryptionService @Inject()(configuration: Configuration) {
 
-  protected lazy val crypto: Encrypter with Decrypter = SymmetricCryptoFactory.aesCryptoFromConfig(
+  protected lazy val crypto: Encrypter with Decrypter = SymmetricCryptoFactory.aesGcmCryptoFromConfig(
+    baseConfigKey = "mongodb.encryption",
+    config = configuration.underlying
+  )
+
+  protected lazy val legacyCrypto: Encrypter with Decrypter = SymmetricCryptoFactory.aesCryptoFromConfig(
     baseConfigKey = "mongodb.encryption",
     config = configuration.underlying
   )
@@ -33,9 +39,15 @@ class EncryptionService @Inject()(configuration: Configuration) {
    crypto.encrypt(PlainText(rawValue)).value
   }
 
-
   def decryptField(decryptedValue: String): String = {
-    crypto.decrypt(Crypted(decryptedValue)).value
+    Try {
+      crypto.decrypt(Crypted(decryptedValue)).value
+    } match {
+      case Success(value) =>
+        value
+      case Failure(_) =>
+        legacyCrypto.decrypt(Crypted(decryptedValue)).value
+    }
   }
 
 }
