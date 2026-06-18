@@ -22,8 +22,6 @@ import play.api.Configuration
 import play.api.test.Helpers.running
 import uk.gov.hmrc.crypto.{PlainText, SymmetricCryptoFactory}
 
-import scala.util.Success
-
 
 class EncryptionServiceSpec extends SpecBase {
   "EncryptionService" - {
