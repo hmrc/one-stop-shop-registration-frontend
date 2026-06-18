@@ -40,7 +40,7 @@ class AuthenticatedUserAnswersRepositorySpec
 
   private val mockConfiguration = mock[Configuration]
   private val mockConfig = mock[Config]
-  private val mockEncryptionService: EncryptionService = new EncryptionService(mockConfiguration)
+  private val mockEncryptionService: EncryptionService = mock[EncryptionService]
   private val encryptor = new UserAnswersEncryptor(mockAppConfig, mockEncryptionService)
   private val secretKey: String = "VqmXp7yigDFxbCUdDdNZVIvbW6RgPNJsliv6swQNCL8="
 
@@ -54,19 +54,23 @@ class AuthenticatedUserAnswersRepositorySpec
   when(mockConfiguration.underlying) thenReturn mockConfig
   when(mockConfig.getString(any())) thenReturn secretKey
   when(mockAppConfig.encryptionKey) thenReturn secretKey
+  private val encryptedUserAnswersData = "WovNVJUSKWKgpi/IrP3cgnx1COboOHM/0XqRS8XWpoD0Gj2Ng+DxqPUEXnEP"
+  when(mockEncryptionService.encryptField(any())) thenReturn encryptedUserAnswersData
+  when(mockEncryptionService.decryptField(any())) thenReturn userAnswers.data.toString
+
+  private val encryptedUserAnswers = EncryptedUserAnswers(userAnswers.id, encryptedUserAnswersData, None, Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
 
   ".set" - {
 
     "must set the last updated time on the supplied user answers to `now`, and save them" in {
 
       val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
-      val encryptedExpectedResult = encryptor.encryptUserAnswers(expectedResult)
 
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
       setResult mustEqual true
-      updatedRecord mustEqual encryptedExpectedResult
+      updatedRecord mustEqual encryptedUserAnswers
     }
   }
 
@@ -76,7 +80,7 @@ class AuthenticatedUserAnswersRepositorySpec
 
       "must update the lastUpdated time and get the record" in {
 
-        insert(encryptor.encryptUserAnswers(userAnswers)).futureValue
+        insert(encryptedUserAnswers).futureValue
 
         val result         = repository.get(userAnswers.id).futureValue
         val expectedResult = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
@@ -98,7 +102,7 @@ class AuthenticatedUserAnswersRepositorySpec
 
     "must remove a record" in {
 
-      insert(encryptor.encryptUserAnswers(userAnswers)).futureValue
+      insert(encryptedUserAnswers).futureValue
 
       val result = repository.clear(userAnswers.id).futureValue
 
@@ -119,17 +123,14 @@ class AuthenticatedUserAnswersRepositorySpec
 
       "must update its lastUpdated to `now` and return true" in {
 
-        insert(encryptor.encryptUserAnswers(userAnswers)).futureValue
+        insert(encryptedUserAnswers).futureValue
 
         val result = repository.keepAlive(userAnswers.id).futureValue
-
-        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = Instant.now(stubClock).truncatedTo(ChronoUnit.MILLIS))
-        val encryptedExpectedUpdatedAnswers = encryptor.encryptUserAnswers(expectedUpdatedAnswers)
 
         result mustEqual true
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
-        updatedAnswers mustEqual encryptedExpectedUpdatedAnswers
+        updatedAnswers mustEqual encryptedUserAnswers
       }
     }
 
