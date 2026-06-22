@@ -16,17 +16,19 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.HasWebsiteFormProvider
 import models.Mode
 import pages.HasWebsitePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AllWebsites
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HasWebsiteView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class HasWebsiteController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -57,8 +59,16 @@ class HasWebsiteController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
+          val cleanedAnswersTry =
+            if (!value && !mode.isInCheck) {
+              request.userAnswers.remove(AllWebsites)
+            } else {
+              Success(request.userAnswers)
+            }
+
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasWebsitePage, value))
+            cleanedAnswers <- Future.fromTry(cleanedAnswersTry)
+            updatedAnswers <- Future.fromTry(cleanedAnswers.set(HasWebsitePage, value))
             _              <- cc.sessionRepository.set(updatedAnswers)
           } yield Redirect(HasWebsitePage.navigate(mode, updatedAnswers))
       )

@@ -16,19 +16,20 @@
 
 package controllers.previousRegistrations
 
-import controllers.actions._
+import controllers.actions.*
 import forms.previousRegistrations.PreviouslyRegisteredFormProvider
 import models.Mode
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.previousRegistration.{AllPreviousRegistrationsRawQuery, DeriveNumberOfPreviousRegistrations}
+import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsRawQuery, DeriveNumberOfPreviousRegistrations}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.cleanup
 import views.html.previousRegistrations.PreviouslyRegisteredView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class PreviouslyRegisteredController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -59,8 +60,16 @@ class PreviouslyRegisteredController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
+          val cleanedAnswersTry =
+            if (!value && !mode.isInCheck) {
+              request.userAnswers.remove(AllPreviousRegistrationsQuery)
+            } else {
+              Success(request.userAnswers)
+            }
+
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PreviouslyRegisteredPage, value))
+            cleanedAnswers <- Future.fromTry(cleanedAnswersTry)
+            updatedAnswers <- Future.fromTry(cleanedAnswers.set(PreviouslyRegisteredPage, value))
             finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfPreviousRegistrations, AllPreviousRegistrationsRawQuery))
             _ <- cc.sessionRepository.set(finalAnswers)
           } yield {

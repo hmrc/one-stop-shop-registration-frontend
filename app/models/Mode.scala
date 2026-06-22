@@ -29,6 +29,9 @@ sealed trait Mode {
   def isInRejoin: Boolean = {
     this == RejoinMode || this == RejoinLoopMode
   }
+
+  def isInCheck: Boolean =
+    this == CheckMode || this == CheckLoopMode
 }
 
 case object CheckMode extends Mode
