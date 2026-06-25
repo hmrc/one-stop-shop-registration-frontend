@@ -16,19 +16,20 @@
 
 package controllers.euDetails
 
-import controllers.actions._
+import controllers.actions.*
 import forms.euDetails.TaxRegisteredInEuFormProvider
 import models.Mode
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{AllEuDetailsRawQuery, DeriveNumberOfEuRegistrations}
+import queries.{AllEuDetailsQuery, AllEuDetailsRawQuery, DeriveNumberOfEuRegistrations}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckExistingRegistrations.cleanup
 import views.html.euDetails.TaxRegisteredInEuView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class TaxRegisteredInEuController @Inject()(
                                              override val messagesApi: MessagesApi,
@@ -58,8 +59,16 @@ class TaxRegisteredInEuController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
+          val cleanedAnswersTry =
+            if (!value && !mode.isInCheck) {
+              request.userAnswers.remove(AllEuDetailsQuery)
+            } else {
+              Success(request.userAnswers)
+            }
+
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRegisteredInEuPage, value))
+            cleanedAnswers <- Future.fromTry(cleanedAnswersTry)
+            updatedAnswers <- Future.fromTry(cleanedAnswers.set(TaxRegisteredInEuPage, value))
             finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfEuRegistrations, AllEuDetailsRawQuery))
             _ <- cc.sessionRepository.set(finalAnswers)
           } yield Redirect(TaxRegisteredInEuPage.navigate(mode, finalAnswers))
