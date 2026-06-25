@@ -44,9 +44,18 @@ class PreviouslyRegisteredController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
 
+      val hasPreviousRegistrations = request.userAnswers.get(AllPreviousRegistrationsQuery).exists(_.nonEmpty)
+
       val preparedForm = request.userAnswers.get(PreviouslyRegisteredPage) match {
         case None => form
-        case Some(value) => form.fill(value)
+        case Some(value) =>
+          if ((mode.isInAmend || mode.isInRejoin) && hasPreviousRegistrations) {
+            throw new RuntimeException(
+              "Cannot change otherOneStopRegistrations when in amend mode and have existing registrations"
+            )
+          } else {
+            form.fill(value)
+          }
       }
 
       Ok(view(preparedForm, mode))
@@ -60,20 +69,28 @@ class PreviouslyRegisteredController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          val cleanedAnswersTry =
-            if (!value && !mode.isInCheck) {
-              request.userAnswers.remove(AllPreviousRegistrationsQuery)
-            } else {
-              Success(request.userAnswers)
-            }
+          val hasPreviousRegistrations = request.userAnswers.get(AllPreviousRegistrationsQuery).exists(_.nonEmpty)
+          
+          if (!value && (mode.isInAmend || mode.isInRejoin) && hasPreviousRegistrations) {
+            throw new RuntimeException(
+              "Cannot change otherOneStopRegistrations when in amend mode and have existing registrations"
+            )
+          } else {
+            val cleanedAnswersTry =
+              if (!value && !mode.isInCheck) {
+                request.userAnswers.remove(AllPreviousRegistrationsQuery)
+              } else {
+                Success(request.userAnswers)
+              }
 
-          for {
-            cleanedAnswers <- Future.fromTry(cleanedAnswersTry)
-            updatedAnswers <- Future.fromTry(cleanedAnswers.set(PreviouslyRegisteredPage, value))
-            finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfPreviousRegistrations, AllPreviousRegistrationsRawQuery))
-            _ <- cc.sessionRepository.set(finalAnswers)
-          } yield {
-            Redirect(PreviouslyRegisteredPage.navigate(mode, finalAnswers))
+            for {
+              cleanedAnswers <- Future.fromTry(cleanedAnswersTry)
+              updatedAnswers <- Future.fromTry(cleanedAnswers.set(PreviouslyRegisteredPage, value))
+              finalAnswers <- Future.fromTry(cleanup(updatedAnswers, DeriveNumberOfPreviousRegistrations, AllPreviousRegistrationsRawQuery))
+              _ <- cc.sessionRepository.set(finalAnswers)
+            } yield {
+              Redirect(PreviouslyRegisteredPage.navigate(mode, finalAnswers))
+            }
           }
       )
   }
