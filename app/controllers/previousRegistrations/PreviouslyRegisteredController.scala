@@ -71,7 +71,7 @@ class PreviouslyRegisteredController @Inject()(
         value =>
           val hasPreviousRegistrations = request.userAnswers.get(AllPreviousRegistrationsQuery).exists(_.nonEmpty)
 
-          if (!value && !mode.isInAmendOrRejoin && hasPreviousRegistrations) {
+          if (!value && mode.isInAmendOrRejoin && hasPreviousRegistrations) {
             throw new RuntimeException(
               "Cannot change otherOneStopRegistrations when in amend mode and have existing registrations"
             )
