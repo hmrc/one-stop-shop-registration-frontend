@@ -49,7 +49,7 @@ class PreviouslyRegisteredController @Inject()(
       val preparedForm = request.userAnswers.get(PreviouslyRegisteredPage) match {
         case None => form
         case Some(value) =>
-          if ((mode.isInAmend || mode.isInRejoin) && hasPreviousRegistrations) {
+          if (mode.isInAmendOrRejoin && hasPreviousRegistrations) {
             throw new RuntimeException(
               "Cannot change otherOneStopRegistrations when in amend mode and have existing registrations"
             )
@@ -70,14 +70,14 @@ class PreviouslyRegisteredController @Inject()(
 
         value =>
           val hasPreviousRegistrations = request.userAnswers.get(AllPreviousRegistrationsQuery).exists(_.nonEmpty)
-          
-          if (!value && (mode.isInAmend || mode.isInRejoin) && hasPreviousRegistrations) {
+
+          if (!value && !mode.isInAmendOrRejoin && hasPreviousRegistrations) {
             throw new RuntimeException(
               "Cannot change otherOneStopRegistrations when in amend mode and have existing registrations"
             )
           } else {
             val cleanedAnswersTry =
-              if (!value && !mode.isInCheck) {
+              if (!value && !mode.isInCheck && !mode.isInAmendOrRejoin) {
                 request.userAnswers.remove(AllPreviousRegistrationsQuery)
               } else {
                 Success(request.userAnswers)

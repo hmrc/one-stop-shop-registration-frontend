@@ -60,7 +60,7 @@ class HasWebsiteController @Inject()(
 
         value =>
           val cleanedAnswersTry =
-            if (!value && !mode.isInCheck) {
+            if (!value && !mode.isInCheck && !mode.isInAmendOrRejoin) {
               request.userAnswers.remove(AllWebsites)
             } else {
               Success(request.userAnswers)
