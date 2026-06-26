@@ -49,7 +49,7 @@ class PreviouslyRegisteredController @Inject()(
       val preparedForm = request.userAnswers.get(PreviouslyRegisteredPage) match {
         case None => form
         case Some(value) =>
-          if (!mode.isInAmendOrRejoin && hasPreviousRegistrations) {
+          if (mode.isInAmendOrRejoin && hasPreviousRegistrations) {
             throw new RuntimeException(
               "Cannot change otherOneStopRegistrations when in amend mode and have existing registrations"
             )
