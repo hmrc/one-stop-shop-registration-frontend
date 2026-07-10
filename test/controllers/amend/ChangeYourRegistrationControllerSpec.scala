@@ -246,33 +246,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           }
         }
 
-        "websites are missing" in {
-
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
-          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
-
-          val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
-          val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
-            .overrides(bind[DateService].toInstance(dateService))
-            .build()
-
-          running(application) {
-            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
-            val result = route(application, request).value
-            val view = application.injector.instanceOf[ChangeYourRegistrationView]
-            implicit val msgs: Messages = messages(application)
-            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, AmendMode)(request = dataRequest.request).futureValue)
-
-            val config = application.injector.instanceOf[FrontendAppConfig]
-            val yourAccountUrl: String = config.ossYourAccountUrl
-
-            status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
-          }
-        }
-
         "eligible sales is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
@@ -594,26 +567,6 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
 
               status(result) `mustBe` SEE_OTHER
               redirectLocation(result).value `mustBe` controllers.routes.DateOfFirstSaleController.onPageLoad(AmendMode).url
-            }
-          }
-
-          "to Has Website when websites are not populated correctly" in {
-
-            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
-              Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
-
-            val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
-
-            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
-              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
-              .build()
-
-            running(application) {
-              val request = FakeRequest(POST, amendRoutes.ChangeYourRegistrationController.onSubmit(true).url)
-              val result = route(application, request).value
-
-              status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.routes.HasWebsiteController.onPageLoad(AmendMode).url
             }
           }
 

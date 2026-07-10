@@ -232,15 +232,18 @@ addTradingName.iossRegistration.warning = Any changes you make here will also up
 addTradingName.iossRegistration.previous.warning = Any changes you make here will also update the trading names in your previous Import One Stop Shop registration.
 addTradingName.iossRegistration.multiple.warning = Any changes you make here will also update the trading names in all of your Import One Stop Shop registrations.
 
-website.title = Enter a website you use to sell your goods
-website.heading = Enter a website you use to sell your goods
+website.title = Enter a website your business uses to sell goods
+website.heading = Enter a website your business uses to sell goods (optional)
+website.hint.text = Leave blank if your business does not sell goods online.
 website.checkYourAnswersLabel = Website address
 website.error.required = Enter a website address
 website.error.length = Website address must be 250 characters or less
 website.error.duplicate = You entered this website address already. Enter a different one.
 website.error.invalid = Enter a website address in the correct format, like https://www.gov.uk
 website.change.hidden = website address
+websites.add.hidden = add website address
 website.change.heading = What is your website address?
+website.noneSupplied = None supplied
 
 deleteWebsite.title = Are you sure you need to remove {0}?
 deleteWebsite.heading = Are you sure you need to remove {0}?
@@ -552,12 +555,6 @@ euTaxReference.error.length = Tax identification number must be 20 characters or
 euTaxReference.error.format = Tax identification number must only include letters, numbers and spaces
 euTaxReference.change.hidden = your tax identification number
 
-hasWebsite.title = Do you sell your goods online?
-hasWebsite.heading = Do you sell your goods online?
-hasWebsite.checkYourAnswersLabel = Sell goods online
-hasWebsite.error.required = Select yes if you sell your goods online
-hasWebsite.change.hidden = if you sell your goods online
-
 inControlOfMovingGoods.title = How do you ship goods to consumers in the EU?
 inControlOfMovingGoods.heading = How do you ship goods to consumers in the EU?
 inControlOfMovingGoods.error.required = Select how you ship goods to consumers in the EU
@@ -865,12 +862,6 @@ amendComplete.feedback.30seconds = (takes 30 seconds)
 amendComplete.iossRegistration.updated = We''ve also updated your Import One Stop Shop registration.
 amendComplete.iossRegistration.previous.updated = We''ve also updated your previous Import One Stop Shop registration.
 amendComplete.iossRegistration.multiple.updated = We''ve also updated your previous Import One Stop Shop registrations.
-
-deleteAllWebsites.title = Remove all your website information from this scheme?
-deleteAllWebsites.heading = Remove all your website information from this scheme?
-deleteAllWebsites.warning = This will delete all the trading websites you have added.
-deleteAllWebsites.error.required = Select yes if you want to remove all your website information from this scheme
-deleteAllWebsites.change.hidden = Remove all your website information from this scheme
 
 deleteAllTradingNames.title = Remove all your alternative trading names from this scheme?
 deleteAllTradingNames.heading = Remove all your alternative trading names from this scheme?

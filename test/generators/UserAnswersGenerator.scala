@@ -32,7 +32,6 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(DeleteAllPreviousRegistrationsPage.type, JsValue)] ::
     arbitrary[(DeleteAllEuDetailsPage.type, JsValue)] ::
     arbitrary[(DeleteAllTradingNamesPage.type, JsValue)] ::
-    arbitrary[(DeleteAllWebsitesPage.type, JsValue)] ::
     arbitrary[(RegistrationTypePage, JsValue)] ::
     arbitrary[(SellsGoodsToEUConsumerMethodPage, JsValue)] ::
     arbitrary[(SellsGoodsToEUConsumersPage, JsValue)] ::
@@ -47,7 +46,6 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(IsOnlineMarketplacePage.type, JsValue)] ::
     arbitrary[(DateOfFirstSalePage.type, JsValue)] ::
     arbitrary[(TaxRegisteredInEuPage.type, JsValue)] ::
-    arbitrary[(HasWebsitePage.type, JsValue)] ::
     arbitrary[(EuTaxReferencePage, JsValue)] ::
     arbitrary[(BankDetailsPage.type, JsValue)] ::
     arbitrary[(PreviouslyRegisteredPage.type, JsValue)] ::

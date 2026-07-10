@@ -353,15 +353,6 @@ POST        /rejoin-amend-eu-tax-number/:index                                  
 GET         /rejoin-first-amend-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onPageLoad(mode: Mode = RejoinLoopMode, index: Index)
 POST        /rejoin-first-amend-eu-tax-number/:index                                   controllers.euDetails.EuTaxReferenceController.onSubmit(mode: Mode = RejoinLoopMode, index: Index)
 
-GET         /give-website-address                                                      controllers.HasWebsiteController.onPageLoad(mode: Mode = NormalMode)
-POST        /give-website-address                                                      controllers.HasWebsiteController.onSubmit(mode: Mode = NormalMode)
-GET         /check-give-website-address                                                controllers.HasWebsiteController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-give-website-address                                                controllers.HasWebsiteController.onSubmit(mode: Mode = CheckMode)
-GET         /amend-give-website-address                                                controllers.HasWebsiteController.onPageLoad(mode: Mode = AmendMode)
-POST        /amend-give-website-address                                                controllers.HasWebsiteController.onSubmit(mode: Mode = AmendMode)
-GET         /rejoin-amend-give-website-address                                         controllers.HasWebsiteController.onPageLoad(mode: Mode = RejoinMode)
-POST        /rejoin-amend-give-website-address                                         controllers.HasWebsiteController.onSubmit(mode: Mode = RejoinMode)
-
 GET         /sell-from-northern-ireland                                                controllers.SellsGoodsFromNiController.onPageLoad()
 POST        /sell-from-northern-ireland                                                controllers.SellsGoodsFromNiController.onSubmit()
 GET         /check-sell-from-northern-ireland                                          controllers.SellsGoodsFromNiController.onPageLoad()
@@ -580,13 +571,6 @@ GET         /start-amend-journey                                                
 
 GET         /change-your-registration                                                  controllers.amend.ChangeYourRegistrationController.onPageLoad()
 POST        /change-your-registration                                                  controllers.amend.ChangeYourRegistrationController.onSubmit(incompletePrompt: Boolean)
-
-GET         /check-remove-all-websites                                                 controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-remove-all-websites                                                 controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = CheckMode)
-GET         /amend-remove-all-websites                                                 controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = AmendMode)
-POST        /amend-remove-all-websites                                                 controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = AmendMode)
-GET         /rejoin-amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onPageLoad(mode: Mode = RejoinMode)
-POST        /rejoin-amend-remove-all-websites                                          controllers.DeleteAllWebsitesController.onSubmit(mode: Mode = RejoinMode)
 
 GET         /check-remove-all-trading-names                                            controllers.DeleteAllTradingNamesController.onPageLoad(mode: Mode = CheckMode)
 POST        /check-remove-all-trading-names                                            controllers.DeleteAllTradingNamesController.onSubmit(mode: Mode = CheckMode)

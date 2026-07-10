@@ -216,16 +216,7 @@ class ChangeYourRegistrationController @Inject()(
 
   private def getWebsiteRows()(implicit request: AuthenticatedDataRequest[_]) = {
     val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, AmendMode)
-    Seq(
-      HasWebsiteSummary.row(request.userAnswers, AmendMode).map { sr =>
-        if (websiteSummaryRow.isDefined) {
-          sr.withCssClass("govuk-summary-list__row--no-border")
-        } else {
-          sr
-        }
-      },
-      websiteSummaryRow
-    )
+    Seq(websiteSummaryRow)
   }
 
   private def getBusinessContactDetailsRows()(implicit request: AuthenticatedDataRequest[_]) = {

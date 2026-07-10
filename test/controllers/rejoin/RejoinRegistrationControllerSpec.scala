@@ -33,7 +33,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
-import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage, HasWebsitePage}
+import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -614,29 +614,6 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
 
               status(result) `mustBe` SEE_OTHER
               redirectLocation(result).value `mustBe` controllers.routes.DateOfFirstSaleController.onPageLoad(RejoinMode).url
-            }
-          }
-
-          "to Has Website when websites are not populated correctly" in {
-
-            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
-              Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
-            when(registrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
-
-            val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
-
-            val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
-              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
-              .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
-              .build()
-
-            running(application) {
-              val request = FakeRequest(POST, controllers.rejoin.routes.RejoinRegistrationController.onSubmit(true).url)
-              val result = route(application, request).value
-
-              status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.routes.HasWebsiteController.onPageLoad(RejoinMode).url
-
             }
           }
 

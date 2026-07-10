@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.amend.routes as amendRoutes
 import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import models.{AmendMode, CheckMode, NormalMode, RejoinMode}
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
 
 class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
@@ -35,10 +35,10 @@ class IsOnlineMarketplacePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Has Website" in {
+      "to Website" in {
 
         IsOnlineMarketplacePage.navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+          .mustEqual(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
       }
     }
 

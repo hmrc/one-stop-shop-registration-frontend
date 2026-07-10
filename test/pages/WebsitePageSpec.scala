@@ -17,6 +17,8 @@
 package pages
 
 import base.SpecBase
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
 import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
 import pages.behaviours.PageBehaviours
@@ -24,6 +26,12 @@ import pages.behaviours.PageBehaviours
 class WebsitePageSpec extends SpecBase with PageBehaviours {
 
   val index: Index = Index(0)
+
+  private val answersWithWebsite =
+    emptyUserAnswers
+      .set(WebsitePage(index), "https://example.com")
+      .success
+      .value
 
   "WebsitePage" - {
 
@@ -35,37 +43,61 @@ class WebsitePageSpec extends SpecBase with PageBehaviours {
 
     "must navigate in Normal mode" - {
 
-      "to Add Website" in {
+      "to Add Website when website provided" in {
+
+        WebsitePage(index).navigate(NormalMode, answersWithWebsite)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(NormalMode))
+      }
+
+      "to Business Contact Details when no website provided" in {
 
         WebsitePage(index).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(routes.AddWebsiteController.onPageLoad(NormalMode))
+          .mustEqual(routes.BusinessContactDetailsController.onPageLoad(NormalMode))
       }
     }
 
     "must navigate in Check mode" - {
 
-      "to Add Website" in {
+      "to Add Website when website provided" in {
+
+        WebsitePage(index).navigate(CheckMode, answersWithWebsite)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
+      }
+
+      "to Check Your Answers when no website provided" in {
 
         WebsitePage(index).navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
+          .mustEqual(routes.CheckYourAnswersController.onPageLoad())
       }
     }
 
     "must navigate in Amend mode" - {
 
-      "to Add Website" in {
+      "to Add Website when website provided" in {
+
+        WebsitePage(index).navigate(AmendMode, answersWithWebsite)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
+      }
+
+      "to Change Your Answers when no website provided" in {
 
         WebsitePage(index).navigate(AmendMode, emptyUserAnswers)
-          .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
+          .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
       }
     }
 
     "must navigate in Rejoin mode" - {
 
-      "to Add Website" in {
+      "to Add Website when website provided" in {
+
+        WebsitePage(index).navigate(RejoinMode, answersWithWebsite)
+          .mustEqual(routes.AddWebsiteController.onPageLoad(RejoinMode))
+      }
+
+      "to Rejoin Registration when no website provided" in {
 
         WebsitePage(index).navigate(RejoinMode, emptyUserAnswers)
-          .mustEqual(routes.AddWebsiteController.onPageLoad(RejoinMode))
+          .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
       }
     }
 

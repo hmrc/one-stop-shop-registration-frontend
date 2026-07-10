@@ -98,7 +98,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
       .set(
         BusinessContactDetailsPage,
         BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-      .set(HasWebsitePage, true).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
       .set(PreviouslyRegisteredPage, true).success.value
       .set(PreviousEuCountryPage(Index(0)), Country("DE", "Germany")).success.value
@@ -180,7 +179,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           .remove(AllTradingNames).success.value
           .set(TaxRegisteredInEuPage, false).success.value
           .remove(AllEuDetailsRawQuery).success.value
-          .set(HasWebsitePage, false).success.value
           .remove(AllWebsites).success.value
 
       val expectedRegistration =
@@ -286,7 +284,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
           .set(
             BusinessContactDetailsPage,
             BusinessContactDetails("Joe Bloggs", "01112223344", "email@email.com")).success.value
-          .set(HasWebsitePage, true).success.value
           .set(AllWebsites, List("website1", "website2")).success.value
           .set(PreviouslyRegisteredPage, false).success.value
           .set(BankDetailsPage, BankDetails("Account name", Some(bic), iban)).success.value
@@ -475,41 +472,6 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(BankDetailsPage)))
-      }
-
-      "when Has Website is missing" in {
-
-        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
-
-        val userAnswers = answersNotPartOfVatGroup.remove(HasWebsitePage).success.value
-        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
-      }
-
-      "when Has Website is true, but there are no websites" in {
-
-        when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
-
-        val userAnswers =
-          answersNotPartOfVatGroup
-            .set(HasWebsitePage, true).success.value
-            .remove(AllWebsites).success.value
-
-        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(AllWebsites)))
-      }
-
-      "when Has Website is false, but there are websites" in {
-
-        val userAnswers =
-          answersNotPartOfVatGroup
-            .set(HasWebsitePage, false).success.value
-
-        val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
-
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasWebsitePage)))
       }
 
       "when Is Online Marketplace is missing" in {

@@ -41,7 +41,6 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
     .set(HasMadeSalesPage, true).success.value
     .set(DateOfFirstSalePage, arbitraryDate).success.value
     .set(IsOnlineMarketplacePage, false).success.value
-    .set(HasWebsitePage, true).success.value
     .set(AllWebsites, List("website.com")).success.value
     .set(PreviouslyRegisteredPage, false).success.value
     .set(BusinessContactDetailsPage, BusinessContactDetails("fullname", "123456789", "unittest@email.com")).success.value

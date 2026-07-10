@@ -101,7 +101,6 @@ class RegistrationServiceSpec
       .set(FixedEstablishmentAddressPage(Index(4)), InternationalAddress("Line 1", None, "Town", None, None, Country("DK", "Denmark"))).success.value
 
       .set(IsOnlineMarketplacePage, false).success.value
-      .set(HasWebsitePage, true).success.value
       .set(AllWebsites, List("website1", "website2")).success.value
 
       .set(BankDetailsPage, BankDetails("Account name", Some(Bic("ABCDGB2A").get), Iban("GB33BUKB20201555555555").
