@@ -224,16 +224,7 @@ class RejoinRegistrationController @Inject()(
 
   private def getWebsiteRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
     val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, RejoinMode)
-    Seq(
-      HasWebsiteSummary.row(request.userAnswers, RejoinMode).map { sr =>
-        if (websiteSummaryRow.isDefined) {
-          sr.withCssClass("govuk-summary-list__row--no-border")
-        } else {
-          sr
-        }
-      },
-      websiteSummaryRow
-    )
+    Seq(websiteSummaryRow)
   }
 
   private def getBusinessContactDetailsRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {

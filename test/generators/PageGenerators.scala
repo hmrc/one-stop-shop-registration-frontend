@@ -33,9 +33,6 @@ trait PageGenerators {
   implicit lazy val arbitraryDeleteAllTradingNamesPage: Arbitrary[DeleteAllTradingNamesPage.type] =
     Arbitrary(DeleteAllTradingNamesPage)
 
-  implicit lazy val arbitraryDeleteAllWebsitesPage: Arbitrary[DeleteAllWebsitesPage.type] =
-    Arbitrary(DeleteAllWebsitesPage)
-
   implicit lazy val arbitraryRegistrationTypePage: Arbitrary[RegistrationTypePage] =
     Arbitrary(RegistrationTypePage(Index(0)))
 
@@ -89,9 +86,7 @@ trait PageGenerators {
 
   implicit lazy val arbitrarySellsGoodsFromNiPage: Arbitrary[SellsGoodsFromNiPage.type] =
     Arbitrary(SellsGoodsFromNiPage)
-
-  implicit lazy val arbitraryHasWebsitePage: Arbitrary[HasWebsitePage.type] =
-    Arbitrary(HasWebsitePage)
+  
 
   implicit lazy val arbitraryEuTaxReferencePage: Arbitrary[EuTaxReferencePage] =
     Arbitrary(EuTaxReferencePage(Index(0)))

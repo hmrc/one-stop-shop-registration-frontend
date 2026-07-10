@@ -51,14 +51,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  implicit lazy val arbitraryDeleteAllWebsitesUserAnswersEntry: Arbitrary[(DeleteAllWebsitesPage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[DeleteAllWebsitesPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
   implicit lazy val arbitraryRegistrationTypeUserAnswersEntry: Arbitrary[(RegistrationTypePage, JsValue)] =
     Arbitrary {
       for {
@@ -183,14 +175,6 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[TaxRegisteredInEuPage.type]
-        value <- arbitrary[Boolean].map(Json.toJson(_))
-      } yield (page, value)
-    }
-
-  implicit lazy val arbitraryHasWebsiteUserAnswersEntry: Arbitrary[(HasWebsitePage.type, JsValue)] =
-    Arbitrary {
-      for {
-        page  <- arbitrary[HasWebsitePage.type]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }

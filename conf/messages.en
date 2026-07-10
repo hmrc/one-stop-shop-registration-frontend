@@ -555,12 +555,6 @@ euTaxReference.error.length = Tax identification number must be 20 characters or
 euTaxReference.error.format = Tax identification number must only include letters, numbers and spaces
 euTaxReference.change.hidden = your tax identification number
 
-hasWebsite.title = Do you sell your goods online?
-hasWebsite.heading = Do you sell your goods online?
-hasWebsite.checkYourAnswersLabel = Sell goods online
-hasWebsite.error.required = Select yes if you sell your goods online
-hasWebsite.change.hidden = if you sell your goods online
-
 inControlOfMovingGoods.title = How do you ship goods to consumers in the EU?
 inControlOfMovingGoods.heading = How do you ship goods to consumers in the EU?
 inControlOfMovingGoods.error.required = Select how you ship goods to consumers in the EU
@@ -868,12 +862,6 @@ amendComplete.feedback.30seconds = (takes 30 seconds)
 amendComplete.iossRegistration.updated = We''ve also updated your Import One Stop Shop registration.
 amendComplete.iossRegistration.previous.updated = We''ve also updated your previous Import One Stop Shop registration.
 amendComplete.iossRegistration.multiple.updated = We''ve also updated your previous Import One Stop Shop registrations.
-
-deleteAllWebsites.title = Remove all your website information from this scheme?
-deleteAllWebsites.heading = Remove all your website information from this scheme?
-deleteAllWebsites.warning = This will delete all the trading websites you have added.
-deleteAllWebsites.error.required = Select yes if you want to remove all your website information from this scheme
-deleteAllWebsites.change.hidden = Remove all your website information from this scheme
 
 deleteAllTradingNames.title = Remove all your alternative trading names from this scheme?
 deleteAllTradingNames.heading = Remove all your alternative trading names from this scheme?
