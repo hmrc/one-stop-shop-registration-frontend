@@ -183,22 +183,10 @@ class RegistrationValidationService @Inject()(
   }
 
   private def getWebsites(answers: UserAnswers): ValidationResult[List[String]] = {
-    answers.get(HasWebsitePage) match {
-      case Some(true) =>
-        answers.get(AllWebsites) match {
-          case Some(Nil) | None => DataMissingError(AllWebsites).invalidNec
-          case Some(list) => list.validNec
-        }
-
-      case Some(false) =>
-        answers.get(AllWebsites) match {
-          case Some(Nil) | None => List.empty.validNec
-          case Some(_) => DataMissingError(HasWebsitePage).invalidNec
-        }
-
-      case None =>
-        DataMissingError(HasWebsitePage).invalidNec
-    }
+      answers
+        .get(AllWebsites)
+        .getOrElse(List.empty[String])
+        .validNec
   }
 
   private def getOnlineMarketplace(answers: UserAnswers): ValidationResult[Boolean] = {

@@ -106,13 +106,6 @@ trait CompletionChecks {
     }
   }
 
-  private def hasWebsiteValid()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
-    request.userAnswers.get(HasWebsitePage).exists {
-      case true => request.userAnswers.get(AllWebsites).getOrElse(List.empty).nonEmpty
-      case false => request.userAnswers.get(AllWebsites).getOrElse(List.empty).isEmpty
-    }
-  }
-
   private def isDeregisteredPopulated()(implicit request: AuthenticatedDataRequest[AnyContent]): Boolean = {
     request.userAnswers.get(PreviouslyRegisteredPage).exists {
       case true => request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).isDefined
@@ -152,7 +145,6 @@ trait CompletionChecks {
       isAlreadyMadeSalesValid() &&
       isDateOfFirstSaleValid() &&
       isPreviouslyRegisteredValid() &&
-      hasWebsiteValid() &&
       isEuDetailsPopulated() &&
       isDeregisteredPopulated() &&
       arePreviousRegistrationsValid() &&
@@ -174,7 +166,6 @@ trait CompletionChecks {
       emptyDeregisteredRedirect(mode) ++
       incompletePreviousRegistrationRedirect(mode) ++
       emptyHasOnlineMarketplace(mode) ++
-      incompleteWebsiteUrlsRedirect(mode) ++
       emptyContactDetails(mode) ++
       emptyBankDetails(mode)
       ).headOption
@@ -254,12 +245,6 @@ trait CompletionChecks {
 
   private def incompleteDateOfFirstSaleRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!isDateOfFirstSaleValid()) {
     Some(Redirect(controllers.routes.DateOfFirstSaleController.onPageLoad(mode)))
-  } else {
-    None
-  }
-
-  private def incompleteWebsiteUrlsRedirect(mode: Mode)(implicit request: AuthenticatedDataRequest[AnyContent]): Option[Result] = if (!hasWebsiteValid()) {
-    Some(Redirect(controllers.routes.HasWebsiteController.onPageLoad(mode)))
   } else {
     None
   }

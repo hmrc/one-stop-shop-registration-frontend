@@ -111,7 +111,6 @@ trait SpecBase
     .set(TaxRegisteredInEuPage, false).success.value
     .set(PreviouslyRegisteredPage, false).success.value
     .set(IsOnlineMarketplacePage, false).success.value
-    .set(HasWebsitePage, false).success.value
     .set(BusinessContactDetailsPage, BusinessContactDetails("fullname", "123456789", "unittest@email.com")).success.value
     .set(BankDetailsPage, BankDetails("unit test account name", None, Iban("GB33BUKB20201555555555").value)).success.value
   val invalidUserAnswers: UserAnswers = completeUserAnswers
@@ -181,7 +180,6 @@ trait SpecBase
       val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(answers, mode)
       val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(answers, mode)
       val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(answers, mode)
-      val hasWebsiteSummaryRow = HasWebsiteSummary.row(answers, mode)
       val websiteSummaryRow = WebsiteSummary.checkAnswersRow(answers, mode)
       val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(answers, mode)
       val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(answers, mode)
@@ -219,13 +217,6 @@ trait SpecBase
         },
         euDetailsSummaryRow,
         isOnlineMarketplaceSummaryRow,
-        hasWebsiteSummaryRow.map { sr =>
-          if (websiteSummaryRow.isDefined) {
-            sr.withCssClass("govuk-summary-list__row--no-border")
-          } else {
-            sr
-          }
-        },
         websiteSummaryRow,
         businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
         businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
@@ -251,7 +242,6 @@ trait SpecBase
       val euDetailsSummaryRow = EuDetailsSummary.amendedAnswersRow(answers)
       val removedEuDetailsRow = EuDetailsSummary.removedAnswersRow(getRemovedEuDetails(answers, registration))
       val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.amendedAnswerRow(answers)
-      val hasWebsiteSummaryRow = HasWebsiteSummary.amendedAnswersRow(answers)
       val websiteSummaryRow = WebsiteSummary.amendedAnswersRow(answers)
       val removedWebsiteRow = WebsiteSummary.removedWebsiteRow(getRemovedWebsites(answers, registration))
       val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.amendedContactNameRow(answers)
@@ -272,7 +262,6 @@ trait SpecBase
         euDetailsSummaryRow,
         removedEuDetailsRow,
         isOnlineMarketplaceSummaryRow,
-        hasWebsiteSummaryRow,
         websiteSummaryRow,
         removedWebsiteRow,
         businessContactDetailsContactNameSummaryRow,

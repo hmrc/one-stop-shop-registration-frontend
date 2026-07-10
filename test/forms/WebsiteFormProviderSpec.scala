@@ -61,41 +61,43 @@ class WebsiteFormProviderSpec extends StringFieldBehaviours {
     "must not bind invalid website data" in {
       val invalidWebsite = "invalid"
       val result = form.bind(Map(fieldName -> invalidWebsite)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(websitePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey))
     }
 
     "must not bind invalid website data with missing ." in {
       val invalidWebsite = "https://websitecom"
       val result = form.bind(Map(fieldName -> invalidWebsite)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(websitePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey))
     }
 
     "must not bind invalid website data with incorrect https://" in {
       val invalidWebsite = "https:/www.website.com"
       val result = form.bind(Map(fieldName -> invalidWebsite)).apply(fieldName)
-      result.errors mustBe Seq(FormError(fieldName, invalidKey, Seq(websitePattern)))
+      result.errors mustBe Seq(FormError(fieldName, invalidKey))
     }
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-
     "must fail to bind when given a duplicate value" in {
-      val existingAnswers = Seq("https://foo", "https://bar")
-      val answer = "https://bar"
+      val existingAnswers = Seq("https://foo.com", "https://bar.com")
+      val answer = "https://bar.com"
       val form = new WebsiteFormProvider()(index, existingAnswers)
 
       val result = form.bind(Map(fieldName ->  answer)).apply(fieldName)
       result.errors must contain only FormError(fieldName, "website.error.duplicate")
+    }
+
+    "bind blank as None" in {
+      val result = form.bind(Map(fieldName -> ""))
+
+      result.errors mustBe empty
+      result.value mustBe Some(None)
+    }
+
+    "must not bind a website longer than 250 characters" in {
+      val longWebsite = s"https://${"a" * 241}.com"
+
+      val result = form.bind(Map(fieldName -> longWebsite))
+
+      result.errors must contain only FormError(fieldName, lengthKey)
     }
   }
 }

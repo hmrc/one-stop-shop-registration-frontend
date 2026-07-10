@@ -16,6 +16,8 @@
 
 package pages
 
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
 import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
 import play.api.libs.json.JsPath
@@ -30,17 +32,42 @@ case class WebsitePage(index: Index) extends QuestionPage[String] {
 
   override val toString: String = "website"
 
-  override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.AddWebsiteController.onPageLoad(NormalMode)
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = {
+    answers.get(this) match {
+      case Some(_) =>
+        routes.AddWebsiteController.onPageLoad(NormalMode)
+      case None =>
+        routes.BusinessContactDetailsController.onPageLoad(NormalMode)
+    }
+  }
 
-  override protected def navigateInCheckMode(answers: UserAnswers): Call =
-    routes.AddWebsiteController.onPageLoad(CheckMode)
+  override protected def navigateInCheckMode(answers: UserAnswers): Call = {
+    answers.get(this) match {
+      case Some(_) =>
+        routes.AddWebsiteController.onPageLoad(CheckMode)
+      case None =>
+        routes.CheckYourAnswersController.onPageLoad()
+    }
+  }
 
-  override protected def navigateInAmendMode(answers: UserAnswers): Call =
-    routes.AddWebsiteController.onPageLoad(AmendMode)
+  override protected def navigateInAmendMode(answers: UserAnswers): Call = {
+    answers.get(this) match {
+      case Some(_) =>
+        routes.AddWebsiteController.onPageLoad(AmendMode)
+      case None =>
+        amendRoutes.ChangeYourRegistrationController.onPageLoad()
+    }
 
-  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
-    routes.AddWebsiteController.onPageLoad(RejoinMode)
+  }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
+    answers.get(this) match {
+      case Some(_) =>
+        routes.AddWebsiteController.onPageLoad(RejoinMode)
+      case None =>
+        rejoinRoutes.RejoinRegistrationController.onPageLoad()
+    }
+  }
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] = {
     if (userAnswers.get(AllWebsites).exists(_.isEmpty)) {

@@ -43,24 +43,41 @@ object WebsiteSummary {
         )
     }
 
-  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AllWebsites).map {
-      websites =>
+  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
 
-        val value = websites.map {
-          name =>
-            HtmlFormat.escape(name)
-        }.mkString("<br/>")
+    val websites = answers.get(AllWebsites).getOrElse(Seq.empty)
+    val hasWebsites = websites.nonEmpty
 
-        SummaryListRowViewModel(
-          key = "websites.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.AddWebsiteController.onPageLoad(mode).url)
-              .withVisuallyHiddenText(messages("websites.change.hidden"))
-          )
-        )
+    val value =  if (hasWebsites) {
+      websites.map {
+        name =>
+          HtmlFormat.escape(name)
+      }.mkString("<br/>")
+    } else {
+      messages("website.noneSupplied")
     }
+
+    val actionText = if (hasWebsites) "site.change" else "site.add"
+
+    val actionUrl = if (hasWebsites) {
+      routes.AddWebsiteController.onPageLoad(mode).url
+    } else {
+      routes.WebsiteController.onPageLoad(mode, Index(0)).url
+    }
+
+    Some(
+      SummaryListRowViewModel(
+        key = "websites.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel(actionText, actionUrl)
+            .withVisuallyHiddenText(
+              if(hasWebsites) messages("websites.change.hidden") else messages("websites.add.hidden")
+            )
+        )
+      )
+    )
+  }
 
   def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllWebsites).map {

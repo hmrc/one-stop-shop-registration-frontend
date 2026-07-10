@@ -77,7 +77,6 @@ class CheckYourAnswersController @Inject()(
         val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(request.userAnswers, CheckMode)
         val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, CheckMode)
         val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(request.userAnswers, CheckMode)
-        val hasWebsiteSummaryRow = HasWebsiteSummary.row(request.userAnswers, CheckMode)
         val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, CheckMode)
         val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(request.userAnswers, CheckMode)
         val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(request.userAnswers, CheckMode)
@@ -116,13 +115,6 @@ class CheckYourAnswersController @Inject()(
             },
             euDetailsSummaryRow,
             isOnlineMarketplaceSummaryRow,
-            hasWebsiteSummaryRow.map { sr =>
-              if (websiteSummaryRow.isDefined) {
-                sr.withCssClass("govuk-summary-list__row--no-border")
-              } else {
-                sr
-              }
-            },
             websiteSummaryRow,
             businessContactDetailsContactNameSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),
             businessContactDetailsTelephoneSummaryRow.map(_.withCssClass("govuk-summary-list__row--no-border")),

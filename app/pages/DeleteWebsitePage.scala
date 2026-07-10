@@ -26,24 +26,24 @@ case class DeleteWebsitePage(index: Index) extends Page {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(DeriveNumberOfWebsites) match {
       case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(NormalMode)
-      case _                => routes.HasWebsiteController.onPageLoad(NormalMode)
+      case _                => routes.WebsiteController.onPageLoad(NormalMode, index)
     }
 
   override protected def navigateInCheckMode (answers: UserAnswers): Call =
     answers.get(DeriveNumberOfWebsites) match {
       case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(CheckMode)
-      case _                => routes.HasWebsiteController.onPageLoad(CheckMode)
+      case _                => routes.WebsiteController.onPageLoad(CheckMode, index)
     }
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call =
     answers.get(DeriveNumberOfWebsites) match {
       case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(AmendMode)
-      case _ => routes.HasWebsiteController.onPageLoad(AmendMode)
+      case _ => routes.WebsiteController.onPageLoad(AmendMode, index)
     }
 
   override protected def navigateInRejoinMode(answers: UserAnswers): Call =
     answers.get(DeriveNumberOfWebsites) match {
       case Some(n) if n > 0 => routes.AddWebsiteController.onPageLoad(RejoinMode)
-      case _ => routes.HasWebsiteController.onPageLoad(RejoinMode)
+      case _ => routes.WebsiteController.onPageLoad(RejoinMode, index)
     }
 }

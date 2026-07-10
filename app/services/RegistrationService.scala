@@ -64,11 +64,10 @@ class RegistrationService @Inject()(
       }
 
       isOnlineMarket <- euVatDetailsUA.set(IsOnlineMarketplacePage, registration.isOnlineMarketplace)
-      hasWebsiteUA <- isOnlineMarket.set(HasWebsitePage, registration.websites.nonEmpty)
       websites <- if (registration.websites.nonEmpty) {
-        hasWebsiteUA.set(AllWebsites, registration.websites.toList)
+        isOnlineMarket.set(AllWebsites, registration.websites.toList)
       } else {
-        Try(hasWebsiteUA)
+        Try(isOnlineMarket)
       }
 
       bankDetails <- websites.set(BankDetailsPage, registration.bankDetails)

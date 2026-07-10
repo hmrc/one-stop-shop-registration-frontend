@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Gen
 import org.scalatestplus.mockito.MockitoSugar
-import pages.WebsitePage
+import pages.{BusinessContactDetailsPage, WebsitePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -72,7 +72,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form.fill("answer"), NormalMode, index)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form.fill(Some("answer")), NormalMode, index)(request, messages(application)).toString
       }
     }
 
@@ -101,7 +101,7 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must redirect to Business Details when no website is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo)).build()
 
@@ -110,14 +110,10 @@ class WebsiteControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, websiteRoute)
             .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[WebsiteView]
-
         val result = route(application, request).value
 
-        status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode, index)(request, messages(application)).toString
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` routes.BusinessContactDetailsController.onPageLoad(NormalMode).url
       }
     }
 

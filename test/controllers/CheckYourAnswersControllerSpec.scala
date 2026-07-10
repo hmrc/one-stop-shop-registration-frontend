@@ -38,7 +38,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{running, *}
-import queries.EuDetailsQuery
+import queries.{AllWebsites, EuDetailsQuery}
 import services.*
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
@@ -129,13 +129,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           }
         }
 
-        "websites are missing" in {
+        "must remain valid when no websites have been supplied" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
           when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
-          val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
+          val answers = completeUserAnswers.remove(AllWebsites).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
             .build()
@@ -149,7 +149,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, CheckMode).futureValue)
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, CheckMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, CheckMode)(request, messages(application)).toString
           }
         }
 
@@ -483,25 +483,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
               status(result) `mustBe` SEE_OTHER
               redirectLocation(result).value `mustBe` controllers.routes.DateOfFirstSaleController.onPageLoad(CheckMode).url
-            }
-          }
-
-          "to Has Website when websites are not populated correctly" in {
-
-            when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
-              Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
-
-            val answers = completeUserAnswers.set(HasWebsitePage, true).success.value
-
-            val application = applicationBuilder(userAnswers = Some(answers))
-              .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService)).build()
-
-            running(application) {
-              val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(true).url)
-              val result = route(application, request).value
-
-              status(result) `mustBe` SEE_OTHER
-              redirectLocation(result).value `mustBe` controllers.routes.HasWebsiteController.onPageLoad(CheckMode).url
             }
           }
 

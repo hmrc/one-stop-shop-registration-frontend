@@ -16,10 +16,10 @@
 
 package pages
 
-import controllers.amend.{routes => amendRoutes}
-import controllers.rejoin.{routes => rejoinRoutes}
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{Index, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -30,7 +30,7 @@ case object IsOnlineMarketplacePage extends QuestionPage[Boolean] {
   override def toString: String = "isOnlineMarketplace"
 
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
-    routes.HasWebsiteController.onPageLoad(NormalMode)
+    routes.WebsiteController.onPageLoad(NormalMode, Index(0))
 
   override protected def navigateInCheckMode(answers: UserAnswers): Call =
     routes.CheckYourAnswersController.onPageLoad()

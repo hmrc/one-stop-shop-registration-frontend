@@ -110,7 +110,6 @@ class AmendCompleteController @Inject()(
           getRegisteredInEuRows(originalRegistration, userAnswers) ++
           getChangedEuDetailsRows(originalRegistration, userAnswers) ++
           getIsOnlineMarketPlace(originalRegistration, userAnswers) ++
-          getHasWebsiteRows(originalRegistration, userAnswers) ++
           getWebsiteRows(originalRegistration, userAnswers) ++
           getBusinessContactDetailsRows(originalRegistration, userAnswers) ++
           getBankDetailsRows(originalRegistration, userAnswers)
@@ -400,29 +399,6 @@ class AmendCompleteController @Inject()(
     } else {
       Seq.empty
     }
-  }
-
-  private def getHasWebsiteRows(
-                                 originalRegistration: Option[Registration],
-                                 userAnswers: UserAnswers
-                               )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
-
-    val originalWebsiteAnswers = originalRegistration.map(_.websites).getOrElse(List.empty)
-    val amendedWebsitesAnswers = userAnswers.get(AllWebsites).getOrElse(List.empty)
-    val hasChangedToNo = amendedWebsitesAnswers.isEmpty && originalWebsiteAnswers.nonEmpty
-    val hasChangedToYes = amendedWebsitesAnswers.nonEmpty && originalWebsiteAnswers.nonEmpty || originalWebsiteAnswers.isEmpty
-    val notAmended = amendedWebsitesAnswers.nonEmpty && originalWebsiteAnswers.nonEmpty || amendedWebsitesAnswers.isEmpty && originalWebsiteAnswers.isEmpty
-
-    if (notAmended) {
-      Seq.empty
-    } else if (hasChangedToNo || hasChangedToYes) {
-      Seq(
-        HasWebsiteSummary.amendedAnswersRow(request.userAnswers)
-      )
-    } else {
-      Seq.empty
-    }
-
   }
 
   private def getWebsiteRows(

@@ -34,10 +34,10 @@ class DeleteWebsitePageSpec extends SpecBase {
           .mustEqual(routes.AddWebsiteController.onPageLoad(NormalMode))
       }
 
-      "to Has Website when there are no websites present" in {
+      "to Website when there are no websites present" in {
 
         DeleteWebsitePage(Index(0)).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(NormalMode))
+          .mustEqual(routes.WebsiteController.onPageLoad(NormalMode, Index(0)))
       }
     }
 
@@ -51,10 +51,10 @@ class DeleteWebsitePageSpec extends SpecBase {
           .mustEqual(routes.AddWebsiteController.onPageLoad(CheckMode))
       }
 
-      "to Has Website when there are no websites present" in {
+      "to Website when there are no websites present" in {
 
         DeleteWebsitePage(Index(0)).navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(CheckMode))
+          .mustEqual(routes.WebsiteController.onPageLoad(CheckMode, Index(0)))
       }
     }
 
@@ -68,10 +68,10 @@ class DeleteWebsitePageSpec extends SpecBase {
           .mustEqual(routes.AddWebsiteController.onPageLoad(AmendMode))
       }
 
-      "to Has Website when there are no websites present" in {
+      "to Website when there are no websites present" in {
 
         DeleteWebsitePage(Index(0)).navigate(AmendMode, emptyUserAnswers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(AmendMode))
+          .mustEqual(routes.WebsiteController.onPageLoad(AmendMode, Index(0)))
       }
     }
 
@@ -85,10 +85,10 @@ class DeleteWebsitePageSpec extends SpecBase {
           .mustEqual(routes.AddWebsiteController.onPageLoad(RejoinMode))
       }
 
-      "to Has Website when there are no websites present" in {
+      "to Website when there are no websites present" in {
 
         DeleteWebsitePage(Index(0)).navigate(RejoinMode, emptyUserAnswers)
-          .mustEqual(routes.HasWebsiteController.onPageLoad(RejoinMode))
+          .mustEqual(routes.WebsiteController.onPageLoad(RejoinMode, Index(0)))
       }
     }
 
