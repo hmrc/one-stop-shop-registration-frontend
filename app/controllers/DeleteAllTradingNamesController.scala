@@ -41,13 +41,13 @@ class DeleteAllTradingNamesController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) {
     implicit request =>
 
       Ok(view(form, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
 
       form.bindFromRequest().fold(

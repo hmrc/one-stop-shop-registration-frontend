@@ -20,27 +20,33 @@ import controllers.routes
 import models.{Mode, UserAnswers}
 import pages.DateOfFirstSalePage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 import java.time.format.DateTimeFormatter
 
 object DateOfFirstSaleSummary  {
 
-  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(DateOfFirstSalePage).map {
       answer =>
 
         val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-        SummaryListRowViewModel(
-          key     = "dateOfFirstSale.checkYourAnswersLabel",
-          value   = ValueViewModel(answer.format(dateFormatter)),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.DateOfFirstSaleController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("dateOfFirstSale.change.hidden"))
           )
+        }
+
+        SummaryListRowViewModel(
+          key     = "dateOfFirstSale.checkYourAnswersLabel",
+          value   = ValueViewModel(answer.format(dateFormatter)),
+          actions = actions
         )
     }
 

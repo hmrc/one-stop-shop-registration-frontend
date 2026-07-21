@@ -38,7 +38,7 @@ class EuCountryController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) {
     implicit request =>
 
       val form = formProvider(index, request.userAnswers.get(AllEuDetailsQuery).getOrElse(Seq.empty).map(_.euCountry))
@@ -51,7 +51,7 @@ class EuCountryController @Inject()(
       Ok(view(preparedForm, mode, index))
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
 
       val form = formProvider(index, request.userAnswers.get(AllEuDetailsQuery).getOrElse(Seq.empty).map(_.euCountry))

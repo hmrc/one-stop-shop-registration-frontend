@@ -46,7 +46,7 @@ class AddEuDetailsController @Inject()(
   protected val controllerComponents: MessagesControllerComponents = cc
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getNumberOfEuCountries(mode) {
         number =>
@@ -65,7 +65,7 @@ class AddEuDetailsController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode, incompletePromptShown: Boolean): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       withCompleteDataAsync[EuOptionalDetails](
         data = getAllIncompleteEuDetails _,

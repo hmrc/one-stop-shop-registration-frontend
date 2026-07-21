@@ -24,6 +24,7 @@ import controllers.amend.routes as amendRoutes
 import logging.Logging
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.{PreviousRegistration, Registration, VatCustomerInfo}
+import models.exclusions.ExclusionReason.Reversal
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.{AmendMode, NormalMode}
 import pages.amend.ChangeYourRegistrationPage
@@ -76,7 +77,9 @@ class ChangeYourRegistrationController @Inject()(
 
       commencementDateSummary.row(request.userAnswers)(request = request.request).flatMap { cds =>
 
-        val list: SummaryList = detailList(existingPreviousRegistrations, cds)(request.request)
+        val isExcluded: Boolean = request.registration.excludedTrader.exists(_.exclusionReason != Reversal)
+
+        val list: SummaryList = detailList(existingPreviousRegistrations, cds, isExcluded)(request.request)
 
         val isValid = validate()(request.request)
 
@@ -150,25 +153,28 @@ class ChangeYourRegistrationController @Inject()(
       }
   }
 
-  private def detailList(existingPreviousRegistrations: Seq[PreviousRegistration], cds: Option[SummaryListRow])
-                        (implicit request: AuthenticatedDataRequest[AnyContent]) = {
+  private def detailList(
+                          existingPreviousRegistrations: Seq[PreviousRegistration],
+                          cds: Option[SummaryListRow],
+                          isExcluded: Boolean
+                        )(implicit request: AuthenticatedDataRequest[AnyContent]) = {
 
     SummaryListViewModel(
-      rows = (getTradingNameRows() ++
-        getSalesRows(cds) ++
-        getPreviouslyRegisteredRows(existingPreviousRegistrations) ++
-        getRegisteredInEuRows() ++
-        Seq(IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode)) ++
-        getWebsiteRows() ++
+      rows = (getTradingNameRows(isExcluded) ++
+        getSalesRows(cds, isExcluded) ++
+        getPreviouslyRegisteredRows(existingPreviousRegistrations, isExcluded) ++
+        getRegisteredInEuRows(isExcluded) ++
+        Seq(IsOnlineMarketplaceSummary.row(request.userAnswers, AmendMode, isExcluded)) ++
+        getWebsiteRows(isExcluded) ++
         getBusinessContactDetailsRows() ++
         getBankDetailsRows()
         ).flatten
     )
   }
 
-  private def getTradingNameRows()(implicit request: AuthenticatedDataRequest[_]) = {
-    val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, AmendMode)
-    Seq(new HasTradingNameSummary().row(request.userAnswers, AmendMode).map { sr =>
+  private def getTradingNameRows(isExcluded: Boolean)(implicit request: AuthenticatedDataRequest[_]) = {
+    val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, AmendMode, isExcluded)
+    Seq(new HasTradingNameSummary().row(request.userAnswers, AmendMode, isExcluded).map { sr =>
       if (tradingNameSummaryRow.isDefined) {
         sr.withCssClass("govuk-summary-list__row--no-border")
       } else {
@@ -178,18 +184,21 @@ class ChangeYourRegistrationController @Inject()(
       tradingNameSummaryRow)
   }
 
-  private def getSalesRows(cds: Option[SummaryListRow])(implicit request: AuthenticatedDataRequest[_]) = {
+  private def getSalesRows(cds: Option[SummaryListRow], isExcluded: Boolean)(implicit request: AuthenticatedDataRequest[_]) = {
     Seq(
-      HasMadeSalesSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
-      DateOfFirstSaleSummary.row(request.userAnswers, AmendMode).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      HasMadeSalesSummary.row(request.userAnswers, AmendMode, isExcluded).map(_.withCssClass("govuk-summary-list__row--no-border")),
+      DateOfFirstSaleSummary.row(request.userAnswers, AmendMode, isExcluded).map(_.withCssClass("govuk-summary-list__row--no-border")),
       cds
     )
   }
 
-  private def getPreviouslyRegisteredRows(existingPreviousRegistrations: Seq[PreviousRegistration])(implicit request: AuthenticatedDataRequest[_]) = {
-    val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, existingPreviousRegistrations, AmendMode)
+  private def getPreviouslyRegisteredRows(
+                                           existingPreviousRegistrations: Seq[PreviousRegistration],
+                                           isExcluded: Boolean
+                                         )(implicit request: AuthenticatedDataRequest[_]) = {
+    val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(request.userAnswers, existingPreviousRegistrations, AmendMode, isExcluded)
     Seq(
-      PreviouslyRegisteredSummary.row(request.userAnswers, AmendMode).map { sr =>
+      PreviouslyRegisteredSummary.row(request.userAnswers, AmendMode, isExcluded).map { sr =>
         if (previousRegistrationSummaryRow.isDefined) {
           sr.withCssClass("govuk-summary-list__row--no-border")
         } else {
@@ -200,10 +209,10 @@ class ChangeYourRegistrationController @Inject()(
     )
   }
 
-  private def getRegisteredInEuRows()(implicit request: AuthenticatedDataRequest[_]) = {
-    val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, AmendMode)
+  private def getRegisteredInEuRows(isExcluded: Boolean)(implicit request: AuthenticatedDataRequest[_]) = {
+    val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(request.userAnswers, AmendMode, isExcluded)
     Seq(
-      TaxRegisteredInEuSummary.row(request.userAnswers, AmendMode).map { sr =>
+      TaxRegisteredInEuSummary.row(request.userAnswers, AmendMode, isExcluded).map { sr =>
         if (euDetailsSummaryRow.isDefined) {
           sr.withCssClass("govuk-summary-list__row--no-border")
         } else {
@@ -214,8 +223,8 @@ class ChangeYourRegistrationController @Inject()(
     )
   }
 
-  private def getWebsiteRows()(implicit request: AuthenticatedDataRequest[_]) = {
-    val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, AmendMode)
+  private def getWebsiteRows(isExcluded: Boolean)(implicit request: AuthenticatedDataRequest[_]) = {
+    val websiteSummaryRow = WebsiteSummary.checkAnswersRow(request.userAnswers, AmendMode, isExcluded)
     Seq(websiteSummaryRow)
   }
 

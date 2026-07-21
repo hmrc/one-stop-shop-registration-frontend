@@ -45,7 +45,7 @@ class EuVatNumberController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getCountry(mode, index) {
         country =>
@@ -65,7 +65,7 @@ class EuVatNumberController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getCountry(mode, index) {
         country =>

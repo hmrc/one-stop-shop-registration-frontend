@@ -43,7 +43,7 @@ class HasTradingNameController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getCompanyName(mode) {
         companyName =>
@@ -59,7 +59,7 @@ class HasTradingNameController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getCompanyName(mode) {
         companyName =>
@@ -90,14 +90,14 @@ class HasTradingNameController @Inject()(
   private def getCompanyName(mode: Mode)(block: String => Future[Result])
                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.vatInfo match {
-      case Some(vatInfo) if(vatInfo.organisationName.isDefined) =>
+      case Some(vatInfo) if vatInfo.organisationName.isDefined =>
         val name = vatInfo.organisationName.getOrElse{
           val exception = new IllegalStateException("No organisation name when expecting one")
           logger.error(exception.getMessage, exception)
           throw exception
         }
         block(name)
-      case Some(vatInfo) if(vatInfo.individualName.isDefined) =>
+      case Some(vatInfo) if vatInfo.individualName.isDefined =>
         val name = vatInfo.individualName.getOrElse {
           val exception = new IllegalStateException("No individual name when expecting one")
           logger.error(exception.getMessage, exception)

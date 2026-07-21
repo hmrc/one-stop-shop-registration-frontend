@@ -43,7 +43,7 @@ object WebsiteSummary {
         )
     }
 
-  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] = {
+  def checkAnswersRow(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] = {
 
     val websites = answers.get(AllWebsites).getOrElse(Seq.empty)
     val hasWebsites = websites.nonEmpty
@@ -64,17 +64,23 @@ object WebsiteSummary {
     } else {
       routes.WebsiteController.onPageLoad(mode, Index(0)).url
     }
+    
+    val actions = if (isExcluded && mode.isInAmend) {
+      Seq.empty
+    } else {
+      Seq(
+        ActionItemViewModel(actionText, actionUrl)
+          .withVisuallyHiddenText(
+            if (hasWebsites) messages("websites.change.hidden") else messages("websites.add.hidden")
+          )
+      )
+    }
 
     Some(
       SummaryListRowViewModel(
         key = "websites.checkYourAnswersLabel",
         value = ValueViewModel(HtmlContent(value)),
-        actions = Seq(
-          ActionItemViewModel(actionText, actionUrl)
-            .withVisuallyHiddenText(
-              if(hasWebsites) messages("websites.change.hidden") else messages("websites.add.hidden")
-            )
-        )
+        actions = actions
       )
     )
   }

@@ -17,7 +17,7 @@
 package controllers
 
 import config.Constants
-import controllers.actions._
+import controllers.actions.*
 import forms.WebsiteFormProvider
 import models.{Index, Mode}
 import pages.WebsitePage
@@ -31,16 +31,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WebsiteController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        cc: AuthenticatedControllerComponents,
-                                        formProvider: WebsiteFormProvider,
-                                        view: WebsiteView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                   override val messagesApi: MessagesApi,
+                                   cc: AuthenticatedControllerComponents,
+                                   formProvider: WebsiteFormProvider,
+                                   view: WebsiteView
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
   def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData(Some(mode)) andThen cc.limitIndex(index, Constants.maxWebsites)) {
+    (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.limitIndex(index, Constants.maxWebsites)) {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
@@ -54,7 +54,7 @@ class WebsiteController @Inject()(
     }
 
   def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData(Some(mode)) andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
+    (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
@@ -71,7 +71,7 @@ class WebsiteController @Inject()(
                 case None =>
                   Future.fromTry(request.userAnswers.remove(WebsitePage(index)))
               }
-              _              <- cc.sessionRepository.set(updatedAnswers)
+              _ <- cc.sessionRepository.set(updatedAnswers)
             } yield Redirect(WebsitePage(index).navigate(mode, updatedAnswers))
         )
     }

@@ -17,7 +17,7 @@
 package controllers
 
 import config.Constants
-import controllers.actions._
+import controllers.actions.*
 import forms.AddWebsiteFormProvider
 import models.Mode
 import models.requests.AuthenticatedDataRequest
@@ -44,7 +44,7 @@ class AddWebsiteController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getNumberOfWebsites(mode) {
         number =>
@@ -53,7 +53,7 @@ class AddWebsiteController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
       getNumberOfWebsites(mode) {
         number =>

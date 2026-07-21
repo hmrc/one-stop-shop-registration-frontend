@@ -20,25 +20,31 @@ import controllers.routes
 import models.{Mode, UserAnswers}
 import pages.IsOnlineMarketplacePage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object IsOnlineMarketplaceSummary  {
 
-  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IsOnlineMarketplacePage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "isOnlineMarketplace.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.IsOnlineMarketplaceController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("isOnlineMarketplace.change.hidden"))
           )
+        }
+
+        SummaryListRowViewModel(
+          key     = "isOnlineMarketplace.checkYourAnswersLabel",
+          value   = ValueViewModel(value),
+          actions = actions
         )
     }
 

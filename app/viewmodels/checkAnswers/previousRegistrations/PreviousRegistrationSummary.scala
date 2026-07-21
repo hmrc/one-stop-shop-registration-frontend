@@ -23,12 +23,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.{AllPreviousRegistrationsQuery, AllPreviousRegistrationsWithOptionalVatNumberQuery}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import utils.CheckExistingRegistrations.existingPreviousRegistration
 import viewmodels.ListItemWrapper
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object PreviousRegistrationSummary {
 
@@ -59,7 +59,8 @@ object PreviousRegistrationSummary {
   def checkAnswersRow(
                        answers: UserAnswers,
                        existingPreviousRegistrations: Seq[PreviousRegistration],
-                       mode: Mode
+                       mode: Mode,
+                       isExcluded: Boolean = false
                      )(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllPreviousRegistrationsQuery).map {
       previousRegistrations =>
@@ -79,10 +80,10 @@ object PreviousRegistrationSummary {
 
         val sameListOfCountries: Boolean = currentAnswerCountries.sortBy(_.code) == existingCountries.sortBy(_.code)
 
-        SummaryListRowViewModel(
-          key = "previousRegistrations.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(if ((mode == AmendMode || mode == RejoinMode) && sameListOfCountries) {
+        val actions: Seq[ActionItem] = if (isExcluded & mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(if ((mode == AmendMode || mode == RejoinMode) && sameListOfCountries) {
             ActionItemViewModel("site.add", routes.AddPreviousRegistrationController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("previousRegistrations.add.hidden"))
           } else {
@@ -90,6 +91,12 @@ object PreviousRegistrationSummary {
               .withVisuallyHiddenText(messages("previousRegistrations.change.hidden"))
           }
           )
+        }
+        
+        SummaryListRowViewModel(
+          key = "previousRegistrations.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
+          actions = actions
         )
     }
 

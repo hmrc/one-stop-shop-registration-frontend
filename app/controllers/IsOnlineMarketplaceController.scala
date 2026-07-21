@@ -38,7 +38,7 @@ class IsOnlineMarketplaceController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(IsOnlineMarketplacePage) match {
@@ -49,7 +49,7 @@ class IsOnlineMarketplaceController @Inject()(
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
     implicit request =>
 
       form.bindFromRequest().fold(
