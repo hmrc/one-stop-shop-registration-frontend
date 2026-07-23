@@ -68,8 +68,6 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
 
-  def checkExcludedInAmendFilter: CheckExcludedInAmendFilter
-
   def authAndGetDataBase(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     actionBuilder andThen
       identify andThen
@@ -82,10 +80,9 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkNiProtocol(mode)
   }
 
-  def authAndGetData(mode: Option[Mode] = None, restrictExcludedInAmend: Boolean = false): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     authAndGetDataBase(mode) andThen
-      checkOtherCountryRegistration(mode) andThen
-      checkExcludedInAmendFilter(mode, restrictExcludedInAmend)
+      checkOtherCountryRegistration(mode)
   }
 
   def authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
@@ -141,6 +138,5 @@ case class DefaultAuthenticatedControllerComponents @Inject()(
                                                                checkEligibleSalesAmendable: CheckEligibleSalesAmendableFilterProvider,
                                                                checkVatExpiredFilter: CheckVatExpiredFilter,
                                                                requireOss: OssRequiredAction,
-                                                               checkBouncedEmailFilter: CheckBouncedEmailFilterProvider,
-                                                               checkExcludedInAmendFilter: CheckExcludedInAmendFilter
+                                                               checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
                                                              ) extends AuthenticatedControllerComponents

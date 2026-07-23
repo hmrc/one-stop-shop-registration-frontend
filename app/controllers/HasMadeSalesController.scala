@@ -46,7 +46,7 @@ class HasMadeSalesController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.checkEligibleSalesAmendable(Some(mode))) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(HasMadeSalesPage) match {
@@ -57,7 +57,7 @@ class HasMadeSalesController @Inject()(
       Ok(view(preparedForm, mode, showHintText(request.userAnswers), getEarliestDateAllowed(mode, dateFormatter)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
       form.bindFromRequest().fold(

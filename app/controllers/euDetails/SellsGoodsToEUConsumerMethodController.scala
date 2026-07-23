@@ -38,7 +38,7 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
+  def onPageLoad(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
       getCountry(mode, countryIndex) {
@@ -55,7 +55,7 @@ class SellsGoodsToEUConsumerMethodController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
+  def onSubmit(mode: Mode, countryIndex: Index): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
 
       getCountry(mode, countryIndex) {

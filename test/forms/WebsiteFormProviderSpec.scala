@@ -16,7 +16,6 @@
 
 package forms
 
-import forms.Validation.Validation.websitePattern
 import forms.behaviours.StringFieldBehaviours
 import models.Index
 import play.api.data.FormError

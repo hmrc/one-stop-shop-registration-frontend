@@ -25,6 +25,7 @@ import controllers.amend.routes as amendRoutes
 import controllers.routes
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
 import models.domain.Registration
+import models.exclusions.ExclusionReason.TransferringMSID
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, BusinessContactDetails, DataMissingError, Index, NormalMode, PreviousScheme, PreviousSchemeType, UserAnswers}
@@ -102,6 +103,43 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           implicit val msgs: Messages = messages(application)
           val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(registrationToUserAnswers))
           val list = SummaryListViewModel(rows = getCYASummaryList(registrationToUserAnswers, dateService, registrationService, RegistrationData.registration.previousRegistrations, AmendMode)(request = dataRequest.request).futureValue)
+
+          val config = application.injector.instanceOf[FrontendAppConfig]
+          val yourAccountUrl: String = config.ossYourAccountUrl
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, yourAccountUrl, AmendMode)(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view when answers are complete and have not been amended and user is excluded" in {
+
+        val commencementDate = LocalDate.of(2022, 1, 1)
+        val excludedRegistration: Registration = registration.copy(
+          excludedTrader = Some(arbitraryExcludedTrader.arbitrary.sample.value.copy(
+            exclusionReason = TransferringMSID
+          ))
+        )
+
+        when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
+        when(dateService.startOfNextQuarter()) thenReturn commencementDate
+        when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+        when(registrationService.toUserAnswers(any(), any(), any())) thenReturn registrationToUserAnswers.toFuture
+
+        val application = applicationBuilder(userAnswers = Some(registrationToUserAnswers), registration = Some(excludedRegistration))
+          .overrides(
+            bind[DateService].toInstance(dateService),
+            bind[RegistrationService].toInstance(registrationService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[ChangeYourRegistrationView]
+          implicit val msgs: Messages = messages(application)
+          val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(registrationToUserAnswers))
+          val list = SummaryListViewModel(rows = getCYASummaryList(registrationToUserAnswers, dateService, registrationService, RegistrationData.registration.previousRegistrations, AmendMode, isExcluded = true)(request = dataRequest.request).futureValue)
 
           val config = application.injector.instanceOf[FrontendAppConfig]
           val yourAccountUrl: String = config.ossYourAccountUrl

@@ -41,7 +41,7 @@ class CommencementDateController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
     implicit request =>
       val hasMadeSales = request.userAnswers.get(HasMadeSalesPage).contains(true)
       for {
@@ -96,7 +96,7 @@ class CommencementDateController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) {
+  def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)) {
     implicit request =>
       Redirect(CommencementDatePage.navigate(mode, request.userAnswers))
   }

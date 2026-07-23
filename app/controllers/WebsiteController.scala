@@ -39,8 +39,7 @@ class WebsiteController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.limitIndex(index, Constants.maxWebsites)) {
+  def onPageLoad(mode: Mode, index: Index): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.limitIndex(index, Constants.maxWebsites)) {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))
@@ -53,8 +52,7 @@ class WebsiteController @Inject()(
         Ok(view(preparedForm, mode, index))
     }
 
-  def onSubmit(mode: Mode, index: Index): Action[AnyContent] =
-    (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
+  def onSubmit(mode: Mode, index: Index): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.limitIndex(index, Constants.maxTradingNames)).async {
       implicit request =>
 
         val form = formProvider(index, request.userAnswers.get(AllWebsites).getOrElse(Seq.empty))

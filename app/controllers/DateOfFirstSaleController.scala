@@ -62,7 +62,7 @@ class DateOfFirstSaleController @Inject()(
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
       createFutureForm(mode).map { form =>
@@ -77,7 +77,7 @@ class DateOfFirstSaleController @Inject()(
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode), restrictExcludedInAmend = true) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (cc.authAndGetData(Some(mode)) andThen cc.checkEligibleSalesAmendable(Some(mode))).async {
     implicit request =>
 
       createFutureForm(mode).flatMap { form =>
