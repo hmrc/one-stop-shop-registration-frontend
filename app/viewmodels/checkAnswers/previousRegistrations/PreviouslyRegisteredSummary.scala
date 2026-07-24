@@ -23,25 +23,24 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.previousRegistration.AllPreviousRegistrationsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object PreviouslyRegisteredSummary {
 
-  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PreviouslyRegisteredPage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key = "previouslyRegistered.checkYourAnswersLabel",
-          value = ValueViewModel(value),
-          actions = if((mode != AmendMode && mode != RejoinMode) ||
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          if ((mode != AmendMode && mode != RejoinMode) ||
             (mode == AmendMode && answers.get(AllPreviousRegistrationsQuery).isEmpty) ||
-          (mode == RejoinMode && answers.get(AllPreviousRegistrationsQuery).isEmpty))
-          {
+            (mode == RejoinMode && answers.get(AllPreviousRegistrationsQuery).isEmpty)) {
             Seq(
               ActionItemViewModel("site.change", routes.PreviouslyRegisteredController.onPageLoad(mode).url)
                 .withVisuallyHiddenText(messages("previouslyRegistered.change.hidden"))
@@ -49,6 +48,12 @@ object PreviouslyRegisteredSummary {
           } else {
             Seq.empty
           }
+        }
+
+        SummaryListRowViewModel(
+          key = "previouslyRegistered.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = actions
         )
     }
 

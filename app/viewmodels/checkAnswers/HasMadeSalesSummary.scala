@@ -20,25 +20,31 @@ import controllers.routes
 import models.{Mode, UserAnswers}
 import pages.HasMadeSalesPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object HasMadeSalesSummary  {
 
-  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HasMadeSalesPage).map {
       hasMadeSales =>
 
         val value = if (hasMadeSales) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = messages("hasMadeSales.checkYourAnswersLabel"),
-          value   = ValueViewModel(value),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.HasMadeSalesController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("hasMadeSales.change.hidden"))
           )
+        }
+
+        SummaryListRowViewModel(
+          key     = messages("hasMadeSales.checkYourAnswersLabel"),
+          value   = ValueViewModel(value),
+          actions = actions
         )
     }
 

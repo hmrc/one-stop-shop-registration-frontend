@@ -17,7 +17,7 @@
 package controllers
 
 import config.Constants
-import controllers.actions._
+import controllers.actions.*
 import forms.AddWebsiteFormProvider
 import models.Mode
 import models.requests.AuthenticatedDataRequest

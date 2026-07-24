@@ -22,11 +22,11 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllEuOptionalDetailsQuery
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryList, SummaryListRow}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.ListItemWrapper
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object EuDetailsSummary {
 
@@ -55,7 +55,7 @@ object EuDetailsSummary {
     }
   }
 
-  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllEuOptionalDetailsQuery).map {
       euVatDetails =>
 
@@ -64,17 +64,23 @@ object EuDetailsSummary {
             HtmlFormat.escape(details.euCountry.name)
         }.mkString("<br/>")
 
-        SummaryListRowViewModel(
-          key = "euVatDetails.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.AddEuDetailsController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("euVatDetails.change.hidden"))
           )
+        }
+
+        SummaryListRowViewModel(
+          key = "euVatDetails.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
+          actions = actions
         )
     }
 
-  def countryAndVatNumberList(answers: UserAnswers, currentMode: Mode)(implicit messages: Messages) = {
+  def countryAndVatNumberList(answers: UserAnswers, currentMode: Mode)(implicit messages: Messages): SummaryList = {
     val changeLinkMode = currentMode match {
       case NormalMode => NormalMode
       case CheckMode => CheckMode

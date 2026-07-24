@@ -17,29 +17,35 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models._
+import models.*
 import pages.HasTradingNamePage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 import javax.inject.Inject
 
 class HasTradingNameSummary @Inject() {
 
-  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(HasTradingNamePage).map {
       hasTradingName =>
         val value = if (hasTradingName) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = messages("hasTradingName.checkYourAnswersLabel"),
-          value   = ValueViewModel(value),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded & mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("hasTradingName.change.hidden"))
           )
+        }
+
+        SummaryListRowViewModel(
+          key     = messages("hasTradingName.checkYourAnswersLabel"),
+          value   = ValueViewModel(value),
+          actions = actions
         )
     }
 

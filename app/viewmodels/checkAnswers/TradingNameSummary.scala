@@ -22,11 +22,11 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import queries.AllTradingNames
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.addtoalist.ListItem
 import viewmodels.ListItemWrapper
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object TradingNameSummary {
 
@@ -43,7 +43,7 @@ object TradingNameSummary {
         )
     }
 
-  def checkAnswersRow(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def checkAnswersRow(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(AllTradingNames).map {
       tradingNames =>
 
@@ -52,13 +52,19 @@ object TradingNameSummary {
             HtmlFormat.escape(name)
         }.mkString("<br/>")
 
-        SummaryListRowViewModel(
-          key = "tradingNames.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.AddTradingNameController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("tradingNames.change.hidden"))
           )
+        }
+
+        SummaryListRowViewModel(
+          key = "tradingNames.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
+          actions = actions
         )
     }
 

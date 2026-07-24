@@ -166,21 +166,22 @@ trait SpecBase
                          dateService: DateService,
                          registrationService: RegistrationService,
                          previousRegsitrations: Seq[PreviousRegistration] = Seq.empty,
-                         mode: Mode
+                         mode: Mode,
+                         isExcluded: Boolean = false
                        )(implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
     new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
-      val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode)
-      val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode)
-      val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode)
+      val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode, isExcluded)
+      val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode, isExcluded)
+      val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode, isExcluded)
       val commencementDateSummaryRow = commencementDateSummary
-      val dateOfFirstSaleSumaryRow = DateOfFirstSaleSummary.row(answers, mode)
-      val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(answers, mode)
-      val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, previousRegsitrations, mode)
-      val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(answers, mode)
-      val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(answers, mode)
-      val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(answers, mode)
-      val websiteSummaryRow = WebsiteSummary.checkAnswersRow(answers, mode)
+      val dateOfFirstSaleSumaryRow = DateOfFirstSaleSummary.row(answers, mode, isExcluded)
+      val previouslyRegisteredSummaryRow = PreviouslyRegisteredSummary.row(answers, mode, isExcluded)
+      val previousRegistrationSummaryRow = PreviousRegistrationSummary.checkAnswersRow(answers, previousRegsitrations, mode, isExcluded)
+      val taxRegisteredInEuSummaryRow = TaxRegisteredInEuSummary.row(answers, mode, isExcluded)
+      val euDetailsSummaryRow = EuDetailsSummary.checkAnswersRow(answers, mode, isExcluded)
+      val isOnlineMarketplaceSummaryRow = IsOnlineMarketplaceSummary.row(answers, mode, isExcluded)
+      val websiteSummaryRow = WebsiteSummary.checkAnswersRow(answers, mode, isExcluded)
       val businessContactDetailsContactNameSummaryRow = BusinessContactDetailsSummary.rowContactName(answers, mode)
       val businessContactDetailsTelephoneSummaryRow = BusinessContactDetailsSummary.rowTelephoneNumber(answers, mode)
       val businessContactDetailsEmailSummaryRow = BusinessContactDetailsSummary.rowEmailAddress(answers, mode)

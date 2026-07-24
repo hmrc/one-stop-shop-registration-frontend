@@ -20,25 +20,31 @@ import controllers.euDetails.routes
 import models.{Mode, UserAnswers}
 import pages.euDetails.TaxRegisteredInEuPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object TaxRegisteredInEuSummary {
 
-  def row(answers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TaxRegisteredInEuPage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key = "taxRegisteredInEu.checkYourAnswersLabel",
-          value = ValueViewModel(value),
-          actions = Seq(
+        val actions: Seq[ActionItem] = if (isExcluded && mode.isInAmend) {
+          Seq.empty
+        } else {
+          Seq(
             ActionItemViewModel("site.change", routes.TaxRegisteredInEuController.onPageLoad(mode).url)
               .withVisuallyHiddenText(messages("taxRegisteredInEu.change.hidden"))
           )
+        }
+        
+        SummaryListRowViewModel(
+          key = "taxRegisteredInEu.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = actions
         )
     }
 
