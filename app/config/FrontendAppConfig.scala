@@ -95,4 +95,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val userResearchUrl2: String = configuration.get[String]("urls.userResearch2")
 
+  val registrationReviewEnabled: Boolean = configuration.get[Boolean]("features.registration-review-enabled")
+
 }

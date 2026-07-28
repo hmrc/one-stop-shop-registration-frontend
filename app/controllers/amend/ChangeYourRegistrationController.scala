@@ -44,6 +44,7 @@ import viewmodels.checkAnswers.previousRegistrations.{PreviousRegistrationSummar
 import viewmodels.govuk.summarylist.*
 import views.html.amend.ChangeYourRegistrationView
 
+import java.time.{Clock, LocalDateTime}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -55,6 +56,7 @@ class ChangeYourRegistrationController @Inject()(
                                                   auditService: AuditService,
                                                   registrationService: RegistrationService,
                                                   frontendAppConfig: FrontendAppConfig,
+                                                  clock: Clock,
                                                   view: ChangeYourRegistrationView,
                                                   commencementDateSummary: CommencementDateSummary
                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with CompletionChecks {
@@ -83,6 +85,12 @@ class ChangeYourRegistrationController @Inject()(
 
         val isValid = validate()(request.request)
 
+        val registrationDueForReview: Boolean = if (frontendAppConfig.registrationReviewEnabled) {
+          request.registration.adminUse.changeDate.exists(changeDate => changeDateMoreThanTwoYears(changeDate))
+        } else {
+          false
+        }
+
         request.userAnswers.vatInfo match {
           case Some(vatCustomerInfo: VatCustomerInfo) =>
             for {
@@ -94,8 +102,8 @@ class ChangeYourRegistrationController @Inject()(
 
               val unusableStatus: Boolean = request.registration.unusableStatus.contains(true)
               val noAmendmentsWithUnusableStatusCheck: Boolean = noAmendments && !unusableStatus
-              
-              Ok(view(vatRegistrationDetailsList, list, isValid, noAmendmentsWithUnusableStatusCheck, frontendAppConfig.ossYourAccountUrl, AmendMode))
+
+              Ok(view(vatRegistrationDetailsList, list, isValid, noAmendmentsWithUnusableStatusCheck, registrationDueForReview, frontendAppConfig.ossYourAccountUrl, AmendMode))
             }
           case None =>
             val errorMessage: String = "Vat information was not found"
@@ -243,5 +251,10 @@ class ChangeYourRegistrationController @Inject()(
       BankDetailsSummary.rowIBAN(request.userAnswers, AmendMode)
     )
   }
+  
+  private def changeDateMoreThanTwoYears(changeDate: LocalDateTime): Boolean = {
+    val twoYearsAgo = LocalDateTime.now(clock).minusYears(2)
 
+    changeDate.isBefore(twoYearsAgo)
+  }
 }
