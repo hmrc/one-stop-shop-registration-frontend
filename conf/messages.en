@@ -214,7 +214,7 @@ deleteTradingName.error.required = Select yes if you need to remove this trading
 
 addTradingName.title.singular = You have added one UK trading name
 addTradingName.heading.singular = You have added one UK trading name
-addTradingName.title = You have added {0} UK trading names
+addTradingName.title.plural = You have added {0} UK trading names
 addTradingName.heading.plural = You have added {0} UK trading names
 addTradingName.maximumReached = You have added the maximum number of trading names.
 addTradingName.error.required = Select yes if you need to add another UK trading name
@@ -844,10 +844,13 @@ salesDeclarationNotRequired.title = Do not tell us about sales of services on yo
 salesDeclarationNotRequired.heading = Do not tell us about sales of services on your returns
 salesDeclarationNotRequired.p1 = You must still tell us about countries where your business is registered.
 
-changeYourRegistration.title = Change Your Registration
-changeYourRegistration.heading = Change Your Registration
+changeYourRegistration.title = Change your registration
+changeYourRegistration.heading = Change your registration
+changeYourRegistration.title.review = Review your registration
+changeYourRegistration.heading.review = Review your registration
 changeYourRegistration.info.p1 = Confirm these changes to save them to your account.
 changeYourRegistration.noAmendments = You have not made any changes.
+changeYourRegistration.noAmendments.review = Confirm your details are correct.
 changeYourRegistration.returnToYourAccount = <a class="govuk-link" id="returnToYourAccount" href="{0}">Return to your account</a>
 
 amendComplete.title = Registration details changed

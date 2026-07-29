@@ -21,6 +21,7 @@
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         button: CancelAmendRegButton,
+        govukButton: GovukButton,
         govukWarningText: GovukWarningText
 )
 
@@ -29,11 +30,26 @@
     list: SummaryList,
     isValid: Boolean,
     noAmendmentsWithUnusableStatusCheck: Boolean,
+    registrationDueForReview: Boolean,
     ossYourAccountUrl: String,
     mode: Mode
 )(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = titleNoForm(messages("changeYourRegistration.title"))) {
+@titleText = @{
+    registrationDueForReview match {
+        case true => messages("changeYourRegistration.title.review")
+        case _ => messages("changeYourRegistration.title")
+    }
+}
+
+@headingText = @{
+    registrationDueForReview match {
+        case true => messages("changeYourRegistration.title.review")
+        case _ => messages("changeYourRegistration.title")
+    }
+}
+
+    @layout(pageTitle = titleNoForm(titleText)) {
 
         @if(!isValid) {
             @govukWarningText(WarningText(
@@ -42,7 +58,7 @@
             ))
         }
 
-        <h1 class="govuk-heading-xl">@messages("changeYourRegistration.heading")</h1>
+        <h1 class="govuk-heading-l">@headingText</h1>
 
         <h2 class="govuk-heading-m">@messages("vatRegistrationDetails.checkYourAnswers.heading")</h2>
 
@@ -62,8 +78,18 @@
 
         @if(isValid) {
             @if(noAmendmentsWithUnusableStatusCheck) {
-                <p class="govuk-body">@messages("changeYourRegistration.noAmendments")</p>
-                <p class="govuk-body">@Html(messages("changeYourRegistration.returnToYourAccount", ossYourAccountUrl))</p>
+                @if(registrationDueForReview) {
+                    <p class="govuk-body">@messages("changeYourRegistration.noAmendments.review")</p>
+                    @formHelper(action = controllers.amend.routes.ChangeYourRegistrationController.onSubmit(false)) {
+                        @govukButton(
+                            ButtonViewModel(messages("site.confirm"))
+                                .withAttribute(("id", "submit"))
+                        )
+                    }
+                } else {
+                    <p class="govuk-body">@messages("changeYourRegistration.noAmendments")</p>
+                    <p class="govuk-body">@Html(messages("changeYourRegistration.returnToYourAccount", ossYourAccountUrl))</p>
+                }
             } else {
                 <p class="govuk-body">@messages("changeYourRegistration.info.p1")</p>
                 @formHelper(action = controllers.amend.routes.ChangeYourRegistrationController.onSubmit(false)) {

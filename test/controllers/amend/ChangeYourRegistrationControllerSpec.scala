@@ -24,7 +24,7 @@ import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
 import controllers.routes
 import models.audit.{RegistrationAuditModel, RegistrationAuditType, SubmissionResult}
-import models.domain.Registration
+import models.domain.{AdminUse, Registration}
 import models.exclusions.ExclusionReason.TransferringMSID
 import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequest}
 import models.responses.UnexpectedResponseStatus
@@ -51,7 +51,7 @@ import utils.FutureSyntax.FutureOps
 import viewmodels.govuk.SummaryListFluency
 import views.html.amend.ChangeYourRegistrationView
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 
 class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
@@ -108,7 +108,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val yourAccountUrl: String = config.ossYourAccountUrl
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, yourAccountUrl, AmendMode)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
         }
       }
 
@@ -145,7 +145,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val yourAccountUrl: String = config.ossYourAccountUrl
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, yourAccountUrl, AmendMode)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
         }
       }
 
@@ -176,7 +176,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val yourAccountUrl: String = config.ossYourAccountUrl
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
         }
       }
 
@@ -251,7 +251,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val yourAccountUrl: String = config.ossYourAccountUrl
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
         }
       }
 
@@ -280,7 +280,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -307,7 +307,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -334,7 +334,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -361,7 +361,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -390,7 +390,7 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
 
@@ -419,7 +419,50 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
             val yourAccountUrl: String = config.ossYourAccountUrl
 
             status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, noAmendmentsWithUnusableStatusCheck = false, registrationDueForReview = false, yourAccountUrl, AmendMode)(request, messages(application)).toString
+          }
+        }
+      }
+
+      "when registration-review-enabled" - {
+
+        "must return OK and the correct view when answers are complete and have not been amended " +
+          "and registration change date is more than 2 years" in {
+
+          val commencementDate = LocalDate.of(2022, 1, 1)
+          val registrationChangeDate: LocalDateTime = LocalDateTime.now(stubClockAtArbitraryDate).minusYears(2).minusDays(1)
+
+          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
+          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
+          when(registrationService.toUserAnswers(any(), any(), any())) thenReturn registrationToUserAnswers.toFuture
+
+          val updatedRegistration: Registration = registration.copy(
+            adminUse = AdminUse(
+              changeDate = Some(registrationChangeDate)
+            )
+          )
+
+          val application = applicationBuilder(userAnswers = Some(registrationToUserAnswers), registration = Some(updatedRegistration))
+            .overrides(
+              bind[DateService].toInstance(dateService),
+              bind[RegistrationService].toInstance(registrationService)
+            )
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
+            val result = route(application, request).value
+            val view = application.injector.instanceOf[ChangeYourRegistrationView]
+            implicit val msgs: Messages = messages(application)
+            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(registrationToUserAnswers))
+            val list = SummaryListViewModel(rows = getCYASummaryList(registrationToUserAnswers, dateService, registrationService, RegistrationData.registration.previousRegistrations, AmendMode)(request = dataRequest.request).futureValue)
+
+            val config = application.injector.instanceOf[FrontendAppConfig]
+            val yourAccountUrl: String = config.ossYourAccountUrl
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = true, noAmendmentsWithUnusableStatusCheck = true, registrationDueForReview = true, yourAccountUrl, AmendMode)(request, messages(application)).toString
           }
         }
       }
