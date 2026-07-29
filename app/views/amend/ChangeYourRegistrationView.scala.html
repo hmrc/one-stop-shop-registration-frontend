@@ -83,6 +83,7 @@
                     @formHelper(action = controllers.amend.routes.ChangeYourRegistrationController.onSubmit(false)) {
                         @govukButton(
                             ButtonViewModel(messages("site.confirm"))
+                                .withAttribute(("id", "submit"))
                         )
                     }
                 } else {
