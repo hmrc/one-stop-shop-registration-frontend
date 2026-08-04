@@ -86,6 +86,7 @@ case object EuDetailsCompletionChecks extends CompletionChecks {
 
   private def sellsToEuConsumers(isPartOfVatGroup: Boolean, details: EuOptionalDetails): Boolean = {
     (details.sellsGoodsToEUConsumers.contains(true) && details.sellsGoodsToEUConsumerMethod.isEmpty) ||
+      (details.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.FixedEstablishment) && details.registrationType.isEmpty) ||
       (details.sellsGoodsToEUConsumerMethod.contains(EuConsumerSalesMethod.DispatchWarehouse) && details.registrationType.isEmpty) ||
       (details.registrationType.contains(RegistrationType.VatNumber) && details.euVatNumber.isEmpty) ||
       (details.registrationType.contains(RegistrationType.TaxId) && details.euTaxReference.isEmpty) ||
