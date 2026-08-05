@@ -82,21 +82,10 @@
         }
 
         @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
-          @defining(numberOfIossRegistrations match {
-            case 1 =>
-              if (latestIossRegistration.exists(_.exclusions.nonEmpty)) {
-              "addTradingName.iossRegistration.previous.warning"
-            } else {
-              "addTradingName.iossRegistration.warning"
-            }
-            case i =>
-              "addTradingName.iossRegistration.multiple.warning"
-          }) { message =>
             @govukWarningText(WarningText(
               iconFallbackText = Option(messages("site.warning")),
-              content = Text(messages(message))
+              content = Text(messages("addTradingName.iossRegistration.warning"))
             ))
-          }
         }
 
         @button("site.continue", routes.AddTradingNameController.onPageLoad(mode).url, mode)

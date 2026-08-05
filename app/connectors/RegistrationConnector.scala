@@ -62,4 +62,6 @@ class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpC
   
   def getAccounts()(implicit hc: HeaderCarrier): Future[EACDEnrolments] =
     httpClientV2.get(url"$iossBaseUrl/accounts").execute[EACDEnrolments]
+    
+  
 }

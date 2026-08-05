@@ -87,21 +87,10 @@
     )
 
     @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "businessContactDetails.iossRegistration.previous.warning"
-          } else {
-            "businessContactDetails.iossRegistration.warning"
-          }
-        case i =>
-          "businessContactDetails.iossRegistration.multiple.warning"
-      }) { message =>
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
-          content = Text(messages(message))
+          content = Text(messages("businessContactDetails.iossRegistration.warning"))
         ))
-      }
     }
 
     <p class="govuk-body">@messages("businessContactDetails.emailHint")</p>

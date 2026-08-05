@@ -46,18 +46,7 @@
     <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
 
     @if(maybeIossRegistration.nonEmpty && hasUpdatedIossRegistration) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "applicationComplete.iossRegistration.previous.updated"
-          } else {
-            "applicationComplete.iossRegistration.updated"
-          }
-        case i =>
-          "applicationComplete.iossRegistration.multiple.updated"
-      }) { message =>
-        <p class="govuk-body">@messages(message)</p>
-      }
+      <p class="govuk-body">@messages("applicationComplete.iossRegistration.updated")</p>
     }
 
     <div class="govuk-body">@messages("applicationComplete.useService.text")</div>
