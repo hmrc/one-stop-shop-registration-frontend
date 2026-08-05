@@ -78,21 +78,10 @@
     )
 
     @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "bankDetails.iossRegistration.previous.warning"
-          } else {
-            "bankDetails.iossRegistration.warning"
-          }
-        case i =>
-          "bankDetails.iossRegistration.multiple.warning"
-      }) { message =>
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
-          content = Text(messages(message))
+          content = Text(messages("bankDetails.iossRegistration.warning"))
         ))
-      }
     }
 
     @button("site.continue", routes.BankDetailsController.onPageLoad(mode).url, mode)

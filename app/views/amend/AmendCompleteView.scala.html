@@ -53,18 +53,7 @@
     )
 
     @if(maybeIossRegistration.nonEmpty && list.rows.nonEmpty) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "amendComplete.iossRegistration.previous.updated"
-          } else {
-            "amendComplete.iossRegistration.updated"
-          }
-        case i =>
-          "amendComplete.iossRegistration.multiple.updated"
-      }) { message =>
-        <p class="govuk-body">@messages(message)</p>
-      }
+        <p class="govuk-body">@messages("amendComplete.iossRegistration.updated")</p>
     }
 
     @externalUrl match {

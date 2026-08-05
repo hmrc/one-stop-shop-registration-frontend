@@ -34,4 +34,5 @@ object Constants {
   val correctionsPeriodsLimit: Int = 3
 
   val iossEnrolmentKey: String = "IOSSNumber"
+  val intermediaryEnrolmentKey: String = "IntNumber"
 }
