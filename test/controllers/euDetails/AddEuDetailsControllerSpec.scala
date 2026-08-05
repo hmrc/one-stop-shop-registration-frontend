@@ -22,7 +22,7 @@ import controllers.euDetails.routes as euDetailsRoutes
 import controllers.routes
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.{EuConsumerSalesMethod, EuOptionalDetails, RegistrationType}
-import models.{AmendMode, CheckMode, Country, Index, NormalMode}
+import models.{AmendMode, CheckMode, Country, Index, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -46,7 +46,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
   private lazy val addEuVatDetailsRoute = euDetailsRoutes.AddEuDetailsController.onPageLoad(NormalMode).url
   private lazy val addEuVatDetailsAmendRoute = euDetailsRoutes.AddEuDetailsController.onPageLoad(AmendMode).url
 
-  private def addEuVatDetailsPostRoute(prompt: Boolean = false) = euDetailsRoutes.AddEuDetailsController.onSubmit(NormalMode, prompt).url
+  private def addEuVatDetailsPostRoute(mode: Mode = NormalMode, prompt: Boolean = false) = euDetailsRoutes.AddEuDetailsController.onSubmit(mode, prompt).url
   
   private val baseAnswers =
     basicUserAnswersWithVatInfo
@@ -254,7 +254,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -272,7 +272,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -291,7 +291,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -311,7 +311,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -331,7 +331,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -352,7 +352,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -374,7 +374,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -395,7 +395,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -417,7 +417,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -435,7 +435,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -454,7 +454,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addEuVatDetailsPostRoute(true))
+          FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -475,7 +475,7 @@ class AddEuDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
           val request =
-            FakeRequest(POST, addEuVatDetailsPostRoute(true))
+            FakeRequest(POST, addEuVatDetailsPostRoute(CheckMode, true))
               .withFormUrlEncodedBody(("value", "true"))
 
           val result = route(application, request).value

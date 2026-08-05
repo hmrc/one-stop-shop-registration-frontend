@@ -16,11 +16,11 @@
 
 package controllers.euDetails
 
-import controllers.actions._
+import controllers.actions.*
 import forms.euDetails.AddEuDetailsFormProvider
 import models.euDetails.EuOptionalDetails
 import models.requests.AuthenticatedDataRequest
-import models.{CheckMode, Country, Mode}
+import models.{Country, Mode}
 import pages.euDetails.AddEuDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -71,7 +71,7 @@ class AddEuDetailsController @Inject()(
         data = getAllIncompleteEuDetails _,
         onFailure = (_: Seq[EuOptionalDetails]) => {
           if (incompletePromptShown) {
-            incompleteCheckEuDetailsRedirect(CheckMode).map(
+            incompleteCheckEuDetailsRedirect(mode).map(
               redirectIncompletePage => redirectIncompletePage.toFuture
             ).getOrElse(Redirect(determineJourneyRecovery(Some(mode))).toFuture)
           } else {
