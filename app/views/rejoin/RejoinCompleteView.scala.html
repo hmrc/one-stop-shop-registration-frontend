@@ -15,6 +15,7 @@
  *@
 
 @import models.iossRegistration.IossEtmpDisplayRegistration
+@import models.etmp.intermediary.IntermediaryRegistrationWrapper
 
 @this(
         layout: templates.Layout
@@ -31,6 +32,7 @@
         firstDayOfNextPeriod: String,
         maybeIossRegistration: Option[IossEtmpDisplayRegistration],
         numberOfIossRegistrations: Int,
+        maybeIntermediaryRegistration: Option[IntermediaryRegistrationWrapper],
         hasUpdatedRegistration: Boolean
 )(implicit request: Request[_], messages: Messages)
 
@@ -46,7 +48,7 @@
     @Html(messages("rejoinComplete.organisationName", organisationName))
     </p>
 
-    @if(maybeIossRegistration.nonEmpty && hasUpdatedRegistration) {
+    @if((maybeIossRegistration.nonEmpty || maybeIntermediaryRegistration.nonEmpty) && hasUpdatedRegistration) {
         <p class="govuk-body">@messages("rejoinComplete.iossRegistration.updated")</p>
     }
 

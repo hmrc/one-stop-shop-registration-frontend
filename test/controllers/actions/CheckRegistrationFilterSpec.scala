@@ -100,7 +100,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None, None, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -120,7 +120,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty), Some(registration), None, 0, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, Enrolments(Set.empty), Some(registration), None, 0, None, None, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -141,7 +141,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment, None, None, 0, None)
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, registrationEnrolment, None, None, 0, None, None, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -164,7 +164,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -187,7 +187,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -210,7 +210,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
       running(app) {
         val config = app.injector.instanceOf[FrontendAppConfig]
-        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
+        val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, iossEnrolments, None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)
         val controller = new Harness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
         val result = controller.callFilter(request).futureValue
@@ -238,7 +238,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), Some(registration), None, 0, None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), Some(registration), None, 0, None, None, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
@@ -255,7 +255,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment, Some(registration), None, 0, None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, registrationEnrolment, Some(registration), None, 0, None, None, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
@@ -271,7 +271,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None)
+            val request = AuthenticatedIdentifierRequest(FakeRequest(), testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None, None, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue
@@ -294,7 +294,7 @@ class CheckRegistrationFilterSpec extends SpecBase with MockitoSugar with Before
 
           running(app) {
             val config = app.injector.instanceOf[FrontendAppConfig]
-            val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, ossAndIossEnrolments, Some(registration), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))
+            val request = AuthenticatedIdentifierRequest(FakeRequest(GET, "/test/url?k=session-id"), testCredentials, vrn, ossAndIossEnrolments, Some(registration), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)
             val controller = new AmendHarness(mockRegistrationConnector, config, mockDataMigrationService, mockIossExclusionService)
 
             val result = controller.callFilter(request).futureValue

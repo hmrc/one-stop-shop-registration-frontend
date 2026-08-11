@@ -44,7 +44,9 @@ class FakeSavedAnswersRetrievalAction(dataToReturn: Option[UserAnswers], vrn: Vr
         dataToReturn,
         request.iossNumber,
         request.numberOfIossRegistrations,
-        request.latestIossRegistration
+        request.latestIossRegistration,
+        request.intermediaryNumber,
+        request.latestIntermediaryRegistration
       ))
 }
 

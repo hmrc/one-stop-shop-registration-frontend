@@ -34,9 +34,9 @@ class CoreRegistrationAuditModelSpec extends SpecBase with Matchers {
 
     "must create correct json object" in {
 
-      val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+      val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
 
-      implicit val dataRequest: AuthenticatedOptionalDataRequest[AnyContent] = AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(emptyUserAnswers), None, 0, None)
+      implicit val dataRequest: AuthenticatedOptionalDataRequest[AnyContent] = AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(emptyUserAnswers), None, 0, None, None, None)
 
       val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 

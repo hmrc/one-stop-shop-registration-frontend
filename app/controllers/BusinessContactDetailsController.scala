@@ -54,11 +54,18 @@ class BusinessContactDetailsController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BusinessContactDetailsPage) match {
-        case None => fillIossBusinessContactDetailsForm(request)
+        case None => fillBusinessContactDetailsForm(request)
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations))
+      Ok(view(
+        preparedForm,
+        mode,
+        config.enrolmentsEnabled,
+        request.latestIossRegistration,
+        request.numberOfIossRegistrations,
+        request.latestIntermediaryRegistration
+      ))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -68,7 +75,14 @@ class BusinessContactDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations)).toFuture,
+          BadRequest(view(
+            formWithErrors,
+            mode,
+            config.enrolmentsEnabled,
+            request.latestIossRegistration,
+            request.numberOfIossRegistrations,
+            request.latestIntermediaryRegistration
+          )).toFuture,
 
         value => {
 
@@ -140,9 +154,9 @@ class BusinessContactDetailsController @Inject()(
     }
   }
 
-  private def fillIossBusinessContactDetailsForm(request: AuthenticatedDataRequest[_]): Form[BusinessContactDetails] = {
-    request.latestIossRegistration match {
-      case Some(iossEtmpDisplayRegistration) =>
+  private def fillBusinessContactDetailsForm(request: AuthenticatedDataRequest[_]): Form[BusinessContactDetails] = {
+    (request.latestIossRegistration, request.latestIntermediaryRegistration) match {
+      case (Some(iossEtmpDisplayRegistration), _) =>
         form.fill(
           BusinessContactDetails(
             fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
@@ -151,7 +165,16 @@ class BusinessContactDetailsController @Inject()(
           )
         )
 
-      case _ => form
+      case (None, Some(intermediaryEtmpDisplayRegistration)) =>
+        form.fill(
+          BusinessContactDetails(
+            fullName = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.schemeDetails.contactName,
+            telephoneNumber = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+            emailAddress = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.schemeDetails.businessEmailId
+          )
+        )
+
+      case (None, None) => form
     }
   }
 }

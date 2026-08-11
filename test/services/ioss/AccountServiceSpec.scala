@@ -17,7 +17,7 @@
 package services.ioss
 
 import base.SpecBase
-import config.Constants.iossEnrolmentKey
+import config.Constants.{intermediaryEnrolmentKey, iossEnrolmentKey}
 import connectors.RegistrationConnector
 import models.enrolments.{EACDEnrolment, EACDEnrolments}
 import org.mockito.ArgumentMatchers.any
@@ -42,8 +42,19 @@ class AccountServiceSpec extends SpecBase {
     identifiers = Seq(arbitraryEACDIdentifiers.arbitrary.sample.value.copy(key = iossEnrolmentKey))
   )
 
+  private val eACDIntermediaryEnrolment1: EACDEnrolment = arbitraryEACDEnrolment.arbitrary.sample.value.copy(
+    identifiers = Seq(arbitraryEACDIdentifiers.arbitrary.sample.value.copy(key = intermediaryEnrolmentKey))
+  )
+
+  private val eACDIntermediaryEnrolment2: EACDEnrolment = arbitraryEACDEnrolment.arbitrary.sample.value.copy(
+    identifiers = Seq(arbitraryEACDIdentifiers.arbitrary.sample.value.copy(key = intermediaryEnrolmentKey))
+  )
+
   private val eACDEnrolments: EACDEnrolments = arbitraryEACDEnrolments.arbitrary.sample.value
     .copy(enrolments = Seq(eACDEnrolment1, eACDEnrolment2))
+
+  private val eACDIntermediaryEnrolments: EACDEnrolments = arbitraryEACDEnrolments.arbitrary.sample.value
+    .copy(enrolments = Seq(eACDIntermediaryEnrolment1, eACDIntermediaryEnrolment2))
 
   "AccountService" - {
 
@@ -65,6 +76,31 @@ class AccountServiceSpec extends SpecBase {
       val service = new AccountService(mockRegistrationConnector)
 
       val result = service.getLatestAccount().futureValue
+
+      result mustBe None
+    }
+  }
+
+  "getLatestIntermediaryAccount" - {
+
+    "must retrieve the latest IOSS account if one exists" in {
+
+      when(mockRegistrationConnector.getIntermediaryAccounts()(any())) thenReturn eACDIntermediaryEnrolments.toFuture
+
+      val service = new AccountService(mockRegistrationConnector)
+
+      val result = service.getLatestIntermediaryAccount().futureValue
+
+      result mustBe Some(eACDIntermediaryEnrolments.enrolments.maxBy(_.activationDate).identifiers.head.value)
+    }
+
+    "must return None when no IOSS accounts are retrieved" in {
+
+      when(mockRegistrationConnector.getIntermediaryAccounts()(any())) thenReturn arbitraryEACDEnrolments.arbitrary.sample.value.toFuture
+
+      val service = new AccountService(mockRegistrationConnector)
+
+      val result = service.getLatestIntermediaryAccount().futureValue
 
       result mustBe None
     }

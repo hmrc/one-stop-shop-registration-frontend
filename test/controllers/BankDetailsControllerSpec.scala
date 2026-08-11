@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
+import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.{AmendMode, BankDetails, Bic, Iban, NormalMode, RejoinMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -61,7 +62,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form, NormalMode, None, 0)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form, NormalMode, None, 0, None)(request, messages(application)).toString
       }
     }
 
@@ -97,7 +98,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           updatedForm,
           NormalMode,
           Some(nonExcludedIossEtmpDisplayRegistration),
-          1
+          1,
+          None
         )(request, messages(application)).toString
       }
     }
@@ -131,7 +133,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           updatedForm,
           NormalMode,
           Some(iossEtmpDisplayRegistration),
-          1
+          1,
+          None
         )(request, messages(application)).toString
       }
     }
@@ -165,7 +168,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           updatedForm,
           NormalMode,
           Some(iossEtmpDisplayRegistration),
-          2
+          2,
+          None
         )(request, messages(application)).toString
       }
     }
@@ -182,7 +186,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode, None, 0)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode, None, 0, None)(request, messages(application)).toString
       }
     }
 
@@ -227,7 +231,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode, None, 0)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, None, 0, None)(request, messages(application)).toString
       }
     }
 
@@ -269,7 +273,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
               updatedForm,
               mode,
               Some(nonExcludedIossEtmpDisplayRegistration),
-              1
+              1,
+              None
             )(request, messages(application)).toString
           }
         }
@@ -303,7 +308,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
               updatedForm,
               mode,
               Some(iossEtmpDisplayRegistration),
-              1
+              1,
+              None
             )(request, messages(application)).toString
           }
         }
@@ -337,7 +343,44 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
               updatedForm,
               mode,
               Some(iossEtmpDisplayRegistration),
-              2
+              2,
+              None
+            )(request, messages(application)).toString
+          }
+        }
+
+        s"must return OK and the correct view for a GET when an Intermediary Registration is present when in $mode" in {
+
+          val intermediaryBankDetails: BankDetails = BankDetails(
+            accountName = registrationWrapper.etmpDisplayRegistration.bankDetails.accountName,
+            bic = registrationWrapper.etmpDisplayRegistration.bankDetails.bic,
+            iban = registrationWrapper.etmpDisplayRegistration.bankDetails.iban
+          )
+
+          val updatedForm: Form[BankDetails] = form.fill(intermediaryBankDetails)
+
+          val application = applicationBuilder(
+            userAnswers = Some(basicUserAnswersWithVatInfo),
+            iossNumber = None,
+            iossEtmpDisplayRegistration = None,
+            intermediaryNumber = Some(intNumber),
+            intermediaryRegistration = Some(registrationWrapper)
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(GET, bankDetailsRoute)
+
+            val view = application.injector.instanceOf[BankDetailsView]
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              updatedForm,
+              mode,
+              None,
+              0,
+              Some(registrationWrapper)
             )(request, messages(application)).toString
           }
         }

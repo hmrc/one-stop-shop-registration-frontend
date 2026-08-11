@@ -17,6 +17,7 @@
 package connectors
 
 import logging.Logging
+import models.etmp.intermediary.IntermediaryRegistrationWrapper
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.{ConflictFound, ErrorResponse, InvalidJson, UnexpectedResponseStatus}
 import play.api.http.Status.{CONFLICT, CREATED, OK}
@@ -27,6 +28,7 @@ object RegistrationHttpParser extends Logging {
 
   type RegistrationResultResponse = Either[ErrorResponse, Unit]
   type IossEtmpDisplayRegistrationResultResponse = Either[ErrorResponse, IossEtmpDisplayRegistration]
+  type IntermediaryRegistrationWrapperResponse = Either[ErrorResponse, IntermediaryRegistrationWrapper]
 
   implicit object RegistrationResponseReads extends HttpReads[RegistrationResultResponse] {
     override def read(method: String, url: String, response: HttpResponse): RegistrationResultResponse =
@@ -52,6 +54,25 @@ object RegistrationHttpParser extends Logging {
         case status =>
           logger.error(s"Unknown error occurred on IOSS Etmp Display Registration $status with body ${response.body}")
           Left(UnexpectedResponseStatus(response.status, s"Unexpected IOSS registration response, status $status returned"))
+      }
+  }
+
+  implicit object IntermediaryRegistrationWrapperResponseReads extends HttpReads[IntermediaryRegistrationWrapperResponse] {
+
+    override def read(method: String, url: String, response: HttpResponse): IntermediaryRegistrationWrapperResponse =
+      response.status match {
+        case OK => response.json.validate[IntermediaryRegistrationWrapper] match {
+          case JsSuccess(registration, _) =>
+            Right(registration)
+          case JsError(errors) =>
+            logger.error(s"Failed trying to parse Intermediary Registration response JSON with body ${response.body}" +
+              s" and status ${response.status} with errors: $errors")
+            Left(InvalidJson)
+        }
+
+        case status =>
+          logger.error(s"Unknown error occurred on Intermediary Registration $status with body ${response.body}")
+          Left(UnexpectedResponseStatus(response.status, s"Unexpected Intermediary registration response, status $status returned"))
       }
   }
 }

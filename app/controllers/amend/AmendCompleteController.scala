@@ -76,6 +76,7 @@ class AmendCompleteController @Inject()(
               list,
               request.latestIossRegistration,
               request.numberOfIossRegistrations,
+              request.latestIntermediaryRegistration,
               userResearchUrl
             )
           )

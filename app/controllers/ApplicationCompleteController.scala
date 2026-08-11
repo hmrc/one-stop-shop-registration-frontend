@@ -22,6 +22,7 @@ import controllers.actions.*
 import formats.Format.dateFormatter
 import logging.Logging
 import models.UserAnswers
+import models.etmp.intermediary.IntermediaryRegistrationWrapper
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
 import pages.{BankDetailsPage, BusinessContactDetailsPage}
@@ -85,8 +86,9 @@ class ApplicationCompleteController @Inject()(
               periodOfFirstReturn.displayShortText,
               firstDayOfNextPeriod.format(dateFormatter),
               request.latestIossRegistration,
-              detailList(request.latestIossRegistration, request.userAnswers).rows.nonEmpty,
+              detailList(request.latestIossRegistration, request.latestIntermediaryRegistration, request.userAnswers).rows.nonEmpty,
               request.numberOfIossRegistrations,
+              request.latestIntermediaryRegistration,
               userResearchUrl
             )
           )
@@ -103,11 +105,14 @@ class ApplicationCompleteController @Inject()(
     }
   }
 
-  private def detailList(originalRegistration: Option[IossEtmpDisplayRegistration], userAnswers: UserAnswers)
-                        (implicit request: AuthenticatedDataRequest[AnyContent]): SummaryList = {
+  private def detailList(
+                          originalRegistration: Option[IossEtmpDisplayRegistration],
+                          intermediaryRegistration: Option[IntermediaryRegistrationWrapper],
+                          userAnswers: UserAnswers
+                        )(implicit request: AuthenticatedDataRequest[AnyContent]): SummaryList = {
 
-    originalRegistration match {
-      case Some(iossEtmpDisplayRegistration) =>
+    (originalRegistration, intermediaryRegistration) match {
+      case (Some(iossEtmpDisplayRegistration), _) =>
 
         SummaryListViewModel(
           rows = (
@@ -116,6 +121,16 @@ class ApplicationCompleteController @Inject()(
               getBusinessContactDetailsRows(iossEtmpDisplayRegistration, userAnswers) ++
               getBankDetailsRows(iossEtmpDisplayRegistration, userAnswers)
             ).flatten
+        )
+
+      case (None, Some(intermediaryEtmpDisplayRegistration)) =>
+        SummaryListViewModel(
+          rows = (
+            getHasIntermediaryTradingNameRows(intermediaryEtmpDisplayRegistration, userAnswers) ++
+            getIntermediaryTradingNameRows(intermediaryEtmpDisplayRegistration, userAnswers) ++
+            getIntermediaryBusinessContactDetailsRows(intermediaryEtmpDisplayRegistration, userAnswers) ++
+            getIntermediaryBankDetailsRows(intermediaryEtmpDisplayRegistration, userAnswers)
+        ).flatten
         )
       case _ =>
         SummaryListViewModel(
@@ -211,6 +226,123 @@ class ApplicationCompleteController @Inject()(
                                   userAnswers: UserAnswers
                                 )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
+    val originalDetails = originalRegistration.bankDetails
+    val amendedDetails = userAnswers.get(BankDetailsPage)
+
+    Seq(
+      if (!amendedDetails.map(_.accountName).contains(originalDetails.accountName)) {
+        BankDetailsSummary.amendedAccountNameRow(userAnswers)
+      } else {
+        None
+      },
+
+      if (!amendedDetails.map(_.bic).contains(originalDetails.bic)) {
+        BankDetailsSummary.amendedBICRow(userAnswers)
+      } else {
+        None
+      },
+
+      if (!amendedDetails.map(_.iban).contains(originalDetails.iban)) {
+        BankDetailsSummary.amendedIBANRow(userAnswers)
+      } else {
+        None
+      }
+    )
+  }
+
+  private def getHasIntermediaryTradingNameRows(
+                                                 wrapper: IntermediaryRegistrationWrapper,
+                                                 userAnswers: UserAnswers
+                                               )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val originalRegistration = wrapper.etmpDisplayRegistration
+
+    val originalTradingNames = originalRegistration.tradingNames.map(_.tradingName).toList
+    val amendedTradingNames = userAnswers.get(AllTradingNames).getOrElse(List.empty)
+    val hasChangedToNo = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
+    val hasChangedToYes = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val notAmended = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || amendedTradingNames.isEmpty && originalTradingNames.isEmpty
+
+    if (notAmended) {
+      Seq.empty
+    } else if (hasChangedToNo || hasChangedToYes) {
+      Seq(
+        new HasTradingNameSummary().amendedAnswersRow(request.userAnswers),
+      )
+    } else {
+      Seq.empty
+    }
+  }
+
+  private def getIntermediaryTradingNameRows(
+                                              wrapper: IntermediaryRegistrationWrapper,
+                                              userAnswers: UserAnswers
+                                            )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val originalRegistration = wrapper.etmpDisplayRegistration
+
+    val originalTradingNames = originalRegistration.tradingNames.map(_.tradingName).toList
+    val amendedTradingNames = userAnswers.get(AllTradingNames).getOrElse(List.empty)
+    val addedTradingNames = amendedTradingNames.diff(originalTradingNames)
+    val removedTradingNames = originalTradingNames.diff(amendedTradingNames)
+
+    val changedTradingNames = amendedTradingNames.zip(originalTradingNames).collect {
+      case (amended, original) if amended != original => amended
+    } ++ amendedTradingNames.drop(originalTradingNames.size)
+
+    val addedTradingNamesRow = if (addedTradingNames.nonEmpty) {
+      userAnswers.set(AllTradingNames, changedTradingNames) match {
+        case Success(amendedUserAnswer) =>
+          Some(TradingNameSummary.amendedAnswersRow(amendedUserAnswer))
+
+        case Failure(_) =>
+          None
+      }
+    } else {
+      None
+    }
+
+    val removedTradingNamesRow = Some(TradingNameSummary.removedAnswersRow(removedTradingNames))
+
+    Seq(addedTradingNamesRow, removedTradingNamesRow).flatten
+  }
+
+  private def getIntermediaryBusinessContactDetailsRows(
+                                                         wrapper: IntermediaryRegistrationWrapper,
+                                                         userAnswers: UserAnswers
+                                                       )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val originalRegistration = wrapper.etmpDisplayRegistration
+    val originalDetails = originalRegistration.schemeDetails
+    val amendedDetails = userAnswers.get(BusinessContactDetailsPage)
+
+    Seq(
+      if (!amendedDetails.map(_.fullName).contains(originalDetails.contactName)) {
+        BusinessContactDetailsSummary.amendedContactNameRow(userAnswers)
+      } else {
+        None
+      },
+
+      if (!amendedDetails.map(_.telephoneNumber).contains(originalDetails.businessTelephoneNumber)) {
+        BusinessContactDetailsSummary.amendedTelephoneNumberRow(userAnswers)
+      } else {
+        None
+      },
+
+      if (!amendedDetails.map(_.emailAddress).contains(originalDetails.businessEmailId)) {
+        BusinessContactDetailsSummary.amendedEmailAddressRow(userAnswers)
+      } else {
+        None
+      }
+    )
+  }
+
+  private def getIntermediaryBankDetailsRows(
+                                              wrapper: IntermediaryRegistrationWrapper,
+                                              userAnswers: UserAnswers
+                                            )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+
+    val originalRegistration = wrapper.etmpDisplayRegistration
     val originalDetails = originalRegistration.bankDetails
     val amendedDetails = userAnswers.get(BankDetailsPage)
 

@@ -80,6 +80,7 @@ class RejoinCompleteController @Inject()(
             firstDayOfNextPeriod.format(dateFormatter),
             request.latestIossRegistration,
             request.numberOfIossRegistrations,
+            request.latestIntermediaryRegistration,
             detailList(request.registration).rows.nonEmpty
           )
         )

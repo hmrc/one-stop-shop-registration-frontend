@@ -123,7 +123,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         firstDayOfNextPeriod.format(dateFormatter),
         None,
         0,
-        hasUpdatedRegistration = false
+        hasUpdatedRegistration = false,
+        maybeIntermediaryRegistration = None
       )(request, messages(application)).toString
     }
   }
@@ -174,7 +175,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         firstDayOfNextPeriod.format(dateFormatter),
         None,
         0,
-        hasUpdatedRegistration = false
+        hasUpdatedRegistration = false,
+        maybeIntermediaryRegistration = None
       )(request, messages(application)).toString
     }
   }
@@ -235,7 +237,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         firstDayOfNextPeriod.format(dateFormatter),
         Some(nonExcludedIossEtmpDisplayRegistration),
         1,
-        hasUpdatedRegistration = false
+        hasUpdatedRegistration = false,
+        maybeIntermediaryRegistration = None
       )(request, messages(application)).toString
     }
   }
@@ -295,7 +298,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         firstDayOfNextPeriod.format(dateFormatter),
         Some(nonExcludedIossEtmpDisplayRegistration),
         1,
-        hasUpdatedRegistration = true
+        hasUpdatedRegistration = true,
+        maybeIntermediaryRegistration = None
       )(request, messages(application)).toString
     }
   }
@@ -352,7 +356,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         firstDayOfNextPeriod.format(dateFormatter),
         Some(iossEtmpDisplayRegistration),
         1,
-        hasUpdatedRegistration = true
+        hasUpdatedRegistration = true,
+        maybeIntermediaryRegistration = None
       )(request, messages(application)).toString
     }
   }
@@ -412,7 +417,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         firstDayOfNextPeriod.format(dateFormatter),
         Some(nonExcludedIossEtmpDisplayRegistration),
         2,
-        hasUpdatedRegistration = true
+        hasUpdatedRegistration = true,
+        maybeIntermediaryRegistration = None
       )(request, messages(application)).toString
     }
   }

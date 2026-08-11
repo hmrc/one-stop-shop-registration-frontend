@@ -96,7 +96,15 @@ class CheckVatDetailsController @Inject()(
           } yield updatedAnswers
 
         case _ =>
-          Try(request.userAnswers)
+          request.latestIntermediaryRegistration match {
+            case Some(intermediaryRegistration) if intermediaryRegistration.etmpDisplayRegistration.tradingNames.nonEmpty =>
+              for {
+                answers <- request.userAnswers.set(HasTradingNamePage, true)
+                updatedAnswers <- answers.set(AllTradingNames, intermediaryRegistration.etmpDisplayRegistration.tradingNames.map(_.tradingName).toList)
+              } yield updatedAnswers
+            case _ =>
+              Try(request.userAnswers)
+          }
       }
     } else {
       Try(request.userAnswers)

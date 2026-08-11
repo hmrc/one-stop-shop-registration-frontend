@@ -61,7 +61,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None, None, 0, None)
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None, None, 0, None, None, None)
             val action = new Harness(NormalMode)
 
             val result = action.callRefine(request).futureValue
@@ -79,9 +79,9 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
             val request = FakeRequest(GET, "test/url")
             val action = new Harness(NormalMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None)).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None, None, None)).futureValue
 
-            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None))
           }
         }
 
@@ -94,9 +94,9 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
             val request = FakeRequest(GET, "test/url")
             val action = new Harness(NormalMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)).futureValue
 
-            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration)))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None))
           }
         }
       }
@@ -112,9 +112,9 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
             val request = FakeRequest(GET, "test/url")
             val action = new Harness(AmendMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo), None, 0, None)).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo), None, 0, None, None, None)).futureValue
 
-            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo, None, 0, None))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo, None, 0, None, None, None))
           }
         }
 
@@ -127,9 +127,9 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
             val request = FakeRequest(GET, "test/url")
             val action = new Harness(AmendMode)
 
-            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration))).futureValue
+            val result = action.callRefine(AuthenticatedOptionalDataRequest(request, testCredentials, vrn, Some(registration), Some(basicUserAnswersWithVatInfo), Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)).futureValue
 
-            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration)))
+            result `mustBe` Right(AuthenticatedDataRequest(request, testCredentials, vrn, Some(registration), basicUserAnswersWithVatInfo, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None))
           }
         }
 
@@ -139,7 +139,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None)
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None, None, None)
             val action = new Harness(AmendMode)
 
             val result = action.callRefine(request).futureValue
@@ -154,7 +154,7 @@ class AuthenticatedDataRequiredActionSpec extends SpecBase with MockitoSugar {
 
           running(application) {
 
-            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers), None, 0, None)
+            val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(emptyUserAnswers), None, 0, None, None, None)
             val action = new Harness(AmendMode)
 
             val result = action.callRefine(request).futureValue

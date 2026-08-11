@@ -44,11 +44,11 @@ class BankDetailsController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BankDetailsPage) match {
-        case None => fillIossBankDetailsForm(request)
+        case None => fillBankDetailsForm(request)
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.latestIossRegistration, request.numberOfIossRegistrations))
+      Ok(view(preparedForm, mode, request.latestIossRegistration, request.numberOfIossRegistrations, request.latestIntermediaryRegistration))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -56,7 +56,13 @@ class BankDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, request.latestIossRegistration, request.numberOfIossRegistrations))),
+          Future.successful(BadRequest(view(
+            formWithErrors,
+            mode,
+            request.latestIossRegistration,
+            request.numberOfIossRegistrations,
+            request.latestIntermediaryRegistration
+          ))),
 
         value =>
           for {
@@ -66,9 +72,9 @@ class BankDetailsController @Inject()(
       )
   }
 
-  private def fillIossBankDetailsForm(request: AuthenticatedDataRequest[_]): Form[BankDetails] = {
-    request.latestIossRegistration match {
-      case Some(iossEtmpDisplayRegistration) =>
+  private def fillBankDetailsForm(request: AuthenticatedDataRequest[_]): Form[BankDetails] = {
+    (request.latestIossRegistration, request.latestIntermediaryRegistration) match {
+      case (Some(iossEtmpDisplayRegistration), _) =>
         form.fill(
           BankDetails(
             accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
@@ -77,7 +83,16 @@ class BankDetailsController @Inject()(
           )
         )
 
-      case _ => form
+      case (None, Some(intermediaryEtmpDisplayRegistration)) =>
+        form.fill(
+          BankDetails(
+            accountName = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.bankDetails.accountName,
+            bic = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.bankDetails.bic,
+            iban = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.bankDetails.iban
+          )
+        )
+
+      case (None, None) => form
     }
   }
 }

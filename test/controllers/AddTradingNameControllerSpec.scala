@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.amend.routes as amendRoutes
 import forms.AddTradingNameFormProvider
+import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.{AmendMode, Index, NormalMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -62,7 +63,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true, None, 0, None)(request, implicitly).toString
       }
     }
 
@@ -98,7 +99,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           list,
           canAddTradingNames = true,
           Some(nonExcludedIossEtmpDisplayRegistration),
-          1
+          1,
+          None
         )(request, implicitly).toString
       }
     }
@@ -132,7 +134,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           list,
           canAddTradingNames = true,
           Some(iossEtmpDisplayRegistration),
-          1
+          1,
+          None
         )(request, implicitly).toString
       }
     }
@@ -166,7 +169,44 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           list,
           canAddTradingNames = true,
           Some(iossEtmpDisplayRegistration),
-          2
+          2,
+          None
+        )(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an Intermediary Registration is present with trading names" in {
+
+      val updatedAnswers: UserAnswers = baseAnswers
+        .set(AllTradingNames, registrationWrapper.etmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+      val application = applicationBuilder(
+        userAnswers = Some(updatedAnswers),
+        iossNumber = None,
+        iossEtmpDisplayRegistration = None,
+        intermediaryNumber = Some(intNumber),
+        intermediaryRegistration = Some(registrationWrapper)
+      )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameRoute)
+
+        val view = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list = TradingNameSummary.addToListRows(updatedAnswers, NormalMode)
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          form,
+          NormalMode,
+          list,
+          canAddTradingNames = true,
+          None,
+          0,
+          Some(registrationWrapper)
         )(request, implicitly).toString
       }
     }
@@ -198,7 +238,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) `mustBe` OK
         contentAsString(result) `mustBe`
-          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false, None, 0)(request, implicitly).toString
+          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false, None, 0, None)(request, implicitly).toString
       }
     }
 
@@ -232,7 +272,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true, None, 0, None)(request, implicitly).toString
       }
     }
 
@@ -282,7 +322,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true, None, 0, None)(request, implicitly).toString
       }
     }
 
@@ -339,7 +379,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
               list,
               canAddTradingNames = true,
               Some(nonExcludedIossEtmpDisplayRegistration),
-              1
+              1,
+              None
             )(request, implicitly).toString
           }
         }
@@ -373,7 +414,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
               list,
               canAddTradingNames = true,
               Some(iossEtmpDisplayRegistration),
-              1
+              1,
+              None
             )(request, implicitly).toString
           }
         }
@@ -407,7 +449,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
               list,
               canAddTradingNames = true,
               Some(iossEtmpDisplayRegistration),
-              2
+              2,
+              None
             )(request, implicitly).toString
           }
         }

@@ -22,6 +22,7 @@ import connectors.RegistrationConnector
 import forms.BusinessContactDetailsFormProvider
 import models.emailVerification.EmailVerificationResponse
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
+import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, BusinessContactDetails, NormalMode, RejoinMode, UserAnswers}
@@ -91,7 +92,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false, None, 0, None)(request, messages(application)).toString
         }
       }
 
@@ -109,7 +110,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true, None, 0, None)(request, messages(application)).toString
         }
       }
 
@@ -127,7 +128,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false, None, 0, None)(request, messages(application)).toString
         }
       }
 
@@ -166,7 +167,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             NormalMode,
             enrolmentsEnabled = false,
             Some(nonExcludedIossEtmpDisplayRegistration),
-            1
+            1,
+            None
           )(request, messages(application)).toString
         }
       }
@@ -203,7 +205,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             NormalMode,
             enrolmentsEnabled = false,
             Some(iossEtmpDisplayRegistration),
-            1
+            1,
+            None
           )(request, messages(application)).toString
         }
       }
@@ -240,7 +243,47 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             NormalMode,
             enrolmentsEnabled = false,
             Some(iossEtmpDisplayRegistration),
-            2
+            2,
+            None
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an Intermediary Registration is present" in {
+
+        val intermediaryBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+          fullName = registrationWrapper.etmpDisplayRegistration.schemeDetails.contactName,
+          telephoneNumber = registrationWrapper.etmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+          emailAddress = registrationWrapper.etmpDisplayRegistration.schemeDetails.businessEmailId
+        )
+
+        val updatedForm: Form[BusinessContactDetails] = form.fill(intermediaryBusinessDetails)
+
+        val application = applicationBuilder(
+          userAnswers = Some(basicUserAnswersWithVatInfo),
+          iossNumber = None,
+          iossEtmpDisplayRegistration = None,
+          intermediaryNumber = Some(intNumber),
+          intermediaryRegistration = Some(registrationWrapper)
+        )
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessContactDetailsRoute)
+
+          val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+          val result = route(application, request).value
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            updatedForm,
+            NormalMode,
+            enrolmentsEnabled = false,
+            None,
+            0,
+            Some(registrationWrapper)
           )(request, messages(application)).toString
         }
       }
@@ -286,7 +329,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 mode,
                 enrolmentsEnabled = false,
                 Some(nonExcludedIossEtmpDisplayRegistration),
-                1
+                1,
+                None
               )(request, messages(application)).toString
             }
           }
@@ -323,7 +367,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 mode,
                 enrolmentsEnabled = false,
                 Some(iossEtmpDisplayRegistration),
-                1
+                1,
+                None
               )(request, messages(application)).toString
             }
           }
@@ -360,7 +405,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 mode,
                 enrolmentsEnabled = false,
                 Some(iossEtmpDisplayRegistration),
-                2
+                2,
+                None
               )(request, messages(application)).toString
             }
           }
@@ -764,7 +810,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` BAD_REQUEST
-          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false, None, 0, None)(request, messages(application)).toString
         }
       }
     }

@@ -20,9 +20,11 @@ import controllers.actions.*
 import generators.Generators
 import models.domain.{PreviousRegistration, Registration, VatCustomerInfo}
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
+import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, IntermediaryRegistrationWrapper, IntermediaryVatCustomerInfo}
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
 import models.{BankDetails, BusinessContactDetails, Country, DesAddress, Iban, Index, Mode, Period, Quarter, UserAnswers}
+import org.scalacheck.Arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -118,8 +120,25 @@ trait SpecBase
     .set(EuCountryPage(Index(0)), Country("Belgium", "BE")).success.value
   val vrn: Vrn = Vrn("123456789")
   val iossNumber: String = "IM9001234567"
+  val intNumber: String = "IN9001234567"
 
   val yourAccountUrl = "http://localhost:10204/pay-vat-on-goods-sold-to-eu/northern-ireland-returns-payments/"
+
+  val intermediaryVatCustomerInfo: IntermediaryVatCustomerInfo = {
+    IntermediaryVatCustomerInfo(
+      registrationDate = Some(LocalDate.now(stubClockAtArbitraryDate)),
+      desAddress = arbitraryDesAddress.arbitrary.sample.value,
+      organisationName = Some("Company name"),
+      individualName = None,
+      singleMarketIndicator = true,
+      deregistrationDecisionDate = None
+    )
+  }
+  
+  val registrationWrapper: IntermediaryRegistrationWrapper = {
+    val etmpDisplayRegistration = Arbitrary.arbitrary[EtmpIntermediaryDisplayRegistration].sample.value
+    IntermediaryRegistrationWrapper(intermediaryVatCustomerInfo, etmpDisplayRegistration = etmpDisplayRegistration)
+  }
 
   protected def applicationBuilder(
                                     userAnswers: Option[UserAnswers] = None,
@@ -128,14 +147,16 @@ trait SpecBase
                                     registration: Option[Registration] = None,
                                     iossNumber: Option[String] = None,
                                     numberOfIossRegistrations: Int = 0,
-                                    iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration] = None
+                                    iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration] = None,
+                                    intermediaryNumber: Option[String] = None,
+                                    intermediaryRegistration: Option[IntermediaryRegistrationWrapper] = None
                                   ): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, iossEtmpDisplayRegistration)),
+        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, iossEtmpDisplayRegistration, intermediaryRegistration, intermediaryNumber)),
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers)),

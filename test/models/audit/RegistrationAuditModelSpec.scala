@@ -33,10 +33,10 @@ class RegistrationAuditModelSpec extends SpecBase {
 
     "must create correct json object" in {
 
-      val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+      val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
 
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+        AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
 
       val registrationAuditModel = RegistrationAuditModel.build(
         registrationAuditType = registrationAuditType,

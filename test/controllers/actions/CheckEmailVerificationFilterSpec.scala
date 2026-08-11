@@ -69,7 +69,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
         running(app) {
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -91,7 +91,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
             Future.successful(Verified)
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None, None, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -115,7 +115,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             Future.successful(NotVerified)
 
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None, None, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -140,7 +140,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             eqTo(contactDetails.emailAddress), eqTo(userAnswersId))(any())) thenReturn
             Future.successful(LockedPasscodeForSingleEmail)
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None, None, None)
           val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
           (ExecutionContext.global, request, hc)
@@ -173,7 +173,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
             Future.successful(LockedTooManyLockedEmails)
 
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, validEmailAddressUserAnswers, None, 0, None, None, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -194,7 +194,7 @@ class CheckEmailVerificationFilterSpec extends SpecBase with MockitoSugar with E
 
         running(app) {
 
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 

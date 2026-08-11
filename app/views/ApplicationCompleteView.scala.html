@@ -15,6 +15,7 @@
  *@
 
 @import models.iossRegistration.IossEtmpDisplayRegistration
+@import models.etmp.intermediary.IntermediaryRegistrationWrapper
 @import uk.gov.hmrc.domain.Vrn
 
 @this(
@@ -33,6 +34,7 @@
         maybeIossRegistration: Option[IossEtmpDisplayRegistration],
         hasUpdatedIossRegistration: Boolean,
         numberOfIossRegistrations: Int,
+        maybeIntermediaryRegistration: Option[IntermediaryRegistrationWrapper],
         userResearchUrl: String
 )(implicit request: Request[_], messages: Messages)
 
@@ -45,7 +47,7 @@
 
     <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
 
-    @if(maybeIossRegistration.nonEmpty && hasUpdatedIossRegistration) {
+    @if((maybeIossRegistration.nonEmpty || maybeIntermediaryRegistration.nonEmpty) && hasUpdatedIossRegistration) {
       <p class="govuk-body">@messages("applicationComplete.iossRegistration.updated")</p>
     }
 

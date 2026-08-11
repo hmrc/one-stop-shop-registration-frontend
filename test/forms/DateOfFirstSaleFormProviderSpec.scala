@@ -38,7 +38,7 @@ class DateOfFirstSaleFormProviderSpec extends SpecBase with DateBehaviours with 
   private val dateService = new DateService(stubClockAtArbitraryDate, coreRegistrationValidationService)
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
 
   val form = new DateOfFirstSaleFormProvider(dateService, stubClockAtArbitraryDate)()
 

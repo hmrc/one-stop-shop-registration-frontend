@@ -56,7 +56,8 @@ class AddTradingNameController @Inject()(
             TradingNameSummary.addToListRows(request.userAnswers, mode),
             canAddTradingNames,
             request.latestIossRegistration,
-            request.numberOfIossRegistrations
+            request.numberOfIossRegistrations,
+            request.latestIntermediaryRegistration
           )).toFuture
       }
   }
@@ -75,7 +76,8 @@ class AddTradingNameController @Inject()(
                 TradingNameSummary.addToListRows(request.userAnswers, mode),
                 canAddTradingNames,
                 request.latestIossRegistration,
-                request.numberOfIossRegistrations
+                request.numberOfIossRegistrations,
+                request.latestIntermediaryRegistration
               )).toFuture,
 
             value =>

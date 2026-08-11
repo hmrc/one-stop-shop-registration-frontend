@@ -55,6 +55,8 @@ class CheckVatExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatInfo)),
           None,
           0,
+          None,
+          None,
           None
         )
         val controller = new Harness()
@@ -82,6 +84,8 @@ class CheckVatExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatInfo)),
           None,
           0,
+          None,
+          None,
           None
         )
         val controller = new Harness()
@@ -110,6 +114,8 @@ class CheckVatExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAn
           basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatInfo)),
           None,
           0,
+          None,
+          None,
           None
         )
         val controller = new Harness()

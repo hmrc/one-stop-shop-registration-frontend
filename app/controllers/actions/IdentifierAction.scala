@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import config.Constants.iossEnrolmentKey
+import config.Constants.{intermediaryEnrolmentKey, iossEnrolmentKey}
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.auth.routes as authRoutes
@@ -26,6 +26,7 @@ import models.requests.{AuthenticatedIdentifierRequest, SessionRequest}
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import services.UrlBuilderService
+import services.intermediary.IntermediaryRegistrationService
 import services.ioss.{AccountService, IossRegistrationService}
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
@@ -47,6 +48,7 @@ class AuthenticatedIdentifierAction @Inject()(
                                                urlBuilder: UrlBuilderService,
                                                accountService: AccountService,
                                                iossRegistrationService: IossRegistrationService,
+                                               intermediaryRegistrationService: IntermediaryRegistrationService,
                                                registrationConnector: RegistrationConnector
                                              )(implicit val executionContext: ExecutionContext)
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
@@ -73,18 +75,18 @@ class AuthenticatedIdentifierAction @Inject()(
         Retrievals.confidenceLevel) {
 
       case Some(credentials) ~ enrolments ~ Some(Organisation) ~ _ =>
-        (findVrnFromEnrolments(enrolments), findIosNumberFromEnrolments(enrolments)) match {
-          case (Some(vrn), futureMaybeIossNumber) =>
-            makeAuthRequest(request, credentials, enrolments, vrn, futureMaybeIossNumber)
+        (findVrnFromEnrolments(enrolments), findIosNumberFromEnrolments(enrolments), findIntermediaryNumberFromEnrolments(enrolments)) match {
+          case (Some(vrn), futureMaybeIossNumber, futureMaybeIntNumber) =>
+            makeAuthRequest(request, credentials, enrolments, vrn, futureMaybeIossNumber, futureMaybeIntNumber)
 
           case _ => throw InsufficientEnrolments()
         }
 
       case Some(credentials) ~ enrolments ~ Some(Individual) ~ confidence =>
-        (findVrnFromEnrolments(enrolments), findIosNumberFromEnrolments(enrolments)) match {
-          case (Some(vrn), futureMaybeIossNumber) =>
+        (findVrnFromEnrolments(enrolments), findIosNumberFromEnrolments(enrolments), findIntermediaryNumberFromEnrolments(enrolments)) match {
+          case (Some(vrn), futureMaybeIossNumber, futureMaybeIntNumber) =>
             if (confidence >= ConfidenceLevel.L200) {
-              makeAuthRequest(request, credentials, enrolments, vrn, futureMaybeIossNumber)
+              makeAuthRequest(request, credentials, enrolments, vrn, futureMaybeIossNumber, futureMaybeIntNumber)
             } else {
               throw InsufficientConfidenceLevel()
             }
@@ -140,13 +142,16 @@ class AuthenticatedIdentifierAction @Inject()(
                                   credentials: Credentials,
                                   enrolments: Enrolments,
                                   vrn: Vrn,
-                                  futureMaybeIossNumber: Future[(Int, Option[String])]
+                                  futureMaybeIossNumber: Future[(Int, Option[String])],
+                                  futureMaybeIntNumber: Future[Option[String]]
                                 )(implicit hc: HeaderCarrier): IdentifierActionResult[A] = {
     for {
       maybeRegistration <- registrationConnector.getRegistration()
       (numberOfIossRegistrations, maybeIossNumber) <- futureMaybeIossNumber
+      maybeIntNumber <- futureMaybeIntNumber
       maybeLatestIossRegistration <- iossRegistrationService.getIossRegistration(maybeIossNumber)
-    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration, maybeIossNumber, numberOfIossRegistrations, maybeLatestIossRegistration))
+      maybeLatestIntRegistration <- intermediaryRegistrationService.getIntermediaryRegistration(maybeIntNumber)
+    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration, maybeIossNumber, numberOfIossRegistrations, maybeLatestIossRegistration, maybeIntNumber, maybeLatestIntRegistration))
   }
 
   private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] = {
@@ -167,6 +172,17 @@ class AuthenticatedIdentifierAction @Inject()(
       case enrolments if enrolments.nonEmpty =>
         accountService.getLatestAccount().map(iossNumber => (enrolments.size, iossNumber))
       case _ => (0, None).toFuture
+    }
+  }
+
+  private def findIntermediaryNumberFromEnrolments(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+    enrolments.enrolments
+      .find(_.key == config.intermediaryEnrolment)
+      .flatMap(_.identifiers.find(id => id.key == intermediaryEnrolmentKey && id.value.nonEmpty).map(_.value)) match {
+      case enrolments if enrolments.nonEmpty =>
+        accountService.getLatestIntermediaryAccount().map(intNumber => intNumber)
+      case _ =>
+        None.toFuture
     }
   }
 

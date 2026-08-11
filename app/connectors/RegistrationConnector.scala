@@ -19,7 +19,7 @@ package connectors
 import config.Service
 import connectors.AmendRegistrationHttpParser.{AmendRegistrationResultResponse, AmendRegistrationResultResponseReads}
 import connectors.ExternalEntryUrlHttpParser.{ExternalEntryUrlResponse, ExternalEntryUrlResponseReads}
-import connectors.RegistrationHttpParser.{IossEtmpDisplayRegistrationReads, IossEtmpDisplayRegistrationResultResponse, RegistrationResponseReads, RegistrationResultResponse}
+import connectors.RegistrationHttpParser.*
 import connectors.VatCustomerInfoHttpParser.{VatCustomerInfoResponse, VatCustomerInfoResponseReads}
 import models.domain.Registration
 import models.enrolments.EACDEnrolments
@@ -38,6 +38,7 @@ class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpC
 
   private val baseUrl: Service = config.get[Service]("microservice.services.one-stop-shop-registration")
   private val iossBaseUrl: Service = config.get[Service]("microservice.services.ioss-registration")
+  private val intBaseUrl: Service = config.get[Service]("microservice.services.ioss-intermediary-registration")
 
   def submitRegistration(registration: Registration)(implicit hc: HeaderCarrier): Future[RegistrationResultResponse] =
     httpClientV2.post(url"$baseUrl/create").withBody(Json.toJson(registration)).execute[RegistrationResultResponse]
@@ -62,6 +63,10 @@ class RegistrationConnector @Inject()(config: Configuration, httpClientV2: HttpC
   
   def getAccounts()(implicit hc: HeaderCarrier): Future[EACDEnrolments] =
     httpClientV2.get(url"$iossBaseUrl/accounts").execute[EACDEnrolments]
-    
-  
+
+  def getIntermediaryRegistration(intNumber: String)(implicit hc: HeaderCarrier): Future[IntermediaryRegistrationWrapperResponse] =
+    httpClientV2.get(url"$intBaseUrl/get-registration/$intNumber").execute[IntermediaryRegistrationWrapperResponse]
+
+  def getIntermediaryAccounts()(implicit hc: HeaderCarrier): Future[EACDEnrolments] =
+    httpClientV2.get(url"$intBaseUrl/accounts").execute[EACDEnrolments]
 }

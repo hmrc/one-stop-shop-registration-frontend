@@ -68,7 +68,9 @@ class SavedAnswersRetrievalAction(
         maybeUserAnswers,
         request.iossNumber,
         request.numberOfIossRegistrations,
-        request.latestIossRegistration
+        request.latestIossRegistration,
+        request.intermediaryNumber,
+        request.latestIntermediaryRegistration
       )
     }
   }
