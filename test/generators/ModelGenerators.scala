@@ -467,21 +467,11 @@ trait ModelGenerators {
     }
   }
 
-  implicit lazy val arbitraryIossNumber: Arbitrary[String] = {
-    Arbitrary {
-      for {
-        iossNumber <- Gen.listOfN(7, Gen.numChar).map(_.mkString)
-      } yield {
-        s"IM900$iossNumber"
-      }
-    }
-  }
-
   implicit lazy val arbitraryEtmpClientDetails: Arbitrary[EtmpClientDetails] = {
     Arbitrary {
       for {
         clientName <- Gen.alphaStr
-        clientIossID <- arbitraryIossNumber.arbitrary
+        clientIossID <- Gen.alphaNumStr
         clientExcluded <- arbitrary[Boolean]
       } yield {
         EtmpClientDetails(
