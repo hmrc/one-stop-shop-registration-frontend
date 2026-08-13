@@ -47,7 +47,7 @@
 
     <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
 
-    @if((latestIossRegistration.exists(_.schemeDetails.contactName.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.tradingNames.nonEmpty)) && !(mode.isInAmend || mode.isInRejoin)) {
+    @if((latestIossRegistration.exists(_.schemeDetails.contactName.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.schemeDetails.contactName.nonEmpty)) && !(mode.isInAmend || mode.isInRejoin)) {
       <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.iossRegistration.p1")</p>
     }
 
@@ -88,7 +88,7 @@
       .asEmail()
     )
 
-    @if(latestIossRegistration.exists(_.tradingNames.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.tradingNames.nonEmpty)) {
+    @if(latestIossRegistration.isDefined || latestIntermediaryRegistration.isDefined) {
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
           content = Text(messages("businessContactDetails.iossRegistration.warning"))

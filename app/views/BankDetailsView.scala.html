@@ -46,7 +46,7 @@
 
     <h1 class="govuk-heading-l">@messages("bankDetails.heading")</h1>
 
-    @if((latestIossRegistration.map(_.bankDetails.accountName.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.tradingNames.nonEmpty)) && !(mode.isInAmend || mode.isInRejoin)) {
+    @if((latestIossRegistration.map(_.bankDetails.accountName.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.bankDetails.accountName.nonEmpty)) && !(mode.isInAmend || mode.isInRejoin)) {
       <p class="govuk-body">@messages("bankDetails.iossRegistration.p1")</p>
     }
 
@@ -79,7 +79,7 @@
       .withHint(HintViewModel(messages("bankDetails.iban.hint")))
     )
 
-    @if(latestIossRegistration.exists(_.tradingNames.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.tradingNames.nonEmpty)) {
+    @if(latestIossRegistration.isDefined || latestIntermediaryRegistration.isDefined) {
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
           content = Text(messages("bankDetails.iossRegistration.warning"))
