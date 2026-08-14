@@ -83,7 +83,7 @@
           <input type="hidden" name="value" id="value" value="false"/>
         }
 
-        @if(latestIossRegistration.exists(_.tradingNames.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.tradingNames.nonEmpty)) {
+        @if(latestIossRegistration.isDefined || latestIntermediaryRegistration.isDefined) {
             @govukWarningText(WarningText(
               iconFallbackText = Option(messages("site.warning")),
               content = Text(messages("addTradingName.iossRegistration.warning"))
