@@ -18,13 +18,11 @@ package controllers
 
 import controllers.actions.*
 import forms.CheckVatDetailsFormProvider
-import models.CheckVatDetails.Yes
-import models.requests.AuthenticatedDataRequest
-import models.{CheckVatDetails, NormalMode, UserAnswers}
-import pages.{CheckVatDetailsPage, HasTradingNamePage}
+import models.{CheckVatDetails, NormalMode}
+import pages.CheckVatDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.AllTradingNames
+import services.TradingNamesService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
 import viewmodels.CheckVatDetailsViewModel
@@ -32,13 +30,13 @@ import views.html.CheckVatDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class CheckVatDetailsController @Inject()(
                                            override val messagesApi: MessagesApi,
                                            cc: AuthenticatedControllerComponents,
                                            formProvider: CheckVatDetailsFormProvider,
-                                           view: CheckVatDetailsView
+                                           view: CheckVatDetailsView,
+                                           tradingNamesService: TradingNamesService
                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
@@ -75,7 +73,14 @@ class CheckVatDetailsController @Inject()(
 
             value =>
               for {
-                answersWithIossTradingNamesCheck <- Future.fromTry(iossTradingNamesAnswersTry(value, request))
+                answersWithIossTradingNamesCheck <- Future.fromTry(
+                  tradingNamesService.updateTradingNameAnswers(
+                    value,
+                    request.userAnswers,
+                    request.latestIossRegistration,
+                    request.latestIntermediaryRegistration
+                  )
+                )
                 updatedAnswers <- Future.fromTry(answersWithIossTradingNamesCheck.set(CheckVatDetailsPage, value))
                 _ <- cc.sessionRepository.set(updatedAnswers)
               } yield Redirect(CheckVatDetailsPage.navigate(NormalMode, updatedAnswers))
@@ -84,30 +89,5 @@ class CheckVatDetailsController @Inject()(
         case None =>
           Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
       }
-  }
-
-  private def iossTradingNamesAnswersTry(value: CheckVatDetails, request: AuthenticatedDataRequest[AnyContent]): Try[UserAnswers] = {
-    if (value == Yes) {
-      request.latestIossRegistration match {
-        case Some(iossRegistration) if iossRegistration.tradingNames.nonEmpty =>
-          for {
-            answers <- request.userAnswers.set(HasTradingNamePage, true)
-            updatedAnswers <- answers.set(AllTradingNames, iossRegistration.tradingNames.map(_.tradingName).toList)
-          } yield updatedAnswers
-
-        case _ =>
-          request.latestIntermediaryRegistration match {
-            case Some(intermediaryRegistration) if intermediaryRegistration.etmpDisplayRegistration.tradingNames.nonEmpty =>
-              for {
-                answers <- request.userAnswers.set(HasTradingNamePage, true)
-                updatedAnswers <- answers.set(AllTradingNames, intermediaryRegistration.etmpDisplayRegistration.tradingNames.map(_.tradingName).toList)
-              } yield updatedAnswers
-            case _ =>
-              Try(request.userAnswers)
-          }
-      }
-    } else {
-      Try(request.userAnswers)
-    }
   }
 }
