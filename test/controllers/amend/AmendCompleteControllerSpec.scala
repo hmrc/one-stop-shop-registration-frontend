@@ -25,7 +25,7 @@ import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, Intermedia
 import models.external.ExternalEntryUrl
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
-import models.{BankDetails, BusinessContactDetails, Period, UserAnswers}
+import models.{BankDetails, BusinessContactDetails, CompositeAccount, Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -38,6 +38,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{AllTradingNames, OriginalRegistrationQuery}
 import services.{CoreRegistrationValidationService, DateService, PeriodService, RegistrationService}
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import testutils.RegistrationData
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
@@ -56,8 +57,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
   private val mockRegistration = RegistrationData.registration
   private val mockRegistrationService = mock[RegistrationService]
   private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val userAnswers = UserAnswers(
     userAnswersId,
@@ -135,7 +136,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            None,
             0,
             None,
             "https://test-url.com"
@@ -185,7 +185,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            None,
             0,
             None,
             "https://test-url.com"
@@ -242,7 +241,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            None,
             0,
             None,
             "https://test-url.com"
@@ -296,7 +294,6 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            None,
             0,
             None,
             "https://test-url.com"
@@ -309,6 +306,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
 
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
+
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
@@ -319,9 +318,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(
           userAnswers = Some(updatedAnswers),
-          iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -362,9 +360,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            Some(nonExcludedIossEtmpDisplayRegistration),
             1,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
@@ -374,6 +371,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+          
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
         val userAnswersWithoutEmail = userAnswers
           .remove(DateOfFirstSalePage).success.value
@@ -385,9 +384,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(
           userAnswers = Some(userAnswersWithoutEmail),
-          iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -424,9 +422,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            Some(nonExcludedIossEtmpDisplayRegistration),
             1,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
@@ -442,11 +439,12 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
           .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value
 
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
         val application = applicationBuilder(
           userAnswers = Some(userAnswersWithoutEmail),
-          iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -483,9 +481,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            Some(iossEtmpDisplayRegistration),
             1,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
@@ -495,6 +492,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+          
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
         val userAnswersWithoutEmail = userAnswers
           .remove(DateOfFirstSalePage).success.value
@@ -506,9 +505,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(
           userAnswers = Some(userAnswersWithoutEmail),
-          iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 2
+          numberOfIossRegistrations = 2,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -545,9 +543,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            Some(nonExcludedIossEtmpDisplayRegistration),
             2,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
@@ -563,12 +560,12 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
           .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(fullName = "Test name")).success.value
           .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value
 
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(intermediaryRegistration = Some(registrationWrapper))
+
         val application = applicationBuilder(
           userAnswers = Some(userAnswersWithoutEmail),
           registration = Some(mockRegistration),
-          iossNumber = None,
-          iossEtmpDisplayRegistration = None,
-          intermediaryRegistration = Some(registrationWrapper)
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch2" -> "https://test-url.com")
           .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
@@ -620,9 +617,8 @@ class AmendCompleteControllerSpec extends SpecBase with MockitoSugar {
             yourAccountUrl,
             "Company name",
             summaryList,
-            None,
             0,
-            Some(registrationWrapper),
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
 

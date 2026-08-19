@@ -42,8 +42,8 @@ class SaveForLaterServiceSpec extends SpecBase with BeforeAndAfterEach {
 
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
-  val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
-  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+  val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val mockSaveForLaterConnector = mock[SaveForLaterConnector]
   private val mockUserAnswersRepository = mock[AuthenticatedUserAnswersRepository]

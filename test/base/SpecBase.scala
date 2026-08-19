@@ -23,7 +23,7 @@ import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, IntermediaryRegistrationWrapper, IntermediaryVatCustomerInfo}
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
-import models.{BankDetails, BusinessContactDetails, Country, DesAddress, Iban, Index, Mode, Period, Quarter, UserAnswers}
+import models.{BankDetails, BusinessContactDetails, CompositeAccount, Country, DesAddress, Iban, Index, Mode, Period, Quarter, UserAnswers}
 import org.scalacheck.Arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -149,14 +149,15 @@ trait SpecBase
                                     numberOfIossRegistrations: Int = 0,
                                     iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration] = None,
                                     intermediaryNumber: Option[String] = None,
-                                    intermediaryRegistration: Option[IntermediaryRegistrationWrapper] = None
+                                    intermediaryRegistration: Option[IntermediaryRegistrationWrapper] = None,
+                                    compositeAccount: Option[CompositeAccount] = None
                                   ): GuiceApplicationBuilder = {
 
     val clockToBind = clock.getOrElse(stubClockAtArbitraryDate)
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, iossEtmpDisplayRegistration, intermediaryRegistration, intermediaryNumber)),
+        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, iossEtmpDisplayRegistration, intermediaryRegistration, intermediaryNumber, compositeAccount)),
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers)),

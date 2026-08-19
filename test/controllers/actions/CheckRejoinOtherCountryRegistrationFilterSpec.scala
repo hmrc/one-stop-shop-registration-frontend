@@ -76,7 +76,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -95,7 +95,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -114,7 +114,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -134,7 +134,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -154,7 +154,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -174,7 +174,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 
@@ -196,7 +196,7 @@ class CheckRejoinOtherCountryRegistrationFilterSpec extends SpecBase with Mockit
           .build()
 
         running(app) {
-          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, None, None)
+          val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
           val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
           val controller: Harness = globalController(frontendAppConfig)
 

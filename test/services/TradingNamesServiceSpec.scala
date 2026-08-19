@@ -17,12 +17,13 @@
 package services
 
 import base.SpecBase
-import models.CheckVatDetails
+import models.{CheckVatDetails, CompositeAccount}
 import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, EtmpTradingName, IntermediaryRegistrationWrapper}
 import models.iossRegistration.IossEtmpDisplayRegistration
 import org.scalacheck.Arbitrary
 import pages.HasTradingNamePage
 import queries.AllTradingNames
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 
 class TradingNamesServiceSpec extends SpecBase {
 
@@ -46,14 +47,14 @@ class TradingNamesServiceSpec extends SpecBase {
 
     "must populate trading name answers from the IOSS registration when CheckVatDetails is Yes" in {
 
-      val registration =
-        arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+      val registration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(registration))
 
       val result = service.updateTradingNameAnswers(
         CheckVatDetails.Yes,
         emptyUserAnswers,
-        Some(registration),
-        None
+        compositeAccount
       ).success.value
 
       result.get(HasTradingNamePage).value mustBe true
@@ -63,11 +64,12 @@ class TradingNamesServiceSpec extends SpecBase {
 
     "must populate trading name answers from the intermediary registration when no IOSS trading names are available" in {
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(intermediaryRegistration = Some(registrationWrapper))
+      
       val result = service.updateTradingNameAnswers(
         CheckVatDetails.Yes,
         emptyUserAnswers,
-        None,
-        Some(registrationWrapper)
+        compositeAccount
       ).success.value
 
       result.get(HasTradingNamePage).value mustBe true
@@ -79,16 +81,17 @@ class TradingNamesServiceSpec extends SpecBase {
 
     "must prefer IOSS trading names when both registrations contain trading names" in {
 
-      val iossRegistration =
-        arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+      val iossRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
 
-      val intermediaryRegistration = registrationWrapper
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(
+        iossRegistration = Some(iossRegistration),
+        intermediaryRegistration = Some(registrationWrapper)
+      )
 
       val result = service.updateTradingNameAnswers(
         CheckVatDetails.Yes,
         emptyUserAnswers,
-        Some(iossRegistration),
-        Some(intermediaryRegistration)
+        compositeAccount
       ).success.value
 
       result.get(AllTradingNames).value mustBe
@@ -100,7 +103,6 @@ class TradingNamesServiceSpec extends SpecBase {
       val result = service.updateTradingNameAnswers(
         CheckVatDetails.WrongAccount,
         emptyUserAnswers,
-        None,
         None
       ).success.value
 
@@ -112,7 +114,6 @@ class TradingNamesServiceSpec extends SpecBase {
       val result = service.updateTradingNameAnswers(
         CheckVatDetails.DetailsIncorrect,
         emptyUserAnswers,
-        None,
         None
       ).success.value
 
@@ -125,11 +126,12 @@ class TradingNamesServiceSpec extends SpecBase {
         arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
           .copy(tradingNames = Seq.empty)
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossRegistration))
+
       val result = service.updateTradingNameAnswers(
         CheckVatDetails.Yes,
         emptyUserAnswers,
-        Some(iossRegistration),
-        None
+        compositeAccount
       ).success.value
 
       result mustBe emptyUserAnswers

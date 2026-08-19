@@ -47,9 +47,9 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
   private val coreRegistrationValidationService: CoreRegistrationValidationService = mock[CoreRegistrationValidationService]
 
   ".startOfNextQuarter" - {
@@ -673,8 +673,6 @@ class DateServiceSpec extends SpecBase with ScalaCheckPropertyChecks with Genera
           emptyUserAnswers,
           None,
           0,
-          None,
-          None,
           None
         )
 

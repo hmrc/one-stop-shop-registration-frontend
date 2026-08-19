@@ -18,13 +18,14 @@ package controllers.actions
 
 import config.FrontendAppConfig
 import connectors.RegistrationConnector
+import models.CompositeAccount
 import models.domain.Registration
 import models.etmp.intermediary.IntermediaryRegistrationWrapper
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.*
-import services.UrlBuilderService
+import services.{CompositeAccountService, UrlBuilderService}
 import services.intermediary.IntermediaryRegistrationService
 import services.ioss.{AccountService, IossRegistrationService}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -40,15 +41,15 @@ class FakeAuthenticatedIdentifierAction(
                                          numberOfIossRegistrations: Int,
                                          iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration],
                                          intermediaryRegistartionWrapper: Option[IntermediaryRegistrationWrapper],
-                                         intermediaryNumber: Option[String]
+                                         intermediaryNumber: Option[String],
+                                         compositeAccount: Option[CompositeAccount]
                                        ) extends AuthenticatedIdentifierAction(
   mock[AuthConnector],
   mock[FrontendAppConfig],
   mock[UrlBuilderService],
   mock[AccountService],
-  mock[IossRegistrationService],
-  mock[IntermediaryRegistrationService],
-  mock[RegistrationConnector]
+  mock[RegistrationConnector],
+  mock[CompositeAccountService]
 )(ExecutionContext.Implicits.global) {
 
   override def refine[A](request: Request[A]): Future[Either[Result, AuthenticatedIdentifierRequest[A]]] = {
@@ -60,9 +61,7 @@ class FakeAuthenticatedIdentifierAction(
       registration,
       iossNumber,
       numberOfIossRegistrations,
-      iossEtmpDisplayRegistration,
-      intermediaryNumber,
-      intermediaryRegistartionWrapper
+      compositeAccount
     )).toFuture
   }
 }

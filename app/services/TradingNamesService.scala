@@ -17,9 +17,7 @@
 package services
 
 import models.CheckVatDetails.Yes
-import models.etmp.intermediary.IntermediaryRegistrationWrapper
-import models.{CheckVatDetails, UserAnswers}
-import models.iossRegistration.IossEtmpDisplayRegistration
+import models.{CheckVatDetails, CompositeAccount, UserAnswers}
 import pages.HasTradingNamePage
 import queries.AllTradingNames
 
@@ -31,15 +29,14 @@ class TradingNamesService @Inject()() {
   def updateTradingNameAnswers(
                                 checkVatDetails: CheckVatDetails,
                                 userAnswers: UserAnswers,
-                                latestIossRegistration: Option[IossEtmpDisplayRegistration],
-                                latestIntermediaryRegistration: Option[IntermediaryRegistrationWrapper]
+                                compositeAccount: Option[CompositeAccount]
                               ): Try[UserAnswers] = {
     
     if (checkVatDetails == Yes) {
-      tradingNames(
-        latestIossRegistration,
-        latestIntermediaryRegistration
-      ) match {
+      compositeAccount
+        .map(_.tradingNames.map(_.tradingName).toList)
+        .filter(_.nonEmpty) match {
+        
         case Some(names) =>
           for {
             answers <- userAnswers.set(HasTradingNamePage, true)
@@ -52,20 +49,5 @@ class TradingNamesService @Inject()() {
     } else {
       Success(userAnswers)
     }
-  }
-  
-  private def tradingNames(
-                            latestIossRegistration: Option[IossEtmpDisplayRegistration],
-                            latestIntermediaryRegistration: Option[IntermediaryRegistrationWrapper]
-                          ): Option[List[String]] = {
-    
-   latestIossRegistration
-     .map(_.tradingNames.map(_.tradingName).toList)
-     .filter(_.nonEmpty)
-     .orElse(
-       latestIntermediaryRegistration
-         .map(_.etmpDisplayRegistration.tradingNames.map(_.tradingName).toList)
-         .filter(_.nonEmpty)
-    )
   }
 }

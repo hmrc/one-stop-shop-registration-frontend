@@ -51,8 +51,8 @@ import java.time.LocalDate
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, Some(intNumber), None)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None, Some(intNumber), None)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val registration = RegistrationData.registration
 
@@ -107,7 +107,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "trading name is missing" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
@@ -132,7 +132,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "must remain valid when no websites have been supplied" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.remove(AllWebsites).success.value
@@ -156,7 +156,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "eligible sales is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
@@ -180,7 +180,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "tax registered in eu is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
@@ -204,7 +204,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "previous registrations is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
@@ -228,7 +228,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "tax registered in eu has a country with missing data" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers
@@ -254,7 +254,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "previous registrations has a country with missing data" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers
@@ -305,7 +305,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None, Some(intNumber), None)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, dataRequest)
 
             status(result) `mustBe` SEE_OTHER
@@ -336,7 +336,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
 
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None, Some(intNumber), None)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, userAnswers, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Success, dataRequest)
 
             status(result) `mustBe` SEE_OTHER
@@ -544,7 +544,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, Some(intNumber), None)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(
               RegistrationAuditType.CreateRegistration,
               registration,
@@ -581,7 +581,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, Some(intNumber), None)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Failure, dataRequest)
 
             status(result) `mustBe` SEE_OTHER
@@ -611,7 +611,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit(false).url)
             val result = route(application, request).value
-            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None, Some(intNumber), None)
+            val dataRequest = AuthenticatedDataRequest(request, testCredentials, vrn, None, basicUserAnswersWithVatInfo, None, 0, None)
             val expectedAuditEvent = RegistrationAuditModel.build(RegistrationAuditType.CreateRegistration, registration, SubmissionResult.Failure, dataRequest)
 
             status(result) `mustBe` SEE_OTHER

@@ -77,8 +77,7 @@ class CheckVatDetailsController @Inject()(
                   tradingNamesService.updateTradingNameAnswers(
                     value,
                     request.userAnswers,
-                    request.latestIossRegistration,
-                    request.latestIntermediaryRegistration
+                    request.compositeAccount
                   )
                 )
                 updatedAnswers <- Future.fromTry(answersWithIossTradingNamesCheck.set(CheckVatDetailsPage, value))

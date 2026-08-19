@@ -51,7 +51,16 @@ class CheckNiProtocolExpiredOptionalFilterSpec extends SpecBase with MockitoSuga
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None, None, None)
+          val request = AuthenticatedOptionalDataRequest(
+            FakeRequest(),
+            testCredentials,
+            vrn,
+            None,
+            Some(basicUserAnswersWithVatInfo),
+            None,
+            0,
+            None
+          )
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -73,7 +82,17 @@ class CheckNiProtocolExpiredOptionalFilterSpec extends SpecBase with MockitoSuga
           Some(vatCustomerInfo.copy(singleMarketIndicator = Some(false))))
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(userAnswersWithSingleMarketIndicatorFalse), None, 0, None, None, None)
+          val request = AuthenticatedOptionalDataRequest(
+            FakeRequest(),
+            testCredentials,
+            vrn,
+            None,
+            Some(userAnswersWithSingleMarketIndicatorFalse),
+            None,
+            0,
+            None
+          )
+          
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -92,7 +111,7 @@ class CheckNiProtocolExpiredOptionalFilterSpec extends SpecBase with MockitoSuga
           .build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None, None, 0, None, None, None)
+          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, None, None, 0, None)
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -113,7 +132,16 @@ class CheckNiProtocolExpiredOptionalFilterSpec extends SpecBase with MockitoSuga
         val userAnswersWithVatCustomerInfoNone = basicUserAnswersWithVatInfo.copy(vatInfo = None)
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(userAnswersWithVatCustomerInfoNone), None, 0, None, None, None)
+          val request = AuthenticatedOptionalDataRequest(
+            FakeRequest(),
+            testCredentials,
+            vrn,
+            None,
+            Some(userAnswersWithVatCustomerInfoNone),
+            None,
+            0,
+            None
+          )
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 
@@ -135,7 +163,16 @@ class CheckNiProtocolExpiredOptionalFilterSpec extends SpecBase with MockitoSuga
           ).build()
 
         running(app) {
-          val request = AuthenticatedOptionalDataRequest(FakeRequest(), testCredentials, vrn, None, Some(basicUserAnswersWithVatInfo), None, 0, None, None, None)
+          val request = AuthenticatedOptionalDataRequest(
+            FakeRequest(),
+            testCredentials,
+            vrn,
+            None,
+            Some(basicUserAnswersWithVatInfo),
+            None,
+            0,
+            None
+          )
           val config = app.injector.instanceOf[FrontendAppConfig]
           val controller = new Harness(config)
 

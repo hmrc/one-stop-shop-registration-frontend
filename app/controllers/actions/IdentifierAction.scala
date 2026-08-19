@@ -25,9 +25,8 @@ import logging.Logging
 import models.requests.{AuthenticatedIdentifierRequest, SessionRequest}
 import play.api.mvc.*
 import play.api.mvc.Results.*
-import services.UrlBuilderService
-import services.intermediary.IntermediaryRegistrationService
-import services.ioss.{AccountService, IossRegistrationService}
+import services.{CompositeAccountService, UrlBuilderService}
+import services.ioss.AccountService
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.auth.core.retrieve.*
@@ -47,9 +46,8 @@ class AuthenticatedIdentifierAction @Inject()(
                                                config: FrontendAppConfig,
                                                urlBuilder: UrlBuilderService,
                                                accountService: AccountService,
-                                               iossRegistrationService: IossRegistrationService,
-                                               intermediaryRegistrationService: IntermediaryRegistrationService,
-                                               registrationConnector: RegistrationConnector
+                                               registrationConnector: RegistrationConnector,
+                                               compositeAccountService: CompositeAccountService
                                              )(implicit val executionContext: ExecutionContext)
   extends ActionRefiner[Request, AuthenticatedIdentifierRequest]
     with AuthorisedFunctions
@@ -149,9 +147,8 @@ class AuthenticatedIdentifierAction @Inject()(
       maybeRegistration <- registrationConnector.getRegistration()
       (numberOfIossRegistrations, maybeIossNumber) <- futureMaybeIossNumber
       maybeIntNumber <- futureMaybeIntNumber
-      maybeLatestIossRegistration <- iossRegistrationService.getIossRegistration(maybeIossNumber)
-      maybeLatestIntRegistration <- intermediaryRegistrationService.getIntermediaryRegistration(maybeIntNumber)
-    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration, maybeIossNumber, numberOfIossRegistrations, maybeLatestIossRegistration, maybeIntNumber, maybeLatestIntRegistration))
+      compositeAccount <- compositeAccountService.getCompositeAccount(enrolments, maybeIossNumber)
+    } yield Right(AuthenticatedIdentifierRequest(request, credentials, vrn, enrolments, maybeRegistration, maybeIossNumber, numberOfIossRegistrations, compositeAccount))
   }
 
   private def findVrnFromEnrolments(enrolments: Enrolments): Option[Vrn] = {

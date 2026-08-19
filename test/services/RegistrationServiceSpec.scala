@@ -122,7 +122,7 @@ class RegistrationServiceSpec
 
   private lazy val dateOfFirstSaleRoute = routes.DateOfFirstSaleController.onPageLoad(NormalMode).url
   implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-    AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+    AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -219,7 +219,7 @@ class RegistrationServiceSpec
     "return true when registrations is amendable" in {
 
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None, None, None)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None)
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Left(NotFound))
       when(mockPeriodService.getFirstReturnPeriod(any())) thenReturn period
       when(mockDateService.calculateFinalAmendmentDate(any())(any())) thenReturn LocalDate.now(stubClock)
@@ -233,7 +233,7 @@ class RegistrationServiceSpec
     "return true when no registration provided" in {
 
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
       val mode = AmendMode
 
@@ -245,7 +245,7 @@ class RegistrationServiceSpec
     "return false when today is passed the amendable date" in {
 
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None, None, None)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None)
       val daysToAdd = 100
       val instant = Instant.now.plus(daysToAdd, ChronoUnit.DAYS)
       val adjustedStubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
@@ -264,7 +264,7 @@ class RegistrationServiceSpec
     "return false when vat return has been submitted not amendable" in {
 
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None, None, None)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, Some(RegistrationData.registration), emptyUserAnswers, None, 0, None)
       val vatReturn = arbitrary[VatReturn].sample.value
       when(mockVatReturnConnector.get(any())(any())) thenReturn Future.successful(Right(vatReturn))
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
@@ -277,7 +277,7 @@ class RegistrationServiceSpec
     "return true when in Rejoin Mode" in {
 
       implicit val dataRequest: AuthenticatedDataRequest[AnyContent] =
-        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, None, None)
+        AuthenticatedDataRequest(FakeRequest(GET, dateOfFirstSaleRoute), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
       val service = new RegistrationService(mockDateService, mockPeriodService, mockVatReturnConnector, stubClock)
       val mode = RejoinMode
 

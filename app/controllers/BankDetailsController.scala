@@ -48,7 +48,7 @@ class BankDetailsController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, request.latestIossRegistration, request.numberOfIossRegistrations, request.latestIntermediaryRegistration))
+      Ok(view(preparedForm, mode, request.numberOfIossRegistrations, request.compositeAccount))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -59,9 +59,8 @@ class BankDetailsController @Inject()(
           Future.successful(BadRequest(view(
             formWithErrors,
             mode,
-            request.latestIossRegistration,
             request.numberOfIossRegistrations,
-            request.latestIntermediaryRegistration
+            request.compositeAccount
           ))),
 
         value =>
@@ -73,26 +72,17 @@ class BankDetailsController @Inject()(
   }
 
   private def fillBankDetailsForm(request: AuthenticatedDataRequest[_]): Form[BankDetails] = {
-    (request.latestIossRegistration, request.latestIntermediaryRegistration) match {
-      case (Some(iossEtmpDisplayRegistration), _) =>
+    request.compositeAccount match {
+      case Some(compositeAccount) =>
         form.fill(
           BankDetails(
-            accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
-            bic = iossEtmpDisplayRegistration.bankDetails.bic,
-            iban = iossEtmpDisplayRegistration.bankDetails.iban
+            accountName = compositeAccount.bankDetails.accountName,
+            bic = compositeAccount.bankDetails.bic,
+            iban = compositeAccount.bankDetails.iban
           )
         )
 
-      case (None, Some(intermediaryEtmpDisplayRegistration)) =>
-        form.fill(
-          BankDetails(
-            accountName = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.bankDetails.accountName,
-            bic = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.bankDetails.bic,
-            iban = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.bankDetails.iban
-          )
-        )
-
-      case (None, None) => form
+      case None => form
     }
   }
 }

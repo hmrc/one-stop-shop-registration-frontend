@@ -62,9 +62,8 @@ class BusinessContactDetailsController @Inject()(
         preparedForm,
         mode,
         config.enrolmentsEnabled,
-        request.latestIossRegistration,
         request.numberOfIossRegistrations,
-        request.latestIntermediaryRegistration
+        request.compositeAccount
       ))
   }
 
@@ -79,9 +78,8 @@ class BusinessContactDetailsController @Inject()(
             formWithErrors,
             mode,
             config.enrolmentsEnabled,
-            request.latestIossRegistration,
             request.numberOfIossRegistrations,
-            request.latestIntermediaryRegistration
+            request.compositeAccount
           )).toFuture,
 
         value => {
@@ -155,26 +153,17 @@ class BusinessContactDetailsController @Inject()(
   }
 
   private def fillBusinessContactDetailsForm(request: AuthenticatedDataRequest[_]): Form[BusinessContactDetails] = {
-    (request.latestIossRegistration, request.latestIntermediaryRegistration) match {
-      case (Some(iossEtmpDisplayRegistration), _) =>
+    request.compositeAccount match {
+      case Some(compositeAccount) =>
         form.fill(
           BusinessContactDetails(
-            fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
-            telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
-            emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+            fullName = compositeAccount.contactDetails.fullName,
+            telephoneNumber = compositeAccount.contactDetails.telephoneNumber,
+            emailAddress = compositeAccount.contactDetails.emailAddress
           )
         )
 
-      case (None, Some(intermediaryEtmpDisplayRegistration)) =>
-        form.fill(
-          BusinessContactDetails(
-            fullName = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.schemeDetails.contactName,
-            telephoneNumber = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
-            emailAddress = intermediaryEtmpDisplayRegistration.etmpDisplayRegistration.schemeDetails.businessEmailId
-          )
-        )
-
-      case (None, None) => form
+      case None => form
     }
   }
 }

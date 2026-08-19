@@ -25,7 +25,7 @@ import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.external.ExternalEntryUrl
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
-import models.{BankDetails, BusinessContactDetails, Period, UserAnswers}
+import models.{BankDetails, BusinessContactDetails, CompositeAccount, Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -38,6 +38,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.AllTradingNames
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 import views.html.ApplicationCompleteView
@@ -54,8 +55,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
   private implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
-  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None, Some(intNumber), None)
-  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None, Some(intNumber), None)
+  private val request = AuthenticatedDataRequest(FakeRequest("GET", "/"), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+  private implicit val dataRequest: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(request, testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
 
   private val userAnswers = UserAnswers(
     userAnswersId,
@@ -133,7 +134,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = false,
             0,
             None,
@@ -187,7 +187,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = false,
             0,
             None,
@@ -240,7 +239,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = false,
             0,
             None,
@@ -293,7 +291,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = false,
             0,
             None,
@@ -352,7 +349,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = false,
             0,
             None,
@@ -407,7 +403,6 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = false,
             0,
             None,
@@ -421,6 +416,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
 
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
+
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
@@ -432,8 +429,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(
           userAnswers = Some(updatedAnswers),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
@@ -472,10 +469,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            Some(nonExcludedIossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = false,
             1,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
@@ -485,6 +481,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
@@ -497,8 +495,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(
           userAnswers = Some(updatedAnswers),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
@@ -537,16 +535,17 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            Some(nonExcludedIossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = true,
             1,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
 
       "must return OK and the correct view for a GET when an excluded IOSS Registration is present and some user answers have been updated" in {
+
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
 
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
@@ -559,8 +558,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(
           userAnswers = Some(updatedAnswers),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
@@ -599,10 +598,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            Some(iossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = true,
             1,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
@@ -612,6 +610,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
@@ -624,8 +624,8 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val application = applicationBuilder(
           userAnswers = Some(updatedAnswers),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 2
+          numberOfIossRegistrations = 2,
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
@@ -664,16 +664,17 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            Some(nonExcludedIossEtmpDisplayRegistration),
             hasUpdatedIossRegistration = true,
             2,
-            None,
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }
       }
 
       "must return OK and the correct view for a GET when an Intermediary Registration is present and some user answers have been updated" in {
+
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(intermediaryRegistration = Some(registrationWrapper))
 
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
@@ -685,10 +686,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
 
         val application = applicationBuilder(
           userAnswers = Some(updatedAnswers),
-          iossNumber = None,
-          iossEtmpDisplayRegistration = None,
-          intermediaryNumber = Some(intNumber),
-          intermediaryRegistration = Some(registrationWrapper)
+          compositeAccount = compositeAccount
         )
           .configure("urls.userResearch1" -> "https://test-url.com")
           .configure("features.registration.email-enabled" -> false)
@@ -727,10 +725,9 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
             "Company name",
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            None,
             hasUpdatedIossRegistration = true,
             0,
-            Some(registrationWrapper),
+            compositeAccount = compositeAccount,
             "https://test-url.com"
           )(request, messages(application)).toString
         }

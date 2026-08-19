@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import forms.CheckVatDetailsFormProvider
 import models.iossRegistration.IossEtmpDisplayRegistration
-import models.{CheckVatDetails, NormalMode}
+import models.{CheckVatDetails, CompositeAccount, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import utils.FutureSyntax.FutureOps
 import viewmodels.CheckVatDetailsViewModel
 import views.html.CheckVatDetailsView
@@ -114,13 +115,15 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
       when(mockSessionRepository.set(any())) thenReturn true.toFuture
 
       val application =
         applicationBuilder(
           userAnswers = Some(basicUserAnswersWithVatInfo),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration)
+          compositeAccount = compositeAccount
         )
           .overrides(bind[AuthenticatedUserAnswersRepository].toInstance(mockSessionRepository))
           .build()

@@ -112,7 +112,7 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
 
         running(application) {
           implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest(
-            FakeRequest(), testCredentials, vrn, None, answers, None, 0, None, None, None
+            FakeRequest(), testCredentials, vrn, None, answers, None, 0, None
           )
 
           val result = TestCompletionChecks.firstIndexedIncompleteEuDetails(Seq(Country("BE", "Belgium")))

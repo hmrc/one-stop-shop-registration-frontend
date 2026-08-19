@@ -67,8 +67,6 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           Some(answers),
           None,
           0,
-          None,
-          None,
           None
         )).futureValue
 
@@ -107,8 +105,6 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           Some(UserAnswers(userAnswersId)),
           None,
           0,
-          None,
-          None,
           None
         )).futureValue
 
@@ -137,8 +133,6 @@ class SavedAnswersRetrievalActionSpec extends SpecBase with MockitoSugar with Ei
           Some(emptyAnswers),
           None,
           0,
-          None,
-          None,
           None
         )).futureValue
 

@@ -14,8 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.iossRegistration.IossEtmpDisplayRegistration
-@import models.etmp.intermediary.IntermediaryRegistrationWrapper
+@import models.CompositeAccount
 
 @this(
         layout: templates.Layout
@@ -30,9 +29,8 @@
         commencementDate: String,
         periodOfFirstReturn: String,
         firstDayOfNextPeriod: String,
-        maybeIossRegistration: Option[IossEtmpDisplayRegistration],
         numberOfIossRegistrations: Int,
-        maybeIntermediaryRegistration: Option[IntermediaryRegistrationWrapper],
+        compositeAccount: Option[CompositeAccount],
         hasUpdatedRegistration: Boolean
 )(implicit request: Request[_], messages: Messages)
 
@@ -48,7 +46,7 @@
     @Html(messages("rejoinComplete.organisationName", organisationName))
     </p>
 
-    @if((maybeIossRegistration.nonEmpty || maybeIntermediaryRegistration.nonEmpty) && hasUpdatedRegistration) {
+    @if(compositeAccount.nonEmpty && hasUpdatedRegistration) {
         <p class="govuk-body">@messages("rejoinComplete.iossRegistration.updated")</p>
     }
 

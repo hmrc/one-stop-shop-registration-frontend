@@ -160,7 +160,7 @@ businessContactDetails.change.emailAddress.hidden = your email address
 businessContactDetails.button.sendCode = Send code and continue
 
 businessContactDetails.iossRegistration.p1 = We have added the details you entered for a previous One Stop Shop scheme. Check they are still correct.
-businessContactDetails.iossRegistration.warning = Changes you make here will also update the contact details in any Import One Stop Shop accounts you registered for.
+businessContactDetails.iossRegistration.warning = Changes you make here will also update the contact details in any One Stop Shop accounts you registered for.
 
 euVatDetails.checkYourAnswersLabel = EU tax details added
 euVatDetails.checkYourAnswersLabel.removed = EU tax details removed
@@ -202,7 +202,7 @@ applicationComplete.fillOut = <a class="govuk-link" href="https://www.gov.uk/gui
 applicationComplete.enrolment.heading = We''ve received your registration request
 applicationComplete.enrolment.title = We''ve received your registration request
 
-applicationComplete.iossRegistration.updated = We''ve also updated any Import One Stop Shop registrations you have.
+applicationComplete.iossRegistration.updated = We''ve also updated any One Stop Shop registrations you have.
 
 deleteTradingName.title = Are you sure you want to remove {0}?
 deleteTradingName.heading = Are you sure you want to remove {0}?
@@ -224,7 +224,7 @@ addTradingName.iossRegistration.title.plural = You have {0} UK trading names fro
 addTradingName.iossRegistration.heading.singular = You have one UK trading name from your Import One Stop Shop registration
 addTradingName.iossRegistration.heading.plural = You have {0} UK trading names from your Import One Stop Shop registration
 addTradingName.iossRegistration.p1 = We have added the details you entered for a previous One Stop Shop scheme. Check they are still correct.
-addTradingName.iossRegistration.warning = Changes you make here will also update the trading names in any Import One Stop Shop accounts you registered for.
+addTradingName.iossRegistration.warning = Changes you make here will also update the trading names in any One Stop Shop accounts you registered for.
 
 website.title = Enter a website your business uses to sell goods
 website.heading = Enter a website your business uses to sell goods (optional)
@@ -537,7 +537,7 @@ bankDetails.change.bic.hidden = your BIC or SWIFT code
 bankDetails.change.iban.hidden = your IBAN
 
 bankDetails.iossRegistration.p1 = We have added the details you entered for a previous One Stop Shop scheme. Check they are still correct.
-bankDetails.iossRegistration.warning = Changes you make here will also update the bank details in any Import One Stop Shop accounts you registered for.
+bankDetails.iossRegistration.warning = Changes you make here will also update the bank details in any One Stop Shop accounts you registered for.
 
 euTaxReference.title = What is your business tax identification number for {0}?
 euTaxReference.heading = What is your business tax identification number for {0}?
@@ -854,7 +854,7 @@ amendComplete.link.yourAccount = Manage your One Stop Shop returns in your accou
 amendComplete.contact.text = We will contact you if we need to check any information.
 amendComplete.feedback.link.text = What did you think of this service?
 amendComplete.feedback.30seconds = (takes 30 seconds)
-amendComplete.iossRegistration.updated = We''ve also updated any Import One Stop Shop registrations you have.
+amendComplete.iossRegistration.updated = We''ve also updated any One Stop Shop registrations you have.
 
 deleteAllTradingNames.title = Remove all your alternative trading names from this scheme?
 deleteAllTradingNames.heading = Remove all your alternative trading names from this scheme?
@@ -947,7 +947,7 @@ rejoinComplete.manageReturnsLink = <a href="{0}" class="govuk-link">Manage your 
 rejoinComplete.contactYou = We will contact you if we need to check any information.
 rejoinComplete.feedback.link.text = What did you think of this service?
 rejoinComplete.feedback.30seconds = (takes 30 seconds)
-rejoinComplete.iossRegistration.updated =  We''ve also updated any Import One Stop Shop registrations you have.
+rejoinComplete.iossRegistration.updated =  We''ve also updated any One Stop Shop registrations you have.
 
 rejoinJourneyRecovery.title = Sorry, there is a problem with the service
 rejoinJourneyRecovery.heading = Sorry, there is a problem with the service

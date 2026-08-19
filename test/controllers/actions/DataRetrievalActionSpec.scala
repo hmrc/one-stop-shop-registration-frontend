@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.UserAnswers
+import models.{CompositeAccount, UserAnswers}
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.{AuthenticatedIdentifierRequest, AuthenticatedOptionalDataRequest, SessionRequest, UnauthenticatedOptionalDataRequest}
 import org.mockito.ArgumentMatchers.any
@@ -31,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
 import repositories.{AuthenticatedUserAnswersRepository, UnauthenticatedUserAnswersRepository}
 import services.DataMigrationService
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderNames
 
@@ -65,7 +66,17 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
         val action = new AuthenticatedHarness(sessionRepository, migrationService)
         val request = FakeRequest(GET, "/test/url?k=session-id")
 
-        val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None, None, None)).futureValue
+        val result = action.callRefine(
+          AuthenticatedIdentifierRequest(
+            request,
+            testCredentials,
+            vrn,
+            Enrolments(Set.empty),
+            None,
+            None,
+            0,
+            None
+          )).futureValue
 
         verify(migrationService, times(1)).migrate("session-id", userAnswersId)
         result mustBe Left(Redirect("/test/url"))
@@ -91,7 +102,17 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url").withHeaders(HeaderNames.xSessionId -> sessionId)
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None, None, None)).futureValue
+          val result = action.callRefine(
+            AuthenticatedIdentifierRequest(
+              request,
+              testCredentials,
+              vrn,
+              Enrolments(Set.empty),
+              None,
+              None,
+              0,
+              None
+            )).futureValue
 
           verify(migrationService, times(1)).migrate("session-id", userAnswersId)
           result.value.credentials mustEqual testCredentials
@@ -113,7 +134,17 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url")
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None, None, None)).futureValue
+          val result = action.callRefine(
+            AuthenticatedIdentifierRequest(
+              request,
+              testCredentials,
+              vrn,
+              Enrolments(Set.empty),
+              None,
+              None,
+              0,
+              None
+            )).futureValue
 
           verifyNoInteractions(migrationService)
           result.value.credentials mustEqual testCredentials
@@ -136,7 +167,17 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url")
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, None, 0, None, None, None)).futureValue
+          val result = action.callRefine(
+            AuthenticatedIdentifierRequest(
+              request,
+              testCredentials,
+              vrn,
+              Enrolments(Set.empty),
+              None,
+              None,
+              0,
+              None
+            )).futureValue
           verify(migrationService, never()).migrate(any(), any())
           result.value.credentials mustEqual testCredentials
           result.value.vrn mustEqual vrn
@@ -146,6 +187,8 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
         "must build a userAnswers object when IOSS Registration Data is present and add it to the request" in {
 
           val iossEtmpDisplayRegistration: IossEtmpDisplayRegistration = arbitraryIossEtmpDisplayRegistration.arbitrary.sample.value
+
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
 
           val answers = UserAnswers(userAnswersId, Json.obj("foo" -> "bar"))
 
@@ -157,7 +200,17 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with EitherValu
           val action = new AuthenticatedHarness(sessionRepository, migrationService)
           val request = FakeRequest(GET, "/test/url")
 
-          val result = action.callRefine(AuthenticatedIdentifierRequest(request, testCredentials, vrn, Enrolments(Set.empty), None, Some(iossNumber), 1, Some(iossEtmpDisplayRegistration), None, None)).futureValue
+          val result = action.callRefine(
+            AuthenticatedIdentifierRequest(
+              request,
+              testCredentials,
+              vrn,
+              Enrolments(Set.empty),
+              None,
+              Some(iossNumber),
+              1,
+              compositeAccount
+            )).futureValue
           verify(migrationService, never()).migrate(any(), any())
           result.value.credentials mustEqual testCredentials
           result.value.vrn mustEqual vrn

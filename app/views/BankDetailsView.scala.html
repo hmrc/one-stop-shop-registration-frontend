@@ -15,8 +15,7 @@
  *@
 
 @import components.ButtonGroup
-@import models.iossRegistration.IossEtmpDisplayRegistration
-@import models.etmp.intermediary.IntermediaryRegistrationWrapper
+@import models.CompositeAccount
 @import viewmodels.InputWidth.*
 
 @this(
@@ -31,9 +30,8 @@
 @(
         form: Form[_],
         mode: Mode,
-        latestIossRegistration: Option[IossEtmpDisplayRegistration],
         numberOfIossRegistrations: Int,
-        latestIntermediaryRegistration: Option[IntermediaryRegistrationWrapper],
+        compositeAccount: Option[CompositeAccount],
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("bankDetails.title"))) {
@@ -46,7 +44,7 @@
 
     <h1 class="govuk-heading-l">@messages("bankDetails.heading")</h1>
 
-    @if((latestIossRegistration.map(_.bankDetails.accountName.nonEmpty) || latestIntermediaryRegistration.exists(_.etmpDisplayRegistration.bankDetails.accountName.nonEmpty)) && !(mode.isInAmend || mode.isInRejoin)) {
+    @if(compositeAccount.nonEmpty && !(mode.isInAmend || mode.isInRejoin)) {
       <p class="govuk-body">@messages("bankDetails.iossRegistration.p1")</p>
     }
 
@@ -79,7 +77,7 @@
       .withHint(HintViewModel(messages("bankDetails.iban.hint")))
     )
 
-    @if(latestIossRegistration.isDefined || latestIntermediaryRegistration.isDefined) {
+    @if(compositeAccount.nonEmpty) {
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
           content = Text(messages("bankDetails.iossRegistration.warning"))
