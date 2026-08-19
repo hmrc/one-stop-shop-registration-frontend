@@ -202,7 +202,7 @@ applicationComplete.fillOut = <a class="govuk-link" href="https://www.gov.uk/gui
 applicationComplete.enrolment.heading = We''ve received your registration request
 applicationComplete.enrolment.title = We''ve received your registration request
 
-applicationComplete.iossRegistration.updated = We''ve also updated any One Stop Shop registrations you have.
+applicationComplete.iossRegistration.updated = We''ve also updated any other One Stop Shop registrations you have.
 
 deleteTradingName.title = Are you sure you want to remove {0}?
 deleteTradingName.heading = Are you sure you want to remove {0}?
@@ -854,7 +854,7 @@ amendComplete.link.yourAccount = Manage your One Stop Shop returns in your accou
 amendComplete.contact.text = We will contact you if we need to check any information.
 amendComplete.feedback.link.text = What did you think of this service?
 amendComplete.feedback.30seconds = (takes 30 seconds)
-amendComplete.iossRegistration.updated = We''ve also updated any One Stop Shop registrations you have.
+amendComplete.iossRegistration.updated = We''ve also updated any other One Stop Shop registrations you have.
 
 deleteAllTradingNames.title = Remove all your alternative trading names from this scheme?
 deleteAllTradingNames.heading = Remove all your alternative trading names from this scheme?
@@ -947,7 +947,7 @@ rejoinComplete.manageReturnsLink = <a href="{0}" class="govuk-link">Manage your 
 rejoinComplete.contactYou = We will contact you if we need to check any information.
 rejoinComplete.feedback.link.text = What did you think of this service?
 rejoinComplete.feedback.30seconds = (takes 30 seconds)
-rejoinComplete.iossRegistration.updated =  We''ve also updated any One Stop Shop registrations you have.
+rejoinComplete.iossRegistration.updated =  We''ve also updated any other One Stop Shop registrations you have.
 
 rejoinJourneyRecovery.title = Sorry, there is a problem with the service
 rejoinJourneyRecovery.heading = Sorry, there is a problem with the service
