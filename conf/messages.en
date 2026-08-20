@@ -219,10 +219,10 @@ addTradingName.remove.hidden = {0}
 addTradingName.addAnother = Add another trading name?
 addTradingName.addAnother.hint = You can add up to 10 trading names.
 
-addTradingName.iossRegistration.title.singular = You have one UK trading name from your Import One Stop Shop registration
-addTradingName.iossRegistration.title.plural = You have {0} UK trading names from your Import One Stop Shop registration
-addTradingName.iossRegistration.heading.singular = You have one UK trading name from your Import One Stop Shop registration
-addTradingName.iossRegistration.heading.plural = You have {0} UK trading names from your Import One Stop Shop registration
+addTradingName.iossRegistration.title.singular = You have one UK trading name from previous One Stop Shop scheme registrations
+addTradingName.iossRegistration.title.plural = You have {0} UK trading names from previous One Stop Shop scheme registrations
+addTradingName.iossRegistration.heading.singular = You have one UK trading name from previous One Stop Shop scheme registrations
+addTradingName.iossRegistration.heading.plural = You have {0} UK trading names from previous One Stop Shop scheme registrations
 addTradingName.iossRegistration.p1 = We have added the details you entered for a previous One Stop Shop scheme. Check they are still correct.
 addTradingName.iossRegistration.warning = Changes you make here will also update the trading names in any One Stop Shop accounts you registered for.
 
