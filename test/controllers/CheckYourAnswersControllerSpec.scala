@@ -107,7 +107,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "trading name is missing" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
@@ -132,7 +132,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "must remain valid when no websites have been supplied" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.remove(AllWebsites).success.value
@@ -156,7 +156,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "eligible sales is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(HasMadeSalesPage, true).success.value
@@ -180,7 +180,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "tax registered in eu is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(TaxRegisteredInEuPage, true).success.value
@@ -204,7 +204,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "previous registrations is not populated correctly" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers.set(PreviouslyRegisteredPage, true).success.value
@@ -228,7 +228,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "tax registered in eu has a country with missing data" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers
@@ -254,7 +254,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
         "previous registrations has a country with missing data" in {
 
           when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn (commencementDate)
+          when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
           val answers = completeUserAnswers

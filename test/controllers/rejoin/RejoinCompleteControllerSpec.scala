@@ -24,7 +24,7 @@ import models.Quarter.{Q1, Q4}
 import models.domain.Registration
 import models.external.ExternalEntryUrl
 import models.iossRegistration.IossEtmpDisplayRegistration
-import models.{BankDetails, BusinessContactDetails, Period, UserAnswers}
+import models.{BankDetails, BusinessContactDetails, CompositeAccount, Period, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,6 +36,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.AllTradingNames
 import services.{CoreRegistrationValidationService, DateService, PeriodService}
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import testutils.RegistrationData
 import views.html.rejoin.RejoinCompleteView
 
@@ -121,9 +122,9 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         commencementDate.format(dateFormatter),
         periodOfFirstReturn.displayShortText,
         firstDayOfNextPeriod.format(dateFormatter),
-        None,
         0,
-        hasUpdatedRegistration = false
+        hasUpdatedRegistration = false,
+        compositeAccount = None
       )(request, messages(application)).toString
     }
   }
@@ -172,9 +173,9 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         commencementDate.format(dateFormatter),
         periodOfFirstReturn.displayShortText,
         firstDayOfNextPeriod.format(dateFormatter),
-        None,
         0,
-        hasUpdatedRegistration = false
+        hasUpdatedRegistration = false,
+        compositeAccount = None
       )(request, messages(application)).toString
     }
   }
@@ -183,6 +184,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
 
     val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
       iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+    val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
     val answers = userAnswers
       .set(AllTradingNames, registration.tradingNames.toList).success.value
@@ -195,7 +198,7 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         registration = Some(registration),
         iossNumber = Some(iossNumber),
         numberOfIossRegistrations = 1,
-        iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration)
+        compositeAccount = compositeAccount
       )
         .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
         .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -233,9 +236,9 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         commencementDate.format(dateFormatter),
         periodOfFirstReturn.displayShortText,
         firstDayOfNextPeriod.format(dateFormatter),
-        Some(nonExcludedIossEtmpDisplayRegistration),
         1,
-        hasUpdatedRegistration = false
+        hasUpdatedRegistration = false,
+        compositeAccount = compositeAccount
       )(request, messages(application)).toString
     }
   }
@@ -244,6 +247,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
 
     val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
       iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+    val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
     val answers = userAnswers
       .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
@@ -255,7 +260,7 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
       registration = Some(registration),
       iossNumber = Some(iossNumber),
       numberOfIossRegistrations = 1,
-      iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration)
+      compositeAccount = compositeAccount
     )
       .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
       .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -293,9 +298,9 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         commencementDate.format(dateFormatter),
         periodOfFirstReturn.displayShortText,
         firstDayOfNextPeriod.format(dateFormatter),
-        Some(nonExcludedIossEtmpDisplayRegistration),
         1,
-        hasUpdatedRegistration = true
+        hasUpdatedRegistration = true,
+        compositeAccount = compositeAccount
       )(request, messages(application)).toString
     }
   }
@@ -307,12 +312,14 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
       .set(BusinessContactDetailsPage, registration.contactDetails).success.value
       .set(BankDetailsPage, iossBankDetails).success.value
 
+    val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
     val application = applicationBuilder(
       userAnswers = Some(answers),
       registration = Some(registration),
       iossNumber = Some(iossNumber),
       numberOfIossRegistrations = 1,
-      iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration)
+      compositeAccount = compositeAccount
     )
       .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
       .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -350,9 +357,9 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         commencementDate.format(dateFormatter),
         periodOfFirstReturn.displayShortText,
         firstDayOfNextPeriod.format(dateFormatter),
-        Some(iossEtmpDisplayRegistration),
         1,
-        hasUpdatedRegistration = true
+        hasUpdatedRegistration = true,
+        compositeAccount = compositeAccount
       )(request, messages(application)).toString
     }
   }
@@ -361,6 +368,8 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
 
     val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
       iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+    val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
     val answers = userAnswers
       .set(AllTradingNames, registration.tradingNames.toList).success.value
@@ -372,7 +381,7 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
       registration = Some(registration),
       iossNumber = Some(iossNumber),
       numberOfIossRegistrations = 2,
-      iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration)
+      compositeAccount = compositeAccount
     )
       .overrides(bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService))
       .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
@@ -410,9 +419,9 @@ class RejoinCompleteControllerSpec extends SpecBase with MockitoSugar {
         commencementDate.format(dateFormatter),
         periodOfFirstReturn.displayShortText,
         firstDayOfNextPeriod.format(dateFormatter),
-        Some(nonExcludedIossEtmpDisplayRegistration),
         2,
-        hasUpdatedRegistration = true
+        hasUpdatedRegistration = true,
+        compositeAccount = compositeAccount
       )(request, messages(application)).toString
     }
   }

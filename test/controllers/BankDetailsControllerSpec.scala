@@ -18,8 +18,9 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
+import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
-import models.{AmendMode, BankDetails, Bic, Iban, NormalMode, RejoinMode}
+import models.{AmendMode, BankDetails, Bic, CompositeAccount, Iban, NormalMode, RejoinMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalacheck.Arbitrary.arbitrary
@@ -30,6 +31,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import utils.FutureSyntax.FutureOps
 import views.html.BankDetailsView
 
@@ -61,7 +63,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form, NormalMode, None, 0)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form, NormalMode, 0, None)(request, messages(application)).toString
       }
     }
 
@@ -69,6 +71,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
         iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
       val iossBankDetails: BankDetails = BankDetails(
         accountName = nonExcludedIossEtmpDisplayRegistration.bankDetails.accountName,
@@ -81,8 +85,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(
         userAnswers = Some(basicUserAnswersWithVatInfo),
         iossNumber = Some(iossNumber),
-        iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-        numberOfIossRegistrations = 1
+        numberOfIossRegistrations = 1,
+        compositeAccount = compositeAccount
       ).build()
 
       running(application) {
@@ -96,8 +100,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) `mustBe` view(
           updatedForm,
           NormalMode,
-          Some(nonExcludedIossEtmpDisplayRegistration),
-          1
+          1,
+          compositeAccount = compositeAccount
         )(request, messages(application)).toString
       }
     }
@@ -110,13 +114,15 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         iban = iossEtmpDisplayRegistration.bankDetails.iban
       )
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
       val updatedForm: Form[BankDetails] = form.fill(iossBankDetails)
 
       val application = applicationBuilder(
         userAnswers = Some(basicUserAnswersWithVatInfo),
         iossNumber = Some(iossNumber),
-        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-        numberOfIossRegistrations = 1
+        numberOfIossRegistrations = 1,
+        compositeAccount = compositeAccount
       ).build()
 
       running(application) {
@@ -130,13 +136,15 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) `mustBe` view(
           updatedForm,
           NormalMode,
-          Some(iossEtmpDisplayRegistration),
-          1
+          1,
+          compositeAccount = compositeAccount
         )(request, messages(application)).toString
       }
     }
 
     "must return OK and the correct view for a GET when multiple IOSS Registrations are present" in {
+
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
 
       val iossBankDetails: BankDetails = BankDetails(
         accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
@@ -149,8 +157,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(
         userAnswers = Some(basicUserAnswersWithVatInfo),
         iossNumber = Some(iossNumber),
-        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-        numberOfIossRegistrations = 2
+        numberOfIossRegistrations = 2,
+        compositeAccount = compositeAccount
       ).build()
 
       running(application) {
@@ -164,8 +172,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) `mustBe` view(
           updatedForm,
           NormalMode,
-          Some(iossEtmpDisplayRegistration),
-          2
+          2,
+          compositeAccount
         )(request, messages(application)).toString
       }
     }
@@ -182,7 +190,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode, None, 0)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(form.fill(bankDetails), NormalMode, 0, None)(request, messages(application)).toString
       }
     }
 
@@ -227,7 +235,7 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode, None, 0)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, 0, None)(request, messages(application)).toString
       }
     }
 
@@ -242,6 +250,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
             iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
 
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
+
           val iossBankDetails: BankDetails = BankDetails(
             accountName = nonExcludedIossEtmpDisplayRegistration.bankDetails.accountName,
             bic = nonExcludedIossEtmpDisplayRegistration.bankDetails.bic,
@@ -253,8 +263,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           val application = applicationBuilder(
             userAnswers = Some(basicUserAnswersWithVatInfo),
             iossNumber = Some(iossNumber),
-            iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-            numberOfIossRegistrations = 1
+            numberOfIossRegistrations = 1,
+            compositeAccount = compositeAccount
           ).build()
 
           running(application) {
@@ -268,14 +278,16 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
             contentAsString(result) `mustBe` view(
               updatedForm,
               mode,
-              Some(nonExcludedIossEtmpDisplayRegistration),
-              1
+              1,
+              compositeAccount = compositeAccount
             )(request, messages(application)).toString
           }
         }
 
         s"must return OK and the correct view for a GET when an excluded IOSS Registration is present when in $mode" in {
 
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
           val iossBankDetails: BankDetails = BankDetails(
             accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
             bic = iossEtmpDisplayRegistration.bankDetails.bic,
@@ -287,8 +299,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           val application = applicationBuilder(
             userAnswers = Some(basicUserAnswersWithVatInfo),
             iossNumber = Some(iossNumber),
-            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-            numberOfIossRegistrations = 1
+            numberOfIossRegistrations = 1,
+            compositeAccount = compositeAccount
           ).build()
 
           running(application) {
@@ -302,14 +314,16 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
             contentAsString(result) `mustBe` view(
               updatedForm,
               mode,
-              Some(iossEtmpDisplayRegistration),
-              1
+              1,
+              compositeAccount = compositeAccount
             )(request, messages(application)).toString
           }
         }
 
         s"must return OK and the correct view for a GET when multiple IOSS Registrations are present when in $mode" in {
 
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
           val iossBankDetails: BankDetails = BankDetails(
             accountName = iossEtmpDisplayRegistration.bankDetails.accountName,
             bic = iossEtmpDisplayRegistration.bankDetails.bic,
@@ -321,8 +335,8 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           val application = applicationBuilder(
             userAnswers = Some(basicUserAnswersWithVatInfo),
             iossNumber = Some(iossNumber),
-            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-            numberOfIossRegistrations = 2
+            numberOfIossRegistrations = 2,
+            compositeAccount = compositeAccount
           ).build()
 
           running(application) {
@@ -336,8 +350,45 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
             contentAsString(result) `mustBe` view(
               updatedForm,
               mode,
-              Some(iossEtmpDisplayRegistration),
-              2
+              2,
+              compositeAccount = compositeAccount
+            )(request, messages(application)).toString
+          }
+        }
+
+        s"must return OK and the correct view for a GET when an Intermediary Registration is present when in $mode" in {
+
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(intermediaryRegistration = Some(registrationWrapper))
+
+          val intermediaryBankDetails: BankDetails = BankDetails(
+            accountName = registrationWrapper.etmpDisplayRegistration.bankDetails.accountName,
+            bic = registrationWrapper.etmpDisplayRegistration.bankDetails.bic,
+            iban = registrationWrapper.etmpDisplayRegistration.bankDetails.iban
+          )
+
+          val updatedForm: Form[BankDetails] = form.fill(intermediaryBankDetails)
+
+          val application = applicationBuilder(
+            userAnswers = Some(basicUserAnswersWithVatInfo),
+            iossNumber = None,
+            iossEtmpDisplayRegistration = None,
+            intermediaryNumber = Some(intNumber),
+            compositeAccount = compositeAccount
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(GET, bankDetailsRoute)
+
+            val view = application.injector.instanceOf[BankDetailsView]
+
+            val result = route(application, request).value
+
+            status(result) `mustBe` OK
+            contentAsString(result) `mustBe` view(
+              updatedForm,
+              mode,
+              0,
+              compositeAccount = compositeAccount
             )(request, messages(application)).toString
           }
         }

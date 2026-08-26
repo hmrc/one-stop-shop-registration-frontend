@@ -74,8 +74,8 @@ class AmendCompleteController @Inject()(
               frontendAppConfig.ossYourAccountUrl,
               organisationName.toString,
               list,
-              request.latestIossRegistration,
               request.numberOfIossRegistrations,
+              request.compositeAccount,
               userResearchUrl
             )
           )

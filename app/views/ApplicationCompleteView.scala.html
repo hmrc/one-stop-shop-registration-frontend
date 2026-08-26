@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.iossRegistration.IossEtmpDisplayRegistration
+@import models.CompositeAccount
 @import uk.gov.hmrc.domain.Vrn
 
 @this(
@@ -30,9 +30,9 @@
         organisationName: String,
         periodOfFirstReturn: String,
         firstDayOfNextPeriod: String,
-        maybeIossRegistration: Option[IossEtmpDisplayRegistration],
         hasUpdatedIossRegistration: Boolean,
         numberOfIossRegistrations: Int,
+        compositeAccount: Option[CompositeAccount],
         userResearchUrl: String
 )(implicit request: Request[_], messages: Messages)
 
@@ -45,19 +45,8 @@
 
     <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
 
-    @if(maybeIossRegistration.nonEmpty && hasUpdatedIossRegistration) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "applicationComplete.iossRegistration.previous.updated"
-          } else {
-            "applicationComplete.iossRegistration.updated"
-          }
-        case i =>
-          "applicationComplete.iossRegistration.multiple.updated"
-      }) { message =>
-        <p class="govuk-body">@messages(message)</p>
-      }
+    @if(compositeAccount.nonEmpty && hasUpdatedIossRegistration) {
+      <p class="govuk-body">@messages("applicationComplete.iossRegistration.updated")</p>
     }
 
     <div class="govuk-body">@messages("applicationComplete.useService.text")</div>

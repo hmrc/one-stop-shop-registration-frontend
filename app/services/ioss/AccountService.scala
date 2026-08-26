@@ -16,7 +16,7 @@
 
 package services.ioss
 
-import config.Constants.iossEnrolmentKey
+import config.Constants.{intermediaryEnrolmentKey, iossEnrolmentKey}
 import connectors.RegistrationConnector
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,6 +34,17 @@ class AccountService @Inject()(
         .maxBy(_.activationDate.get)
         .identifiers
         .find(_.key == iossEnrolmentKey)
+        .map(_.value)
+    }
+  }
+
+  def getLatestIntermediaryAccount()(implicit hc: HeaderCarrier): Future[Option[String]] = {
+    registrationConnector.getIntermediaryAccounts().map { eACDEnrolments =>
+      eACDEnrolments.enrolments
+        .filter(_.activationDate.isDefined)
+        .maxBy(_.activationDate.get)
+        .identifiers
+        .find(_.key == intermediaryEnrolmentKey)
         .map(_.value)
     }
   }

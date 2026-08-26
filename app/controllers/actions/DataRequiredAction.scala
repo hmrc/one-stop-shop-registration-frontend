@@ -50,7 +50,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
                 data,
                 request.iossNumber,
                 request.numberOfIossRegistrations,
-                request.latestIossRegistration
+                request.compositeAccount
               )).toFuture
             case None =>
               if (mode.contains(AmendMode)) {
@@ -68,7 +68,7 @@ class AuthenticatedDataRequiredActionImpl @Inject()(
             data,
             request.iossNumber,
             request.numberOfIossRegistrations,
-            request.latestIossRegistration
+            request.compositeAccount
           )).toFuture
         }
     }

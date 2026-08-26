@@ -19,12 +19,14 @@ package connectors
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.enrolments.EACDEnrolments
+import models.etmp.intermediary.IntermediaryRegistrationWrapper
 import models.external.ExternalEntryUrl
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedResponseStatus}
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.libs.json.Json
+import play.api.mvc.Results.InternalServerError
 import play.api.test.Helpers.*
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -39,6 +41,7 @@ class RegistrationConnectorSpec extends SpecBase with WireMockHelper {
     applicationBuilder()
       .configure("microservice.services.one-stop-shop-registration.port" -> server.port)
       .configure("microservice.services.ioss-registration.port" -> server.port)
+      .configure("microservice.services.ioss-intermediary-registration.port" -> server.port)
       .build()
 
   "submitRegistration" - {
@@ -408,6 +411,88 @@ class RegistrationConnectorSpec extends SpecBase with WireMockHelper {
         )
 
         val result = connector.getAccounts().futureValue
+
+        result mustBe eACDEnrolments
+      }
+    }
+  }
+
+  "getIntermediaryRegistration" - {
+
+    val url = s"/ioss-intermediary-registration/get-registration/$intNumber"
+
+    val registrationWrapperResponse: IntermediaryRegistrationWrapper = registrationWrapper
+
+    "must return a registration when the backend returns one" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val response: IntermediaryRegistrationWrapper = registrationWrapperResponse
+
+        val responseBody = Json.toJson(response).toString
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getIntermediaryRegistration(intNumber).futureValue
+
+        result mustBe Right(response)
+      }
+    }
+
+    "must return UnexpectedResponseStatus when the backend returns Left" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(notFound()))
+
+        val result = connector.getIntermediaryRegistration(intNumber).futureValue
+
+        result mustBe Left(UnexpectedResponseStatus(
+          NOT_FOUND,
+          "Unexpected Intermediary registration response, status 404 returned"
+        ))
+      }
+    }
+
+    "must return InvalidJson ErrorResponse when the backend returns Left JSError" in {
+
+      running(application) {
+        val connector = application.injector.instanceOf[RegistrationConnector]
+
+        val invalidJSONResponse = Json.obj("test" -> "test").toString
+
+        val responseBody = Json.toJson(invalidJSONResponse).toString
+
+        server.stubFor(get(urlEqualTo(url)).willReturn(ok().withBody(responseBody)))
+
+        val result = connector.getIntermediaryRegistration(intNumber).futureValue
+
+        result mustBe Left(InvalidJson)
+      }
+    }
+  }
+
+  "getIntermediaryAccounts" - {
+
+    "must return a valid EACDEnrolments payload when the server provides one" in {
+
+      val intermediaryAccountsUrl: String = "/ioss-intermediary-registration/accounts"
+
+      val eACDEnrolments: EACDEnrolments = arbitraryEACDEnrolments.arbitrary.sample.value
+
+      running(application) {
+
+        val connector: RegistrationConnector = application.injector.instanceOf[RegistrationConnector]
+
+        val responseJson = Json.toJson(eACDEnrolments).toString
+
+        server.stubFor(get(urlEqualTo(intermediaryAccountsUrl))
+          .willReturn(ok().withBody(responseJson))
+        )
+
+        val result = connector.getIntermediaryAccounts().futureValue
 
         result mustBe eACDEnrolments
       }

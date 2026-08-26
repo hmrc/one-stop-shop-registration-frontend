@@ -14,8 +14,8 @@
  * limitations under the License.
  *@
 
-@import models.iossRegistration.IossEtmpDisplayRegistration
 @import uk.gov.hmrc.domain.Vrn
+@import models.CompositeAccount
 
 @this(
         layout: templates.Layout,
@@ -29,8 +29,8 @@
         yourAccountUrl: String,
         organisationName: String,
         list: SummaryList,
-        maybeIossRegistration: Option[IossEtmpDisplayRegistration],
         numberOfIossRegistrations: Int,
+        compositeAccount: Option[CompositeAccount],
         userResearchUrl: String
 )(implicit request: Request[_], messages: Messages)
 
@@ -52,19 +52,8 @@
       ).withCssClass("govuk-body govuk-!-margin-bottom-7")
     )
 
-    @if(maybeIossRegistration.nonEmpty && list.rows.nonEmpty) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(maybeIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "amendComplete.iossRegistration.previous.updated"
-          } else {
-            "amendComplete.iossRegistration.updated"
-          }
-        case i =>
-          "amendComplete.iossRegistration.multiple.updated"
-      }) { message =>
-        <p class="govuk-body">@messages(message)</p>
-      }
+    @if(compositeAccount.nonEmpty && list.rows.nonEmpty) {
+        <p class="govuk-body">@messages("amendComplete.iossRegistration.updated")</p>
     }
 
     @externalUrl match {

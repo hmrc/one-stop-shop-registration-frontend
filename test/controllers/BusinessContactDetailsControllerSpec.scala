@@ -22,9 +22,10 @@ import connectors.RegistrationConnector
 import forms.BusinessContactDetailsFormProvider
 import models.emailVerification.EmailVerificationResponse
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
+import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.UnexpectedResponseStatus
-import models.{AmendMode, BusinessContactDetails, NormalMode, RejoinMode, UserAnswers}
+import models.{AmendMode, BusinessContactDetails, CompositeAccount, NormalMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -39,6 +40,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
 import services.{EmailVerificationService, SaveForLaterService}
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import testutils.RegistrationData
 import utils.FutureSyntax.FutureOps
 import views.html.BusinessContactDetailsView
@@ -91,7 +93,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = false, 0, None)(request, messages(application)).toString
         }
       }
 
@@ -109,7 +111,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form, NormalMode, enrolmentsEnabled = true, 0, None)(request, messages(application)).toString
         }
       }
 
@@ -127,7 +129,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` OK
-          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(form.fill(contactDetails), NormalMode, enrolmentsEnabled = false, 0, None)(request, messages(application)).toString
         }
       }
 
@@ -135,6 +137,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
         val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
           iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
+
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
 
         val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
           fullName = nonExcludedIossEtmpDisplayRegistration.schemeDetails.contactName,
@@ -147,8 +151,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         val application = applicationBuilder(
           userAnswers = Some(basicUserAnswersWithVatInfo),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("features.enrolments-enabled" -> "false")
           .build()
@@ -165,14 +169,16 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             updatedForm,
             NormalMode,
             enrolmentsEnabled = false,
-            Some(nonExcludedIossEtmpDisplayRegistration),
-            1
+            1,
+            compositeAccount = compositeAccount
           )(request, messages(application)).toString
         }
       }
 
       "must return OK and the correct view for a GET when an excluded IOSS Registration is present" in {
 
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
         val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
           fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
           telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
@@ -184,8 +190,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         val application = applicationBuilder(
           userAnswers = Some(basicUserAnswersWithVatInfo),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 1
+          numberOfIossRegistrations = 1,
+          compositeAccount = compositeAccount
         )
           .configure("features.enrolments-enabled" -> "false")
           .build()
@@ -202,14 +208,16 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             updatedForm,
             NormalMode,
             enrolmentsEnabled = false,
-            Some(iossEtmpDisplayRegistration),
-            1
+            1,
+            compositeAccount = compositeAccount
           )(request, messages(application)).toString
         }
       }
 
       "must return OK and the correct view for a GET when multiple IOSS Registrations are present" in {
 
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
         val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
           fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
           telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
@@ -221,8 +229,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
         val application = applicationBuilder(
           userAnswers = Some(basicUserAnswersWithVatInfo),
           iossNumber = Some(iossNumber),
-          iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-          numberOfIossRegistrations = 2
+          numberOfIossRegistrations = 2,
+          compositeAccount = compositeAccount
         )
           .configure("features.enrolments-enabled" -> "false")
           .build()
@@ -239,8 +247,46 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             updatedForm,
             NormalMode,
             enrolmentsEnabled = false,
-            Some(iossEtmpDisplayRegistration),
-            2
+            2,
+            compositeAccount = compositeAccount
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must return OK and the correct view for a GET when an Intermediary Registration is present" in {
+
+        val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(intermediaryRegistration = Some(registrationWrapper))
+
+        val intermediaryBusinessDetails: BusinessContactDetails = BusinessContactDetails(
+          fullName = registrationWrapper.etmpDisplayRegistration.schemeDetails.contactName,
+          telephoneNumber = registrationWrapper.etmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
+          emailAddress = registrationWrapper.etmpDisplayRegistration.schemeDetails.businessEmailId
+        )
+
+        val updatedForm: Form[BusinessContactDetails] = form.fill(intermediaryBusinessDetails)
+
+        val application = applicationBuilder(
+          userAnswers = Some(basicUserAnswersWithVatInfo),
+          intermediaryNumber = Some(intNumber),
+          compositeAccount = compositeAccount
+        )
+          .configure("features.enrolments-enabled" -> "false")
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessContactDetailsRoute)
+
+          val view = application.injector.instanceOf[BusinessContactDetailsView]
+
+          val result = route(application, request).value
+
+          status(result) `mustBe` OK
+          contentAsString(result) `mustBe` view(
+            updatedForm,
+            NormalMode,
+            enrolmentsEnabled = false,
+            0,
+            compositeAccount = compositeAccount
           )(request, messages(application)).toString
         }
       }
@@ -256,6 +302,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
               iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
 
+            val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
+
             val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
               fullName = nonExcludedIossEtmpDisplayRegistration.schemeDetails.contactName,
               telephoneNumber = nonExcludedIossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
@@ -267,8 +315,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val application = applicationBuilder(
               userAnswers = Some(basicUserAnswersWithVatInfo),
               iossNumber = Some(iossNumber),
-              iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-              numberOfIossRegistrations = 1
+              numberOfIossRegistrations = 1,
+              compositeAccount = compositeAccount
             )
               .configure("features.enrolments-enabled" -> "false")
               .build()
@@ -285,14 +333,16 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 updatedForm,
                 mode,
                 enrolmentsEnabled = false,
-                Some(nonExcludedIossEtmpDisplayRegistration),
-                1
+                1,
+                compositeAccount = compositeAccount
               )(request, messages(application)).toString
             }
           }
 
           s"must return OK and the correct view for a GET when an excluded IOSS Registration is present when in $mode" in {
 
+            val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
             val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
               fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
               telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
@@ -304,8 +354,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val application = applicationBuilder(
               userAnswers = Some(basicUserAnswersWithVatInfo),
               iossNumber = Some(iossNumber),
-              iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-              numberOfIossRegistrations = 1
+              numberOfIossRegistrations = 1,
+              compositeAccount = compositeAccount
             )
               .configure("features.enrolments-enabled" -> "false")
               .build()
@@ -322,14 +372,16 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 updatedForm,
                 mode,
                 enrolmentsEnabled = false,
-                Some(iossEtmpDisplayRegistration),
-                1
+                1,
+                compositeAccount = compositeAccount
               )(request, messages(application)).toString
             }
           }
 
           s"must return OK and the correct view for a GET when multiple IOSS Registrations are present when in $mode" in {
 
+            val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
             val iossBusinessDetails: BusinessContactDetails = BusinessContactDetails(
               fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
               telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
@@ -341,8 +393,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
             val application = applicationBuilder(
               userAnswers = Some(basicUserAnswersWithVatInfo),
               iossNumber = Some(iossNumber),
-              iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-              numberOfIossRegistrations = 2
+              numberOfIossRegistrations = 2,
+              compositeAccount = compositeAccount
             )
               .configure("features.enrolments-enabled" -> "false")
               .build()
@@ -359,8 +411,8 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
                 updatedForm,
                 mode,
                 enrolmentsEnabled = false,
-                Some(iossEtmpDisplayRegistration),
-                2
+                2,
+                compositeAccount = compositeAccount
               )(request, messages(application)).toString
             }
           }
@@ -463,9 +515,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val mockSessionRepository = mock[AuthenticatedUserAnswersRepository]
 
           when(mockSessionRepository.set(any())) thenReturn true.toFuture
-          when(mockEmailVerificationService.isEmailVerified(
-            eqTo(emailVerificationRequest.email.get.address),
-            eqTo(emailVerificationRequest.credId))(any())) thenReturn NotVerified.toFuture
+          when(mockEmailVerificationService.isEmailVerified(any(), any())(any())) thenReturn NotVerified.toFuture
 
           val application =
             applicationBuilder(userAnswers = Some(basicUserAnswersWithVatInfo))
@@ -764,7 +814,7 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
           val result = route(application, request).value
 
           status(result) `mustBe` BAD_REQUEST
-          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false, None, 0)(request, messages(application)).toString
+          contentAsString(result) `mustBe` view(boundForm, NormalMode, enrolmentsEnabled = false, 0, None)(request, messages(application)).toString
         }
       }
     }

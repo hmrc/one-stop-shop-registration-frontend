@@ -78,8 +78,8 @@ class RejoinCompleteController @Inject()(
             calculatedCommencementDate.format(dateFormatter),
             periodOfFirstReturn.displayShortText,
             firstDayOfNextPeriod.format(dateFormatter),
-            request.latestIossRegistration,
             request.numberOfIossRegistrations,
+            request.compositeAccount,
             detailList(request.registration).rows.nonEmpty
           )
         )

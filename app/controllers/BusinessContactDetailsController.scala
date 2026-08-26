@@ -54,11 +54,17 @@ class BusinessContactDetailsController @Inject()(
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BusinessContactDetailsPage) match {
-        case None => fillIossBusinessContactDetailsForm(request)
+        case None => fillBusinessContactDetailsForm(request)
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations))
+      Ok(view(
+        preparedForm,
+        mode,
+        config.enrolmentsEnabled,
+        request.numberOfIossRegistrations,
+        request.compositeAccount
+      ))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = cc.authAndGetData(Some(mode)).async {
@@ -68,7 +74,13 @@ class BusinessContactDetailsController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          BadRequest(view(formWithErrors, mode, config.enrolmentsEnabled, request.latestIossRegistration, request.numberOfIossRegistrations)).toFuture,
+          BadRequest(view(
+            formWithErrors,
+            mode,
+            config.enrolmentsEnabled,
+            request.numberOfIossRegistrations,
+            request.compositeAccount
+          )).toFuture,
 
         value => {
 
@@ -140,18 +152,18 @@ class BusinessContactDetailsController @Inject()(
     }
   }
 
-  private def fillIossBusinessContactDetailsForm(request: AuthenticatedDataRequest[_]): Form[BusinessContactDetails] = {
-    request.latestIossRegistration match {
-      case Some(iossEtmpDisplayRegistration) =>
+  private def fillBusinessContactDetailsForm(request: AuthenticatedDataRequest[_]): Form[BusinessContactDetails] = {
+    request.compositeAccount match {
+      case Some(compositeAccount) =>
         form.fill(
           BusinessContactDetails(
-            fullName = iossEtmpDisplayRegistration.schemeDetails.contactName,
-            telephoneNumber = iossEtmpDisplayRegistration.schemeDetails.businessTelephoneNumber,
-            emailAddress = iossEtmpDisplayRegistration.schemeDetails.businessEmailId
+            fullName = compositeAccount.contactDetails.fullName,
+            telephoneNumber = compositeAccount.contactDetails.telephoneNumber,
+            emailAddress = compositeAccount.contactDetails.emailAddress
           )
         )
 
-      case _ => form
+      case None => form
     }
   }
 }

@@ -43,7 +43,7 @@ class FakeAuthenticatedDataRequiredAction(dataToReturn: Option[UserAnswers], mod
       registration, data,
       request.iossNumber,
       request.numberOfIossRegistrations,
-      request.latestIossRegistration
+      request.compositeAccount
     )).toFuture
   }
 }

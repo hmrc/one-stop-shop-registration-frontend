@@ -19,8 +19,9 @@ package controllers
 import base.SpecBase
 import controllers.amend.routes as amendRoutes
 import forms.AddTradingNameFormProvider
+import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
-import models.{AmendMode, Index, NormalMode, RejoinMode, UserAnswers}
+import models.{AmendMode, CompositeAccount, Index, NormalMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,6 +32,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.AllTradingNames
 import repositories.AuthenticatedUserAnswersRepository
+import testutils.GenerateCompositeAccount.generateCompositeAccount
 import utils.FutureSyntax.FutureOps
 import viewmodels.checkAnswers.TradingNameSummary
 import views.html.AddTradingNameView
@@ -62,7 +64,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+        contentAsString(result) `mustBe` view(form, NormalMode, list, canAddTradingNames = true, 0, None)(request, implicitly).toString
       }
     }
 
@@ -71,14 +73,16 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
         iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
+
       val updatedAnswers: UserAnswers = baseAnswers
         .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
       val application = applicationBuilder(
         userAnswers = Some(updatedAnswers),
         iossNumber = Some(iossNumber),
-        iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-        numberOfIossRegistrations = 1
+        numberOfIossRegistrations = 1,
+        compositeAccount = compositeAccount
       )
         .build()
 
@@ -97,8 +101,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           list,
           canAddTradingNames = true,
-          Some(nonExcludedIossEtmpDisplayRegistration),
-          1
+          1,
+          compositeAccount = compositeAccount
         )(request, implicitly).toString
       }
     }
@@ -108,11 +112,13 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val updatedAnswers: UserAnswers = baseAnswers
         .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
       val application = applicationBuilder(
         userAnswers = Some(updatedAnswers),
         iossNumber = Some(iossNumber),
-        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-        numberOfIossRegistrations = 1
+        numberOfIossRegistrations = 1,
+        compositeAccount = compositeAccount
       )
         .build()
 
@@ -131,8 +137,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           list,
           canAddTradingNames = true,
-          Some(iossEtmpDisplayRegistration),
-          1
+          1,
+          compositeAccount = compositeAccount
         )(request, implicitly).toString
       }
     }
@@ -142,11 +148,13 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val updatedAnswers: UserAnswers = baseAnswers
         .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
       val application = applicationBuilder(
         userAnswers = Some(updatedAnswers),
         iossNumber = Some(iossNumber),
-        iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-        numberOfIossRegistrations = 2
+        numberOfIossRegistrations = 2,
+        compositeAccount = compositeAccount
       )
         .build()
 
@@ -165,8 +173,43 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           list,
           canAddTradingNames = true,
-          Some(iossEtmpDisplayRegistration),
-          2
+          2,
+          compositeAccount = compositeAccount
+        )(request, implicitly).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when an Intermediary Registration is present with trading names" in {
+
+      val updatedAnswers: UserAnswers = baseAnswers
+        .set(AllTradingNames, registrationWrapper.etmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
+
+      val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(intermediaryRegistration = Some(registrationWrapper))
+
+      val application = applicationBuilder(
+        userAnswers = Some(updatedAnswers),
+        intermediaryNumber = Some(intNumber),
+        compositeAccount = compositeAccount
+      )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, addTradingNameRoute)
+
+        val view = application.injector.instanceOf[AddTradingNameView]
+        implicit val msgs: Messages = messages(application)
+        val list = TradingNameSummary.addToListRows(updatedAnswers, NormalMode)
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` OK
+        contentAsString(result) `mustBe` view(
+          form,
+          NormalMode,
+          list,
+          canAddTradingNames = true,
+          0,
+          compositeAccount = compositeAccount
         )(request, implicitly).toString
       }
     }
@@ -198,7 +241,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) `mustBe` OK
         contentAsString(result) `mustBe`
-          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false, None, 0)(request, implicitly).toString
+          view(form, NormalMode, TradingNameSummary.addToListRows(answers, NormalMode), canAddTradingNames = false, 0, None)(request, implicitly).toString
       }
     }
 
@@ -232,7 +275,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) `mustBe` OK
-        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+        contentAsString(result) must not be view(form.fill(true), NormalMode, list, canAddTradingNames = true, 0, None)(request, implicitly).toString
       }
     }
 
@@ -282,7 +325,7 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
         status(result) `mustBe` BAD_REQUEST
-        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true, None, 0)(request, implicitly).toString
+        contentAsString(result) `mustBe` view(boundForm, NormalMode, list, canAddTradingNames = true, 0, None)(request, implicitly).toString
       }
     }
 
@@ -312,14 +355,16 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           val nonExcludedIossEtmpDisplayRegistration: IossEtmpDisplayRegistration =
             iossEtmpDisplayRegistration.copy(exclusions = Seq.empty)
 
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(nonExcludedIossEtmpDisplayRegistration))
+
           val updatedAnswers: UserAnswers = baseAnswers
             .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
           val application = applicationBuilder(
             userAnswers = Some(updatedAnswers),
             iossNumber = Some(iossNumber),
-            iossEtmpDisplayRegistration = Some(nonExcludedIossEtmpDisplayRegistration),
-            numberOfIossRegistrations = 1
+            numberOfIossRegistrations = 1,
+            compositeAccount = compositeAccount
           )
             .build()
 
@@ -338,8 +383,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
               mode,
               list,
               canAddTradingNames = true,
-              Some(nonExcludedIossEtmpDisplayRegistration),
-              1
+              1,
+              compositeAccount = compositeAccount
             )(request, implicitly).toString
           }
         }
@@ -349,11 +394,13 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           val updatedAnswers: UserAnswers = baseAnswers
             .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
           val application = applicationBuilder(
             userAnswers = Some(updatedAnswers),
             iossNumber = Some(iossNumber),
-            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-            numberOfIossRegistrations = 1
+            numberOfIossRegistrations = 1,
+            compositeAccount = compositeAccount
           )
             .build()
 
@@ -372,8 +419,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
               mode,
               list,
               canAddTradingNames = true,
-              Some(iossEtmpDisplayRegistration),
-              1
+              1,
+              compositeAccount = compositeAccount
             )(request, implicitly).toString
           }
         }
@@ -383,11 +430,13 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
           val updatedAnswers: UserAnswers = baseAnswers
             .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
+          val compositeAccount: Option[CompositeAccount] = generateCompositeAccount(Some(iossEtmpDisplayRegistration))
+
           val application = applicationBuilder(
             userAnswers = Some(updatedAnswers),
             iossNumber = Some(iossNumber),
-            iossEtmpDisplayRegistration = Some(iossEtmpDisplayRegistration),
-            numberOfIossRegistrations = 2
+            numberOfIossRegistrations = 2,
+            compositeAccount = compositeAccount
           )
             .build()
 
@@ -406,8 +455,8 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
               mode,
               list,
               canAddTradingNames = true,
-              Some(iossEtmpDisplayRegistration),
-              2
+              2,
+              compositeAccount = compositeAccount
             )(request, implicitly).toString
           }
         }

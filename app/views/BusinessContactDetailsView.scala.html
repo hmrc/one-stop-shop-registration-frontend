@@ -15,7 +15,7 @@
  *@
 
 @import components.ButtonGroup
-@import models.iossRegistration.IossEtmpDisplayRegistration
+@import models.CompositeAccount
 @import viewmodels.InputWidth.*
 
 @this(
@@ -31,8 +31,8 @@
         form: Form[_],
         mode: Mode,
         enrolmentsEnabled: Boolean,
-        latestIossRegistration: Option[IossEtmpDisplayRegistration],
-        numberOfIossRegistrations: Int
+        numberOfIossRegistrations: Int,
+        compositeAccount: Option[CompositeAccount],
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("businessContactDetails.title"))) {
@@ -45,7 +45,7 @@
 
     <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@messages("businessContactDetails.heading")</h1>
 
-    @if(latestIossRegistration.exists(_.schemeDetails.contactName.nonEmpty) && !(mode.isInAmend || mode.isInRejoin)) {
+    @if(compositeAccount.nonEmpty && !(mode.isInAmend || mode.isInRejoin)) {
       <p class="govuk-body govuk-!-margin-bottom-4">@messages("businessContactDetails.iossRegistration.p1")</p>
     }
 
@@ -86,22 +86,11 @@
       .asEmail()
     )
 
-    @if(latestIossRegistration.exists(_.tradingNames.nonEmpty)) {
-      @defining(numberOfIossRegistrations match {
-        case 1 =>
-          if(latestIossRegistration.exists(_.exclusions.nonEmpty)) {
-            "businessContactDetails.iossRegistration.previous.warning"
-          } else {
-            "businessContactDetails.iossRegistration.warning"
-          }
-        case i =>
-          "businessContactDetails.iossRegistration.multiple.warning"
-      }) { message =>
+    @if(compositeAccount.nonEmpty) {
         @govukWarningText(WarningText(
           iconFallbackText = Option(messages("site.warning")),
-          content = Text(messages(message))
+          content = Text(messages("businessContactDetails.iossRegistration.warning"))
         ))
-      }
     }
 
     <p class="govuk-body">@messages("businessContactDetails.emailHint")</p>

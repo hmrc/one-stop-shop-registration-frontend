@@ -55,7 +55,7 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
                 Some(answers),
                 request.iossNumber,
                 request.numberOfIossRegistrations,
-                request.latestIossRegistration
+                request.compositeAccount
               ).toFuture.map(Right(_))
           }
     }
@@ -67,8 +67,8 @@ class AuthenticatedDataRetrievalAction @Inject()(authenticatedUserAnswersReposit
       id =>
         migrationService
           .migrate(id.value, request.userId)
-          .map(ua => AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(ua), request.iossNumber, request.numberOfIossRegistrations, request.latestIossRegistration))
-    }.getOrElse(AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, None, request.iossNumber, request.numberOfIossRegistrations, request.latestIossRegistration).toFuture)
+          .map(ua => AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, Some(ua), request.iossNumber, request.numberOfIossRegistrations, request.compositeAccount))
+    }.getOrElse(AuthenticatedOptionalDataRequest(request, request.credentials, request.vrn, request.registration, None, request.iossNumber, request.numberOfIossRegistrations, request.compositeAccount).toFuture)
   }
 }
 
