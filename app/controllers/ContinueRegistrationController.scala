@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.SaveForLaterConnector
-import controllers.actions._
+import controllers.actions.*
 import forms.ContinueRegistrationFormProvider
 import models.ContinueRegistration
 import models.ContinueRegistration.Delete
@@ -26,10 +26,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.ContinueRegistrationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ContinueRegistrationController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -44,28 +45,28 @@ class ContinueRegistrationController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
+      // TODO -> Check if prev reg mpty? If so look at prev reg(s) and revalidate tax ids?
         request.userAnswers.get(SavedProgressPage).map(
           _ => Ok(view(form))
         ).getOrElse(
           Redirect(controllers.routes.IndexController.onPageLoad())
         )
-
   }
 
   def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+          BadRequest(view(formWithErrors)).toFuture,
         value =>
           (value, request.userAnswers.get(SavedProgressPage)) match {
-            case (ContinueRegistration.Continue, Some(url)) => Future.successful(Redirect(Call(GET, url)))
+            case (ContinueRegistration.Continue, Some(url)) => Redirect(Call(GET, url)).toFuture
             case (Delete, _) =>
               for {
                 _ <- cc.sessionRepository.clear(request.userId)
                 _ <- saveForLaterConnector.delete()
               } yield Redirect(controllers.auth.routes.AuthController.onSignIn())
-            case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
           }
       )
   }

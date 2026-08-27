@@ -18,6 +18,7 @@ package generators
 
 import connectors.SavedUserAnswers
 import models.*
+import models.core.{Match, TraderId}
 import models.domain.*
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.returns.*
@@ -676,6 +677,36 @@ trait ModelGenerators {
           individualName = Some(individualName),
           singleMarketIndicator = singleMarketIndicator,
           deregistrationDecisionDate = None
+        )
+      }
+    }
+  }
+
+  implicit lazy val arbitraryTraderId: Arbitrary[TraderId] = {
+    Arbitrary {
+      for {
+        traderId <- Gen.alphaStr
+      } yield TraderId(
+        traderId = traderId
+      )
+    }
+  }
+
+  implicit lazy val arbitraryMatch: Arbitrary[Match] = {
+    Arbitrary {
+      for {
+        traderId <- arbitraryTraderId.arbitrary
+        memberState <- arbitraryCountry.arbitrary.map(_.code)
+      } yield {
+        Match(
+          traderId = traderId,
+          intermediary = None,
+          memberState = memberState,
+          exclusionStatusCode = None,
+          exclusionDecisionDate = None,
+          exclusionEffectiveDate = None,
+          nonCompliantReturns = None,
+          nonCompliantPayments = None
         )
       }
     }
