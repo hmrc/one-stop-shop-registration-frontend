@@ -29,6 +29,7 @@ import models.etmp.intermediary.*
 import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
 import models.exclusions.{ExcludedTrader, ExclusionReason}
 import models.iossRegistration.*
+import models.previousRegistrations.{SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
@@ -711,4 +712,34 @@ trait ModelGenerators {
       }
     }
   }
+
+  implicit lazy val arbitrarySchemeNumbersWithOptionalVatNumber: Arbitrary[SchemeNumbersWithOptionalVatNumber] = {
+    Arbitrary {
+      for {
+        previousSchemeNumber <- arbitraryEuVatNumber
+        previousIntermediaryNumber <- genIntermediaryNumber
+      } yield {
+        SchemeNumbersWithOptionalVatNumber(
+          previousSchemeNumber = Some(previousSchemeNumber),
+          previousIntermediaryNumber = Some(previousIntermediaryNumber)
+        )
+      }
+    }
+  }
+
+  implicit lazy val arbitrarySchemeDetailsWithOptionalVatNumber: Arbitrary[SchemeDetailsWithOptionalVatNumber] = {
+    Arbitrary {
+      for {
+        previousScheme <- Gen.oneOf(PreviousScheme.values)
+        previousSchemeNumbers <- arbitrarySchemeNumbersWithOptionalVatNumber.arbitrary
+      } yield {
+        SchemeDetailsWithOptionalVatNumber(
+          previousScheme = Some(previousScheme),
+          previousSchemeNumbers = Some(previousSchemeNumbers)
+        )
+      }
+    }
+  }
+  
+  
 }

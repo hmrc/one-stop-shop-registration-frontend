@@ -1,8 +1,25 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package services
 
 import controllers.{SetActiveTraderResult, routes}
 import models.core.Match
 import models.domain.VatCustomerInfo
+import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -20,8 +37,72 @@ class SavedAnswersRevalidationService @Inject()(
                                                  clock: Clock
                                                )(implicit ec: ExecutionContext) extends SetActiveTraderResult {
 
-  def revalidateSavedUserAnswers() = {
-    true
+  def revalidateSavedUserAnswers()(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    revalidateUKVrn().flatMap {
+      case None => None.toFuture
+      case redirectUrl => redirectUrl.toFuture
+    }
+  }
+
+  private def revalidatePreviousSchemeDetails(
+                                               countryCode: String,
+                                               allPreviousSchemeDetails: List[SchemeDetailsWithOptionalVatNumber]
+                                             )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    allPreviousSchemeDetails match {
+      case Nil => None.toFuture
+
+      case ::(SchemeDetailsWithOptionalVatNumber(
+        Some(previousScheme),
+        Some(SchemeNumbersWithOptionalVatNumber(
+          Some(previousSchemeNumber),
+          Some(previousIntermediaryNumber),
+        ))
+      ), remaining) =>
+        coreRegistrationValidationService.searchScheme(
+          searchNumber = previousSchemeNumber,
+          previousScheme = previousScheme,
+          intermediaryNumber = Some(previousIntermediaryNumber),
+          countryCode = countryCode
+        ).flatMap { maybeMatch =>
+          activeMatchRedirectUrl(maybeMatch).flatMap {
+            case Some(result) =>
+              Some(result).toFuture
+
+            case _ =>
+              revalidatePreviousSchemeDetails(countryCode, remaining)
+          }
+        }
+        
+      case ::(_, remaining) =>
+        revalidatePreviousSchemeDetails(countryCode, allPreviousSchemeDetails)
+    }
+  }
+
+  private def revalidateAllPreviousRegistrations(
+                                                  allPreviousRegistrations: List[PreviousRegistrationDetailsWithOptionalVatNumber]
+                                                )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+
+    allPreviousRegistrations match {
+      case Nil => None.toFuture
+
+      case ::(PreviousRegistrationDetailsWithOptionalVatNumber(
+        country,
+        Some(optionalSchemeDetails)
+      ), remaining) =>
+        revalidatePreviousSchemeDetails(
+          countryCode = country.code,
+          allPreviousSchemeDetails = optionalSchemeDetails
+        ).flatMap {
+          case Some(result) =>
+            Some(result).toFuture
+
+          case _ =>
+            revalidateAllPreviousRegistrations(remaining)
+        }
+
+      case ::(_, remaining) =>
+        revalidateAllPreviousRegistrations(remaining)
+    }
   }
 
   private def activeMatchRedirectUrl(maybeMatch: Option[Match])(implicit request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
