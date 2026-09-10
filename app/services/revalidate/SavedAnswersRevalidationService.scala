@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package services
+package services.revalidate
 
-import controllers.{SetActiveTraderResult, routes}
+import controllers.routes
 import models.core.Match
 import models.domain.VatCustomerInfo
 import models.euDetails.EuDetails
@@ -29,6 +29,8 @@ import play.api.mvc.Results.Redirect
 import queries.AllEuDetailsQuery
 import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
 import repositories.AuthenticatedUserAnswersRepository
+import services.CoreRegistrationValidationService
+import services.revalidate.SetActiveTraderResult
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package models.revalidate
 
 import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-// TODO -> Test
 case class ActiveTraderResult(
                                isReversal: Boolean,
                                exclusionEffectiveDate: Option[LocalDate] // TODO -> Check this, may need to be String

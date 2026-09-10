@@ -16,7 +16,7 @@
 
 package queries
 
-import models.ActiveTraderResult
+import models.revalidate.ActiveTraderResult
 import play.api.libs.json.JsPath
 
 case object ActiveTraderResultQuery extends Gettable[ActiveTraderResult] with Settable[ActiveTraderResult] {

@@ -1,4 +1,4 @@
-package services
+package services.revalidate
 
 import base.SpecBase
 import controllers.routes
@@ -12,7 +12,8 @@ import models.exclusions.ExclusionReason
 import models.exclusions.ExclusionReason.FailsToComply
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
-import models.{ActiveTraderResult, Country, Index, PreviousScheme, UserAnswers}
+import models.revalidate.ActiveTraderResult
+import models.{Country, Index, PreviousScheme, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -26,6 +27,8 @@ import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import queries.ActiveTraderResultQuery
 import repositories.AuthenticatedUserAnswersRepository
+import services.CoreRegistrationValidationService
+import services.revalidate.SavedAnswersRevalidationService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 

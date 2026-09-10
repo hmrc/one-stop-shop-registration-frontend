@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers
+package services.revalidate
 
-import models.ActiveTraderResult
 import models.core.Match
 import models.requests.AuthenticatedDataRequest
+import models.revalidate.ActiveTraderResult
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Call, Result}
 import queries.ActiveTraderResultQuery
@@ -28,11 +28,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait SetActiveTraderResult {
 
-  def setActiveTraderResultAndRedirect(
-                                        activeMatch: Match,
-                                        sessionRepository: AuthenticatedUserAnswersRepository,
-                                        redirect: Call
-                                      )(implicit request: AuthenticatedDataRequest[_], executionContext: ExecutionContext): Future[Result] = {
+  private[revalidate] def setActiveTraderResultAndRedirect(
+                                                            activeMatch: Match,
+                                                            sessionRepository: AuthenticatedUserAnswersRepository,
+                                                            redirect: Call
+                                                          )(implicit request: AuthenticatedDataRequest[_], executionContext: ExecutionContext): Future[Result] = {
 
     val activeTrader = ActiveTraderResult(
       isReversal = activeMatch.exclusionStatusCode.contains(-1),

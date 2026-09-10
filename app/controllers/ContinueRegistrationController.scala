@@ -24,6 +24,7 @@ import models.ContinueRegistration.Delete
 import pages.SavedProgressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import services.revalidate.SavedAnswersRevalidationService
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
@@ -33,24 +34,30 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class ContinueRegistrationController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         saveForLaterConnector: SaveForLaterConnector,
-                                         formProvider: ContinueRegistrationFormProvider,
-                                         view: ContinueRegistrationView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                override val messagesApi: MessagesApi,
+                                                cc: AuthenticatedControllerComponents,
+                                                saveForLaterConnector: SaveForLaterConnector,
+                                                savedAnswersRevalidationService: SavedAnswersRevalidationService,
+                                                formProvider: ContinueRegistrationFormProvider,
+                                                view: ContinueRegistrationView
+                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData().async {
     implicit request =>
-      // TODO -> Do Check here
-        request.userAnswers.get(SavedProgressPage).map(
-          _ => Ok(view(form))
-        ).getOrElse(
-          Redirect(controllers.routes.IndexController.onPageLoad())
-        )
+      
+      savedAnswersRevalidationService.revalidateSavedUserAnswers().flatMap {
+        case Some(result) => result.toFuture
+        
+        case _ =>
+          request.userAnswers.get(SavedProgressPage).map(
+            _ => Ok(view(form)).toFuture
+          ).getOrElse(
+            Redirect(controllers.routes.IndexController.onPageLoad()).toFuture
+          )
+      }
   }
 
   def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
