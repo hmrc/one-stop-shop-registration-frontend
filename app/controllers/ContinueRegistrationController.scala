@@ -45,7 +45,7 @@ class ContinueRegistrationController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
     implicit request =>
-      // TODO -> Check if prev reg mpty? If so look at prev reg(s) and revalidate tax ids?
+      // TODO -> Do Check here
         request.userAnswers.get(SavedProgressPage).map(
           _ => Ok(view(form))
         ).getOrElse(

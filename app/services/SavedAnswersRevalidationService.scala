@@ -19,10 +19,15 @@ package services
 import controllers.{SetActiveTraderResult, routes}
 import models.core.Match
 import models.domain.VatCustomerInfo
+import models.euDetails.EuDetails
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
+import pages.euDetails.TaxRegisteredInEuPage
+import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import queries.AllEuDetailsQuery
+import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
 import repositories.AuthenticatedUserAnswersRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
@@ -39,8 +44,90 @@ class SavedAnswersRevalidationService @Inject()(
 
   def revalidateSavedUserAnswers()(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
     revalidateUKVrn().flatMap {
-      case None => None.toFuture
+      case None =>
+        checkPreviousRegistrations().flatMap {
+          case None =>
+            checkEuDetails()
+
+          case redirectUrl => redirectUrl.toFuture
+        }
+
       case redirectUrl => redirectUrl.toFuture
+    }
+  }
+
+  private def checkEuDetails()(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    request.userAnswers.get(TaxRegisteredInEuPage) match {
+      case Some(true) =>
+        val euDetails: List[EuDetails] = request.userAnswers.get(AllEuDetailsQuery).getOrElse(List.empty)
+        checkAllEuDetails(euDetails)
+
+      case _ => None.toFuture
+    }
+  }
+
+  private def checkAllEuDetails(
+                                 allEuDetails: List[EuDetails]
+                               )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    allEuDetails match {
+      case ::(euDetails, remaining) =>
+        revalidateEuDetails(euDetails).flatMap {
+          case Some(redirectUrl) =>
+            Some(redirectUrl).toFuture
+
+          case _ =>
+            checkAllEuDetails(remaining)
+        }
+
+      case Nil => None.toFuture
+    }
+  }
+
+  private def revalidateEuDetails(
+                                   euDetails: EuDetails
+                                 )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    euDetails.euVatNumber match {
+      case Some(euVatNumber) =>
+        revalidateEuVrn(euVatNumber, euDetails.euCountry.code)
+
+      case _ =>
+        euDetails.euTaxReference match {
+          case Some(euTaxReference) =>
+            revalidateEuTaxReference(euTaxReference, euDetails.euCountry.code)
+
+          case _ => None.toFuture
+        }
+    }
+  }
+
+  private def revalidateEuTaxReference(
+                                        euTaxReference: String,
+                                        countryCode: String
+                                      )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    coreRegistrationValidationService.searchEuTaxId(euTaxReference, countryCode).flatMap { maybeActiveMatch =>
+      activeMatchRedirectUrl(maybeActiveMatch)
+    }
+  }
+
+  private def revalidateEuVrn(
+                               euVrn: String,
+                               countryCode: String
+                             )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    // TODO -> Check isOtherMS
+    coreRegistrationValidationService.searchEuVrn(euVrn, countryCode, isOtherMS = false).flatMap { maybeActiveMatch =>
+      activeMatchRedirectUrl(maybeActiveMatch)
+    }
+  }
+
+  private def checkPreviousRegistrations()(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    request.userAnswers.get(PreviouslyRegisteredPage) match {
+      case Some(true) =>
+        val allPreviousRegistrations: List[PreviousRegistrationDetailsWithOptionalVatNumber] =
+          request.userAnswers.get(AllPreviousRegistrationsWithOptionalVatNumberQuery).getOrElse(List.empty)
+
+        revalidateAllPreviousRegistrations(allPreviousRegistrations)
+
+      case _ => None.toFuture
     }
   }
 
@@ -55,13 +142,13 @@ class SavedAnswersRevalidationService @Inject()(
         Some(previousScheme),
         Some(SchemeNumbersWithOptionalVatNumber(
           Some(previousSchemeNumber),
-          Some(previousIntermediaryNumber),
+          previousIntermediaryNumber,
         ))
       ), remaining) =>
         coreRegistrationValidationService.searchScheme(
           searchNumber = previousSchemeNumber,
           previousScheme = previousScheme,
-          intermediaryNumber = Some(previousIntermediaryNumber),
+          intermediaryNumber = previousIntermediaryNumber,
           countryCode = countryCode
         ).flatMap { maybeMatch =>
           activeMatchRedirectUrl(maybeMatch).flatMap {
@@ -72,16 +159,15 @@ class SavedAnswersRevalidationService @Inject()(
               revalidatePreviousSchemeDetails(countryCode, remaining)
           }
         }
-        
+
       case ::(_, remaining) =>
-        revalidatePreviousSchemeDetails(countryCode, allPreviousSchemeDetails)
+        revalidatePreviousSchemeDetails(countryCode, remaining)
     }
   }
 
   private def revalidateAllPreviousRegistrations(
                                                   allPreviousRegistrations: List[PreviousRegistrationDetailsWithOptionalVatNumber]
                                                 )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
-
     allPreviousRegistrations match {
       case Nil => None.toFuture
 

@@ -123,6 +123,7 @@ class CoreRegistrationValidationService @Inject()(
             coreRegistrationResponse
           ))
           coreRegistrationResponse.matches.headOption
+          
         case _ => throw CoreRegistrationValidationException("Error while validating core registration")
       }
     }
