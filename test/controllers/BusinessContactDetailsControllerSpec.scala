@@ -22,7 +22,6 @@ import connectors.RegistrationConnector
 import forms.BusinessContactDetailsFormProvider
 import models.emailVerification.EmailVerificationResponse
 import models.emailVerification.PasscodeAttemptsStatus.{LockedPasscodeForSingleEmail, LockedTooManyLockedEmails, NotVerified, Verified}
-import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.UnexpectedResponseStatus
 import models.{AmendMode, BusinessContactDetails, CompositeAccount, NormalMode, RejoinMode, UserAnswers}
@@ -267,7 +266,6 @@ class BusinessContactDetailsControllerSpec extends SpecBase with MockitoSugar wi
 
         val application = applicationBuilder(
           userAnswers = Some(basicUserAnswersWithVatInfo),
-          intermediaryNumber = Some(intNumber),
           compositeAccount = compositeAccount
         )
           .configure("features.enrolments-enabled" -> "false")

@@ -19,7 +19,6 @@ package models
 import base.SpecBase
 import models.etmp.intermediary.EtmpTradingName
 import models.iossRegistration.{IossEtmpBankDetails, IossEtmpDisplayRegistration, IossEtmpTradingName}
-import models.{BankDetails, CompositeAccount}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import testutils.GenerateCompositeAccount.generateCompositeAccount
 

@@ -26,7 +26,6 @@ import models.responses.{ConflictFound, InvalidJson, NotFound, UnexpectedRespons
 import org.scalacheck.Gen
 import play.api.Application
 import play.api.libs.json.Json
-import play.api.mvc.Results.InternalServerError
 import play.api.test.Helpers.*
 import testutils.{RegistrationData, WireMockHelper}
 import uk.gov.hmrc.http.HeaderCarrier

@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
 import models.Quarter.{Q1, Q4}
-import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, IntermediaryRegistrationWrapper}
+import models.etmp.intermediary.IntermediaryRegistrationWrapper
 import models.external.ExternalEntryUrl
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest

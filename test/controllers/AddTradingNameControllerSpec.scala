@@ -19,7 +19,6 @@ package controllers
 import base.SpecBase
 import controllers.amend.routes as amendRoutes
 import forms.AddTradingNameFormProvider
-import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.{AmendMode, CompositeAccount, Index, NormalMode, RejoinMode, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -188,7 +187,6 @@ class AddTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(updatedAnswers),
-        intermediaryNumber = Some(intNumber),
         compositeAccount = compositeAccount
       )
         .build()

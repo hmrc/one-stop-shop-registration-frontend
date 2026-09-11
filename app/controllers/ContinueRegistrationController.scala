@@ -49,8 +49,9 @@ class ContinueRegistrationController @Inject()(
     implicit request =>
       
       savedAnswersRevalidationService.revalidateSavedUserAnswers().flatMap {
-        case Some(result) => result.toFuture
-        
+        case Some(result) =>
+          result.toFuture
+
         case _ =>
           request.userAnswers.get(SavedProgressPage).map(
             _ => Ok(view(form)).toFuture

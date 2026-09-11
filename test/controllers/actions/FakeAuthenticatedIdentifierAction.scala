@@ -20,14 +20,11 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import models.CompositeAccount
 import models.domain.Registration
-import models.etmp.intermediary.IntermediaryRegistrationWrapper
-import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedIdentifierRequest
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.*
+import services.ioss.AccountService
 import services.{CompositeAccountService, UrlBuilderService}
-import services.intermediary.IntermediaryRegistrationService
-import services.ioss.{AccountService, IossRegistrationService}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolments}
 import uk.gov.hmrc.domain.Vrn
@@ -39,9 +36,6 @@ class FakeAuthenticatedIdentifierAction(
                                          registration: Option[Registration],
                                          iossNumber: Option[String],
                                          numberOfIossRegistrations: Int,
-                                         iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration],
-                                         intermediaryRegistartionWrapper: Option[IntermediaryRegistrationWrapper],
-                                         intermediaryNumber: Option[String],
                                          compositeAccount: Option[CompositeAccount]
                                        ) extends AuthenticatedIdentifierAction(
   mock[AuthConnector],

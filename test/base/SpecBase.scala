@@ -21,7 +21,6 @@ import generators.Generators
 import models.domain.{PreviousRegistration, Registration, VatCustomerInfo}
 import models.emailVerification.{EmailVerificationRequest, VerifyEmail}
 import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, IntermediaryRegistrationWrapper, IntermediaryVatCustomerInfo}
-import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest
 import models.{BankDetails, BusinessContactDetails, CompositeAccount, Country, DesAddress, Iban, Index, Mode, Period, Quarter, UserAnswers}
 import org.scalacheck.Arbitrary
@@ -147,9 +146,6 @@ trait SpecBase
                                     registration: Option[Registration] = None,
                                     iossNumber: Option[String] = None,
                                     numberOfIossRegistrations: Int = 0,
-                                    iossEtmpDisplayRegistration: Option[IossEtmpDisplayRegistration] = None,
-                                    intermediaryNumber: Option[String] = None,
-                                    intermediaryRegistration: Option[IntermediaryRegistrationWrapper] = None,
                                     compositeAccount: Option[CompositeAccount] = None
                                   ): GuiceApplicationBuilder = {
 
@@ -157,7 +153,7 @@ trait SpecBase
 
     new GuiceApplicationBuilder()
       .overrides(
-        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, iossEtmpDisplayRegistration, intermediaryRegistration, intermediaryNumber, compositeAccount)),
+        bind[AuthenticatedIdentifierAction].toInstance(new FakeAuthenticatedIdentifierAction(registration, iossNumber, numberOfIossRegistrations, compositeAccount)),
         bind[AuthenticatedDataRetrievalAction].toInstance(new FakeAuthenticatedDataRetrievalAction(userAnswers, vrn)),
         bind[SavedAnswersRetrievalAction].toInstance(new FakeSavedAnswersRetrievalAction(userAnswers, vrn)),
         bind[UnauthenticatedDataRetrievalAction].toInstance(new FakeUnauthenticatedDataRetrievalAction(userAnswers)),

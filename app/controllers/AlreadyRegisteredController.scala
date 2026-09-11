@@ -36,8 +36,7 @@ class AlreadyRegisteredController @Inject()(
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: MessagesControllerComponents = cc
-
-  // TODO -> Get Actuve Trader result???
+  
   def onPageLoad: Action[AnyContent] = (cc.actionBuilder andThen cc.identify).async {
     implicit request =>
 

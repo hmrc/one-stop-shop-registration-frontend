@@ -18,7 +18,6 @@ package controllers
 
 import base.SpecBase
 import forms.BankDetailsFormProvider
-import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.{AmendMode, BankDetails, Bic, CompositeAccount, Iban, NormalMode, RejoinMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -371,8 +370,6 @@ class BankDetailsControllerSpec extends SpecBase with MockitoSugar {
           val application = applicationBuilder(
             userAnswers = Some(basicUserAnswersWithVatInfo),
             iossNumber = None,
-            iossEtmpDisplayRegistration = None,
-            intermediaryNumber = Some(intNumber),
             compositeAccount = compositeAccount
           ).build()
 

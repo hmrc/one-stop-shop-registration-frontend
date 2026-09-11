@@ -19,7 +19,6 @@ package services.intermediary
 import base.SpecBase
 import connectors.RegistrationConnector
 import models.etmp.intermediary.IntermediaryRegistrationWrapper
-import models.iossRegistration.IossEtmpDisplayRegistration
 import models.responses.RegistrationNotFound
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

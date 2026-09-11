@@ -16,7 +16,9 @@
 
 package services.revalidate
 
-import controllers.routes
+import config.Constants.addQuarantineYears
+import controllers.revalidation.routes
+import formats.Format.dateFormatter
 import models.core.Match
 import models.domain.VatCustomerInfo
 import models.euDetails.EuDetails
@@ -30,7 +32,6 @@ import queries.AllEuDetailsQuery
 import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.CoreRegistrationValidationService
-import services.revalidate.SetActiveTraderResult
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.FutureSyntax.FutureOps
 
@@ -90,7 +91,7 @@ class SavedAnswersRevalidationService @Inject()(
                                  )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
     euDetails.euVatNumber match {
       case Some(euVatNumber) =>
-        revalidateEuVrn(euVatNumber, euDetails.euCountry.code)
+        revalidateEuVrn(euVatNumber, euDetails.euCountry.code, euDetails.sellsGoodsToEUConsumers)
 
       case _ =>
         euDetails.euTaxReference match {
@@ -113,10 +114,10 @@ class SavedAnswersRevalidationService @Inject()(
 
   private def revalidateEuVrn(
                                euVrn: String,
-                               countryCode: String
+                               countryCode: String,
+                               isOtherMS: Boolean
                              )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
-    // TODO -> Check isOtherMS
-    coreRegistrationValidationService.searchEuVrn(euVrn, countryCode, isOtherMS = false).flatMap { maybeActiveMatch =>
+    coreRegistrationValidationService.searchEuVrn(euVrn, countryCode, isOtherMS).flatMap { maybeActiveMatch =>
       activeMatchRedirectUrl(maybeActiveMatch)
     }
   }
@@ -199,13 +200,20 @@ class SavedAnswersRevalidationService @Inject()(
         setActiveTraderResultAndRedirect(
           activeMatch = activeMatch,
           sessionRepository = authenticatedUserAnswersRepository,
-          redirect = routes.AlreadyRegisteredController.onPageLoad()
+          redirect = routes.RevalidateAlreadyRegisteredController.onPageLoad()
         ).flatMap { result =>
           Some(result).toFuture
         }
 
       case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
-        Some(Redirect(routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(activeMatch.memberState, activeMatch.getEffectiveDate).url)).toFuture
+        val formattedExclusionExpiryDate: String = LocalDate
+          .parse(activeMatch.getEffectiveDate)
+          .plusYears(addQuarantineYears)
+          .format(dateFormatter)
+        
+        Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
+          exclusionExpiryDate = formattedExclusionExpiryDate
+        ).url)).toFuture
 
       case _ => None.toFuture
     }
@@ -214,8 +222,7 @@ class SavedAnswersRevalidationService @Inject()(
 
   private def revalidateUKVrn()(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
     if (checkVrnExpired(request.userAnswers.vatInfo)) {
-      // TODO -> Redirect to new page? Expired VRN
-      Some(Redirect(routes.JourneyRecoveryController.onPageLoad().url)).toFuture
+      Some(Redirect(routes.RevalidateVrnExpiredController.onPageLoad().url)).toFuture
     } else {
       coreRegistrationValidationService.searchUkVrn(request.vrn).flatMap { maybeMatch =>
         activeMatchRedirectUrl(maybeMatch)

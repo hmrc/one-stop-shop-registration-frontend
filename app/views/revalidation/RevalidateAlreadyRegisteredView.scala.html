@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.revalidate
+@this(
+        layout: templates.Layout
+)
 
-import play.api.libs.json.{Json, OFormat}
+@()(implicit request: Request[_], messages: Messages)
 
-import java.time.LocalDate
+@layout(pageTitle = titleNoForm(messages("revalidateAlreadyRegistered.title"))) {
 
-case class ActiveTraderResult(
-                               isReversal: Boolean,
-                               exclusionEffectiveDate: Option[LocalDate]
-                             )
+    <h1 class="govuk-heading-l">@messages("revalidateAlreadyRegistered.heading")</h1>
 
-object ActiveTraderResult {
-
-  implicit lazy val format: OFormat[ActiveTraderResult] = Json.format[ActiveTraderResult]
+    <p class="govuk-body">@messages("revalidateAlreadyRegistered.p1")</p>
 }

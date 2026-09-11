@@ -21,7 +21,6 @@ import config.FrontendAppConfig
 import connectors.RegistrationConnector
 import formats.Format.dateFormatter
 import models.Quarter.{Q1, Q4}
-import models.etmp.intermediary.EtmpIntermediaryDisplayRegistration
 import models.external.ExternalEntryUrl
 import models.iossRegistration.IossEtmpDisplayRegistration
 import models.requests.AuthenticatedDataRequest

@@ -647,3 +647,9 @@ GET         /hybrid-reversal                                                    
 POST        /hybrid-reversal                                                           controllers.rejoin.HybridReversalController.onSubmit()
 
 GET         /cannot-register-quarantined-ioss-trader                                   controllers.ioss.CannotRegisterQuarantinedIossTraderController.onPageLoad()
+
+GET         /revalidate-vrn-expired                                                    controllers.revalidation.RevalidateVrnExpiredController.onPageLoad()
+
+GET         /revalidate-quarantined-trader/:exclusionExpiryDate                        controllers.revalidation.RevalidateQuarantinedTraderController.onPageLoad(exclusionExpiryDate: String)
+
+GET         /revalidate-already-registered                                             controllers.revalidation.RevalidateAlreadyRegisteredController.onPageLoad()
