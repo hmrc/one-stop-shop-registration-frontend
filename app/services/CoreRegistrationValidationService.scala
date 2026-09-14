@@ -102,7 +102,7 @@ class CoreRegistrationValidationService @Inject()(
 
       val sourceType = SourceType.TraderId
 
-      val convertedSearchNumber = if (Seq(PreviousScheme.OSSU, PreviousScheme.OSSNU).contains(previousScheme)) {
+      val convertedSearchNumber = if (PreviousScheme.OSSU == previousScheme) {
         convertTaxIdentifierForTransfer(searchNumber, countryCode)
       } else {
         searchNumber
