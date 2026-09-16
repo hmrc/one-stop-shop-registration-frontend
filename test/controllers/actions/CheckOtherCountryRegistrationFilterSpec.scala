@@ -18,6 +18,8 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
+import controllers.revalidation.routes as revalidateRoutes
+import controllers.routes
 import models.core.{Match, TraderId}
 import models.requests.AuthenticatedDataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -49,8 +51,8 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
     None
   )
 
-  class Harness(service: CoreRegistrationValidationService, appConfig: FrontendAppConfig) extends
-    CheckOtherCountryRegistrationFilterImpl(None, service, appConfig, stubClockAtArbitraryDate) {
+  class Harness(service: CoreRegistrationValidationService, appConfig: FrontendAppConfig, revalidateSavedAnswers: Boolean = false) extends
+    CheckOtherCountryRegistrationFilterImpl(None, service, appConfig, stubClockAtArbitraryDate, revalidateSavedAnswers) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -84,7 +86,33 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val result = controller.callFilter(request).futureValue
 
-            result mustBe Some(Redirect(controllers.routes.AlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url))
+            result mustBe Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(genericMatch.memberState).url))
+          }
+        }
+
+        "must redirect to RevalidateAlreadyRegistered page when the user is registered in another OSS service and revalidateSavedAnswers is true" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn
+              Future.successful(Option(genericMatch.copy(exclusionStatusCode = None)))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig, revalidateSavedAnswers = true)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe Some(Redirect(revalidateRoutes.RevalidateAlreadyRegisteredController.onPageLoad().url))
           }
         }
       }
@@ -114,7 +142,34 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val result = controller.callFilter(request).futureValue
 
-            result mustBe Some(Redirect(controllers.routes.AlreadyRegisteredOtherCountryController.onPageLoad(expectedMatch.memberState).url))
+            result mustBe Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(expectedMatch.memberState).url))
+          }
+        }
+
+        "must redirect to RevalidateAlreadyRegistered page when the user is registered in another OSS service and revalidateSavedAnswers is true" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = None)
+
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig, revalidateSavedAnswers = true)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe Some(Redirect(revalidateRoutes.RevalidateAlreadyRegisteredController.onPageLoad().url))
           }
         }
       }
@@ -143,8 +198,36 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val result = controller.callFilter(request).futureValue
 
-            result mustBe Some(Redirect(controllers.routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
+            result mustBe Some(Redirect(routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
               expectedMatch.memberState, expectedMatch.exclusionEffectiveDate.get.toString).url))
+          }
+        }
+
+        "must redirect to RevalidateQuarantinedTrader page when the user is excluded and quarantined from OSS and revalidateSavedAnswers is true" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(4), exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig, revalidateSavedAnswers = true)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe Some(Redirect(revalidateRoutes.RevalidateQuarantinedTraderController.onPageLoad(
+              expectedMatch.exclusionEffectiveDate.get.toString).url
+            ))
           }
         }
 
@@ -201,8 +284,36 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val result = controller.callFilter(request).futureValue
 
-            result mustBe Some(Redirect(controllers.routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
+            result mustBe Some(Redirect(routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
               expectedMatch.memberState, expectedMatch.exclusionEffectiveDate.get.toString).url))
+          }
+        }
+
+        "must redirect to RevalidateQuarantinedTrader page when the user is excluded and quarantined from OSS and revalidateSavedAnswers is true" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val expectedMatch = genericMatch.copy(exclusionStatusCode = Some(4), exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig, revalidateSavedAnswers = true)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe Some(Redirect(revalidateRoutes.RevalidateQuarantinedTraderController.onPageLoad(
+              expectedMatch.exclusionEffectiveDate.get.toString).url
+            ))
           }
         }
 
@@ -259,8 +370,36 @@ class CheckOtherCountryRegistrationFilterSpec extends SpecBase with MockitoSugar
 
             val result = controller.callFilter(request).futureValue
 
-            result mustBe Some(Redirect(controllers.routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
+            result mustBe Some(Redirect(routes.OtherCountryExcludedAndQuarantinedController.onPageLoad(
               expectedMatch.memberState, expectedMatch.exclusionEffectiveDate.get.toString).url))
+          }
+        }
+
+        "must redirect to RevalidateQuarantinedTrader page when the user is excluded and quarantined from OSS and revalidateSavedAnswers is true" in {
+
+          val vrn = Vrn("333333331")
+          val app = applicationBuilder(None)
+            .configure(
+              "features.other-country-reg-validation-enabled" -> true
+            )
+            .overrides(
+              bind[CoreRegistrationValidationService].toInstance(mockCoreRegistrationValidationService)
+            ).build()
+
+          running(app) {
+
+            val expectedMatch = genericMatch.copy(exclusionEffectiveDate = Some(LocalDate.of(2024, 10, 10)), exclusionStatusCode = Some(4))
+            when(mockCoreRegistrationValidationService.searchUkVrn(eqTo(vrn))(any(), any())) thenReturn Future.successful(Option(expectedMatch))
+
+            val request = AuthenticatedDataRequest(FakeRequest(), testCredentials, vrn, None, emptyUserAnswers, None, 0, None)
+            val frontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+            val controller = new Harness(mockCoreRegistrationValidationService, frontendAppConfig, revalidateSavedAnswers = true)
+
+            val result = controller.callFilter(request).futureValue
+
+            result mustBe Some(Redirect(revalidateRoutes.RevalidateQuarantinedTraderController.onPageLoad(
+              expectedMatch.exclusionEffectiveDate.get.toString).url
+            ))
           }
         }
 

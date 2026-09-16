@@ -18,7 +18,6 @@ package services.revalidate
 
 import base.SpecBase
 import controllers.revalidation.routes
-import formats.Format.dateFormatter
 import models.PreviousScheme.{IOSSWI, OSSNU, OSSU}
 import models.core.{Match, TraderId}
 import models.domain.{PreviousSchemeNumbers, VatCustomerInfo}
@@ -111,10 +110,6 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
     .set(EuVatNumberPage(index(0)), baseEuDetails.euVatNumber.head).success.value
     .set(EuSendGoodsTradingNamePage(index(0)), baseEuDetails.euSendGoodsTradingName.head).success.value
     .set(EuSendGoodsAddressPage(index(0)), baseEuDetails.euSendGoodsAddress.head).success.value
-
-  private def createFormattedExpiryDate(date: String): String = {
-    LocalDate.parse(date).plusYears(2).format(dateFormatter)
-  }
   
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -314,7 +309,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service.revalidateSavedUserAnswers()
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           ).url))
           verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
@@ -397,7 +392,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service.revalidateSavedUserAnswers()
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           ).url))
           verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
@@ -493,7 +488,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(hc, request)
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
         verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
@@ -586,7 +581,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(euDetailsList, hc, request)
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
         verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())
@@ -666,7 +661,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service invokePrivate privateMethodCall(baseEuDetails, hc, request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           )))
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
           verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
@@ -754,7 +749,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service invokePrivate privateMethodCall(euDetails, hc, request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           )))
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
           verify(mockCoreRegistrationValidationService, times(1)).searchEuTaxId(eqTo(euDetails.euTaxReference.head), eqTo(euDetails.euCountry.code))(any(), any())
@@ -837,7 +832,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(euTaxIdentifier, countryCode, hc, request)
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
         verify(mockCoreRegistrationValidationService, times(1)).searchEuTaxId(eqTo(euTaxIdentifier), eqTo(countryCode))(any(), any())
@@ -919,7 +914,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(euVrn, countryCode, true, hc, request)
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
         verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euVrn), eqTo(countryCode), eqTo(true))(any(), any())
@@ -1045,7 +1040,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(hc, request)
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
         verify(mockCoreRegistrationValidationService, times(1)).searchScheme(
@@ -1209,7 +1204,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service invokePrivate privateMethodCall(countryCode, allPreviousSchemeDetails, hc, request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           ).url))
           verify(mockCoreRegistrationValidationService, times(2)).searchScheme(any(), any(), any(), eqTo(countryCode))(any(), any())
         }
@@ -1285,7 +1280,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service invokePrivate privateMethodCall(countryCode, allPreviousSchemeDetails, hc, request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           ).url))
           verify(mockCoreRegistrationValidationService, times(1)).searchScheme(
             eqTo(previousSchemeNumber),
@@ -1425,7 +1420,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
             val result = service invokePrivate privateMethodCall(allPreviousRegistrations, hc, request)
 
             result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-              exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+              exclusionExpiryDate = quarantinedMatch.getEffectiveDate
             ).url))
             verify(mockCoreRegistrationValidationService, times(6)).searchScheme(any(), any(), any(), any())(any(), any())
           }
@@ -1491,7 +1486,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
             val result = service invokePrivate privateMethodCall(Seq(previousRegistration1, previousRegistration2), hc, request)
 
             result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-              exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+              exclusionExpiryDate = quarantinedMatch.getEffectiveDate
             ).url))
             verify(mockCoreRegistrationValidationService, times(4)).searchScheme(any(), any(), any(), any())(any(), any())
           }
@@ -1558,7 +1553,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service invokePrivate privateMethodCall(Some(quarantinedMatch), request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-            exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           )))
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
         }
@@ -1665,7 +1660,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(hc, request)
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = createFormattedExpiryDate(quarantinedMatch.getEffectiveDate)
+          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)

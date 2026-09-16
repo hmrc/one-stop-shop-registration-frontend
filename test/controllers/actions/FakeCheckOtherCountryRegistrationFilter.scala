@@ -30,7 +30,8 @@ class FakeCheckOtherCountryRegistrationFilterImpl() extends CheckOtherCountryReg
   mock[Option[Mode]],
   mock[CoreRegistrationValidationService],
   mock[FrontendAppConfig],
-  mock[Clock]
+  mock[Clock],
+  revalidateSavedAnswers = false
 )(ExecutionContext.Implicits.global) {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
@@ -45,5 +46,5 @@ extends CheckOtherCountryRegistrationFilter(
   mock[FrontendAppConfig],
   mock[Clock]
 )(ExecutionContext.Implicits.global) {
-  override def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = new FakeCheckOtherCountryRegistrationFilterImpl
+  override def apply(mode: Option[Mode], revalidateSavedAnswers: Boolean): CheckOtherCountryRegistrationFilterImpl = new FakeCheckOtherCountryRegistrationFilterImpl
 }

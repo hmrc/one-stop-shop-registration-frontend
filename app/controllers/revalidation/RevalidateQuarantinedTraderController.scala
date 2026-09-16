@@ -16,12 +16,15 @@
 
 package controllers.revalidation
 
+import config.Constants.addQuarantineYears
 import controllers.actions.*
+import formats.Format.dateFormatter
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.revalidation.RevalidateQuarantinedTraderView
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class RevalidateQuarantinedTraderController @Inject()(
@@ -34,6 +37,12 @@ class RevalidateQuarantinedTraderController @Inject()(
 
   def onPageLoad(exclusionExpiryDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      Ok(view(exclusionExpiryDate))
+      println(s"WAZZA $exclusionExpiryDate")
+      val formattedExclusionExpiryDate: String = LocalDate
+        .parse(exclusionExpiryDate)
+        .plusYears(addQuarantineYears)
+        .format(dateFormatter)
+
+      Ok(view(formattedExclusionExpiryDate))
   }
 }

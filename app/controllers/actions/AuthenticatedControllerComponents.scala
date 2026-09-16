@@ -82,7 +82,7 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def authAndGetData(mode: Option[Mode] = None, revalidateSavedAnswers: Boolean = false): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     authAndGetDataBase(mode, revalidateSavedAnswers) andThen
-      checkOtherCountryRegistration(mode)
+      checkOtherCountryRegistration(mode, revalidateSavedAnswers)
   }
 
   def authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode: Option[Mode] = None, revalidateSavedAnswers: Boolean): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {

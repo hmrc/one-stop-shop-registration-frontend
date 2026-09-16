@@ -16,9 +16,7 @@
 
 package services.revalidate
 
-import config.Constants.addQuarantineYears
 import controllers.revalidation.routes
-import formats.Format.dateFormatter
 import models.core.Match
 import models.domain.VatCustomerInfo
 import models.euDetails.EuDetails
@@ -206,13 +204,8 @@ class SavedAnswersRevalidationService @Inject()(
         }
 
       case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
-        val formattedExclusionExpiryDate: String = LocalDate
-          .parse(activeMatch.getEffectiveDate)
-          .plusYears(addQuarantineYears)
-          .format(dateFormatter)
-        
         Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = formattedExclusionExpiryDate
+          exclusionExpiryDate = activeMatch.getEffectiveDate
         ).url)).toFuture
 
       case _ => None.toFuture

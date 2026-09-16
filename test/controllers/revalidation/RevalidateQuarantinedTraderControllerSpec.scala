@@ -22,9 +22,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.revalidation.RevalidateQuarantinedTraderView
 
+import java.time.LocalDate
+
 class RevalidateQuarantinedTraderControllerSpec extends SpecBase {
   
-  private val exclusionExpiryDate: String = arbitraryDate.format(dateFormatter)
+  private val exclusionExpiryDate: String = arbitraryDate.toString
+  private val formattedExclusionExpiryDate: String = LocalDate.parse(exclusionExpiryDate).plusYears(2).format(dateFormatter)
 
   "RevalidateQuarantinedTrader Controller" - {
 
@@ -40,7 +43,7 @@ class RevalidateQuarantinedTraderControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[RevalidateQuarantinedTraderView]
 
         status(result) `mustBe` OK
-        contentAsString(result) `mustBe` view(exclusionExpiryDate)(request, messages(application)).toString
+        contentAsString(result) `mustBe` view(formattedExclusionExpiryDate)(request, messages(application)).toString
       }
     }
   }
