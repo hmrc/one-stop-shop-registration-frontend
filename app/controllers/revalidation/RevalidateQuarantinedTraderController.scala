@@ -37,7 +37,7 @@ class RevalidateQuarantinedTraderController @Inject()(
 
   def onPageLoad(exclusionExpiryDate: String): Action[AnyContent] = (cc.actionBuilder andThen cc.identify) {
     implicit request =>
-      println(s"WAZZA $exclusionExpiryDate")
+
       val formattedExclusionExpiryDate: String = LocalDate
         .parse(exclusionExpiryDate)
         .plusYears(addQuarantineYears)
