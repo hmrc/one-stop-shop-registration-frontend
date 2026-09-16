@@ -977,7 +977,8 @@ userResearch.link.text = Sign up to take part in research about the One Stop Sho
 revalidateVrnExpired.title = You can no longer register for this service
 revalidateVrnExpired.heading = You can no longer register for this service
 revalidateVrnExpired.p1 = The VAT number you used to register has expired.
-revalidateVrnExpired.link = <a class="govuk-link" href="/">Apply for a new VAT number to register for this service</a>
+revalidateVrnExpired.link  = <a href="https://www.gov.uk/register-for-vat/how-register-for-vat" class="govuk-link" rel="noreferrer noopener" target="_blank">Apply for a new VAT number to register for this service</a>
+
 
 revalidateQuarantinedTrader.title = You can no longer register for this service
 revalidateQuarantinedTrader.heading = You can no longer register for this service
