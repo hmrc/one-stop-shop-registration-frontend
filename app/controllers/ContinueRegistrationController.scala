@@ -45,7 +45,7 @@ class ContinueRegistrationController @Inject()(
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetData().async {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData(revalidateSavedAnswers = true).async {
     implicit request =>
       
       savedAnswersRevalidationService.revalidateSavedUserAnswers().flatMap {
@@ -61,7 +61,7 @@ class ContinueRegistrationController @Inject()(
       }
   }
 
-  def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(): Action[AnyContent] = cc.authAndGetData(revalidateSavedAnswers = true).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>

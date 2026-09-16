@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class CheckVatExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  class Harness() extends CheckVatExpiredFilterImpl(Some(RejoinMode), stubClockAtArbitraryDate) {
+  class Harness(revalidateSavedAnswers: Boolean = false) extends CheckVatExpiredFilterImpl(Some(RejoinMode), stubClockAtArbitraryDate, revalidateSavedAnswers) {
     def callFilter(request: AuthenticatedDataRequest[_]): Future[Option[Result]] = filter(request)
   }
 
@@ -92,7 +92,32 @@ class CheckVatExpiredFilterSpec extends SpecBase with MockitoSugar with BeforeAn
       }
     }
 
+    "must return None when revalidateSavedAnswers is true" in {
 
+      val app = applicationBuilder(None)
+        .build()
+      
+      val vatInfo = vatCustomerInfo.copy(deregistrationDecisionDate = Some(LocalDate.now(stubClockAtArbitraryDate).plusYears(1)))
+
+      running(app) {
+        val request = AuthenticatedDataRequest(
+          FakeRequest(),
+          testCredentials,
+          vrn,
+          None,
+          basicUserAnswersWithVatInfo.copy(vatInfo = Some(vatInfo)),
+          None,
+          0,
+          None
+        )
+        val controller = new Harness(revalidateSavedAnswers = true)
+
+        val result = controller.callFilter(request).futureValue
+
+        result must not be defined
+      }
+    }
+    
     "must redirect to invalid vrn date page when dereg date is in the past" in {
 
       val app = applicationBuilder(None)

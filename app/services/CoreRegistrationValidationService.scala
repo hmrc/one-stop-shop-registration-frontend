@@ -34,7 +34,7 @@ class CoreRegistrationValidationService @Inject()(
                                                  )(implicit ec: ExecutionContext) extends Logging {
 
   def searchUkVrn(vrn: Vrn)(implicit hc: HeaderCarrier, request: AuthenticatedVrnRequest[_]): Future[Option[Match]] = {
-
+    
     val coreRegistrationRequest = CoreRegistrationRequest(SourceType.VATNumber.toString, None, vrn.vrn, None, "GB")
 
     connector.validateCoreRegistration(coreRegistrationRequest).map {

@@ -29,14 +29,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckVatExpiredFilterImpl(
                                  mode: Option[Mode],
-                                 clock: Clock
+                                 clock: Clock,
+                                 revalidateSavedAnswers: Boolean
                                )
                                (implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
   override protected def filter[A](request: AuthenticatedDataRequest[A]): Future[Option[Result]] = {
 
-    if (!mode.contains(AmendMode)) {
+    if (!revalidateSavedAnswers && !mode.contains(AmendMode)) {
 
       request.userAnswers.vatInfo.flatMap(_.deregistrationDecisionDate) match {
         case Some(deregistrationDecisionDate) if !deregistrationDecisionDate.isAfter(LocalDate.now(clock)) =>
@@ -53,7 +54,7 @@ class CheckVatExpiredFilterImpl(
 class CheckVatExpiredFilter @Inject()(clock: Clock)
                                      (implicit val executionContext: ExecutionContext) {
 
-  def apply(mode: Option[Mode]): CheckVatExpiredFilterImpl = {
-    new CheckVatExpiredFilterImpl(mode, clock)
+  def apply(mode: Option[Mode], revalidateSavedAnswers: Boolean): CheckVatExpiredFilterImpl = {
+    new CheckVatExpiredFilterImpl(mode, clock, revalidateSavedAnswers)
   }
 }
