@@ -17,7 +17,6 @@
 package models.etmp.intermediary
 
 import base.SpecBase
-import models.domain.VatCustomerInfo
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 

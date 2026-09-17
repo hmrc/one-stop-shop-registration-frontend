@@ -17,55 +17,64 @@
 package controllers
 
 import connectors.SaveForLaterConnector
-import controllers.actions._
+import controllers.actions.*
 import forms.ContinueRegistrationFormProvider
 import models.ContinueRegistration
 import models.ContinueRegistration.Delete
 import pages.SavedProgressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import services.revalidate.SavedAnswersRevalidationService
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FutureSyntax.FutureOps
 import views.html.ContinueRegistrationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ContinueRegistrationController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         saveForLaterConnector: SaveForLaterConnector,
-                                         formProvider: ContinueRegistrationFormProvider,
-                                         view: ContinueRegistrationView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                override val messagesApi: MessagesApi,
+                                                cc: AuthenticatedControllerComponents,
+                                                saveForLaterConnector: SaveForLaterConnector,
+                                                savedAnswersRevalidationService: SavedAnswersRevalidationService,
+                                                formProvider: ContinueRegistrationFormProvider,
+                                                view: ContinueRegistrationView
+                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
   protected val controllerComponents: MessagesControllerComponents = cc
 
-  def onPageLoad(): Action[AnyContent] = cc.authAndGetData() {
+  def onPageLoad(): Action[AnyContent] = cc.authAndGetData(revalidateSavedAnswers = true).async {
     implicit request =>
-        request.userAnswers.get(SavedProgressPage).map(
-          _ => Ok(view(form))
-        ).getOrElse(
-          Redirect(controllers.routes.IndexController.onPageLoad())
-        )
+      
+      savedAnswersRevalidationService.revalidateSavedUserAnswers().flatMap {
+        case Some(result) =>
+          result.toFuture
 
+        case _ =>
+          request.userAnswers.get(SavedProgressPage).map(
+            _ => Ok(view(form)).toFuture
+          ).getOrElse(
+            Redirect(controllers.routes.IndexController.onPageLoad()).toFuture
+          )
+      }
   }
 
-  def onSubmit(): Action[AnyContent] = cc.authAndGetData().async {
+  def onSubmit(): Action[AnyContent] = cc.authAndGetData(revalidateSavedAnswers = true).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+          BadRequest(view(formWithErrors)).toFuture,
         value =>
           (value, request.userAnswers.get(SavedProgressPage)) match {
-            case (ContinueRegistration.Continue, Some(url)) => Future.successful(Redirect(Call(GET, url)))
+            case (ContinueRegistration.Continue, Some(url)) => Redirect(Call(GET, url)).toFuture
             case (Delete, _) =>
               for {
                 _ <- cc.sessionRepository.clear(request.userId)
                 _ <- saveForLaterConnector.delete()
               } yield Redirect(controllers.auth.routes.AuthController.onSignIn())
-            case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad()).toFuture
           }
       )
   }

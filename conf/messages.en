@@ -973,3 +973,17 @@ cannotRegisterQuarantinedIossTrader.BTA.link = <a class="govuk-link" href="/busi
 
 userResearch.heading = Help us improve the service
 userResearch.link.text = Sign up to take part in research about the One Stop Shop service.
+
+revalidateVrnExpired.title = You can no longer register for this service
+revalidateVrnExpired.heading = You can no longer register for this service
+revalidateVrnExpired.p1 = The VAT number you used to register has expired.
+revalidateVrnExpired.link  = <a href="https://www.gov.uk/register-for-vat/how-register-for-vat" class="govuk-link" rel="noreferrer noopener" target="_blank">Apply for a new VAT number to register for this service</a>
+
+
+revalidateQuarantinedTrader.title = You can no longer register for this service
+revalidateQuarantinedTrader.heading = You can no longer register for this service
+revalidateQuarantinedTrader.p1 = This account is blocked from using or registering for One Stop Shop services until {0}.
+
+revalidateAlreadyRegistered.title = You can no longer register for this service
+revalidateAlreadyRegistered.heading = You can no longer register for this service
+revalidateAlreadyRegistered.p1 = This VAT number is already registered on a One Stop Shop service.

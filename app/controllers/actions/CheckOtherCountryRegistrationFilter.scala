@@ -17,6 +17,7 @@
 package controllers.actions
 
 import config.FrontendAppConfig
+import controllers.revalidation.routes as revalidateRoutes
 import controllers.routes
 import logging.Logging
 import models.core.Match
@@ -36,7 +37,8 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
                                                          mode: Option[Mode],
                                                          service: CoreRegistrationValidationService,
                                                          appConfig: FrontendAppConfig,
-                                                         clock: Clock
+                                                         clock: Clock,
+                                                         revalidateSavedAnswers: Boolean
                                                        )(implicit val executionContext: ExecutionContext)
   extends ActionFilter[AuthenticatedDataRequest] with Logging {
 
@@ -47,9 +49,18 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
     if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode) || !mode.contains(RejoinMode)) {
       service.searchUkVrn(request.vrn).map {
+// TODO -> Test
+
+        case Some(activeMatch) if activeMatch.isActiveTrader && revalidateSavedAnswers =>
+          Some(Redirect(revalidateRoutes.RevalidateAlreadyRegisteredController.onPageLoad()))
 
         case Some(activeMatch) if activeMatch.isActiveTrader =>
           Some(Redirect(routes.AlreadyRegisteredOtherCountryController.onPageLoad(activeMatch.memberState)))
+
+        case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) && revalidateSavedAnswers =>
+          Some(Redirect(
+            revalidateRoutes.RevalidateQuarantinedTraderController.onPageLoad(activeMatch.getEffectiveDate)
+          ))
 
         case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
           Some(Redirect(
@@ -69,7 +80,7 @@ class CheckOtherCountryRegistrationFilter @Inject()(
                                                      appConfig: FrontendAppConfig,
                                                      clock: Clock
                                                    )(implicit val executionContext: ExecutionContext) {
-  def apply(mode: Option[Mode]): CheckOtherCountryRegistrationFilterImpl = {
-    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig, clock)
+  def apply(mode: Option[Mode], revalidateSavedAnswers: Boolean): CheckOtherCountryRegistrationFilterImpl = {
+    new CheckOtherCountryRegistrationFilterImpl(mode, service, appConfig, clock, revalidateSavedAnswers)
   }
 }

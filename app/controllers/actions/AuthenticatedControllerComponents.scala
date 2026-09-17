@@ -68,25 +68,25 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
 
   def checkBouncedEmailFilter: CheckBouncedEmailFilterProvider
 
-  def authAndGetDataBase(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+  def authAndGetDataBase(mode: Option[Mode] = None, revalidateSavedAnswers: Boolean): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
     actionBuilder andThen
       identify andThen
       checkVrnAllowList andThen
       checkRegistration(mode) andThen
       getData andThen
       requireData(mode) andThen
-      checkVatExpiredFilter(mode) andThen
+      checkVatExpiredFilter(mode, revalidateSavedAnswers) andThen
       checkNiProtocolExpired(mode) andThen
       checkNiProtocol(mode)
   }
 
-  def authAndGetData(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
-    authAndGetDataBase(mode) andThen
-      checkOtherCountryRegistration(mode)
+  def authAndGetData(mode: Option[Mode] = None, revalidateSavedAnswers: Boolean = false): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+    authAndGetDataBase(mode, revalidateSavedAnswers) andThen
+      checkOtherCountryRegistration(mode, revalidateSavedAnswers)
   }
 
-  def authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode: Option[Mode] = None): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
-    authAndGetDataBase(mode) andThen
+  def authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode: Option[Mode] = None, revalidateSavedAnswers: Boolean): ActionBuilder[AuthenticatedDataRequest, AnyContent] = {
+    authAndGetDataBase(mode, revalidateSavedAnswers) andThen
       checkRejoinOtherCountryRegistration(mode) andThen
       checkEmailVerificationStatus(mode)
   }
@@ -105,8 +105,8 @@ trait AuthenticatedControllerComponents extends MessagesControllerComponents {
       checkEmailVerificationStatus(mode)
   }
 
-  def authAndGetDataWithOss(mode: Option[Mode] = None): ActionBuilder[AuthenticatedMandatoryDataRequest, AnyContent] = {
-    authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode) andThen
+  def authAndGetDataWithOss(mode: Option[Mode] = None, revalidateSavedAnswers: Boolean = false): ActionBuilder[AuthenticatedMandatoryDataRequest, AnyContent] = {
+    authAndGetDataAndCheckRejoinAndCheckVerifyEmail(mode, revalidateSavedAnswers) andThen
       requireOss() andThen
       checkBouncedEmailFilter(mode)
   }

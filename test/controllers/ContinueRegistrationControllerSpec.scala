@@ -21,28 +21,47 @@ import connectors.SaveForLaterConnector
 import forms.ContinueRegistrationFormProvider
 import models.ContinueRegistration.{Continue, Delete}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.SavedProgressPage
 import play.api.inject.bind
+import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.AuthenticatedUserAnswersRepository
+import services.revalidate.SavedAnswersRevalidationService
 import utils.FutureSyntax.FutureOps
 import views.html.ContinueRegistrationView
 
-class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
+class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
+  private val mockSavedAnswersRevalidationService: SavedAnswersRevalidationService = mock[SavedAnswersRevalidationService]
+
+  private val redirectUrl: String = controllers.revalidation.routes.RevalidateAlreadyRegisteredController.onPageLoad().url
   private val formProvider = new ContinueRegistrationFormProvider()
   private val form = formProvider()
 
   private lazy val continueRegistrationRoute = routes.ContinueRegistrationController.onPageLoad().url
 
+  override def beforeEach(): Unit = {
+    Mockito.reset(
+      mockSavedAnswersRevalidationService
+    )
+  }
+
   "ContinueRegistration Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when revalidation returns None" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(SavedProgressPage, "testUrl").success.value)).build()
+      when(mockSavedAnswersRevalidationService.revalidateSavedUserAnswers()(any(), any())) thenReturn None.toFuture
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(SavedProgressPage, "testUrl").success.value))
+        .overrides(
+          bind[SavedAnswersRevalidationService].toInstance(mockSavedAnswersRevalidationService)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, continueRegistrationRoute)
@@ -53,6 +72,28 @@ class ContinueRegistrationControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) `mustBe` OK
         contentAsString(result) `mustBe` view(form)(request, messages(application)).toString
+        verify(mockSavedAnswersRevalidationService, times(1)).revalidateSavedUserAnswers()(any(), any())
+      }
+    }
+
+    "must return OK and the correct view for a GET when revalidation returns Some(result)" in {
+
+      when(mockSavedAnswersRevalidationService.revalidateSavedUserAnswers()(any(), any())) thenReturn Some(Redirect(redirectUrl)).toFuture
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(SavedProgressPage, "testUrl").success.value))
+        .overrides(
+          bind[SavedAnswersRevalidationService].toInstance(mockSavedAnswersRevalidationService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, continueRegistrationRoute)
+
+        val result = route(application, request).value
+
+        status(result) `mustBe` SEE_OTHER
+        redirectLocation(result).value `mustBe` redirectUrl
+        verify(mockSavedAnswersRevalidationService, times(1)).revalidateSavedUserAnswers()(any(), any())
       }
     }
 

@@ -18,6 +18,7 @@ package generators
 
 import connectors.SavedUserAnswers
 import models.*
+import models.core.{Match, TraderId}
 import models.domain.*
 import models.domain.ModelHelpers.normaliseSpaces
 import models.domain.returns.*
@@ -25,9 +26,10 @@ import models.domain.returns.VatOnSalesChoice.Standard
 import models.enrolments.{EACDEnrolment, EACDEnrolments, EACDIdentifiers}
 import models.etmp.EtmpExclusion
 import models.etmp.intermediary.*
-import models.euDetails.{EuConsumerSalesMethod, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, EuDetails, EuOptionalDetails, RegistrationType}
 import models.exclusions.{ExcludedTrader, ExclusionReason}
 import models.iossRegistration.*
+import models.previousRegistrations.{SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.{choose, listOfN}
 import org.scalacheck.{Arbitrary, Gen}
@@ -485,7 +487,7 @@ trait ModelGenerators {
 
   implicit lazy val genIntermediaryNumber: Gen[String] = {
     for {
-      intermediaryNumber <- Gen.listOfN(12, Gen.alphaChar).map(_.mkString)
+      intermediaryNumber <- "IN" + Gen.listOfN(10, Gen.alphaChar).map(_.mkString)
     } yield intermediaryNumber
   }
 
@@ -543,8 +545,9 @@ trait ModelGenerators {
 
   implicit lazy val arbitraryEuVatNumber: Gen[String] = {
     for {
-      vatNumber <- Gen.alphaNumStr
-    } yield vatNumber
+      countryCode <- Gen.oneOf(Country.euCountries.map(_.code))
+      matchedCountryRule = CountryWithValidationDetails.euCountriesWithVRNValidationRules.find(_.country.code == countryCode).head
+    } yield s"$countryCode${matchedCountryRule.exampleVrn}"
   }
 
   implicit lazy val arbitraryEtmpDisplayEuRegistrationDetails: Arbitrary[EtmpDisplayEuRegistrationDetails] = {
@@ -678,6 +681,126 @@ trait ModelGenerators {
           deregistrationDecisionDate = None
         )
       }
+    }
+  }
+
+  implicit lazy val arbitraryTraderId: Arbitrary[TraderId] = {
+    Arbitrary {
+      for {
+        traderId <- Gen.alphaStr
+      } yield TraderId(
+        traderId = traderId
+      )
+    }
+  }
+
+  implicit lazy val arbitraryMatch: Arbitrary[Match] = {
+    Arbitrary {
+      for {
+        traderId <- arbitraryTraderId.arbitrary
+        memberState <- arbitraryCountry.arbitrary.map(_.code)
+      } yield {
+        Match(
+          traderId = traderId,
+          intermediary = None,
+          memberState = memberState,
+          exclusionStatusCode = None,
+          exclusionDecisionDate = None,
+          exclusionEffectiveDate = None,
+          nonCompliantReturns = None,
+          nonCompliantPayments = None
+        )
+      }
+    }
+  }
+
+  implicit lazy val arbitrarySchemeNumbersWithOptionalVatNumber: Arbitrary[SchemeNumbersWithOptionalVatNumber] = {
+    Arbitrary {
+      for {
+        previousSchemeNumber <- arbitraryEuVatNumber
+        previousIntermediaryNumber <- genIntermediaryNumber
+      } yield {
+        SchemeNumbersWithOptionalVatNumber(
+          previousSchemeNumber = Some(previousSchemeNumber),
+          previousIntermediaryNumber = Some(previousIntermediaryNumber)
+        )
+      }
+    }
+  }
+
+  implicit lazy val arbitrarySchemeDetailsWithOptionalVatNumber: Arbitrary[SchemeDetailsWithOptionalVatNumber] = {
+    Arbitrary {
+      for {
+        previousScheme <- Gen.oneOf(PreviousScheme.values)
+        previousSchemeNumbers <- arbitrarySchemeNumbersWithOptionalVatNumber.arbitrary
+      } yield {
+        SchemeDetailsWithOptionalVatNumber(
+          previousScheme = Some(previousScheme),
+          previousSchemeNumbers = Some(previousSchemeNumbers)
+        )
+      }
+    }
+  }
+
+  implicit lazy val arbitraryEuDetails: Arbitrary[EuDetails] = {
+    Arbitrary {
+      for {
+        sellsGoodsToEUConsumers <- arbitrary[Boolean]
+        sellsGoodsToEUConsumerMethod <- Gen.oneOf(EuConsumerSalesMethod.values)
+        registrationType <- arbitraryRegistrationType.arbitrary
+        vatRegistered <- arbitrary[Boolean]
+        euTaxReference <- genEuTaxReference
+        euVatNumber = arbitraryEuVatNumber.sample.head
+        countryCode = euVatNumber.substring(0, 2)
+        euCountry = Country.euCountries.find(_.code == countryCode).head
+        fixedEstablishmentTradingName = Gen.alphaStr.sample.head
+        fixedEstablishmentAddress <- arbitraryInternationalAddress.arbitrary
+        euSendGoodsTradingName = Gen.alphaStr.sample.head
+        euSendGoodsAddress <- arbitraryInternationalAddress.arbitrary
+      } yield EuDetails(
+        euCountry = euCountry,
+        sellsGoodsToEUConsumers = sellsGoodsToEUConsumers,
+        sellsGoodsToEUConsumerMethod = Some(sellsGoodsToEUConsumerMethod),
+        registrationType = Some(registrationType),
+        vatRegistered = Some(vatRegistered),
+        euVatNumber = Some(euVatNumber),
+        euTaxReference = Some(euTaxReference),
+        fixedEstablishmentTradingName = Some(fixedEstablishmentTradingName),
+        fixedEstablishmentAddress = Some(fixedEstablishmentAddress),
+        euSendGoodsTradingName = Some(euSendGoodsTradingName),
+        euSendGoodsAddress = Some(euSendGoodsAddress)
+      )
+    }
+  }
+
+  implicit lazy val arbitraryEuOptionalDetails: Arbitrary[EuOptionalDetails] = {
+    Arbitrary {
+      for {
+        sellsGoodsToEUConsumers <- arbitrary[Boolean]
+        sellsGoodsToEUConsumerMethod <- Gen.oneOf(EuConsumerSalesMethod.values)
+        registrationType <- arbitraryRegistrationType.arbitrary
+        vatRegistered <- arbitrary[Boolean]
+        euTaxReference <- genEuTaxReference
+        euVatNumber = arbitraryEuVatNumber.sample.head
+        countryCode = euVatNumber.substring(0, 2)
+        euCountry = Country.euCountries.find(_.code == countryCode).head
+        fixedEstablishmentTradingName = Gen.alphaStr.sample.head
+        fixedEstablishmentAddress <- arbitraryInternationalAddress.arbitrary
+        euSendGoodsTradingName = Gen.alphaStr.sample.head
+        euSendGoodsAddress <- arbitraryInternationalAddress.arbitrary
+      } yield EuOptionalDetails(
+        euCountry = euCountry,
+        sellsGoodsToEUConsumers = Some(sellsGoodsToEUConsumers),
+        sellsGoodsToEUConsumerMethod = Some(sellsGoodsToEUConsumerMethod),
+        registrationType = Some(registrationType),
+        vatRegistered = Some(vatRegistered),
+        euVatNumber = Some(euVatNumber),
+        euTaxReference = Some(euTaxReference),
+        fixedEstablishmentTradingName = Some(fixedEstablishmentTradingName),
+        fixedEstablishmentAddress = Some(fixedEstablishmentAddress),
+        euSendGoodsTradingName = Some(euSendGoodsTradingName),
+        euSendGoodsAddress = Some(euSendGoodsAddress)
+      )
     }
   }
 }

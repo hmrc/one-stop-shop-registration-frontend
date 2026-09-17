@@ -38,8 +38,7 @@ class SaveForLaterService @Inject()(
                    redirectLocation: Call,
                    originLocation: Call
                  )(implicit request: AuthenticatedDataRequest[_], ec: ExecutionContext, hc: HeaderCarrier): Future[Result] = {
-    Future.fromTry(request.userAnswers.set(SavedProgressPage, originLocation.url)).flatMap {
-      updatedAnswers =>
+    Future.fromTry(request.userAnswers.set(SavedProgressPage, originLocation.url)).flatMap { updatedAnswers =>
         val save4LaterRequest = SaveForLaterRequest(updatedAnswers, request.vrn)
         saveForLaterConnector.submit(save4LaterRequest).flatMap {
           case Right(Some(_: SavedUserAnswers)) =>

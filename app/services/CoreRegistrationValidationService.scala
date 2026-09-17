@@ -70,7 +70,6 @@ class CoreRegistrationValidationService @Inject()(
 
   def searchEuVrn(euVrn: String, countryCode: String, isOtherMS: Boolean)(implicit hc: HeaderCarrier,
                                                                           request: AuthenticatedVrnRequest[_]): Future[Option[Match]] = {
-
     val sourceType = if (isOtherMS) {
       SourceType.EUVATNumber
     } else {
@@ -102,7 +101,7 @@ class CoreRegistrationValidationService @Inject()(
 
       val sourceType = SourceType.TraderId
 
-      val convertedSearchNumber = if (Seq(PreviousScheme.OSSU, PreviousScheme.OSSNU).contains(previousScheme)) {
+      val convertedSearchNumber = if (PreviousScheme.OSSU == previousScheme) {
         convertTaxIdentifierForTransfer(searchNumber, countryCode)
       } else {
         searchNumber
@@ -123,6 +122,7 @@ class CoreRegistrationValidationService @Inject()(
             coreRegistrationResponse
           ))
           coreRegistrationResponse.matches.headOption
+          
         case _ => throw CoreRegistrationValidationException("Error while validating core registration")
       }
     }
