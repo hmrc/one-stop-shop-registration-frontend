@@ -20,14 +20,14 @@ import controllers.revalidation.routes
 import models.PreviousScheme
 import models.core.Match
 import models.domain.VatCustomerInfo
-import models.euDetails.EuDetails
+import models.euDetails.{EuDetails, EuOptionalDetails}
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import queries.AllEuDetailsQuery
+import queries.{AllEuDetailsQuery, AllEuOptionalDetailsQuery}
 import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.CoreRegistrationValidationService
@@ -61,7 +61,7 @@ class SavedAnswersRevalidationService @Inject()(
   private def checkEuDetails()(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
     request.userAnswers.get(TaxRegisteredInEuPage) match {
       case Some(true) =>
-        val euDetails: List[EuDetails] = request.userAnswers.get(AllEuDetailsQuery).getOrElse(List.empty)
+        val euDetails: List[EuOptionalDetails] = request.userAnswers.get(AllEuOptionalDetailsQuery).getOrElse(List.empty)
         checkAllEuDetails(euDetails)
 
       case _ => None.toFuture
@@ -69,7 +69,7 @@ class SavedAnswersRevalidationService @Inject()(
   }
 
   private def checkAllEuDetails(
-                                 allEuDetails: List[EuDetails]
+                                 allEuDetails: List[EuOptionalDetails]
                                )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
     allEuDetails match {
       case ::(euDetails, remaining) =>
@@ -86,11 +86,11 @@ class SavedAnswersRevalidationService @Inject()(
   }
 
   private def revalidateEuDetails(
-                                   euDetails: EuDetails
+                                   euDetails: EuOptionalDetails
                                  )(implicit hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
     euDetails.euVatNumber match {
       case Some(euVatNumber) =>
-        revalidateEuVrn(euVatNumber, euDetails.euCountry.code, euDetails.sellsGoodsToEUConsumers)
+        revalidateEuVrn(euVatNumber, euDetails.euCountry.code, !euDetails.sellsGoodsToEUConsumers.getOrElse(false))
 
       case _ =>
         euDetails.euTaxReference match {
@@ -207,14 +207,14 @@ class SavedAnswersRevalidationService @Inject()(
           Some(result).toFuture
         }
 
-//      case (Some(activeMatch), _) if activeMatch.isActiveTrader =>
-//        setActiveTraderResultAndRedirect(
-//          activeMatch = activeMatch,
-//          sessionRepository = authenticatedUserAnswersRepository,
-//          redirect = routes.RevalidateAlreadyRegisteredController.onPageLoad()
-//        ).flatMap { result =>
-//          Some(result).toFuture
-//        }
+      case (Some(activeMatch), None) if activeMatch.isActiveTrader =>
+        setActiveTraderResultAndRedirect(
+          activeMatch = activeMatch,
+          sessionRepository = authenticatedUserAnswersRepository,
+          redirect = routes.RevalidateAlreadyRegisteredController.onPageLoad()
+        ).flatMap { result =>
+          Some(result).toFuture
+        }
 
       case (Some(activeMatch), _)if activeMatch.isQuarantinedTrader(clock) =>
         Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
