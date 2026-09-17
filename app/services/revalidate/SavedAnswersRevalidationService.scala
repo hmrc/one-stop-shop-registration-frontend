@@ -17,6 +17,7 @@
 package services.revalidate
 
 import controllers.revalidation.routes
+import models.PreviousScheme
 import models.core.Match
 import models.domain.VatCustomerInfo
 import models.euDetails.EuDetails
@@ -152,7 +153,7 @@ class SavedAnswersRevalidationService @Inject()(
           intermediaryNumber = previousIntermediaryNumber,
           countryCode = countryCode
         ).flatMap { maybeMatch =>
-          activeMatchRedirectUrl(maybeMatch).flatMap {
+          activeMatchRedirectUrl(maybeMatch, Some(previousScheme)).flatMap {
             case Some(result) =>
               Some(result).toFuture
 
@@ -192,9 +193,12 @@ class SavedAnswersRevalidationService @Inject()(
     }
   }
 
-  private def activeMatchRedirectUrl(maybeMatch: Option[Match])(implicit request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
-    maybeMatch match {
-      case Some(activeMatch) if activeMatch.isActiveTrader =>
+  private def activeMatchRedirectUrl(
+                                      maybeMatch: Option[Match],
+                                      previousScheme: Option[PreviousScheme] = None
+                                    )(implicit request: AuthenticatedDataRequest[_]): Future[Option[Result]] = {
+    (maybeMatch, previousScheme) match {
+      case (Some(activeMatch), Some(previousScheme)) if activeMatch.isActiveTrader && PreviousScheme.OSSU == previousScheme =>
         setActiveTraderResultAndRedirect(
           activeMatch = activeMatch,
           sessionRepository = authenticatedUserAnswersRepository,
@@ -203,7 +207,16 @@ class SavedAnswersRevalidationService @Inject()(
           Some(result).toFuture
         }
 
-      case Some(activeMatch) if activeMatch.isQuarantinedTrader(clock) =>
+//      case (Some(activeMatch), _) if activeMatch.isActiveTrader =>
+//        setActiveTraderResultAndRedirect(
+//          activeMatch = activeMatch,
+//          sessionRepository = authenticatedUserAnswersRepository,
+//          redirect = routes.RevalidateAlreadyRegisteredController.onPageLoad()
+//        ).flatMap { result =>
+//          Some(result).toFuture
+//        }
+
+      case (Some(activeMatch), _)if activeMatch.isQuarantinedTrader(clock) =>
         Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
           exclusionExpiryDate = activeMatch.getEffectiveDate
         ).url)).toFuture
