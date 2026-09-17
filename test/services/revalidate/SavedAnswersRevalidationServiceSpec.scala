@@ -22,7 +22,7 @@ import models.PreviousScheme.{IOSSWI, OSSNU, OSSU}
 import models.core.{Match, TraderId}
 import models.domain.{PreviousSchemeNumbers, VatCustomerInfo}
 import models.euDetails.EuConsumerSalesMethod.DispatchWarehouse
-import models.euDetails.EuDetails
+import models.euDetails.EuOptionalDetails
 import models.euDetails.RegistrationType.{TaxId, VatNumber}
 import models.exclusions.ExclusionReason
 import models.exclusions.ExclusionReason.FailsToComply
@@ -94,8 +94,8 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
     Index(indexVal)
   }
 
-  private val baseEuDetails: EuDetails = arbitraryEuDetails.arbitrary.sample.value.copy(
-    sellsGoodsToEUConsumers = true,
+  private val baseEuDetails: EuOptionalDetails = arbitraryEuOptionalDetails.arbitrary.sample.value.copy(
+    sellsGoodsToEUConsumers = Some(true),
     sellsGoodsToEUConsumerMethod = Some(DispatchWarehouse),
     registrationType = Some(VatNumber),
     vatRegistered = Some(true)
@@ -104,9 +104,9 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
   private val updatedUserAnswers: UserAnswers = emptyUserAnswersWithVatInfo
     .set(TaxRegisteredInEuPage, true).success.value
     .set(EuCountryPage(index(0)), baseEuDetails.euCountry).success.value
-    .set(SellsGoodsToEUConsumersPage(index(0)), true).success.value
-    .set(SellsGoodsToEUConsumerMethodPage(index(0)), DispatchWarehouse).success.value
-    .set(RegistrationTypePage(index(0)), VatNumber).success.value
+    .set(SellsGoodsToEUConsumersPage(index(0)), baseEuDetails.sellsGoodsToEUConsumers.value).success.value
+    .set(SellsGoodsToEUConsumerMethodPage(index(0)), baseEuDetails.sellsGoodsToEUConsumerMethod.value).success.value
+    .set(RegistrationTypePage(index(0)), baseEuDetails.registrationType.value).success.value
     .set(EuVatNumberPage(index(0)), baseEuDetails.euVatNumber.head).success.value
     .set(EuSendGoodsTradingNamePage(index(0)), baseEuDetails.euSendGoodsTradingName.head).success.value
     .set(EuSendGoodsAddressPage(index(0)), baseEuDetails.euSendGoodsAddress.head).success.value
@@ -238,7 +238,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
         "must return a result when there are previous registrations present and an active match is found" in {
 
-          val previousSchemeNumber: String = previousSchemeDetails1.previousSchemeNumbers.value.previousSchemeNumber.value
+          val previousSchemeNumber: String = previousSchemeDetails2.previousSchemeNumbers.value.previousSchemeNumber.value
 
           val activeMatch: Match = aMatch.copy(
             traderId = TraderId(traderId = previousSchemeNumber),
@@ -255,7 +255,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val updatedUserAnswers: UserAnswers = emptyUserAnswersWithVatInfo
             .set(PreviouslyRegisteredPage, true).success.value
             .set(PreviousEuCountryPage(Index(0)), previousRegistration1.previousEuCountry).success.value
-            .set(PreviousSchemePage(Index(0), Index(0)), previousSchemeDetails1.previousScheme.value).success.value
+            .set(PreviousSchemePage(Index(0), Index(0)), previousSchemeDetails2.previousScheme.value).success.value
             .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers(previousSchemeNumber, None)).success.value
 
           when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
@@ -276,7 +276,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
           verify(mockCoreRegistrationValidationService, times(1)).searchScheme(
             eqTo(previousSchemeNumber),
-            eqTo(previousSchemeDetails1.previousScheme.value),
+            eqTo(previousSchemeDetails2.previousScheme.value),
             eqTo(None),
             eqTo(previousRegistration1.previousEuCountry.code),
           )(any(), any())
@@ -337,7 +337,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
           result.futureValue `mustBe` None
           verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
-          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
         }
 
         "must redirect to the corresponding URL when EU details are present and an active match is found" in {
@@ -370,7 +370,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
           verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
           verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
-          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
         }
 
         "must redirect to the corresponding URL when EU details are present and a quarantined trader is found" in {
@@ -396,7 +396,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           ).url))
           verify(mockCoreRegistrationValidationService, times(1)).searchUkVrn(eqTo(vrn))(any(), any())
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
-          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
         }
       }
     }
@@ -432,72 +432,141 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
         result.futureValue `mustBe` None
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
       }
 
-      "must redirect to the corresponding URL when EuDetails are present and an active match is found" in {
+      "with complete answers" - {
 
-        val activeMatch: Match = aMatch.copy(
-          traderId = TraderId(traderId = baseEuDetails.euVatNumber.head),
-          memberState = baseEuDetails.euCountry.code,
-          exclusionStatusCode = None,
-          exclusionEffectiveDate = None
-        )
+        "must redirect to the corresponding URL when EuDetails are present and an active match is found" in {
 
-        val activeTrader = ActiveTraderResult(
-          isReversal = false,
-          exclusionEffectiveDate = activeMatch.exclusionEffectiveDate
-        )
+          val activeMatch: Match = aMatch.copy(
+            traderId = TraderId(traderId = baseEuDetails.euVatNumber.head),
+            memberState = baseEuDetails.euCountry.code,
+            exclusionStatusCode = None,
+            exclusionEffectiveDate = None
+          )
 
-        when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
-        when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn Some(activeMatch).toFuture
+          val activeTrader = ActiveTraderResult(
+            isReversal = false,
+            exclusionEffectiveDate = activeMatch.exclusionEffectiveDate
+          )
 
-        val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
+          when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+          when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn Some(activeMatch).toFuture
 
-        implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, updatedUserAnswers, None, 0, None)
+          val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
 
-        val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkEuDetails"))
+          implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, updatedUserAnswers, None, 0, None)
 
-        val result = service invokePrivate privateMethodCall(hc, request)
+          val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkEuDetails"))
 
-        val expectedAnswers: UserAnswers = updatedUserAnswers
-          .set(ActiveTraderResultQuery, activeTrader).success.value
+          val result = service invokePrivate privateMethodCall(hc, request)
 
-        result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
-        verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          val expectedAnswers: UserAnswers = updatedUserAnswers
+            .set(ActiveTraderResultQuery, activeTrader).success.value
+
+          result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
+          verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
+        }
+
+        "must redirect to the corresponding URL when EuDetails are present and a quarantined trader is found" in {
+
+          val quarantinedMatch: Match = aMatch.copy(
+            traderId = TraderId(traderId = baseEuDetails.euVatNumber.head),
+            memberState = baseEuDetails.euCountry.code,
+            exclusionStatusCode = Some(FailsToComply.numberValue),
+            exclusionEffectiveDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusYears(2).plusDays(1))
+          )
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn Some(quarantinedMatch).toFuture
+
+          val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
+
+          implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, updatedUserAnswers, None, 0, None)
+
+          val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkEuDetails"))
+
+          val result = service invokePrivate privateMethodCall(hc, request)
+
+          result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
+          )))
+          verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
+        }
       }
 
-      "must redirect to the corresponding URL when EuDetails are present and a quarantined trader is found" in {
+      "with incomplete answers" - {
 
-        val quarantinedMatch: Match = aMatch.copy(
-          traderId = TraderId(traderId = baseEuDetails.euVatNumber.head),
-          memberState = baseEuDetails.euCountry.code,
-          exclusionStatusCode = Some(FailsToComply.numberValue),
-          exclusionEffectiveDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusYears(2).plusDays(1))
-        )
+        val incompleteEuDetails: UserAnswers = updatedUserAnswers
+          .remove(EuSendGoodsTradingNamePage(index(0))).success.value
+          .remove(EuSendGoodsAddressPage(index(0))).success.value
 
-        when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn Some(quarantinedMatch).toFuture
+        "must redirect to the corresponding URL when EuDetails are present and an active match is found" in {
 
-        val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
+          val activeMatch: Match = aMatch.copy(
+            traderId = TraderId(traderId = baseEuDetails.euVatNumber.head),
+            memberState = baseEuDetails.euCountry.code,
+            exclusionStatusCode = None,
+            exclusionEffectiveDate = None
+          )
 
-        implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, updatedUserAnswers, None, 0, None)
+          val activeTrader = ActiveTraderResult(
+            isReversal = false,
+            exclusionEffectiveDate = activeMatch.exclusionEffectiveDate
+          )
 
-        val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkEuDetails"))
+          when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
+          when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn Some(activeMatch).toFuture
 
-        val result = service invokePrivate privateMethodCall(hc, request)
+          val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
 
-        result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
-          exclusionExpiryDate = quarantinedMatch.getEffectiveDate
-        )))
-        verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, incompleteEuDetails, None, 0, None)
+
+          val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkEuDetails"))
+
+          val result = service invokePrivate privateMethodCall(hc, request)
+
+          val expectedAnswers: UserAnswers = incompleteEuDetails
+            .set(ActiveTraderResultQuery, activeTrader).success.value
+
+          result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
+          verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
+        }
+
+        "must redirect to the corresponding URL when EuDetails are present and a quarantined trader is found" in {
+
+          val quarantinedMatch: Match = aMatch.copy(
+            traderId = TraderId(traderId = baseEuDetails.euVatNumber.head),
+            memberState = baseEuDetails.euCountry.code,
+            exclusionStatusCode = Some(FailsToComply.numberValue),
+            exclusionEffectiveDate = Some(LocalDate.now(stubClockAtArbitraryDate).minusYears(2).plusDays(1))
+          )
+
+          when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn Some(quarantinedMatch).toFuture
+
+          val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
+
+          implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, incompleteEuDetails, None, 0, None)
+
+          val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkEuDetails"))
+
+          val result = service invokePrivate privateMethodCall(hc, request)
+
+          result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
+            exclusionExpiryDate = quarantinedMatch.getEffectiveDate
+          )))
+          verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
+        }
       }
     }
 
     ".checkAllEuDetails" - {
 
-      val euDetailsList: List[EuDetails] = List(baseEuDetails, arbitraryEuDetails.arbitrary.sample.value)
+      val euDetailsList: List[EuOptionalDetails] = List(baseEuDetails, arbitraryEuOptionalDetails.arbitrary.sample.value)
 
       val userAnswers: UserAnswers = updatedUserAnswers
         .set(EuCountryPage(index(1)), euDetailsList.head.euCountry).success.value
@@ -511,7 +580,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
       "must return None when no match is found" in {
 
         when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
-        when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())) thenReturn None.toFuture
+        when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers.value))(any(), any())) thenReturn None.toFuture
 
         val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
 
@@ -522,8 +591,8 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         val result = service invokePrivate privateMethodCall(euDetailsList, hc, request)
 
         result.futureValue `mustBe` None
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.head.euVatNumber.head), eqTo(euDetailsList.head.euCountry.code), eqTo(euDetailsList.head.sellsGoodsToEUConsumers))(any(), any())
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())
+        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.head.euVatNumber.head), eqTo(euDetailsList.head.euCountry.code), eqTo(!euDetailsList.head.sellsGoodsToEUConsumers.value))(any(), any())
+        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(!euDetailsList.tail.head.sellsGoodsToEUConsumers.value))(any(), any())
       }
 
       "must redirect to the corresponding URL when an active trader is found" in {
@@ -542,7 +611,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
         when(mockAuthenticatedUserAnswersRepository.set(any())) thenReturn true.toFuture
         when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
-        when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())) thenReturn Some(activeMatch).toFuture
+        when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(!euDetailsList.tail.head.sellsGoodsToEUConsumers.value))(any(), any())) thenReturn Some(activeMatch).toFuture
 
         val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
 
@@ -557,7 +626,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
         result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
         verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())
+        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(!euDetailsList.tail.head.sellsGoodsToEUConsumers.value))(any(), any())
       }
 
       "must redirect to the corresponding URL when a quarantined trader is found" in {
@@ -570,7 +639,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         )
 
         when(mockCoreRegistrationValidationService.searchEuVrn(any(), any(), any())(any(), any())) thenReturn None.toFuture
-        when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())) thenReturn Some(quarantinedMatch).toFuture
+        when(mockCoreRegistrationValidationService.searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(!euDetailsList.tail.head.sellsGoodsToEUConsumers.value))(any(), any())) thenReturn Some(quarantinedMatch).toFuture
 
         val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
 
@@ -584,7 +653,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           exclusionExpiryDate = quarantinedMatch.getEffectiveDate
         )))
         verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
-        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(euDetailsList.tail.head.sellsGoodsToEUConsumers))(any(), any())
+        verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(euDetailsList.tail.head.euVatNumber.head), eqTo(euDetailsList.tail.head.euCountry.code), eqTo(!euDetailsList.tail.head.sellsGoodsToEUConsumers.value))(any(), any())
       }
     }
 
@@ -605,7 +674,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val result = service invokePrivate privateMethodCall(baseEuDetails, hc, request)
 
           result.futureValue `mustBe` None
-          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
         }
 
         "must redirect to the corresponding URL when an active trader is found" in {
@@ -638,7 +707,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
           verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
-          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
         }
 
         "must redirect to the corresponding URL when a quarantined trader is found" in {
@@ -664,13 +733,13 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
             exclusionExpiryDate = quarantinedMatch.getEffectiveDate
           )))
           verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
-          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(baseEuDetails.sellsGoodsToEUConsumers))(any(), any())
+          verify(mockCoreRegistrationValidationService, times(1)).searchEuVrn(eqTo(baseEuDetails.euVatNumber.head), eqTo(baseEuDetails.euCountry.code), eqTo(!baseEuDetails.sellsGoodsToEUConsumers.value))(any(), any())
         }
       }
 
       "when a Tax reference is present" - {
 
-        val euDetails: EuDetails = baseEuDetails.copy(
+        val euDetails: EuOptionalDetails = baseEuDetails.copy(
           registrationType = Some(TaxId),
           euVatNumber = None
         )
@@ -965,7 +1034,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         )(any(), any())
       }
 
-      "must return a result when there are previous registrations present and an active match is found" in {
+      "must return None when there are previous registrations present and an active match is found and previous scheme is OSSNU" in {
 
         val previousSchemeNumber: String = previousSchemeDetails1.previousSchemeNumbers.value.previousSchemeNumber.value
 
@@ -973,6 +1042,43 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           .set(PreviouslyRegisteredPage, true).success.value
           .set(PreviousEuCountryPage(Index(0)), previousEuCountry1).success.value
           .set(PreviousSchemePage(Index(0), Index(0)), previousSchemeDetails1.previousScheme.value).success.value
+          .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers(previousSchemeNumber, None)).success.value
+
+        val activeMatch: Match = aMatch.copy(
+          traderId = TraderId(traderId = previousSchemeNumber),
+          memberState = previousEuCountry1.code,
+          exclusionStatusCode = None,
+          exclusionEffectiveDate = None
+        )
+
+        when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn Some(activeMatch).toFuture
+
+        val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
+
+        implicit val request: AuthenticatedDataRequest[AnyContent] = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, updatedUserAnswers, None, 0, None)
+
+        val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("checkPreviousRegistrations"))
+
+        val result = service invokePrivate privateMethodCall(hc, request)
+
+        result.futureValue `mustBe` None
+        verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
+        verify(mockCoreRegistrationValidationService, times(1)).searchScheme(
+          eqTo(previousSchemeNumber),
+          eqTo(previousSchemeDetails1.previousScheme.value),
+          eqTo(None),
+          eqTo(previousEuCountry1.code)
+        )(any(), any())
+      }
+
+      "must return a result when there are previous registrations present and an active match is found and previous scheme is OSSU" in {
+
+        val previousSchemeNumber: String = previousSchemeDetails2.previousSchemeNumbers.value.previousSchemeNumber.value
+
+        val updatedUserAnswers: UserAnswers = emptyUserAnswersWithVatInfo
+          .set(PreviouslyRegisteredPage, true).success.value
+          .set(PreviousEuCountryPage(Index(0)), previousEuCountry1).success.value
+          .set(PreviousSchemePage(Index(0), Index(0)), previousSchemeDetails2.previousScheme.value).success.value
           .set(PreviousOssNumberPage(Index(0), Index(0)), PreviousSchemeNumbers(previousSchemeNumber, None)).success.value
 
         val activeMatch: Match = aMatch.copy(
@@ -1005,7 +1111,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
         verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
         verify(mockCoreRegistrationValidationService, times(1)).searchScheme(
           eqTo(previousSchemeNumber),
-          eqTo(previousSchemeDetails1.previousScheme.value),
+          eqTo(previousSchemeDetails2.previousScheme.value),
           eqTo(None),
           eqTo(previousEuCountry1.code)
         )(any(), any())
@@ -1129,9 +1235,47 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           )(any(), any())
         }
 
-        "must save the active trader result and redirect to the corresponding URL when an active match is found" in {
+        "must return None when an active match is found for a OSSNU previous scheme" in {
 
           val previousSchemeNumber: String = allPreviousSchemeDetails.tail.tail.head.previousSchemeNumbers.value.previousSchemeNumber.value
+
+          val activeMatch: Match = aMatch.copy(
+            traderId = TraderId(traderId = previousSchemeNumber),
+            memberState = countryCode,
+            exclusionStatusCode = None,
+            exclusionEffectiveDate = None
+          )
+
+          when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
+          when(mockCoreRegistrationValidationService.searchScheme(
+            eqTo(previousSchemeNumber),
+            eqTo(allPreviousSchemeDetails.tail.tail.head.previousScheme.value),
+            any(),
+            any()
+          )(any(), any())
+          ) thenReturn Some(activeMatch).toFuture
+
+          val service = new SavedAnswersRevalidationService(mockCoreRegistrationValidationService, mockAuthenticatedUserAnswersRepository, stubClockAtArbitraryDate)
+
+          val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("revalidatePreviousSchemeDetails"))
+
+          val request = AuthenticatedDataRequest[AnyContent](FakeRequest(), testCredentials, vrn, None, emptyUserAnswersWithVatInfo, None, 0, None)
+
+          val result = service invokePrivate privateMethodCall(countryCode, allPreviousSchemeDetails, hc, request)
+
+          result.futureValue `mustBe` None
+          verifyNoInteractions(mockAuthenticatedUserAnswersRepository)
+          verify(mockCoreRegistrationValidationService, times(3)).searchScheme(
+            any(),
+            any(),
+            any(),
+            eqTo(countryCode)
+          )(any(), any())
+        }
+
+        "must save the active trader result and redirect to the corresponding URL when an active match is found and is a OSSU previous scheme" in {
+
+          val previousSchemeNumber: String = allPreviousSchemeDetails.tail.head.previousSchemeNumbers.value.previousSchemeNumber.value
 
           val activeMatch: Match = aMatch.copy(
             traderId = TraderId(traderId = previousSchemeNumber),
@@ -1149,7 +1293,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           when(mockCoreRegistrationValidationService.searchScheme(any(), any(), any(), any())(any(), any())) thenReturn None.toFuture
           when(mockCoreRegistrationValidationService.searchScheme(
             eqTo(previousSchemeNumber),
-            eqTo(allPreviousSchemeDetails.tail.tail.head.previousScheme.value),
+            eqTo(allPreviousSchemeDetails.tail.head.previousScheme.value),
             any(),
             any()
           )(any(), any())
@@ -1168,7 +1312,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
           verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
-          verify(mockCoreRegistrationValidationService, times(3)).searchScheme(
+          verify(mockCoreRegistrationValidationService, times(2)).searchScheme(
             any(),
             any(),
             any(),
@@ -1504,7 +1648,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
         val activeMatchRedirectUrl = PrivateMethod[Future[Option[Result]]](Symbol("activeMatchRedirectUrl"))
 
-        val result = service invokePrivate activeMatchRedirectUrl(None, request)
+        val result = service invokePrivate activeMatchRedirectUrl(None, None, request)
 
         result.futureValue `mustBe` None
       }
@@ -1531,7 +1675,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
           val expectedAnswers: UserAnswers = emptyUserAnswersWithVatInfo
             .set(ActiveTraderResultQuery, activeTrader).success.value
 
-          val result = service invokePrivate privateMethodCall(Some(activeMatch), request)
+          val result = service invokePrivate privateMethodCall(Some(activeMatch), None, request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateAlreadyRegisteredController.onPageLoad().url))
           verify(mockAuthenticatedUserAnswersRepository, times(1)).set(eqTo(expectedAnswers))
@@ -1550,7 +1694,7 @@ class SavedAnswersRevalidationServiceSpec extends SpecBase with PrivateMethodTes
 
           val privateMethodCall = PrivateMethod[Future[Option[Result]]](Symbol("activeMatchRedirectUrl"))
 
-          val result = service invokePrivate privateMethodCall(Some(quarantinedMatch), request)
+          val result = service invokePrivate privateMethodCall(Some(quarantinedMatch), None, request)
 
           result.futureValue `mustBe` Some(Redirect(routes.RevalidateQuarantinedTraderController.onPageLoad(
             exclusionExpiryDate = quarantinedMatch.getEffectiveDate

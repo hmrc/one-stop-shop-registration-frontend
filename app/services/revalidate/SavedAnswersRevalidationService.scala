@@ -20,14 +20,14 @@ import controllers.revalidation.routes
 import models.PreviousScheme
 import models.core.Match
 import models.domain.VatCustomerInfo
-import models.euDetails.{EuDetails, EuOptionalDetails}
+import models.euDetails.EuOptionalDetails
 import models.previousRegistrations.{PreviousRegistrationDetailsWithOptionalVatNumber, SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
 import models.requests.AuthenticatedDataRequest
 import pages.euDetails.TaxRegisteredInEuPage
 import pages.previousRegistrations.PreviouslyRegisteredPage
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import queries.{AllEuDetailsQuery, AllEuOptionalDetailsQuery}
+import queries.AllEuOptionalDetailsQuery
 import queries.previousRegistration.AllPreviousRegistrationsWithOptionalVatNumberQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.CoreRegistrationValidationService

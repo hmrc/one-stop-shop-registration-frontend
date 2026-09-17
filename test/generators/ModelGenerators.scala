@@ -26,7 +26,7 @@ import models.domain.returns.VatOnSalesChoice.Standard
 import models.enrolments.{EACDEnrolment, EACDEnrolments, EACDIdentifiers}
 import models.etmp.EtmpExclusion
 import models.etmp.intermediary.*
-import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
+import models.euDetails.{EuConsumerSalesMethod, EuDetails, EuOptionalDetails, RegistrationType}
 import models.exclusions.{ExcludedTrader, ExclusionReason}
 import models.iossRegistration.*
 import models.previousRegistrations.{SchemeDetailsWithOptionalVatNumber, SchemeNumbersWithOptionalVatNumber}
@@ -760,6 +760,37 @@ trait ModelGenerators {
       } yield EuDetails(
         euCountry = euCountry,
         sellsGoodsToEUConsumers = sellsGoodsToEUConsumers,
+        sellsGoodsToEUConsumerMethod = Some(sellsGoodsToEUConsumerMethod),
+        registrationType = Some(registrationType),
+        vatRegistered = Some(vatRegistered),
+        euVatNumber = Some(euVatNumber),
+        euTaxReference = Some(euTaxReference),
+        fixedEstablishmentTradingName = Some(fixedEstablishmentTradingName),
+        fixedEstablishmentAddress = Some(fixedEstablishmentAddress),
+        euSendGoodsTradingName = Some(euSendGoodsTradingName),
+        euSendGoodsAddress = Some(euSendGoodsAddress)
+      )
+    }
+  }
+
+  implicit lazy val arbitraryEuOptionalDetails: Arbitrary[EuOptionalDetails] = {
+    Arbitrary {
+      for {
+        sellsGoodsToEUConsumers <- arbitrary[Boolean]
+        sellsGoodsToEUConsumerMethod <- Gen.oneOf(EuConsumerSalesMethod.values)
+        registrationType <- arbitraryRegistrationType.arbitrary
+        vatRegistered <- arbitrary[Boolean]
+        euTaxReference <- genEuTaxReference
+        euVatNumber = arbitraryEuVatNumber.sample.head
+        countryCode = euVatNumber.substring(0, 2)
+        euCountry = Country.euCountries.find(_.code == countryCode).head
+        fixedEstablishmentTradingName = Gen.alphaStr.sample.head
+        fixedEstablishmentAddress <- arbitraryInternationalAddress.arbitrary
+        euSendGoodsTradingName = Gen.alphaStr.sample.head
+        euSendGoodsAddress <- arbitraryInternationalAddress.arbitrary
+      } yield EuOptionalDetails(
+        euCountry = euCountry,
+        sellsGoodsToEUConsumers = Some(sellsGoodsToEUConsumers),
         sellsGoodsToEUConsumerMethod = Some(sellsGoodsToEUConsumerMethod),
         registrationType = Some(registrationType),
         vatRegistered = Some(vatRegistered),
