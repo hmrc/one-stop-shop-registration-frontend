@@ -26,27 +26,27 @@ case class DeleteTradingNamePage(index: Index) extends Page {
   override protected def navigateInNormalMode(answers: UserAnswers): Call =
     answers.get(DeriveNumberOfTradingNames) match {
       case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(NormalMode)
-      case _                => routes.HasTradingNameController.onPageLoad(NormalMode)
+      case _                => routes.HasNoOtherTradingNamesController.onPageLoad(NormalMode)
     }
 
   override protected def navigateInCheckMode (answers: UserAnswers): Call = {
     answers.get(DeriveNumberOfTradingNames) match {
       case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(CheckMode)
-      case _                => routes.HasTradingNameController.onPageLoad(CheckMode)
+      case _                => routes.HasNoOtherTradingNamesController.onPageLoad(CheckMode)
     }
   }
 
   override protected def navigateInAmendMode(answers: UserAnswers): Call = {
     answers.get(DeriveNumberOfTradingNames) match {
       case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(AmendMode)
-      case _ => routes.HasTradingNameController.onPageLoad(AmendMode)
+      case _ => routes.HasNoOtherTradingNamesController.onPageLoad(AmendMode)
     }
   }
 
   override protected def navigateInRejoinMode(answers: UserAnswers): Call = {
     answers.get(DeriveNumberOfTradingNames) match {
       case Some(n) if n > 0 => routes.AddTradingNameController.onPageLoad(RejoinMode)
-      case _ => routes.HasTradingNameController.onPageLoad(RejoinMode)
+      case _ => routes.HasNoOtherTradingNamesController.onPageLoad(RejoinMode)
     }
   }
 }

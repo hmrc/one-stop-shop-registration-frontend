@@ -182,7 +182,7 @@ class ChangeYourRegistrationController @Inject()(
 
   private def getTradingNameRows(isExcluded: Boolean)(implicit request: AuthenticatedDataRequest[_]) = {
     val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, AmendMode, isExcluded)
-    Seq(new HasTradingNameSummary().row(request.userAnswers, AmendMode, isExcluded).map { sr =>
+    Seq(new HasNoOtherTradingNamesSummary().row(request.userAnswers, AmendMode, isExcluded).map { sr =>
       if (tradingNameSummaryRow.isDefined) {
         sr.withCssClass("govuk-summary-list__row--no-border")
       } else {

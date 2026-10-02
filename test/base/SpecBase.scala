@@ -107,7 +107,7 @@ trait SpecBase
   val basicUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers.set(RegisteredForOssInEuPage, false).success.value copy (vatInfo = Some(vatCustomerInfo))
   val emptyUserAnswersWithVatInfo: UserAnswers = emptyUserAnswers copy (vatInfo = Some(vatCustomerInfo))
   val completeUserAnswers: UserAnswers = basicUserAnswersWithVatInfo
-    .set(HasTradingNamePage, false).success.value
+    .set(HasNoOtherTradingNamesPage, true).success.value
     .set(HasMadeSalesPage, false).success.value
     .set(TaxRegisteredInEuPage, false).success.value
     .set(PreviouslyRegisteredPage, false).success.value
@@ -189,7 +189,7 @@ trait SpecBase
                        )(implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
     new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
-      val hasTradingNameSummaryRow = new HasTradingNameSummary().row(answers, mode, isExcluded)
+      val hasNoOtherTradingNamesSummaryRow = new HasNoOtherTradingNamesSummary().row(answers, mode, isExcluded)
       val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(answers, mode, isExcluded)
       val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(answers, mode, isExcluded)
       val commencementDateSummaryRow = commencementDateSummary
@@ -208,7 +208,7 @@ trait SpecBase
       val bankDetailsIbanSummaryRow = BankDetailsSummary.rowIBAN(answers, mode)
 
       Seq(
-        hasTradingNameSummaryRow.map { sr =>
+        hasNoOtherTradingNamesSummaryRow.map { sr =>
           if (tradingNameSummaryRow.isDefined) {
             sr.withCssClass("govuk-summary-list__row--no-border")
           } else {
@@ -251,7 +251,7 @@ trait SpecBase
                               (implicit msgs: Messages, hc: HeaderCarrier, request: AuthenticatedDataRequest[_]): Future[Seq[SummaryListRow]] = {
     new CommencementDateSummary(dateService, registrationService).row(answers).map { commencementDateSummary =>
 
-      val hasTradingNameSummaryRow = new HasTradingNameSummary().amendedAnswersRow(answers)
+      val hasNoOtherTradingNamesSummaryRow = new HasNoOtherTradingNamesSummary().amendedAnswersRow(answers)
       val tradingNameSummaryRow = TradingNameSummary.amendedAnswersRow(answers)
       val removedTradingNameRows = TradingNameSummary.removedAnswersRow(getRemovedTradingNames(answers, registration))
       val hasMadeSalesSummaryRow = HasMadeSalesSummary.amendedAnswersRow(answers)
@@ -271,7 +271,7 @@ trait SpecBase
       val bankDetailsIbanSummaryRow = BankDetailsSummary.amendedIBANRow(answers)
 
       Seq(
-        hasTradingNameSummaryRow,
+        hasNoOtherTradingNamesSummaryRow,
         tradingNameSummaryRow,
         removedTradingNameRows,
         hasMadeSalesSummaryRow,

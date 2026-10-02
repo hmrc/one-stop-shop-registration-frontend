@@ -19,14 +19,14 @@ POST        /check-answers/:incompletePrompt                                    
 
 GET         /unauthorised                                                              controllers.UnauthorisedController.onPageLoad()
 
-GET         /have-uk-trading-name                                                      controllers.HasTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /have-uk-trading-name                                                      controllers.HasTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET         /check-have-uk-trading-name                                                controllers.HasTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /check-have-uk-trading-name                                                controllers.HasTradingNameController.onSubmit(mode: Mode = CheckMode)
-GET         /amend-have-uk-trading-name                                                controllers.HasTradingNameController.onPageLoad(mode: Mode = AmendMode)
-POST        /amend-have-uk-trading-name                                                controllers.HasTradingNameController.onSubmit(mode: Mode = AmendMode)
-GET         /rejoin-amend-have-uk-trading-name                                         controllers.HasTradingNameController.onPageLoad(mode: Mode = RejoinMode)
-POST        /rejoin-amend-have-uk-trading-name                                         controllers.HasTradingNameController.onSubmit(mode: Mode = RejoinMode)
+GET         /have-no-other-uk-trading-names                                            controllers.HasNoOtherTradingNamesController.onPageLoad(mode: Mode = NormalMode)
+POST        /have-no-other-uk-trading-names                                            controllers.HasNoOtherTradingNamesController.onSubmit(mode: Mode = NormalMode)
+GET         /check-have-no-other-uk-trading-names                                      controllers.HasNoOtherTradingNamesController.onPageLoad(mode: Mode = CheckMode)
+POST        /check-have-no-other-uk-trading-names                                      controllers.HasNoOtherTradingNamesController.onSubmit(mode: Mode = CheckMode)
+GET         /amend-have-no-other-uk-trading-names                                      controllers.HasNoOtherTradingNamesController.onPageLoad(mode: Mode = AmendMode)
+POST        /amend-have-no-other-uk-trading-names                                      controllers.HasNoOtherTradingNamesController.onSubmit(mode: Mode = AmendMode)
+GET         /rejoin-amend-have-no-other-uk-trading-names                               controllers.HasNoOtherTradingNamesController.onPageLoad(mode: Mode = RejoinMode)
+POST        /rejoin-amend-have-no-other-uk-trading-names                               controllers.HasNoOtherTradingNamesController.onSubmit(mode: Mode = RejoinMode)
 
 GET         /uk-trading-name/:index                                                    controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode, index: Index)
 POST        /uk-trading-name/:index                                                    controllers.TradingNameController.onSubmit(mode: Mode = NormalMode, index: Index)

@@ -26,9 +26,9 @@
 
 @(form: Form[_], mode: Mode, registeredCompanyName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("hasTradingName.title"))) {
+@layout(pageTitle = title(form, messages("hasNoOtherTradingNames.title", registeredCompanyName))) {
 
-    @formHelper(action = routes.HasTradingNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.HasNoOtherTradingNamesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -37,10 +37,10 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("hasTradingName.heading", registeredCompanyName)).asPageHeading()
+                legend = LegendViewModel(messages("hasNoOtherTradingNames.heading", registeredCompanyName)).asPageHeading()
             )
         )
 
-        @button("site.continue",  routes.HasTradingNameController.onPageLoad(mode).url, mode)
+        @button("site.continue",  routes.HasNoOtherTradingNamesController.onPageLoad(mode).url, mode)
     }
 }

@@ -67,7 +67,7 @@ class CheckYourAnswersController @Inject()(
 
       commencementDateSummary.row(request.userAnswers).map { cds =>
 
-        val hasTradingNameSummaryRow = new HasTradingNameSummary().row(request.userAnswers, CheckMode)
+        val hasNoOtherTradingNamesSummaryRow = new HasNoOtherTradingNamesSummary().row(request.userAnswers, CheckMode)
         val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, CheckMode)
         val hasMadeSalesSummaryRow = HasMadeSalesSummary.row(request.userAnswers, CheckMode)
         val dateOfFirstSaleSummaryRow = DateOfFirstSaleSummary.row(request.userAnswers, CheckMode)
@@ -87,7 +87,7 @@ class CheckYourAnswersController @Inject()(
 
         val list = SummaryListViewModel(
           rows = Seq(
-            hasTradingNameSummaryRow.map { sr =>
+            hasNoOtherTradingNamesSummaryRow.map { sr =>
               if (tradingNameSummaryRow.isDefined) {
                 sr.withCssClass("govuk-summary-list__row--no-border")
               } else {

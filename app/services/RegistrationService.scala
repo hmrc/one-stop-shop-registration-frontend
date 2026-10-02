@@ -49,11 +49,11 @@ class RegistrationService @Inject()(
         vatInfo = Some(vatCustomerInfo)
       ).set(BusinessBasedInNiPage, true)
       eligibleSalesUA <- setEligibleSales(businessBasedInNiUA, registration)
-      hasTradingNameUA <- eligibleSalesUA.set(HasTradingNamePage, registration.tradingNames.nonEmpty)
+      hasNoOtherTradingNamesUA <- eligibleSalesUA.set(HasNoOtherTradingNamesPage, registration.tradingNames.isEmpty)
       tradingNamesUA <- if (registration.tradingNames.nonEmpty) {
-        hasTradingNameUA.set(AllTradingNames, registration.tradingNames.toList)
+        hasNoOtherTradingNamesUA.set(AllTradingNames, registration.tradingNames.toList)
       } else {
-        Try(hasTradingNameUA)
+        Try(hasNoOtherTradingNamesUA)
       }
 
       hasTaxRegisteredInEuUA <- tradingNamesUA.set(TaxRegisteredInEuPage, registration.euRegistrations.nonEmpty)

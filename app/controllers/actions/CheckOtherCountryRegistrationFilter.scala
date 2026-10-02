@@ -49,7 +49,6 @@ class CheckOtherCountryRegistrationFilterImpl @Inject()(
 
     if (appConfig.otherCountryRegistrationValidationEnabled && !mode.contains(AmendMode) || !mode.contains(RejoinMode)) {
       service.searchUkVrn(request.vrn).map {
-// TODO -> Test
 
         case Some(activeMatch) if activeMatch.isActiveTrader && revalidateSavedAnswers =>
           Some(Redirect(revalidateRoutes.RevalidateAlreadyRegisteredController.onPageLoad()))

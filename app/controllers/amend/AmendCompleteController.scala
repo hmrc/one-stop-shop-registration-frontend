@@ -56,7 +56,7 @@ class AmendCompleteController @Inject()(
     implicit request => {
 
       val userResearchUrl = frontendAppConfig.userResearchUrl2
-      
+
       getOriginalRegistration() { originalRegistration =>
 
         for {
@@ -99,7 +99,7 @@ class AmendCompleteController @Inject()(
 
     SummaryListViewModel(
       rows = (
-        getHasTradingNameRows(originalRegistration, userAnswers) ++
+        getHasNoOtherTradingNamesRows(originalRegistration, userAnswers) ++
           getTradingNameRows(originalRegistration, userAnswers) ++
           getHasSalesRows(originalRegistration, userAnswers) ++
           getSalesRows(cds, originalRegistration, userAnswers) ++
@@ -117,22 +117,22 @@ class AmendCompleteController @Inject()(
     )
   }
 
-  private def getHasTradingNameRows(
-                                     originalRegistration: Option[Registration],
-                                     userAnswers: UserAnswers
-                                   )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+  private def getHasNoOtherTradingNamesRows(
+                                             originalRegistration: Option[Registration],
+                                             userAnswers: UserAnswers
+                                           )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
     val originalTradingNames = originalRegistration.map(_.tradingNames).getOrElse(List.empty)
     val amendedTradingNames = userAnswers.get(AllTradingNames).getOrElse(List.empty)
-    val hasChangedToNo = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
-    val hasChangedToYes = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val hasChangedToNo = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val hasChangedToYes = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
     val notAmended = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || amendedTradingNames.isEmpty && originalTradingNames.isEmpty
 
     if (notAmended) {
       Seq.empty
     } else if (hasChangedToNo || hasChangedToYes) {
       Seq(
-        new HasTradingNameSummary().amendedAnswersRow(request.userAnswers),
+        new HasNoOtherTradingNamesSummary().amendedAnswersRow(request.userAnswers),
       )
     } else {
       Seq.empty

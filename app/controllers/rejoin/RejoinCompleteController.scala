@@ -21,9 +21,9 @@ import connectors.RegistrationConnector
 import controllers.actions.*
 import formats.Format.dateFormatter
 import logging.Logging
-import models.{RejoinMode, UserAnswers}
 import models.domain.Registration
 import models.requests.AuthenticatedDataRequest
+import models.{RejoinMode, UserAnswers}
 import pages.{BankDetailsPage, BusinessContactDetailsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,7 +31,7 @@ import queries.AllTradingNames
 import services.{DateService, PeriodService}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.{BankDetailsSummary, BusinessContactDetailsSummary, HasTradingNameSummary, TradingNameSummary}
+import viewmodels.checkAnswers.{BankDetailsSummary, BusinessContactDetailsSummary, HasNoOtherTradingNamesSummary, TradingNameSummary}
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.rejoin.RejoinCompleteView
 
@@ -101,7 +101,7 @@ class RejoinCompleteController @Inject()(
 
         SummaryListViewModel(
           rows = (
-            getHasTradingNameRows(registration) ++
+            getHasNoOtherTradingNamesRows(registration) ++
               getTradingNameRows(registration) ++
               getBusinessContactDetailsRows(registration) ++
               getBankDetailsRows(registration)
@@ -115,21 +115,21 @@ class RejoinCompleteController @Inject()(
     }
   }
 
-  private def getHasTradingNameRows(
-                                     originalRegistration: Registration
-                                   )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+  private def getHasNoOtherTradingNamesRows(
+                                             originalRegistration: Registration
+                                           )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
     val originalTradingNames = originalRegistration.tradingNames
     val amendedTradingNames = request.userAnswers.get(AllTradingNames).getOrElse(List.empty)
-    val hasChangedToNo = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
-    val hasChangedToYes = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val hasChangedToNo = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val hasChangedToYes = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
     val notAmended = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || amendedTradingNames.isEmpty && originalTradingNames.isEmpty
 
     if (notAmended) {
       Seq.empty
     } else if (hasChangedToNo || hasChangedToYes) {
       Seq(
-        new HasTradingNameSummary().amendedAnswersRow(request.userAnswers),
+        new HasNoOtherTradingNamesSummary().amendedAnswersRow(request.userAnswers),
       )
     } else {
       Seq.empty
@@ -174,7 +174,7 @@ class RejoinCompleteController @Inject()(
 
     Seq(
       if (amendedDetails.exists(_.fullName != originalDetails.fullName)) {
-        
+
         BusinessContactDetailsSummary.amendedContactNameRow(request.userAnswers)
       } else {
         None

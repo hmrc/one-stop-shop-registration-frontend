@@ -34,10 +34,10 @@ class DeleteTradingNamePageSpec extends SpecBase {
           .mustEqual(routes.AddTradingNameController.onPageLoad(NormalMode))
       }
 
-      "to Has Trading Name when there are no trading names present" in {
+      "to Has No Other Trading Names when there are no trading names present" in {
 
         DeleteTradingNamePage(Index(0)).navigate(NormalMode, emptyUserAnswers)
-          .mustEqual(routes.HasTradingNameController.onPageLoad(NormalMode))
+          .mustEqual(routes.HasNoOtherTradingNamesController.onPageLoad(NormalMode))
       }
     }
 
@@ -51,10 +51,10 @@ class DeleteTradingNamePageSpec extends SpecBase {
           .mustEqual(routes.AddTradingNameController.onPageLoad(CheckMode))
       }
 
-      "to Has Trading Name when there are no trading names present" in {
+      "to Has No OtherTrading Names when there are no trading names present" in {
 
         DeleteTradingNamePage(Index(0)).navigate(CheckMode, emptyUserAnswers)
-          .mustEqual(routes.HasTradingNameController.onPageLoad(CheckMode))
+          .mustEqual(routes.HasNoOtherTradingNamesController.onPageLoad(CheckMode))
       }
     }
 
@@ -68,10 +68,10 @@ class DeleteTradingNamePageSpec extends SpecBase {
           .mustEqual(routes.AddTradingNameController.onPageLoad(AmendMode))
       }
 
-      "to Has Trading Name when there are no trading names present" in {
+      "to Has No Other Trading Names when there are no trading names present" in {
 
         DeleteTradingNamePage(Index(0)).navigate(AmendMode, emptyUserAnswers)
-          .mustEqual(routes.HasTradingNameController.onPageLoad(AmendMode))
+          .mustEqual(routes.HasNoOtherTradingNamesController.onPageLoad(AmendMode))
       }
     }
 
@@ -85,10 +85,10 @@ class DeleteTradingNamePageSpec extends SpecBase {
           .mustEqual(routes.AddTradingNameController.onPageLoad(RejoinMode))
       }
 
-      "to Has Trading Name when there are no trading names present" in {
+      "to Has No Other Trading Names when there are no trading names present" in {
 
         DeleteTradingNamePage(Index(0)).navigate(RejoinMode, emptyUserAnswers)
-          .mustEqual(routes.HasTradingNameController.onPageLoad(RejoinMode))
+          .mustEqual(routes.HasNoOtherTradingNamesController.onPageLoad(RejoinMode))
       }
     }
   }

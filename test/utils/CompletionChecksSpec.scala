@@ -36,7 +36,7 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
   object TestCompletionChecks extends CompletionChecks
 
   private val completeAnswers = completeUserAnswers
-    .set(HasTradingNamePage, true).success.value
+    .set(HasNoOtherTradingNamesPage, false).success.value
     .set(AllTradingNames, List("Trading Name")).success.value
     .set(HasMadeSalesPage, true).success.value
     .set(DateOfFirstSalePage, arbitraryDate).success.value
@@ -123,6 +123,7 @@ class CompletionChecksSpec extends SpecBase with MockitoSugar {
     }
 
     "validate" - {
+
       "should return true if all validations pass" in {
 
         val application = applicationBuilder(userAnswers = Some(completeAnswers)).build()

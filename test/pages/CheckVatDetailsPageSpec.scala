@@ -40,12 +40,12 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
         "when we have VAT details" - {
 
-          "to wherever the Has Trading Name page would navigate to" in {
+          "to wherever the Has No Other Trading Names page would navigate to" in {
 
             val answers = basicUserAnswersWithVatInfo.set(CheckVatDetailsPage, Yes).success.value
 
             CheckVatDetailsPage.navigate(NormalMode, answers)
-              .mustEqual(controllers.routes.HasTradingNameController.onPageLoad(NormalMode))
+              .mustEqual(controllers.routes.HasNoOtherTradingNamesController.onPageLoad(NormalMode))
           }
 
         }
@@ -71,7 +71,7 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
               val answers = basicUserAnswersWithVatInfo
                 .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
-                .set(HasTradingNamePage, true).success.value
+                .set(HasNoOtherTradingNamesPage, true).success.value
                 .set(CheckVatDetailsPage, Yes).success.value
 
               CheckVatDetailsPage.navigate(NormalMode, answers)
@@ -81,13 +81,13 @@ class CheckVatDetailsPageSpec extends SpecBase with PageBehaviours {
 
           "and there are no trading names present within the latest IOSS account" - {
 
-            "to Has Trading Name" in {
+            "to Has No Other Trading Names" in {
 
               val answers = basicUserAnswersWithVatInfo
                 .set(CheckVatDetailsPage, Yes).success.value
 
               CheckVatDetailsPage.navigate(NormalMode, answers)
-                .mustEqual(controllers.routes.HasTradingNameController.onPageLoad(NormalMode))
+                .mustEqual(controllers.routes.HasNoOtherTradingNamesController.onPageLoad(NormalMode))
             }
           }
         }

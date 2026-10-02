@@ -23,7 +23,7 @@ import models.{CheckVatDetails, CompositeAccount, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CheckVatDetailsPage, HasTradingNamePage, RegisteredForOssInEuPage}
+import pages.{CheckVatDetailsPage, HasNoOtherTradingNamesPage, RegisteredForOssInEuPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -136,7 +136,7 @@ class CheckVatDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val expectedAnswers = basicUserAnswersWithVatInfo
           .set(CheckVatDetailsPage, CheckVatDetails.Yes).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, false).success.value
           .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
 
         status(result) `mustBe` SEE_OTHER

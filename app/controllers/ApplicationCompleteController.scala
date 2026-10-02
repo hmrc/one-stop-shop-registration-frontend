@@ -21,8 +21,8 @@ import connectors.RegistrationConnector
 import controllers.actions.*
 import formats.Format.dateFormatter
 import logging.Logging
-import models.{CompositeAccount, UserAnswers}
 import models.requests.AuthenticatedDataRequest
+import models.{CompositeAccount, UserAnswers}
 import pages.{BankDetailsPage, BusinessContactDetailsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,7 +31,7 @@ import queries.AllTradingNames
 import services.{DateService, PeriodService}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.{BankDetailsSummary, BusinessContactDetailsSummary, HasTradingNameSummary, TradingNameSummary}
+import viewmodels.checkAnswers.{BankDetailsSummary, BusinessContactDetailsSummary, HasNoOtherTradingNamesSummary, TradingNameSummary}
 import viewmodels.govuk.all.SummaryListViewModel
 import views.html.ApplicationCompleteView
 
@@ -112,7 +112,7 @@ class ApplicationCompleteController @Inject()(
 
         SummaryListViewModel(
           rows = (
-            getHasTradingNameRows(compositeAccountDetails, userAnswers) ++
+            getHasNoOtherTradingNamseRows(compositeAccountDetails, userAnswers) ++
               getTradingNameRows(compositeAccountDetails, userAnswers) ++
               getBusinessContactDetailsRows(compositeAccountDetails, userAnswers) ++
               getBankDetailsRows(compositeAccountDetails, userAnswers)
@@ -126,22 +126,22 @@ class ApplicationCompleteController @Inject()(
     }
   }
 
-  private def getHasTradingNameRows(
-                                     compositeAccount: CompositeAccount,
-                                     userAnswers: UserAnswers
-                                   )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
+  private def getHasNoOtherTradingNamseRows(
+                                             compositeAccount: CompositeAccount,
+                                             userAnswers: UserAnswers
+                                           )(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
 
     val originalTradingNames = compositeAccount.tradingNames.map(_.tradingName).toList
     val amendedTradingNames = userAnswers.get(AllTradingNames).getOrElse(List.empty)
-    val hasChangedToNo = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
-    val hasChangedToYes = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val hasChangedToNo = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || originalTradingNames.isEmpty
+    val hasChangedToYes = amendedTradingNames.isEmpty && originalTradingNames.nonEmpty
     val notAmended = amendedTradingNames.nonEmpty && originalTradingNames.nonEmpty || amendedTradingNames.isEmpty && originalTradingNames.isEmpty
 
     if (notAmended) {
       Seq.empty
     } else if (hasChangedToNo || hasChangedToYes) {
       Seq(
-        new HasTradingNameSummary().amendedAnswersRow(request.userAnswers),
+        new HasNoOtherTradingNamesSummary().amendedAnswersRow(request.userAnswers),
       )
     } else {
       Seq.empty

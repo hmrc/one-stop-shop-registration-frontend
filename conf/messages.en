@@ -74,11 +74,11 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-hasTradingName.title = Does your business trade using a different name in the UK?
-hasTradingName.heading = Does your business trade using a name that is different from {0} in the UK?
-hasTradingName.checkYourAnswersLabel = Have a different UK trading name
-hasTradingName.error.required = Select yes if you use a different trading name in the UK
-hasTradingName.change.hidden = if you have a different UK trading name
+hasNoOtherTradingNames.title = Is {0} your only trading name?
+hasNoOtherTradingNames.heading = Is {0} your only trading name
+hasNoOtherTradingNames.checkYourAnswersLabel = Is your only trading name
+hasNoOtherTradingNames.error.required = Select no if you use a different trading name
+hasNoOtherTradingNames.change.hidden = is your only trading name
 
 tradingName.title = What is your UK trading name?
 tradingName.heading = What is your UK trading name?
@@ -352,7 +352,7 @@ checkVatDetails.individualName = Name
 checkVatDetails.partOfVatGroup = UK VAT group
 checkVatDetails.address = Principal place of business address
 checkVatDetails.yes = Yes
-checkVatDetails.detailsIncorrect = Yes, but some of my VAT details are incorrect
+checkVatDetails.detailsIncorrect = Yes, but some of my details are incorrect
 checkVatDetails.wrongAccount = No, I want to register a different business
 
 useOtherAccount.title = Sign in with a different Government Gateway user ID
