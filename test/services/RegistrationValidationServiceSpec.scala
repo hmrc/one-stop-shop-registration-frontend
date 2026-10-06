@@ -74,7 +74,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
     )
       .set(BusinessBasedInNiPage, true).success.value
       .set(DateOfFirstSalePage, arbitraryDate).success.value
-      .set(HasTradingNamePage, true).success.value
+      .set(HasNoOtherTradingNamesPage, false).success.value
       .set(AllTradingNames, List("single", "double")).success.value
       .set(TaxRegisteredInEuPage, true).success.value
       .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
@@ -175,7 +175,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
 
       val userAnswers =
         answersNotPartOfVatGroup
-          .set(HasTradingNamePage, false).success.value
+          .set(HasNoOtherTradingNamesPage, true).success.value
           .remove(AllTradingNames).success.value
           .set(TaxRegisteredInEuPage, false).success.value
           .remove(AllEuDetailsRawQuery).success.value
@@ -274,7 +274,7 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         UserAnswers("id", vatInfo = Some(vatCustomerInfo.copy(partOfVatGroup = true)))
           .set(BusinessBasedInNiPage, true).success.value
           .set(DateOfFirstSalePage, arbitraryDate).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, false).success.value
           .set(AllTradingNames, List("single", "double")).success.value
           .set(TaxRegisteredInEuPage, true).success.value
           .set(EuCountryPage(Index(0)), Country("FR", "France")).success.value
@@ -413,17 +413,17 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(CheckVatDetailsPage), DataMissingError(CheckVatDetailsPage)))
       }
 
-      "when Has Trading Name is missing" in {
+      "when Has No Other Trading Names is missing" in {
 
         when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
-        val userAnswers = answersNotPartOfVatGroup.remove(HasTradingNamePage).success.value
+        val userAnswers = answersNotPartOfVatGroup.remove(HasNoOtherTradingNamesPage).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasNoOtherTradingNamesPage)))
       }
 
-      "when Has Trading Name is true, but there are no trading names" in {
+      "when Has No Other Trading Names is false, but there are no trading names" in {
 
         when(mockRegistrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
@@ -433,12 +433,12 @@ class RegistrationValidationServiceSpec extends SpecBase with MockitoSugar with 
         result mustEqual Invalid(NonEmptyChain(DataMissingError(AllTradingNames)))
       }
 
-      "when Has Trading Name is false, but there are trading names" in {
+      "when Has No Other Trading Names is true, but there are trading names" in {
 
-        val userAnswers = answersNotPartOfVatGroup.set(HasTradingNamePage, false).success.value
+        val userAnswers = answersNotPartOfVatGroup.set(HasNoOtherTradingNamesPage, true).success.value
         val result = getRegistrationService.fromUserAnswers(userAnswers, vrn).futureValue
 
-        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasTradingNamePage)))
+        result mustEqual Invalid(NonEmptyChain(DataMissingError(HasNoOtherTradingNamesPage)))
       }
 
       "when both Date of First Sale and previously registered are missing" in {

@@ -17,8 +17,8 @@
 package pages
 
 import controllers.routes
+import models.CheckVatDetails.*
 import models.{CheckVatDetails, NormalMode, UserAnswers}
-import models.CheckVatDetails._
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import queries.AllTradingNames
@@ -32,7 +32,7 @@ case object CheckVatDetailsPage extends QuestionPage[CheckVatDetails] {
   override def navigateInNormalMode(answers: UserAnswers): Call =
     (answers.get(CheckVatDetailsPage), answers.vatInfo, answers.get(AllTradingNames)) match {
       case (Some(Yes), Some(vatInfo), Some(tradingNames)) if tradingNames.nonEmpty     => routes.AddTradingNameController.onPageLoad(NormalMode)
-      case (Some(Yes), Some(vatInfo), _) if vatInfo.address.line1.nonEmpty             => routes.HasTradingNameController.onPageLoad(NormalMode)
+      case (Some(Yes), Some(vatInfo), _) if vatInfo.address.line1.nonEmpty             => routes.HasNoOtherTradingNamesController.onPageLoad(NormalMode)
       case (Some(WrongAccount), _, _)                                                  => routes.UseOtherAccountController.onPageLoad()
       case (Some(DetailsIncorrect), _, _)                                              => routes.UpdateVatDetailsController.onPageLoad()
       case _                                                                           => routes.JourneyRecoveryController.onPageLoad()

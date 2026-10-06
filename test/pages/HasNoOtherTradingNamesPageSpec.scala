@@ -1,0 +1,242 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package pages
+
+import base.SpecBase
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import controllers.routes
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import pages.behaviours.PageBehaviours
+
+class HasNoOtherTradingNamesPageSpec extends SpecBase with PageBehaviours with MockitoSugar with BeforeAndAfterEach {
+
+  "HasNoOtherTradingNamesPage" - {
+
+    beRetrievable[Boolean](HasNoOtherTradingNamesPage)
+
+    beSettable[Boolean](HasNoOtherTradingNamesPage)
+
+    beRemovable[Boolean](HasNoOtherTradingNamesPage)
+
+    "must navigate in Normal mode" - {
+
+      "when the answer is yes" - {
+
+        "to Date of First Sale when the scheme has started" in {
+
+          val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, true).success.value
+
+          HasNoOtherTradingNamesPage.navigate(NormalMode, answers)
+            .mustBe(routes.HasMadeSalesController.onPageLoad(NormalMode))
+        }
+      }
+
+      "to Trading Name (index 0) when the answer is no" in {
+
+        val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
+
+        HasNoOtherTradingNamesPage.navigate(NormalMode, answers)
+          .mustBe(routes.TradingNameController.onPageLoad(NormalMode, Index(0)))
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasNoOtherTradingNamesPage.navigate(NormalMode, emptyUserAnswers)
+            .mustBe(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Check mode" - {
+
+      "when the answer is yes" - {
+
+        "to Delete All Trading Names when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasNoOtherTradingNamesPage, true).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasNoOtherTradingNamesPage.navigate(CheckMode, answers)
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad(CheckMode))
+        }
+
+        "to Check Your Answers when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasNoOtherTradingNamesPage, true).success.value
+
+          HasNoOtherTradingNamesPage.navigate(CheckMode, answers)
+            .mustEqual(routes.CheckYourAnswersController.onPageLoad())
+        }
+
+      }
+
+      "when the answer is no" - {
+
+        "to Trading name (index 0) when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
+
+          HasNoOtherTradingNamesPage.navigate(CheckMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(CheckMode, Index(0)))
+        }
+
+        "to Add Trading Name when there are trading names in the user's answers" in {
+
+          val answers =
+            emptyUserAnswers
+              .set(TradingNamePage(Index(0)), "foo trading name").success.value
+              .set(HasNoOtherTradingNamesPage, false).success.value
+
+          HasNoOtherTradingNamesPage.navigate(CheckMode, answers)
+            .mustEqual(routes.AddTradingNameController.onPageLoad(CheckMode))
+        }
+
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasNoOtherTradingNamesPage.navigate(CheckMode, emptyUserAnswers)
+            .mustBe(routes.JourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Amend mode" - {
+
+      "when the answer is yes" - {
+
+        "to Delete All Trading Names Page when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasNoOtherTradingNamesPage, true).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasNoOtherTradingNamesPage.navigate(AmendMode, answers)
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad(AmendMode))
+        }
+
+        "to Change Your Registration Page when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, true).success.value
+
+          HasNoOtherTradingNamesPage.navigate(AmendMode, answers)
+            .mustEqual(amendRoutes.ChangeYourRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Trading name (index 0) when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
+
+          HasNoOtherTradingNamesPage.navigate(AmendMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(AmendMode, Index(0)))
+        }
+
+        "to Add Trading name when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasNoOtherTradingNamesPage, false).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasNoOtherTradingNamesPage.navigate(AmendMode, answers)
+            .mustEqual(routes.AddTradingNameController.onPageLoad(AmendMode))
+        }
+
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasNoOtherTradingNamesPage.navigate(AmendMode, emptyUserAnswers)
+            .mustBe(amendRoutes.AmendJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+
+    "must navigate in Rejoin mode" - {
+
+      "when the answer is yes" - {
+
+        "to Delete All Trading Names Page when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasNoOtherTradingNamesPage, true).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasNoOtherTradingNamesPage.navigate(RejoinMode, answers)
+            .mustEqual(routes.DeleteAllTradingNamesController.onPageLoad(RejoinMode))
+        }
+
+        "to Rejoin Registration Page when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, true).success.value
+
+          HasNoOtherTradingNamesPage.navigate(RejoinMode, answers)
+            .mustEqual(rejoinRoutes.RejoinRegistrationController.onPageLoad())
+        }
+      }
+
+      "when the answer is no" - {
+
+        "to Trading name (index 0) when there are no trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
+
+          HasNoOtherTradingNamesPage.navigate(RejoinMode, answers)
+            .mustEqual(routes.TradingNameController.onPageLoad(RejoinMode, Index(0)))
+        }
+
+        "to Add Trading name when there are trading names in the user's answers" in {
+
+          val answers = emptyUserAnswers
+            .set(HasNoOtherTradingNamesPage, false).success.value
+            .set(TradingNamePage(Index(0)), "foo trading name").success.value
+            .set(TradingNamePage(Index(1)), "bar trading name").success.value
+
+          HasNoOtherTradingNamesPage.navigate(RejoinMode, answers)
+            .mustEqual(routes.AddTradingNameController.onPageLoad(RejoinMode))
+        }
+
+      }
+
+      "when the answer is empty" - {
+
+        "to Journey recovery" in {
+
+          HasNoOtherTradingNamesPage.navigate(RejoinMode, emptyUserAnswers)
+            .mustBe(rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad())
+        }
+      }
+    }
+  }
+}

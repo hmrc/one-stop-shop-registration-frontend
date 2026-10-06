@@ -22,7 +22,7 @@ import forms.DeleteAllTradingNamesFormProvider
 import javax.inject.Inject
 import models.Mode
 import models.requests.AuthenticatedDataRequest
-import pages.{DeleteAllTradingNamesPage, HasTradingNamePage}
+import pages.{DeleteAllTradingNamesPage, HasNoOtherTradingNamesPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.AllTradingNames
@@ -64,7 +64,7 @@ class DeleteAllTradingNamesController @Inject()(
     val removeTradingNames = if (value) {
       request.userAnswers.remove(AllTradingNames)
     } else {
-      request.userAnswers.set(HasTradingNamePage, true)
+      request.userAnswers.set(HasNoOtherTradingNamesPage, false)
     }
     for {
       updatedAnswers <- Future.fromTry(removeTradingNames)

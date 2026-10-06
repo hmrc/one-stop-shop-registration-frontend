@@ -17,29 +17,29 @@
 package controllers
 
 import controllers.actions.*
-import forms.HasTradingNameFormProvider
+import forms.HasNoOtherTradingNamesFormProvider
 import logging.Logging
 import models.Mode
 import models.requests.AuthenticatedDataRequest
-import pages.HasTradingNamePage
+import pages.HasNoOtherTradingNamesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.AllTradingNames
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.CheckJourneyRecovery.determineJourneyRecovery
 import utils.FutureSyntax.FutureOps
-import views.html.HasTradingNameView
+import views.html.HasNoOtherTradingNamesView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
-class HasTradingNameController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         cc: AuthenticatedControllerComponents,
-                                         formProvider: HasTradingNameFormProvider,
-                                         view: HasTradingNameView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+class HasNoOtherTradingNamesController @Inject()(
+                                                  override val messagesApi: MessagesApi,
+                                                  cc: AuthenticatedControllerComponents,
+                                                  formProvider: HasNoOtherTradingNamesFormProvider,
+                                                  view: HasNoOtherTradingNamesView
+                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   protected val controllerComponents: MessagesControllerComponents = cc
 
@@ -50,7 +50,7 @@ class HasTradingNameController @Inject()(
 
           val form = formProvider()
 
-          val preparedForm = request.userAnswers.get(HasTradingNamePage) match {
+          val preparedForm = request.userAnswers.get(HasNoOtherTradingNamesPage) match {
             case None => form
             case Some(value) => form.fill(value)
           }
@@ -72,7 +72,7 @@ class HasTradingNameController @Inject()(
 
             value =>
               val cleanedAnswersTry =
-                if (!value && !mode.isInCheck && !mode.isInAmendOrRejoin) {
+                if (value && !mode.isInCheck && !mode.isInAmendOrRejoin) {
                   request.userAnswers.remove(AllTradingNames)
                 } else {
                   Success(request.userAnswers)
@@ -80,10 +80,10 @@ class HasTradingNameController @Inject()(
 
               for {
                 cleanedAnswers <- Future.fromTry(cleanedAnswersTry)
-                updatedAnswers <- Future.fromTry(cleanedAnswers.set(HasTradingNamePage, value))
-                _              <- cc.sessionRepository.set(updatedAnswers)
-              } yield Redirect(HasTradingNamePage.navigate(mode, updatedAnswers))
-        )
+                updatedAnswers <- Future.fromTry(cleanedAnswers.set(HasNoOtherTradingNamesPage, value))
+                _ <- cc.sessionRepository.set(updatedAnswers)
+              } yield Redirect(HasNoOtherTradingNamesPage.navigate(mode, updatedAnswers))
+          )
       }
   }
 
@@ -91,7 +91,7 @@ class HasTradingNameController @Inject()(
                             (implicit request: AuthenticatedDataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.vatInfo match {
       case Some(vatInfo) if vatInfo.organisationName.isDefined =>
-        val name = vatInfo.organisationName.getOrElse{
+        val name = vatInfo.organisationName.getOrElse {
           val exception = new IllegalStateException("No organisation name when expecting one")
           logger.error(exception.getMessage, exception)
           throw exception

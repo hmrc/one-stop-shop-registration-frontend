@@ -17,11 +17,11 @@
 package services
 
 import base.SpecBase
-import models.{CheckVatDetails, CompositeAccount}
 import models.etmp.intermediary.{EtmpIntermediaryDisplayRegistration, EtmpTradingName, IntermediaryRegistrationWrapper}
 import models.iossRegistration.IossEtmpDisplayRegistration
+import models.{CheckVatDetails, CompositeAccount}
 import org.scalacheck.Arbitrary
-import pages.HasTradingNamePage
+import pages.HasNoOtherTradingNamesPage
 import queries.AllTradingNames
 import testutils.GenerateCompositeAccount.generateCompositeAccount
 
@@ -57,7 +57,7 @@ class TradingNamesServiceSpec extends SpecBase {
         compositeAccount
       ).success.value
 
-      result.get(HasTradingNamePage).value mustBe true
+      result.get(HasNoOtherTradingNamesPage).value mustBe false
       result.get(AllTradingNames).value mustBe
         registration.tradingNames.map(_.tradingName).toList
     }
@@ -72,7 +72,7 @@ class TradingNamesServiceSpec extends SpecBase {
         compositeAccount
       ).success.value
 
-      result.get(HasTradingNamePage).value mustBe true
+      result.get(HasNoOtherTradingNamesPage).value mustBe false
       result.get(AllTradingNames).value mustBe
         registrationWrapper.etmpDisplayRegistration.tradingNames
           .map(_.tradingName)

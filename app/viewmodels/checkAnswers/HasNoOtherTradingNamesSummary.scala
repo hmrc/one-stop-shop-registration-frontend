@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.*
-import pages.HasTradingNamePage
+import pages.HasNoOtherTradingNamesPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryListRow}
 import viewmodels.govuk.summarylist.*
@@ -26,36 +26,36 @@ import viewmodels.implicits.*
 
 import javax.inject.Inject
 
-class HasTradingNameSummary @Inject() {
+class HasNoOtherTradingNamesSummary @Inject() {
 
   def row(answers: UserAnswers, mode: Mode, isExcluded: Boolean = false)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(HasTradingNamePage).map {
-      hasTradingName =>
-        val value = if (hasTradingName) "site.yes" else "site.no"
+    answers.get(HasNoOtherTradingNamesPage).map {
+      hasNoOtherTradingNames =>
+        val value = if (hasNoOtherTradingNames) "site.yes" else "site.no"
 
         val actions: Seq[ActionItem] = if (isExcluded & mode.isInAmend) {
           Seq.empty
         } else {
           Seq(
-            ActionItemViewModel("site.change", routes.HasTradingNameController.onPageLoad(mode).url)
-              .withVisuallyHiddenText(messages("hasTradingName.change.hidden"))
+            ActionItemViewModel("site.change", routes.HasNoOtherTradingNamesController.onPageLoad(mode).url)
+              .withVisuallyHiddenText(messages("hasNoOtherTradingNames.change.hidden"))
           )
         }
 
         SummaryListRowViewModel(
-          key     = messages("hasTradingName.checkYourAnswersLabel"),
+          key     = messages("hasNoOtherTradingNames.checkYourAnswersLabel"),
           value   = ValueViewModel(value),
           actions = actions
         )
     }
 
   def amendedAnswersRow(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(HasTradingNamePage).map {
-      hasTradingName =>
-        val value = if (hasTradingName) "site.yes" else "site.no"
+    answers.get(HasNoOtherTradingNamesPage).map {
+      hasNoOtherTradingNames =>
+        val value = if (hasNoOtherTradingNames) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = KeyViewModel("hasTradingName.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
+          key     = KeyViewModel("hasNoOtherTradingNames.checkYourAnswersLabel").withCssClass("govuk-!-width-one-half"),
           value   = ValueViewModel(value),
         )
     }

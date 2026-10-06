@@ -111,21 +111,21 @@ class RegistrationValidationService @Inject()(
   }
 
   private def getTradingNames(answers: UserAnswers): ValidationResult[List[String]] = {
-    answers.get(HasTradingNamePage) match {
+    answers.get(HasNoOtherTradingNamesPage) match {
       case Some(true) =>
+        answers.get(AllTradingNames) match {
+          case Some(Nil) | None => List.empty.validNec
+          case Some(_) => DataMissingError(HasNoOtherTradingNamesPage).invalidNec
+        }
+
+      case Some(false) =>
         answers.get(AllTradingNames) match {
           case Some(Nil) | None => DataMissingError(AllTradingNames).invalidNec
           case Some(list) => list.validNec
         }
 
-      case Some(false) =>
-        answers.get(AllTradingNames) match {
-          case Some(Nil) | None => List.empty.validNec
-          case Some(_) => DataMissingError(HasTradingNamePage).invalidNec
-        }
-
       case None =>
-        DataMissingError(HasTradingNamePage).invalidNec
+        DataMissingError(HasNoOtherTradingNamesPage).invalidNec
     }
   }
 
@@ -183,10 +183,10 @@ class RegistrationValidationService @Inject()(
   }
 
   private def getWebsites(answers: UserAnswers): ValidationResult[List[String]] = {
-      answers
-        .get(AllWebsites)
-        .getOrElse(List.empty[String])
-        .validNec
+    answers
+      .get(AllWebsites)
+      .getOrElse(List.empty[String])
+      .validNec
   }
 
   private def getOnlineMarketplace(answers: UserAnswers): ValidationResult[Boolean] = {

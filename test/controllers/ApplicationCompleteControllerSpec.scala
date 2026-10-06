@@ -420,7 +420,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, true).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
           .set(BankDetailsPage, iossBankDetails).success.value
@@ -486,7 +486,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, true).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
           .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value
@@ -549,7 +549,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, true).success.value
           .set(AllTradingNames, iossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(telephoneNumber = "123456789")).success.value
           .set(BankDetailsPage, iossBankDetails).success.value
@@ -615,7 +615,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, true).success.value
           .set(AllTradingNames, nonExcludedIossEtmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails.copy(fullName = "Test name")).success.value
           .set(BankDetailsPage, iossBankDetails).success.value
@@ -678,7 +678,7 @@ class ApplicationCompleteControllerSpec extends SpecBase with MockitoSugar {
         val updatedAnswers = userAnswers
           .remove(DateOfFirstSalePage).success.value
           .set(HasMadeSalesPage, false).success.value
-          .set(HasTradingNamePage, true).success.value
+          .set(HasNoOtherTradingNamesPage, true).success.value
           .set(AllTradingNames, registrationWrapper.etmpDisplayRegistration.tradingNames.map(_.tradingName).toList).success.value
           .set(BusinessContactDetailsPage, iossBusinessContactDetails).success.value
           .set(BankDetailsPage, iossBankDetails.copy(accountName = "Test account name")).success.value

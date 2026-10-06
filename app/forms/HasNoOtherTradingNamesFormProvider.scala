@@ -21,10 +21,10 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class HasTradingNameFormProvider @Inject() extends Mappings {
+class HasNoOtherTradingNamesFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("hasTradingName.error.required")
+      "value" -> boolean("hasNoOtherTradingNames.error.required")
     )
 }

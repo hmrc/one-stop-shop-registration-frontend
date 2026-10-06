@@ -1,0 +1,66 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package pages
+
+import controllers.amend.routes as amendRoutes
+import controllers.rejoin.routes as rejoinRoutes
+import controllers.routes
+import models.{AmendMode, CheckMode, Index, NormalMode, RejoinMode, UserAnswers}
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
+import queries.AllTradingNames
+
+
+case object HasNoOtherTradingNamesPage extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "hasTradingName"
+
+  override protected def navigateInNormalMode(answers: UserAnswers): Call = answers.get(HasNoOtherTradingNamesPage) match {
+    case Some(true) => routes.HasMadeSalesController.onPageLoad(NormalMode)
+    case Some(false) => routes.TradingNameController.onPageLoad(NormalMode, Index(0))
+    case None => routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  override protected def navigateInCheckMode(answers: UserAnswers): Call =
+    (answers.get(HasNoOtherTradingNamesPage), answers.get(AllTradingNames)) match {
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.AddTradingNameController.onPageLoad(CheckMode)
+      case (Some(false), _) => routes.TradingNameController.onPageLoad(CheckMode, Index(0))
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(CheckMode)
+      case (Some(true), _) => routes.CheckYourAnswersController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInAmendMode(answers: UserAnswers): Call =
+    (answers.get(HasNoOtherTradingNamesPage), answers.get(AllTradingNames)) match {
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.AddTradingNameController.onPageLoad(AmendMode)
+      case (Some(false), _) => routes.TradingNameController.onPageLoad(AmendMode, Index(0))
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(AmendMode)
+      case (Some(true), _) => amendRoutes.ChangeYourRegistrationController.onPageLoad()
+      case _ => amendRoutes.AmendJourneyRecoveryController.onPageLoad()
+    }
+
+  override protected def navigateInRejoinMode(answers: UserAnswers): Call =
+    (answers.get(HasNoOtherTradingNamesPage), answers.get(AllTradingNames)) match {
+      case (Some(false), Some(tradingNames)) if tradingNames.nonEmpty => routes.AddTradingNameController.onPageLoad(RejoinMode)
+      case (Some(false), _) => routes.TradingNameController.onPageLoad(RejoinMode, Index(0))
+      case (Some(true), Some(tradingNames)) if tradingNames.nonEmpty => routes.DeleteAllTradingNamesController.onPageLoad(RejoinMode)
+      case (Some(true), _) => rejoinRoutes.RejoinRegistrationController.onPageLoad()
+      case _ => rejoinRoutes.RejoinJourneyRecoveryController.onPageLoad()
+    }
+}

@@ -144,7 +144,7 @@ object RegistrationData extends Generators with EitherValues with SpecBase {
       .set(BusinessBasedInNiPage, true).success.value
       .set(HasMadeSalesPage, true).success.value
       .set(DateOfFirstSalePage, LocalDate.now()).success.value
-      .set(HasTradingNamePage, true).success.value
+      .set(HasNoOtherTradingNamesPage, false).success.value
       .set(AllTradingNames, List("single", "double")).success.value
       .set(TaxRegisteredInEuPage, true).success.value
 

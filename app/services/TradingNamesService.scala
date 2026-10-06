@@ -18,7 +18,7 @@ package services
 
 import models.CheckVatDetails.Yes
 import models.{CheckVatDetails, CompositeAccount, UserAnswers}
-import pages.HasTradingNamePage
+import pages.HasNoOtherTradingNamesPage
 import queries.AllTradingNames
 
 import javax.inject.Inject
@@ -39,7 +39,7 @@ class TradingNamesService @Inject()() {
         
         case Some(names) =>
           for {
-            answers <- userAnswers.set(HasTradingNamePage, true)
+            answers <- userAnswers.set(HasNoOtherTradingNamesPage, false)
             updatedAnswers <- answers.set(AllTradingNames, names)
           } yield updatedAnswers
 

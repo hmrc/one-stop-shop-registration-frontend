@@ -22,7 +22,7 @@ import models.{AmendMode, CheckMode, Index}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{DeleteAllTradingNamesPage, HasTradingNamePage, TradingNamePage}
+import pages.{DeleteAllTradingNamesPage, HasNoOtherTradingNamesPage, TradingNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -113,7 +113,7 @@ class DeleteAllTradingNamesControllerSpec extends SpecBase with MockitoSugar {
               val result = route(application, request).value
               val expectedAnswers = userAnswers
                 .set(DeleteAllTradingNamesPage, false).success.value
-                .set(HasTradingNamePage, true).success.value
+                .set(HasNoOtherTradingNamesPage, false).success.value
 
               status(result) `mustBe` SEE_OTHER
               redirectLocation(result).value `mustBe` DeleteAllTradingNamesPage.navigate(mode, expectedAnswers).url

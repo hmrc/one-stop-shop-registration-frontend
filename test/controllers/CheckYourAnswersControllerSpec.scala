@@ -110,7 +110,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
           when(dateService.startOfNextQuarter()) thenReturn commencementDate
           when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
 
-          val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+          val answers = completeUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
           val application = applicationBuilder(userAnswers = Some(answers))
             .overrides(bind[DateService].toInstance(dateService))
             .build()
@@ -435,7 +435,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Sum
             when(registrationValidationService.fromUserAnswers(any(), any())(any(), any(), any())) thenReturn
               Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
 
-            val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+            val answers = completeUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
             val application = applicationBuilder(userAnswers = Some(answers))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService)).build()
 

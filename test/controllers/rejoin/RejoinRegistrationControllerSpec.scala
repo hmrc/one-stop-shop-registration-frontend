@@ -27,13 +27,13 @@ import models.requests.{AuthenticatedDataRequest, AuthenticatedMandatoryDataRequ
 import models.responses.UnexpectedResponseStatus
 import models.{BusinessContactDetails, Country, CurrentReturns, DataMissingError, Index, PreviousScheme, PreviousSchemeType, RejoinMode, Return, SubmissionStatus}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.{ArgumentMatchers, Mockito}
 import org.mockito.Mockito.{doNothing, times, verify, when}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.euDetails.{EuCountryPage, EuTaxReferencePage, TaxRegisteredInEuPage}
 import pages.previousRegistrations.{PreviousEuCountryPage, PreviousSchemePage, PreviousSchemeTypePage, PreviouslyRegisteredPage}
-import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasTradingNamePage}
+import pages.{BusinessContactDetailsPage, HasMadeSalesPage, HasNoOtherTradingNamesPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -169,41 +169,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
           when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
             Right(CurrentReturns(returns = Seq(), finalReturnsCompleted = true)).toFuture
 
-          val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
-
-          val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
-            .overrides(bind[DateService].toInstance(dateService))
-            .overrides(bind[RegistrationConnector].toInstance(registrationConnector))
-            .overrides(bind[RejoinRegistrationService].toInstance(rejoinRegistrationService))
-            .overrides(bind[ReturnStatusConnector].toInstance(returnStatusConnector))
-            .build()
-
-          running(application) {
-            val request = FakeRequest(GET, controllers.rejoin.routes.RejoinRegistrationController.onPageLoad().url)
-            val result = route(application, request).value
-            val view = application.injector.instanceOf[RejoinRegistrationView]
-            implicit val msgs: Messages = messages(application)
-            val vatRegistrationDetailsList = SummaryListViewModel(rows = getCYAVatRegistrationDetailsSummaryList(answers))
-            val list = SummaryListViewModel(rows = getCYASummaryList(answers, dateService, registrationService, Seq.empty, RejoinMode)(request = dataRequest.request).futureValue)
-
-            status(result) `mustBe` OK
-            contentAsString(result) `mustBe` view(vatRegistrationDetailsList, list, isValid = false, RejoinMode)(request, messages(application)).toString
-          }
-        }
-
-        "websites are missing" in {
-
-          when(dateService.calculateCommencementDate(any())(any(), any(), any())) thenReturn Some(commencementDate).toFuture
-          when(dateService.startOfNextQuarter()) thenReturn commencementDate
-          when(registrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
-          when(rejoinRegistrationService.canRejoinRegistration(any(), any())) thenReturn true
-          when(registrationService.eligibleSalesDifference(any(), any())) thenReturn true
-
-          when(returnStatusConnector.getCurrentReturns(any())(any())) thenReturn
-            Right(CurrentReturns(returns = Seq(), finalReturnsCompleted = true)).toFuture
-
-
-          val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+          val answers = completeUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
             .overrides(bind[DateService].toInstance(dateService))
@@ -559,7 +525,7 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
               Invalid(NonEmptyChain(DataMissingError(EuTaxReferencePage(Index(0))))).toFuture
             when(registrationConnector.getRegistration()(any())) thenReturn Some(registration).toFuture
 
-            val answers = completeUserAnswers.set(HasTradingNamePage, true).success.value
+            val answers = completeUserAnswers.set(HasNoOtherTradingNamesPage, false).success.value
 
             val application = applicationBuilder(userAnswers = Some(answers), registration = Some(registration))
               .overrides(bind[RegistrationValidationService].toInstance(registrationValidationService))
@@ -663,8 +629,11 @@ class RejoinRegistrationControllerSpec extends SpecBase with MockitoSugar with S
         }
       }
     }
+
     ".onPageLoad" -{
+
       "must redirect to Cannot Rejoin Registration Page when there are outstanding returns" in {
+
         val registrationConnector = mock[RegistrationConnector]
         val rejoinRegistrationValidation = mock[RejoinEuRegistrationValidationService]
 

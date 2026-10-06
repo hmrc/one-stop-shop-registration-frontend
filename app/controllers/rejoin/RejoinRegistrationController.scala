@@ -163,7 +163,7 @@ class RejoinRegistrationController @Inject()(
 
   private def getTradingNameRows()(implicit request: AuthenticatedDataRequest[_]): Seq[Option[SummaryListRow]] = {
     val tradingNameSummaryRow = TradingNameSummary.checkAnswersRow(request.userAnswers, RejoinMode)
-    Seq(new HasTradingNameSummary().row(request.userAnswers, RejoinMode).map { sr =>
+    Seq(new HasNoOtherTradingNamesSummary().row(request.userAnswers, RejoinMode).map { sr =>
       if (tradingNameSummaryRow.isDefined) {
         sr.withCssClass("govuk-summary-list__row--no-border")
       } else {
