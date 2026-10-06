@@ -75,7 +75,7 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 hasNoOtherTradingNames.title = Is {0} your only trading name?
-hasNoOtherTradingNames.heading = Is {0} your only trading name
+hasNoOtherTradingNames.heading = Is {0} your only trading name?
 hasNoOtherTradingNames.checkYourAnswersLabel = Is your only trading name
 hasNoOtherTradingNames.error.required = Select no if you use a different trading name
 hasNoOtherTradingNames.change.hidden = is your only trading name
