@@ -15,40 +15,36 @@
  *@
 
 @import views.html.components.ButtonGroup
+@import viewmodels.DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel
+
 @this(
-        layout: templates.Layout,
-        formHelper: FormWithCSRF,
-        button: ButtonGroup
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukTable: GovukTable,
+    button: ButtonGroup
 )
 
-@(euDetails: Seq[EuDetails])(implicit request: Request[_], messages: Messages)
+@(viewModel: DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel, multipleEuDetails: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("deleteAllFixedEstablishment.title"))) {
 
-    <h1 class="govuk-heading-l">@messages("deleteAllFixedEstablishment.heading")</h1>
+  <h1 class="govuk-heading-l">@messages("deleteAllFixedEstablishment.heading")</h1>
 
-    <div class="govuk-hint">@messages("deleteAllFixedEstablishment.paragraph")</div>
+  <div class="govuk-hint">@messages("deleteAllFixedEstablishment.paragraph")</div>
 
-    @for(details <- euDetails) {
-        <dl id="vatContainer" class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
-            <div class="hmrc-add-to-a-list__contents">
-                <dt class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light vat-country">@Html(details.euCountry.name)</dt>
-                <dd class="govuk-summary-list__value">@Html(details.fixedEstablishmentTradingName.getOrElse(""))</dd>
-            </div>
-        </dl>
-    }
+  @govukTable(viewModel.table)
 
-    <div id="changed-name-hint" class="govuk-hint">
-        @if(euDetails.size > 1) {
-            @messages("deleteAllFixedEstablishment.moreThanOneFixedEstablishment")
-        } else {
-            @messages("deleteAllFixedEstablishment.oneFixedEstablishment")
-        }
-    </div>
+  <div id="changed-name-hint" class="govuk-hint">
+  @if(multipleEuDetails) {
+    @messages("deleteAllFixedEstablishment.moreThanOneFixedEstablishment")
+  } else {
+    @messages("deleteAllFixedEstablishment.oneFixedEstablishment")
+  }
+  </div>
 
-   <p class="govuk-body">@Html(messages("deleteAllFixedEstablishment.contactUs"))</p>
+  <p class="govuk-body">@Html(messages("deleteAllFixedEstablishment.contactUs"))</p>
 
-    @formHelper(action = routes.DeleteAllFixedEstablishmentController.onSubmit()) {
-        @button("site.continue", routes.DeleteAllFixedEstablishmentController.onPageLoad().url, AmendMode)
-    }
+  @formHelper(action = routes.DeleteAllFixedEstablishmentController.onSubmit()) {
+    @button("site.continue", routes.DeleteAllFixedEstablishmentController.onPageLoad().url, AmendMode)
+  }
 }

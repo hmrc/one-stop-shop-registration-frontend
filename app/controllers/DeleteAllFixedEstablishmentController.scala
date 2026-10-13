@@ -30,6 +30,7 @@ import repositories.AuthenticatedUserAnswersRepository
 import services.{RegistrationService, RegistrationValidationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FutureSyntax.FutureOps
+import viewmodels.DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel
 import views.html.DeleteAllFixedEstablishmentView
 
 import javax.inject.Inject
@@ -64,7 +65,8 @@ class DeleteAllFixedEstablishmentController @Inject()(
                   _ <- authenticatedUserAnswersRepository.set(originalRegistration)
                 } yield {
                   val euDetails = getEuDetailsForFixedEstablishment(userAnswers)
-                  Ok(view(euDetails))
+                  val viewModel = DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel(euDetails)
+                  Ok(view(viewModel, euDetails.size > 1))
                 }
 
               case Left(error) => val exception = new Exception(s"Error while getting VAT Customer Info $error")

@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import cats.data.Validated.Valid
 import connectors.RegistrationConnector
-import controllers.amend.{routes => amendRoutes}
+import controllers.amend.routes as amendRoutes
 import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
 import models.{Country, Index}
 import org.mockito.ArgumentMatchers.any
@@ -27,13 +27,15 @@ import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.euDetails._
+import pages.euDetails.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import queries.AllEuDetailsQuery
 import repositories.AuthenticatedUserAnswersRepository
 import services.{RegistrationService, RegistrationValidationService}
 import testutils.RegistrationData
+import viewmodels.DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel
 import viewmodels.govuk.SummaryListFluency
 import views.html.DeleteAllFixedEstablishmentView
 
@@ -43,22 +45,24 @@ class DeleteAllFixedEstablishmentControllerSpec extends SpecBase with MockitoSug
 
   private val countryIndex = Index(0)
   private val country = Country.euCountries.head
-  private val euVatDetails = Seq(
+  private val euVatDetails = List(
     EuDetails(
-      country, sellsGoodsToEUConsumers = true, Some(EuConsumerSalesMethod.FixedEstablishment), Some(RegistrationType.VatNumber),
-      vatRegistered = Some(true), None, Some("12345678"), None, None, None, None))
+      euCountry = country,
+      sellsGoodsToEUConsumers = true,
+      sellsGoodsToEUConsumerMethod = Some(EuConsumerSalesMethod.FixedEstablishment),
+      registrationType = Some(RegistrationType.VatNumber),
+      vatRegistered = Some(true),
+      euVatNumber = None,
+      euTaxReference = Some("12345678"),
+      fixedEstablishmentTradingName = Some("Fixed Establishment trading name"),
+      fixedEstablishmentAddress = None,
+      euSendGoodsTradingName = None,
+      euSendGoodsAddress = None))
 
   private val baseUserAnswers =
     basicUserAnswersWithVatInfo
       .set(TaxRegisteredInEuPage, true).success.value
-      .set(EuCountryPage(countryIndex), country).success.value
-      .set(SellsGoodsToEUConsumersPage(countryIndex), true).success.value
-      .set(SellsGoodsToEUConsumerMethodPage(countryIndex), EuConsumerSalesMethod.FixedEstablishment).success.value
-      .set(RegistrationTypePage(countryIndex), RegistrationType.VatNumber).success.value
-      .set(EuVatNumberPage(countryIndex), "12345678").success.value
-      .set(EuSendGoodsTradingNamePage(countryIndex), "Foo").success.value
-      .set(EuSendGoodsAddressPage(countryIndex), arbitraryInternationalAddress.arbitrary.sample.value).success.value
-
+      .set(AllEuDetailsQuery, euVatDetails).success.value
 
   private val registration = RegistrationData.registration
 
@@ -97,9 +101,10 @@ class DeleteAllFixedEstablishmentControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[DeleteAllFixedEstablishmentView]
+        val viewModel = DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel(euVatDetails)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(euVatDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel, false)(request, messages(application)).toString
       }
     }
 
