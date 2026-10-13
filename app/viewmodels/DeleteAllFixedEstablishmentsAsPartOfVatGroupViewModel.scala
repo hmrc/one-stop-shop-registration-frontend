@@ -57,8 +57,6 @@ object DeleteAllFixedEstablishmentsAsPartOfVatGroupViewModel extends Logging {
   }
 
   private def buildTable(allEuDetails: Seq[EuDetails]): Table = {
-    println("HELLO")
-    println(allEuDetails)
 
     val rows = allEuDetails.map { euDetails =>
       euDetails.fixedEstablishmentTradingName.map { companyName =>
