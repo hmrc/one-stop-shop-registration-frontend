@@ -86,7 +86,7 @@ class ChangeYourRegistrationController @Inject()(
         val isValid = validate()(request.request)
 
         val registrationDueForReview: Boolean = if (frontendAppConfig.registrationReviewEnabled) {
-          request.registration.adminUse.changeDate.exists(changeDate => changeDateMoreThanTwoYears(changeDate))
+          request.registration.adminUse.changeDate.exists(changeDate => changeDateMoreThanSixMonths(changeDate))
         } else {
           false
         }
@@ -252,9 +252,9 @@ class ChangeYourRegistrationController @Inject()(
     )
   }
   
-  private def changeDateMoreThanTwoYears(changeDate: LocalDateTime): Boolean = {
-    val twoYearsAgo = LocalDateTime.now(clock).minusYears(2)
+  private def changeDateMoreThanSixMonths(changeDate: LocalDateTime): Boolean = {
+    val sixMonthsAgo = LocalDateTime.now(clock).minusMonths(6)
 
-    changeDate.isBefore(twoYearsAgo)
+    changeDate.isBefore(sixMonthsAgo)
   }
 }
