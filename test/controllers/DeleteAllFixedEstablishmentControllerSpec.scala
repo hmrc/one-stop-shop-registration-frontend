@@ -20,8 +20,8 @@ import base.SpecBase
 import cats.data.Validated.Valid
 import connectors.RegistrationConnector
 import controllers.amend.routes as amendRoutes
+import models.Country
 import models.euDetails.{EuConsumerSalesMethod, EuDetails, RegistrationType}
-import models.{Country, Index}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -43,7 +43,6 @@ import scala.concurrent.Future
 
 class DeleteAllFixedEstablishmentControllerSpec extends SpecBase with MockitoSugar with SummaryListFluency with BeforeAndAfterEach {
 
-  private val countryIndex = Index(0)
   private val country = Country.euCountries.head
   private val euVatDetails = List(
     EuDetails(

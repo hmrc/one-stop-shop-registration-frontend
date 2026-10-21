@@ -207,11 +207,9 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
         }
       }
 
-      "must throw an exception when no VAT info is present" in {
+      "must redirect to Start Amend Journey when no VAT info is present" in {
 
         val answersWithoutVatInfo: UserAnswers = emptyUserAnswers
-
-        val errorMessage: String = "Vat information was not found"
 
         val application = applicationBuilder(userAnswers = Some(answersWithoutVatInfo), registration = Some(registration))
           .build()
@@ -220,10 +218,8 @@ class ChangeYourRegistrationControllerSpec extends SpecBase with MockitoSugar wi
           val request = FakeRequest(GET, amendRoutes.ChangeYourRegistrationController.onPageLoad().url)
           val result = route(application, request).value
 
-          whenReady(result.failed) { exp =>
-            exp `mustBe` a[Exception]
-            exp.getMessage `mustBe` errorMessage
-          }
+          status(result) `mustBe` SEE_OTHER
+          redirectLocation(result).value `mustBe` amendRoutes.StartAmendJourneyController.onPageLoad().url
           verifyNoInteractions(registrationService)
         }
       }
