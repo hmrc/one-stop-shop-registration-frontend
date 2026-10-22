@@ -105,11 +105,9 @@ class ChangeYourRegistrationController @Inject()(
 
               Ok(view(vatRegistrationDetailsList, list, isValid, noAmendmentsWithUnusableStatusCheck, registrationDueForReview, frontendAppConfig.ossYourAccountUrl, AmendMode))
             }
+
           case None =>
-            val errorMessage: String = "Vat information was not found"
-            logger.error(errorMessage)
-            val exception: Exception = new Exception(errorMessage)
-            throw exception
+            Redirect(routes.StartAmendJourneyController.onPageLoad()).toFuture
         }
       }
   }
