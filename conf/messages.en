@@ -972,7 +972,7 @@ cannotRegisterQuarantinedIossTrader.contact = If you believe this is an error, c
 cannotRegisterQuarantinedIossTrader.BTA.link = <a class="govuk-link" href="/business-account">Return to your business tax account</a>
 
 userResearch.heading = Help us improve the service
-userResearch.link.text = Sign up to take part in research about the One Stop Shop service.
+userResearch.link.text = Sign up to take part in research about the One Stop Shop service (opens in a new tab).
 
 revalidateVrnExpired.title = You can no longer register for this service
 revalidateVrnExpired.heading = You can no longer register for this service
