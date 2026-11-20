@@ -16,7 +16,7 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.{commonTextPattern, postcodePattern}
+import forms.Validation.Validation.{commonTextPattern, postcodeCleanerPattern, postcodePattern}
 import forms.mappings.Mappings
 import models.{Country, InternationalAddress}
 import play.api.data.Form
@@ -43,8 +43,7 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
       "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
         .transform[String](value =>
           val trimmed = value.trim
-          val postcodeFormatPattern: String = "[\\s+.:_;=(){}\\[\\]\\-\\^\\*]"
-          val removedExtras = trimmed.replaceAll(postcodeFormatPattern, "")
+          val removedExtras = trimmed.replaceAll(postcodeCleanerPattern, "")
           removedExtras.trim,
           identity
         )
