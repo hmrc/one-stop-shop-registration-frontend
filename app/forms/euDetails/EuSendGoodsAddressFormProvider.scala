@@ -42,6 +42,13 @@ class EuSendGoodsAddressFormProvider @Inject() extends Mappings {
           .verifying(maxLength(35, "euSendGoodsAddress.error.stateOrRegion.length"))
           .verifying(regexp(commonTextPattern, "euSendGoodsAddress.error.stateOrRegion.format"))),
         "postCode" -> optional(text("euSendGoodsAddress.error.postCode.required")
+          .transform[String](value =>
+            val trimmed = value.trim
+            val postcodeFormatPattern: String = "[\\s+.:_;=(){}\\[\\]\\-\\^\\*]"
+            val removedExtras = trimmed.replaceAll(postcodeFormatPattern, "")
+            removedExtras.trim,
+            identity
+          )
           .verifying(firstError(
             maxLength(40, "euSendGoodsAddress.error.postCode.length"),
             regexp(postcodePattern, "euSendGoodsAddress.error.postCode.invalid"))))

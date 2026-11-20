@@ -142,12 +142,22 @@ class EuSendGoodsAddressFormProviderSpec extends StringFieldBehaviours {
     val invalidKey = "euSendGoodsAddress.error.postCode.invalid"
     val maxLength = 40
     val validData = "75700 PARIS CEDEX"
+    val otherValidData = "AB-1234(567)"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
       validData
     )
+
+    "other valid data" - {
+
+      behave like fieldThatBindsValidData(
+        form,
+        fieldName,
+        otherValidData
+      )
+    }
 
     behave like fieldWithMaxLength(
       form,
