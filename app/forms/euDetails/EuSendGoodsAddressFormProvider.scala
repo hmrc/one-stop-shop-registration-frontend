@@ -16,7 +16,7 @@
 
 package forms.euDetails
 
-import forms.Validation.Validation.{commonTextPattern, postcodePattern}
+import forms.Validation.Validation.{commonTextPattern, postcodeCleanerPattern, postcodePattern}
 import forms.mappings.Mappings
 import models.{Country, InternationalAddress}
 import play.api.data.Form
@@ -42,6 +42,11 @@ class EuSendGoodsAddressFormProvider @Inject() extends Mappings {
           .verifying(maxLength(35, "euSendGoodsAddress.error.stateOrRegion.length"))
           .verifying(regexp(commonTextPattern, "euSendGoodsAddress.error.stateOrRegion.format"))),
         "postCode" -> optional(text("euSendGoodsAddress.error.postCode.required")
+          .transform[String](value =>
+            val trimmed = value.trim
+            trimmed.replaceAll(postcodeCleanerPattern, ""),
+            identity
+          )
           .verifying(firstError(
             maxLength(40, "euSendGoodsAddress.error.postCode.length"),
             regexp(postcodePattern, "euSendGoodsAddress.error.postCode.invalid"))))
