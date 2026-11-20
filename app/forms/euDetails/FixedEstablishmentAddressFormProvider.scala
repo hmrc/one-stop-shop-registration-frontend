@@ -43,8 +43,7 @@ class FixedEstablishmentAddressFormProvider @Inject() extends Mappings {
       "postCode" -> optional(text("fixedEstablishmentAddress.error.postCode.required")
         .transform[String](value =>
           val trimmed = value.trim
-          val removedExtras = trimmed.replaceAll(postcodeCleanerPattern, "")
-          removedExtras.trim,
+          trimmed.replaceAll(postcodeCleanerPattern, ""),
           identity
         )
         .verifying(firstError(
