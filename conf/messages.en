@@ -21,6 +21,7 @@ site.tryAgain = Try again
 site.to = to
 site.processing = We are processing your registration.
 site.cancel = Cancel
+site.print = Print this page
 
 date.day = Day
 date.month = Month

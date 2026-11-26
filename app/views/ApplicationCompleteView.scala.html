@@ -16,9 +16,11 @@
 
 @import models.CompositeAccount
 @import uk.gov.hmrc.domain.Vrn
+@import views.html.components.PrintPage
 
 @this(
-        layout: templates.Layout
+        layout: templates.Layout,
+        printPage: PrintPage
 )
 
 @(
@@ -42,6 +44,8 @@
       <h1 class="govuk-panel__title">@messages("applicationComplete.heading")</h1>
       <div class="govuk-panel__body">@Html(messages("applicationComplete.heading.reference", vrn.vrn))</div>
     </div>
+
+    @printPage()
 
     <div class="govuk-body">@Html(messages("applicationComplete.registration.text", organisationName))</div>
 

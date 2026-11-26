@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import views.html.components.CancelAmendRegButton
+@import views.html.components.{CancelAmendRegButton, PrintPage}
 
 @this(
         layout: templates.Layout,
@@ -22,7 +22,8 @@
         govukSummaryList: GovukSummaryList,
         button: CancelAmendRegButton,
         govukButton: GovukButton,
-        govukWarningText: GovukWarningText
+        govukWarningText: GovukWarningText,
+        printPage: PrintPage
 )
 
 @(
@@ -59,6 +60,8 @@
         }
 
         <h1 class="govuk-heading-l">@headingText</h1>
+
+        @printPage()
 
         <h2 class="govuk-heading-m">@messages("vatRegistrationDetails.checkYourAnswers.heading")</h2>
 

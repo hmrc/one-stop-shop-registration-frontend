@@ -15,9 +15,11 @@
  *@
 
 @import models.CompositeAccount
+@import views.html.components.PrintPage
 
 @this(
-        layout: templates.Layout
+        layout: templates.Layout,
+        printPage: PrintPage
 )
 
 @(
@@ -42,8 +44,10 @@
       <div class="govuk-panel__body"> @Html(messages("rejoinComplete.ossReference", vrn))</div>
     </div>
 
+    @printPage()
+
     <p class="govuk-body">
-    @Html(messages("rejoinComplete.organisationName", organisationName))
+        @Html(messages("rejoinComplete.organisationName", organisationName))
     </p>
 
     @if(compositeAccount.nonEmpty && hasUpdatedRegistration) {
